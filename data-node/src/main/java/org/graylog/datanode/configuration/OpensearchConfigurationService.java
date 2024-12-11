@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.configuration;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
@@ -24,10 +23,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
 
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -41,7 +40,7 @@ import java.util.stream.Collectors;
 public class OpensearchConfigurationService extends AbstractIdleService {
     private final Configuration localConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
-    private final Set<OpensearchConfigurationBean> opensearchConfigurationBeans;
+    private final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans;
 
     /**
      * This configuration won't survive datanode restart. But it can be repeatedly provided to the managed opensearch
@@ -54,7 +53,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     @Inject
     public OpensearchConfigurationService(final Configuration localConfiguration,
                                           final DatanodeConfiguration datanodeConfiguration,
-                                          final Set<OpensearchConfigurationBean> opensearchConfigurationBeans,
+                                          final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans,
                                           final EventBus eventBus) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
@@ -104,8 +103,8 @@ public class OpensearchConfigurationService extends AbstractIdleService {
 
     private OpensearchConfiguration get() {
 
-        final List<OpensearchConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
-                .map(bean -> bean.buildConfigurationPart(new ConfigurationBuildParams(trustedCertificates, transientConfiguration)))
+        final List<DatanodeConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
+                .map(bean -> bean.buildConfigurationPart(new OpensearchConfigurationParams(trustedCertificates, transientConfiguration)))
                 .collect(Collectors.toList());
 
         return new OpensearchConfiguration(

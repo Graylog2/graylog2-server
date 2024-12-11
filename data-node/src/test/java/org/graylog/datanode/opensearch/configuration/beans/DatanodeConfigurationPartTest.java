@@ -21,16 +21,18 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-class OpensearchConfigurationPartTest {
+class DatanodeConfigurationPartTest {
 
     @Test
     void testConfigBuild() {
-        final OpensearchConfigurationPart configurationPart = OpensearchConfigurationPart.builder()
+        final DatanodeConfigurationPart configurationPart = DatanodeConfigurationPart.builder()
                 .addNodeRole("cluster_manager")
                 .addNodeRole("data")
                 .addNodeRole("search")
                 .keystoreItems(Collections.singletonMap("foo", "bar"))
                 .properties(Collections.singletonMap("reindex.remote.allowlist", "localhost:9201"))
+                .systemProperty("file.encoding", "utf-8")
+                .systemProperty("java.home", "/jdk")
                 .build();
 
         Assertions.assertThat(configurationPart.nodeRoles())
@@ -44,5 +46,10 @@ class OpensearchConfigurationPartTest {
         Assertions.assertThat(configurationPart.properties())
                 .hasSize(1)
                 .containsEntry("reindex.remote.allowlist", "localhost:9201");
+
+        Assertions.assertThat(configurationPart.systemProperties())
+                .hasSize(2)
+                .containsEntry("file.encoding", "utf-8")
+                .containsEntry("java.home", "/jdk");
     }
 }

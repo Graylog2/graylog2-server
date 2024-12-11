@@ -25,9 +25,9 @@ import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.configuration.variants.OpensearchCertificatesProvider;
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.opensearch.configuration.beans.files.KeystoreConfigFile;
 import org.graylog.datanode.opensearch.configuration.beans.files.OpensearchSecurityConfigurationFile;
 import org.graylog.security.certutil.CertConstants;
@@ -48,7 +48,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class OpensearchSecurityConfigurationBean implements OpensearchConfigurationBean {
+public class OpensearchSecurityConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchSecurityConfigurationBean.class);
 
@@ -86,9 +86,9 @@ public class OpensearchSecurityConfigurationBean implements OpensearchConfigurat
     }
 
     @Override
-    public OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams configurationBuildParams) {
+    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams opensearchConfigurationParams) {
 
-        final OpensearchConfigurationPart.Builder configurationBuilder = OpensearchConfigurationPart.builder();
+        final DatanodeConfigurationPart.Builder configurationBuilder = DatanodeConfigurationPart.builder();
 
         Optional<OpensearchCertificates> opensearchCertificates = opensearchCertificatesProviders.stream()
                 .filter(s -> s.isConfigured(localConfiguration))
@@ -100,7 +100,7 @@ public class OpensearchSecurityConfigurationBean implements OpensearchConfigurat
         final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
         final TruststoreCreator truststoreCreator = TruststoreCreator.newDefaultJvm()
-                .addCertificates(configurationBuildParams.trustedCertificates());
+                .addCertificates(opensearchConfigurationParams.trustedCertificates());
 
         final Optional<KeystoreInformation> httpCert = opensearchCertificates
                 .map(OpensearchCertificates::getHttpCertificate);

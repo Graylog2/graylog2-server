@@ -21,7 +21,7 @@ import jakarta.annotation.Nonnull;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
 import org.graylog.datanode.opensearch.configuration.beans.files.YamlConfigFile;
 import org.graylog.datanode.process.Environment;
@@ -47,11 +47,11 @@ public class OpensearchConfiguration {
     private final OpensearchDistribution opensearchDistribution;
     private final String hostname;
     private final int httpPort;
-    private final List<OpensearchConfigurationPart> configurationParts;
+    private final List<DatanodeConfigurationPart> configurationParts;
     private final OpensearchConfigurationDir opensearchConfigurationDir;
     private final DatanodeDirectories datanodeDirectories;
 
-    public OpensearchConfiguration(OpensearchDistribution opensearchDistribution, DatanodeDirectories datanodeDirectories, String hostname, int httpPort, List<OpensearchConfigurationPart> configurationParts) {
+    public OpensearchConfiguration(OpensearchDistribution opensearchDistribution, DatanodeDirectories datanodeDirectories, String hostname, int httpPort, List<DatanodeConfigurationPart> configurationParts) {
         this.opensearchDistribution = opensearchDistribution;
         this.hostname = hostname;
         this.httpPort = httpPort;
@@ -72,7 +72,7 @@ public class OpensearchConfiguration {
 
         List<String> javaOpts = new LinkedList<>();
 
-        configurationParts.stream().map(OpensearchConfigurationPart::javaOpts)
+        configurationParts.stream().map(DatanodeConfigurationPart::javaOpts)
                 .forEach(javaOpts::addAll);
 
         env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
@@ -92,14 +92,14 @@ public class OpensearchConfiguration {
      * Are there any {@link  org.graylog.datanode.configuration.variants.OpensearchCertificatesProvider} configured?
      */
     public boolean securityConfigured() {
-        return configurationParts.stream().anyMatch(OpensearchConfigurationPart::securityConfigured);
+        return configurationParts.stream().anyMatch(DatanodeConfigurationPart::securityConfigured);
     }
 
 
     public Map<String, String> getKeystoreItems() {
         final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         configurationParts.stream()
-                .map(OpensearchConfigurationPart::keystoreItems)
+                .map(DatanodeConfigurationPart::keystoreItems)
                 .forEach(builder::putAll);
 
         return builder.build();
@@ -107,7 +107,7 @@ public class OpensearchConfiguration {
 
     public KeyStore trustStore() {
         return configurationParts.stream()
-                .map(OpensearchConfigurationPart::trustStore)
+                .map(DatanodeConfigurationPart::trustStore)
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("This should not happen, truststore should always be present"));
@@ -115,14 +115,14 @@ public class OpensearchConfiguration {
 
     public Optional<KeystoreInformation> httpCertificate() {
         return configurationParts.stream()
-                .map(OpensearchConfigurationPart::httpCertificate)
+                .map(DatanodeConfigurationPart::httpCertificate)
                 .filter(Objects::nonNull)
                 .findFirst();
     }
 
     public Optional<KeystoreInformation> transportCertificate() {
         return configurationParts.stream()
-                .map(OpensearchConfigurationPart::transportCertificate)
+                .map(DatanodeConfigurationPart::transportCertificate)
                 .filter(Objects::nonNull)
                 .findFirst();
     }
@@ -147,7 +147,7 @@ public class OpensearchConfiguration {
         config.put("node.roles", buildRolesList());
 
         configurationParts.stream()
-                .map(OpensearchConfigurationPart::properties)
+                .map(DatanodeConfigurationPart::properties)
                 .forEach(config::putAll);
 
         // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,

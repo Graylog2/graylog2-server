@@ -24,9 +24,9 @@ import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -53,7 +53,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
@@ -65,8 +65,8 @@ class SearchableSnapshotsConfigurationBeanTest {
                 .containsKeys("s3.client.default.endpoint", "node.search.cache.size");
     }
 
-    private ConfigurationBuildParams emptyBuildParams() {
-        return new ConfigurationBuildParams(Collections.emptyList(), Collections.emptyMap());
+    private OpensearchConfigurationParams emptyBuildParams() {
+        return new OpensearchConfigurationParams(Collections.emptyList(), Collections.emptyMap());
     }
 
     @Test
@@ -83,7 +83,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
@@ -109,7 +109,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .isEmpty(); // no search role should be provided

@@ -17,9 +17,9 @@
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import jakarta.annotation.Nonnull;
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.opensearch.configuration.beans.files.ConfigFile;
 import org.graylog.datanode.opensearch.configuration.beans.files.InputStreamConfigFile;
 
@@ -41,11 +41,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class OpensearchDefaultConfigFilesBean implements OpensearchConfigurationBean {
+public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     @Override
-    public OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams trustedCertificates) {
-        return OpensearchConfigurationPart.builder()
+    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
+        return DatanodeConfigurationPart.builder()
                 .configFiles(collectConfigFiles())
                 .build();
     }

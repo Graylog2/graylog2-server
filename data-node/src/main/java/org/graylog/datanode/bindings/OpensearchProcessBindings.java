@@ -18,6 +18,7 @@ package org.graylog.datanode.bindings;
 
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
@@ -29,9 +30,10 @@ import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.OpensearchProcessImpl;
 import org.graylog.datanode.opensearch.OpensearchProcessService;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpaceProvider;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchClusterConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchCommonConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchDefaultConfigFilesBean;
@@ -65,7 +67,8 @@ public class OpensearchProcessBindings extends AbstractModule {
 
 
         //opensearch configuration beans. The order of the beans is important here!
-        Multibinder<OpensearchConfigurationBean> opensearchConfigurationBeanMultibinder = Multibinder.newSetBinder(binder(), OpensearchConfigurationBean.class);
+
+        Multibinder<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeanMultibinder = Multibinder.newSetBinder(binder(), new TypeLiteral<DatanodeConfigurationBean<OpensearchConfigurationParams>>() {});
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchDefaultConfigFilesBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchCommonConfigurationBean.class).asEagerSingleton();
         opensearchConfigurationBeanMultibinder.addBinding().to(OpensearchCommonConfigurationBean.class).asEagerSingleton();

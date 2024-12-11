@@ -19,9 +19,9 @@ package org.graylog.datanode.opensearch.configuration.beans.impl;
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.opensearch.configuration.beans.files.TextConfigFile;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class OpensearchClusterConfigurationBean implements OpensearchConfigurationBean {
+public class OpensearchClusterConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     public static final Path UNICAST_HOSTS_FILE = Path.of("unicast_hosts.txt");
 
@@ -46,7 +46,7 @@ public class OpensearchClusterConfigurationBean implements OpensearchConfigurati
     }
 
     @Override
-    public OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams trustedCertificates) {
+    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
         ImmutableMap.Builder<String, String> properties = ImmutableMap.builder();
 
         properties.put("network.bind_host", localConfiguration.getBindAddress());
@@ -81,7 +81,7 @@ public class OpensearchClusterConfigurationBean implements OpensearchConfigurati
         // TODO: why do we have this configured?
         properties.put("node.max_local_storage_nodes", "3");
 
-        return OpensearchConfigurationPart.builder()
+        return DatanodeConfigurationPart.builder()
                 .properties(properties.build())
                 .withConfigFile(seedHostFile())
                 .build();

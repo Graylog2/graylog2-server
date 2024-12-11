@@ -24,10 +24,10 @@ import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
  * If there is neither S3 nor local filesystem snapshot configuration, both search role and cache are disabled,
  * preventing unnecessary disk space consumption on the node.
  */
-public class SearchableSnapshotsConfigurationBean implements OpensearchConfigurationBean {
+public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchableSnapshotsConfigurationBean.class);
 
@@ -62,17 +62,17 @@ public class SearchableSnapshotsConfigurationBean implements OpensearchConfigura
     }
 
     @Override
-    public OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams trustedCertificates) {
+    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
         if (snapshotsAreEnabled()) {
             validateUsableSpace();
-            return OpensearchConfigurationPart.builder()
+            return DatanodeConfigurationPart.builder()
                     .properties(properties())
                     .keystoreItems(keystoreItems())
                     .addNodeRole(SEARCH_NODE_ROLE)
                     .build();
         } else {
             LOG.info("Opensearch snapshots not configured, skipping search role and cache configuration.");
-            return OpensearchConfigurationPart.builder().build();
+            return DatanodeConfigurationPart.builder().build();
         }
     }
 

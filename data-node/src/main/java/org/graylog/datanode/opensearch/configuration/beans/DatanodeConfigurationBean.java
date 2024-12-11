@@ -16,8 +16,6 @@
  */
 package org.graylog.datanode.opensearch.configuration.beans;
 
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
-
-public interface OpensearchConfigurationBean {
-    OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams trustedCertificates);
+public interface DatanodeConfigurationBean<T extends ConfigurationBuildParams> {
+    DatanodeConfigurationPart buildConfigurationPart(T trustedCertificates);
 }

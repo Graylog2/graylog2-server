@@ -21,13 +21,13 @@ import jakarta.inject.Inject;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.opensearch.configuration.ConfigurationBuildParams;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationBean;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.opensearch.configuration.beans.DatanodeConfigurationPart;
 
 import java.util.Map;
 
-public class OpensearchCommonConfigurationBean implements OpensearchConfigurationBean {
+public class OpensearchCommonConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
     private final Configuration localConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
@@ -39,8 +39,8 @@ public class OpensearchCommonConfigurationBean implements OpensearchConfiguratio
     }
 
     @Override
-    public OpensearchConfigurationPart buildConfigurationPart(ConfigurationBuildParams buildParams) {
-        return OpensearchConfigurationPart.builder()
+    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams buildParams) {
+        return DatanodeConfigurationPart.builder()
                 .properties(commonOpensearchConfig(buildParams))
                 .nodeRoles(localConfiguration.getNodeRoles())
                 .javaOpt("-Xms%s".formatted(datanodeConfiguration.opensearchHeap()))
@@ -49,7 +49,7 @@ public class OpensearchCommonConfigurationBean implements OpensearchConfiguratio
                 .build();
     }
 
-    private Map<String, String> commonOpensearchConfig(ConfigurationBuildParams buildParams) {
+    private Map<String, String> commonOpensearchConfig(OpensearchConfigurationParams buildParams) {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         localConfiguration.getOpensearchNetworkHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
