@@ -62,7 +62,7 @@ const deletePipeline = async (pipelineId: string) => {
 const deleteRouting = async (params: RoutingParams) => {
   const url = qualifyUrl(ApiRoutes.PipelinesController.deleteRouting().url);
 
-  return fetch('DELETE', url, params);
+  return fetch('PUT', url, params);
 };
 
 const usePipelineRoutingMutation = () => {
