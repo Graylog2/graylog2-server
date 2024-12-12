@@ -20,6 +20,7 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.rabbitmq.client.ConnectionFactory;
@@ -39,14 +40,14 @@ import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Named;
-
 import java.io.IOException;
 import java.time.Duration;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -76,9 +77,9 @@ public class AmqpTransport extends ThrottleableTransport2 {
     private final Configuration configuration;
     private final EventBus eventBus;
     private final MetricRegistry localRegistry;
+    private final NodeId nodeId;
     private final EncryptedValueService encryptedValueService;
-    private final ScheduledExecutorService scheduler;
-    private final ScheduledExecutorService amqpScheduler;
+    private ScheduledExecutorService amqpScheduler;
 
     private AmqpConsumer consumer;
 
@@ -89,16 +90,14 @@ public class AmqpTransport extends ThrottleableTransport2 {
     public AmqpTransport(@Assisted Configuration configuration,
                          EventBus eventBus,
                          LocalMetricRegistry localRegistry,
-                         EncryptedValueService encryptedValueService,
-                         @Named("daemonScheduler") ScheduledExecutorService scheduler,
-                         @Named("AMQP Executor") ScheduledExecutorService amqpScheduler) {
+                         NodeId nodeId,
+                         EncryptedValueService encryptedValueService) {
         super(eventBus, configuration);
         this.configuration = configuration;
         this.eventBus = eventBus;
         this.localRegistry = localRegistry;
+        this.nodeId = nodeId;
         this.encryptedValueService = encryptedValueService;
-        this.scheduler = scheduler;
-        this.amqpScheduler = amqpScheduler;
 
         localRegistry.register("read_bytes_1sec", new Gauge<Long>() {
             @Override
@@ -166,16 +165,38 @@ public class AmqpTransport extends ThrottleableTransport2 {
 
         consumer = new AmqpConsumer(
                 heartbeatTimeout,
+                nodeId,
                 input,
                 configuration,
-                scheduler,
                 inputFailureRecorder,
                 this,
                 encryptedValueService,
                 connectionRecoveryInterval()
         );
+        localRegistry.registerAll(consumer.getMetricSet());
+        if (amqpScheduler == null) {
+            this.amqpScheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("amqp-input-" + input.getId() + "-executor-%d").build());
+        }
         eventBus.register(this);
-        runConsumer();
+        try {
+            runConsumer();
+        } catch (Exception e) {
+            stopAmqpScheduler();
+            throw e;
+        }
+    }
+
+    private void stopAmqpScheduler() {
+        if (amqpScheduler != null) {
+            amqpScheduler.shutdown();
+            try {
+                if (!amqpScheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                    LOG.warn("Timeout shutting down AMQP scheduler thread");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     private void runConsumer() {
@@ -212,8 +233,12 @@ public class AmqpTransport extends ThrottleableTransport2 {
 
     @Override
     public void doStop() {
-        stopConsumer();
-        eventBus.unregister(this);
+        try {
+            stopConsumer();
+        } finally {
+            eventBus.unregister(this);
+            stopAmqpScheduler();
+        }
     }
 
     private void stopConsumer() {
