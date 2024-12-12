@@ -132,7 +132,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             LOG.info("OpenSearch starting up");
             checkWritePreflightFinishedOnInsecureStartup();
             try {
-                lockfileCheck.checkDatanodeLock(config.datanodeDirectories().getDataTargetDir());
+                lockfileCheck.checkDatanodeLock(config.getDatanodeDirectories().getDataTargetDir());
                 if (stateMachine.isInState(OpensearchState.WAITING_FOR_CONFIGURATION) && !this.processAutostart) {
                     stateMachine.fire(OpensearchEvent.PROCESS_PREPARED);
                     this.processAutostart = true; // reset to default

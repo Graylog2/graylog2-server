@@ -159,7 +159,7 @@ const StreamActions = ({
 
   return (
     <ButtonToolbar>
-      <IfPermitted permissions={`streams:edit:${stream.id}`}>
+      <IfPermitted permissions={`streams:read:${stream.id}`}>
         <LinkContainer to={Routes.stream_view(stream.id)}>
           <Button disabled={isNotEditable}
                   bsStyle="primary"
