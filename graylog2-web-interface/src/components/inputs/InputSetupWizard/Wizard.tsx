@@ -118,7 +118,8 @@ const Wizard = ({ show, input, onClose }: Props) => {
   if (!show || orderedSteps.length < 1) return null;
 
   return (
-    <Modal show onHide={onClose}>
+    <Modal show onHide={onClose} backdrop={false}>
+      <Modal.Header closeButton>Input Setup Wizard</Modal.Header>
       <Modal.Body>
         <InputSetupWizardStepsProvider>
           <CommonWizard activeStep={activeStep}
