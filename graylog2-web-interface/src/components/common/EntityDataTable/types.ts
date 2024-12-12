@@ -72,3 +72,10 @@ export type ExpandedSectionRenderer<Entity> = {
   actions?: (entity: Entity) => React.ReactNode,
   disableHeader?: boolean,
 }
+
+export type DefaultLayout = {
+  entityTableId: string,
+  defaultSort: Sort,
+  defaultDisplayedAttributes: Array<string>
+  defaultPageSize: number,
+}
