@@ -16,14 +16,14 @@
  */
 import React from 'react';
 
-import type useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
 import useNonDisplayedAttributes from 'components/events/events/hooks/useNonDisplayedAttributes';
+import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
 type Props = {
-  defaultLayout: Parameters<typeof useTableLayout>[0],
+  defaultLayout: DefaultLayout,
   event: Event,
 }
 
