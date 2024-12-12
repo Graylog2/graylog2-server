@@ -16,9 +16,7 @@
  */
 package org.graylog.datanode.bootstrap;
 
-import com.github.rvesse.airline.annotations.Option;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -31,32 +29,19 @@ import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.bindings.OpensearchProcessBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
-import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog.datanode.bootstrap.preflight.PreflightClusterConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
-import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
-import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
-import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.shared.bindings.FreshInstallDetectionModule;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
-import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.jsoftbiz.utils.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -64,58 +49,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-
-public abstract class ServerBootstrap extends CmdLineTool {
-    private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
-    private boolean isFreshInstallation;
+public abstract class DatanodeBootstrap extends AbstractNodeCommand {
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeBootstrap.class);
     protected Configuration configuration;
 
-    protected ServerBootstrap(String commandName, Configuration configuration) {
-        super(commandName);
+    protected DatanodeBootstrap(String commandName, Configuration configuration) {
+        super(commandName, configuration);
         this.commandName = commandName;
         this.configuration = configuration;
     }
 
-    @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog DataNode")
-    private String pidFile = TMPDIR + FILE_SEPARATOR + "datanode.pid";
-
-    @Option(name = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
-    private boolean noPidFile = false;
-
     protected abstract void startNodeRegistration(Injector injector);
-
-    public String getPidFile() {
-        return pidFile;
-    }
-
-    public boolean isNoPidFile() {
-        return noPidFile;
-    }
-
-    private boolean isFreshInstallation() {
-        return isFreshInstallation;
-    }
-
-    private void registerFreshInstallation() {
-        this.isFreshInstallation = true;
-    }
-
-    @Override
-    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, Configuration configuration) {
-        super.beforeStart(tlsProtocolsConfiguration, configuration);
-
-        // Do not use a PID file if the user requested not to
-        if (!isNoPidFile()) {
-            savePidFile(getPidFile());
-        }
-        // This needs to run before the first SSLContext is instantiated,
-        // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings(tlsProtocolsConfiguration);
-
-        // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults(configuration);
-    }
 
     @Override
     protected void beforeInjectorCreation(Set<Plugin> plugins) {
@@ -128,40 +72,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
             return;
         }
 
-        runMongoPreflightCheck();
-
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
-        preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
         getPreflightInjector(preflightCheckModules).getInstance(PreflightCheckService.class).runChecks();
-    }
-
-    private void runMongoPreflightCheck() {
-        // The MongoDBPreflightCheck is not run via the PreflightCheckService,
-        // because it also detects whether we are running on a fresh Graylog installation
-        final Injector injector = getMongoPreFlightInjector();
-        final MongoDBPreflightCheck mongoDBPreflightCheck = injector.getInstance(MongoDBPreflightCheck.class);
-        try {
-            mongoDBPreflightCheck.runCheck();
-        } catch (PreflightCheckException e) {
-            LOG.error("Preflight check failed with error: {}", e.getLocalizedMessage());
-            throw e;
-        }
-
-        if (mongoDBPreflightCheck.isFreshInstallation()) {
-            registerFreshInstallation();
-        }
-    }
-
-    private Injector getMongoPreFlightInjector() {
-        return Guice.createInjector(
-                new IsDevelopmentBindings(),
-                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
-                new ConfigurationModule(configuration),
-                new DatanodeConfigurationBindings()
-
-        );
     }
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
@@ -180,24 +94,13 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 });
     }
 
-    private void setNettyNativeDefaults(Configuration configuration) {
-        // Give netty a better spot than /tmp to unpack its tcnative libraries
-        if (System.getProperty("io.netty.native.workdir") == null) {
-            System.setProperty("io.netty.native.workdir", configuration.getNativeLibDir().toAbsolutePath().toString());
-        }
-        // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
-        if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
-            System.setProperty("io.netty.native.deleteLibAfterLoading", "false");
-        }
-    }
-
     @Override
     protected void startCommand() {
         final String systemInformation = Tools.getSystemInformation();
 
         final OS os = OS.getOs();
 
-        LOG.info("Graylog {} {} starting up", commandName, version);
+        LOG.info("Graylog Data Node {} starting up (command: {})", version, commandName);
         LOG.info("JRE: {}", systemInformation);
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());
@@ -247,33 +150,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
         }
     }
 
-    public void runMigrations() {
-        LOG.info("Running {} migrations...", 0);
-    }
-
-    protected void savePidFile(final String pidFile) {
-        final String pid = Tools.getPID();
-        final Path pidFilePath = Paths.get(pidFile);
-        pidFilePath.toFile().deleteOnExit();
-
-        try {
-            if (isNullOrEmpty(pid) || "unknown".equals(pid)) {
-                throw new Exception("Could not determine PID.");
-            }
-
-            Files.write(pidFilePath, pid.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW, LinkOption.NOFOLLOW_LINKS);
-        } catch (Exception e) {
-            LOG.error("Could not write PID file: " + e.getMessage(), e);
-            System.exit(1);
-        }
-    }
-
     @Override
     protected List<Module> getSharedBindingsModules() {
         final List<Module> result = super.getSharedBindingsModules();
-        result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
-        result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new OpensearchProcessBindings());
         result.add(new DatanodeConfigurationBindings());
