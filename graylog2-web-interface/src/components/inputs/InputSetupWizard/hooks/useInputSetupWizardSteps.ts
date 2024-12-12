@@ -14,18 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext } from 'react';
 
-import { Row, Col } from 'components/bootstrap';
+import InputSetupWizardStepsContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardStepsContext';
 
-const CreateStream = () => (
-  <Row>
-    <Col md={12}>
-      <h3>
-        Create new stream
-      </h3>
-    </Col>
-  </Row>
-);
+const useInputSetupWizardSteps = () => {
+  const inputSetupWizardSteps = useContext(InputSetupWizardStepsContext);
 
-export default CreateStream;
+  if (!inputSetupWizardSteps) {
+    throw new Error('useInputSetupWizardSteps hook needs to be used inside InputSetupWizardContextSteps.Provider');
+  }
+
+  return inputSetupWizardSteps;
+};
+
+export default useInputSetupWizardSteps;

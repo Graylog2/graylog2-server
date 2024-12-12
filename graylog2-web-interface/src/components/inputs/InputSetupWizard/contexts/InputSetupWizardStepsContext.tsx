@@ -14,22 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 
-import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
-import Wizard from './Wizard';
-import type { WizardData } from './types';
+import { singleton } from 'logic/singleton';
+import type { StepsData } from 'components/inputs/InputSetupWizard/types';
 
-type Props = {
-  show: boolean,
-  input: WizardData['input'],
-  onClose: () => void,
-}
+type InputSetupWizardStepsContextType = {
+  stepsData: StepsData,
+  setStepsData: (stepsData: StepsData) => void,
+};
 
-const InputSetupWizard = ({ show, input, onClose }: Props) => (
-  <InputSetupWizardProvider>
-    <Wizard show={show} input={input} onClose={onClose} />
-  </InputSetupWizardProvider>
-);
+const InputSetupWizardStepsContext = React.createContext<InputSetupWizardStepsContextType | undefined>(undefined);
 
-export default InputSetupWizard;
+export default singleton('contexts.InputSetupWizardStepsContext', () => InputSetupWizardStepsContext);
