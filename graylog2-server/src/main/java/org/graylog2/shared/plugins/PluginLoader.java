@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.plugins;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableSet;
@@ -59,11 +60,7 @@ public class PluginLoader {
     // when nodeType is set, only plugins annotated for this specific node type will be loaded.
     // if it is not set, all plugins without the SpecificNodePlugin annotation will be loaded.
     private final NodeType nodeType;
-
-    public PluginLoader(File pluginDir, ChainingClassLoader classLoader) {
-        this(pluginDir, classLoader, null);
-    }
-
+    
     public PluginLoader(File pluginDir, ChainingClassLoader classLoader, NodeType nodeType) {
         this.pluginDir = requireNonNull(pluginDir);
         this.classLoader = requireNonNull(classLoader);
@@ -91,7 +88,8 @@ public class PluginLoader {
         return ImmutableSet.copyOf(filterPlugins(ServiceLoader.load(Plugin.class, classLoader)));
     }
 
-    private Iterable<Plugin> filterPlugins(ServiceLoader<Plugin> plugins) {
+    @VisibleForTesting
+    Iterable<Plugin> filterPlugins(ServiceLoader<Plugin> plugins) {
         if (nodeType != null) {
             return plugins.stream()
                     .map(ServiceLoader.Provider::get)
