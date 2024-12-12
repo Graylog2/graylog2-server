@@ -78,9 +78,9 @@ const INITIAL_DATA = {
  */
 const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   actionsCellWidth = 160, columnsOrder, entityActions, tableLayout, fetchEntities, keyFn,
-  humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
-  expandedSectionsRenderer, bulkSelection, additionalAttributes = [],
-  entityAttributesAreCamelCase, topRightCol, searchPlaceholder, fetchOptions: reactQueryOptions,
+  humanName, columnRenderers, queryHelpComponent = undefined, filterValueRenderers = undefined,
+  expandedSectionsRenderer = undefined, bulkSelection = undefined, additionalAttributes = [],
+  entityAttributesAreCamelCase, topRightCol = undefined, searchPlaceholder = undefined, fetchOptions: reactQueryOptions = undefined,
 }: Props<T, M>) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
