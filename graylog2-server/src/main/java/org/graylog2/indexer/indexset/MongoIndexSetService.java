@@ -201,7 +201,12 @@ public class MongoIndexSetService implements IndexSetService {
         if (!isDeletable(id)) {
             return 0;
         }
-        int removedEntries = scopedEntityMongoUtils.deleteById(id) ? 1 : 0;
+        int removedEntries;
+        try {
+            removedEntries = scopedEntityMongoUtils.deleteById(id) ? 1 : 0;
+        } catch (IllegalArgumentException e) {
+            return 0;
+        }
         if (removedEntries > 0) {
             final IndexSetDeletedEvent deletedEvent = IndexSetDeletedEvent.create(id.toHexString());
             clusterEventBus.post(deletedEvent);
