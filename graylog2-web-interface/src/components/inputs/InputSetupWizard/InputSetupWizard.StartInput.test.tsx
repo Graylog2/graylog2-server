@@ -157,9 +157,6 @@ const updateRoutingUrlRegEx = /.+(system\/pipelines\/pipeline\/routing)/i;
 const createStreamUrl = '/streams';
 const startStreamUrl = (streamId) => `/streams/${streamId}/resume`;
 const createPipelineUrlRegEx = /.+(system\/pipelines\/pipeline)/i;
-const deleteStreamUrl = (streamId) => `/streams/${streamId}`;
-const deletePipelineUrl = (pipelineId) => `/system/pipelines/pipeline/${pipelineId}`;
-const deleteRoutingRuleUrl = (ruleId) => `/system/pipelines/rule/${ruleId}`;
 
 const newStreamConfig = {
   description: 'Wingardium new stream',
