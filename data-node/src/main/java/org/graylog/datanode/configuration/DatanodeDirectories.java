@@ -17,7 +17,6 @@
 package org.graylog.datanode.configuration;
 
 import jakarta.annotation.Nonnull;
-import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -32,6 +31,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * This is a collection of pointers to directories used to store data, logs and configuration of the managed opensearch.
@@ -39,6 +39,11 @@ import java.util.Set;
 public class DatanodeDirectories {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDirectories.class);
+
+    /**
+     * The execute bit for directories means that owner can traverse these and access their content.
+     */
+    protected static final FileAttribute<Set<PosixFilePermission>> DIRECTORY_PERMISSIONS = PosixFilePermissions.asFileAttribute(Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_EXECUTE));
 
     private final Path dataTargetDir;
     private final Path logsTargetDir;
@@ -91,10 +96,6 @@ public class DatanodeDirectories {
         return dataTargetDir.toAbsolutePath();
     }
 
-    public String getDataTargetDirSpace() {
-        return FileUtils.byteCountToDisplaySize(dataTargetDir.toFile().getFreeSpace());
-    }
-
     /**
      * This directory is used by the managed opensearch to store its logs in it.
      * Read-write permissions required.
@@ -102,11 +103,6 @@ public class DatanodeDirectories {
     public Path getLogsTargetDir() {
         return logsTargetDir.toAbsolutePath();
     }
-
-    public String getLogsTargetDirSpace() {
-        return FileUtils.byteCountToDisplaySize(logsTargetDir.toFile().getFreeSpace());
-    }
-
 
     /**
      * This directory is provided by system admin to the datanode. We read our configuration from this location,
@@ -129,52 +125,42 @@ public class DatanodeDirectories {
     /**
      * This directory is used by us to store all runtime-generated configuration of datanode. This
      * could be truststores, private keys, certificates and other generated config files.
-     * We also synchronize and generate opensearch configuration into a subdir of this dir, see {@link #getOpensearchProcessConfigurationDir()}
+     * We also synchronize and generate opensearch configuration into a subdir of this dir, see {@link #createUniqueOpensearchProcessConfigurationDir()}
      * Read-write permissions required.
      */
     public Path getConfigurationTargetDir() {
         return configurationTargetDir.toAbsolutePath();
     }
 
-    public String getConfigurationTargetDirSpace() {
-        return FileUtils.byteCountToDisplaySize(configurationTargetDir.toFile().getFreeSpace());
-    }
-
-    public Path createConfigurationFile(Path relativePath) throws IOException {
-        final Path resolvedPath = getConfigurationTargetDir().resolve(relativePath);
-        return createRestrictedAccessFile(resolvedPath);
-    }
-
     @Nonnull
-    private static Path createRestrictedAccessFile(Path resolvedPath) throws IOException {
+    static Path createRestrictedAccessFile(Path resolvedPath) throws IOException {
         Files.deleteIfExists(resolvedPath);
         final Set<PosixFilePermission> permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
         final FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
         return Files.createFile(resolvedPath, fileAttributes);
     }
 
+
     /**
      * This is a subdirectory of {@link #getConfigurationTargetDir()}. It's used by us to synchronize and generate opensearch
      * configuration. Opensearch is then instructed to accept this dir as its base configuration dir (OPENSEARCH_PATH_CONF env property).
-     * @see org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync
+      * Opensearch configuration is always regenerated during runtime, so the target dir may be temp and deleted when
+     * the JVM terminates. This prevents concurrency collisions, outdated files, need to remove existing but not needed.
      */
-    public Path getOpensearchProcessConfigurationDir() {
-        return getConfigurationTargetDir().resolve("opensearch");
+    public OpensearchConfigurationDir createUniqueOpensearchProcessConfigurationDir() {
+        final Path configRootDir = getConfigurationTargetDir();
+        try {
+            final Path opensearchConfigDir = Files.createTempDirectory(configRootDir, "opensearch", DIRECTORY_PERMISSIONS);
+            // the process configuration dir can be safely removed when this JVM terminates. It will be generated
+            // again next time we'll start a process.
+            Runtime.getRuntime().addShutdownHook(new ConfigDirRemovalThread(opensearchConfigDir));
+            return new OpensearchConfigurationDir(opensearchConfigDir);
+        } catch (IOException e) {
+            throw new OpensearchConfigurationException("Failed to create opensearch configuration directory", e);
+        }
     }
 
-    public Path createOpensearchProcessConfigurationDir() throws IOException {
-        final Path dir = getOpensearchProcessConfigurationDir();
-        // TODO: should we always delete existing process configuration dir and recreate it here? IMHO yes
-        final Set<PosixFilePermission> permissions = Set.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);
-        final FileAttribute<Set<PosixFilePermission>> fileAttributes = PosixFilePermissions.asFileAttribute(permissions);
-        Files.createDirectories(dir, fileAttributes);
-        return dir;
-    }
 
-    public Path createOpensearchProcessConfigurationFile(Path relativePath) throws IOException {
-        final Path resolvedPath = getOpensearchProcessConfigurationDir().resolve(relativePath);
-        return createRestrictedAccessFile(resolvedPath);
-    }
 
     @Override
     public String toString() {
@@ -183,7 +169,6 @@ public class DatanodeDirectories {
                 ", logsTargetDir='" + getLogsTargetDir() + '\'' +
                 ", configurationSourceDir='" + getConfigurationSourceDir() + '\'' +
                 ", configurationTargetDir='" + getConfigurationTargetDir() + '\'' +
-                ", opensearchProcessConfigurationDir='" + getOpensearchProcessConfigurationDir() + '\'' +
                 '}';
     }
 }

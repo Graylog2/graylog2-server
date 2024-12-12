@@ -14,18 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.datanode.opensearch.configuration;
 
-public class OpensearchConfigurationException extends RuntimeException {
-    public OpensearchConfigurationException(String message) {
-        super(message);
-    }
 
-    public OpensearchConfigurationException(Exception cause) {
-        super(cause);
-    }
+import org.graylog.datanode.process.configuration.beans.ConfigurationBuildParams;
 
-    public OpensearchConfigurationException(String message, Exception cause) {
-        super(message, cause);
-    }
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+public record OpensearchConfigurationParams(List<X509Certificate> trustedCertificates,
+                                            java.util.Map<String, String> transientConfiguration) implements ConfigurationBuildParams {
 }
