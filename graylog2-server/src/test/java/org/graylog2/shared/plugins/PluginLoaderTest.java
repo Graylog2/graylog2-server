@@ -40,9 +40,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class PluginLoaderTest {
-
-    @Mock
-    private ServiceLoader.Provider<Plugin> pluginProvider;
+    
     @Mock
     private ServiceLoader<Plugin> serviceLoader;
 
