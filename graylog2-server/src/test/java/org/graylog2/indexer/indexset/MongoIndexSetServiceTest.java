@@ -24,6 +24,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
@@ -83,7 +84,8 @@ public class MongoIndexSetServiceTest {
                 nodeId, new RestrictedChainingClassLoader(
                 new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 clusterEventBus);
-        indexSetService = new MongoIndexSetService(mongodb.mongoConnection(), objectMapperProvider, streamService, clusterConfigService, clusterEventBus);
+        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
+        indexSetService = new MongoIndexSetService(mongoCollections, streamService, clusterConfigService, clusterEventBus);
     }
 
     @Test
