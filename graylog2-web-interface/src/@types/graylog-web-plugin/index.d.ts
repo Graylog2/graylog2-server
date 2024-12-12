@@ -193,7 +193,9 @@ export type FieldValueProvider = {
 }
 
 interface PluginDataWarehouse {
-  StreamDataWarehouse: React.ComponentType,
+  StreamDataWarehouse: React.ComponentType<{
+    permissions: Immutable.List<string>,
+  }>,
   DataWarehouseStatus: React.ComponentType<{
     datawareHouseEnabled: boolean;
   }>,
@@ -201,6 +203,7 @@ interface PluginDataWarehouse {
     nodeId: string,
   }>,
   DataWarehouseJobs: React.ComponentType<{
+    permissions: Immutable.List<string>,
     streamId: string,
   }>,
   StreamIlluminateProcessingSection: React.ComponentType<{

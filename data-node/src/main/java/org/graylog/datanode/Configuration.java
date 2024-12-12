@@ -663,6 +663,16 @@ public class Configuration implements CommonNodeConfiguration {
     }
 
     @Override
+    public String getEnvironmentVariablePrefix() {
+        return "GRAYLOG_DATANODE_";
+    }
+
+    @Override
+    public String getSystemPropertyPrefix() {
+        return "graylog.datanode.";
+    }
+
+    @Override
     public boolean withPlugins() {
         return true;
     }
@@ -672,13 +682,4 @@ public class Configuration implements CommonNodeConfiguration {
         return PluginLoader.NodeType.DATA_NODE;
     }
 
-    @Override
-    public String getEnvironmentVariablePrefix() {
-        return "GRAYLOG_DATANODE_";
-    }
-
-    @Override
-    public String getSystemPropertyPrefix() {
-        return "graylog.datanode.";
-    }
 }

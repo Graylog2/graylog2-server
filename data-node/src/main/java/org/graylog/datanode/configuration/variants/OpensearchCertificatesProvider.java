@@ -14,18 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.datanode.configuration.variants;
 
-import { Row, Col } from 'components/bootstrap';
+import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.OpensearchConfigurationException;
 
-const CreateStream = () => (
-  <Row>
-    <Col md={12}>
-      <h3>
-        Create new stream
-      </h3>
-    </Col>
-  </Row>
-);
+public interface OpensearchCertificatesProvider {
 
-export default CreateStream;
+    boolean isConfigured(final Configuration localConfiguration) throws OpensearchConfigurationException;
+
+    OpensearchCertificates build();
+}

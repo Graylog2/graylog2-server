@@ -30,8 +30,8 @@ public class OpensearchCli {
 
     public OpensearchCli(OpensearchConfiguration config) {
         this(
-                config.datanodeDirectories().getOpensearchProcessConfigurationDir(),
-                config.opensearchDistribution().getOpensearchBinDirPath()
+                config.getOpensearchConfigurationDir().configurationRoot(),
+                config.getOpensearchDistribution().getOpensearchBinDirPath()
         );
     }
 

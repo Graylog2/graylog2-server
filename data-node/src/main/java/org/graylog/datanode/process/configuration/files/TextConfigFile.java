@@ -14,18 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration.variants;
+package org.graylog.datanode.process.configuration.files;
 
-import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.OpensearchConfigurationException;
-import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
-public interface SecurityConfigurationVariant {
+public record TextConfigFile(Path relativePath, String text) implements DatanodeConfigFile {
 
-    boolean isConfigured(final Configuration localConfiguration) throws OpensearchConfigurationException;
-
-    OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException;
+    @Override
+    public void write(OutputStream output) throws IOException {
+        try (final ByteArrayInputStream input = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))) {
+            input.transferTo(output);
+        }
+    }
 }

@@ -16,7 +16,6 @@
  */
 
 import moment from 'moment';
-import trim from 'lodash/trim';
 
 import * as URLUtils from 'util/URLUtils';
 import { adjustFormat } from 'util/DateTime';
@@ -27,6 +26,8 @@ import type { Event, EventsAdditionalData } from 'components/events/events/types
 import { additionalAttributes } from 'components/events/Constants';
 import { extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 const url = URLUtils.qualifyUrl('/events/search');
 
@@ -38,45 +39,24 @@ type FiltersResult = {
     aggregation_timerange?: { from?: string, to?: string, type: string, range?: number },
     key?: Array<string>,
   },
-  timerange?: { from?: string, to?: string, type: string, range?: number },
+  timerange?: TimeRange,
 };
 
-const allTimesRange = { type: 'relative', range: 0 };
-
-const isNullOrBlank = (s: string | undefined) => {
-  if (!s) {
-    return true;
+export const parseTypeFilter = (alert: string) => {
+  switch (alert) {
+    case 'true':
+      return 'only';
+    case 'false':
+      return 'exclude';
+    default:
+      return 'include';
   }
-
-  if (trim(s) === '') {
-    return true;
-  }
-
-  return false;
-};
-
-const parseTimestampFilter = (timestamp: string | undefined) => {
-  if (!timestamp) {
-    return allTimesRange;
-  }
-
-  const [from, to] = extractRangeFromString(timestamp);
-
-  if (!from && !to) {
-    return allTimesRange;
-  }
-
-  return {
-    type: 'absolute',
-    from: isNullOrBlank(from) ? adjustFormat(moment(0).utc(), 'internal') : from,
-    to: isNullOrBlank(to) ? adjustFormat(moment().utc(), 'internal') : to,
-  };
 };
 
 const parseFilters = (filters: UrlQueryFilters) => {
   const result: FiltersResult = { filter: {} };
 
-  result.timerange = parseTimestampFilter(filters.get('timestamp')?.[0]);
+  result.timerange = parseTimerangeFilter(filters.get('timestamp')?.[0]);
 
   if (filters.get('timerange_start')?.[0]) {
     const [from, to] = extractRangeFromString(filters.get('timerange_start')[0]);
@@ -98,16 +78,7 @@ const parseFilters = (filters: UrlQueryFilters) => {
     result.filter.priority = filters.get('priority');
   }
 
-  switch (filters?.get('alert')?.[0]) {
-    case 'true':
-      result.filter.alerts = 'only';
-      break;
-    case 'false':
-      result.filter.alerts = 'exclude';
-      break;
-    default:
-      result.filter.alerts = 'include';
-  }
+  result.filter.alerts = parseTypeFilter(filters?.get('alert')?.[0]);
 
   return result;
 };
