@@ -187,10 +187,8 @@ const StartInputStep = () => {
       case 'NEW':
         stopInput();
 
-        if (routingStepData.shouldCreateNewPipeline) {
-          if (createdPipelineId) {
-            deletePipelineMutation.mutateAsync(createdPipelineId);
-          }
+        if (routingStepData.shouldCreateNewPipeline && createdPipelineId) {
+          deletePipelineMutation.mutateAsync(createdPipelineId);
         }
 
         if (!createdStreamId) return;

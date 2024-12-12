@@ -121,7 +121,7 @@ const SetupRoutingStep = () => {
         setStepsData(withInitialStepsData);
       }
     } // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // Initial setup: intentionally ommiting dependencies to prevent from unneccesary rerenders
 
   const options = useMemo(() => {
     if (!streams) return [];

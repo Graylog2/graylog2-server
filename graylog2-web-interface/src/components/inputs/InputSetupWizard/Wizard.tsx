@@ -54,7 +54,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
   useEffect(() => {
     setStepsConfig(initialStepsConfig);
     setWizardData({ ...wizardData, input }); // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // Initial setup: intentionally ommiting dependencies to prevent from unneccesary rerenders
 
   const steps = useMemo(() => {
     const defaultSteps = {
