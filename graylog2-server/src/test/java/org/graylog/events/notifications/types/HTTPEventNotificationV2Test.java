@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -99,6 +100,21 @@ public class HTTPEventNotificationV2Test {
         assertThat(body).contains("\\\"bad_field\\\"");
     }
 
+    @Test
+    public void testEscapedQuotesInList() {
+        Map<String, Object> model = Map.of(
+                "event_definition_title", "<<Test Event Title>>",
+                "backlog", createBacklog(),
+                "event", createEvent()
+        );
+        String bodyTemplate = "{\n" +
+                "    \"message\": \"${event.message}\\\\n\\\\n${event.list_field}\",\n" +
+                "    \"title\": \"${event_definition_title}\"\n" +
+                "}";
+        String body = notification.transformBody(bodyTemplate, HTTPEventNotificationConfigV2.ContentType.JSON, model);
+        assertThat(body).contains("\\\"list_value1\\\"");
+    }
+
     private ImmutableList<MessageSummary> createBacklog() {
         Message message = new TestMessageFactory().createMessage("Message with \"Double Quotes\"", "Unit Test", DateTime.now(DateTimeZone.UTC));
         MessageSummary summary = new MessageSummary("index1", message);
@@ -113,6 +129,7 @@ public class HTTPEventNotificationV2Test {
         );
         event.put("message", "Event Message & Whatnot");
         event.put("fields", fields);
+        event.put("list_field", List.of("\"list_value1\"", "\"list_value2\""));
         return event;
     }
 

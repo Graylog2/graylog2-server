@@ -23,6 +23,8 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang.StringEscapeUtils;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -35,6 +37,8 @@ public class JsonSafeEngineProvider implements Provider<Engine> {
         engine = Engine.createEngine();
         engine.registerRenderer(String.class, new JsonSafeRenderer());
         engine.registerRenderer(Map.class, new JsonSafeMapRenderer());
+        engine.registerRenderer(Iterable.class, new JsonSafeIterableRenderer());
+        engine.registerRenderer(Collection.class, new JsonSafeCollectionRenderer());
     }
 
     @Override
@@ -71,5 +75,38 @@ public class JsonSafeEngineProvider implements Provider<Engine> {
             }
             return StringEscapeUtils.escapeJava(renderedResult).replace("/", "\\/");
         }
+    }
+
+    private static class JsonSafeIterableRenderer implements Renderer<Iterable> {
+
+        @Override
+        public String render(Iterable iterable, Locale locale, Map<String, Object> model) {
+            final String renderedResult;
+
+            final Iterator<?> iterator = iterable.iterator();
+            renderedResult = iterator.hasNext() ? iterator.next().toString() : "";
+            return StringEscapeUtils.escapeJava(renderedResult).replace("/", "\\/");
+
+        }
+
+    }
+
+    private static class JsonSafeCollectionRenderer implements Renderer<Collection> {
+
+        @Override
+        public String render(Collection collection, Locale locale, Map<String, Object> model) {
+            final String renderedResult;
+
+            if (collection.isEmpty()) {
+                renderedResult = "";
+            } else if (collection.size() == 1) {
+                renderedResult = collection.iterator().next().toString();
+            } else {
+                renderedResult = collection.toString();
+            }
+            return StringEscapeUtils.escapeJava(renderedResult).replace("/", "\\/");
+
+        }
+
     }
 }
