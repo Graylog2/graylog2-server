@@ -14,18 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.datanode.process.configuration.files;
 
-public class OpensearchConfigurationException extends RuntimeException {
-    public OpensearchConfigurationException(String message) {
-        super(message);
-    }
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-    public OpensearchConfigurationException(Exception cause) {
-        super(cause);
-    }
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.util.Map;
 
-    public OpensearchConfigurationException(String message, Exception cause) {
-        super(message, cause);
+public record YamlConfigFile(Path relativePath, Map<String, Object> config) implements DatanodeConfigFile {
+    private static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());
+
+    @Override
+    public void write(OutputStream output) throws IOException {
+        MAPPER.writeValue(output, config);
     }
 }

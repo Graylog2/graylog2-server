@@ -277,11 +277,14 @@ public class PipelineResource extends RestResource implements PluginRestResource
             @Nullable @JsonProperty(value = "remove_from_default") Boolean removeFromDefault
     ) {}
 
+    public record RoutingResponse(@JsonProperty(value = "rule_id") String ruleId) {}
+
     @ApiOperation(value = "Add a stream routing rule to the default routing pipeline.")
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/routing")
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
-    public PipelineSource routing(@ApiParam(name = "body", required = true) @NotNull RoutingRequest request) throws NotFoundException {
+    public RoutingResponse routing(@ApiParam(name = "body", required = true) @NotNull RoutingRequest request) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, request.streamId());
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_CREATE);
 
@@ -304,7 +307,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
             ensurePipelineConnection(pipelineDao.id(), DEFAULT_STREAM_ID);
         } catch (NotFoundException e) {
             // Create pipeline with first rule
-            return createRoutingPipeline(ruleDao);
+            createRoutingPipeline(ruleDao);
+            return new RoutingResponse(ruleDao.id());
         }
 
         // Add rule to existing pipeline
@@ -320,7 +324,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
             log.info(f("Routing for input <%s> already exists - skipping", request.inputId()));
         }
 
-        return pipelineSource;
+        return new RoutingResponse(ruleDao.id());
     }
 
     private PipelineSource createRoutingPipeline(RuleDao ruleDao) {

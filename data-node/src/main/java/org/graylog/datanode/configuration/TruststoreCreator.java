@@ -19,10 +19,9 @@ package org.graylog.datanode.configuration;
 import jakarta.annotation.Nonnull;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -60,9 +59,14 @@ public class TruststoreCreator {
         }
     }
 
-    public TruststoreCreator addRootCert(final String name, FilesystemKeystoreInformation keystoreInformation,
-                                         final String alias) throws IOException, GeneralSecurityException {
-        final X509Certificate rootCert = findRootCert(keystoreInformation.location(), keystoreInformation.password(), alias);
+    public TruststoreCreator addRootCert(final String name, KeystoreInformation keystoreInformation,
+                                         final String alias) throws GeneralSecurityException {
+        final X509Certificate rootCert;
+        try {
+            rootCert = findRootCert(keystoreInformation, alias);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         this.truststore.setCertificateEntry(name, rootCert);
         return this;
     }
@@ -91,11 +95,14 @@ public class TruststoreCreator {
         return this.truststore;
     }
 
+    public KeystoreInformation toKeystoreInformation(final char[] truststorePassword) {
+        return new InMemoryKeystoreInformation(this.truststore, truststorePassword);
+    }
 
-    private static X509Certificate findRootCert(Path keystorePath,
-                                                char[] password,
-                                                final String alias) throws IOException, GeneralSecurityException {
-        final KeyStore keystore = loadKeystore(keystorePath, password);
+
+    private static X509Certificate findRootCert(KeystoreInformation keystoreInformation,
+                                                final String alias) throws Exception {
+        final KeyStore keystore = keystoreInformation.loadKeystore();
         final Certificate[] certs = keystore.getCertificateChain(alias);
 
         return Arrays.stream(certs)
@@ -108,14 +115,5 @@ public class TruststoreCreator {
 
     private static boolean isRootCaCertificate(X509Certificate cert) {
         return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-    }
-
-    private static KeyStore loadKeystore(final Path keystorePath,
-                                         final char[] password) throws IOException, GeneralSecurityException {
-        KeyStore nodeKeystore = KeyStore.getInstance(CertConstants.PKCS12);
-        try (final FileInputStream is = new FileInputStream(keystorePath.toFile())) {
-            nodeKeystore.load(is, password);
-        }
-        return nodeKeystore;
     }
 }

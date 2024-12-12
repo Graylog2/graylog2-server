@@ -31,15 +31,16 @@ class DatanodeDirectoriesTest {
     @Test
     void testConfigDirPermissions(@TempDir Path dataDir, @TempDir Path logsDir, @TempDir Path configSourceDir, @TempDir Path configTargetDir) throws IOException {
         final DatanodeDirectories datanodeDirectories = new DatanodeDirectories(dataDir, logsDir, configSourceDir, configTargetDir);
-        final Path dir = datanodeDirectories.createOpensearchProcessConfigurationDir();
-        Assertions.assertThat(Files.getPosixFilePermissions(dir)).
+        final OpensearchConfigurationDir dir = datanodeDirectories.createUniqueOpensearchProcessConfigurationDir();
+
+        Assertions.assertThat(Files.getPosixFilePermissions(dir.configurationRoot())).
                 contains(
                         PosixFilePermission.OWNER_EXECUTE,
                         PosixFilePermission.OWNER_WRITE,
                         PosixFilePermission.OWNER_READ
                 );
 
-        final Path keyFile = datanodeDirectories.createOpensearchProcessConfigurationFile(Path.of("my-secret-file.key"));
+        final Path keyFile = dir.createOpensearchProcessConfigurationFile(Path.of("my-secret-file.key"));
         Assertions.assertThat(Files.getPosixFilePermissions(keyFile)).
                 contains(
                         PosixFilePermission.OWNER_WRITE,

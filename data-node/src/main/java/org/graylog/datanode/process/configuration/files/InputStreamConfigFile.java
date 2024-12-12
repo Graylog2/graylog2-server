@@ -14,18 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.datanode.process.configuration.files;
 
-public class OpensearchConfigurationException extends RuntimeException {
-    public OpensearchConfigurationException(String message) {
-        super(message);
-    }
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
 
-    public OpensearchConfigurationException(Exception cause) {
-        super(cause);
-    }
-
-    public OpensearchConfigurationException(String message, Exception cause) {
-        super(message, cause);
+public record InputStreamConfigFile(Path relativePath, ByteArrayInputStream inputStream) implements DatanodeConfigFile {
+    @Override
+    public void write(OutputStream output) throws IOException {
+        inputStream.transferTo(output);
     }
 }

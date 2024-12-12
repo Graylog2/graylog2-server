@@ -14,18 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog2.indexer.indexset;
 
-public class OpensearchConfigurationException extends RuntimeException {
-    public OpensearchConfigurationException(String message) {
-        super(message);
+import org.graylog2.database.entities.EntityScope;
+
+public class SystemIndexSetScope extends EntityScope {
+    public static final String NAME = "GRAYLOG_SYSTEM_INDEX_SET_SCOPE";
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
-    public OpensearchConfigurationException(Exception cause) {
-        super(cause);
+    @Override
+    public boolean isMutable() {
+        return true;
     }
 
-    public OpensearchConfigurationException(String message, Exception cause) {
-        super(message, cause);
+    @Override
+    public boolean isDeletable() {
+        return false;
     }
 }

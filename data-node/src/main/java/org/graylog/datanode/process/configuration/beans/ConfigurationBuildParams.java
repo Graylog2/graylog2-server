@@ -14,18 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.datanode.process.configuration.beans;
 
-public class OpensearchConfigurationException extends RuntimeException {
-    public OpensearchConfigurationException(String message) {
-        super(message);
-    }
-
-    public OpensearchConfigurationException(Exception cause) {
-        super(cause);
-    }
-
-    public OpensearchConfigurationException(String message, Exception cause) {
-        super(message, cause);
-    }
+public interface ConfigurationBuildParams {
 }
