@@ -317,7 +317,7 @@ type DashboardAction<T> = {
   useCondition?: () => boolean,
 }
 
-export type EventAction<T> = {
+export type EventAction<T = unknown> = {
   useCondition: (events: Array<Event>) => boolean,
   modal?: React.ComponentType<EventActionModalProps<T>>,
   component: React.ComponentType<EventActionComponentProps<T>>,
@@ -337,7 +337,7 @@ type AssetInformation = {
   key: string,
 }
 
-export type EventActionComponentProps<T> = {
+export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>,
   modalRef: () => T,
 }
