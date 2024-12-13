@@ -45,9 +45,9 @@ import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.preflight.GraylogServerProvisioningBindings;
+import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.PathConfiguration;
-import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationType;
 import org.graylog2.plugin.MessageBindings;
@@ -97,13 +97,16 @@ import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
 import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_PREFLIGHT_WEB_ENABLED;
 
-public abstract class ServerBootstrap extends CmdLineTool {
+public abstract class ServerBootstrap extends AbstractNodeCommand {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
+
+    private final Configuration configuration;
 
     protected ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
         this.commandName = commandName;
+        this.configuration = configuration;
     }
 
     @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog")
@@ -131,20 +134,16 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Override
-    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
-        super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
+    protected void beforeStart() {
+        super.beforeStart();
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
             savePidFile(getPidFile());
         }
-        // This needs to run before the first SSLContext is instantiated,
-        // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings(tlsProtocolsConfiguration);
 
         // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults(pathConfiguration);
-
+        setNettyNativeDefaults(parseAndGetPathConfiguration(configFile));
     }
 
     @Override
@@ -446,10 +445,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new GenericBindings(isMigrationCommand()));
         result.add(new MessageBindings());
         result.add(new SecurityBindings());
-        result.add(new ServerStatusBindings(capabilities()));
         result.add(new ValidatorModule());
         result.add(new SharedPeriodicalBindings());
-        result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
         result.add(new IndexerDiscoveryModule());

@@ -110,25 +110,25 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
   message: {
     minWidth: 300,
     width: 0.5,
-    renderCell: (_message: string, event) => <MessageRenderer message={_message} eventId={event.id} />,
+    renderCell: (message: string, event) => <MessageRenderer message={message} eventId={event.id} />,
   },
   key: {
-    renderCell: (_key: string) => <span>{_key || <em>No Key set for this Event.</em>}</span>,
+    renderCell: (key: string) => <span>{key || <em>No Key set for this Event.</em>}</span>,
     staticWidth: 200,
   },
   id: {
     staticWidth: 300,
   },
   alert: {
-    renderCell: (_alert: boolean) => <EventTypeLabel isAlert={_alert} />,
+    renderCell: (alert: boolean) => <EventTypeLabel isAlert={alert} />,
     staticWidth: 100,
   },
   priority: {
-    renderCell: (_priority: number) => <PriorityName priority={_priority} />,
+    renderCell: (priority: number) => <PriorityName priority={priority} />,
     staticWidth: 100,
   },
   event_definition_type: {
-    renderCell: (_type: string) => <EventDefinitionTypeRenderer type={_type} />,
+    renderCell: (type: string) => <EventDefinitionTypeRenderer type={type} />,
     staticWidth: 200,
   },
   group_by_fields: {
@@ -142,10 +142,10 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
     event_definition_id: {
       minWidth: 300,
       width: 0.3,
-      renderCell: (_eventDefinitionId: string, _, __, meta: EventsAdditionalData) => <EventDefinitionRenderer meta={meta} eventDefinitionId={_eventDefinitionId} />,
+      renderCell: (eventDefinitionId: string, _, __, meta: EventsAdditionalData) => <EventDefinitionRenderer meta={meta} eventDefinitionId={eventDefinitionId} />,
     },
     fields: {
-      renderCell: (_fields: Record<string, string>) => <FieldsRenderer fields={_fields} />,
+      renderCell: (fields: Record<string, string>) => <FieldsRenderer fields={fields} />,
       staticWidth: 400,
     },
     remediation_steps: {
