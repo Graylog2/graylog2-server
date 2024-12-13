@@ -180,7 +180,7 @@ public class ClusterEventPeriodical extends Periodical {
 
     private FindIterable<ClusterEvent> eventsIterable(NodeId nodeId) {
         return collection.find(Filters.nin("consumers", nodeId.getNodeId()))
-                .sort(Sorts.ascending("timestamps"));
+                .sort(Sorts.ascending("timestamp"));
     }
 
     private void updateConsumers(final String eventId, final NodeId nodeId) {
