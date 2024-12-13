@@ -17,7 +17,6 @@
 package org.graylog.datanode.commands;
 
 import com.github.rvesse.airline.annotations.Command;
-import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
@@ -25,13 +24,14 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
+import org.graylog.datanode.bindings.DatanodeServerBindings;
 import org.graylog.datanode.bindings.PeriodicalBindings;
-import org.graylog.datanode.bindings.ServerBindings;
+import org.graylog.datanode.bootstrap.DatanodeBootstrap;
 import org.graylog.datanode.bootstrap.Main;
-import org.graylog.datanode.bootstrap.ServerBootstrap;
 import org.graylog.datanode.configuration.DatanodeProvisioningBindings;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.rest.RestBindings;
@@ -40,13 +40,11 @@ import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.UI;
-import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -57,51 +55,41 @@ import java.util.Collection;
 import java.util.List;
 
 
-@Command(name = "datanode", description = "Start the Graylog DataNode")
-public class Server extends ServerBootstrap {
-    private static final Logger LOG = LoggerFactory.getLogger(Server.class);
+@Command(name = "datanode", description = "Start Graylog Data Node")
+public class Datanode extends DatanodeBootstrap {
+    private static final Logger LOG = LoggerFactory.getLogger(Datanode.class);
 
-    protected static final Configuration configuration = new Configuration();
     private final S3RepositoryConfiguration s3RepositoryConfiguration = new S3RepositoryConfiguration();
-    private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
 
-    public Server() {
-        super("datanode", configuration);
-    }
-
-    public Server(String commandName) {
-        super(commandName, configuration);
-    }
-
-    @Option(name = {"-l", "--local"}, description = "Run Graylog DataNode in local mode. Only interesting for Graylog developers.")
-    private boolean local = false;
-
-    public boolean isLocal() {
-        return local;
+    public Datanode() {
+        super("datanode", new Configuration());
     }
 
     @Override
-    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
+    protected @Nonnull List<Module> getNodeCommandBindings(FeatureFlags featureFlags) {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
                 new ConfigurationModule(configuration),
                 new MongoDBModule(),
-                new ServerBindings(configuration, isMigrationCommand()),
+                new DatanodeServerBindings(),
                 new RestBindings(),
                 new DatanodeProvisioningBindings(),
-                new PeriodicalBindings(),
-                new ObjectMapperModule(chainingClassLoader)
+                new PeriodicalBindings()
         );
         return modules.build();
     }
 
     @Override
-    public List<Object> getCommandConfigurationBeans() {
+    public @Nonnull List<Object> getNodeCommandConfigurationBeans() {
         return Arrays.asList(configuration,
-                mongoDbConfiguration,
                 tlsConfiguration,
                 s3RepositoryConfiguration);
+    }
+
+    @Override
+    protected Class<? extends Runnable> shutdownHook() {
+        return ShutdownHook.class;
     }
 
     private static class ShutdownHook implements Runnable {
@@ -140,11 +128,6 @@ public class Server extends ServerBootstrap {
                 .setHostname(Tools.getLocalCanonicalHostname())
                 .setDataNodeStatus(DataNodeStatus.STARTING)
                 .build());
-    }
-
-    @Override
-    protected Class<? extends Runnable> shutdownHook() {
-        return ShutdownHook.class;
     }
 
     @Override

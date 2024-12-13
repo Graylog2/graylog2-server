@@ -45,7 +45,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useFeature from 'hooks/useFeature';
-import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
+import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from 'components/inputs/InputSetupWizard';
 
 type Props = {
   input: Input,
@@ -68,11 +68,20 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState<boolean>(false);
   const [showStaticFieldForm, setShowStaticFieldForm] = useState<boolean>(false);
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
+  const [showWizard, setShowWizard] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const { inputTypes, inputDescriptions } = useStore(InputTypesStore);
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+
+  const openWizard = () => {
+    setShowWizard(true);
+  };
+
+  const closeWizard = () => {
+    setShowWizard(false);
+  };
 
   const deleteInput = () => {
     setShowConfirmDeleteDialog(true);
@@ -187,7 +196,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       );
     }
 
-    actions.push(<InputStateControl key={`input-state-control-${input.id}`} input={input} />);
+    actions.push(<InputStateControl key={`input-state-control-${input.id}`} input={input} openWizard={openWizard} />);
   }
 
   actions.push(
@@ -261,6 +270,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
 
   const additionalContent = (
     <div>
+      {inputSetupFeatureFlagIsEnabled && showWizard && (<InputSetupWizard input={input} show={showWizard} onClose={closeWizard} />)}
       <Col md={8}>
         <ConfigurationWell id={input.id}
                            configuration={input.attributes}

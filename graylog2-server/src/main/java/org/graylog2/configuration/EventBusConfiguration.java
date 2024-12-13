@@ -14,22 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.configuration;
 
-import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
-import Wizard from './Wizard';
-import type { WizardData } from './types';
+import com.github.joschi.jadconfig.Parameter;
 
-type Props = {
-  show: boolean,
-  input: WizardData['input'],
-  onClose: () => void,
+public class EventBusConfiguration {
+    
+    @Parameter(value = "async_eventbus_processors")
+    private final int asyncEventbusProcessors = 2;
+
+    public int getAsyncEventbusProcessors() {
+        return asyncEventbusProcessors;
+    }
+
 }
-
-const InputSetupWizard = ({ show, input, onClose }: Props) => (
-  <InputSetupWizardProvider>
-    <Wizard show={show} input={input} onClose={onClose} />
-  </InputSetupWizardProvider>
-);
-
-export default InputSetupWizard;
