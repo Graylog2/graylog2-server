@@ -16,7 +16,6 @@
  */
 
 import moment from 'moment';
-import trim from 'lodash/trim';
 
 import * as URLUtils from 'util/URLUtils';
 import { adjustFormat } from 'util/DateTime';
@@ -27,6 +26,8 @@ import type { Event, EventsAdditionalData } from 'components/events/events/types
 import { additionalAttributes } from 'components/events/Constants';
 import { extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 const url = URLUtils.qualifyUrl('/events/search');
 
@@ -38,39 +39,7 @@ type FiltersResult = {
     aggregation_timerange?: { from?: string, to?: string, type: string, range?: number },
     key?: Array<string>,
   },
-  timerange?: { from?: string, to?: string, type: string, range?: number },
-};
-
-const allTimesRange = { type: 'relative', range: 0 };
-
-const isNullOrBlank = (s: string | undefined) => {
-  if (!s) {
-    return true;
-  }
-
-  if (trim(s) === '') {
-    return true;
-  }
-
-  return false;
-};
-
-const parseTimestampFilter = (timestamp: string | undefined) => {
-  if (!timestamp) {
-    return allTimesRange;
-  }
-
-  const [from, to] = extractRangeFromString(timestamp);
-
-  if (!from && !to) {
-    return allTimesRange;
-  }
-
-  return {
-    type: 'absolute',
-    from: isNullOrBlank(from) ? adjustFormat(moment(0).utc(), 'internal') : from,
-    to: isNullOrBlank(to) ? adjustFormat(moment().utc(), 'internal') : to,
-  };
+  timerange?: TimeRange,
 };
 
 export const parseTypeFilter = (alert: string) => {
@@ -87,7 +56,7 @@ export const parseTypeFilter = (alert: string) => {
 const parseFilters = (filters: UrlQueryFilters) => {
   const result: FiltersResult = { filter: {} };
 
-  result.timerange = parseTimestampFilter(filters.get('timestamp')?.[0]);
+  result.timerange = parseTimerangeFilter(filters.get('timestamp')?.[0]);
 
   if (filters.get('timerange_start')?.[0]) {
     const [from, to] = extractRangeFromString(filters.get('timerange_start')[0]);

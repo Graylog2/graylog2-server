@@ -22,12 +22,14 @@ import Routes from 'routing/Routes';
 import { Button, Col, Row } from 'components/bootstrap';
 import { FormikInput, InputOptionalInfo, Spinner } from 'components/common';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
-import type { Stream } from 'stores/streams/StreamsStore';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
+import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
+
+export type StreamFormValues = StreamConfiguration
 
 export type FormValues = {
     create_new_pipeline?: boolean
-  } & Partial<Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream'>>
+} & StreamConfiguration
 
 type Props = {
     submitForm: (values: FormValues) => void

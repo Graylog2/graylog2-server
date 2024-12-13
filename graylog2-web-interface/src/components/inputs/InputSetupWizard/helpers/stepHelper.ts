@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { InputSetupWizardStep, StepsData, StepData } from 'components/inputs/InputSetupWizard/types';
+import type { InputSetupWizardStep, StepsConfig, StepsData } from 'components/inputs/InputSetupWizard/types';
 
-export const getStepData = (stepsData: StepsData, stepName: InputSetupWizardStep, key?: string) => {
-  if (key) return stepsData[stepName] ? stepsData[stepName][key] : undefined;
+export const getStepConfigOrData = (configOrData: StepsConfig | StepsData, stepName: InputSetupWizardStep, key?: string) => {
+  if (key) return configOrData[stepName] ? configOrData[stepName][key] : undefined;
 
-  return stepsData[stepName];
+  return configOrData[stepName];
 };
 
 export const getNextStep = (orderedSteps: Array<InputSetupWizardStep>, activeStep: InputSetupWizardStep) : InputSetupWizardStep | undefined => {
@@ -31,10 +31,10 @@ export const getNextStep = (orderedSteps: Array<InputSetupWizardStep>, activeSte
   return orderedSteps[activeStepIndex + 1];
 };
 
-export const checkIsNextStepDisabled = (orderedSteps: Array<InputSetupWizardStep>, activeStep: InputSetupWizardStep, stepsData: StepsData, step?: InputSetupWizardStep) => {
+export const checkIsNextStepDisabled = (orderedSteps: Array<InputSetupWizardStep>, activeStep: InputSetupWizardStep, stepsConfig: StepsConfig, step?: InputSetupWizardStep) => {
   const nextStep = step ?? getNextStep(orderedSteps, activeStep);
 
-  return !stepsData[nextStep]?.enabled;
+  return !stepsConfig[nextStep]?.enabled;
 };
 
 export const checkHasNextStep = (orderedSteps: Array<InputSetupWizardStep>, activeStep: InputSetupWizardStep) => {
@@ -71,27 +71,40 @@ export const addStepAfter = (orderedSteps: Array<InputSetupWizardStep>, step: In
   return newOrderedSteps;
 };
 
-export const updateStepData = (stepsData: StepsData, stepName: InputSetupWizardStep, data: StepData = {}, override: boolean = false) : StepsData => {
+export const updateStepConfigOrData = (configOrData: StepsConfig | StepsData, stepName: InputSetupWizardStep, data: object = {}, override: boolean = false) : StepsConfig | StepsData => {
   if (!stepName) return {};
 
-  if (!stepsData) return { [stepName]: data };
+  if (!configOrData) return { [stepName]: data };
 
   if (override) {
-    return { ...stepsData, [stepName]: data };
+    return { ...configOrData, [stepName]: data };
   }
 
-  return { ...stepsData, [stepName]: { ...stepsData[stepName], ...data } };
+  return { ...configOrData, [stepName]: { ...configOrData[stepName], ...data } };
 };
 
 export const enableNextStep = (
   orderedSteps: Array<InputSetupWizardStep>,
   activeStep: InputSetupWizardStep,
-  stepsData: StepsData,
+  stepsConfig: StepsConfig,
   step?: InputSetupWizardStep,
-) : StepsData => {
+) : StepsConfig => {
   const nextStep = step ?? getNextStep(orderedSteps, activeStep);
 
-  if (!nextStep) return stepsData;
+  if (!nextStep) return stepsConfig;
 
-  return updateStepData(stepsData, nextStep, { enabled: true });
+  return updateStepConfigOrData(stepsConfig, nextStep, { enabled: true });
+};
+
+export const disableNextStep = (
+  orderedSteps: Array<InputSetupWizardStep>,
+  activeStep: InputSetupWizardStep,
+  stepsConfig: StepsConfig,
+  step?: InputSetupWizardStep,
+) : StepsConfig => {
+  const nextStep = step ?? getNextStep(orderedSteps, activeStep);
+
+  if (!nextStep) return stepsConfig;
+
+  return updateStepConfigOrData(stepsConfig, nextStep, { enabled: false });
 };

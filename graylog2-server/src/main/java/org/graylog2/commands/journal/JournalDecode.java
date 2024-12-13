@@ -25,14 +25,15 @@ import com.google.common.collect.Range;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
+import jakarta.annotation.Nonnull;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageBindings;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
-import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.journal.Journal;
 import org.slf4j.helpers.MessageFormatter;
 
@@ -51,11 +52,11 @@ public class JournalDecode extends AbstractJournalCommand {
     }
 
     @Override
-    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
+    protected @Nonnull List<Module> getNodeCommandBindings(FeatureFlags featureFlags) {
         return ImmutableList.<Module>builder()
-                .addAll(super.getCommandBindings(featureFlags))
+                .addAll(super.getNodeCommandBindings(featureFlags))
                 .add(new CodecsModule())
-                .add(new ObjectMapperModule(getClass().getClassLoader()))
+                .add(new MessageBindings())
                 .add(new Graylog2Module() {
                     @Override
                     protected void configure() {
