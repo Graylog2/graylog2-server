@@ -68,6 +68,7 @@ import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -273,33 +274,41 @@ public class PipelineResource extends RestResource implements PluginRestResource
     public record RoutingRequest(
             @JsonProperty(value = "input_id", required = true) String inputId,
             @JsonProperty(value = "stream_id", required = true) String streamId,
-            @JsonProperty(value = "remove_from_default", required = true) boolean removeFromDefault
+            @Nullable @JsonProperty(value = "remove_from_default") Boolean removeFromDefault
     ) {}
 
+    public record RoutingResponse(@JsonProperty(value = "rule_id") String ruleId) {}
+
     @ApiOperation(value = "Add a stream routing rule to the default routing pipeline.")
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/routing")
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
-    public PipelineSource routing(@ApiParam(name = "body", required = true) @NotNull RoutingRequest request) throws NotFoundException {
+    public RoutingResponse routing(@ApiParam(name = "body", required = true) @NotNull RoutingRequest request) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, request.streamId());
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_CREATE);
 
-        String streamName;
+        Stream stream;
         try {
-            final Stream stream = streamService.load(request.streamId());
-            streamName = stream.getTitle();
+            stream = streamService.load(request.streamId());
         } catch (NotFoundException e) {
             throw new NotFoundException(f("Unable to load stream %s", request.streamId()), e);
         }
 
-        RuleDao ruleDao = createRoutingRule(request, streamName);
+        boolean removeFromDefault = true;
+        if (request.removeFromDefault() == null) {
+            removeFromDefault = stream.getRemoveMatchesFromDefaultStream();
+        }
+
+        RuleDao ruleDao = createRoutingRule(request, removeFromDefault, stream.getTitle());
         PipelineDao pipelineDao;
         try {
             pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
             ensurePipelineConnection(pipelineDao.id(), DEFAULT_STREAM_ID);
         } catch (NotFoundException e) {
             // Create pipeline with first rule
-            return createRoutingPipeline(ruleDao);
+            createRoutingPipeline(ruleDao);
+            return new RoutingResponse(ruleDao.id());
         }
 
         // Add rule to existing pipeline
@@ -315,7 +324,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
             log.info(f("Routing for input <%s> already exists - skipping", request.inputId()));
         }
 
-        return pipelineSource;
+        return new RoutingResponse(ruleDao.id());
     }
 
     private PipelineSource createRoutingPipeline(RuleDao ruleDao) {
@@ -347,7 +356,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
         connectionsService.save(pipelineConnections);
     }
 
-    private RuleDao createRoutingRule(RoutingRequest request, String streamName) {
+    private RuleDao createRoutingRule(RoutingRequest request, boolean removeFromDefault, String streamName) {
         String ruleName = "route_" + request.inputId() + "_to_" + streamName;
         final Optional<RuleDao> ruleDaoOpt = ruleService.findByName(ruleName);
         if (ruleDaoOpt.isPresent()) {
@@ -360,7 +369,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                         + "when has_field(\"gl2_source_input\") AND to_string($message.gl2_source_input)==\"" + request.inputId() + "\"\n"
                         + "then\n"
                         + "route_to_stream(id:\"" + request.streamId() + "\""
-                        + ", remove_from_default: " + request.removeFromDefault()
+                        + ", remove_from_default: " + removeFromDefault
                         + ");\nend\n";
 
         RuleDao ruleDao = RuleDao.builder()

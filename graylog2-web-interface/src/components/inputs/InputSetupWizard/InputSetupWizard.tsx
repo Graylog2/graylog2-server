@@ -15,94 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useCallback, useMemo } from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Modal } from 'components/bootstrap';
-import { Wizard } from 'components/common';
-import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
-import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
-import { getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
+import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
+import Wizard from './Wizard';
+import type { WizardData } from './types';
 
-import { InputDiagnosisStep, SetupRoutingStep, StartInputStep } from './steps';
+type Props = {
+  show: boolean,
+  input: WizardData['input'],
+  onClose: () => void,
+}
 
-const InputSetupWizard = () => {
-  const { activeStep, setActiveStep, show, orderedSteps, setOrderedSteps, stepsData, closeWizard } = useInputSetupWizard();
-  const enterpriseSteps = PluginStore.exports('inputSetupWizard').find((plugin) => (!!plugin.steps))?.steps;
-
-  const steps = useMemo(() => {
-    const defaultSteps = {
-      [INPUT_WIZARD_STEPS.SETUP_ROUTING]: {
-        key: INPUT_WIZARD_STEPS.SETUP_ROUTING,
-        title: (
-          <>
-            Setup Routing
-          </>
-        ),
-        component: (
-          <SetupRoutingStep />
-        ),
-        disabled: false,
-      },
-      [INPUT_WIZARD_STEPS.START_INPUT]: {
-        key: INPUT_WIZARD_STEPS.START_INPUT,
-        title: (
-          <>
-            Start Input
-          </>
-        ),
-        component: (
-          <StartInputStep />
-        ),
-        disabled: !getStepData(stepsData, INPUT_WIZARD_STEPS.START_INPUT, 'enabled'),
-      },
-      [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
-        key: INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
-        title: (
-          <>
-            Input Diagnosis
-          </>
-        ),
-        component: (
-          <InputDiagnosisStep />
-        ),
-        disabled: !getStepData(stepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, 'enabled'),
-      },
-    };
-    if (enterpriseSteps) return { ...defaultSteps, ...enterpriseSteps };
-
-    return defaultSteps;
-  }, [enterpriseSteps, stepsData]);
-
-  const determineFirstStep = useCallback(() => {
-    setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);
-    setOrderedSteps([INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.START_INPUT, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]);
-  }, [setActiveStep, setOrderedSteps]);
-
-  useEffect(() => {
-    if (!activeStep) {
-      determineFirstStep();
-    }
-
-    if (activeStep && orderedSteps.length < 1) {
-      setOrderedSteps([activeStep]);
-    }
-  }, [activeStep, determineFirstStep, orderedSteps, setOrderedSteps]);
-
-  if (!show || orderedSteps.length < 1) return null;
-
-  return (
-    <Modal show onHide={closeWizard}>
-      <Modal.Body>
-        <Wizard activeStep={activeStep}
-                hidePreviousNextButtons
-                horizontal
-                justified
-                onStepChange={setActiveStep}
-                steps={orderedSteps.map((step) => steps[step])} />
-      </Modal.Body>
-    </Modal>
-  );
-};
+const InputSetupWizard = ({ show, input, onClose }: Props) => (
+  <InputSetupWizardProvider>
+    <Wizard show={show} input={input} onClose={onClose} />
+  </InputSetupWizardProvider>
+);
 
 export default InputSetupWizard;
