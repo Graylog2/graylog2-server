@@ -1,5 +1,5 @@
 type = "c"
-message = "Handle scoping for index sets: System index sets cannot be deleted."
+message = "Handle scoping for index sets: System index sets cannot be deleted. "
 
 pulls = ["21174"]
 issues = ["Graylog2/graylog-plugin-enterprise#5904"]
