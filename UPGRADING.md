@@ -23,9 +23,9 @@ Alternatively the `SaveOrCancelButtons` component can be used in the edit compon
 
 The following Java Code API changes have been made.
 
-| File/method                         | Description            |
-|-------------------------------------|------------------------|
-| `tbd`                               | tbd                    |
+| File/method                                    | Description |
+|------------------------------------------------|-------------|
+| `org.graylog.scheduler.JobSchedule#toDBUpdate` | removed     |
 
 ## REST API Endpoint Changes
 
