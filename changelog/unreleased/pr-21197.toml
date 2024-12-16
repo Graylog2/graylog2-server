@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Add archive restore retry on mapper parsing exception."
+
+issues = ["graylog-plugin-enterprise#9208"]
+pulls = ["graylog-plugin-enterprise#9413, 21197"]
