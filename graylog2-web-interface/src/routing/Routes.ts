@@ -118,7 +118,7 @@ const Routes = {
       CREATE: '/system/index_sets/create',
     },
     INPUTS: '/system/inputs',
-    INPUT_DIAGNOSTICS: (input: string) => `/system/input/diagnostics/${input}`,
+    INPUT_DIAGNOSIS: (input: string) => `/system/input/diagnosis/${input}`,
     LOGGING: '/system/logging',
     METRICS: (nodeId: string) => `/system/metrics/node/${nodeId}`,
     NODES: {
