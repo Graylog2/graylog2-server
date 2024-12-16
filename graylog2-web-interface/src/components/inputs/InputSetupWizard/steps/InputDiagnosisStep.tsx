@@ -16,10 +16,23 @@
  */
 import * as React from 'react';
 
-const InputDiagnosisStep = () => (
-  <div>
-    Input Diagnosis
-  </div>
-);
+import { Button } from 'components/bootstrap';
+import Routes from 'routing/Routes';
+import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
+
+const InputDiagnosisStep = () => {
+  const { wizardData: { input } } = useInputSetupWizard();
+  return (
+    <div>
+      <div>Test inputs and parsing without writing any data to the search cluster.</div>
+      <br />
+      {input?.id && (
+        <Button bsSize="xs" onClick={() => window.open(Routes.SYSTEM.INPUT_DIAGNOSIS(input?.id), '_blank')}>
+          Go to Input Diagnosis
+        </Button>
+      )}
+    </div>
+  )
+};
 
 export default InputDiagnosisStep;
