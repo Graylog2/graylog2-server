@@ -22,6 +22,7 @@ import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInp
 
 const InputDiagnosisStep = () => {
   const { wizardData: { input } } = useInputSetupWizard();
+
   return (
     <div>
       <div>Test inputs and parsing without writing any data to the search cluster.</div>
@@ -32,7 +33,7 @@ const InputDiagnosisStep = () => {
         </Button>
       )}
     </div>
-  )
+  );
 };
 
 export default InputDiagnosisStep;

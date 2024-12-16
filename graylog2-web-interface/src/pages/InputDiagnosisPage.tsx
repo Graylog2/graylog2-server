@@ -17,15 +17,22 @@
 import React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
+import useParams from 'routing/useParams';
+import { Row, Col } from 'components/bootstrap';
 
 const InputDiagnosisPage = () => {
+  const { inputId } = useParams();
+
   return (
     <DocumentTitle title="Input Diagnosis">
-      <div>
         <PageHeader title="Input Diagnosis">
           <span>Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.</span>
         </PageHeader>
-      </div>
+        <Row className="content">
+          <Col xs={12}>
+            {inputId}
+          </Col>
+        </Row>
     </DocumentTitle>
   );
 };
