@@ -320,20 +320,20 @@ public class MongoIndexSetRegistryTest {
         final AtomicReference<MongoIndexSet> matchingMongoMock = new AtomicReference<>();
         when(mongoIndexSetFactory.create(any(IndexSetConfig.class)))
                 .thenAnswer((Answer<MongoIndexSet>) invocation -> {
-                    Object[] args = invocation.getArguments();
-                    final IndexSetConfig cfg = (IndexSetConfig) args[0];
-                    final MongoIndexSet mockedIndexSet = mock(MongoIndexSet.class);
-                    when(mockedIndexSet.getConfig()).thenReturn(cfg);
-                    final int currentIndex = Integer.parseInt(Objects.requireNonNull(cfg.id()));
-                    if (currentIndex == noOfIndices - 1) {
-                        when(mockedIndexSet.getActiveWriteIndex()).thenReturn(cfg.indexPrefix() + "_0");
-                        //Let the last MongoIndexSet be the one responsible to the index we're looking for:
-                        when(mockedIndexSet.isManagedIndex(idxName)).thenReturn(true);
-                        matchingMongoMock.getAndSet(mockedIndexSet);
-                    }
-                    mockedMongosBuilder.add(mockedIndexSet);
-                    return mockedIndexSet;
-                }
+                            Object[] args = invocation.getArguments();
+                            final IndexSetConfig cfg = (IndexSetConfig) args[0];
+                            final MongoIndexSet mockedIndexSet = mock(MongoIndexSet.class);
+                            when(mockedIndexSet.getConfig()).thenReturn(cfg);
+                            final int currentIndex = Integer.parseInt(Objects.requireNonNull(cfg.id()));
+                            if (currentIndex == noOfIndices - 1) {
+                                when(mockedIndexSet.getActiveWriteIndex()).thenReturn(cfg.indexPrefix() + "_0");
+                                //Let the last MongoIndexSet be the one responsible to the index we're looking for:
+                                when(mockedIndexSet.isManagedIndex(idxName)).thenReturn(true);
+                                matchingMongoMock.getAndSet(mockedIndexSet);
+                            }
+                            mockedMongosBuilder.add(mockedIndexSet);
+                            return mockedIndexSet;
+                        }
                 );
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
         assertThat(indexSetRegistry.isCurrentWriteIndex(idxName)).isFalse();
