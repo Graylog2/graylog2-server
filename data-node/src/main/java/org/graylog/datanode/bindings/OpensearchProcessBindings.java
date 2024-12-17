@@ -38,13 +38,15 @@ import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchCommon
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchDefaultConfigFilesBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchSecurityConfigurationBean;
 import org.graylog.datanode.opensearch.configuration.beans.impl.SearchableSnapshotsConfigurationBean;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachineProvider;
 import org.graylog.datanode.opensearch.statemachine.tracer.ClusterNodeStateTracer;
+import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchStateMachineTransitionLogger;
 import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchWatchdog;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTransitionLogger;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 
 public class OpensearchProcessBindings extends AbstractModule {
 
@@ -82,10 +84,12 @@ public class OpensearchProcessBindings extends AbstractModule {
         bind(DatanodeTrustManagerProvider.class);
 
         // tracer
-        Multibinder<StateMachineTracer> tracerBinder = Multibinder.newSetBinder(binder(), StateMachineTracer.class);
+        TypeLiteral<StateMachineTracer<OpensearchState, OpensearchEvent>> tracerType = new TypeLiteral<>() {};
+        Multibinder<StateMachineTracer<OpensearchState, OpensearchEvent>> tracerBinder =
+                Multibinder.newSetBinder(binder(), tracerType);
         tracerBinder.addBinding().to(ClusterNodeStateTracer.class).asEagerSingleton();
         tracerBinder.addBinding().to(OpensearchWatchdog.class).asEagerSingleton();
-        tracerBinder.addBinding().to(StateMachineTransitionLogger.class).asEagerSingleton();
+        tracerBinder.addBinding().to(OpensearchStateMachineTransitionLogger.class).asEagerSingleton();
         tracerBinder.addBinding().to(ConfigureMetricsIndexSettings.class).asEagerSingleton();
 
     }
