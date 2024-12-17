@@ -614,7 +614,7 @@
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
                                     <artifactId>fb-contrib</artifactId>
-                                    <version>7.6.8</version>
+                                    <version>7.6.9</version>
                                 </plugin>
                             </plugins>
                         </configuration>
