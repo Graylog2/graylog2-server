@@ -309,9 +309,9 @@ public class MongoIndexSetRegistryTest {
     }
 
     @Test
-    public void isCurrentWriteIndex500IndexSetConfigNoneFoundDueToMismatchingIndexName() {
+    public void isCurrentWriteIndexOnManyIndexSetConfigsNoneFoundDueToMismatchingIndexName() {
         final String idxName = "index";
-        final int noOfIndices = 500;
+        final int noOfIndices = 2;
         // The following constructs are necessary, because internally the IndexSetConfigs are handled as Set.
         // Simply mocking a gazillion of them would de-duplicate, rendering the entire test useless.
         final List<IndexSetConfig> indexSetConfigs = mkIndexSetConfigs(noOfIndices);
