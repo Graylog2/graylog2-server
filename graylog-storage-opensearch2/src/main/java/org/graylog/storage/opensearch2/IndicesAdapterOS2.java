@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -85,6 +84,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -110,7 +110,9 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
 
-    private final int MAX_INDICES = 20;
+    // this is the maximum amount of bytes that the index list is supposed to fill in a request, it assumes that these don't
+    // need url encoding
+    private final int MAX_INDICES_URL_PART_LENGTH = 3000;
 
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
@@ -434,6 +436,23 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         return catApi.getShardsInfo(indexName);
     }
 
+
+    private List<List<String>> partition(final List<String> indices) {
+        List<List<String>> partitions = new ArrayList<>();
+        List<String> partition = new ArrayList<>();
+        int length = 0;
+        for(String index: indices) {
+            if(length > MAX_INDICES_URL_PART_LENGTH) {
+                partitions.add(partition);
+                partition = new ArrayList<>();
+            }
+            length += index.length();
+            partition.add(index);
+        }
+        partitions.add(partition);
+        return partitions;
+    }
+
     @Override
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
         if (indices == null || indices.isEmpty()) {
@@ -441,7 +460,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         }
 
         IndicesBlockStatus result = new IndicesBlockStatus();
-        Lists.partition(indices, MAX_INDICES).forEach(i -> {
+        partition(indices).forEach(i -> {
             final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
                     .indices(i.toArray(new String[]{}))
                     .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
