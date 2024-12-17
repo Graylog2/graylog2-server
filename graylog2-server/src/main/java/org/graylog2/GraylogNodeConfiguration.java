@@ -59,6 +59,11 @@ public interface GraylogNodeConfiguration {
     boolean withNodeIdFile();
 
     /**
+     * Will only bind an InputConfigurationDeserializerModifier stub if there are no inputs configured
+     */
+    boolean withInputs();
+
+    /**
      * Provides the {@link ServerStatus.Capability} to be used by ServerStatusBindings.
      */
     Set<ServerStatus.Capability> withCapabilities();

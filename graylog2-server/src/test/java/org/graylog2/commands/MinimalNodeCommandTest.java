@@ -134,6 +134,11 @@ public class MinimalNodeCommandTest {
             public boolean isMessageRecordingsEnabled() {
                 return false;
             }
+
+            @Override
+            public boolean withInputs() {
+                return false;
+            }
         }
     }
 
