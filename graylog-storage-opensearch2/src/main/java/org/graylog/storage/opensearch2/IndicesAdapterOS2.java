@@ -442,7 +442,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         List<String> partition = new ArrayList<>();
         int length = 0;
         for(String index: indices) {
-            if(length > MAX_INDICES_URL_PART_LENGTH) {
+            if(length + index.length() > MAX_INDICES_URL_PART_LENGTH) {
                 partitions.add(partition);
                 partition = new ArrayList<>();
             }
