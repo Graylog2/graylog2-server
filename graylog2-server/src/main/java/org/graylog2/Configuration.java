@@ -670,4 +670,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     public boolean withPlugins() {
         return true;
     }
+
+    @Override
+    public boolean withInputs() {
+        return true;
+    }
 }
