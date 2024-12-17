@@ -25,14 +25,14 @@ const InputDiagnosisPage = () => {
 
   return (
     <DocumentTitle title="Input Diagnosis">
-        <PageHeader title="Input Diagnosis">
-          <span>Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.</span>
-        </PageHeader>
-        <Row className="content">
-          <Col xs={12}>
-            {inputId}
-          </Col>
-        </Row>
+      <PageHeader title="Input Diagnosis">
+        <span>Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.</span>
+      </PageHeader>
+      <Row className="content">
+        <Col xs={12}>
+          {inputId}
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

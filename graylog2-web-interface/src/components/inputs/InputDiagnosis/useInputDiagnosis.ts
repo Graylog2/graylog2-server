@@ -14,9 +14,49 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useEffect } from 'react';
 
-const useInputDiagnosis = () => {
-    
+import { useStore } from 'stores/connect';
+import { InputDescription, InputTypesStore } from 'stores/inputs/InputTypesStore';
+import { InputsActions, InputsStore } from "stores/inputs/InputsStore";
+import InputStatesStore, { InputStateByNode, InputStates } from 'stores/inputs/InputStatesStore';
+import type { Input } from 'components/messageloaders/Types';
+import { ClusterMetric, MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+
+const InputDiagnosisMetricNames = [];
+
+const useInputDiagnosis = (inputId: string): {
+    input: Input,
+    inputStateByNode: InputStateByNode,
+    inputDescription: InputDescription,
+    metricsByNode: ClusterMetric,
+} => {
+    const { input } = useStore(InputsStore);
+    const { inputDescriptions } = useStore(InputTypesStore);
+    const inputDescription = inputDescriptions[input.type]
+    const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+    const inputStateByNode = inputStates[inputId];
+
+    const { metrics: metricsByNode } = useStore(MetricsStore);
+
+    useEffect(() => { 
+        InputsActions.get(inputId);
+    }, [inputId]);
+
+    useEffect(() => {
+        InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.addGlobal(metricName));
+
+        return () => {
+            InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.removeGlobal(metricName));
+        };
+    }, [InputDiagnosisMetricNames]);
+        
+    return {
+        input,
+        inputStateByNode,
+        inputDescription,
+        metricsByNode,
+    }
 };
 
 export default useInputDiagnosis;
