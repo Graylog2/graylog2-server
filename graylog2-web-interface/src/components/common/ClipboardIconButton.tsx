@@ -32,7 +32,7 @@ type Props = {
   text: string,
 }
 
-const ClipboardIconButton = ({ buttonTitle, className, disabled, onSuccess, text }: Props) => (
+const ClipboardIconButton = ({ buttonTitle = undefined, className = undefined, disabled = undefined, onSuccess = undefined, text }: Props) => (
   <ClipboardContainer text={text}>
     {({ copy }) => (
       <IconButton className={className}

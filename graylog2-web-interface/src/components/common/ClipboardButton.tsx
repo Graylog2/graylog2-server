@@ -37,7 +37,10 @@ type Props = {
   title: React.ReactNode,
 }
 
-const ClipboardButton = ({ bsSize, bsStyle, buttonTitle, className, disabled, onSuccess, text, title }: Props) => (
+const ClipboardButton = ({
+  bsSize = undefined, bsStyle = undefined, buttonTitle = undefined, className = undefined,
+  disabled = undefined, onSuccess = undefined, text, title,
+}: Props) => (
   <ClipboardContainer text={text}>
     {({ copy }) => (
       <Button bsSize={bsSize}
