@@ -105,6 +105,7 @@ module.exports = {
         position: 'after',
       }],
       'newlines-between': 'always',
+      pathGroupsExcludedImportTypes: ['builtin'],
     }],
     'sort-imports': 'off', // disabled in favor of 'import/order'
     'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],

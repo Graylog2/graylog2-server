@@ -43,8 +43,8 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
         return DatanodeConfigurationPart.builder()
                 .properties(commonOpensearchConfig(buildParams))
                 .nodeRoles(localConfiguration.getNodeRoles())
-                .javaOpt("-Xms%s".formatted(datanodeConfiguration.opensearchHeap()))
-                .javaOpt("-Xmx%s".formatted(datanodeConfiguration.opensearchHeap()))
+                .javaOpt("-Xms%s".formatted(localConfiguration.getOpensearchHeap()))
+                .javaOpt("-Xmx%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Dopensearch.transport.cname_in_publish_address=true")
                 .build();
     }
