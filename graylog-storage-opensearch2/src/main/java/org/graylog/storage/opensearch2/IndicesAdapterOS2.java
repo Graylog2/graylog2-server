@@ -445,6 +445,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
             if(length + index.length() > MAX_INDICES_URL_PART_LENGTH) {
                 partitions.add(partition);
                 partition = new ArrayList<>();
+                length = 0;
             }
             length += index.length();
             partition.add(index);
