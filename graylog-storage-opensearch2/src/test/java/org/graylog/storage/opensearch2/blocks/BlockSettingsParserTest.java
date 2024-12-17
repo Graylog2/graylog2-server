@@ -35,7 +35,8 @@ public class BlockSettingsParserTest {
     @Test
     public void noBlockedIndicesIdentifiedIfEmptyResponseParsed() {
         GetSettingsResponse emptyResponse = new GetSettingsResponse(Map.of(), Map.of());
-        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptyResponse);
+        final IndicesBlockStatus indicesBlockStatus = new IndicesBlockStatus();
+        BlockSettingsParser.parseBlockSettings(indicesBlockStatus, emptyResponse);
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
@@ -44,7 +45,8 @@ public class BlockSettingsParserTest {
     public void noBlockedIndicesIdentifiedIfEmptySettingsPresent() {
         var settingsBuilder = Map.of("index_0", Settings.builder().build());
         GetSettingsResponse emptySettingsResponse = new GetSettingsResponse(settingsBuilder, Map.of());
-        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptySettingsResponse);
+        final IndicesBlockStatus indicesBlockStatus = new IndicesBlockStatus();
+        BlockSettingsParser.parseBlockSettings(indicesBlockStatus, emptySettingsResponse);
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
@@ -64,7 +66,8 @@ public class BlockSettingsParserTest {
                         .put("index.blocks.read_only_allow_delete", true)
                         .build());
         GetSettingsResponse settingsResponse = new GetSettingsResponse(settingsBuilder, Map.of());
-        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(settingsResponse);
+        final IndicesBlockStatus indicesBlockStatus = new IndicesBlockStatus();
+        BlockSettingsParser.parseBlockSettings(indicesBlockStatus, settingsResponse);
         assertNotNull(indicesBlockStatus);
         assertEquals(3, indicesBlockStatus.countBlockedIndices());
         final Set<String> blockedIndices = indicesBlockStatus.getBlockedIndices();

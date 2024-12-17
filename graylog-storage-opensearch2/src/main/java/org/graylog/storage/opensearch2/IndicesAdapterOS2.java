@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -108,6 +109,8 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
+
+    private final int MAX_INDICES = 20;
 
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
@@ -436,15 +439,18 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         if (indices == null || indices.isEmpty()) {
             throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
         }
-        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
-                .indices(indices.toArray(new String[]{}))
-                .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names(new String[]{});
 
-        return client.execute((c, requestOptions) -> {
-            final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            return BlockSettingsParser.parseBlockSettings(settingsResponse);
+        IndicesBlockStatus result = new IndicesBlockStatus();
+        Lists.partition(indices, MAX_INDICES).forEach(i -> {
+            final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
+                    .indices(i.toArray(new String[]{}))
+                    .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
+                    .names(new String[]{});
+
+            final GetSettingsResponse settingsResponse = client.execute((c, requestOptions) -> c.indices().getSettings(getSettingsRequest, requestOptions));
+            BlockSettingsParser.parseBlockSettings(result, settingsResponse);
         });
+        return result;
     }
 
     @Override

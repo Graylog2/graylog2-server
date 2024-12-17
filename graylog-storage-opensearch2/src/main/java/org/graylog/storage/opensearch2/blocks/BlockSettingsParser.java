@@ -27,8 +27,7 @@ public class BlockSettingsParser {
 
     static final String BLOCK_SETTINGS_PREFIX = "index.blocks.";
 
-    public static IndicesBlockStatus parseBlockSettings(final GetSettingsResponse settingsResponse) {
-        IndicesBlockStatus result = new IndicesBlockStatus();
+    public static void parseBlockSettings(final IndicesBlockStatus result, final GetSettingsResponse settingsResponse) {
         final var indexToSettingsMap = settingsResponse.getIndexToSettings();
         final String[] indicesInResponse = indexToSettingsMap.keySet().toArray(new String[0]);
         for (String index : indicesInResponse) {
@@ -45,7 +44,5 @@ public class BlockSettingsParser {
                 }
             }
         }
-
-        return result;
     }
 }
