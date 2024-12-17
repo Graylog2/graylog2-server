@@ -18,7 +18,7 @@ import React from 'react';
 
 import { Button } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
-import { Input } from 'components/messageloaders/Types';
+import type { Input } from 'components/messageloaders/Types';
 import { LinkContainer } from 'components/common/router';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import recentMessagesTimeRange from 'util/TimeRangeHelper';
@@ -36,7 +36,7 @@ const ShowReceivedMessagesButton = ({ input }: Props) => {
   const currentUser = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  
+
   const queryField = (input.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput') ? 'gl2_forwarder_input' : 'gl2_source_input';
 
   if (isPermitted(currentUser.permissions, ['searches:relative'])) {

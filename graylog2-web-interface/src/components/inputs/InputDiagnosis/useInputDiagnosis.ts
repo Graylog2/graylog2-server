@@ -17,11 +17,14 @@
 import { useEffect } from 'react';
 
 import { useStore } from 'stores/connect';
-import { InputDescription, InputTypesStore } from 'stores/inputs/InputTypesStore';
-import { InputsActions, InputsStore } from "stores/inputs/InputsStore";
-import InputStatesStore, { InputStateByNode, InputStates } from 'stores/inputs/InputStatesStore';
+import InputStatesStore from 'stores/inputs/InputStatesStore';
+import { InputsStore, InputsActions } from "stores/inputs/InputsStore";
+import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import { MetricsStore, MetricsActions } from 'stores/metrics/MetricsStore';
+import type { InputStateByNode, InputStates } from 'stores/inputs/InputStatesStore';
 import type { Input } from 'components/messageloaders/Types';
-import { ClusterMetric, MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+import type { InputDescription } from 'stores/inputs/InputTypesStore';
+import type { ClusterMetric } from 'stores/metrics/MetricsStore';
 
 const InputDiagnosisMetricNames = [];
 
@@ -33,7 +36,7 @@ const useInputDiagnosis = (inputId: string): {
 } => {
     const { input } = useStore(InputsStore);
     const { inputDescriptions } = useStore(InputTypesStore);
-    const inputDescription = inputDescriptions[input.type]
+    const inputDescription = inputDescriptions[input.type];
     const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
     const inputStateByNode = inputStates[inputId];
 
