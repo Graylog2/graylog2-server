@@ -14,18 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.plugin.inputs.failure;
 
-import { Row, Col } from 'components/bootstrap';
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import org.graylog2.plugin.journal.RawMessage;
 
-const CreateStream = () => (
-  <Row>
-    <Col md={12}>
-      <h3>
-        Create new stream
-      </h3>
-    </Col>
-  </Row>
-);
-
-export default CreateStream;
+public record InputProcessingFailure(@Nonnull String errorMessage,
+                                     @Nullable Throwable exception,
+                                     @Nonnull RawMessage rawMessage,
+                                     @Nullable String inputMessage) {
+}

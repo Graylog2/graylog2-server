@@ -18,17 +18,17 @@ package org.graylog.events.processor;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
-import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.bson.conversions.Bson;
+import org.graylog2.database.MongoCollections;
 import org.joda.time.DateTime;
-import org.mongojack.DBQuery;
-import org.mongojack.DBUpdate;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.UpdateOperationValue;
-import org.mongojack.internal.update.SingleUpdateOperationValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,6 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.util.Objects.requireNonNull;
 import static org.graylog.events.processor.EventProcessorStateDto.FIELD_EVENT_DEFINITION_ID;
 import static org.graylog.events.processor.EventProcessorStateDto.FIELD_MAX_PROCESSED_TIMESTAMP;
 import static org.graylog.events.processor.EventProcessorStateDto.FIELD_MIN_PROCESSED_TIMESTAMP;
@@ -45,26 +44,20 @@ import static org.graylog.events.processor.EventProcessorStateDto.FIELD_MIN_PROC
 /**
  * Manages database state for {@link EventProcessor}s.
  */
-// This class does NOT use PaginatedDbService because we don't want to allow overwriting records via "save()"
-// and other methods.
 public class DBEventProcessorStateService {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventProcessorStateService.class);
     private static final String COLLECTION_NAME = "event_processor_state";
 
-    private final JacksonDBCollection<EventProcessorStateDto, ObjectId> db;
+    private final MongoCollection<EventProcessorStateDto> collection;
 
     @Inject
-    public DBEventProcessorStateService(MongoConnection mongoConnection,
-                                        MongoJackObjectMapperProvider mapper) {
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                EventProcessorStateDto.class,
-                ObjectId.class,
-                mapper.get());
+    public DBEventProcessorStateService(MongoCollections mongoCollections) {
+        collection = mongoCollections.collection(COLLECTION_NAME, EventProcessorStateDto.class);
 
         // There should only be one state document for each event processor.
-        db.createIndex(new BasicDBObject(FIELD_EVENT_DEFINITION_ID, 1), new BasicDBObject("unique", true));
-        db.createIndex(new BasicDBObject(FIELD_MIN_PROCESSED_TIMESTAMP, 1));
-        db.createIndex(new BasicDBObject(FIELD_MAX_PROCESSED_TIMESTAMP, 1));
+        collection.createIndex(Indexes.ascending(FIELD_EVENT_DEFINITION_ID), new IndexOptions().unique(true));
+        collection.createIndex(Indexes.ascending(FIELD_MIN_PROCESSED_TIMESTAMP));
+        collection.createIndex(Indexes.ascending(FIELD_MAX_PROCESSED_TIMESTAMP));
     }
 
     /**
@@ -77,7 +70,7 @@ public class DBEventProcessorStateService {
     Optional<EventProcessorStateDto> findByEventDefinitionId(String eventDefinitionId) {
         checkArgument(!isNullOrEmpty(eventDefinitionId), "eventDefinitionId cannot be null or empty");
 
-        return Optional.ofNullable(db.findOne(DBQuery.is(FIELD_EVENT_DEFINITION_ID, eventDefinitionId)));
+        return Optional.ofNullable(collection.find(Filters.eq(FIELD_EVENT_DEFINITION_ID, eventDefinitionId)).first());
     }
 
     /**
@@ -92,12 +85,12 @@ public class DBEventProcessorStateService {
         checkArgument(eventDefinitionIds != null && !eventDefinitionIds.isEmpty(), "eventDefinitionIds cannot be null or empty");
         checkArgument(maxTimestamp != null, "maxTimestamp cannot be null");
 
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.in(FIELD_EVENT_DEFINITION_ID, eventDefinitionIds),
-                DBQuery.greaterThanEquals(FIELD_MAX_PROCESSED_TIMESTAMP, maxTimestamp)
+        final Bson query = Filters.and(
+                Filters.in(FIELD_EVENT_DEFINITION_ID, eventDefinitionIds),
+                Filters.gte(FIELD_MAX_PROCESSED_TIMESTAMP, maxTimestamp)
         );
 
-        return ImmutableSet.copyOf(db.find(query).iterator());
+        return ImmutableSet.copyOf(collection.find(query));
     }
 
     /**
@@ -133,31 +126,13 @@ public class DBEventProcessorStateService {
         // Example: If the minProcessedTimestamp argument is newer than the value in the existing record, we don't
         // want to change it. The other way around for the maxProcessedTimestamp.
         // That's why we are using the $min and $max operations for the update query.
-        final DBUpdate.Builder update = DBUpdate.set(FIELD_EVENT_DEFINITION_ID, eventDefinitionId)
-                // Our current mongojack implementation doesn't offer $min/$max helper
-                .addOperation("$min", FIELD_MIN_PROCESSED_TIMESTAMP, updateValue(minProcessedTimestamp))
-                .addOperation("$max", FIELD_MAX_PROCESSED_TIMESTAMP, updateValue(maxProcessedTimestamp));
+        final Bson update = Updates.combine(
+                Updates.set(FIELD_EVENT_DEFINITION_ID, eventDefinitionId),
+                Updates.min(FIELD_MIN_PROCESSED_TIMESTAMP, minProcessedTimestamp),
+                Updates.max(FIELD_MAX_PROCESSED_TIMESTAMP, maxProcessedTimestamp));
 
-        return Optional.ofNullable(db.findAndModify(
-                // We have a unique index on the eventDefinitionId so this query is enough
-                DBQuery.is(FIELD_EVENT_DEFINITION_ID, eventDefinitionId),
-                null,
-                null,
-                false,
-                update,
-                true, // We want to return the updated document to the caller
-                true));
-    }
-
-    /**
-     * Only used to create an {@link UpdateOperationValue} for
-     * {@link DBUpdate.Builder#addOperation(String, String, UpdateOperationValue)}.
-     *
-     * @param value the object value
-     * @return the update operation value
-     */
-    private SingleUpdateOperationValue updateValue(Object value) {
-        return new SingleUpdateOperationValue(false, true, value);
+        return Optional.ofNullable(collection.findOneAndUpdate(Filters.eq(FIELD_EVENT_DEFINITION_ID, eventDefinitionId),
+                update, new FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.AFTER)));
     }
 
     /**
@@ -167,8 +142,6 @@ public class DBEventProcessorStateService {
      * @return the number of objects that have been deleted
      */
     public int deleteByEventDefinitionId(String id) {
-        return findByEventDefinitionId(id)
-                .map(dto -> db.removeById(new ObjectId(requireNonNull(dto.id()))).getN())
-                .orElse(0);
+        return (int) collection.deleteOne(Filters.eq(FIELD_EVENT_DEFINITION_ID, id)).getDeletedCount();
     }
 }

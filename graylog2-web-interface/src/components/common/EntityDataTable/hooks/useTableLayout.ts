@@ -16,16 +16,11 @@
  */
 import { useMemo } from 'react';
 
-import type { Sort } from 'stores/PaginationTypes';
+import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 
-const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDisplayedAttributes }: {
-  entityTableId: string,
-  defaultSort: Sort,
-  defaultDisplayedAttributes: Array<string>
-  defaultPageSize: number,
-}) => {
+const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDisplayedAttributes }: DefaultLayout) => {
   const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(entityTableId);
 
   return useMemo(() => ({

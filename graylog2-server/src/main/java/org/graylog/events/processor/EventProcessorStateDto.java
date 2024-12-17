@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -28,7 +29,7 @@ import javax.annotation.Nullable;
 
 @AutoValue
 @JsonDeserialize(builder = EventProcessorStateDto.Builder.class)
-public abstract class EventProcessorStateDto {
+public abstract class EventProcessorStateDto implements MongoEntity {
     private static final String FIELD_ID = "id";
     static final String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
     static final String FIELD_MIN_PROCESSED_TIMESTAMP = "min_processed_timestamp";
