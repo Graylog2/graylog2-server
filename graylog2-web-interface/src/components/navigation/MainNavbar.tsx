@@ -19,83 +19,17 @@ import * as React from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
 import { useMemo } from 'react';
 
-import { Nav, NavDropdown } from 'components/bootstrap';
+import { Nav } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 import filterByPerspective from 'components/perspectives/util/filterByPerspective';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import usePluginEntities from 'hooks/usePluginEntities';
-import AppConfig from 'util/AppConfig';
-import isActiveRoute from 'components/navigation/util/isActiveRoute';
 import { navigation as securityNavigation } from 'components/security/bindings';
-import useLocation from 'routing/useLocation';
-
-import NavigationLink from './NavigationLink';
+import NavigationItem from 'components/navigation/NavigationItem';
 
 const LAST_POSITION = 'last';
-const requiredFeatureFlagIsEnabled = (requiredFeatureFlag: undefined | string) => (requiredFeatureFlag ? AppConfig.isFeatureEnabled(requiredFeatureFlag) : true);
-
-type PluginRouteProps = {
-  navigationItem: {
-    path: string;
-    description: string;
-    requiredFeatureFlag?: string;
-    BadgeComponent?: React.ComponentType<{ text: string }>
-    permissions?: string | Array<string>
-  },
-  topLevel?: boolean
-}
-
-const PluginRoute = ({
-  navigationItem: {
-    description,
-    path,
-    BadgeComponent,
-  },
-  topLevel = false,
-}: PluginRouteProps) => (
-  <NavigationLink key={description}
-                  description={BadgeComponent ? <BadgeComponent text={description} /> : description}
-                  path={path}
-                  topLevel={topLevel} />
-);
-
-type PluginNavDropdownProps = {
-  navigationItem: PluginNavigation,
-}
-
-const PluginNavDropdown = ({
-  navigationItem: {
-    children,
-    description,
-    BadgeComponent,
-  },
-}: PluginNavDropdownProps) => {
-  const { pathname } = useLocation();
-  const currentUser = useCurrentUser();
-
-  const activeChild = children.filter(({ path, end }) => (path && isActiveRoute(pathname, path, end)));
-  const title = activeChild.length > 0 ? `${description} / ${activeChild[0].description}` : description;
-  const isEmpty = !children.some((child) => (
-    isPermitted(currentUser.permissions, child.permissions) && requiredFeatureFlagIsEnabled(child.requiredFeatureFlag)),
-  );
-
-  if (isEmpty) {
-    return null;
-  }
-
-  const renderBadge = children.some((child) => isPermitted(currentUser.permissions, child.permissions) && child?.BadgeComponent);
-
-  return (
-    <NavDropdown key={title}
-                 title={title}
-                 badge={renderBadge ? BadgeComponent : null}
-                 inactiveTitle={description}>
-      {children.map((childNavigationItem) => <PluginRoute navigationItem={childNavigationItem} key={childNavigationItem.description} />)}
-    </NavDropdown>
-  );
-};
 
 const _existingDropdownItemIndex = (existingNavigationItems: Array<PluginNavigation>, newNavigationItem: PluginNavigation) => {
   if (!newNavigationItem.children) {
@@ -190,45 +124,13 @@ const useNavigationItems = () => {
   }, [activePerspective, allNavigationItems, permissions]);
 };
 
-const PluginNavItem = ({ navigationItem }: { navigationItem: PluginNavigation }) => {
-  const currentUser = useCurrentUser();
-
-  if (!requiredFeatureFlagIsEnabled(navigationItem.requiredFeatureFlag)) {
-    return null;
-  }
-
-  if (navigationItem.permissions && !isPermitted(currentUser.permissions, navigationItem.permissions)) return null;
-
-  if (navigationItem.useCondition) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const shouldBeVisible = navigationItem.useCondition();
-
-    if (!shouldBeVisible) {
-      return false;
-    }
-  }
-
-  if (navigationItem.children) {
-    return (
-      <PluginNavDropdown navigationItem={navigationItem}
-                         key={navigationItem.description} />
-    );
-  }
-
-  return (
-    <PluginRoute navigationItem={navigationItem}
-                 key={navigationItem.description}
-                 topLevel />
-  );
-};
-
 const MainNavbar = () => {
   const navigationItems = useNavigationItems();
 
   return (
     <Nav className="navbar-main">
       {navigationItems.map((navigationItem) => (
-        <PluginNavItem navigationItem={navigationItem} />
+        <NavigationItem navigationItem={navigationItem} />
       ))}
     </Nav>
   );

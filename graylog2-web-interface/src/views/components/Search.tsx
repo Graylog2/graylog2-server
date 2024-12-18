@@ -51,7 +51,6 @@ import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import useParameters from 'views/hooks/useParameters';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
-import { Button } from 'components/bootstrap';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
