@@ -1,0 +1,5 @@
+type = "a"
+message = "Implement `useCondition` hook for navigation web interface plugin, to render navigation items conditionally."
+
+pulls = ["21215"]
+
