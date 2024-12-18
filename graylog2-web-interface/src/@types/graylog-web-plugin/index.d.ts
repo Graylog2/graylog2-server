@@ -58,6 +58,7 @@ type PluginNavigation = {
   position?: 'last' | undefined,
   permissions?: string | Array<string>,
   useIsValidLicense?: () => boolean,
+  useCondition?: () => boolean,
 } & (PluginNavigationLink | PluginNavigationDropdown)
 
 interface PluginNavigationItems {
