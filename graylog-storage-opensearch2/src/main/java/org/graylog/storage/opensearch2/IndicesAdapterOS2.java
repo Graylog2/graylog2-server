@@ -98,6 +98,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.graylog.storage.opensearch2.OpenSearchClient.withTimeout;
 
@@ -110,9 +111,10 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
 
-    // this is the maximum amount of bytes that the index list is supposed to fill in a request, it assumes that these don't
-    // need url encoding
-    private final int MAX_INDICES_URL_PART_LENGTH = 3000;
+    // this is the maximum amount of bytes that the index list is supposed to fill in a request,
+    // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
+    // and filter after wards
+    private final int MAX_INDICES_URL_LENGTH = 3000;
 
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
@@ -437,40 +439,29 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
 
-    private List<List<String>> partition(final List<String> indices) {
-        List<List<String>> partitions = new ArrayList<>();
-        List<String> partition = new ArrayList<>();
-        int length = 0;
-        for(String index: indices) {
-            if(length + index.length() > MAX_INDICES_URL_PART_LENGTH) {
-                partitions.add(partition);
-                partition = new ArrayList<>();
-                length = 0;
-            }
-            length += index.length();
-            partition.add(index);
-        }
-        partitions.add(partition);
-        return partitions;
-    }
-
     @Override
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
         if (indices == null || indices.isEmpty()) {
             throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
         }
 
-        IndicesBlockStatus result = new IndicesBlockStatus();
-        partition(indices).forEach(i -> {
+        if(String.join(",", indices).length() > MAX_INDICES_URL_LENGTH) {
             final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
-                    .indices(i.toArray(new String[]{}))
+                    .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
+                    .names(new String[]{});
+            final GetSettingsResponse settingsResponse = client.execute((c, requestOptions) -> c.indices().getSettings(getSettingsRequest, requestOptions));
+            return BlockSettingsParser.parseBlockSettings(settingsResponse, Optional.of(indices));
+        } else {
+            final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
+                    .indices(indices.toArray(new String[]{}))
                     .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
                     .names(new String[]{});
 
-            final GetSettingsResponse settingsResponse = client.execute((c, requestOptions) -> c.indices().getSettings(getSettingsRequest, requestOptions));
-            BlockSettingsParser.parseBlockSettings(result, settingsResponse);
-        });
-        return result;
+            return client.execute((c, requestOptions) -> {
+                final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
+                return BlockSettingsParser.parseBlockSettings(settingsResponse);
+            });
+        }
     }
 
     @Override

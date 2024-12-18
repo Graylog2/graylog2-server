@@ -109,6 +109,11 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
 
+    // this is the maximum amount of bytes that the index list is supposed to fill in a request,
+    // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
+    // and filter after wards
+    private final int MAX_INDICES_URL_LENGTH = 3000;
+
     @Inject
     public IndicesAdapterES7(ElasticsearchClient client,
                              StatsApi statsApi,
@@ -435,15 +440,24 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         if (indices == null || indices.isEmpty()) {
             throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
         }
-        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
-                .indices(indices.toArray(new String[]{}))
-                .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names(new String[]{});
 
-        return client.execute((c, requestOptions) -> {
-            final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            return BlockSettingsParser.parseBlockSettings(settingsResponse);
-        });
+        if(String.join(",", indices).length() > MAX_INDICES_URL_LENGTH) {
+            final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
+                    .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
+                    .names(new String[]{});
+            final GetSettingsResponse settingsResponse = client.execute((c, requestOptions) -> c.indices().getSettings(getSettingsRequest, requestOptions));
+            return BlockSettingsParser.parseBlockSettings(settingsResponse, Optional.of(indices));
+        } else {
+            final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
+                    .indices(indices.toArray(new String[]{}))
+                    .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
+                    .names(new String[]{});
+
+            return client.execute((c, requestOptions) -> {
+                final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
+                return BlockSettingsParser.parseBlockSettings(settingsResponse);
+            });
+        }
     }
 
     @Override
