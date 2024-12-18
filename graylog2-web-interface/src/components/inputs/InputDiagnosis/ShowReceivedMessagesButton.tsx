@@ -37,9 +37,9 @@ const ShowReceivedMessagesButton = ({ input }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
 
-  const queryField = (input.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput') ? 'gl2_forwarder_input' : 'gl2_source_input';
+  const queryField = (input?.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput') ? 'gl2_forwarder_input' : 'gl2_source_input';
 
-  if (isPermitted(currentUser.permissions, ['searches:relative'])) {
+  if (input?.id && isPermitted(currentUser.permissions, ['searches:relative'])) {
     return (
       <LinkContainer key={`received-messages-${input.id}`}
                      to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
