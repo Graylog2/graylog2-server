@@ -19,8 +19,8 @@ import { OrderedMap } from 'immutable';
 import * as React from 'react';
 import { useQueryParam } from 'use-query-params';
 import { MemoryRouter } from 'react-router-dom';
-import DefaultQueryParamProvider from 'src/routing/DefaultQueryParamProvider';
 
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import { asMock } from 'helpers/mocking';
 
 import useUrlQueryFilters from './useUrlQueryFilters';
