@@ -181,6 +181,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(StreamCategoryFilter.class);
         registerJacksonSubtype(QueryStringFilter.class);
 
+        // to support unversioned query backends
+        queryBackendBinder();
         // query backends for jackson
         registerJacksonSubtype(ElasticsearchQueryString.class);
 

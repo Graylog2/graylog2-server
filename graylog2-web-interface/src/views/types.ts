@@ -317,10 +317,10 @@ type DashboardAction<T> = {
   useCondition?: () => boolean,
 }
 
-export type EventAction = {
+export type EventAction<T = unknown> = {
   useCondition: (events: Array<Event>) => boolean,
-  modal?: React.ComponentType<EventActionModalProps<unknown>>,
-  component: React.ComponentType<EventActionComponentProps>,
+  modal?: React.ComponentType<EventActionModalProps<T>>,
+  component: React.ComponentType<EventActionComponentProps<T>>,
   key: string,
   isBulk?: boolean
 }
@@ -337,9 +337,9 @@ type AssetInformation = {
   key: string,
 }
 
-export type EventActionComponentProps = {
+export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>,
-  modalRef: () => unknown,
+  modalRef: () => T,
 }
 
 type MessageActionComponentProps = {
@@ -491,7 +491,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>
-    'views.components.eventActions'?: Array<EventAction>;
+    'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<MessageDetailContextProviderProps>>>;

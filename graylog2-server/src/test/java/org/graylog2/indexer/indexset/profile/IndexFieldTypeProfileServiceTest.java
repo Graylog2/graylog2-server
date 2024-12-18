@@ -65,8 +65,8 @@ public class IndexFieldTypeProfileServiceTest {
     public void setUp() {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        mongoIndexSetService = new MongoIndexSetService(mongoConnection,
-                objectMapperProvider,
+        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
+        mongoIndexSetService = new MongoIndexSetService(mongoCollections,
                 mock(StreamService.class),
                 mock(ClusterConfigService.class),
                 mock(ClusterEventBus.class)
@@ -268,6 +268,7 @@ public class IndexFieldTypeProfileServiceTest {
     private IndexSetConfig createIndexSetConfigForTest(final String id, final String description, final String profileId) {
         return IndexSetConfig.create(
                 id, "title", description,
+                null,
                 true,
                 true, "prefix_" + id, null, null,
                 1, 0,

@@ -29,8 +29,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.ClusterClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
@@ -66,8 +64,6 @@ public class OpensearchProcessImplTest {
     @Mock
     private Configuration configuration;
     @Mock
-    private NodeService<DataNodeDto> nodeService;
-    @Mock
     private ObjectMapper objectMapper;
     @Mock
     private OpensearchStateMachine processState;
@@ -86,7 +82,7 @@ public class OpensearchProcessImplTest {
         when(datanodeConfiguration.processLogsBufferSize()).thenReturn(100);
         when(configuration.getDatanodeNodeName()).thenReturn(nodeName);
         this.opensearchProcess = spy(new OpensearchProcessImpl(datanodeConfiguration, trustmManager, configuration,
-                nodeService, objectMapper, processState, nodeId, eventBus));
+                 objectMapper, processState, nodeId, eventBus));
         when(opensearchProcess.restClient()).thenReturn(Optional.of(restClient));
         when(restClient.cluster()).thenReturn(clusterClient);
     }
