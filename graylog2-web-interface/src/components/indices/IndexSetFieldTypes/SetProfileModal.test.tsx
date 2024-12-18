@@ -16,8 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
-import { QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import selectEvent from 'react-select-event';
 
 import useSetIndexSetProfileMutation from 'components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation';
@@ -27,6 +25,7 @@ import SetProfileModal from 'components/indices/IndexSetFieldTypes/SetProfileMod
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 import useRemoveProfileFromIndexMutation
   from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const selectItem = async (select: HTMLElement, option: string | RegExp) => {
   selectEvent.openMenu(select);
@@ -35,9 +34,9 @@ const selectItem = async (select: HTMLElement, option: string | RegExp) => {
 };
 
 const renderModal = (currentProfile = 'profile-id-111') => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
+  <DefaultQueryParamProvider>
     <SetProfileModal currentProfile={currentProfile} onClose={() => {}} show />
-  </QueryParamProvider>,
+  </DefaultQueryParamProvider>,
 );
 
 jest.mock('routing/useParams', () => jest.fn());
