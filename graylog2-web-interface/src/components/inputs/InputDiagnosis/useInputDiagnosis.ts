@@ -18,7 +18,7 @@ import { useEffect } from 'react';
 
 import { useStore } from 'stores/connect';
 import InputStatesStore from 'stores/inputs/InputStatesStore';
-import { InputsStore, InputsActions } from "stores/inputs/InputsStore";
+import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 import { MetricsStore, MetricsActions } from 'stores/metrics/MetricsStore';
 import type { InputStateByNode, InputStates } from 'stores/inputs/InputStatesStore';
@@ -42,7 +42,7 @@ const useInputDiagnosis = (inputId: string): {
 
     const { metrics: metricsByNode } = useStore(MetricsStore);
 
-    useEffect(() => { 
+    useEffect(() => {
         InputsActions.get(inputId);
     }, [inputId]);
 
