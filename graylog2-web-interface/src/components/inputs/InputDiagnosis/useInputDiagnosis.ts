@@ -26,7 +26,7 @@ import type { Input } from 'components/messageloaders/Types';
 import type { InputDescription } from 'stores/inputs/InputTypesStore';
 import type { ClusterMetric } from 'stores/metrics/MetricsStore';
 
-const InputDiagnosisMetricNames = [];
+export const metricWithPrefix = (input: Input, metric: string) => `${input?.type}.${input?.id}.${metric}`;
 
 const useInputDiagnosis = (inputId: string): {
     input: Input,
@@ -35,16 +35,29 @@ const useInputDiagnosis = (inputId: string): {
     metricsByNode: ClusterMetric,
 } => {
     const { input } = useStore(InputsStore);
-    const { inputDescriptions } = useStore(InputTypesStore);
-    const inputDescription = inputDescriptions[input.type];
-    const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
-    const inputStateByNode = inputStates[inputId];
-
-    const { metrics: metricsByNode } = useStore(MetricsStore);
 
     useEffect(() => {
         InputsActions.get(inputId);
     }, [inputId]);
+
+    const { inputDescriptions } = useStore(InputTypesStore);
+    const inputDescription = (input?.type && inputDescriptions) ? (inputDescriptions[input?.type] || {} as InputDescription) : {} as InputDescription;
+    const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+    const inputStateByNode = inputStates ? inputStates[inputId] || {} : {} as InputStateByNode;
+
+    
+    const InputDiagnosisMetricNames = [
+        metricWithPrefix(input, 'incomingMessages'),
+        metricWithPrefix(input, 'emptyMessages'),
+        metricWithPrefix(input, 'open_connections'),
+        metricWithPrefix(input, 'total_connections'),
+        metricWithPrefix(input, 'written_bytes_1sec'),
+        metricWithPrefix(input, 'written_bytes_total'),
+        metricWithPrefix(input, 'read_bytes_1sec'),
+        metricWithPrefix(input, 'read_bytes_total'),
+    ];
+
+    const { metrics: metricsByNode } = useStore(MetricsStore);
 
     useEffect(() => {
         InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.addGlobal(metricName));
