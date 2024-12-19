@@ -54,8 +54,8 @@ const MetricsCol = styled(Col)(({ theme }) => css`
 
 const InputDiagnosisPage = () => {
   const { inputId } = useParams();
-  const { input, inputStateByNode, inputDescription, inputMetrics } = useInputDiagnosis(inputId);
-  console.log(input, inputStateByNode, inputDescription, inputMetrics);
+  const { input, inputNodeStates, inputMetrics } = useInputDiagnosis(inputId);
+  console.log(inputNodeStates);
 
   return (
     <DocumentTitle title="Input Diagnosis">
@@ -76,11 +76,11 @@ const InputDiagnosisPage = () => {
                   <dd>{input.global ? 'all graylog nodes' : <LinkToNode nodeId={input.node} />}</dd>
                   <dt>This Input is listening on:</dt>
                   <dd>
-                    Bind address {inputDescription?.requested_configuration?.bind_address?.default_value},
-                    Port {inputDescription?.requested_configuration?.port?.default_value}.
+                    Bind address {input?.attributes?.bind_address},
+                    Port {input?.attributes?.port}.
                   </dd>
                   <dt>This Input is listening for:</dt>
-                  <dd>{inputDescription?.requested_configuration?.tcp_keepalive ? 'TCP Traffic.' : 'UDP Traffic.'}</dd>
+                  <dd>{('tcp_keepalive' in (input?.attributes || {})) ? 'TCP Traffic.' : 'UDP Traffic.'}</dd>
                 </StyledDl>
               </InfoCol>
               <MetricsCol xs={6}>
@@ -121,20 +121,21 @@ const InputDiagnosisPage = () => {
             <br /><br />
             <Row>
               <Col xs={3}>
-                <div>Input State</div>
-                <div>TODO</div>
+                <dt>Input State</dt>
+                <dd>Running: {inputNodeStates.running}/{inputNodeStates.total}</dd>
+                <dd>Failed: {inputNodeStates.failed}/{inputNodeStates.total}</dd>
               </Col>
               <Col xs={3}>
-                <div>Message Error at Input</div>
-                <div>TODO</div>
+                <dt>Message Error at Input</dt>
+                <dd>TODO</dd>
               </Col>
               <Col xs={3}>
-                <div>Message Failed to Process</div>
-                <div>TODO</div>
+                <dt>Message Failed to Process</dt>
+                <dd>TODO</dd>
               </Col>
               <Col xs={3}>
-                <div>Message Failed to Index</div>
-                <div>TODO</div>
+                <dt>Message Failed to Index</dt>
+                <dd>TODO</dd>
               </Col>
             </Row>
             <br /><br />
@@ -143,13 +144,8 @@ const InputDiagnosisPage = () => {
                 <ShowReceivedMessagesButton input={input} />
               </Col>
               <Col xs={6}>
-                <div>Recceived Message count by Stream:</div>
-                <StyledDl>
-                  <dt>TODO</dt>
-                  <dd>TODO</dd>
-                  <dt>TODO</dt>
-                  <dd>TODO</dd>
-                </StyledDl>
+                <dt>Recceived Message count by Stream</dt>
+                <dd>TODO</dd>
               </Col>
             </Row>
           </ContainerCol>
