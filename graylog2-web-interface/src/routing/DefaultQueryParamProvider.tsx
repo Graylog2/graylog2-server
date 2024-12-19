@@ -14,9 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Attribute } from 'stores/PaginationTypes';
+import * as React from 'react';
+import type { PropsWithChildren } from 'react';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
-export const isDateAttribute = ({ type }: Attribute) => type === 'DATE';
-export const isAttributeWithFilterOptions = ({ filter_options }: Attribute) => !!filter_options?.length;
-export const isAttributeWithRelatedCollection = ({ related_collection }: Attribute) => !!related_collection;
-export const isCustomComponentFilter = ({ filter_component }: Attribute) => !!filter_component;
+const DefaultQueryParamProvider = ({ children }: PropsWithChildren) => (
+  <QueryParamProvider adapter={ReactRouter6Adapter}>
+    {children}
+  </QueryParamProvider>
+);
+
+export default DefaultQueryParamProvider;
