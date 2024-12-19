@@ -29,50 +29,49 @@ import type { ClusterMetric } from 'stores/metrics/MetricsStore';
 export const metricWithPrefix = (input: Input, metric: string) => `${input?.type}.${input?.id}.${metric}`;
 
 const useInputDiagnosis = (inputId: string): {
-    input: Input,
-    inputStateByNode: InputStateByNode,
-    inputDescription: InputDescription,
-    metricsByNode: ClusterMetric,
+  input: Input,
+  inputStateByNode: InputStateByNode,
+  inputDescription: InputDescription,
+  metricsByNode: ClusterMetric,
 } => {
-    const { input } = useStore(InputsStore);
+  const { input } = useStore(InputsStore);
 
-    useEffect(() => {
-        InputsActions.get(inputId);
-    }, [inputId]);
+  useEffect(() => {
+    InputsActions.get(inputId);
+  }, [inputId]);
 
-    const { inputDescriptions } = useStore(InputTypesStore);
-    const inputDescription = (input?.type && inputDescriptions) ? (inputDescriptions[input?.type] || {} as InputDescription) : {} as InputDescription;
-    const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
-    const inputStateByNode = inputStates ? inputStates[inputId] || {} : {} as InputStateByNode;
+  const { inputDescriptions } = useStore(InputTypesStore);
+  const inputDescription = (input?.type && inputDescriptions) ? (inputDescriptions[input?.type] || {} as InputDescription) : {} as InputDescription;
+  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
+  const inputStateByNode = inputStates ? inputStates[inputId] || {} : {} as InputStateByNode;
 
-    
-    const InputDiagnosisMetricNames = [
-        metricWithPrefix(input, 'incomingMessages'),
-        metricWithPrefix(input, 'emptyMessages'),
-        metricWithPrefix(input, 'open_connections'),
-        metricWithPrefix(input, 'total_connections'),
-        metricWithPrefix(input, 'written_bytes_1sec'),
-        metricWithPrefix(input, 'written_bytes_total'),
-        metricWithPrefix(input, 'read_bytes_1sec'),
-        metricWithPrefix(input, 'read_bytes_total'),
-    ];
+  const InputDiagnosisMetricNames = [
+    metricWithPrefix(input, 'incomingMessages'),
+    metricWithPrefix(input, 'emptyMessages'),
+    metricWithPrefix(input, 'open_connections'),
+    metricWithPrefix(input, 'total_connections'),
+    metricWithPrefix(input, 'written_bytes_1sec'),
+    metricWithPrefix(input, 'written_bytes_total'),
+    metricWithPrefix(input, 'read_bytes_1sec'),
+    metricWithPrefix(input, 'read_bytes_total'),
+  ];
 
-    const { metrics: metricsByNode } = useStore(MetricsStore);
+  const { metrics: metricsByNode } = useStore(MetricsStore);
 
-    useEffect(() => {
-        InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.addGlobal(metricName));
+  useEffect(() => {
+    InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.addGlobal(metricName));
 
-        return () => {
-            InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.removeGlobal(metricName));
-        };
-    }, [InputDiagnosisMetricNames]);
-        
-    return {
-        input,
-        inputStateByNode,
-        inputDescription,
-        metricsByNode,
-    }
+    return () => {
+        InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.removeGlobal(metricName));
+    };
+  }, [InputDiagnosisMetricNames]);
+ 
+  return {
+    input,
+    inputStateByNode,
+    inputDescription,
+    metricsByNode,
+  }
 };
 
 export default useInputDiagnosis;

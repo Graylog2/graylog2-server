@@ -58,7 +58,7 @@ type Props = {
   readBytesTotal: number,
 }
 
-const NetworkStats = ({ writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal }: Props) => (
+const NetworkStats = ({ writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal }: Props) => (
   <InputIO>
     <span className="persec">
       <Icon name="arrow_drop_down" className="channel-direction channel-direction-down" />
