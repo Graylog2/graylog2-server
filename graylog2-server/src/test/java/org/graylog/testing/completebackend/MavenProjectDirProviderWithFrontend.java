@@ -14,15 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.csr;
+package org.graylog.testing.completebackend;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-
-public interface KeystoreInformation {
-
-    KeyStore loadKeystore() throws IOException, GeneralSecurityException;
-
-    char[] password();
+public class MavenProjectDirProviderWithFrontend extends DefaultMavenProjectDirProvider {
+    @Override
+    public boolean includeFrontend() {
+        return true;
+    }
 }
