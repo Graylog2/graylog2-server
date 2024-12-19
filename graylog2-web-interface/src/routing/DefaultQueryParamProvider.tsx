@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.csr;
+import * as React from 'react';
+import type { PropsWithChildren } from 'react';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
+const DefaultQueryParamProvider = ({ children }: PropsWithChildren) => (
+  <QueryParamProvider adapter={ReactRouter6Adapter}>
+    {children}
+  </QueryParamProvider>
+);
 
-public interface KeystoreInformation {
-
-    KeyStore loadKeystore() throws IOException, GeneralSecurityException;
-
-    char[] password();
-}
+export default DefaultQueryParamProvider;
