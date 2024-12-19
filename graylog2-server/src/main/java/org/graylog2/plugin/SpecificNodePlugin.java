@@ -16,7 +16,14 @@
  */
 package org.graylog2.plugin;
 
-import org.graylog2.configuration.PluginPathConfiguration;
+import org.graylog2.shared.plugins.PluginLoader;
 
-public class PluginLoaderConfig extends PluginPathConfiguration {
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SpecificNodePlugin {
+
+    PluginLoader.NodeType value();
+
 }
