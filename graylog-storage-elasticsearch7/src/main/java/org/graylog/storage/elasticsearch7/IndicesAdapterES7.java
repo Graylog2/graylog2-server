@@ -445,11 +445,12 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
                 .names("index.blocks.read", "index.blocks.write", "index.blocks.metadata");
 
-        final GetSettingsRequest getSettingsRequest = String.join(",", indices).length() > MAX_INDICES_URL_LENGTH ? request : request.indices(indices.toArray(new String[]{}));
+        final var maxLengthExceeded = String.join(",", indices).length() > MAX_INDICES_URL_LENGTH;
+        final GetSettingsRequest getSettingsRequest = maxLengthExceeded ? request : request.indices(indices.toArray(new String[]{}));
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            return BlockSettingsParser.parseBlockSettings(settingsResponse);
+            return BlockSettingsParser.parseBlockSettings(settingsResponse, maxLengthExceeded ? Optional.of(indices) : Optional.empty());
         });
     }
 
