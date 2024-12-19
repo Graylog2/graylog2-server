@@ -443,7 +443,7 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         final GetSettingsRequest request = new GetSettingsRequest()
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names("index.blocks.read", "index.blocks.write", "index.blocks.metadata");
+                .names("index.blocks.read", "index.blocks.write", "index.blocks.metadata", "index.blocks.read_only", "index.blocks.read_only_allow_delete");
 
         final var maxLengthExceeded = String.join(",", indices).length() > MAX_INDICES_URL_LENGTH;
         final GetSettingsRequest getSettingsRequest = maxLengthExceeded ? request : request.indices(indices.toArray(new String[]{}));

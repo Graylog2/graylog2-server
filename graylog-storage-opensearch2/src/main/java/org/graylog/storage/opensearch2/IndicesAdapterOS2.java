@@ -114,7 +114,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
     // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
     // and filter after wards
-    private final int MAX_INDICES_URL_LENGTH = 3000;
+    private final int MAX_INDICES_URL_LENGTH = 20;
 
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
@@ -447,7 +447,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
         final GetSettingsRequest request = new GetSettingsRequest()
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names("index.blocks.read", "index.blocks.write", "index.blocks.metadata");
+                .names("index.blocks.read", "index.blocks.write", "index.blocks.metadata", "index.blocks.read_only", "index.blocks.read_only_allow_delete");
 
         final var maxLengthExceeded = String.join(",", indices).length() > MAX_INDICES_URL_LENGTH;
         final GetSettingsRequest getSettingsRequest = maxLengthExceeded ? request : request.indices(indices.toArray(new String[]{}));
