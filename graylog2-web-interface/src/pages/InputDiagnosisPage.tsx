@@ -20,9 +20,8 @@ import styled, { css } from 'styled-components';
 import { DocumentTitle, LinkToNode, PageHeader } from 'components/common';
 import useParams from 'routing/useParams';
 import { Row, Col, Button } from 'components/bootstrap';
-import useInputDiagnosis, { metricWithPrefix } from 'components/inputs/InputDiagnosis/useInputDiagnosis';
+import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 import ShowReceivedMessagesButton from 'components/inputs/InputDiagnosis/ShowReceivedMessagesButton';
-import type { CounterMetric, GaugeMetric, Rate } from 'stores/metrics/MetricsStore';
 import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
 
 const StyledDl = styled.dl`
@@ -55,8 +54,8 @@ const MetricsCol = styled(Col)(({ theme }) => css`
 
 const InputDiagnosisPage = () => {
   const { inputId } = useParams();
-  const { input, inputStateByNode, inputDescription, metricsByNode } = useInputDiagnosis(inputId);
-  console.log(input, inputStateByNode, inputDescription, metricsByNode);
+  const { input, inputStateByNode, inputDescription, inputMetrics } = useInputDiagnosis(inputId);
+  console.log(input, inputStateByNode, inputDescription, inputMetrics);
 
   return (
     <DocumentTitle title="Input Diagnosis">
@@ -85,31 +84,31 @@ const InputDiagnosisPage = () => {
                 </StyledDl>
               </InfoCol>
               <MetricsCol xs={6}>
-                {metricsByNode && (
+                {inputMetrics && (
                   <StyledDl>
                     <dt>Total Messages received by Input:</dt>
-                    <dd>{(metricsByNode[input.node][metricWithPrefix(input, 'incomingMessages')]?.metric as Rate)?.rate?.total || 0} events</dd>
+                    <dd>{inputMetrics.incomingMessagesTotal} events</dd>
                     <dt>Messages received (15min avg):</dt>
-                    <dd>{(metricsByNode[input.node][metricWithPrefix(input, 'incomingMessages')]?.metric as Rate)?.rate?.fifteen_minute || 0} events/second</dd>
+                    <dd>{inputMetrics.incomingMessages15minAvg} events/second</dd>
                     <dt>Empty Messages Discarded:</dt>
-                    <dd>{(metricsByNode[input.node][metricWithPrefix(input, 'emptyMessages')] as CounterMetric)?.metric?.count || 0}</dd>
+                    <dd>{inputMetrics.emptyMessages}</dd>
                     <dt>Active Connections:</dt>
                     <dd>
-                      {(metricsByNode[input.node][metricWithPrefix(input, 'open_connections')] as GaugeMetric)?.metric?.value || 0}&nbsp;
-                      ({(metricsByNode[input.node][metricWithPrefix(input, 'total_connections')] as GaugeMetric)?.metric?.value || 0} total)
+                      {inputMetrics.open_connections}&nbsp;
+                      ({inputMetrics.total_connections} total)
                     </dd>
                     <dt>Network I/O:</dt>
                     <dd>
-                      <NetworkStats readBytes1Sec={(metricsByNode[input.node][metricWithPrefix(input, 'read_bytes_1sec')] as GaugeMetric)?.metric?.value || 0}
-                                    readBytesTotal={(metricsByNode[input.node][metricWithPrefix(input, 'read_bytes_total')] as GaugeMetric)?.metric?.value || 0}
-                                    writtenBytes1Sec={(metricsByNode[input.node][metricWithPrefix(input, 'write_bytes_1sec')] as GaugeMetric)?.metric?.value || 0}
-                                    writtenBytesTotal={(metricsByNode[input.node][metricWithPrefix(input, 'write_bytes_total')] as GaugeMetric)?.metric?.value || 0} />
+                      <NetworkStats readBytes1Sec={inputMetrics.read_bytes_1sec}
+                                    readBytesTotal={inputMetrics.read_bytes_total}
+                                    writtenBytes1Sec={inputMetrics.write_bytes_1sec}
+                                    writtenBytesTotal={inputMetrics.write_bytes_total} />
                     </dd>
                   </StyledDl>
                 )}
               </MetricsCol>
             </Row>
-            <br/><br/>
+            <br /><br />
             <Row>
               <Col xs={6}>
                 <h3>Input Test Results</h3>
@@ -119,7 +118,7 @@ const InputDiagnosisPage = () => {
                 <Button>Every 10 seconds</Button>
               </Col>
             </Row>
-            <br/><br/>
+            <br /><br />
             <Row>
               <Col xs={3}>
                 <div>Input State</div>
@@ -138,7 +137,7 @@ const InputDiagnosisPage = () => {
                 <div>TODO</div>
               </Col>
             </Row>
-            <br/><br/>
+            <br /><br />
             <Row>
               <Col xs={6}>
                 <ShowReceivedMessagesButton input={input} />
