@@ -48,6 +48,7 @@ export type InputNodeStates = {
   running: number;
   failed: number;
   total: number;
+  inputStateByNode: InputStateByNode;
 }
 
 export type InputDiagnostics = {
@@ -116,6 +117,7 @@ const useInputDiagnosis = (inputId: string): {
       running: inputNodeStates.filter((state) => state === 'RUNNING').length,
       failed: inputNodeStates.filter((state) => state === 'FAILED').length,
       total: inputNodeStates.length,
+      inputStateByNode,
     },
     inputMetrics: {
       incomingMessagesTotal: (nodeMetrics[metricWithPrefix(input, 'incomingMessages')]?.metric as Rate)?.rate?.total || 0,
@@ -127,9 +129,9 @@ const useInputDiagnosis = (inputId: string): {
       read_bytes_total: (nodeMetrics[metricWithPrefix(input, 'read_bytes_total')] as GaugeMetric)?.metric?.value || 0,
       write_bytes_1sec: (nodeMetrics[metricWithPrefix(input, 'write_bytes_1sec')] as GaugeMetric)?.metric?.value || 0,
       write_bytes_total: (nodeMetrics[metricWithPrefix(input, 'write_bytes_total')] as GaugeMetric)?.metric?.value || 0,
-      failures_indexing: nodeMetrics[failures_indexing] || 0,
-      failures_processing: nodeMetrics[failures_processing] || 0,
-      failures_inputs_codecs: nodeMetrics[failures_inputs_codecs] || 0,
+      failures_indexing: (nodeMetrics[failures_indexing]?.metric as Rate)?.rate?.fifteen_minute || 0,
+      failures_processing: (nodeMetrics[failures_processing]?.metric as Rate)?.rate?.fifteen_minute || 0,
+      failures_inputs_codecs: (nodeMetrics[failures_inputs_codecs]?.metric as Rate)?.rate?.fifteen_minute || 0,
       stream_message_count: Object.entries(messageCountByStream?.stream_message_count || {}),
     },
   };

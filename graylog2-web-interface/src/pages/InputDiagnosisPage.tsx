@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { DocumentTitle, LinkToNode, PageHeader } from 'components/common';
 import useParams from 'routing/useParams';
-import { Row, Col, Button } from 'components/bootstrap';
+import { Row, Col } from 'components/bootstrap';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 import ShowReceivedMessagesButton from 'components/inputs/InputDiagnosis/ShowReceivedMessagesButton';
 import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
@@ -114,7 +114,7 @@ const InputDiagnosisPage = () => {
                 Metrics show the last 15 minutes:
               </Col>
               <Col xs={6}>
-                <Button>Every 10 seconds</Button>
+                {/* <Button>Every 10 seconds</Button> */}
               </Col>
             </Row>
             <br /><br />
