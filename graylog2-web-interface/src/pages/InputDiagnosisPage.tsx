@@ -55,7 +55,6 @@ const MetricsCol = styled(Col)(({ theme }) => css`
 const InputDiagnosisPage = () => {
   const { inputId } = useParams();
   const { input, inputNodeStates, inputMetrics } = useInputDiagnosis(inputId);
-  console.log(inputNodeStates);
 
   return (
     <DocumentTitle title="Input Diagnosis">
@@ -141,11 +140,20 @@ const InputDiagnosisPage = () => {
             <br /><br />
             <Row>
               <Col xs={6}>
-                <ShowReceivedMessagesButton input={input} />
+                <h3>Recceived Message count by Stream</h3>
+                {inputMetrics?.stream_message_count?.length && (
+                  <StyledDl>
+                    {inputMetrics.stream_message_count.map(([key, value]) => (
+                      <>
+                        <dt>{key}</dt>
+                        <dd>{value}</dd>
+                      </>
+                    ))}
+                  </StyledDl>
+                )}
               </Col>
               <Col xs={6}>
-                <dt>Recceived Message count by Stream</dt>
-                <dd>TODO</dd>
+                <ShowReceivedMessagesButton input={input} />
               </Col>
             </Row>
           </ContainerCol>

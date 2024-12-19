@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { useStore } from 'stores/connect';
 import InputStatesStore from 'stores/inputs/InputStatesStore';
@@ -23,6 +24,9 @@ import { MetricsStore, MetricsActions } from 'stores/metrics/MetricsStore';
 import type { InputStateByNode, InputStates } from 'stores/inputs/InputStatesStore';
 import type { Input } from 'components/messageloaders/Types';
 import type { CounterMetric, GaugeMetric, Rate } from 'stores/metrics/MetricsStore';
+import { qualifyUrl } from 'util/URLUtils';
+import fetch from 'logic/rest/FetchProvider';
+import { defaultOnError } from 'util/conditional/onError';
 
 export type InputDiagnosisMetrics = {
   incomingMessagesTotal: number;
@@ -37,6 +41,7 @@ export type InputDiagnosisMetrics = {
   failures_indexing: any;
   failures_processing: any;
   failures_inputs_codecs: any;
+  stream_message_count: [string, number][];
 }
 
 export type InputNodeStates = {
@@ -45,7 +50,16 @@ export type InputNodeStates = {
   total: number;
 }
 
+export type InputDiagnostics = {
+  stream_message_count: {
+    [streamName: string]: number,
+  },
+}
+
 export const metricWithPrefix = (input: Input, metric: string) => `${input?.type}.${input?.id}.${metric}`;
+
+export const fetchInputDiagnostics = (inputId: string): Promise<InputDiagnostics> => 
+fetch<InputDiagnostics>('GET', qualifyUrl(`system/inputs/diagnostics/${inputId}`));
 
 const useInputDiagnosis = (inputId: string): {
   input: Input,
@@ -57,6 +71,9 @@ const useInputDiagnosis = (inputId: string): {
   useEffect(() => {
     InputsActions.get(inputId);
   }, [inputId]);
+
+  const { data: messageCountByStream } = useQuery<InputDiagnostics, Error>(['input-diagnostics', inputId],
+    () => defaultOnError(fetchInputDiagnostics(inputId), 'Fetching Input Diagnostics failed with status', 'Could not fetch Input Diagnostics'));
 
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const inputStateByNode = inputStates ? inputStates[inputId] || {} : {} as InputStateByNode;
@@ -80,7 +97,7 @@ const useInputDiagnosis = (inputId: string): {
     failures_indexing,
     failures_processing,
     failures_inputs_codecs,
-  ]), [input]);
+  ]), [input, inputId]);
 
   const { metrics: metricsByNode } = useStore(MetricsStore);
   console.log(metricsByNode);
@@ -114,6 +131,7 @@ const useInputDiagnosis = (inputId: string): {
       failures_indexing: nodeMetrics[failures_indexing],
       failures_processing: nodeMetrics[failures_processing],
       failures_inputs_codecs: nodeMetrics[failures_inputs_codecs],
+      stream_message_count: Object.entries(messageCountByStream?.stream_message_count || {}),
     },
   };
 };
