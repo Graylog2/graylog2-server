@@ -544,7 +544,6 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         for (Map.Entry<String, Object> x : doc.entrySet()) {
             if (x.getValue() instanceof EncryptedValue encryptedValue) {
                 doc.put(x.getKey(), objectMapper.convertValue(encryptedValue, TypeReferences.MAP_STRING_OBJECT));
-                return;
             }
         }
         super.fieldTransformations(doc);
