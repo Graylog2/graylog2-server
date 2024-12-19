@@ -62,7 +62,7 @@ export type GaugeMetric = {
   type: 'gauge',
 };
 
-type Rate = {
+export type Rate = {
   rate: {
     total: number,
     mean: number,

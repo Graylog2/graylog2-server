@@ -63,6 +63,7 @@ const IndexSetTemplateCreatePage = loadAsync(() => import('./IndexSetTemplateCre
 const IndexSetTemplateEditPage = loadAsync(() => import('./IndexSetTemplateEditPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
+const InputDiagnosisPage = loadAsync(() => import('./InputDiagnosisPage'));
 const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
@@ -160,6 +161,7 @@ export {
   IndexSetTemplateEditPage,
   IndicesPage,
   InputsPage,
+  InputDiagnosisPage,
   KeyboardShortcutsPage,
   LoadingPage,
   LoggersPage,
