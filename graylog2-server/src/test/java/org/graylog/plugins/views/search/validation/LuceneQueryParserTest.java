@@ -37,6 +37,18 @@ class LuceneQueryParserTest {
     }
 
     @Test
+    void testSuperSimpleQueryWithWhitespaceInField() throws ParseException {
+        final ParsedQuery fields = parser.parse("foo\\ foo:bar");
+        assertThat(fields.allFieldNames()).contains("foo foo");
+    }
+
+    @Test
+    void testSuperSimpleQueryWithSlashInField() throws ParseException {
+        final ParsedQuery fields = parser.parse("foo\\/foo:bar");
+        assertThat(fields.allFieldNames()).contains("foo/foo");
+    }
+
+    @Test
     void getFieldNamesSimple() throws ParseException {
         final ParsedQuery fields = parser.parse("foo:bar AND lorem:ipsum");
         assertThat(fields.allFieldNames()).contains("foo", "lorem");
