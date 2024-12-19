@@ -445,23 +445,16 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
             throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
         }
 
-        if(String.join(",", indices).length() > MAX_INDICES_URL_LENGTH) {
-            final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
-                    .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                    .names(new String[]{});
-            final GetSettingsResponse settingsResponse = client.execute((c, requestOptions) -> c.indices().getSettings(getSettingsRequest, requestOptions));
-            return BlockSettingsParser.parseBlockSettings(settingsResponse, Optional.of(indices));
-        } else {
-            final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
-                    .indices(indices.toArray(new String[]{}))
-                    .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                    .names(new String[]{});
+        final GetSettingsRequest request = new GetSettingsRequest()
+                .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
+                .names("index.blocks.read", "index.blocks.write", "index.blocks.metadata");
 
-            return client.execute((c, requestOptions) -> {
-                final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-                return BlockSettingsParser.parseBlockSettings(settingsResponse);
-            });
-        }
+        final GetSettingsRequest getSettingsRequest = String.join(",", indices).length() > MAX_INDICES_URL_LENGTH ? request : request.indices(indices.toArray(new String[]{}));
+
+        return client.execute((c, requestOptions) -> {
+            final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
+            return BlockSettingsParser.parseBlockSettings(settingsResponse);
+        });
     }
 
     @Override
