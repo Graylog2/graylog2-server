@@ -75,11 +75,11 @@ const InputDiagnosisPage = () => {
                   <dd>{input.global ? 'all graylog nodes' : <LinkToNode nodeId={input.node} />}</dd>
                   <dt>This Input is listening on:</dt>
                   <dd>
-                    Bind address {input?.attributes?.bind_address},
-                    Port {input?.attributes?.port}.
+                    Bind address {input.attributes?.bind_address},
+                    Port {input.attributes?.port}.
                   </dd>
                   <dt>This Input is listening for:</dt>
-                  <dd>{('tcp_keepalive' in (input?.attributes || {})) ? 'TCP Traffic.' : 'UDP Traffic.'}</dd>
+                  <dd>{('tcp_keepalive' in (input.attributes || {})) ? 'TCP Traffic.' : 'UDP Traffic.'}</dd>
                 </StyledDl>
               </InfoCol>
               <MetricsCol xs={6}>
@@ -126,22 +126,22 @@ const InputDiagnosisPage = () => {
               </Col>
               <Col xs={3}>
                 <dt>Message Error at Input</dt>
-                <dd>TODO</dd>
+                <dd>{inputMetrics.failures_inputs_codecs}</dd>
               </Col>
               <Col xs={3}>
                 <dt>Message Failed to Process</dt>
-                <dd>TODO</dd>
+                <dd>{inputMetrics.failures_processing}</dd>
               </Col>
               <Col xs={3}>
                 <dt>Message Failed to Index</dt>
-                <dd>TODO</dd>
+                <dd>{inputMetrics.failures_indexing}</dd>
               </Col>
             </Row>
             <br /><br />
             <Row>
               <Col xs={6}>
                 <h3>Recceived Message count by Stream</h3>
-                {inputMetrics?.stream_message_count?.length && (
+                {inputMetrics.stream_message_count?.length && (
                   <StyledDl>
                     {inputMetrics.stream_message_count.map(([key, value]) => (
                       <>

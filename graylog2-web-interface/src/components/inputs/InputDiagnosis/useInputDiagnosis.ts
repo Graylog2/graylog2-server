@@ -58,8 +58,7 @@ export type InputDiagnostics = {
 
 export const metricWithPrefix = (input: Input, metric: string) => `${input?.type}.${input?.id}.${metric}`;
 
-export const fetchInputDiagnostics = (inputId: string): Promise<InputDiagnostics> => 
-fetch<InputDiagnostics>('GET', qualifyUrl(`system/inputs/diagnostics/${inputId}`));
+export const fetchInputDiagnostics = (inputId: string): Promise<InputDiagnostics> => fetch<InputDiagnostics>('GET', qualifyUrl(`system/inputs/diagnostics/${inputId}`));
 
 const useInputDiagnosis = (inputId: string): {
   input: Input,
@@ -97,7 +96,7 @@ const useInputDiagnosis = (inputId: string): {
     failures_indexing,
     failures_processing,
     failures_inputs_codecs,
-  ]), [input, inputId]);
+  ]), [input, failures_indexing, failures_processing, failures_inputs_codecs]);
 
   const { metrics: metricsByNode } = useStore(MetricsStore);
   console.log(metricsByNode);
@@ -128,9 +127,9 @@ const useInputDiagnosis = (inputId: string): {
       read_bytes_total: (nodeMetrics[metricWithPrefix(input, 'read_bytes_total')] as GaugeMetric)?.metric?.value || 0,
       write_bytes_1sec: (nodeMetrics[metricWithPrefix(input, 'write_bytes_1sec')] as GaugeMetric)?.metric?.value || 0,
       write_bytes_total: (nodeMetrics[metricWithPrefix(input, 'write_bytes_total')] as GaugeMetric)?.metric?.value || 0,
-      failures_indexing: nodeMetrics[failures_indexing],
-      failures_processing: nodeMetrics[failures_processing],
-      failures_inputs_codecs: nodeMetrics[failures_inputs_codecs],
+      failures_indexing: nodeMetrics[failures_indexing] || 0,
+      failures_processing: nodeMetrics[failures_processing] || 0,
+      failures_inputs_codecs: nodeMetrics[failures_inputs_codecs] || 0,
       stream_message_count: Object.entries(messageCountByStream?.stream_message_count || {}),
     },
   };
