@@ -16,8 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
-import { QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import asMock from 'helpers/mocking/AsMock';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
@@ -28,6 +26,7 @@ import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/h
 import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
 import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const getData = (list = [profile1]) => (
   {
@@ -40,11 +39,11 @@ const getData = (list = [profile1]) => (
 );
 
 const renderIndexSetFieldTypeProfilesList = () => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
+  <DefaultQueryParamProvider>
     <TestStoreProvider>
       <ProfilesList />
     </TestStoreProvider>,
-  </QueryParamProvider>,
+  </DefaultQueryParamProvider>,
 );
 
 jest.mock('routing/useParams', () => jest.fn());

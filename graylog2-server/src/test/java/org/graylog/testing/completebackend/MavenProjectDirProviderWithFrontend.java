@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Attribute } from 'stores/PaginationTypes';
+package org.graylog.testing.completebackend;
 
-export const isDateAttribute = ({ type }: Attribute) => type === 'DATE';
-export const isAttributeWithFilterOptions = ({ filter_options }: Attribute) => !!filter_options?.length;
-export const isAttributeWithRelatedCollection = ({ related_collection }: Attribute) => !!related_collection;
-export const isCustomComponentFilter = ({ filter_component }: Attribute) => !!filter_component;
+public class MavenProjectDirProviderWithFrontend extends DefaultMavenProjectDirProvider {
+    @Override
+    public boolean includeFrontend() {
+        return true;
+    }
+}
