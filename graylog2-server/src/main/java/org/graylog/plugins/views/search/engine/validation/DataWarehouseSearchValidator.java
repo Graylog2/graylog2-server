@@ -69,11 +69,11 @@ public class DataWarehouseSearchValidator implements SearchValidator {
         return Set.of();
     }
 
-    private boolean containsDataWarehouseSearchElements(final Search search) {
-        return search.queries().stream().anyMatch(this::containsDataWarehouseSearchElements);
+    public static boolean containsDataWarehouseSearchElements(final Search search) {
+        return search.queries().stream().anyMatch(DataWarehouseSearchValidator::containsDataWarehouseSearchElements);
     }
 
-    private boolean containsDataWarehouseSearchElements(final Query query) {
+    public static boolean containsDataWarehouseSearchElements(final Query query) {
         return (query.query().type().startsWith(DataWarehouseSearchType.PREFIX))
                 || (query.searchTypes().stream().anyMatch(searchType -> searchType instanceof DataWarehouseSearchType));
     }
