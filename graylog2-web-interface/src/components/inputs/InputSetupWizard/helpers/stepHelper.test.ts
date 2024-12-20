@@ -16,16 +16,16 @@
  */
 
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
-import type { StepData, StepsData } from 'components/inputs/InputSetupWizard/types';
+import type { StepsData } from 'components/inputs/InputSetupWizard/types';
 
 import {
-  getStepData,
+  getStepConfigOrData,
   getNextStep,
   checkHasNextStep,
   checkHasPreviousStep,
   checkIsNextStepDisabled,
   addStepAfter,
-  updateStepData,
+  updateStepConfigOrData,
   enableNextStep,
 } from './stepHelper';
 
@@ -43,15 +43,15 @@ const stepsData = {
 const orderedSteps = [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
 
 describe('stepHelper', () => {
-  describe('getStepData', () => {
+  describe('getStepConfigOrData', () => {
     it('returns data for specific step', () => {
-      expect(getStepData(stepsData as StepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS)).toEqual(
+      expect(getStepConfigOrData(stepsData as StepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS)).toEqual(
         stepsData[INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS],
       );
     });
 
     it('returns undefined if no step data exists', () => {
-      expect(getStepData(stepsData as StepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(
+      expect(getStepConfigOrData(stepsData as StepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(
         undefined,
       );
     });
@@ -221,7 +221,7 @@ describe('stepHelper', () => {
     });
   });
 
-  describe('updateStepData', () => {
+  describe('updateStepConfigOrData', () => {
     it('returns updated steps data with new attribute', () => {
       const testStepsData = {
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
@@ -232,7 +232,7 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, { foo: 'bar' } as StepData)).toEqual({
+      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, { foo: 'bar' })).toEqual({
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
           foo: 'bar',
@@ -255,7 +255,7 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' } as StepData)).toEqual({
+      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' })).toEqual({
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
           foo: 'foo',
@@ -279,7 +279,7 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' } as StepData, true)).toEqual({
+      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' }, true)).toEqual({
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
           foo: 'foo',
@@ -302,7 +302,7 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, {} as StepData)).toEqual(testStepsData);
+      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, {})).toEqual(testStepsData);
     });
 
     it('returns updated steps data when no step data existed', () => {
@@ -313,7 +313,7 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' } as StepData)).toEqual({
+      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' })).toEqual({
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
           foo: 'foo',
@@ -325,7 +325,7 @@ describe('stepHelper', () => {
     });
 
     it('returns new steps data when no steps data existed', () => {
-      expect(updateStepData(undefined, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' } as StepData)).toEqual({
+      expect(updateStepConfigOrData(undefined, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' })).toEqual({
         [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
           foo: 'bar',
         },
@@ -333,7 +333,7 @@ describe('stepHelper', () => {
     });
 
     it('returns empty object when no step name is given', () => {
-      expect(updateStepData(undefined, undefined, { foo: 'bar' } as StepData)).toEqual({});
+      expect(updateStepConfigOrData(undefined, undefined, { foo: 'bar' })).toEqual({});
     });
   });
 

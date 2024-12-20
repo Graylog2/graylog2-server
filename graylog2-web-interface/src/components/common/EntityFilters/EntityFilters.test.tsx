@@ -19,11 +19,13 @@ import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { OrderedMap } from 'immutable';
 import type { Optional } from 'utility-types';
+import { Formik, Form } from 'formik';
 
-import type { Attributes } from 'stores/PaginationTypes';
+import type { Attributes, FilterComponentProps } from 'stores/PaginationTypes';
 import { asMock } from 'helpers/mocking';
 import useFilterValueSuggestions from 'components/common/EntityFilters/hooks/useFilterValueSuggestions';
 import useFiltersWithTitle from 'components/common/EntityFilters/hooks/useFiltersWithTitle';
+import { ModalSubmit, FormikInput } from 'components/common';
 
 import OriginalEntityFilters from './EntityFilters';
 
@@ -36,10 +38,31 @@ jest.mock('logic/generateId', () => jest.fn(() => 'filter-id'));
 jest.mock('components/common/EntityFilters/hooks/useFilterValueSuggestions');
 jest.mock('components/common/EntityFilters/hooks/useFiltersWithTitle');
 
+const CustomFilterInput = ({ filter, onSubmit }: FilterComponentProps) => (
+  <div data-testid="custom-component-form">
+    <Formik initialValues={{ value: filter?.value }} onSubmit={({ value }) => onSubmit({ title: value, value })}>
+      {({ isValid }) => (
+        <Form>
+          <FormikInput type="text"
+                       id="custom-input"
+                       name="value"
+                       formGroupClassName=""
+                       required
+                       placeholder="My custom input" />
+          <ModalSubmit submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
+                       bsSize="small"
+                       disabledSubmit={!isValid}
+                       displayCancel={false} />
+        </Form>
+      )}
+    </Formik>
+  </div>
+);
+
 describe('<EntityFilters />', () => {
   const onChangeFiltersWithTitle = jest.fn();
   const setUrlQueryFilters = jest.fn();
-  const attributes = [
+  const attributes: Attributes = [
     { id: 'title', title: 'Title', sortable: true },
     { id: 'description', title: 'Description', sortable: true },
     {
@@ -88,7 +111,14 @@ describe('<EntityFilters />', () => {
       title: 'Generic Attribute',
       type: 'STRING',
     },
-  ] as Attributes;
+    {
+      id: 'customComponent',
+      filterable: true,
+      title: 'Custom Component Attribute',
+      type: 'STRING',
+      filter_component: CustomFilterInput,
+    },
+  ];
 
   const EntityFilters = (props: Optional<React.ComponentProps<typeof OriginalEntityFilters>, 'setUrlQueryFilters' | 'attributes'>) => (
     <OriginalEntityFilters setUrlQueryFilters={setUrlQueryFilters} attributes={attributes} {...props} />
@@ -420,6 +450,52 @@ describe('<EntityFilters />', () => {
 
       await waitFor(() => {
         expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ generic: ['bar'] }));
+      });
+    });
+  });
+
+  describe('custom component attribute', () => {
+    it('provides text input to create filter', async () => {
+      render(
+        <EntityFilters urlQueryFilters={OrderedMap()} />,
+      );
+
+      userEvent.click(await screen.findByRole('button', { name: /create filter/i }));
+
+      userEvent.click(await screen.findByRole('menuitem', { name: /custom component/i }));
+
+      const filterInput = await screen.findByPlaceholderText('My custom input');
+      userEvent.type(filterInput, 'foo');
+
+      const form = await screen.findByTestId('custom-component-form');
+      userEvent.click(await within(form).findByRole('button', { name: /create filter/i }));
+
+      await waitFor(() => {
+        expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ customComponent: ['foo'] }));
+      });
+    });
+
+    it('allows changing filter', async () => {
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ customComponent: [{ title: 'foo', value: 'foo' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
+
+      render(
+        <EntityFilters urlQueryFilters={OrderedMap()} />,
+      );
+
+      userEvent.click(await screen.findByText('foo'));
+
+      const filterInput = await screen.findByPlaceholderText('My custom input');
+      userEvent.type(filterInput, '{selectall}bar');
+
+      const form = await screen.findByTestId('custom-component-form');
+      userEvent.click(await within(form).findByRole('button', { name: /update filter/i }));
+
+      await waitFor(() => {
+        expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ customComponent: ['bar'] }));
       });
     });
   });

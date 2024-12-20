@@ -20,7 +20,7 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ReflectionUtils;
 import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.ClassUtils;
-import org.graylog.datanode.commands.Server;
+import org.graylog.datanode.commands.Datanode;
 import org.graylog.datanode.docs.printers.ConfigFileDocsPrinter;
 import org.graylog.datanode.docs.printers.ConfigurationSection;
 import org.graylog.datanode.docs.printers.CsvDocsPrinter;
@@ -131,7 +131,7 @@ public class ConfigurationDocsGenerator {
     }
 
     private static List<Object> getDatanodeConfigurationBeans() {
-        return new Server().getCommandConfigurationBeans();
+        return new Datanode().getNodeCommandConfigurationBeans();
     }
 
     /**

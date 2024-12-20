@@ -71,26 +71,31 @@ type Props = {
   destinationType: string,
   paginatedFilters: PaginatedListType<StreamOutputFilterRule>,
   onPaginationChange: (newPage: number, newPerPage: number) => void,
+  requiredPermissions: Array<string>,
 };
 const _headerCellFormatter = (header: string) => (<th>{header}</th>);
-const buildFilterItem = (destinationType: string) => (filter: StreamOutputFilterRule) => (
+const buildFilterItem = (destinationType: string, requiredPermissions: Array<string>) => (filter: StreamOutputFilterRule) => (
   <tr key={filter.id}>
     <td>
       {filter.title}
       <StyledText>{filter.description}</StyledText>
     </td>
     <td><FilterStatusCell filterOutputRule={filter} /></td>
-    <td><FilterActions filterRule={filter} destinationType={destinationType} /></td>
+    <td>
+      <IfPermitted permissions={requiredPermissions}>
+        <FilterActions filterRule={filter} destinationType={destinationType} />
+      </IfPermitted>
+    </td>
   </tr>
 );
 
-const FilterRulesList = ({ streamId, destinationType, paginatedFilters, onPaginationChange }: Props) => {
+const FilterRulesList = ({ streamId, destinationType, paginatedFilters, onPaginationChange, requiredPermissions }: Props) => {
   const { list: filters, pagination: { total } } = paginatedFilters;
 
   return (
     <StyledSectionComponent title="Filter Rules"
                             headerActions={(
-                              <IfPermitted permissions="">
+                              <IfPermitted permissions={requiredPermissions}>
                                 <FilterRuleEditButton filterRule={{ stream_id: streamId }}
                                                       destinationType={destinationType}
                                                       streamId={streamId} />
@@ -112,7 +117,7 @@ const FilterRulesList = ({ streamId, destinationType, paginatedFilters, onPagina
                    sortByKey="title"
                    noDataText={<NoSearchResult>No filter have been found.</NoSearchResult>}
                    rows={filters.toJS()}
-                   dataRowFormatter={buildFilterItem(destinationType)} />
+                   dataRowFormatter={buildFilterItem(destinationType, requiredPermissions)} />
       </PaginatedList>
     </StyledSectionComponent>
   );
