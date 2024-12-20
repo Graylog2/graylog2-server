@@ -100,7 +100,6 @@ const useInputDiagnosis = (inputId: string): {
   ]), [input, failures_indexing, failures_processing, failures_inputs_codecs]);
 
   const { metrics: metricsByNode } = useStore(MetricsStore);
-  console.log(metricsByNode);
   const nodeMetrics = (metricsByNode && input?.node) ? metricsByNode[input?.node] : {};
 
   useEffect(() => {

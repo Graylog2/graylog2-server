@@ -114,7 +114,6 @@ const InputDiagnosisPage = () => {
                 Metrics show the last 15 minutes:
               </Col>
               <Col xs={6}>
-                {/* <Button>Every 10 seconds</Button> */}
               </Col>
             </Row>
             <br /><br />
