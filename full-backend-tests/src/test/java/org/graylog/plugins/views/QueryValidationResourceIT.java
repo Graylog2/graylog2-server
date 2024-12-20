@@ -52,6 +52,8 @@ public class QueryValidationResourceIT {
                                 "source":"example.org",
                                 "http_response_code":200,
                                 "bytes":42,
+                                "field with whitespace":13,
+                                "field/with/slashes":14,
                                 "timestamp": "2019-07-23 09:53:08.175",
                                 "otherDate": "2020-07-29T12:00:00.000-05:00",
                                 "resource": "posts",
@@ -187,30 +189,18 @@ public class QueryValidationResourceIT {
         verifyQueryIsValidatedSuccessfully("otherDate:[\\\"2020-07-29T12:00:00.000-05:00\\\" TO \\\"2020-07-30T15:13:00.000-05:00\\\"]");
         verifyQueryIsValidatedSuccessfully("otherDate:[now-5d TO now-4d]");
         verifyQueryIsValidatedSuccessfully("resource:\\/posts\\/45326");
+        verifyQueryIsValidatedSuccessfully("field\\\\ with\\\\ whitespace:>400");
+        verifyQueryIsValidatedSuccessfully("field\\\\/with\\\\/slashes:<=400");
     }
 
     private void verifyQueryIsValidatedSuccessfully(final String query) {
-        given()
-                .spec(api.requestSpecification())
-                .when()
-                .body("{\"query\": \"" + query + "\"}")
-                .post("/search/validate")
-                .then()
-                .statusCode(200)
-                .log().ifStatusCodeMatches(not(200))
+        api.post("/search/validate", "{\"query\": \"" + query + "\"}", 200)
                 .log().ifValidationFails()
                 .assertThat().body("status", equalTo("OK"));
     }
 
     private void verifyQueryIsValidatedWithValidationError(final String query) {
-        given()
-                .spec(api.requestSpecification())
-                .when()
-                .body("{\"query\": \"" + query + "\"}")
-                .post("/search/validate")
-                .then()
-                .statusCode(200)
-                .log().ifStatusCodeMatches(not(200))
+        api.post("/search/validate", "{\"query\": \"" + query + "\"}", 200)
                 .log().ifValidationFails()
                 .assertThat().body("status", equalTo("ERROR"));
     }
