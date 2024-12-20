@@ -30,15 +30,17 @@ export type InputState = | 'RUNNING'
     | 'FAILING'
     | 'SETUP'
 
-export type InputStates = {
-  [inputId: string]: {
-    [nodeId: string]: {
-      state: InputState,
-      id: string,
-      detailed_message: string | null,
-      message_input: Input,
-    }
+export type InputStateByNode = {
+  [nodeId: string]: {
+    state: InputState,
+    id: string,
+    detailed_message: string | null,
+    message_input: Input,
   }
+}
+
+export type InputStates = {
+  [inputId: string]: InputStateByNode,
 }
 
 export const InputStatesStore = singletonStore(
