@@ -114,7 +114,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
     // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
     // and filter after wards
-    private final int MAX_INDICES_URL_LENGTH = 20;
+    private final int MAX_INDICES_URL_LENGTH = 3000;
 
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
