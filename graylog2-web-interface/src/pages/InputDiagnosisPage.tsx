@@ -113,8 +113,6 @@ const InputDiagnosisPage = () => {
                 <h3>Input Test Results</h3>
                 Metrics show the last 15 minutes:
               </Col>
-              <Col xs={6}>
-              </Col>
             </Row>
             <br /><br />
             <Row>
