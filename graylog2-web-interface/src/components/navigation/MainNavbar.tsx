@@ -130,7 +130,7 @@ const MainNavbar = () => {
   return (
     <Nav className="navbar-main">
       {navigationItems.map((navigationItem) => (
-        <NavigationItem navigationItem={navigationItem} />
+        <NavigationItem navigationItem={navigationItem} key={navigationItem.description} />
       ))}
     </Nav>
   );

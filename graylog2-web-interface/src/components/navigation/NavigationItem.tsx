@@ -112,7 +112,7 @@ const NavigationItem = ({ navigationItem }: { navigationItem: PluginNavigation }
   }
 
   return (
-    <PluginNavLink path={navigationItem.description}
+    <PluginNavLink path={navigationItem.path}
                    description={navigationItem.description}
                    key={navigationItem.description}
                    topLevel />

@@ -20,6 +20,7 @@ import * as React from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { defaultUser } from 'defaultMockValues';
+import type { Location } from 'history';
 
 import AppConfig from 'util/AppConfig';
 import { asMock } from 'helpers/mocking';
@@ -27,15 +28,17 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import PerspectivesBindings from 'components/perspectives/bindings';
+import useLocation from 'routing/useLocation';
 
 import MainNavbar from './MainNavbar';
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('routing/useLocation');
 
 describe('MainNavbar', () => {
   const SUT = (props: Partial<React.ComponentProps<typeof MainNavbar>>) => (
     <PerspectivesProvider>
-      <MainNavbar pathname="/" {...props} />
+      <MainNavbar {...props} />
     </PerspectivesProvider>
   );
 
@@ -45,6 +48,7 @@ describe('MainNavbar', () => {
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
+    asMock(useLocation).mockReturnValue({ pathname: '/' } as Location);
   });
 
   describe('renders custom navigation elements supplied by plugins', () => {
@@ -168,11 +172,13 @@ describe('MainNavbar', () => {
     });
 
     it('sets dropdown title based on match', async () => {
+      asMock(useLocation).mockReturnValue({ pathname: '/somethingelse' } as Location);
+
       asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
         .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
         .build());
 
-      render(<SUT pathname="/somethingelse" />);
+      render(<SUT />);
 
       await screen.findByRole('button', { name: /neat stuff \/ something else/i });
     });
