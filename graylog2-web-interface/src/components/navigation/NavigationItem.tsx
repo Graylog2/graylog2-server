@@ -97,7 +97,6 @@ const NavigationItem = ({ navigationItem }: { navigationItem: PluginNavigation }
   if (navigationItem.permissions && !isPermitted(currentUser.permissions, navigationItem.permissions)) return null;
 
   if (navigationItem.useCondition) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const shouldBeVisible = navigationItem.useCondition();
 
     if (!shouldBeVisible) {

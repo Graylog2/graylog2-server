@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 
-import useLocation from 'routing/useLocation';
 import { LinkContainer } from 'components/common/router';
 import AppConfig from 'util/AppConfig';
 import { Navbar, Nav, NavItem } from 'components/bootstrap';
