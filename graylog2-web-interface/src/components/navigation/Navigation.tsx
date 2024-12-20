@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 
-import useLocation from 'routing/useLocation';
 import { LinkContainer } from 'components/common/router';
 import AppConfig from 'util/AppConfig';
 import { Navbar, Nav, NavItem } from 'components/bootstrap';
@@ -36,11 +35,7 @@ import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
 
-type Props = {
-  pathname: string,
-};
-
-const Navigation = React.memo(({ pathname }: Props) => {
+const Navigation = React.memo(() => {
   const pluginItems = usePluginEntities('navigationItems');
   const { activePerspective } = useActivePerspective();
 
@@ -55,7 +50,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
         {pluginItems.map(({ key, component: Item }) => <Item key={key} smallScreen />)}
       </Navbar.Header>
       <Navbar.Collapse>
-        <MainNavbar pathname={pathname} />
+        <MainNavbar />
 
         <NotificationBadge />
 
@@ -89,10 +84,4 @@ const Navigation = React.memo(({ pathname }: Props) => {
   );
 });
 
-const NavigationContainer = () => {
-  const { pathname } = useLocation();
-
-  return <Navigation pathname={pathname} />;
-};
-
-export default NavigationContainer;
+export default Navigation;
