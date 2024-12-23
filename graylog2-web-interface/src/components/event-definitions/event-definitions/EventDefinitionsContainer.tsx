@@ -27,6 +27,7 @@ import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks/useEventDefinitions';
+import useTableComponents from 'components/event-definitions/event-definitions/useTableComponents';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import SchedulingCell from './SchedulingCell';
@@ -71,6 +72,8 @@ const EventDefinitionsContainer = () => {
     <EventDefinitionActions eventDefinition={listItem} />
   ), []);
 
+  const { bulkSelection } = useTableComponents();
+
   return (
     <PaginatedEntityTable<EventDefinition> humanName="event definitions"
                                            columnsOrder={COLUMNS_ORDER}
@@ -82,7 +85,8 @@ const EventDefinitionsContainer = () => {
                                            keyFn={keyFn}
                                            entityAttributesAreCamelCase={false}
                                            filterValueRenderers={FilterValueRenderers}
-                                           columnRenderers={columnRenderers} />
+                                           columnRenderers={columnRenderers}
+                                           bulkSelection={bulkSelection} />
   );
 };
 
