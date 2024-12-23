@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
 
 import {
   QueryHelper,
@@ -24,10 +23,9 @@ import {
 } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks/useEventDefinitions';
-import useTableComponents from 'components/event-definitions/event-definitions/useTableComponents';
+import BulkActions from 'components/event-definitions/event-definitions/BulkActions';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import SchedulingCell from './SchedulingCell';
@@ -36,7 +34,7 @@ import StatusCell from './StatusCell';
 import type { EventDefinition } from '../event-definitions-types';
 import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER } from '../constants';
 
-const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
+const customColumnRenderers = {
   attributes: {
     title: {
       renderCell: (title: string, eventDefinition) => (
@@ -63,31 +61,29 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
       staticWidth: 100,
     },
   },
-});
-
-const EventDefinitionsContainer = () => {
-  const columnRenderers = customColumnRenderers();
-
-  const renderEventDefinitionActions = useCallback((listItem: EventDefinition) => (
-    <EventDefinitionActions eventDefinition={listItem} />
-  ), []);
-
-  const { bulkSelection } = useTableComponents();
-
-  return (
-    <PaginatedEntityTable<EventDefinition> humanName="event definitions"
-                                           columnsOrder={COLUMNS_ORDER}
-                                           additionalAttributes={ADDITIONAL_ATTRIBUTES}
-                                           queryHelpComponent={<QueryHelper entityName="event definition" />}
-                                           tableLayout={DEFAULT_LAYOUT}
-                                           fetchEntities={fetchEventDefinitions}
-                                           entityActions={renderEventDefinitionActions}
-                                           keyFn={keyFn}
-                                           entityAttributesAreCamelCase={false}
-                                           filterValueRenderers={FilterValueRenderers}
-                                           columnRenderers={columnRenderers}
-                                           bulkSelection={bulkSelection} />
-  );
 };
+
+const bulkSelection = {
+  actions: <BulkActions />,
+
+};
+const renderEventDefinitionActions = (listItem: EventDefinition) => (
+  <EventDefinitionActions eventDefinition={listItem} />
+);
+
+const EventDefinitionsContainer = () => (
+  <PaginatedEntityTable<EventDefinition> humanName="event definitions"
+                                         columnsOrder={COLUMNS_ORDER}
+                                         additionalAttributes={ADDITIONAL_ATTRIBUTES}
+                                         queryHelpComponent={<QueryHelper entityName="event definition" />}
+                                         tableLayout={DEFAULT_LAYOUT}
+                                         fetchEntities={fetchEventDefinitions}
+                                         entityActions={renderEventDefinitionActions}
+                                         keyFn={keyFn}
+                                         entityAttributesAreCamelCase={false}
+                                         filterValueRenderers={FilterValueRenderers}
+                                         columnRenderers={customColumnRenderers}
+                                         bulkSelection={bulkSelection} />
+);
 
 export default EventDefinitionsContainer;
