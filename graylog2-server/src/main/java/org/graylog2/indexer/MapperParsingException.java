@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Attribute } from 'stores/PaginationTypes';
+package org.graylog2.indexer;
 
-export const isDateAttribute = ({ type }: Attribute) => type === 'DATE';
-export const isAttributeWithFilterOptions = ({ filter_options }: Attribute) => !!filter_options?.length;
-export const isAttributeWithRelatedCollection = ({ related_collection }: Attribute) => !!related_collection;
-export const isCustomComponentFilter = ({ filter_component }: Attribute) => !!filter_component;
+public class MapperParsingException extends ElasticsearchException {
+    public MapperParsingException(String errorMessage) {
+        super(errorMessage);
+    }
+}

@@ -16,28 +16,31 @@
  */
 import * as React from 'react';
 
-import type { Attribute } from 'stores/PaginationTypes';
-import type { Filters, Filter } from 'components/common/EntityFilters/types';
+import type { FilterComponentProps } from 'stores/PaginationTypes';
 import { MenuItem } from 'components/bootstrap';
 import {
   isAttributeWithFilterOptions,
-  isAttributeWithRelatedCollection, isDateAttribute,
+  isAttributeWithRelatedCollection, isDateAttribute, isCustomComponentFilter,
 } from 'components/common/EntityFilters/helpers/AttributeIdentification';
-import GenericFilterInput from 'components/common/EntityFilters/FilterConfiguration/GenericFilterInput';
 
+import SuggestionsListFilter from './SuggestionsListFilter';
+import GenericFilterInput from './GenericFilterInput';
 import StaticOptionsList from './StaticOptionsList';
-import SuggestionsList from './SuggestionsList';
 import DateRangeForm from './DateRangeForm';
 
-type Props = {
-  attribute: Attribute,
-  filter?: Filter,
-  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: { title: string, value: string }, closeDropdown?: boolean) => void,
-  allActiveFilters: Filters | undefined,
-}
+const FilterComponent = ({ allActiveFilters, attribute, filter = undefined, filterValueRenderer, onSubmit }: FilterComponentProps) => {
+  if (isCustomComponentFilter(attribute)) {
+    const CustomFilterComponent = attribute.filter_component;
 
-const FilterComponent = ({ allActiveFilters, attribute, filter, filterValueRenderer, onSubmit }: Pick<Props, 'allActiveFilters' | 'attribute' | 'filter' | 'filterValueRenderer' | 'onSubmit'>) => {
+    return (
+      <CustomFilterComponent attribute={attribute}
+                             filterValueRenderer={filterValueRenderer}
+                             onSubmit={onSubmit}
+                             allActiveFilters={allActiveFilters}
+                             filter={filter} />
+    );
+  }
+
   if (isAttributeWithFilterOptions(attribute)) {
     return (
       <StaticOptionsList attribute={attribute}
@@ -49,11 +52,11 @@ const FilterComponent = ({ allActiveFilters, attribute, filter, filterValueRende
 
   if (isAttributeWithRelatedCollection(attribute)) {
     return (
-      <SuggestionsList attribute={attribute}
-                       filterValueRenderer={filterValueRenderer}
-                       onSubmit={onSubmit}
-                       allActiveFilters={allActiveFilters}
-                       filter={filter} />
+      <SuggestionsListFilter attribute={attribute}
+                             filterValueRenderer={filterValueRenderer}
+                             onSubmit={onSubmit}
+                             allActiveFilters={allActiveFilters}
+                             filter={filter} />
     );
   }
 
@@ -73,7 +76,7 @@ export const FilterConfiguration = ({
   filter = undefined,
   filterValueRenderer,
   onSubmit,
-}: Props) => (
+}: FilterComponentProps) => (
   <>
     <MenuItem header>{filter ? 'Edit' : 'Create'} {attribute.title.toLowerCase()} filter</MenuItem>
     <FilterComponent attribute={attribute}
