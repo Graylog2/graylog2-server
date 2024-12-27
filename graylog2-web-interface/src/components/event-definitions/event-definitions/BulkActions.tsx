@@ -115,8 +115,6 @@ const BulkActions = () => {
   };
 
   const onAction = useCallback(() => {
-    const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event definition', 'event definitions');
-
     fetch('POST',
       qualifyUrl(ACTION_TEXT[actionType].bulkActionUrl),
       { entity_ids: selectedEntities },
@@ -124,7 +122,7 @@ const BulkActions = () => {
       if (failures?.length) {
         const notUpdatedDefinitionIds = failures.map(({ entity_id }) => entity_id);
         setSelectedEntities(notUpdatedDefinitionIds);
-        UserNotification.error(`${notUpdatedDefinitionIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted.`);
+        UserNotification.error(`${notUpdatedDefinitionIds.length} out of ${selectedItemsAmount} selected ${getDescriptor(selectedItemsAmount)} could not be ${actionType}d.`);
       } else {
         setSelectedEntities([]);
         UserNotification.success(`${selectedItemsAmount} ${getDescriptor(selectedItemsAmount)} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionType}d successfully.`, 'Success');
