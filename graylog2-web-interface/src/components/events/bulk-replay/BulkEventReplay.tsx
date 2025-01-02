@@ -18,7 +18,7 @@ const EventsListSidebar = styled.div(({ theme }) => css`
   top: 0;
   left: 0;
   overflow: auto;
-  padding: 5px;
+  padding: 5px 10px;
 
   background: ${theme.colors.global.contentBackground};
   border-right: none;
@@ -32,6 +32,11 @@ const ReplayedSearchContainer = styled.div`
   padding: 5px;
 `;
 
+const StyledList = styled.ul`
+  padding-inline-start: 0;
+  margin-top: 20px;
+`;
+
 type Props = {
   initialEventIds: Array<string>;
   events: { [eventId: string]: { event: Event } };
@@ -40,6 +45,8 @@ type Props = {
 const BulkEventReplay = ({ initialEventIds, events }: Props) => {
   const { eventIds, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents(initialEventIds);
   const selectedEvent = events?.[selectedId];
+  const total = eventIds.length;
+  const completed = eventIds.filter((event) => event.status === 'DONE').length;
 
   return (
     <Container>
@@ -49,7 +56,8 @@ const BulkEventReplay = ({ initialEventIds, events }: Props) => {
           The following list contains all of the events/alerts you selected in the previous step, allowing you to
           investigate the replayed search for each of them.
         </p>
-        <ul>
+        <i>Investigation of {completed}/{total} events completed.</i>
+        <StyledList>
           {eventIds.map(({ id: eventId, status }) => (
             <EventListItem event={events?.[eventId]?.event}
                            selected={eventId === selectedId}
@@ -58,7 +66,7 @@ const BulkEventReplay = ({ initialEventIds, events }: Props) => {
                            onClick={() => selectItem(eventId)}
                            markItemAsDone={markItemAsDone} />
           ))}
-        </ul>
+        </StyledList>
       </EventsListSidebar>
       <ReplayedSearchContainer>
         {selectedEvent
