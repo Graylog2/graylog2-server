@@ -78,7 +78,9 @@ public class GraylogNodeModule extends Graylog2Module {
         install(new ServerStatusBindings(configuration.withCapabilities()));
 
         bind(EncryptedValueService.class).asEagerSingleton();
-        bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
+        if (!configuration.withInputs()) {
+            bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
+        }
     }
 
     public Set<Object> getConfigurationBeans() {

@@ -36,6 +36,7 @@ import org.graylog2.security.JwtSecret;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -112,10 +113,10 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
             try {
                 configurationBuilder.httpCertificate(cert);
                 configurationBuilder.withConfigFile(new KeystoreConfigFile(Path.of(TARGET_DATANODE_HTTP_KEYSTORE_FILENAME), cert));
-                truststoreCreator.addRootCert("http-cert", cert, CertConstants.DATANODE_KEY_ALIAS);
+                truststoreCreator.addFromKeystore(cert, CertConstants.DATANODE_KEY_ALIAS);
                 logCertificateInformation("HTTP certificate", cert);
-            } catch (GeneralSecurityException e) {
-                throw new RuntimeException(e);
+            } catch (GeneralSecurityException | IOException e) {
+                throw new OpensearchConfigurationException(e);
             }
         });
 
@@ -123,10 +124,10 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
             try {
                 configurationBuilder.transportCertificate(cert);
                 configurationBuilder.withConfigFile(new KeystoreConfigFile(Path.of(TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME), cert));
-                truststoreCreator.addRootCert("transport-cert", cert, CertConstants.DATANODE_KEY_ALIAS);
+                truststoreCreator.addFromKeystore(cert, CertConstants.DATANODE_KEY_ALIAS);
                 logCertificateInformation("Transport certificate", cert);
-            } catch (GeneralSecurityException e) {
-                throw new RuntimeException(e);
+            } catch (GeneralSecurityException | IOException e) {
+                throw new OpensearchConfigurationException(e);
             }
         });
 
