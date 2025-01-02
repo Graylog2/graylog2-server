@@ -42,6 +42,7 @@ import org.graylog.storage.errors.ResponseError;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
+import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,6 +203,9 @@ public class ElasticsearchClient {
             if (isBatchSizeTooLargeException(elasticsearchException)) {
                 throw new BatchSizeTooLargeException(elasticsearchException.getMessage());
             }
+            if (isMapperParsingExceptionException(elasticsearchException)) {
+                throw new MapperParsingException(elasticsearchException.getMessage());
+            }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
             throw new BatchSizeTooLargeException(e.getMessage());
         }
@@ -229,6 +233,10 @@ public class ElasticsearchClient {
 
     private boolean isIndexNotFoundException(ElasticsearchException elasticsearchException) {
         return elasticsearchException.getMessage().contains("index_not_found_exception");
+    }
+
+    private boolean isMapperParsingExceptionException(ElasticsearchException openSearchException) {
+        return openSearchException.getMessage().contains("mapper_parsing_exception");
     }
 
     private boolean isBatchSizeTooLargeException(ElasticsearchException elasticsearchException) {
