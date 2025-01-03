@@ -30,7 +30,8 @@ const usePluggableEventActions = (events: Array<Event>, onlyBulk: boolean = fals
   const actions = availableActions.map(({ component: PluggableEventAction, key }: { component: React.ComponentType<EventActionComponentProps>, key: string }) => (
     <PluggableEventAction key={`event-action-${key}`}
                           events={events}
-                          modalRef={() => modalRefs.current[key]} />
+                          modalRef={() => modalRefs.current[key]}
+                          fromBulk={onlyBulk} />
   ));
 
   const actionModals = availableActions
@@ -38,7 +39,8 @@ const usePluggableEventActions = (events: Array<Event>, onlyBulk: boolean = fals
     .map(({ modal: ActionModal, key }) => (
       <ActionModal key={`event-action-modal-${key}`}
                    events={events}
-                   ref={(r) => { modalRefs.current[key] = r; }} />
+                   ref={(r) => { modalRefs.current[key] = r; }}
+                   fromBulk={onlyBulk} />
     ));
 
   return ({ actions, actionModals });

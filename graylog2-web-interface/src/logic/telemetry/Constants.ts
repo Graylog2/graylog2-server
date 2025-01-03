@@ -400,4 +400,7 @@ export const TELEMETRY_EVENT_TYPE = {
     REMOTEREINDEX_RUNNING_RETRY_CONFIRM_CLICKED: 'Datanode Migration RemoteReindex Running Retry Confirm Clicked',
     REMOTEREINDEX_SHUTDOWN_OLD_CLUSTER_NEXT_CLICKED: 'Datanode Migration RemoteReindex Shutdown Old Cluster Next Clicked',
   },
+  ALERTS_AND_EVENTS: {
+    ACTION_RAN: 'Alerts And Events Action Ran',
+  },
 } as const;
