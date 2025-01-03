@@ -21,12 +21,12 @@ import Routes from 'routing/Routes';
 import { ReplaySearchButtonComponent } from 'views/components/widgets/ReplaySearchButton';
 import useParams from 'routing/useParams';
 
-const LinkToReplaySearch = ({ isEvent = false, id }: { id?: string, isEvent?: boolean }) => {
+const LinkToReplaySearch = ({ isEvent = false, id, onClick }: { id?: string, isEvent?: boolean, onClick?: () => void }) => {
   const { definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
   const searchLink = isEvent ? Routes.ALERTS.replay_search(id) : Routes.ALERTS.DEFINITIONS.replay_search(id || definitionId);
 
   return (
-    <ReplaySearchButtonComponent searchLink={searchLink}>Replay search</ReplaySearchButtonComponent>
+    <ReplaySearchButtonComponent searchLink={searchLink} onClick={onClick}>Replay search</ReplaySearchButtonComponent>
   );
 };
 

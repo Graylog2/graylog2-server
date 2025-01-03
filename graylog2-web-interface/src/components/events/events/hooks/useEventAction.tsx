@@ -19,13 +19,15 @@ import React, { useMemo } from 'react';
 import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
 import { MenuItem } from 'components/bootstrap';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
+import useSendEventActionTelemetry from 'components/events/events/hooks/useSendEventActionTelemetry';
 
 const useEventAction = (event) => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions([event]);
+  const sendEventActionTelemetry = useSendEventActionTelemetry();
   const hasReplayInfo = !!event.replay_info;
 
   const moreActions = useMemo(() => [
-    hasReplayInfo ? <MenuItem key="replay_info"><LinkToReplaySearch id={event.id} isEvent /></MenuItem> : null,
+    hasReplayInfo ? <MenuItem key="replay_info"><LinkToReplaySearch onClick={() => sendEventActionTelemetry('REPLAY_SEARCH', false)} id={event.id} isEvent /></MenuItem> : null,
     pluggableActions.length && hasReplayInfo ? <MenuItem divider key="divider" /> : null,
     pluggableActions.length ? pluggableActions : null,
   ].filter(Boolean), [event.id, hasReplayInfo, pluggableActions]);
