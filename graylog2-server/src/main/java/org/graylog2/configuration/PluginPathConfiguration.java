@@ -14,9 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+package org.graylog2.configuration;
 
-import org.graylog2.configuration.PluginPathConfiguration;
+import com.github.joschi.jadconfig.Parameter;
 
-public class PluginLoaderConfig extends PluginPathConfiguration {
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class PluginPathConfiguration {
+
+    protected static final Path DEFAULT_PLUGIN_DIR = Paths.get("plugin");
+
+    @Parameter(value = "plugin_dir", required = true)
+    private final Path pluginDir = DEFAULT_PLUGIN_DIR;
+
+    public Path getPluginDir() {
+        return pluginDir;
+    }
+
 }

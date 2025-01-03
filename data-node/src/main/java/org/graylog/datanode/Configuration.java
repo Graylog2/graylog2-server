@@ -37,6 +37,7 @@ import org.graylog2.Configuration.SafeClassesValidator;
 import org.graylog2.configuration.Documentation;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
+import org.graylog2.shared.plugins.PluginLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -670,4 +671,15 @@ public class Configuration implements CommonNodeConfiguration {
     public String getSystemPropertyPrefix() {
         return "graylog.datanode.";
     }
+
+    @Override
+    public boolean withPlugins() {
+        return true;
+    }
+
+    @Override
+    public PluginLoader.NodeType getPluginNodeType() {
+        return PluginLoader.NodeType.DATA_NODE;
+    }
+
 }
