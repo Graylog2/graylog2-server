@@ -9,8 +9,8 @@ import type { Event } from 'components/events/events/types';
 import Button from 'components/bootstrap/Button';
 import DropdownButton from 'components/bootstrap/DropdownButton';
 import useEventBulkActions from 'components/events/events/hooks/useEventBulkActions';
-
-import ButtonToolbar from '../../bootstrap/ButtonToolbar';
+import Center from 'components/common/Center';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 const Container = styled.div`
   display: flex;
@@ -84,6 +84,38 @@ const RemainingBulkActions = ({ completed, events }: RemainingBulkActionsProps) 
   );
 };
 
+const ReplayedSearch = ({ total, completed, selectedEvent }: React.PropsWithChildren<{
+  total: number;
+  completed: number;
+  selectedEvent: { event: Event } | undefined;
+}>) => {
+  if (total === 0) {
+    return (
+      <Center>
+        You have removed all events from the list. You can now return back by clicking the &ldquo;Close&rdquo; button.
+      </Center>
+    );
+  }
+
+  if (!selectedEvent && total === completed) {
+    return (
+      <Center>
+        You are done investigating all events. You can now select a bulk action to apply to all remaining events, or close the page to return to the events list.
+      </Center>
+    );
+  }
+
+  if (!selectedEvent) {
+    return (
+      <Center>
+        You have no event selected. Please select an event from the list to replay its search.
+      </Center>
+    );
+  }
+
+  return <ReplaySearch key={`replaying-search-for-event-${selectedEvent.event.id}`} event={selectedEvent.event} />;
+};
+
 const BulkEventReplay = ({ initialEventIds, events: _events, onClose }: Props) => {
   const [events] = useState<Props['events']>(_events);
   const { eventIds, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents(initialEventIds);
@@ -117,11 +149,7 @@ const BulkEventReplay = ({ initialEventIds, events: _events, onClose }: Props) =
         </ActionsBar>
       </EventsListSidebar>
       <ReplayedSearchContainer>
-        {selectedEvent
-          ? (
-            <ReplaySearch key={`replaying-search-for-event-${selectedEvent.event.id}`} event={selectedEvent.event} />
-          )
-          : <span>You are done investigating all events. You can now select a bulk action to apply to all remaining events, or close the page to return to the events list.</span>}
+        <ReplayedSearch total={total} completed={completed} selectedEvent={selectedEvent} />
       </ReplayedSearchContainer>
     </Container>
   );
