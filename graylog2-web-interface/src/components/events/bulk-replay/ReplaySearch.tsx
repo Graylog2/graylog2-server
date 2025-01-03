@@ -22,7 +22,8 @@ const ViewReplaySearch = ({ eventData, eventDefinition, aggregations }) => {
       isShown: false,
     },
     infoBar: { component: EventInfoBar },
-  }), []);
+    synchronizeUrl: false,
+  } as const), []);
 
   return (
     <SearchPageLayoutProvider value={searchPageLayout}>

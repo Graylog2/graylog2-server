@@ -24,7 +24,7 @@ const BulkEventReplayPage = () => {
   const history = useHistory();
   const onClose = useCallback(() => {
     history.push(Routes.ALERTS.LIST);
-  }, []);
+  }, [history]);
 
   return isInitialLoading
     ? <Spinner />
