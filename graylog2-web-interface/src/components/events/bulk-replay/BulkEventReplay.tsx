@@ -23,7 +23,7 @@ const EventsListSidebar = styled.div(({ theme }) => css`
   
   flex-shrink: 0;
   position: relative;
-  width: 25vw;
+  width: 20vw;
   height: 100%;
   top: 0;
   left: 0;

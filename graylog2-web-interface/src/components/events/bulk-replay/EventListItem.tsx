@@ -47,6 +47,10 @@ const Summary = styled.span<SummaryProps>(({ theme, $done }) => css`
   }
 `);
 
+const CompletedButton = styled(IconButton)<{ $done: boolean }>(({ theme, $done }) => css`
+  color: ${$done ? theme.colors.variant.success : theme.colors.global.textDefault};
+`);
+
 const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsDone }: EventListItemProps) => {
   const _removeItem = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -65,7 +69,7 @@ const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsD
 
       <ButtonGroup>
         <IconButton onClick={_removeItem} title="Remove event from list" name="delete" />
-        <IconButton onClick={_markItemAsDone} title="Mark event as investigated" name="check" />
+        <CompletedButton onClick={_markItemAsDone} title="Mark event as investigated" name="check" $done={done} />
       </ButtonGroup>
     </StyledItem>
   );
