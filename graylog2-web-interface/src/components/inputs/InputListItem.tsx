@@ -210,6 +210,19 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
                   disabled={definition === undefined}>
           Edit input
         </MenuItem>
+
+        <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
+          <MenuItem key={`input-diagnosis-${input.id}`}
+                    onClick={() => {
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_DIAGNOSIS_CLICKED, {
+                        app_pathname: getPathnameWithoutId(pathname),
+                        app_action_value: 'input-diagnosis',
+                      });
+                    }}>
+            Input Diagnosis
+          </MenuItem>
+        </LinkContainer>
+
         {inputSetupFeatureFlagIsEnabled && (
           isInputInSetupMode(inputStates, input.id) ? (
             <MenuItem key={`remove-setup-mode-${input.id}`}
@@ -229,7 +242,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
         )}
       </IfPermitted>
 
-      {input.global && (
+      {input.global && input.node && (
         <LinkContainer to={Routes.filtered_metrics(input.node, input.id)}>
           <MenuItem key={`show-metrics-${input.id}`}
                     onClick={() => {
