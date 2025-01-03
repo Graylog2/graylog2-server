@@ -4,8 +4,7 @@ import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 import ButtonGroup from 'components/bootstrap/ButtonGroup';
-
-import type { Event } from './types';
+import type { Event } from 'components/events/events/types';
 
 type EventListItemProps = {
   event: Event,

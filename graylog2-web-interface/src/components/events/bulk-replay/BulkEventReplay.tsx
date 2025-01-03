@@ -1,10 +1,11 @@
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import EventListItem from 'components/events/bulk-replay/EventListItem';
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
-
-import type { Event } from './types';
+import ReplaySearch from 'components/events/bulk-replay/ReplaySearch';
+import type { Event } from 'components/events/events/types';
 
 const Container = styled.div`
   display: flex;
@@ -12,6 +13,7 @@ const Container = styled.div`
 `;
 
 const EventsListSidebar = styled.div(({ theme }) => css`
+  flex-shrink: 0;
   position: relative;
   width: 25vw;
   height: 100%;
@@ -28,6 +30,7 @@ const EventsListSidebar = styled.div(({ theme }) => css`
 `);
 
 const ReplayedSearchContainer = styled.div`
+  width: 100%;
   overflow: auto;
   padding: 5px;
 `;
@@ -42,7 +45,8 @@ type Props = {
   events: { [eventId: string]: { event: Event } };
 }
 
-const BulkEventReplay = ({ initialEventIds, events }: Props) => {
+const BulkEventReplay = ({ initialEventIds, events: _events }: Props) => {
+  const [events] = useState<Props['events']>(_events);
   const { eventIds, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents(initialEventIds);
   const selectedEvent = events?.[selectedId];
   const total = eventIds.length;
@@ -71,9 +75,7 @@ const BulkEventReplay = ({ initialEventIds, events }: Props) => {
       <ReplayedSearchContainer>
         {selectedEvent
           ? (
-            <span>
-              Replayed Search for {selectedEvent.event.id}: {selectedEvent.event.message}
-            </span>
+            <ReplaySearch key={`replaying-search-for-event-${selectedEvent.event.id}`} event={selectedEvent.event} />
           )
           : <span>You are done investigating all events. You can now select a bulk action to apply to all remaining events, or close the page to return to the events list.</span>}
       </ReplayedSearchContainer>
