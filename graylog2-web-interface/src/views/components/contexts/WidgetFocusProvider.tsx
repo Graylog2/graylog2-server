@@ -125,8 +125,11 @@ const useCleanupQueryParams = ({ focusUriParams, widgetIds, query, history }: Cl
   useEffect(() => {
     if ((focusUriParams?.id && !widgetIds.includes(focusUriParams.id) && focusUriParams.isPageShown) || (focusUriParams?.id === undefined)) {
       const baseURI = _clearURI(query);
+      const newQuery = baseURI.toString();
 
-      history.replace(baseURI.toString());
+      if (query !== newQuery) {
+        history.replace(newQuery);
+      }
     }
   }, [focusUriParams, widgetIds, query, history]);
 };

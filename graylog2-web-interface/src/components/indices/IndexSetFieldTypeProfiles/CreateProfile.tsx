@@ -35,7 +35,7 @@ const CreateProfile = () => {
   const navigate = useNavigate();
   const { createProfile } = useProfileMutations();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
-  const location = useLocation();
+  const location = useLocation<{ customFieldMappings: any }>();
   const history = useHistory();
   const initialValues = useMemo<IndexSetFieldTypeProfileForm>(() => {
     const defaultCustomFieldMappings = location?.state?.customFieldMappings;

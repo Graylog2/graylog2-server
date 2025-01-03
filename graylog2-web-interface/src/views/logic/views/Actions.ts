@@ -19,6 +19,7 @@ import { stringify } from 'qs';
 import Routes from 'routing/Routes';
 import type View from 'views/logic/views/View';
 import type { HistoryFunction } from 'routing/useHistory';
+import type { NewDashboardPageState } from 'views/pages/NewDashboardPage';
 
 export const loadNewView = (history: HistoryFunction) => history.push(`${Routes.SEARCH}/new`);
 
@@ -32,7 +33,7 @@ export const loadDashboard = (history: HistoryFunction, dashboardId: string, ini
   `${Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId)}${initialPage ? `?${stringify({ page: initialPage })}` : ''}`,
 );
 
-export const loadAsDashboard = (history: HistoryFunction, view: View) => history.pushWithState(
+export const loadAsDashboard = (history: HistoryFunction, view: View) => history.pushWithState<NewDashboardPageState>(
   Routes.pluginRoute('DASHBOARDS_NEW'),
   {
     view,

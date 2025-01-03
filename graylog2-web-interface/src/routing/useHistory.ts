@@ -23,7 +23,7 @@ const useHistory = () => {
   return useMemo(() => ({
     goBack: () => navigate(-1),
     push: (to: string) => navigate(to),
-    pushWithState: (to: string, state: any) => navigate(to, { state }),
+    pushWithState: <T>(to: string, state: T) => navigate(to, { state }),
     replace: (to: string) => navigate(to, { replace: true }),
   }), [navigate]);
 };

@@ -39,7 +39,11 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -69,20 +73,38 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @Path("{event_id}")
     @ApiOperation("Get event by ID")
     public Optional<EventsSearchResult.Event> getById(@ApiParam(name = "event_id") @PathParam("event_id") final String eventId) {
+        return searchByIds(List.of(eventId))
+                .stream()
+                .findFirst();
+    }
 
+    public record BulkEventsByIds(Collection<String> eventIds) {}
+
+    @POST
+    @Path("/byIds")
+    @ApiOperation("Get multiple events by IDs")
+    @NoAuditEvent("Does not change any data")
+    public Map<String, EventsSearchResult.Event> getByIds(@ApiParam(name = "body") BulkEventsByIds request) {
+        return searchByIds(request.eventIds())
+                .stream()
+                .collect(Collectors.toMap(event -> event.event().id(), event -> event));
+    }
+
+    private List<EventsSearchResult.Event> searchByIds(Collection<String> eventIds) {
+        final var query = eventIds.stream()
+                .map(eventId -> EventDto.FIELD_ID + ":" + eventId)
+                .collect(Collectors.joining(" OR "));
         final EventsSearchParameters parameters = EventsSearchParameters.builder()
                 .page(1)
-                .perPage(1)
+                .perPage(eventIds.size())
                 .timerange(RelativeRange.allTime())
-                .query(EventDto.FIELD_ID + ":" + eventId)
+                .query(query)
                 .filter(EventsSearchFilter.empty())
                 .sortBy(Message.FIELD_TIMESTAMP)
                 .sortDirection(EventsSearchParameters.SortDirection.DESC)
                 .build();
 
         final EventsSearchResult result = searchService.search(parameters, getSubject());
-        return result.events()
-                .stream()
-                .findFirst();
+        return result.events();
     }
 }

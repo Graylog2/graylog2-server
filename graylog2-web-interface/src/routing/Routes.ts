@@ -53,6 +53,7 @@ const Routes = {
   ALERTS: {
     LIST: '/alerts',
     replay_search: (alertId: string) => `/alerts/${alertId}/replay-search`,
+    BULK_REPLAY_SEARCH: '/alerts/replay-search',
     DEFINITIONS: {
       LIST: '/alerts/definitions',
       CREATE: '/alerts/definitions/new',

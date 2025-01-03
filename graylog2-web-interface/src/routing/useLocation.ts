@@ -15,5 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useLocation } from 'react-router-dom';
+import type { Location } from 'react-router-dom';
 
-export default useLocation;
+const _useLocation = <T, >(): Location<T> => useLocation();
+export default _useLocation;
