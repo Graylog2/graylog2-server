@@ -16,19 +16,12 @@
  */
 package org.graylog2.inputs.transports;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.Provides;
 import com.google.inject.multibindings.MapBinder;
 import io.netty.channel.EventLoopGroup;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.EventLoopGroupProvider;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.transports.Transport;
-
-import jakarta.inject.Named;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class TransportsModule extends Graylog2Module {
     @Override
@@ -47,11 +40,5 @@ public class TransportsModule extends Graylog2Module {
 
         bind(EventLoopGroupFactory.class).asEagerSingleton();
         bind(EventLoopGroup.class).toProvider(EventLoopGroupProvider.class).asEagerSingleton();
-    }
-
-    @Provides
-    @Named("AMQP Executor")
-    protected ScheduledExecutorService AMQPscheduledExecService() {
-        return Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("amqp-input-executor").build());
     }
 }
