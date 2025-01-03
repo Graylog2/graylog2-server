@@ -21,6 +21,7 @@ import org.graylog2.bindings.providers.DefaultPasswordAlgorithmProvider;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
+import org.graylog2.security.hashing.PBKDF2PasswordAlgorithm;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
 import org.graylog2.users.DefaultPasswordAlgorithm;
 
@@ -34,6 +35,7 @@ public class PasswordAlgorithmBindings extends Graylog2Module {
         MapBinder<String, PasswordAlgorithm> passwordAlgorithms = MapBinder.newMapBinder(binder(), String.class, PasswordAlgorithm.class);
         passwordAlgorithms.addBinding("sha-1").to(SHA1HashPasswordAlgorithm.class);
         passwordAlgorithms.addBinding("bcrypt").to(BCryptPasswordAlgorithm.class);
+        passwordAlgorithms.addBinding("pbkdf2").to(PBKDF2PasswordAlgorithm.class);
 
         bind(PasswordAlgorithm.class).annotatedWith(DefaultPasswordAlgorithm.class).toProvider(DefaultPasswordAlgorithmProvider.class);
     }
