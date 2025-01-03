@@ -106,6 +106,10 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
             fieldTypeRefreshIntervalValue = writableValue ? DEFAULT_FIELD_TYPE_REFRESH_INTERVAL : Duration.ZERO;
         }
 
+        if (scope == null) {
+            scope = Boolean.FALSE.equals(isRegular) ? SystemIndexSetScope.NAME : DefaultEntityScope.NAME;
+        }
+
         return AutoValue_IndexSetConfig.builder()
                 .id(id)
                 .title(title)
@@ -131,7 +135,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
                 .customFieldMappings(customFieldMappings == null ? new CustomFieldMappings() : customFieldMappings)
                 .fieldTypeProfile(fieldTypeProfile)
                 .dataTieringConfig(dataTiering)
-                .scope(scope == null ? DefaultEntityScope.NAME : scope)
+                .scope(scope)
                 .build();
     }
 
