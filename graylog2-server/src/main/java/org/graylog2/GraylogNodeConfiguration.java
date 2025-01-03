@@ -17,6 +17,7 @@
 package org.graylog2;
 
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.shared.plugins.PluginLoader;
 
 import java.util.Set;
 
@@ -44,6 +45,12 @@ public interface GraylogNodeConfiguration {
      * Configures node startup to load plugin configurations and plugins.
      */
     boolean withPlugins();
+
+    /**
+     * Selectively load only plugins annotated with a <pre>SpecificNodeType</pre>. If <pre>null</pre> is provided,
+     * all plugins without the annotation will be loaded for backward compatibility.
+     */
+    PluginLoader.NodeType getPluginNodeType();
 
     /**
      * Will bind NodeId to an id provided by FilePersistedNodeIdProvider.
@@ -75,4 +82,6 @@ public interface GraylogNodeConfiguration {
      * Enables message recording in ServerStatus.
      */
     boolean isMessageRecordingsEnabled();
+
+    boolean isCloud();
 }

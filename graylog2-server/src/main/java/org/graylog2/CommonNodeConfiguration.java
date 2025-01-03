@@ -20,6 +20,8 @@ import org.graylog2.plugin.ServerStatus;
 
 import java.util.Set;
 
+import org.graylog2.shared.plugins.PluginLoader;
+
 /**
  * Helper class to hold configuration shared by all Graylog node types
  */
@@ -66,6 +68,11 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
     }
 
     @Override
+    default PluginLoader.NodeType getPluginNodeType() {
+        return null;
+    }
+
+    @Override
     default String getEnvironmentVariablePrefix() {
         return "GRAYLOG_";
     }
@@ -73,5 +80,10 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
     @Override
     default String getSystemPropertyPrefix() {
         return "graylog.";
+    }
+
+    @Override
+    default boolean isCloud() {
+        return false;
     }
 }

@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+package org.graylog.datanode.opensearch.statemachine.tracer;
 
-import org.graylog2.configuration.PluginPathConfiguration;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTransitionLogger;
 
-public class PluginLoaderConfig extends PluginPathConfiguration {
+public class OpensearchStateMachineTransitionLogger extends StateMachineTransitionLogger<OpensearchState, OpensearchEvent> {
 }

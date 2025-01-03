@@ -14,9 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+package org.graylog.datanode.process.statemachine.tracer;
 
-import org.graylog2.configuration.PluginPathConfiguration;
+import com.github.oxo42.stateless4j.StateMachine;
+import com.github.oxo42.stateless4j.delegates.Trace;
 
-public class PluginLoaderConfig extends PluginPathConfiguration {
+public interface StateMachineTracer<STATE, EVENT> extends Trace<STATE, EVENT> {
+
+    default void setStateMachine(StateMachine<STATE, EVENT> stateMachine) {
+    }
 }
