@@ -109,6 +109,11 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
 
+    // this is the maximum amount of bytes that the index list is supposed to fill in a request,
+    // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
+    // and filter after wards
+    private final int MAX_INDICES_URL_LENGTH = 3000;
+
     @Inject
     public IndicesAdapterES7(ElasticsearchClient client,
                              StatsApi statsApi,
@@ -405,14 +410,17 @@ public class IndicesAdapterES7 implements IndicesAdapter {
         if (indices == null || indices.isEmpty()) {
             throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
         }
-        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
-                .indices(indices.toArray(new String[]{}))
+
+        final GetSettingsRequest request = new GetSettingsRequest()
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names(new String[]{});
+                .names("index.blocks.read", "index.blocks.write", "index.blocks.metadata", "index.blocks.read_only", "index.blocks.read_only_allow_delete");
+
+        final var maxLengthExceeded = String.join(",", indices).length() > MAX_INDICES_URL_LENGTH;
+        final GetSettingsRequest getSettingsRequest = maxLengthExceeded ? request : request.indices(indices.toArray(new String[]{}));
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            return BlockSettingsParser.parseBlockSettings(settingsResponse);
+            return BlockSettingsParser.parseBlockSettings(settingsResponse, maxLengthExceeded ? Optional.of(indices) : Optional.empty());
         });
     }
 
