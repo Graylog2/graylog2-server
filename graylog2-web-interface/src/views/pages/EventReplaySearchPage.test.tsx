@@ -103,12 +103,10 @@ describe('EventReplaySearchPage', () => {
       eventData: mockEventData.event,
       eventDefinition: mockEventDefinitionTwoAggregations,
       aggregations: mockedMappedAggregation,
-      isEvent: true,
-      isEventDefinition: false,
-      isAlert: false,
       alertId: mockEventData.event.id,
       definitionId: mockEventDefinitionTwoAggregations.id,
       definitionTitle: mockEventDefinitionTwoAggregations.title,
+      isLoading: false,
     }));
 
     render(<SimpleReplaySearchPage />);

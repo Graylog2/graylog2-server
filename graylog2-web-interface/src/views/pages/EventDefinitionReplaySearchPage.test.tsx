@@ -47,7 +47,7 @@ jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
 
 jest.mock('hooks/useEventDefinition');
-jest.mock('hooks/useAlertAndEventDefinitionData');
+jest.mock('components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData');
 
 jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
@@ -90,17 +90,15 @@ describe('EventDefinitionReplaySearchPage', () => {
   });
 
   it('should run useEventDefinition, UseCreateViewForEvent with correct parameters', async () => {
-    asMock(useAlertAndEventDefinitionData).mockImplementation(() => ({
+    asMock(useAlertAndEventDefinitionData).mockReturnValue({
       eventData: undefined,
       eventDefinition: mockEventDefinitionTwoAggregations,
       aggregations: mockedMappedAggregation,
-      isEvent: false,
-      isEventDefinition: true,
-      isAlert: false,
       alertId: undefined,
       definitionId: mockEventDefinitionTwoAggregations.id,
       definitionTitle: mockEventDefinitionTwoAggregations.title,
-    }));
+      isLoading: false,
+    });
 
     render(<SimpleReplaySearchPage />);
 

@@ -68,6 +68,7 @@ const mockUseAlertAndEventDefinitionData = ({
   alertId,
   definitionId,
   definitionTitle,
+  isLoading: false,
 });
 
 jest.mock('views/logic/slices/highlightSelectors', () => ({
