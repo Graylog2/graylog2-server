@@ -101,6 +101,7 @@ describe('useAlertAndEventDefinitionData', () => {
       ...mockedHookData,
       eventData: undefined,
       alertId: undefined,
+      isLoading: false,
     });
   });
 });
