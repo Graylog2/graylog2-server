@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +36,7 @@ public class BlockSettingsParserTest {
     @Test
     public void noBlockedIndicesIdentifiedIfEmptyResponseParsed() {
         GetSettingsResponse emptyResponse = new GetSettingsResponse(Map.of(), Map.of());
-        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptyResponse);
+        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptyResponse, Optional.empty());
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
@@ -44,7 +45,7 @@ public class BlockSettingsParserTest {
     public void noBlockedIndicesIdentifiedIfEmptySettingsPresent() {
         var settingsBuilder = Map.of("index_0", Settings.builder().build());
         GetSettingsResponse emptySettingsResponse = new GetSettingsResponse(settingsBuilder, Map.of());
-        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptySettingsResponse);
+        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptySettingsResponse, Optional.empty());
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
@@ -64,7 +65,7 @@ public class BlockSettingsParserTest {
                         .put("index.blocks.read_only_allow_delete", true)
                         .build());
         GetSettingsResponse settingsResponse = new GetSettingsResponse(settingsBuilder, Map.of());
-        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(settingsResponse);
+        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(settingsResponse, Optional.empty());
         assertNotNull(indicesBlockStatus);
         assertEquals(3, indicesBlockStatus.countBlockedIndices());
         final Set<String> blockedIndices = indicesBlockStatus.getBlockedIndices();
