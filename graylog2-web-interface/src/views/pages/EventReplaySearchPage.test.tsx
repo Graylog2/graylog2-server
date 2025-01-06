@@ -29,7 +29,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import EventReplaySearchPage, { onErrorHandler } from 'views/pages/EventReplaySearchPage';
 import useEventById from 'hooks/useEventById';
 import useEventDefinition from 'hooks/useEventDefinition';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
+import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 import {
   mockedMappedAggregation,
   mockEventData,

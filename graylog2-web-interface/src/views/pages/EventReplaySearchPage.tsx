@@ -24,7 +24,7 @@ import { Spinner } from 'components/common';
 import SearchPage from 'views/pages/SearchPage';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
+import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
@@ -32,7 +32,9 @@ import useCreateSearch from 'views/hooks/useCreateSearch';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 
 const EventView = () => {
-  const { eventData, eventDefinition, aggregations } = useAlertAndEventDefinitionData();
+  const { alertId, definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
+
+  const { eventData, eventDefinition, aggregations } = useAlertAndEventDefinitionData(alertId, definitionId);
   const _view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
   const view = useCreateSearch(_view);
   const searchPageLayout = useMemo(() => ({

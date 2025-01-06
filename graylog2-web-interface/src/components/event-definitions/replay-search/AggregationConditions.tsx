@@ -25,11 +25,13 @@ import type HighlightingRule from 'views/logic/views/formatting/highlighting/Hig
 import { conditionToExprMapper, exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
 import useAppSelector from 'stores/useAppSelector';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import { updateHighlightingRule, createHighlightingRules } from 'views/logic/slices/highlightActions';
 import { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import useAppDispatch from 'stores/useAppDispatch';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
+import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+
+import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionData';
 
 const List = styled.div`
   display: flex;
@@ -53,7 +55,8 @@ const useHighlightingRules = () => useAppSelector(selectHighlightingRules);
 
 const AggregationConditions = () => {
   const dispatch = useAppDispatch();
-  const { aggregations } = useAlertAndEventDefinitionData();
+  const { alertId, definitionId } = useReplaySearchContext();
+  const { aggregations } = useAlertAndEventDefinitionData(alertId, definitionId);
   const highlightingRules = useHighlightingRules();
 
   const aggregationsMap = useMemo(() => new Map(aggregations.map((agg) => [

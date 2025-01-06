@@ -20,7 +20,6 @@ import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import {
   mockedMappedAggregation,
   mockEventData,
@@ -31,6 +30,10 @@ import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import type { AlertType } from 'components/event-definitions/types';
+import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
+
+import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionData';
 
 jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
@@ -39,7 +42,7 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [{ id: 'email_notification_id', title: 'Email notification' }] })])),
 }));
 
-jest.mock('hooks/useAlertAndEventDefinitionData');
+jest.mock('./hooks/useAlertAndEventDefinitionData');
 
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
@@ -51,36 +54,36 @@ jest.mock('views/logic/Widgets', () => ({
   }),
 }));
 
-const setMockedHookCache = ({
+const mockUseAlertAndEventDefinitionData = ({
   eventData = mockEventData.event,
   eventDefinition = mockEventDefinitionTwoAggregations,
   aggregations = mockedMappedAggregation,
-  isEvent = false,
-  isEventDefinition = false,
-  isAlert = false,
   alertId = mockEventData.event.id,
   definitionId = mockEventDefinitionTwoAggregations.id,
   definitionTitle = mockEventDefinitionTwoAggregations.title,
-}) => asMock(useAlertAndEventDefinitionData).mockImplementation(() => ({
+}) => asMock(useAlertAndEventDefinitionData).mockReturnValue({
   eventData,
   eventDefinition,
   aggregations,
-  isEvent,
-  isEventDefinition,
-  isAlert,
   alertId,
   definitionId,
   definitionTitle,
-}));
+});
 
 jest.mock('views/logic/slices/highlightSelectors', () => ({
   selectHighlightingRules: jest.fn(),
 }));
 
 describe('<EventInfoBar />', () => {
-  const EventInfoComponent = () => (
+  const EventInfoComponent = ({ type }: { type: AlertType }) => (
     <TestStoreProvider>
-      <EventInfoBar />
+      <ReplaySearchContext.Provider value={{
+        type,
+        definitionId: '',
+        alertId: '',
+      }}>
+        <EventInfoBar />
+      </ReplaySearchContext.Provider>
     </TestStoreProvider>
   );
 
@@ -91,16 +94,15 @@ describe('<EventInfoBar />', () => {
       .mockReturnValue([
         HighlightingRule.create('count(field1)', 500, 'greater', StaticColor.create('#fff')),
         HighlightingRule.create('count(field2)', 8000, 'less', StaticColor.create('#000')),
-      ],
-      );
+      ]);
+  });
+
+  beforeEach(() => {
+    mockUseAlertAndEventDefinitionData({});
   });
 
   it('Always shows fields: Priority, Execute search every, Search within, Description, Notifications, Aggregation conditions', async () => {
-    setMockedHookCache({
-      isEvent: true,
-    });
-
-    render(<EventInfoComponent />);
+    render(<EventInfoComponent type="event" />);
 
     const priority = await screen.findByTitle('Priority');
     const execution = await screen.findByTitle('Execute search every');
@@ -123,11 +125,7 @@ describe('<EventInfoBar />', () => {
   });
 
   it('Shows event timestamp and event definition link for event', async () => {
-    setMockedHookCache({
-      isEvent: true,
-    });
-
-    render(<EventInfoComponent />);
+    render(<EventInfoComponent type="event" />);
 
     const timestamp = await screen.findByTitle('Timestamp');
     const eventDefinition = await screen.findByTitle('Event definition');
@@ -138,11 +136,7 @@ describe('<EventInfoBar />', () => {
   });
 
   it("Didn't Shows Event definition updated at for event definition which was updated before event", async () => {
-    setMockedHookCache({
-      isEvent: true,
-    });
-
-    render(<EventInfoComponent />);
+    render(<EventInfoComponent type="event" />);
 
     const eventDefinitionUpdated = screen.queryByTitle('Event definition updated at');
 
@@ -150,15 +144,14 @@ describe('<EventInfoBar />', () => {
   });
 
   it('Shows Event definition updated at for event definition which was updated after event', async () => {
-    setMockedHookCache({
-      isEvent: true,
+    mockUseAlertAndEventDefinitionData({
       eventDefinition: {
         ...mockEventDefinitionTwoAggregations,
         updated_at: '2023-03-21T13:28:09.296Z',
       },
     });
 
-    render(<EventInfoComponent />);
+    render(<EventInfoComponent type="event" />);
 
     const eventDefinitionUpdated = await screen.findByTitle('Event definition updated at');
 
@@ -166,12 +159,11 @@ describe('<EventInfoBar />', () => {
   });
 
   it('Do not shows event timestamp and event definition link for event definition', async () => {
-    setMockedHookCache({
-      isEventDefinition: true,
+    mockUseAlertAndEventDefinitionData({
       eventData: undefined,
     });
 
-    render(<EventInfoComponent />);
+    render(<EventInfoComponent type="event_definition" />);
 
     const timestamp = screen.queryByTitle('Timestamp');
     const eventDefinition = screen.queryByTitle('Event definition');
@@ -181,11 +173,7 @@ describe('<EventInfoBar />', () => {
   });
 
   it('show and hide data on button click', async () => {
-    setMockedHookCache({
-      isEventDefinition: true,
-    });
-
-    render(<EventInfoComponent />);
+    render(<EventInfoComponent type="event_definition" />);
 
     const hideButton = await screen.findByText('Hide event definition details');
     const detailsContainer = await screen.findByTestId('info-container');

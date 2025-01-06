@@ -21,11 +21,14 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
 import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
+import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+
+import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionData';
 
 const Notifications = () => {
-  const { eventDefinition } = useAlertAndEventDefinitionData();
+  const { alertId, definitionId } = useReplaySearchContext();
+  const { eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
 
   const allNotifications = useStore(EventNotificationsStore, ({ all }) => all.reduce((res, cur) => {
     res[cur.id] = cur;

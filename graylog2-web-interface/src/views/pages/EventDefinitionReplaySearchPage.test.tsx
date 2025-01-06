@@ -28,13 +28,13 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import EventDefinitionReplaySearchPage, { onErrorHandler } from 'views/pages/EventDefinitionReplaySearchPage';
 import useEventDefinition from 'hooks/useEventDefinition';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import {
   mockedMappedAggregation,
   mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
 import type { Stream } from 'logic/streams/types';
+import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 
 const mockView = createSearch();
 
