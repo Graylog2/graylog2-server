@@ -24,10 +24,11 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 import useEventById from 'hooks/useEventById';
 
 const useAlertAndEventDefinitionData = (alertId: string, definitionId?: string) => {
-  const { data: eventData } = useEventById(alertId);
-  const { data } = useEventDefinition(definitionId ?? eventData?.event_definition_id);
+  const { data: eventData, isLoading: isLoadingEvent } = useEventById(alertId);
+  const { data, isLoading: isLoadingEventDefinition } = useEventDefinition(definitionId ?? eventData?.event_definition_id);
   const eventDefinition = data?.eventDefinition;
   const aggregations = data?.aggregations;
+  const isLoading = (alertId && isLoadingEvent) || (definitionId && isLoadingEventDefinition);
 
   return useMemo<{
     alertId: string,
@@ -36,6 +37,7 @@ const useAlertAndEventDefinitionData = (alertId: string, definitionId?: string) 
     eventData: Event,
     eventDefinition: EventDefinition,
     aggregations: Array<EventDefinitionAggregation>,
+    isLoading: boolean,
   }>(() => ({
     alertId,
     definitionId: eventDefinition?.id,
@@ -43,7 +45,8 @@ const useAlertAndEventDefinitionData = (alertId: string, definitionId?: string) 
     eventData,
     eventDefinition,
     aggregations,
-  }), [alertId, eventDefinition, eventData, aggregations]);
+    isLoading,
+  }), [alertId, eventDefinition, eventData, aggregations, isLoading]);
 };
 
 export default useAlertAndEventDefinitionData;

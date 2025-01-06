@@ -43,10 +43,6 @@ const useAttributeComponents = () => {
   return useMemo(() => {
     const isEventDefinition = type === 'event_definition';
 
-    if (!eventData) {
-      return [];
-    }
-
     if (!eventDefinition) {
       return [
         { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
