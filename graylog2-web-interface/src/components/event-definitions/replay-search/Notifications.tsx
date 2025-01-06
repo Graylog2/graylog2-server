@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
-import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { EventNotificationsStore, EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 
@@ -30,19 +30,17 @@ const Notifications = () => {
   const { alertId, definitionId } = useReplaySearchContext();
   const { eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
 
-  const allNotifications = useStore(EventNotificationsStore, ({ all }) => all.reduce((res, cur) => {
-    res[cur.id] = cur;
+  useEffect(() => {
+    EventNotificationsActions.listAll();
+  }, []);
 
-    return res;
-  }, {}));
+  const allNotifications = useStore(EventNotificationsStore, ({ all }) => Object.fromEntries(
+    (all ?? []).map((notification) => [notification.id, notification]),
+  ));
 
-  const notificationList = useMemo(() => eventDefinition.notifications.reduce((res, cur) => {
-    if (allNotifications[cur.notification_id]) {
-      res.push((allNotifications[cur.notification_id]));
-    }
-
-    return res;
-  }, []), [eventDefinition, allNotifications]);
+  const notificationList = useMemo(() => eventDefinition.notifications
+    .flatMap(({ notification_id }) => (allNotifications[notification_id] ? [allNotifications[notification_id]] : [])),
+  [allNotifications, eventDefinition.notifications]);
 
   return notificationList.length ? (
     <>

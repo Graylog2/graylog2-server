@@ -43,6 +43,10 @@ const useAttributeComponents = () => {
   return useMemo(() => {
     const isEventDefinition = type === 'event_definition';
 
+    if (!eventData) {
+      return [];
+    }
+
     if (!eventDefinition) {
       return [
         { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
@@ -51,7 +55,7 @@ const useAttributeComponents = () => {
 
     const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
-    const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
+    const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
 
     return [
       { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
@@ -94,7 +98,7 @@ const useAttributeComponents = () => {
         content: <AggregationConditions />,
       },
     ];
-  }, [eventData.timestamp, eventDefinition, type]);
+  }, [eventData?.timestamp, eventDefinition, type]);
 };
 
 export default useAttributeComponents;
