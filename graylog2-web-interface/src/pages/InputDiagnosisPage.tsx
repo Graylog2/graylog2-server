@@ -38,8 +38,8 @@ const StyledDl = styled.dl`
 `;
 
 const ContainerCol = styled(Col)(({ theme }) => css`
-  margin-left:  ${theme.spacings.sm};
-  margin-right:  ${theme.spacings.sm};
+  margin-left: ${theme.spacings.sm};
+  margin-right: ${theme.spacings.sm};
 `);
 
 const InfoCol = styled(Col)(({ theme }) => css`
@@ -93,7 +93,7 @@ const InputDiagnosisPage = () => {
                     <dd>{inputMetrics.incomingMessagesTotal} events</dd>
                     <dt>Messages received (15min avg):</dt>
                     <dd>{inputMetrics.incomingMessages15minAvg} events/second</dd>
-                    <dt>Empty Messages Discarded:</dt>
+                    <dt>Empty Messages discarded:</dt>
                     <dd>{inputMetrics.emptyMessages}</dd>
                     <dt>Active Connections:</dt>
                     <dd>
@@ -131,18 +131,18 @@ const InputDiagnosisPage = () => {
                 <dd>{inputMetrics.failures_inputs_codecs}</dd>
               </Col>
               <Col xs={3}>
-                <dt>Message Failed to Process</dt>
+                <dt>Message Failed to process</dt>
                 <dd>{inputMetrics.failures_processing}</dd>
               </Col>
               <Col xs={3}>
-                <dt>Message Failed to Index</dt>
+                <dt>Message Failed to index</dt>
                 <dd>{inputMetrics.failures_indexing}</dd>
               </Col>
             </Row>
             <br /><br />
             <Row>
               <Col xs={6}>
-                <h3>Recceived Message count by Stream</h3>
+                <h3>Received Message count by Stream</h3>
                 {inputMetrics.stream_message_count?.length && (
                   <StyledDl>
                     {inputMetrics.stream_message_count.map(([key, value]) => (
