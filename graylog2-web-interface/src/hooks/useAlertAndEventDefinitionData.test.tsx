@@ -28,6 +28,7 @@ import {
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import asMock from 'helpers/mocking/AsMock';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
+import useEventById from 'hooks/useEventById';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '/' })));
@@ -50,6 +51,8 @@ jest.mock('views/logic/Widgets', () => ({
     }],
   }),
 }));
+
+jest.mock('./useEventById');
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,6 +87,12 @@ const mockUseRouterForEventDefinition = (id) => asMock(useLocation).mockImplemen
   pathname: `/alerts/definitions/${id}/replay-search`,
 } as Location));
 
+const baseEventResponse = {
+  refetch: () => {},
+  isLoading: false,
+  isFetched: true,
+};
+
 describe('useAlertAndEventDefinitionData', () => {
   beforeEach(() => {
     queryClient.clear();
@@ -92,6 +101,8 @@ describe('useAlertAndEventDefinitionData', () => {
       eventDefinition: mockEventDefinitionTwoAggregations,
       aggregations: mockedMappedAggregation,
     });
+
+    asMock(useEventById).mockReturnValue({ ...baseEventResponse, data: undefined });
   });
 
   afterEach(() => {
@@ -106,7 +117,7 @@ describe('useAlertAndEventDefinitionData', () => {
       alertId: mockEventData.event.id,
     }));
 
-    queryClient.setQueryData(['event-by-id', eventId], { ...mockEventData.event, id: eventId, alert: true });
+    asMock(useEventById).mockReturnValue({ ...baseEventResponse, data: { ...mockEventData.event, id: eventId, alert: true } });
     const { result } = renderHook(() => useAlertAndEventDefinitionData(), { wrapper });
 
     await expect(result.current).toEqual(mockedHookData);
@@ -121,17 +132,20 @@ describe('useAlertAndEventDefinitionData', () => {
 
     mockUseRouterForEvent(eventId);
 
-    queryClient.setQueryData(['event-by-id', eventId], {
-      ...mockEventData.event,
-      eventId,
-      alert: false,
+    asMock(useEventById).mockReturnValue({
+      ...baseEventResponse,
+      data: {
+        ...mockEventData.event,
+        id: eventId,
+        alert: false,
+      },
     });
 
     const { result } = renderHook(() => useAlertAndEventDefinitionData(), { wrapper });
 
     await expect(result.current).toEqual({
       ...mockedHookData,
-      eventData: { ...mockEventData.event, eventId, alert: false },
+      eventData: { ...mockEventData.event, id: eventId, alert: false },
       alertId: eventId,
       isAlert: false,
       isEvent: true,
