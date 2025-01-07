@@ -30,9 +30,9 @@ import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPar
 import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
 import org.graylog.datanode.process.configuration.files.OpensearchSecurityConfigurationFile;
 import org.graylog.security.certutil.CertConstants;
-import org.graylog.security.certutil.TruststoreCreator;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog2.security.JwtSecret;
+import org.graylog2.security.TruststoreCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
