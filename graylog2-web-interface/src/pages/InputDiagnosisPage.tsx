@@ -73,13 +73,17 @@ const InputDiagnosisPage = () => {
                   <dd>{input.name}</dd>
                   <dt>This Input is running on:</dt>
                   <dd>{input.global ? 'all graylog nodes' : <LinkToNode nodeId={input.node} />}</dd>
-                  <dt>This Input is listening on:</dt>
-                  <dd>
-                    Bind address {input.attributes?.bind_address},
-                    Port {input.attributes?.port}.
-                  </dd>
-                  <dt>This Input is listening for:</dt>
-                  <dd>{('tcp_keepalive' in (input.attributes || {})) ? 'TCP Traffic.' : 'UDP Traffic.'}</dd>
+                  {input.attributes?.bind_address && input.attributes?.port && (
+                    <>
+                      <dt>This Input is listening on:</dt>
+                      <dd>
+                        Bind address {input.attributes?.bind_address},
+                        Port {input.attributes?.port}.
+                      </dd>
+                      <dt>This Input is listening for:</dt>
+                      <dd>{('tcp_keepalive' in (input.attributes || {})) ? 'TCP Traffic.' : 'UDP Traffic.'}</dd>
+                    </>
+                  )}
                 </StyledDl>
               </InfoCol>
               <MetricsCol xs={6}>
