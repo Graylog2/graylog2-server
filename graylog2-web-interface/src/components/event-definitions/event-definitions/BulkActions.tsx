@@ -122,6 +122,7 @@ const BulkActions = () => {
       if (failures?.length) {
         const notUpdatedDefinitionIds = failures.map(({ entity_id }) => entity_id);
         setSelectedEntities(notUpdatedDefinitionIds);
+        UserNotification.error(`${notUpdatedDefinitionIds.length} out of ${selectedItemsAmount} selected ${getDescriptor(selectedItemsAmount)} could not be ${actionType}d.`);
       } else {
         setSelectedEntities([]);
         UserNotification.success(`${selectedItemsAmount} ${getDescriptor(selectedItemsAmount)} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionType}d successfully.`, 'Success');
