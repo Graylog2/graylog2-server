@@ -122,8 +122,9 @@ const InputDiagnosisPage = () => {
             <Row>
               <Col xs={3}>
                 <dt>Input State</dt>
-                <dd>Running: {inputNodeStates.running}/{inputNodeStates.total}</dd>
-                <dd>Failed: {inputNodeStates.failed}/{inputNodeStates.total}</dd>
+                {Object.keys(inputNodeStates.states).map((state) => (
+                  <dd>{state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}</dd>
+                ))}
               </Col>
               <Col xs={3}>
                 <dt>Message Error at Input</dt>

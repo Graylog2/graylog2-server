@@ -44,11 +44,21 @@ export type InputDiagnosisMetrics = {
   stream_message_count: [string, number][];
 }
 
+export type InputNodeStateInfo = {
+  detailed_message: string,
+  node_id: string,
+}
+
 export type InputNodeStates = {
-  running: number;
-  failed: number;
+  states: {
+    'RUNNING'?: InputNodeStateInfo[],
+    'FAILED'?: InputNodeStateInfo[],
+    'STOPPED'?: InputNodeStateInfo[],
+    'STARTING'?: InputNodeStateInfo[],
+    'FAILING'?: InputNodeStateInfo[],
+    'SETUP'?: InputNodeStateInfo[],
+  }
   total: number;
-  inputStateByNode: InputStateByNode;
 }
 
 export type InputDiagnostics = {
@@ -77,7 +87,14 @@ const useInputDiagnosis = (inputId: string): {
 
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const inputStateByNode = inputStates ? inputStates[inputId] || {} : {} as InputStateByNode;
-  const inputNodeStates = Object.values(inputStateByNode).map(({ state }) => state);
+  const inputNodeStates = { total: Object.keys(inputStateByNode).length, states: {} }
+  Object.values(inputStateByNode).forEach(({ state, detailed_message, message_input: { node: node_id } }) => {
+    if(!inputNodeStates.states[state]) {
+      inputNodeStates.states[state] = [{ detailed_message, node_id }]
+    } else if (Array.isArray(inputNodeStates.states[state])) {
+      inputNodeStates.states[state].push({ detailed_message, node_id })
+    }
+  });
 
   const failures_indexing = `org.graylog2.${inputId}.failures.indexing`;
   const failures_processing = `org.graylog2.${inputId}.failures.processing`;
@@ -112,12 +129,7 @@ const useInputDiagnosis = (inputId: string): {
 
   return {
     input,
-    inputNodeStates: {
-      running: inputNodeStates.filter((state) => state === 'RUNNING').length,
-      failed: inputNodeStates.filter((state) => state === 'FAILED').length,
-      total: inputNodeStates.length,
-      inputStateByNode,
-    },
+    inputNodeStates,
     inputMetrics: {
       incomingMessagesTotal: (nodeMetrics[metricWithPrefix(input, 'incomingMessages')]?.metric as Rate)?.rate?.total || 0,
       incomingMessages15minAvg: (nodeMetrics[metricWithPrefix(input, 'incomingMessages')]?.metric as Rate)?.rate?.fifteen_minute || 0,
