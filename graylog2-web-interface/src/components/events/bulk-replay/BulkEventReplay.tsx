@@ -132,6 +132,10 @@ const ReplayedSearch = ({ total, completed, selectedEvent }: React.PropsWithChil
   return <ReplaySearch key={`replaying-search-for-event-${selectedEvent.event.id}`} event={selectedEvent.event} />;
 };
 
+const Headline = styled.h2`
+  margin-bottom: 10px;
+`;
+
 const BulkEventReplay = ({ initialEventIds, events: _events, onClose }: Props) => {
   const [events] = useState<Props['events']>(_events);
   const { eventIds, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents(initialEventIds);
@@ -143,7 +147,7 @@ const BulkEventReplay = ({ initialEventIds, events: _events, onClose }: Props) =
   return (
     <Container>
       <EventsListSidebar>
-        <h3>Replay Search</h3>
+        <Headline>Replay Search</Headline>
         <p>
           The following list contains all of the events/alerts you selected in the previous step, allowing you to
           investigate the replayed search for each of them.
