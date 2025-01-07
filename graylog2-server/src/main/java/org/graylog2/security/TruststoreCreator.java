@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog2.security;
 
 import jakarta.annotation.Nonnull;
 import org.graylog.security.certutil.CertConstants;
@@ -22,7 +22,6 @@ import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;

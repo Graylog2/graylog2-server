@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog2.security;
 
 import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
