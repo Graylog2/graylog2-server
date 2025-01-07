@@ -88,11 +88,12 @@ const useInputDiagnosis = (inputId: string): {
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const inputStateByNode = inputStates ? inputStates[inputId] || {} : {} as InputStateByNode;
   const inputNodeStates = { total: Object.keys(inputStateByNode).length, states: {} }
+
   Object.values(inputStateByNode).forEach(({ state, detailed_message, message_input: { node: node_id } }) => {
-    if(!inputNodeStates.states[state]) {
-      inputNodeStates.states[state] = [{ detailed_message, node_id }]
+    if (!inputNodeStates.states[state]) {
+      inputNodeStates.states[state] = [{ detailed_message, node_id }];
     } else if (Array.isArray(inputNodeStates.states[state])) {
-      inputNodeStates.states[state].push({ detailed_message, node_id })
+      inputNodeStates.states[state].push({ detailed_message, node_id });
     }
   });
 

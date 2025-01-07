@@ -23,7 +23,6 @@ import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInp
 
 import { checkHasPreviousStep } from '../helpers/stepHelper';
 
-
 const StepCol = styled(Col)(({ theme }) => css`
   padding-left: ${theme.spacings.lg};
   padding-right: ${theme.spacings.lg};
@@ -44,7 +43,7 @@ const ButtonCol = styled(Col)(({ theme }) => css`
 const InputDiagnosisStep = () => {
   const { wizardData: { input }, goToPreviousStep, orderedSteps, activeStep } = useInputSetupWizard();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
-  
+
   return (
     <Row>
       <StepCol md={12}>
