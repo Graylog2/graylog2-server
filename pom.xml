@@ -722,6 +722,16 @@
                                         <ignore>org.graylog.plugins</ignore>
                                     </ignores>
                                 </banDynamicVersions>
+                                <RestrictImports>
+                                    <groups>
+                                        <group>
+                                            <reason>Data Node packages must not be used outside the data-node/ module.</reason>
+                                            <bannedImports>
+                                                <bannedImport>org.graylog.datanode.**</bannedImport>
+                                            </bannedImports>
+                                        </group>
+                                    </groups>
+                                </RestrictImports>
                                 <requireMavenVersion>
                                     <!-- Enforce the same version we define in the maven wrapper -->
                                     <version>[3.9.6,3.99.99]</version>
@@ -736,6 +746,14 @@
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>de.skuzzle.enforcer</groupId>
+                        <artifactId>restrict-imports-enforcer-rule</artifactId>
+                        <version>2.6.0</version>
+                        <scope>compile</scope>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>de.thetaphi</groupId>
