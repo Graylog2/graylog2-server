@@ -84,8 +84,8 @@ const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsD
       <Summary $done={done}>{event?.message ?? <i>Unknown</i>}</Summary>
 
       <ButtonGroup>
-        <IconButton onClick={_removeItem} title="Remove event from list" name="delete" />
-        <CompletedButton onClick={_markItemAsDone} title="Mark event as investigated" name="check" $done={done} />
+        <IconButton onClick={_removeItem} title={`Remove event "${event?.id}" from list`} name="delete" />
+        <CompletedButton onClick={_markItemAsDone} title={`Mark event "${event?.id}" as investigated`} name="check" $done={done} />
       </ButtonGroup>
     </StyledItem>
   );

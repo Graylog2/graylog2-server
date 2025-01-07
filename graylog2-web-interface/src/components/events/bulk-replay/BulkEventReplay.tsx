@@ -151,7 +151,8 @@ const BulkEventReplay = ({ initialEventIds, events: _events, onClose }: Props) =
         <i>Investigation of {completed}/{total} events completed.</i>
         <StyledList>
           {eventIds.map(({ id: eventId, status }) => (
-            <EventListItem event={events?.[eventId]?.event}
+            <EventListItem key={`bulk-replay-search-item-${eventId}`}
+                           event={events?.[eventId]?.event}
                            selected={eventId === selectedId}
                            done={status === 'DONE'}
                            removeItem={removeItem}
