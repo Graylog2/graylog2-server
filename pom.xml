@@ -144,7 +144,7 @@
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.13.0</joda-time.version>
         <jool.version>0.9.15</jool.version>
-        <json-org.version>20241224</json-org.version>
+        <json-org.version>20250107</json-org.version>
         <json-path.version>2.9.0</json-path.version>
         <kafka.version>3.9.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
