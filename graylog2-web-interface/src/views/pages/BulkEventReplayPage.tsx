@@ -28,19 +28,20 @@ import Routes from 'routing/Routes';
 
 export type BulkEventReplayState = {
   eventIds: Array<string>;
+  returnUrl: string;
 }
 
 const useEventsById = (eventIds: Array<string>) => useQuery(['events', eventIds], () => Events.getByIds({ event_ids: eventIds }));
 
 const BulkEventReplayPage = () => {
   const location = useLocation<BulkEventReplayState>();
-  const initialEventIds = location.state?.eventIds ?? [];
+  const { eventIds: initialEventIds = [], returnUrl } = location.state;
   const { data: events, isInitialLoading } = useEventsById(initialEventIds);
 
   const history = useHistory();
   const onClose = useCallback(() => {
-    history.push(Routes.ALERTS.LIST);
-  }, [history]);
+    history.push(returnUrl ?? Routes.ALERTS.LIST);
+  }, [history, returnUrl]);
 
   return isInitialLoading
     ? <Spinner />

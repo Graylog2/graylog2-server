@@ -24,6 +24,7 @@ import useEventBulkActions from 'components/events/events/hooks/useEventBulkActi
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import type { BulkEventReplayState } from 'views/pages/BulkEventReplayPage';
+import useLocation from 'routing/useLocation';
 
 type Props = {
   selectedEntitiesData: { [eventId: string]: Event }
@@ -33,11 +34,14 @@ const BulkActions = ({ selectedEntitiesData }: Props) => {
   const events = Object.values(selectedEntitiesData);
   const { actions, pluggableActionModals } = useEventBulkActions(events);
 
+  const location = useLocation();
+  const returnUrl = `${location.pathname}${location.search}`;
+
   const history = useHistory();
   const onReplaySearchClick = useCallback(() => {
     const eventIds = events.map((event) => event.id);
-    history.pushWithState<BulkEventReplayState>(Routes.ALERTS.BULK_REPLAY_SEARCH, { eventIds });
-  }, [events, history]);
+    history.pushWithState<BulkEventReplayState>(Routes.ALERTS.BULK_REPLAY_SEARCH, { eventIds, returnUrl });
+  }, [events, history, returnUrl]);
 
   return (
     <>
