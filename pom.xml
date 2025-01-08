@@ -148,7 +148,7 @@
         <json-path.version>2.9.0</json-path.version>
         <kafka.version>3.9.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.24.2</log4j.version>
+        <log4j.version>2.24.3</log4j.version>
         <lucene.version>9.12.0</lucene.version>
         <metrics.version>4.2.29</metrics.version>
         <mongodb-driver.version>5.2.1</mongodb-driver.version>
