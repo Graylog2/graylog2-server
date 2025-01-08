@@ -91,8 +91,6 @@ const InputDiagnosisPage = () => {
                   <StyledDl>
                     <dt>Total Messages received by Input:</dt>
                     <dd>{inputMetrics.incomingMessagesTotal} events</dd>
-                    <dt>Messages received (15min avg):</dt>
-                    <dd>{inputMetrics.incomingMessages15minAvg} events/second</dd>
                     <dt>Empty Messages discarded:</dt>
                     <dd>{inputMetrics.emptyMessages}</dd>
                     <dt>Active Connections:</dt>

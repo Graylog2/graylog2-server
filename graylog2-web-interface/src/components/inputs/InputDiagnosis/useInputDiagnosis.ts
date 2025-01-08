@@ -30,7 +30,6 @@ import { defaultOnError } from 'util/conditional/onError';
 
 export type InputDiagnosisMetrics = {
   incomingMessagesTotal: number;
-  incomingMessages15minAvg: number;
   emptyMessages: number;
   open_connections: number;
   total_connections: number;
@@ -133,7 +132,6 @@ const useInputDiagnosis = (inputId: string): {
     inputNodeStates,
     inputMetrics: {
       incomingMessagesTotal: (nodeMetrics[metricWithPrefix(input, 'incomingMessages')]?.metric as Rate)?.rate?.total || 0,
-      incomingMessages15minAvg: (nodeMetrics[metricWithPrefix(input, 'incomingMessages')]?.metric as Rate)?.rate?.fifteen_minute || 0,
       emptyMessages: (nodeMetrics[metricWithPrefix(input, 'emptyMessages')] as CounterMetric)?.metric?.count || 0,
       open_connections: (nodeMetrics[metricWithPrefix(input, 'open_connections')] as GaugeMetric)?.metric?.value || 0,
       total_connections: (nodeMetrics[metricWithPrefix(input, 'total_connections')] as GaugeMetric)?.metric?.value || 0,
