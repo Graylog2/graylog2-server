@@ -98,7 +98,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
     if (enterpriseSteps) return { ...defaultSteps, ...enterpriseSteps };
 
     return defaultSteps;
-  }, [enterpriseSteps, stepsConfig]);
+  }, [enterpriseSteps, stepsConfig, onClose]);
 
   const determineFirstStep = useCallback(() => {
     setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);

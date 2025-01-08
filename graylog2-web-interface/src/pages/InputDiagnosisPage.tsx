@@ -19,10 +19,12 @@ import styled, { css } from 'styled-components';
 
 import { DocumentTitle, LinkToNode, PageHeader } from 'components/common';
 import useParams from 'routing/useParams';
-import { Row, Col } from 'components/bootstrap';
+import { Row, Col, DropdownButton, MenuItem } from 'components/bootstrap';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 import ShowReceivedMessagesButton from 'components/inputs/InputDiagnosis/ShowReceivedMessagesButton';
 import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
+import Routes from 'routing/Routes';
+import { LinkContainer } from 'components/common/router';
 
 const StyledDl = styled.dl`
   margin: 0;
@@ -51,6 +53,11 @@ const InfoCol = styled(Col)(({ theme }) => css`
 const MetricsCol = styled(Col)(({ theme }) => css`
   padding: ${theme.spacings.sm};
 `);
+
+const InputNodeInfo = styled.div`
+  max-width: 500px;
+  white-space: break-spaces;
+`;
 
 const InputDiagnosisPage = () => {
   const { inputId } = useParams();
@@ -121,7 +128,23 @@ const InputDiagnosisPage = () => {
               <Col xs={3}>
                 <dt>Input State</dt>
                 {Object.keys(inputNodeStates.states).map((state) => (
-                  <dd>{state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}</dd>
+                  <DropdownButton
+                    key={state}
+                    bsSize="xs"
+                    title={<dd key={state}>{state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}</dd>}>
+                    {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
+                        <LinkContainer key={node_id} to={Routes.SYSTEM.NODES.SHOW(node_id)}>
+                          <MenuItem>
+                            {node_id && (
+                              <div><b>Node ID:</b> {node_id}</div>
+                            )}
+                            {detailed_message && (
+                              <InputNodeInfo><b>Message:</b> {detailed_message}</InputNodeInfo>
+                            )}
+                          </MenuItem>
+                        </LinkContainer>
+                      ))}
+                  </DropdownButton>
                 ))}
               </Col>
               <Col xs={3}>
@@ -144,10 +167,10 @@ const InputDiagnosisPage = () => {
                 {inputMetrics.stream_message_count?.length && (
                   <StyledDl>
                     {inputMetrics.stream_message_count.map(([key, value]) => (
-                      <>
+                      <span key={key}>
                         <dt>{key}</dt>
                         <dd>{value}</dd>
-                      </>
+                      </span>
                     ))}
                   </StyledDl>
                 )}
