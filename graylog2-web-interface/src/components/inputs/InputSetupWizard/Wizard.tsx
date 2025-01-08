@@ -90,7 +90,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
           </>
         ),
         component: (
-          <InputDiagnosisStep />
+          <InputDiagnosisStep onClose={() => onClose()} />
         ),
         disabled: !getStepConfigOrData(stepsConfig, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, 'enabled'),
       },

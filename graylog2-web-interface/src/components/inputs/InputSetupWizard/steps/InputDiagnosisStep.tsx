@@ -21,8 +21,6 @@ import { Button, Row, Col } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 
-import { checkHasPreviousStep } from '../helpers/stepHelper';
-
 const StepCol = styled(Col)(({ theme }) => css`
   padding-left: ${theme.spacings.lg};
   padding-right: ${theme.spacings.lg};
@@ -40,9 +38,12 @@ const ButtonCol = styled(Col)(({ theme }) => css`
   margin-top: ${theme.spacings.lg};
 `);
 
-const InputDiagnosisStep = () => {
-  const { wizardData: { input }, goToPreviousStep, orderedSteps, activeStep } = useInputSetupWizard();
-  const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
+type Props = {
+  onClose: () => void,
+}
+
+const InputDiagnosisStep = ({ onClose }: Props) => {
+  const { wizardData: { input } } = useInputSetupWizard();
 
   return (
     <Row>
@@ -57,13 +58,11 @@ const InputDiagnosisStep = () => {
             Go to Input Diagnosis
           </Button>
         )}
-        {hasPreviousStep && (
-          <Row>
-            <ButtonCol md={12}>
-              <Button onClick={goToPreviousStep}>Back</Button>
-            </ButtonCol>
-          </Row>
-        )}
+        <Row>
+          <ButtonCol md={12}>
+            <Button onClick={onClose}>Finish</Button>
+          </ButtonCol>
+        </Row>
       </StepCol>
     </Row>
   );
