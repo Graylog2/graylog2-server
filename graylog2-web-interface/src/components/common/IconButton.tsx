@@ -44,7 +44,7 @@ const Wrapper = styled.button<{ disabled: boolean }>(({ theme, disabled }) => cs
 type Props = {
   focusable?: boolean,
   title: string,
-  onClick?: () => void,
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void,
   className?: string,
   name: IconName
   iconType?: IconType,
@@ -54,9 +54,9 @@ type Props = {
   size?: SizeProp,
 };
 
-const handleClick = (onClick: () => void | undefined) => {
+const handleClick = (onClick: (e: React.MouseEvent<HTMLButtonElement>) => void | undefined, e: React.MouseEvent<HTMLButtonElement>) => {
   if (typeof onClick === 'function') {
-    onClick();
+    onClick(e);
   }
 };
 
@@ -75,7 +75,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, Props>(({
            data-testid={dataTestId}
            title={title}
            aria-label={title}
-           onClick={() => handleClick(onClick)}
+           onClick={(e) => handleClick(onClick, e)}
            className={className}
            type="button"
            disabled={disabled}>
