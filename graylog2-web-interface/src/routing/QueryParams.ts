@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQueryParams, useQueryParam, StringParam, NumberParam } from 'use-query-params';
+import { useQueryParams, useQueryParam, StringParam, NumberParam, ArrayParam } from 'use-query-params';
 
 const parseNestedObject = (fieldQueryString: string) => {
   try {
@@ -29,4 +29,4 @@ const NestedObjectParam = {
   decode: (objectStr: string | null | undefined) => parseNestedObject(objectStr),
 };
 
-export { useQueryParams, useQueryParam, StringParam, NumberParam, NestedObjectParam };
+export { useQueryParams, useQueryParam, StringParam, NumberParam, NestedObjectParam, ArrayParam };

@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { useMemo, useCallback } from 'react';
-import { useQueryParam, StringParam } from 'use-query-params';
 import styled from 'styled-components';
 
+import { useQueryParam, StringParam } from 'routing/QueryParams';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
