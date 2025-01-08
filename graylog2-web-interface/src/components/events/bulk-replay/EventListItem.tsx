@@ -64,7 +64,7 @@ const Summary = styled.span<SummaryProps>(({ theme, $done }) => css`
 `);
 
 const CompletedButton = styled(IconButton)<{ $done: boolean }>(({ theme, $done }) => css`
-  color: ${$done ? theme.colors.variant.success : theme.colors.global.textDefault};
+  color: ${$done ? theme.colors.variant.success : theme.colors.gray[60]};
 `);
 
 const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsDone }: EventListItemProps) => {
