@@ -87,7 +87,7 @@ const useInputDiagnosis = (inputId: string): {
 
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const inputStateByNode = inputStates ? inputStates[inputId] || {} : {} as InputStateByNode;
-  const inputNodeStates = { total: Object.keys(inputStateByNode).length, states: {} }
+  const inputNodeStates = { total: Object.keys(inputStateByNode).length, states: {} };
 
   Object.values(inputStateByNode).forEach(({ state, detailed_message, message_input: { node: node_id } }) => {
     if (!inputNodeStates.states[state]) {
