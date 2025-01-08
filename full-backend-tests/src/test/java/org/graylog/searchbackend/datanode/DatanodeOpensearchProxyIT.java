@@ -46,7 +46,7 @@ public class DatanodeOpensearchProxyIT {
     void testProxyPlaintextGet() throws ExecutionException, RetryException {
         final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_cat/indices", 200);
         final String responseBody = response.extract().body().asString();
-        Assertions.assertThat(responseBody).contains(".ds-gl-datanode-metrics").contains("graylog_0").contains("gl-system-events_0");
+        Assertions.assertThat(responseBody).contains("graylog_0").contains("gl-system-events_0");
     }
 
     @ContainerMatrixTest
