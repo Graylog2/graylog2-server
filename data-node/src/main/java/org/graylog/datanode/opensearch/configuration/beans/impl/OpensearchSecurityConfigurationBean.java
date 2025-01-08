@@ -22,7 +22,6 @@ import jakarta.inject.Inject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
-import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.configuration.variants.OpensearchCertificatesProvider;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
@@ -33,6 +32,7 @@ import org.graylog.datanode.process.configuration.files.OpensearchSecurityConfig
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog2.security.JwtSecret;
+import org.graylog2.security.TruststoreCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
