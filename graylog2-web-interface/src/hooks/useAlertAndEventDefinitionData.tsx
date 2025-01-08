@@ -16,21 +16,21 @@
  */
 
 import { useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 import useLocation from 'routing/useLocation';
 import Routes from 'routing/Routes';
 import useParams from 'routing/useParams';
 import type { Event } from 'components/events/events/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
+import useEventDefinition from 'hooks/useEventDefinition';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import useEventById from 'hooks/useEventById';
 
 const useAlertAndEventDefinitionData = () => {
   const { pathname: path } = useLocation();
   const { alertId, definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
-  const queryClient = useQueryClient();
-  const eventData = queryClient.getQueryData(['event-by-id', alertId]) as Event;
-  const data = queryClient.getQueryData(['event-definition-by-id', definitionId || eventData?.event_definition_id]) as { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation>};
+  const { data: eventData } = useEventById(alertId);
+  const { data } = useEventDefinition(definitionId ?? eventData?.event_definition_id);
   const eventDefinition = data?.eventDefinition;
   const aggregations = data?.aggregations;
 
