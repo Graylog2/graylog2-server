@@ -162,7 +162,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        try (Stream<ViewSummaryDTO> nativeViews = getNativeViews()) {
+        try (final Stream<ViewSummaryDTO> nativeViews = getNativeViews()) {
             return nativeViews.map(this::createExcerpt).collect(Collectors.toSet());
         }
     }
