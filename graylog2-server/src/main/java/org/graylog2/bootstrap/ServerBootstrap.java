@@ -305,7 +305,7 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
         }
         // The jna.tmpdir should reside in the native lib dir. (See: https://github.com/Graylog2/graylog2-server/issues/21223)
         if (System.getProperty("jna.tmpdir") == null) {
-            System.setProperty("jna.tmpdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
+            System.setProperty("jna.tmpdir", pathConfiguration.getNativeLibDir().toAbsolutePath().resolve("jna").toString());
         }
         // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
         if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
