@@ -85,6 +85,6 @@ public class TokenUsageServiceImpl implements TokenUsageService {
             authBackend = "";
         }
 
-        return TokenUsage.create(username, dto.name(), dto.createdAt(), dto.lastAccess(), isExternal, authBackend);
+        return TokenUsage.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess(), isExternal, authBackend);
     }
 }

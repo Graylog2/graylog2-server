@@ -12,8 +12,14 @@ import javax.annotation.Nullable;
 @AutoValue
 @WithBeanGetter
 public abstract class TokenUsage {
+    @JsonProperty("token_id")
+    public abstract String tokenId();
+
     @JsonProperty
     public abstract String username();
+
+    @JsonProperty("user_id")
+    public abstract String userId();
 
     @JsonProperty("token_name")
     public abstract String tokenName();
@@ -31,13 +37,15 @@ public abstract class TokenUsage {
     @JsonProperty("auth_backend")
     public abstract String authBackend();
 
-    public static TokenUsage create(@JsonProperty("username") String username,
+    public static TokenUsage create(@JsonProperty("token_id") String tokenId,
+                                    @JsonProperty("username") String username,
+                                    @JsonProperty("user_id") String userId,
                                     @JsonProperty("token_name") String tokenName,
                                     @Nullable @JsonProperty("created_at") DateTime createdAt,
                                     @JsonProperty("last_access") DateTime lastAccess,
                                     @JsonProperty("user_is_external") boolean userIsExternal,
                                     @Nullable @JsonProperty("auth_backend") String authBackend) {
-        return new AutoValue_TokenUsage(username,
+        return new AutoValue_TokenUsage(tokenId, username, userId,
                 tokenName,
                 createdAt,
                 lastAccess,
