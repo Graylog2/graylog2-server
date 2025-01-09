@@ -23,6 +23,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoCollection;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -67,6 +68,7 @@ public class ClusterConfigServiceImplTest {
     private ClusterEventBus clusterEventBus;
     private MongoConnection mongoConnection;
     private ClusterConfigService clusterConfigService;
+    private MongoJackObjectMapperProvider mapperProvider;
 
     @Before
     public void setUpService() throws Exception {
@@ -74,10 +76,10 @@ public class ClusterConfigServiceImplTest {
 
         this.mongoConnection = mongodb.mongoConnection();
 
-        MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
+        this.mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         this.clusterConfigService = new ClusterConfigServiceImpl(
-                provider,
+                mapperProvider,
                 mongodb.mongoConnection(),
                 nodeId,
                 new RestrictedChainingClassLoader(new ChainingClassLoader(getClass().getClassLoader()),
@@ -325,9 +327,9 @@ public class ClusterConfigServiceImplTest {
         assertThat(original.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(original.getIndexInfo()).hasSize(1);
 
-        DBCollection collection = ClusterConfigServiceImpl.prepareCollection(mongoConnection);
-        assertThat(collection.getName()).isEqualTo(COLLECTION_NAME);
-        assertThat(collection.getIndexInfo()).hasSize(2);
+        MongoCollection<ClusterConfig> collection = ClusterConfigServiceImpl.prepareCollection(mongoConnection, mapperProvider);
+        assertThat(collection.getNamespace().getCollectionName()).isEqualTo(COLLECTION_NAME);
+        assertThat(collection.listIndexes()).hasSize(2);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
     }
 
@@ -337,10 +339,10 @@ public class ClusterConfigServiceImplTest {
         final DB database = mongoConnection.getDatabase();
         database.getCollection(COLLECTION_NAME).drop();
         assertThat(database.collectionExists(COLLECTION_NAME)).isFalse();
-        DBCollection collection = ClusterConfigServiceImpl.prepareCollection(mongoConnection);
+        MongoCollection<ClusterConfig> collection = ClusterConfigServiceImpl.prepareCollection(mongoConnection, mapperProvider);
 
-        assertThat(collection.getName()).isEqualTo(COLLECTION_NAME);
-        assertThat(collection.getIndexInfo()).hasSize(2);
+        assertThat(collection.getNamespace().getCollectionName()).isEqualTo(COLLECTION_NAME);
+        assertThat(collection.listIndexes()).hasSize(2);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
     }
 
