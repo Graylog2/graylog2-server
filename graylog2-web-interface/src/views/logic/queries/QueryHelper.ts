@@ -69,3 +69,5 @@ export const formatTimestamp = (value: string | number) => {
 export const predicate = (field: string, value: string | number) => ((value === MISSING_BUCKET_NAME || value === escape(MISSING_BUCKET_NAME))
   ? `NOT _exists_:${field}`
   : `${field}:${value}`);
+
+export const not = (query:string) => `NOT ${query}`.replace(/^NOT NOT /, '');

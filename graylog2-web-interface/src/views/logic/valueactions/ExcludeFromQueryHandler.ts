@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { escape, addToQuery, predicate } from 'views/logic/queries/QueryHelper';
+import { escape, addToQuery, predicate, not } from 'views/logic/queries/QueryHelper';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState } from 'views/types';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 
 const formatNewQuery = (oldQuery: string, field: string, value: any) => {
-  const fieldPredicate = predicate(field, escape(value));
+  const fieldPredicate = not(predicate(field, escape(value)));
 
   return addToQuery(oldQuery, fieldPredicate);
 };
