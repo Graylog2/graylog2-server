@@ -25,7 +25,13 @@ import { Input, BootstrapModalWrapper, Modal } from 'components/bootstrap';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Select from 'components/common/Select';
-import HighlightingRule, {
+import type {
+  Value,
+  Condition,
+  Color,
+} from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import {
   ConditionLabelMap,
   StringConditionLabelMap,
 } from 'views/logic/views/formatting/highlighting/HighlightingRule';
@@ -40,8 +46,6 @@ import {
   StaticColor,
 } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { ModalSubmit } from 'components/common';
-import useAppDispatch from 'stores/useAppDispatch';
-import { addHighlightingRule, updateHighlightingRule } from 'views/logic/slices/highlightActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -50,9 +54,10 @@ import useLocation from 'routing/useLocation';
 type Props = {
   onClose: () => void,
   rule?: HighlightingRule | null | undefined,
+  onSubmit: (field: string, value: Value, condition: Condition, color: Color) => Promise<void>
 };
 
-const _isRequired = (field) => (value: string) => {
+const _isRequired = (field: string) => (value: string) => {
   if (['', null, undefined].includes(value)) {
     return `${field} is required`;
   }
@@ -107,7 +112,7 @@ const colorFromObject = (color: StaticColorObject | GradientColorObject) => {
   return undefined;
 };
 
-const HighlightForm = ({ onClose, rule }: Props) => {
+const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
@@ -117,9 +122,8 @@ const HighlightForm = ({ onClose, rule }: Props) => {
   const fieldOptions = useMemo(() => fields.map(({ name }) => ({ value: name, label: name }))
     .sort((optA, optB) => defaultCompare(optA.label, optB.label))
     .toArray(), [fields]);
-  const dispatch = useAppDispatch();
 
-  const onSubmit = useCallback(({ field, value, color, condition }) => {
+  const onSubmit = useCallback(({ field, value, condition, color }: { field, value, condition, color }) => {
     const newColor = colorFromObject(color);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE[`SEARCH_SIDEBAR_HIGHLIGHT_${rule ? 'UPDATED' : 'CREATED'}`], {
@@ -127,12 +131,8 @@ const HighlightForm = ({ onClose, rule }: Props) => {
       app_action_value: 'search-sidebar-highlight',
     });
 
-    if (rule) {
-      return dispatch(updateHighlightingRule(rule, { field, value, condition, color: newColor })).then(onClose);
-    }
-
-    return dispatch(addHighlightingRule(HighlightingRule.create(field, value, condition, newColor))).then(onClose);
-  }, [dispatch, location.pathname, onClose, rule, sendTelemetry]);
+    return onSubmitProp(field, value, condition, newColor).then(onClose);
+  }, [location.pathname, onClose, onSubmitProp, rule, sendTelemetry]);
 
   const headerPrefix = rule ? 'Edit' : 'Create';
   const submitButtonPrefix = rule ? 'Update' : 'Create';
