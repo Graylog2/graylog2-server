@@ -87,7 +87,8 @@ const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsD
         <IconButton onClick={_removeItem} title={`Remove event "${event?.id}" from list`} name="delete" />
         <CompletedButton onClick={_markItemAsDone}
                          title={`Mark event "${event?.id}" as ${done ? 'not' : ''} investigated`}
-                         name="verified" iconType={done ? 'solid' : 'regular'}
+                         name="verified"
+                         iconType={done ? 'solid' : 'regular'}
                          $done={done} />
       </ButtonGroup>
     </StyledItem>
