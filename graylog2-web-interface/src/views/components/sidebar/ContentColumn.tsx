@@ -19,9 +19,9 @@ import styled, { css } from 'styled-components';
 
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
 import { IconButton } from 'components/common';
-import useViewTitle from 'views/hooks/useViewTitle';
 
 type Props = {
+  title: string,
   children: React.ReactNode,
   closeSidebar: () => void,
   searchPageLayout: SearchPreferencesLayout | undefined | null,
@@ -75,7 +75,7 @@ const Header = styled.div`
   grid-row: 1;
 `;
 
-const SearchTitle = styled.div`
+const TitleSection = styled.div`
   height: 35px;
   display: grid;
   grid-template-columns: 1fr auto;
@@ -137,28 +137,27 @@ const toggleSidebarPinning = (searchPageLayout) => {
   togglePinning();
 };
 
-const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, forceSideBarPinned }: Props) => {
+const ContentColumn = ({ children, title, sectionTitle, closeSidebar, searchPageLayout, forceSideBarPinned }: Props) => {
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned || forceSideBarPinned;
-  const title = useViewTitle();
 
   return (
     <Container $sidebarIsPinned={sidebarIsPinned}>
       <ContentGrid>
         <Header>
-          <SearchTitle title={title}>
+          <TitleSection title={title}>
             <CenterVertical>
               <Title onClick={closeSidebar}>{title}</Title>
             </CenterVertical>
             {!forceSideBarPinned && (
-            <CenterVertical>
-              <OverlayToggle $sidebarIsPinned={sidebarIsPinned}>
-                <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
-                            title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
-                            name="keep" />
-              </OverlayToggle>
-            </CenterVertical>
+              <CenterVertical>
+                <OverlayToggle $sidebarIsPinned={sidebarIsPinned}>
+                  <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
+                              title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
+                              name="keep" />
+                </OverlayToggle>
+              </CenterVertical>
             )}
-          </SearchTitle>
+          </TitleSection>
           <HorizontalRule />
           <SectionTitle>{sectionTitle}</SectionTitle>
         </Header>

@@ -25,7 +25,6 @@ import HighlightingRules from './highlighting/HighlightingRules';
 export type SidebarSectionProps = {
   sidebarChildren: React.ReactElement,
   sidebarIsPinned: boolean,
-  queryId: string,
   results: any,
   toggleSidebar: () => void
 };

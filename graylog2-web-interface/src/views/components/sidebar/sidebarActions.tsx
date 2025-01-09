@@ -26,7 +26,7 @@ export type SidebarAction = {
   Component: React.ComponentType<SidebarActionsProps>
 };
 
-const sidebarSections: Array<SidebarAction> = [
+const sidebarActions: Array<SidebarAction> = [
   {
     key: 'undoAction',
     Component: UndoNavItem,
@@ -37,4 +37,4 @@ const sidebarSections: Array<SidebarAction> = [
   },
 ];
 
-export default sidebarSections;
+export default sidebarActions;
