@@ -404,5 +404,8 @@ export const TELEMETRY_EVENT_TYPE = {
     COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
     SORT_CHANGED: 'Entity Data Table Sort Changed',
     PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
+    FILTER_CREATED: 'Entity Data Table Filter Created',
+    FILTER_DELETED: 'Entity Data Table Filter Deleted',
+    FILTER_CHANGED: 'Entity Data Table Filter Changed',
   },
 } as const;

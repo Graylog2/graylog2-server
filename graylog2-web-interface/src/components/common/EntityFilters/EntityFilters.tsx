@@ -25,6 +25,10 @@ import ActiveFilters from 'components/common/EntityFilters/ActiveFilters';
 import useFiltersWithTitle from 'components/common/EntityFilters/hooks/useFiltersWithTitle';
 
 import { ROW_MIN_HEIGHT } from './Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import {TELEMETRY_EVENT_TYPE} from 'logic/telemetry/Constants';
+import {getPathnameWithoutId} from 'util/URLUtils';
 
 const SUPPORTED_ATTRIBUTE_TYPES = ['STRING', 'BOOLEAN', 'DATE', 'OBJECT_ID'];
 
@@ -43,10 +47,14 @@ type Props = {
   attributes: Attributes,
   urlQueryFilters: UrlQueryFilters | undefined,
   setUrlQueryFilters: (urlQueryFilters: UrlQueryFilters) => void,
-  filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode };
+  filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode },
+  appSection: string,
 }
 
-const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters, setUrlQueryFilters }: Props) => {
+const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters, setUrlQueryFilters, appSection }: Props) => {
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
   const {
     data: activeFilters,
     onChange: onChangeFiltersWithTitle,
@@ -68,6 +76,13 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
   }, [onChangeFiltersWithTitle, setUrlQueryFilters]);
 
   const onCreateFilter = useCallback((attributeId: string, filter: Filter) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CREATED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: appSection,
+      app_action_value: 'new-filter-created',
+      attribute_id: attributeId,
+    });
+
     onChangeFilters(OrderedMap(activeFilters).set(
       attributeId,
       [...(activeFilters?.get(attributeId) ?? []), filter],
@@ -75,6 +90,13 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
   }, [activeFilters, onChangeFilters]);
 
   const onDeleteFilter = useCallback((attributeId: string, filterId: string) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_DELETED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: appSection,
+      app_action_value: 'filter-deleted',
+      attribute_id: attributeId,
+    });
+
     const filterGroup = activeFilters.get(attributeId);
     const updatedFilterGroup = filterGroup.filter(({ value }) => value !== filterId);
 
@@ -86,6 +108,13 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
   }, [activeFilters, onChangeFilters]);
 
   const onChangeFilter = useCallback((attributeId: string, prevValue: string, newFilter: Filter) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: appSection,
+      app_action_value: 'filter-value-changed',
+      attribute_id: attributeId,
+    });
+
     const filterGroup = activeFilters.get(attributeId);
     const targetFilterIndex = filterGroup.findIndex(({ value }) => value === prevValue);
     const updatedFilterGroup = [...filterGroup];
