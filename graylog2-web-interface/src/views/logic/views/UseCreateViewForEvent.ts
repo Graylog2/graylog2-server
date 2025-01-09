@@ -19,7 +19,12 @@ import * as Immutable from 'immutable';
 import uniq from 'lodash/uniq';
 
 import View from 'views/logic/views/View';
-import type { AbsoluteTimeRange, ElasticsearchQueryString, RelativeTimeRangeStartOnly } from 'views/logic/queries/Query';
+import type {
+  AbsoluteTimeRange,
+  ElasticsearchQueryString,
+  RelativeTimeRangeStartOnly,
+  TimeRange,
+} from 'views/logic/queries/Query';
 import type { Event } from 'components/events/events/types';
 import type { EventDefinition, SearchFilter } from 'components/event-definitions/event-definitions-types';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
@@ -224,14 +229,18 @@ export const UseCreateViewForEvent = (
   const eventQueryString = eventData?.replay_info?.query ?? eventDefinition?.config?.query ?? '';
   const streams = eventData?.replay_info?.streams ?? eventDefinition?.config?.streams ?? [];
   const streamCategories = eventData?.replay_info?.stream_categories ?? eventDefinition?.config?.stream_categories ?? [];
-  const timeRange: AbsoluteTimeRange = {
-    type: 'absolute',
-    from: eventData?.replay_info?.timerange_start,
-    to: eventData?.replay_info?.timerange_end,
-  };
+  const timeRange: TimeRange = eventData
+    ? {
+      type: 'absolute',
+      from: eventData?.replay_info?.timerange_start,
+      to: eventData?.replay_info?.timerange_end,
+    } : {
+      type: 'relative',
+      range: (eventDefinition?.config?.search_within_ms ?? 0) / 1000,
+    };
   const queryString: ElasticsearchQueryString = {
     type: 'elasticsearch',
-    query_string: concatQueryStrings([eventQueryString, queryStringFromGrouping]),
+    query_string: eventData ? concatQueryStrings([eventQueryString, queryStringFromGrouping]) : (eventDefinition?.config?.query ?? ''),
   };
 
   const queryParameters = eventDefinition?.config?.query_parameters ?? [];
