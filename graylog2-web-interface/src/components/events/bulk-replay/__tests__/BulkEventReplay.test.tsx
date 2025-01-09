@@ -19,7 +19,6 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { PluginManifest } from 'graylog-web-plugin/plugin';
 
-import type { Event } from 'components/events/events/types';
 import { usePlugin } from 'views/test/testPlugins';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 
