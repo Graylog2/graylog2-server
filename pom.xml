@@ -525,6 +525,15 @@
                 <artifactId>auto-value-javabean</artifactId>
                 <version>${auto-value-javabean.version}</version>
             </dependency>
+
+            <!-- Explicitly manage mina-core to fix CVE-2024-52046. We are only using mina-core as a transitive
+                 dependency for the Apache DS server in our tests. Remove once its usages are updated and the fixed
+                 version is pulled in automatically. -->
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>2.2.4</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
