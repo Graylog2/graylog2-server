@@ -128,22 +128,21 @@ const InputDiagnosisPage = () => {
               <Col xs={3}>
                 <dt>Input State</dt>
                 {Object.keys(inputNodeStates.states).map((state) => (
-                  <DropdownButton
-                    key={state}
-                    bsSize="xs"
-                    title={<dd key={state}>{state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}</dd>}>
+                  <DropdownButton title={<dd key={state}>{state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}</dd>}
+                                  key={state}
+                                  bsSize="xs">
                     {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
-                        <LinkContainer key={node_id} to={Routes.SYSTEM.NODES.SHOW(node_id)}>
-                          <MenuItem>
-                            {node_id && (
-                              <div><b>Node ID:</b> {node_id}</div>
-                            )}
-                            {detailed_message && (
-                              <InputNodeInfo><b>Message:</b> {detailed_message}</InputNodeInfo>
-                            )}
-                          </MenuItem>
-                        </LinkContainer>
-                      ))}
+                      <LinkContainer key={node_id} to={Routes.SYSTEM.NODES.SHOW(node_id)}>
+                        <MenuItem>
+                          {node_id && (
+                            <div><b>Node ID:</b> {node_id}</div>
+                          )}
+                          {detailed_message && (
+                            <InputNodeInfo><b>Message:</b> {detailed_message}</InputNodeInfo>
+                          )}
+                        </MenuItem>
+                      </LinkContainer>
+                    ))}
                   </DropdownButton>
                 ))}
               </Col>
