@@ -400,4 +400,9 @@ export const TELEMETRY_EVENT_TYPE = {
     REMOTEREINDEX_RUNNING_RETRY_CONFIRM_CLICKED: 'Datanode Migration RemoteReindex Running Retry Confirm Clicked',
     REMOTEREINDEX_SHUTDOWN_OLD_CLUSTER_NEXT_CLICKED: 'Datanode Migration RemoteReindex Shutdown Old Cluster Next Clicked',
   },
+  ENTITY_DATA_TABLE: {
+    COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
+    SORT_CHANGED: 'Entity Data Table Sort Changed',
+    PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
+  },
 } as const;
