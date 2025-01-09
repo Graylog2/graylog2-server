@@ -17,44 +17,36 @@
 
 import { useMemo } from 'react';
 
-import useLocation from 'routing/useLocation';
-import Routes from 'routing/Routes';
-import useParams from 'routing/useParams';
 import type { Event } from 'components/events/events/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import useEventDefinition from 'hooks/useEventDefinition';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useEventById from 'hooks/useEventById';
 
-const useAlertAndEventDefinitionData = () => {
-  const { pathname: path } = useLocation();
-  const { alertId, definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
-  const { data: eventData } = useEventById(alertId);
-  const { data } = useEventDefinition(definitionId ?? eventData?.event_definition_id);
+const useAlertAndEventDefinitionData = (alertId: string, definitionId?: string) => {
+  const { data: eventData, isLoading: isLoadingEvent } = useEventById(alertId);
+  const { data, isLoading: isLoadingEventDefinition } = useEventDefinition(definitionId ?? eventData?.event_definition_id);
   const eventDefinition = data?.eventDefinition;
   const aggregations = data?.aggregations;
+  const isLoading = (alertId && isLoadingEvent) || (definitionId && isLoadingEventDefinition);
 
   return useMemo<{
     alertId: string,
     definitionId: string,
     definitionTitle: string,
-    isAlert: boolean,
-    isEvent: boolean,
-    isEventDefinition: boolean,
     eventData: Event,
     eventDefinition: EventDefinition,
     aggregations: Array<EventDefinitionAggregation>,
+    isLoading: boolean,
   }>(() => ({
     alertId,
     definitionId: eventDefinition?.id,
     definitionTitle: eventDefinition?.title,
-    isAlert: (path === Routes.ALERTS.replay_search(alertId)) && eventData && eventData?.alert,
-    isEvent: !!alertId && (path === Routes.ALERTS.replay_search(alertId)) && eventData && !eventData?.alert,
-    isEventDefinition: !!definitionId && (path === Routes.ALERTS.DEFINITIONS.replay_search(definitionId)) && !!eventDefinition,
     eventData,
     eventDefinition,
     aggregations,
-  }), [alertId, eventDefinition, path, eventData, definitionId, aggregations]);
+    isLoading,
+  }), [alertId, eventDefinition, eventData, aggregations, isLoading]);
 };
 
 export default useAlertAndEventDefinitionData;

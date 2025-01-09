@@ -14,22 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useContext } from 'react';
 
-import type { ValueExpr } from 'hooks/useEventDefinition';
-import type { Condition } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import ReplaySearchContext from '../ReplaySearchContext';
 
-export const exprToConditionMapper: { [name: string]: Condition } = {
-  '<': 'less',
-  '<=': 'less_equal',
-  '>=': 'greater_equal',
-  '>': 'greater',
-  '==': 'equal',
-};
-
-export const conditionToExprMapper: { [name: string]: ValueExpr } = {
-  less: '<',
-  less_equal: '<=',
-  greater_equal: '>=',
-  greater: '>',
-  equal: '==',
-};
+const useReplaySearchContext = () => useContext(ReplaySearchContext);
+export default useReplaySearchContext;

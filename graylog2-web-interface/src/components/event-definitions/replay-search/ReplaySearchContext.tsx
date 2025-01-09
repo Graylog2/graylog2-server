@@ -14,22 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-import type { ValueExpr } from 'hooks/useEventDefinition';
-import type { Condition } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type { AlertType } from 'components/event-definitions/types';
 
-export const exprToConditionMapper: { [name: string]: Condition } = {
-  '<': 'less',
-  '<=': 'less_equal',
-  '>=': 'greater_equal',
-  '>': 'greater',
-  '==': 'equal',
-};
-
-export const conditionToExprMapper: { [name: string]: ValueExpr } = {
-  less: '<',
-  less_equal: '<=',
-  greater_equal: '>=',
-  greater: '>',
-  equal: '==',
-};
+type ReplaySearchContextType = {
+  alertId: string;
+  definitionId: string;
+  type: AlertType;
+}
+const ReplaySearchContext = React.createContext<ReplaySearchContextType>({ alertId: undefined, definitionId: undefined, type: undefined });
+export default ReplaySearchContext;
