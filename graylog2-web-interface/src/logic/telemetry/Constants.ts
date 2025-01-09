@@ -403,4 +403,9 @@ export const TELEMETRY_EVENT_TYPE = {
   ALERTS_AND_EVENTS: {
     ACTION_RAN: 'Alerts And Events Action Ran',
   },
+  ENTITY_DATA_TABLE: {
+    COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
+    SORT_CHANGED: 'Entity Data Table Sort Changed',
+    PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
+  },
 } as const;

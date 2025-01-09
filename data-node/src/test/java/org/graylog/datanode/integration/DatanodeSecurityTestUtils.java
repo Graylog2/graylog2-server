@@ -17,13 +17,13 @@
 package org.graylog.datanode.integration;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.CertutilCert;
 import org.graylog.security.certutil.CertutilHttp;
 import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
+import org.graylog2.security.TruststoreCreator;
 
 import java.io.IOException;
 import java.nio.file.Path;
