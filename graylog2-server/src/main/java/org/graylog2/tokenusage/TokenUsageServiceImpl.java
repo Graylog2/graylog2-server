@@ -66,7 +66,7 @@ public class TokenUsageServiceImpl implements TokenUsageService {
         //Build up the resulting objects:
         final List<TokenUsage> tokenUsage = currentPage.stream()
                 .map(dto -> toTokenUsage(dto, usersOfThisPage, authServiceIdToTitle))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         return new PaginatedList<>(tokenUsage, currentPage.pagination().total(), page, perPage);
 
@@ -81,7 +81,7 @@ public class TokenUsageServiceImpl implements TokenUsageService {
             authBackend = Optional.ofNullable(authServiceIdToTitle.get(user.getAuthServiceId()))
                     .orElse("<" + user.getAuthServiceId() + "> (DELETED)");
         } else {
-            //User is not external, so this field stays empty.
+            //User is not external, so this field stays blank.
             authBackend = "";
         }
 
