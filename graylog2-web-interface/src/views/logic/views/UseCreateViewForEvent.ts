@@ -217,11 +217,13 @@ export const ViewGenerator = async ({
 };
 
 export const UseCreateViewForEvent = (
-  { eventData, eventDefinition, aggregations }: { eventData: Event, eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
+  { eventData, eventDefinition, aggregations }: { eventData?: Event, eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
 ) => {
-  const queryStringFromGrouping = concatQueryStrings(Object.entries(eventData.group_by_fields).map(([field, value]) => `${field}:${escape(value)}`), { withBrackets: false });
-  const eventQueryString = eventData?.replay_info?.query || '';
-  const { streams, stream_categories: streamCategories } = eventData.replay_info;
+  const queryStringFromGrouping = concatQueryStrings(Object.entries(eventData?.group_by_fields ?? {})
+    .map(([field, value]) => `${field}:${escape(value)}`), { withBrackets: false });
+  const eventQueryString = eventData?.replay_info?.query ?? eventDefinition?.config?.query ?? '';
+  const streams = eventData?.replay_info?.streams ?? eventDefinition?.config?.streams ?? [];
+  const streamCategories = eventData?.replay_info?.stream_categories ?? eventDefinition?.config?.stream_categories ?? [];
   const timeRange: AbsoluteTimeRange = {
     type: 'absolute',
     from: eventData?.replay_info?.timerange_start,
@@ -232,7 +234,7 @@ export const UseCreateViewForEvent = (
     query_string: concatQueryStrings([eventQueryString, queryStringFromGrouping]),
   };
 
-  const queryParameters = eventDefinition?.config?.query_parameters || [];
+  const queryParameters = eventDefinition?.config?.query_parameters ?? [];
 
   const groupBy = eventDefinition?.config?.group_by ?? [];
 

@@ -19,7 +19,6 @@ import { useMemo } from 'react';
 
 import useAlertAndEventDefinitionData
   from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
-import useCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForEventDefinition';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
@@ -30,6 +29,7 @@ import Spinner from 'components/common/Spinner';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Event } from 'components/events/events/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
+import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 
 type ReplaySearchProps = {
   alertId: string,
@@ -47,7 +47,7 @@ const defaultSearchPageLayout = {};
 const ReplaySearch = ({
   alertId, definitionId, eventDefinition, aggregations, event: eventData, replayEventDefinition, searchPageLayout, forceSidebarPinned,
 }: ReplaySearchProps) => {
-  const _view = useCreateViewForEventDefinition({ eventDefinition, aggregations });
+  const _view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
   const view = useCreateSearch(_view);
   const _searchPageLayout = useMemo(() => ({
     ...searchPageLayout,

@@ -49,7 +49,7 @@ jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
 jest.mock('hooks/useEventById');
 jest.mock('hooks/useEventDefinition');
-jest.mock('hooks/useAlertAndEventDefinitionData');
+jest.mock('components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData');
 
 jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {

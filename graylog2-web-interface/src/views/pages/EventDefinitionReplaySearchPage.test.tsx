@@ -21,7 +21,7 @@ import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
 import SearchComponent from 'views/components/Search';
 import StreamsContext from 'contexts/StreamsContext';
-import UseCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForEventDefinition';
+import UseCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -42,7 +42,7 @@ jest.mock('views/components/Search');
 jest.mock('routing/useParams');
 
 jest.mock('views/logic/views/Actions');
-jest.mock('views/logic/views/UseCreateViewForEventDefinition');
+jest.mock('views/logic/views/UseCreateViewForEvent');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useCreateSearch');
 
@@ -77,7 +77,7 @@ describe('EventDefinitionReplaySearchPage', () => {
 
   beforeEach(() => {
     asMock(useParams).mockReturnValue({ definitionId: mockEventDefinitionTwoAggregations.id });
-    asMock(UseCreateViewForEventDefinition).mockReturnValue(Promise.resolve(mockView));
+    asMock(UseCreateViewForEvent).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
 
@@ -107,7 +107,7 @@ describe('EventDefinitionReplaySearchPage', () => {
     }));
 
     await waitFor(() => {
-      expect(UseCreateViewForEventDefinition).toHaveBeenCalledWith({
+      expect(UseCreateViewForEvent).toHaveBeenCalledWith({
         eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,
       });
     });
