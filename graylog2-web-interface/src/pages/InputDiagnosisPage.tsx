@@ -100,18 +100,26 @@ const InputDiagnosisPage = () => {
                     <dd>{inputMetrics.incomingMessagesTotal} events</dd>
                     <dt>Empty Messages discarded:</dt>
                     <dd>{inputMetrics.emptyMessages}</dd>
-                    <dt>Active Connections:</dt>
-                    <dd>
-                      {inputMetrics.open_connections}&nbsp;
-                      ({inputMetrics.total_connections} total)
-                    </dd>
-                    <dt>Network I/O:</dt>
-                    <dd>
-                      <NetworkStats readBytes1Sec={inputMetrics.read_bytes_1sec}
-                                    readBytesTotal={inputMetrics.read_bytes_total}
-                                    writtenBytes1Sec={inputMetrics.write_bytes_1sec}
-                                    writtenBytesTotal={inputMetrics.write_bytes_total} />
-                    </dd>
+                    {Number.isInteger(inputMetrics.open_connections) && Number.isInteger(inputMetrics.total_connections) && (
+                      <>
+                        <dt>Active Connections:</dt>
+                        <dd>
+                          {inputMetrics.open_connections}&nbsp;
+                          ({inputMetrics.total_connections} total)
+                        </dd>
+                      </>
+                    )}
+                    {Number.isInteger(inputMetrics.read_bytes_1sec) && Number.isInteger(inputMetrics.read_bytes_total) && (
+                      <>
+                        <dt>Network I/O:</dt>
+                        <dd>
+                          <NetworkStats readBytes1Sec={inputMetrics.read_bytes_1sec}
+                                        readBytesTotal={inputMetrics.read_bytes_total}
+                                        writtenBytes1Sec={inputMetrics.write_bytes_1sec}
+                                        writtenBytesTotal={inputMetrics.write_bytes_total} />
+                        </dd>
+                      </>
+                    )}
                   </StyledDl>
                 )}
               </MetricsCol>
