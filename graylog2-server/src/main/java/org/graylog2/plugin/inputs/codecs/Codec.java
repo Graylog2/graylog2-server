@@ -28,6 +28,12 @@ import java.util.Optional;
 
 public interface Codec {
 
+    /**
+     * @param rawMessage
+     * @return an empty Optional if RawMessage contains payload data that should not be decoded.
+     * Otherwise, an Optional with a Message that can be processed further.
+     * @throws org.graylog2.plugin.inputs.failure.InputProcessingException if an error occurs during decoding.
+     */
     default Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         return Optional.ofNullable(decode(rawMessage));
     }

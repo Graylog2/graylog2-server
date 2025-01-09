@@ -42,6 +42,7 @@ const getEvent = (id: string): Event => ({
   source_streams: ['000000000000000000000001'],
   replay_info: undefined,
   alert: undefined,
+  message: '',
 });
 
 const mockedSelectedEntitiesData = {
