@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useLocation } from 'react-router-dom';
-import type { Location } from 'react-router-dom';
+import { useContext } from 'react';
 
-const _useLocation = <T, >(): Location<T> => useLocation();
-export default _useLocation;
+import ReplaySearchContext from '../ReplaySearchContext';
+
+const useReplaySearchContext = () => useContext(ReplaySearchContext);
+export default useReplaySearchContext;

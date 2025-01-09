@@ -22,6 +22,8 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import com.google.errorprone.annotations.MustBeClosed;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -47,8 +49,6 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -162,9 +162,12 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return getNativeViews().map(this::createExcerpt).collect(Collectors.toSet());
+        try (final Stream<ViewSummaryDTO> nativeViews = getNativeViews()) {
+            return nativeViews.map(this::createExcerpt).collect(Collectors.toSet());
+        }
     }
 
+    @MustBeClosed
     protected Stream<ViewSummaryDTO> getNativeViews() {
         return viewSummaryService.streamAll().filter(v -> v.type().equals(this.getDTOType()));
     }

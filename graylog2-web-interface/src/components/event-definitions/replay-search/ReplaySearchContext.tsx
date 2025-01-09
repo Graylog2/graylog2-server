@@ -14,8 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useLocation } from 'react-router-dom';
-import type { Location } from 'react-router-dom';
+import * as React from 'react';
 
-const _useLocation = <T, >(): Location<T> => useLocation();
-export default _useLocation;
+import type { AlertType } from 'components/event-definitions/types';
+
+type ReplaySearchContextType = {
+  alertId: string;
+  definitionId: string;
+  type: AlertType;
+}
+const ReplaySearchContext = React.createContext<ReplaySearchContextType>({ alertId: undefined, definitionId: undefined, type: undefined });
+export default ReplaySearchContext;
