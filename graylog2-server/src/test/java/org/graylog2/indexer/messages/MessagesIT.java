@@ -205,6 +205,37 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     }
 
     @Test
+    public void retryIndexingMessagesWhenHeapSpaceIsMaxed() throws Exception {
+        lowerCircuitBreaker();
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final AtomicBoolean succeeded = new AtomicBoolean(false);
+        final var messageCount = 20;
+        final List<MessageWithIndex> messageBatch = createMessageBatch(10240, messageCount);
+
+        final Future<IndexingResults> resultsFuture = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+
+        countDownLatch.await();
+
+        relaxCircuitBreaker();
+
+        var results = resultsFuture.get(3, TimeUnit.MINUTES);
+        assertThat(results.errors()).isEmpty();
+
+        client().refreshNode();
+
+        assertThat(messageCount(INDEX_NAME)).isEqualTo(messageCount);
+        assertThat(succeeded.get()).isTrue();
+    }
+
+    private void lowerCircuitBreaker() {
+        client().setRequestCircuitBreakerLimit("100kb");
+    }
+
+    private void relaxCircuitBreaker() {
+        client().setRequestCircuitBreakerLimit(null);
+    }
+
+    @Test
     public void retryIndexingMessagesDuringFloodStage() throws Exception {
         triggerFloodStage(INDEX_NAME);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -226,7 +257,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
         assertThat(succeeded.get()).isTrue();
     }
-
 
     private void waitForClusterBlockRelease() throws ExecutionException, RetryException {
         RetryerBuilder.<String>newBuilder()

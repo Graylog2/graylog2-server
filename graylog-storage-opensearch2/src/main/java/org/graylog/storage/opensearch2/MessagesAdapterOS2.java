@@ -70,6 +70,9 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
     static final String ILLEGAL_ARGUMENT_EXCEPTION = "illegal_argument_exception";
     static final String NO_WRITE_INDEX_DEFINED_FOR_ALIAS = "no write index is defined for alias";
 
+    static final String CIRCUIT_BREAKING_EXCEPTION = "circuit_breaking_exception";
+    static final String DATA_TOO_LARGE = "Data too large";
+
     private final ResultMessageFactory resultMessageFactory;
     private final OpenSearchClient client;
     private final Meter invalidTimestampMeter;
@@ -244,6 +247,10 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
             case ILLEGAL_ARGUMENT_EXCEPTION:
                 if (exception.reason().contains(NO_WRITE_INDEX_DEFINED_FOR_ALIAS)) {
                     return IndexingError.Type.IndexBlocked;
+                }
+            case CIRCUIT_BREAKING_EXCEPTION:
+                if (exception.reason().contains(DATA_TOO_LARGE)) {
+                    return IndexingError.Type.DataTooLarge;
                 }
             default:
                 return IndexingError.Type.Unknown;

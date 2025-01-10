@@ -40,6 +40,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.errors.ResponseError;
 import org.graylog2.indexer.BatchSizeTooLargeException;
+import org.graylog2.indexer.CircuitBreakerException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MapperParsingException;
@@ -206,10 +207,22 @@ public class OpenSearchClient {
             if (isMapperParsingExceptionException(openSearchException)) {
                 throw new MapperParsingException(openSearchException.getMessage());
             }
+            if (isCircuitBreakerException(openSearchException)) {
+                throw new CircuitBreakerException(openSearchException.getMessage());
+            }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
             throw new BatchSizeTooLargeException(e.getMessage());
         }
         return new OpenSearchException(errorMessage, e);
+    }
+
+    private boolean isCircuitBreakerException(OpenSearchException openSearchException) {
+        try {
+            final var parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
+            return parsedException.type().equals("circuit_breaking_exception");
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private boolean isInvalidWriteTargetException(OpenSearchException openSearchException) {

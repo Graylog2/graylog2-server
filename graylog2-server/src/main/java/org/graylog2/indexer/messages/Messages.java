@@ -26,7 +26,10 @@ import com.github.rholder.retry.WaitStrategies;
 import com.github.rholder.retry.WaitStrategy;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.failure.FailureSubmissionService;
+import org.graylog2.indexer.CircuitBreakerException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog2.indexer.results.ResultMessage;
@@ -36,10 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -75,7 +74,8 @@ public class Messages {
         return RetryerBuilder.<IndexingResults>newBuilder()
                 .retryIfException(t -> ExceptionUtils.hasCauseOf(t, IOException.class)
                         || t instanceof InvalidWriteTargetException
-                        || t instanceof MasterNotDiscoveredException)
+                        || t instanceof MasterNotDiscoveredException
+                        || t instanceof CircuitBreakerException)
                 .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
                 .withRetryListener(new RetryListener() {
                     @Override
@@ -144,7 +144,7 @@ public class Messages {
     public IndexingResults bulkIndexRequests(List<IndexingRequest> indexingRequestList, boolean isSystemTraffic, IndexingListener indexingListener) {
         final IndexingResults indexingResults = runBulkRequest(indexingRequestList, indexingRequestList.size(), indexingListener);
 
-        final IndexingResults retryBlockResults = retryOnlyIndexBlockItemsForever(indexingRequestList, indexingResults.errors(), indexingListener);
+        final IndexingResults retryBlockResults = retryQualifyingIndividualItems(indexingRequestList, indexingResults.errors(), indexingListener);
 
         final IndexingResults finalResults = retryBlockResults.mergeWith(indexingResults.successes(), List.of());
 
@@ -158,32 +158,32 @@ public class Messages {
         return finalResults;
     }
 
-    private IndexingResults retryOnlyIndexBlockItemsForever(List<IndexingRequest> messages, List<IndexingError> allFailedItems, IndexingListener indexingListener) {
-        Set<IndexingError> indexBlocks = indexBlocksFrom(allFailedItems);
-        final Set<IndexingError> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), indexBlocks));
-        List<IndexingRequest> blockedMessages = messagesForResultItems(messages, indexBlocks);
+    private IndexingResults retryQualifyingIndividualItems(List<IndexingRequest> messages, List<IndexingError> allFailedItems, IndexingListener indexingListener) {
+        Set<IndexingError> retryableErrors = retryableErrorsFrom(allFailedItems);
+        final Set<IndexingError> otherFailures = new HashSet<>(Sets.difference(new HashSet<>(allFailedItems), retryableErrors));
+        List<IndexingRequest> blockedMessages = messagesForResultItems(messages, retryableErrors);
 
-        if (!indexBlocks.isEmpty()) {
-            LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", indexBlocks.size());
+        if (!retryableErrors.isEmpty()) {
+            LOG.warn("Retrying {} messages, because their indices are blocked with status [read-only / allow delete]", retryableErrors.size());
         }
 
         long attempt = 1;
 
         final IndexingResults.Builder builder = IndexingResults.Builder.create();
-        while (!indexBlocks.isEmpty()) {
+        while (!retryableErrors.isEmpty()) {
             waitBeforeRetrying(attempt++);
 
             final IndexingResults indexingResults = runBulkRequest(blockedMessages, messages.size(), indexingListener);
 
             builder.addSuccesses(indexingResults.successes());
             final var failedItems = indexingResults.errors();
-            indexBlocks = indexBlocksFrom(failedItems);
-            blockedMessages = messagesForResultItems(blockedMessages, indexBlocks);
+            retryableErrors = retryableErrorsFrom(failedItems);
+            blockedMessages = messagesForResultItems(blockedMessages, retryableErrors);
 
-            final Set<IndexingError> newOtherFailures = Sets.difference(new HashSet<>(failedItems), indexBlocks);
+            final Set<IndexingError> newOtherFailures = Sets.difference(new HashSet<>(failedItems), retryableErrors);
             otherFailures.addAll(newOtherFailures);
 
-            if (indexBlocks.isEmpty()) {
+            if (retryableErrors.isEmpty()) {
                 LOG.info("Retries were successful after {} attempts. Ingestion will continue now.", attempt);
             }
         }
@@ -198,12 +198,13 @@ public class Messages {
         return chunk.stream().filter(entry -> blockedMessageIds.contains(entry.message().getId())).collect(Collectors.toList());
     }
 
-    private Set<IndexingError> indexBlocksFrom(List<IndexingError> allFailedItems) {
-        return allFailedItems.stream().filter(this::hasFailedDueToBlockedIndex).collect(Collectors.toSet());
+    private Set<IndexingError> retryableErrorsFrom(List<IndexingError> allFailedItems) {
+        return allFailedItems.stream().filter(this::isRetryable).collect(Collectors.toSet());
     }
 
-    private boolean hasFailedDueToBlockedIndex(IndexingError indexingError) {
-        return indexingError.error().type().equals(IndexingError.Type.IndexBlocked);
+    private boolean isRetryable(IndexingError indexingError) {
+        final var errorType = indexingError.error().type();
+        return errorType.equals(IndexingError.Type.IndexBlocked) || errorType.equals(IndexingError.Type.DataTooLarge);
     }
 
     private void waitBeforeRetrying(long attempt) {
