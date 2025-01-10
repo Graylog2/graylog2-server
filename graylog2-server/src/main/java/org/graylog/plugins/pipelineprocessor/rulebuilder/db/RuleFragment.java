@@ -69,8 +69,6 @@ public abstract class RuleFragment implements MongoEntity, BuildableMongoEntity<
         return new AutoValue_RuleFragment.Builder().isCondition(false);
     }
 
-    public abstract Builder toBuilder();
-
     @AutoValue.Builder
     public abstract static class Builder implements BuildableMongoEntity.Builder<RuleFragment, Builder> {
 
