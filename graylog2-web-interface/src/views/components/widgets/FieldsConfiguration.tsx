@@ -56,10 +56,10 @@ type Props = {
 const FieldsConfiguration = ({
   createSelectPlaceholder = 'Add a field',
   displaySortableListOverlayInPortal = false,
-  menuPortalTarget,
+  menuPortalTarget = undefined,
   onChange,
-  isFieldQualified,
-  selectSize,
+  isFieldQualified = undefined,
+  selectSize = undefined,
   selectedFields,
   testPrefix = '',
   showSelectAllRest = false,

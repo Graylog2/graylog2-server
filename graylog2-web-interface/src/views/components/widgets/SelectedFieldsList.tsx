@@ -135,8 +135,8 @@ type Props = {
 };
 
 const SelectedFieldsList = ({
-  testPrefix, selectedFields, onChange, selectSize, displayOverlayInPortal = false,
-  showUnit = false, fieldSelect = undefined, fieldSelectMenuPortalTarget,
+  testPrefix = undefined, selectedFields, onChange, selectSize = undefined, displayOverlayInPortal = false,
+  showUnit = false, fieldSelect = undefined, fieldSelectMenuPortalTarget = undefined,
 
 }: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
