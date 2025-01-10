@@ -59,8 +59,11 @@ const useCleanupQueryParams = ({ uriParams, query, navigate }) => {
   useEffect(() => {
     if (uriParams?.page === undefined) {
       const baseURI = _clearURI(query);
+      const newQuery = baseURI.toString();
 
-      navigate(baseURI.toString(), { replace: true });
+      if (query !== newQuery) {
+        navigate(newQuery, { replace: true });
+      }
     }
   }, [query, navigate, uriParams?.page]);
 };
