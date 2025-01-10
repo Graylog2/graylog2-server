@@ -169,7 +169,7 @@ const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Pr
                               options={fieldOptions}
                               allowCreate
                               value={value}
-                              placeholder="Pick a field" />
+                              placeholder="Select or type field name" />
                     </Input>
                   )}
                 </Field>

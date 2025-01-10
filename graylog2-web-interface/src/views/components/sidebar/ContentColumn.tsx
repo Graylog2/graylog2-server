@@ -21,12 +21,13 @@ import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPa
 import { IconButton } from 'components/common';
 
 type Props = {
-  title: string,
   children: React.ReactNode,
   closeSidebar: () => void,
+  enableSidebarPinning: boolean,
+  forceSideBarPinned: boolean,
   searchPageLayout: SearchPreferencesLayout | undefined | null,
   sectionTitle: string,
-  forceSideBarPinned: boolean,
+  title: string,
 };
 
 export const Container = styled.div<{ $sidebarIsPinned: boolean }>(({ theme, $sidebarIsPinned }) => css`
@@ -127,7 +128,7 @@ const SectionContent = styled.div`
   }
 `;
 
-const toggleSidebarPinning = (searchPageLayout) => {
+const toggleSidebarPinning = (searchPageLayout: SearchPreferencesLayout) => {
   if (!searchPageLayout) {
     return;
   }
@@ -137,7 +138,7 @@ const toggleSidebarPinning = (searchPageLayout) => {
   togglePinning();
 };
 
-const ContentColumn = ({ children, title, sectionTitle, closeSidebar, searchPageLayout, forceSideBarPinned }: Props) => {
+const ContentColumn = ({ children, title, sectionTitle, closeSidebar, searchPageLayout, forceSideBarPinned, enableSidebarPinning }: Props) => {
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned || forceSideBarPinned;
 
   return (
@@ -148,7 +149,7 @@ const ContentColumn = ({ children, title, sectionTitle, closeSidebar, searchPage
             <CenterVertical>
               <Title onClick={closeSidebar}>{title}</Title>
             </CenterVertical>
-            {!forceSideBarPinned && (
+            {!forceSideBarPinned && enableSidebarPinning && (
               <CenterVertical>
                 <OverlayToggle $sidebarIsPinned={sidebarIsPinned}>
                   <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}

@@ -37,6 +37,7 @@ import sidebarActions from './sidebarActions';
 type Props = {
   actions?: Array<SidebarAction>,
   children?: React.ReactElement,
+  enableSidebarPinning?: boolean,
   forceSideBarPinned?: boolean,
   results?: QueryResult
   searchPageLayout?: SearchPreferencesLayout,
@@ -80,6 +81,7 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
 const Sidebar = ({
   searchPageLayout = undefined, results = undefined, children = undefined, title,
   sections = sidebarSections, actions = sidebarActions, forceSideBarPinned = false,
+  enableSidebarPinning = true,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
@@ -112,6 +114,7 @@ const Sidebar = ({
       {activeSection && !!SectionContent && (
         <ContentColumn closeSidebar={toggleSidebar}
                        title={title}
+                       enableSidebarPinning={enableSidebarPinning}
                        searchPageLayout={searchPageLayout}
                        sectionTitle={activeSection.title}
                        forceSideBarPinned={forceSideBarPinned}>
@@ -128,7 +131,7 @@ const Sidebar = ({
   );
 };
 
-const SidebarWithContext = ({ children, ...props }: React.ComponentProps<typeof Sidebar>) => (
+const SidebarWithContext = ({ children = undefined, ...props }: React.ComponentProps<typeof Sidebar>) => (
   <SearchPagePreferencesContext.Consumer>
     {(searchPageLayout) => <Sidebar {...props} searchPageLayout={searchPageLayout}>{children}</Sidebar>}
   </SearchPagePreferencesContext.Consumer>

@@ -31,7 +31,7 @@ import type HighlightingRule from 'views/logic/views/formatting/highlighting/Hig
 import useAppDispatch from 'stores/useAppDispatch';
 
 const DESCRIPTION = 'Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the graylog server config.\n'
-  + 'Any field value can be highlighted by clicking on the value and selecting &quot;Highlight this value&quot;.\n'
+  + 'Any field value can be highlighted by clicking on the value and selecting "Highlight this value".\n'
   + 'If a term or a value has more than one rule, the first matching rule is used.';
 
 const ViewsHighlightingRules = () => {

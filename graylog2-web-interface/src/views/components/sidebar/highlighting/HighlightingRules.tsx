@@ -65,9 +65,10 @@ type Props = {
   onCreateRule: (newRule: HighlightingRuleClass) => Promise<void>,
   onUpdateRule: (targetRule: HighlightingRuleClass, field: string, value: Value, condition: Condition, color: Color) => Promise<void>,
   onDeleteRule: (rule: HighlightingRuleClass) => Promise<void>,
+  showSearchHighlightInfo?: boolean,
 }
 
-const HighlightingRules = ({ description, onUpdateRules, onCreateRule: onCreateRuleProp, onUpdateRule, onDeleteRule }: Props) => {
+const HighlightingRules = ({ description, onUpdateRules, onCreateRule: onCreateRuleProp, onUpdateRule, onDeleteRule, showSearchHighlightInfo = true }: Props) => {
   const [showForm, setShowForm] = useState(false);
   const rules = useContext(HighlightingRulesContext) ?? [];
   const rulesWithId = rules.map((rule) => ({ rule, id: `${rule.field}-${rule.value}-${rule.color}-${rule.condition}` }));
@@ -89,7 +90,7 @@ const HighlightingRules = ({ description, onUpdateRules, onCreateRule: onCreateR
     className?: string,
   }) => (
     <SortableHighlightingRule {...props} onUpdate={onUpdateRule} onDelete={onDeleteRule} />
-  ), [onUpdateRule]);
+  ), [onDeleteRule, onUpdateRule]);
 
   return (
     <>
@@ -103,10 +104,13 @@ const HighlightingRules = ({ description, onUpdateRules, onCreateRule: onCreateR
                                       title="Add highlighting rule" />
       </SectionSubheadline>
       {showForm && <HighlightForm onClose={() => setShowForm(false)} onSubmit={onCreateRule} />}
-      <Container $displayBorder={!!rulesWithId?.length}>
-        <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
-        <RuleContainer>Search terms</RuleContainer>
-      </Container>
+
+      {showSearchHighlightInfo && (
+        <Container $displayBorder={!!rulesWithId?.length}>
+          <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
+          <RuleContainer>Search terms</RuleContainer>
+        </Container>
+      )}
       <SortableList items={rulesWithId}
                     onMoveItem={updateRules}
                     customListItemRender={listItemRender} />
