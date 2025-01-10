@@ -16,7 +16,8 @@
  */
 package org.graylog2.tokenusage;
 
-import com.google.inject.Inject;
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.DBAuthServiceBackendService;
 import org.graylog2.database.PaginatedList;
@@ -27,7 +28,6 @@ import org.graylog2.rest.models.tokenusage.TokenUsageDTO;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.shared.tokenusage.TokenUsageService;
 import org.graylog2.shared.users.UserService;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +88,8 @@ public class TokenUsageServiceImpl implements TokenUsageService {
 
     }
 
-    private @NotNull TokenUsage toTokenUsage(TokenUsageDTO dto, Map<String, User> usersOfThisPage, Map<String, String> authServiceIdToTitle) {
+    @Nonnull
+    private TokenUsage toTokenUsage(TokenUsageDTO dto, Map<String, User> usersOfThisPage, Map<String, String> authServiceIdToTitle) {
         final String username = dto.userName();
         final User user = usersOfThisPage.get(username);
         final boolean isExternal = user.isExternalUser();

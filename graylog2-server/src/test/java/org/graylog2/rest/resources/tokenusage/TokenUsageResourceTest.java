@@ -27,9 +27,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,7 +67,7 @@ public class TokenUsageResourceTest {
 
         final PaginatedResponse<TokenUsage> expected = PaginatedResponse.create("token_usage", mkPaginatedList(), query);
         //Sorry. the PaginatedResponse doesn't have a proper equals():
-        assertTrue(EqualsBuilder.reflectionEquals(expected, actual));
+        assertTrue(new ReflectionEquals(expected).matches(actual));
 
         verify(tokenUsageService, times(1)).loadTokenUsage(eq(PAGE), eq(PER_PAGE), any(SearchQuery.class), eq(TokenUsageDTO.FIELD_NAME), eq(SortOrder.ASCENDING));
     }

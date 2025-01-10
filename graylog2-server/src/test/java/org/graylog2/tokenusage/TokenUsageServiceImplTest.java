@@ -22,6 +22,7 @@ import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.DBAuthServiceBackendService;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.SortOrder;
@@ -34,7 +35,6 @@ import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -158,9 +158,9 @@ public class TokenUsageServiceImplTest {
                 .id("tokenId" + number)
                 .name("tokenName" + number)
                 .userName("userName" + number)
-                .createdAt(DateTime.now().minusDays(number))
-                .lastAccess(DateTime.now())
-                .expiresAt(DateTime.now().plusDays(number))
+                .createdAt(Tools.nowUTC().minusDays(number))
+                .lastAccess(Tools.nowUTC())
+                .expiresAt(Tools.nowUTC().plusDays(number))
                 .build();
     }
 
