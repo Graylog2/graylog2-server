@@ -23,12 +23,12 @@ import type { Attributes } from 'stores/PaginationTypes';
 import type { Filters, Filter, UrlQueryFilters } from 'components/common/EntityFilters/types';
 import ActiveFilters from 'components/common/EntityFilters/ActiveFilters';
 import useFiltersWithTitle from 'components/common/EntityFilters/hooks/useFiltersWithTitle';
-
-import { ROW_MIN_HEIGHT } from './Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
-import {TELEMETRY_EVENT_TYPE} from 'logic/telemetry/Constants';
-import {getPathnameWithoutId} from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+
+import { ROW_MIN_HEIGHT } from './Constants';
 
 const SUPPORTED_ATTRIBUTE_TYPES = ['STRING', 'BOOLEAN', 'DATE', 'OBJECT_ID'];
 
@@ -87,7 +87,7 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
       attributeId,
       [...(activeFilters?.get(attributeId) ?? []), filter],
     ));
-  }, [activeFilters, onChangeFilters]);
+  }, [activeFilters, appSection, onChangeFilters, pathname, sendTelemetry]);
 
   const onDeleteFilter = useCallback((attributeId: string, filterId: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_DELETED, {
@@ -105,7 +105,7 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
     }
 
     return onChangeFilters(activeFilters.remove(attributeId));
-  }, [activeFilters, onChangeFilters]);
+  }, [activeFilters, appSection, onChangeFilters, pathname, sendTelemetry]);
 
   const onChangeFilter = useCallback((attributeId: string, prevValue: string, newFilter: Filter) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CHANGED, {
@@ -121,7 +121,7 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
     updatedFilterGroup[targetFilterIndex] = newFilter;
 
     onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
-  }, [activeFilters, onChangeFilters]);
+  }, [activeFilters, appSection, onChangeFilters, pathname, sendTelemetry]);
 
   if (!filterableAttributes.length) {
     return null;
