@@ -28,12 +28,6 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import { updateHighlightingRule } from 'views/logic/slices/highlightActions';
-
-jest.mock('views/logic/slices/highlightActions', () => ({
-  addHighlightingRule: jest.fn(() => () => Promise.resolve()),
-  updateHighlightingRule: jest.fn(() => () => Promise.resolve()),
-}));
 
 const rule = HighlightingRule.builder()
   .color(StaticColor.create('#333333'))
@@ -54,10 +48,10 @@ describe('HighlightForm', () => {
     all: Immutable.List([FieldTypeMapping.create('foob', FieldType.create('long', [Properties.Numeric]))]),
     queryFields: Immutable.Map(),
   };
-  const HighlightFormWithContext = (props: React.ComponentProps<typeof HighlightForm>) => (
+  const SUT = (props: Partial<React.ComponentProps<typeof HighlightForm>>) => (
     <TestStoreProvider>
       <FieldTypesContext.Provider value={fieldTypes}>
-        <HighlightForm {...props} />
+        <HighlightForm onClose={() => {}} rule={undefined} onSubmit={() => Promise.resolve()} {...props} />
       </FieldTypesContext.Provider>
     </TestStoreProvider>
   );
@@ -70,7 +64,7 @@ describe('HighlightForm', () => {
   useViewsPlugin();
 
   it('should render for edit', async () => {
-    const { findByText } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
+    const { findByText } = render(<SUT rule={rule} />);
 
     const form = await findByText('Edit Highlighting Rule');
     const input = await screen.findByLabelText('Value');
@@ -80,15 +74,14 @@ describe('HighlightForm', () => {
   });
 
   it('should render for new', async () => {
-    const { findByText } = render(<HighlightFormWithContext onClose={() => {}} />);
+    const { findByText } = render(<SUT rule={undefined} />);
 
     await findByText('Create Highlighting Rule');
   });
 
   it('should fire onClose on cancel', async () => {
     const onClose = jest.fn();
-    const { findByText } = render(<HighlightFormWithContext onClose={onClose} />);
-
+    const { findByText } = render(<SUT onClose={onClose} />);
     const elem = await findByText('Cancel');
 
     fireEvent.click(elem);
@@ -97,29 +90,28 @@ describe('HighlightForm', () => {
   });
 
   it('should fire update action when saving a existing rule', async () => {
-    render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
+    const onSubmit = jest.fn(() => Promise.resolve());
+    render(<SUT rule={rule} onSubmit={onSubmit} />);
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(updateHighlightingRule)
-      .toHaveBeenCalledWith(rule, { field: rule.field, value: rule.value, condition: rule.condition, color: rule.color }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(rule.field, rule.value, rule.condition, rule.color));
   });
 
   it('assigns a new static color when type is selected', async () => {
-    render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
+    const onSubmit = jest.fn(() => Promise.resolve());
+    render(<SUT rule={rule} onSubmit={onSubmit} />);
 
     userEvent.click(screen.getByLabelText('Static Color'));
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(updateHighlightingRule)
-      .toHaveBeenCalledWith(rule, expect.objectContaining({
-        color: expect.objectContaining({ type: 'static', color: expect.any(String) }),
-      })));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(rule.field, rule.value, rule.condition, expect.objectContaining({ type: 'static', color: expect.any(String) })));
   });
 
   it('creates a new gradient when type is selected', async () => {
-    render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
+    const onSubmit = jest.fn(() => Promise.resolve());
+    render(<SUT rule={rule} onSubmit={onSubmit} />);
 
     userEvent.click(screen.getByLabelText('Gradient'));
 
@@ -129,27 +121,23 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(updateHighlightingRule)
-      .toHaveBeenCalledWith(rule, expect.objectContaining({
-        color: expect.objectContaining({ gradient: 'Viridis' }),
-      })));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(rule.field, rule.value, rule.condition, expect.objectContaining({ gradient: 'Viridis' })));
   });
 
   it('should be able to click submit when has value 0 with type number', async () => {
-    render(<HighlightFormWithContext onClose={() => {}} rule={ruleWithValueZero} />);
+    const onSubmit = jest.fn(() => Promise.resolve());
+    render(<SUT rule={ruleWithValueZero} onSubmit={onSubmit} />);
 
     await triggerSaveButtonClick();
-
-    await waitFor(() => expect(updateHighlightingRule)
-      .toHaveBeenCalledWith(ruleWithValueZero, { field: ruleWithValueZero.field, value: '0', condition: ruleWithValueZero.condition, color: ruleWithValueZero.color }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(ruleWithValueZero.field, '0', ruleWithValueZero.condition, ruleWithValueZero.color));
   });
 
-  it('should be able to click submit when has value false  with type boolean', async () => {
-    render(<HighlightFormWithContext onClose={() => {}} rule={ruleWithValueFalse} />);
+  it('should be able to click submit when has value false with type boolean', async () => {
+    const onSubmit = jest.fn(() => Promise.resolve());
+    render(<SUT rule={ruleWithValueFalse} onSubmit={onSubmit} />);
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(updateHighlightingRule)
-      .toHaveBeenCalledWith(ruleWithValueFalse, { field: ruleWithValueFalse.field, value: 'false', condition: ruleWithValueFalse.condition, color: ruleWithValueFalse.color }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(ruleWithValueFalse.field, 'false', ruleWithValueFalse.condition, ruleWithValueFalse.color));
   });
 });

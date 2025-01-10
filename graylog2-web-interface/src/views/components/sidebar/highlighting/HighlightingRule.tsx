@@ -26,8 +26,6 @@ import { ColorPickerPopover, Icon, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import { updateHighlightingRule, removeHighlightingRule } from 'views/logic/slices/highlightActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -124,7 +122,6 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
     });
 
     return onUpdate(rule, rule.field, rule.value, rule.condition, newColor).then(hidePopover);
-    // return dispatch(updateColor(rule, newColor, hidePopover));
   }, [location.pathname, onUpdate, rule, sendTelemetry]);
 
   const _onDelete = useCallback(() => {
@@ -135,11 +132,9 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
       });
 
       return onDelete(rule);
-      // return dispatch(removeHighlightingRule(rule));
     }
 
     return Promise.resolve();
-    // return dispatch(onDelete(rule));
   }, [location.pathname, onDelete, rule, sendTelemetry]);
 
   return (
