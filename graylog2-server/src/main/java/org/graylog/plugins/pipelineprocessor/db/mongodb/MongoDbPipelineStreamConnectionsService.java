@@ -79,7 +79,7 @@ public class MongoDbPipelineStreamConnectionsService implements PipelineStreamCo
     public PipelineConnections load(String streamId) throws NotFoundException {
         final PipelineConnections oneById = collection.find(eq("stream_id", streamId)).first();
         if (oneById == null) {
-            throw new NotFoundException("No pipeline connections with for stream " + streamId);
+            throw new NotFoundException("No pipeline connections for stream " + streamId);
         }
         return oneById;
     }
