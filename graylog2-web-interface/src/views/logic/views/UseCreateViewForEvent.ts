@@ -47,7 +47,7 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import Parameter from 'views/logic/parameters/Parameter';
-import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
+import { concatQueryStrings, escape, predicate } from 'views/logic/queries/QueryHelper';
 import HighlightingRule, { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
@@ -225,7 +225,7 @@ export const UseCreateViewForEvent = (
   { eventData, eventDefinition, aggregations }: { eventData?: Event, eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
 ) => {
   const queryStringFromGrouping = concatQueryStrings(Object.entries(eventData?.group_by_fields ?? {})
-    .map(([field, value]) => `${field}:${escape(value)}`), { withBrackets: false });
+    .map(([field, value]) => predicate(field, escape(value))), { withBrackets: false });
   const eventQueryString = eventData?.replay_info?.query ?? eventDefinition?.config?.query ?? '';
   const streams = eventData?.replay_info?.streams ?? eventDefinition?.config?.streams ?? [];
   const streamCategories = eventData?.replay_info?.stream_categories ?? eventDefinition?.config?.stream_categories ?? [];
