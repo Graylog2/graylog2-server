@@ -140,7 +140,7 @@
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
-        <jersey.version>3.1.9</jersey.version>
+        <jersey.version>3.1.10</jersey.version>
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.13.0</joda-time.version>
         <jool.version>0.9.15</jool.version>
@@ -184,7 +184,7 @@
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.6</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
-        <poi.version>5.3.0</poi.version>
+        <poi.version>5.4.0</poi.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0.AM27</apacheds-server.version>
