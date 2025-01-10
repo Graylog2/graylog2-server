@@ -23,6 +23,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type FetchError from 'logic/errors/FetchError';
+import { onError } from 'util/conditional/onError';
 
 export type ValueExpr = '>' | '<' | '>=' | '<=' | '==';
 
@@ -99,14 +100,13 @@ const useEventDefinition = (definitionId: string, { onErrorHandler }: { onErrorH
 } => {
   const { data, refetch, isLoading, isFetched } = useQuery(
     ['event-definition-by-id', definitionId],
-    () => fetchDefinition(definitionId),
-    {
-      onError: (errorThrown: FetchError) => {
-        if (onErrorHandler) onErrorHandler(errorThrown);
+    () => onError(fetchDefinition(definitionId), (errorThrown: FetchError) => {
+      if (onErrorHandler) onErrorHandler(errorThrown);
 
-        UserNotification.error(`Loading event definition failed with status: ${errorThrown}`,
-          'Could not load event definition');
-      },
+      UserNotification.error(`Loading event definition failed with status: ${errorThrown}`,
+        'Could not load event definition');
+    }),
+    {
       keepPreviousData: true,
       enabled: !!definitionId,
       initialData: {

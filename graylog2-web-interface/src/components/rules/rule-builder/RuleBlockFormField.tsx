@@ -15,19 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useField } from 'formik';
 
 import { FormikFormGroup, InputOptionalInfo } from 'components/common';
 import { Button, ControlLabel } from 'components/bootstrap';
 
-import { RuleBuilderTypes, outputVariablesPropType } from './types';
+import { RuleBuilderTypes } from './types';
 import type { OutputVariables, BlockFieldDict, BlockType } from './types';
 
 type Props = {
   param: BlockFieldDict,
   functionName: string,
-  blockId: string,
+  blockId?: string
   order: number,
   outputVariableList?: OutputVariables,
   blockType: BlockType,
@@ -36,7 +35,7 @@ type Props = {
 
 const SupportedFieldTypes = [RuleBuilderTypes.String, RuleBuilderTypes.Object, RuleBuilderTypes.Number, RuleBuilderTypes.Boolean];
 
-const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariableList, blockType, resetField }: Props) => {
+const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariableList = [], blockType, resetField }: Props) => {
   const [primaryInputToggle, setPrimaryInputToggle] = useState<'custom' | 'select' | undefined>(undefined);
   const [field, fieldMeta] = useField(param.name);
 
@@ -119,10 +118,12 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
                        buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
                        help={param.description}
                        {...field}>
-        <option key="placeholder" value="">Select output from list</option>
-        {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
-          <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
-        )}
+        <>
+          <option key="placeholder" value="">Select output from list</option>
+          {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
+            <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
+          )}
+        </>
       </FormikFormGroup>
     );
   }
@@ -188,37 +189,18 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
                                : undefined
                            }
                            {...field}>
-            <option key="placeholder" value="">Select output from list</option>
-            {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
-              <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
-            )}
+            <>
+              <option key="placeholder" value="">Select output from list</option>
+              {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
+                <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
+              )}
+            </>
           </FormikFormGroup>
         );
       }
 
       return null;
   }
-};
-
-RuleBlockFormField.propTypes = {
-  param: PropTypes.shape({
-    type: PropTypes.string.isRequired,
-    transformed_type: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    optional: PropTypes.bool.isRequired,
-    rule_builder_variable: PropTypes.bool.isRequired,
-    description: PropTypes.string,
-  }).isRequired,
-  blockId: PropTypes.string,
-  functionName: PropTypes.string.isRequired,
-  order: PropTypes.number.isRequired,
-  outputVariableList: outputVariablesPropType,
-  resetField: PropTypes.func.isRequired,
-};
-
-RuleBlockFormField.defaultProps = {
-  blockId: undefined,
-  outputVariableList: [],
 };
 
 export default RuleBlockFormField;

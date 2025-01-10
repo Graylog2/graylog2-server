@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useMemo } from 'react';
 import type { DayModifiers } from 'react-day-picker';
 import DayPicker from 'react-day-picker';
@@ -76,7 +75,7 @@ type Props = {
   showOutsideDays?: boolean,
 };
 
-const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
+const DatePicker = ({ date, fromDate, onChange, showOutsideDays = false }: Props) => {
   const selectedDate = useSelectedDate(date);
 
   const modifiers = useMemo(() => ({
@@ -98,29 +97,6 @@ const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
                      modifiers={modifiers}
                      showOutsideDays={showOutsideDays} />
   );
-};
-
-DatePicker.propTypes = {
-  /** Initial date to select in the date picker. */
-  date: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.string,
-  ]),
-  /**
-   * Callback that will be called when user picks a date. It will receive the new selected day,
-   * `react-day-picker`'s modifiers, and the original event as arguments.
-   */
-  onChange: PropTypes.func.isRequired,
-  /** Earliest date possible to select in the date picker. */
-  fromDate: PropTypes.instanceOf(Date),
-  /** Earliest date possible to select in the date picker. */
-  showOutsideDays: PropTypes.bool,
-};
-
-DatePicker.defaultProps = {
-  date: undefined,
-  fromDate: undefined,
-  showOutsideDays: false,
 };
 
 export default DatePicker;

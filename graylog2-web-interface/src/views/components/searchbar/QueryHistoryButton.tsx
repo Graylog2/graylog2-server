@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { SearchSuggestions } from '@graylog/server-api';
+
 import IconButton from 'components/common/IconButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import { startAutocomplete } from 'views/components/searchbar/queryinput/commands';

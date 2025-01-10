@@ -37,6 +37,7 @@ export type Event = {
   source_streams: string[],
   replay_info: EventReplayInfo | undefined,
   alert: boolean | undefined,
+  message: string,
 };
 
 export type EventDefinitionContext = {
@@ -45,3 +46,8 @@ export type EventDefinitionContext = {
   remediation_steps?: string,
   description?: string,
 };
+
+export type EventDefinitionContexts = { [eventDefinitionId: string]: EventDefinitionContext };
+export type EventsAdditionalData = {
+  context: { event_definitions?: EventDefinitionContexts, streams?: EventDefinitionContexts },
+}

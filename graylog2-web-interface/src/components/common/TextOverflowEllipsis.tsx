@@ -39,9 +39,4 @@ const TextOverflowEllipsis = ({ children, titleOverride, className }: Props) => 
   </Wrapper>
 );
 
-TextOverflowEllipsis.defaultProps = {
-  className: undefined,
-  titleOverride: undefined,
-};
-
 export default TextOverflowEllipsis;

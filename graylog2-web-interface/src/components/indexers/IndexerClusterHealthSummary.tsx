@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -75,15 +74,6 @@ const IndexerClusterHealthSummary = ({ health, name }: {
       <DocumentationLink page={DocsHelper.PAGES.CLUSTER_STATUS_EXPLAINED} text="What does this mean?" />
     </ESClusterStatus>
   );
-};
-
-IndexerClusterHealthSummary.defaultProps = {
-  name: undefined,
-};
-
-IndexerClusterHealthSummary.propTypes = {
-  health: PropTypes.object.isRequired,
-  name: PropTypes.object,
 };
 
 export default IndexerClusterHealthSummary;

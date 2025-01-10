@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css, useTheme } from 'styled-components';
 
 import { Tooltip } from 'components/bootstrap';
@@ -100,7 +99,7 @@ const Label = styled.div<LabelProps>(({ value }) => css`
     : 'left: 0;'}
 `);
 
-const StyledTooltip = styled(Tooltip)(({ value }) => css`
+const StyledTooltip = styled(Tooltip)<{ value: number }>(({ value }) => css`
   position: absolute;
   top: 0;
   
@@ -118,7 +117,7 @@ const StyledTooltip = styled(Tooltip)(({ value }) => css`
   `}    
 `);
 
-const DataTieringVisualisation = ({ archiveData, minDays, maxDays, minDaysInHot, warmTierEnabled }: Props) => {
+const DataTieringVisualisation = ({ archiveData = false, minDays = 0, maxDays = 0, minDaysInHot = 0, warmTierEnabled = false }: Props) => {
   const [showMinDaysTooltip, setShowMinDaysTooltip] = useState<boolean>(false);
   const [showMinDaysInHotTooltip, setShowMinDaysInHotTooltip] = useState<boolean>(false);
   const theme = useTheme();
@@ -190,19 +189,3 @@ const DataTieringVisualisation = ({ archiveData, minDays, maxDays, minDaysInHot,
 };
 
 export default DataTieringVisualisation;
-
-DataTieringVisualisation.propTypes = {
-  minDays: PropTypes.number,
-  maxDays: PropTypes.number,
-  minDaysInHot: PropTypes.number,
-  warmTierEnabled: PropTypes.bool,
-  archiveData: PropTypes.bool,
-};
-
-DataTieringVisualisation.defaultProps = {
-  minDays: 0,
-  maxDays: 0,
-  minDaysInHot: 0,
-  warmTierEnabled: false,
-  archiveData: false,
-};

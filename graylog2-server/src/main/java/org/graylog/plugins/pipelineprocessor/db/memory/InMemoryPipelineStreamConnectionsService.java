@@ -17,14 +17,14 @@
 package org.graylog.plugins.pipelineprocessor.db.memory;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 
-import jakarta.inject.Inject;
-
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -86,6 +86,12 @@ public class InMemoryPipelineStreamConnectionsService implements PipelineStreamC
         } catch (NotFoundException e) {
             // Do nothing
         }
+    }
+
+    @Override
+    public Map<String, PipelineConnections> loadByStreamIds(Collection<String> streamIds) {
+        return streamIds.stream()
+                .collect(Collectors.toMap(streamId -> streamId, store::get));
     }
 
     private String createId() {

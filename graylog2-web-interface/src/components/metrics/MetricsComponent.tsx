@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -61,17 +60,6 @@ const MetricsListContainer = styled.div`
 `;
 
 class MetricsComponent extends React.Component<Props, State> {
-  static propTypes = {
-    names: PropTypes.arrayOf(PropTypes.object),
-    namespace: PropTypes.string.isRequired,
-    nodeId: PropTypes.string.isRequired,
-    filter: PropTypes.string,
-    error: PropTypes.shape({
-      responseMessage: PropTypes.string,
-      status: PropTypes.number,
-    }),
-  };
-
   static defaultProps = {
     names: undefined,
     filter: '',

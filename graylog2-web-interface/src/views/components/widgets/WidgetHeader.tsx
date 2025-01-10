@@ -15,14 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Spinner, Icon } from 'components/common';
-import EditableTitle from 'views/components/common/EditableTitle';
+import EditableTitle, { Title } from 'views/components/common/EditableTitle';
 import { Input } from 'components/bootstrap';
-
-import CustomPropTypes from '../CustomPropTypes';
 
 const LoadingSpinner = styled(Spinner)`
   margin-left: 10px;
@@ -78,33 +75,64 @@ const TitleInput = styled(Input)(({ theme }) => css`
   width: 100%;
 `);
 
-type Props = {
-  children: React.ReactNode,
-  onRename: (newTitle: string) => unknown,
-  hideDragHandle: boolean,
-  title: string,
-  loading: boolean,
+type WidgetTitleProps = {
+  onChange?: (newTitle: string) => void,
   editing: boolean,
+  title: string,
+  titleIcon?: React.ReactNode,
+}
+
+const WidgetTitle = ({ onChange, editing, title, titleIcon }: WidgetTitleProps) => {
+  if (typeof onChange !== 'function') {
+    return <><Title>{title}</Title>{titleIcon}</>;
+  }
+
+  if (editing) {
+    return (
+      <TitleInputWrapper>
+        <TitleInput type="text"
+                    id="widget-title"
+                    onChange={(e) => onChange(e.target.value)}
+                    value={title}
+                    required />
+      </TitleInputWrapper>
+    );
+  }
+
+  return (
+    <>
+      <EditableTitle key={title}
+                     disabled={!onChange}
+                     value={title}
+                     onChange={onChange} />
+      {titleIcon}
+    </>
+  );
 };
 
-const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading, editing }: Props) => (
+type Props = {
+  children?: React.ReactNode
+  onRename?: (newTitle: string) => unknown
+  hideDragHandle?: boolean
+  title: string,
+  loading?: boolean
+  editing: boolean,
+  titleIcon?: React.ReactNode,
+};
+
+const WidgetHeader = ({
+  title,
+  editing,
+  hideDragHandle = false,
+  loading = false,
+  children,
+  titleIcon,
+  onRename,
+}: Props) => (
   <Container>
     <Col>
       {hideDragHandle || <DragHandleContainer className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="drag_indicator" /></DragHandleContainer>}
-      {editing ? (
-        <TitleInputWrapper>
-          <TitleInput type="text"
-                      id="widget-title"
-                      onChange={(e) => onRename(e.target.value)}
-                      value={title}
-                      required />
-        </TitleInputWrapper>
-      ) : (
-        <EditableTitle key={title}
-                       disabled={!onRename}
-                       value={title}
-                       onChange={onRename} />
-      )}
+      <WidgetTitle editing={editing} title={title} titleIcon={titleIcon} onChange={onRename} />
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>
     <WidgetActionDropdown>
@@ -112,20 +140,5 @@ const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading, edit
     </WidgetActionDropdown>
   </Container>
 );
-
-WidgetHeader.propTypes = {
-  children: CustomPropTypes.OneOrMoreChildren,
-  onRename: PropTypes.func,
-  hideDragHandle: PropTypes.bool,
-  title: PropTypes.node.isRequired,
-  loading: PropTypes.bool,
-};
-
-WidgetHeader.defaultProps = {
-  children: null,
-  onRename: undefined,
-  hideDragHandle: false,
-  loading: false,
-};
 
 export default WidgetHeader;

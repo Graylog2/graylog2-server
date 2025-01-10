@@ -16,32 +16,44 @@
  */
 package org.graylog2.grok;
 
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
-import org.graylog2.database.PaginatedList;
-import org.graylog2.search.SearchQuery;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-
+import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.search.SearchQuery;
 
-public class PaginatedGrokPatternService extends PaginatedDbService<GrokPattern> {
+public class PaginatedGrokPatternService {
     private static final String COLLECTION_NAME = "grok_patterns";
+    private final MongoCollection<GrokPattern> collection;
+    private final MongoPaginationHelper<GrokPattern> paginationHelper;
 
     @Inject
-    public PaginatedGrokPatternService(MongoConnection mongoConnection,
-                                       MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, GrokPattern.class, COLLECTION_NAME);
+    public PaginatedGrokPatternService(MongoCollections mongoCollections) {
+        collection = mongoCollections.collection(COLLECTION_NAME, GrokPattern.class);
+        paginationHelper = mongoCollections.paginationHelper(collection);
     }
 
     public long count() {
-        return db.count();
+        return collection.countDocuments();
     }
 
-    public PaginatedList<GrokPattern> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, String order) {
-        final DBQuery.Query dbQuery = searchQuery.toDBQuery();
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
-        return findPaginatedWithQueryAndSort(dbQuery, sortBuilder, page, perPage);
+    /**
+     * @deprecated Use {@link #findPaginated(SearchQuery, int, int, String, SortOrder)}
+     */
+    @Deprecated(forRemoval = true)
+    public PaginatedList<GrokPattern> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField,
+                                                    String order) {
+        return findPaginated(searchQuery, page, perPage, sortField, SortOrder.fromString(order));
+    }
+
+    public PaginatedList<GrokPattern> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField,
+                                                    SortOrder order) {
+        return paginationHelper
+                .filter(searchQuery.toBson())
+                .sort(order.toBsonSort(sortField))
+                .perPage(perPage)
+                .page(page);
     }
 }

@@ -39,7 +39,7 @@ import { DEFAULT_LAYOUT } from '../Constants';
 
 type Props = {
   activeSavedSearchId: string,
-  deleteSavedSearch: (view: View) => Promise<View>,
+  deleteSavedSearch: (view: View) => Promise<void>,
   onLoadSavedSearch: () => void,
 };
 

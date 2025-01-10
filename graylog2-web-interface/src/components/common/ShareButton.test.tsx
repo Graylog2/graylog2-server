@@ -40,8 +40,6 @@ describe('<ShareButton />', () => {
     <ShareButton {...rest} onClick={onClick} entityType={entityType} entityId={entityId} />
   );
 
-  SimpleShareButton.defaultProps = { disabledInfo: undefined };
-
   it('should be clickable if user has correct permissions', async () => {
     const onClickStub = jest.fn();
     asMock(useCurrentUser).mockReturnValue(currentUser.toBuilder().grnPermissions(Immutable.List([`entity:own:${entityGRN}`])).build());

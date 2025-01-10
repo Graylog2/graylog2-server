@@ -15,20 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Button, Col, Label, Row, MenuItem } from 'components/bootstrap';
+import { Button, Col, Label, Row, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import { IconButton } from 'components/common';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
 import type { BlockType, RuleBlock } from './types';
-import { ruleBlockPropType, RuleBuilderTypes } from './types';
+import { RuleBuilderTypes } from './types';
 import { useRuleBuilder } from './RuleBuilderContext';
 
 type Props = {
-  block: RuleBlock,
+  block?: RuleBlock
   negatable?: boolean,
   onDelete: () => void,
   onEdit: () => void,
@@ -90,7 +89,7 @@ const EditIconButton = styled(IconButton)(({ theme }) => css`
   margin-right: ${theme.spacings.xs};
 `);
 
-const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType, type } : Props) => {
+const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType, type } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
@@ -122,13 +121,15 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
       return part;
     });
 
-    return (
-      partsWithHighlight.map((item, index) => (
-        // eslint-disable-next-line react/no-array-index-key
+    return (partsWithHighlight.map((item, index) => (
+
+      (
+
         <React.Fragment key={index}>
           {item}
         </React.Fragment>
-      )));
+      )
+    )));
   };
 
   const errorMessage = block?.errors?.join(', ');
@@ -193,27 +194,13 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
               <MenuItem onClick={onInsertAbove}>Insert above</MenuItem>
               <MenuItem onClick={onInsertBelow}>Insert below</MenuItem>
               <MenuItem divider />
-              <MenuItem onClick={onDelete} variant="danger">Delete</MenuItem>
+              <DeleteMenuItem onClick={onDelete} />
             </OverlayDropdownButton>
           </ActionsContainer>
         )}
       </Col>
     </StyledRow>
   );
-};
-
-RuleBlockDisplay.propTypes = {
-  block: ruleBlockPropType,
-  onDelete: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
-  negatable: PropTypes.bool,
-  onNegate: PropTypes.func.isRequired,
-};
-
-RuleBlockDisplay.defaultProps = {
-  block: undefined,
-  negatable: false,
-  returnType: undefined,
 };
 
 export default RuleBlockDisplay;

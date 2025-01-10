@@ -23,12 +23,12 @@ export type RefreshConfig = {
   enabled: boolean
 }
 
-export type IntervalSetupCallback = () => void;
-
-type AutoRefreshContextType = {
+export type AutoRefreshContextType = {
   refreshConfig: RefreshConfig | null,
   startAutoRefresh: (interval: number) => void
   stopAutoRefresh: () => void,
+  restartAutoRefresh: () => void,
+  animationId: string,
 };
 
 const AutoRefreshContext = React.createContext<AutoRefreshContextType | null>(null);

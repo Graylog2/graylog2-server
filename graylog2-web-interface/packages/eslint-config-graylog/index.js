@@ -14,7 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const noUnusedVarsOptions = { argsIgnorePattern: '^_' };
+const ignorePattern = '^(_|ignored)';
+const noUnusedVarsOptions = {
+  argsIgnorePattern: ignorePattern,
+  caughtErrorsIgnorePattern: ignorePattern,
+};
 
 module.exports = {
   parser: '@babel/eslint-parser',
@@ -95,7 +99,13 @@ module.exports = {
     'import/no-unresolved': 'off',
     'import/order': ['error', {
       groups: ['builtin', 'external', 'internal', ['sibling', 'index'], 'parent'],
+      pathGroups: [{
+        pattern: '@graylog/*-api',
+        group: 'external',
+        position: 'after',
+      }],
       'newlines-between': 'always',
+      pathGroupsExcludedImportTypes: ['builtin'],
     }],
     'sort-imports': 'off', // disabled in favor of 'import/order'
     'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
@@ -136,7 +146,9 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
+    'react/prop-types': ['off'],
     'react/static-property-placement': 'off',
+    'react/require-default-props': ['warn', { functions: 'defaultArguments' }],
 
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',

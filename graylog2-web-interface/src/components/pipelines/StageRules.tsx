@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { DataTable, Icon } from 'components/common';
@@ -32,10 +31,10 @@ const TitleTd = styled.td`
 type Props = {
   pipeline: PipelineType,
   stage: StageType,
-  rules: RuleType[],
+  rules?: RuleType[]
 };
 
-const StageRules = ({ pipeline, stage, rules }: Props) => {
+const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
   const headers = ['Title', 'Description', 'Throughput', 'Errors'];
 
   const _ruleRowFormatter = (ruleArg, ruleIdx) => {
@@ -69,12 +68,12 @@ const StageRules = ({ pipeline, stage, rules }: Props) => {
         <td>{rule.description}</td>
         <td>
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.executed`}>
-            <CounterRate zeroOnMissing suffix="msg/s" />
+            <CounterRate suffix="msg/s" />
           </MetricContainer>
         </td>
         <td>
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.failed`}>
-            <CounterRate showTotal zeroOnMissing suffix="errors/s" />
+            <CounterRate showTotal suffix="errors/s" />
           </MetricContainer>
         </td>
       </tr>
@@ -93,16 +92,6 @@ const StageRules = ({ pipeline, stage, rules }: Props) => {
                filterLabel=""
                filterKeys={[]} />
   );
-};
-
-StageRules.propTypes = {
-  pipeline: PropTypes.object.isRequired,
-  stage: PropTypes.object.isRequired,
-  rules: PropTypes.array,
-};
-
-StageRules.defaultProps = {
-  rules: [],
 };
 
 export default StageRules;

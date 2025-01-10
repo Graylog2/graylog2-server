@@ -68,9 +68,11 @@ describe('CompatibilityCheckStep', () => {
     asMock(useCompatibilityCheck).mockReturnValue({
       data: {
         datanode1: {
+          hostname: 'hostname1',
           opensearch_version: '2.10.0',
           info: null,
           compatibility_errors: ['org.graylog.shaded.opensearch2.org.apache.lucene.index.IndexFormatTooOldException: Format version is not supported (resource BufferedChecksumIndexInput(ByteBufferIndexInput(path="/index/segments_3"))): This index was initially created with Lucene 7.x while the current version is 9.7.0 and Lucene only supports reading the current and previous major versions. This version of Lucene only supports indexes created with release 8.0 and later by default.'],
+          compatibility_warnings: ['warnings'],
         },
       },
       refetch: () => {},

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import * as PropTypes from 'prop-types';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 
@@ -56,13 +55,13 @@ const StaticInput = ({ input: { type, title } }: { input: InputType }) => (
 
 type Props = {
   disabled?: boolean,
-  inputs: Immutable.Map<string, InputType>,
+  inputs?: Immutable.Map<string, InputType>
   preselectedInputId?: string,
-  onLoadMessage: (inputId: string) => any,
+  onLoadMessage?: (inputId: string) => any
   title: string,
 };
 
-const InputDropdown = ({ disabled, inputs, onLoadMessage, preselectedInputId, title }: Props) => {
+const InputDropdown = ({ disabled = false, inputs = Immutable.Map(), onLoadMessage = () => {}, preselectedInputId, title }: Props) => {
   const [selectedInput, setSelectedInput] = useState(preselectedInputId || PLACEHOLDER);
   const onSelectedInputChange = useCallback((event) => setSelectedInput(event.target.value), []);
   const _onLoadMessage = useCallback(() => onLoadMessage(selectedInput), [onLoadMessage, selectedInput]);
@@ -108,21 +107,6 @@ const InputDropdown = ({ disabled, inputs, onLoadMessage, preselectedInputId, ti
   }
 
   return <Spinner />;
-};
-
-InputDropdown.propTypes = {
-  inputs: PropTypes.object,
-  title: PropTypes.string.isRequired,
-  preselectedInputId: PropTypes.string,
-  onLoadMessage: PropTypes.func,
-  disabled: PropTypes.bool,
-};
-
-InputDropdown.defaultProps = {
-  inputs: Immutable.Map(),
-  onLoadMessage: () => {},
-  preselectedInputId: undefined,
-  disabled: false,
 };
 
 export default InputDropdown;

@@ -18,7 +18,7 @@
 import type { ValueExpr } from 'hooks/useEventDefinition';
 import type { Condition } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
-export const exprToConditionMapper: {[name: string]: Condition} = {
+export const exprToConditionMapper: { [name: string]: Condition } = {
   '<': 'less',
   '<=': 'less_equal',
   '>=': 'greater_equal',
@@ -26,7 +26,7 @@ export const exprToConditionMapper: {[name: string]: Condition} = {
   '==': 'equal',
 };
 
-export const conditionToExprMapper: {[name: string]: ValueExpr} = {
+export const conditionToExprMapper: { [name: string]: ValueExpr } = {
   less: '<',
   less_equal: '<=',
   greater_equal: '>=',

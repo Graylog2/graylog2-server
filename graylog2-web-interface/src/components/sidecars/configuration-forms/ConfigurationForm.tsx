@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState, useRef, useEffect } from 'react';
 import clone from 'lodash/clone';
 import cloneDeep from 'lodash/cloneDeep';
@@ -38,14 +37,21 @@ import ConfigurationTagsSelect from './ConfigurationTagsSelect';
 import type { Collector, Configuration, ConfigurationSidecarsResponse } from '../types';
 
 type Props = {
-  action: string,
-  configuration: Configuration,
-  configurationSidecars: ConfigurationSidecarsResponse,
+  action?: string
+  configuration?: Configuration
+  configurationSidecars?: ConfigurationSidecarsResponse
 };
 
 const ConfigurationForm = ({
-  action,
-  configuration,
+  action = 'edit',
+  configuration = {
+    id: '',
+    name: '',
+    collector_id: '',
+    template: '',
+    color: '#FFFFFF',
+    tags: [],
+  },
   configurationSidecars,
 }: Props) => {
   const initFormData = {
@@ -70,15 +76,16 @@ const ConfigurationForm = ({
     CollectorsActions.all().then((response) => setCollectors(response.collectors));
   }, []);
 
-  const _isTemplateSet = (template) => template !== undefined && template !== '';
+  const _isTemplateSet = (template: string) => template !== undefined && template !== '';
 
   const _hasErrors = () => error || !_isTemplateSet(formData.template);
 
-  const _validateFormData = (nextFormData, checkForRequiredFields) => {
+  const _validateFormData = (nextFormData: Partial<Configuration>, checkForRequiredFields: boolean) => {
     CollectorConfigurationsActions.validate(nextFormData).then((validation) => {
       const nextValidation = clone(validation);
 
       if (checkForRequiredFields && !_isTemplateSet(nextFormData.template)) {
+        // @ts-expect-error
         nextValidation.errors.template = ['Please fill out the configuration field.'];
         nextValidation.failed = true;
       }
@@ -117,7 +124,7 @@ const ConfigurationForm = ({
 
   const _debouncedValidateFormData = debounce(_validateFormData, 200);
 
-  const _formDataUpdate = (key) => (nextValue, _?: React.ChangeEvent<HTMLInputElement>, hideCallback?: () => void) => {
+  const _formDataUpdate = (key: string) => (nextValue, _?: React.ChangeEvent<HTMLInputElement>, hideCallback?: () => void) => {
     const nextFormData = cloneDeep(formData);
 
     nextFormData[key] = nextValue;
@@ -129,7 +136,7 @@ const ConfigurationForm = ({
     }
   };
 
-  const _onTemplateChange = (nextTemplate) => {
+  const _onTemplateChange = (nextTemplate: string) => {
     _formDataUpdate('template')(nextTemplate);
   };
 
@@ -144,24 +151,24 @@ const ConfigurationForm = ({
     _onTemplateChange(updatedTemplate);
   };
 
-  const _onNameChange = (event) => {
+  const _onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextName = event.target.value;
 
     _formDataUpdate('name')(nextName);
   };
 
-  const _onTagsChange = (nextTags) => {
+  const _onTagsChange = (nextTags: string) => {
     const nextTagsArray = nextTags.split(',');
 
     _formDataUpdate('tags')(nextTagsArray);
   };
 
-  const _getCollectorDefaultTemplate = (collectorId) => {
+  const _getCollectorDefaultTemplate = (collectorId: string) => {
     const storedTemplate = defaultTemplates.current[collectorId];
 
     if (storedTemplate !== undefined) {
       // eslint-disable-next-line no-promise-executor-return
-      return new Promise((resolve) => resolve(storedTemplate));
+      return new Promise<string>((resolve) => resolve(storedTemplate));
     }
 
     return CollectorsActions.getCollector(collectorId).then((collector) => {
@@ -171,7 +178,7 @@ const ConfigurationForm = ({
     });
   };
 
-  const _onCollectorChange = async (nextId) => {
+  const _onCollectorChange = async (nextId: string) => {
     // Start loading the request to get the default template, so it is available asap.
     const defaultTemplate = await _getCollectorDefaultTemplate(nextId);
 
@@ -189,7 +196,7 @@ const ConfigurationForm = ({
     setFormData(nextFormData);
   };
 
-  const _onSubmit = (event) => {
+  const _onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     _save();
   };
@@ -202,7 +209,7 @@ const ConfigurationForm = ({
     setShowPreviewModal(true);
   };
 
-  const _formatCollector = (collector) => (collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector');
+  const _formatCollector = (collector: Collector) => (collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector');
 
   const _formatCollectorOptions = () => {
     const options = [];
@@ -218,7 +225,7 @@ const ConfigurationForm = ({
     return options;
   };
 
-  const _formatValidationMessage = (fieldName, defaultText) => {
+  const _formatValidationMessage = (fieldName: string, defaultText: React.ReactNode) => {
     if (validationErrors[fieldName]) {
       return <span>{validationErrors[fieldName][0]}</span>;
     }
@@ -226,33 +233,33 @@ const ConfigurationForm = ({
     return <span>{defaultText}</span>;
   };
 
-  const _validationState = (fieldName) => {
+  const _validationState = (fieldName: string) => {
     if (validationErrors[fieldName]) {
-      return 'error';
+      return 'error' as const;
     }
 
     return null;
   };
 
-  const _renderCollectorTypeField = (collectorId, _collectors, _configurationSidecars) => {
-    const isConfigurationInUse = _configurationSidecars.sidecar_ids && _configurationSidecars.sidecar_ids.length > 0;
+  const _renderCollectorTypeField = (collectorId: string, _collectors: Array<Collector>, _configurationSidecars: ConfigurationSidecarsResponse) => {
+    const isConfigurationInUse = _configurationSidecars?.sidecar_ids?.length > 0;
 
     if (isConfigurationInUse) {
       const collector = _collectors ? _collectors.find((c) => c.id === collectorId) : undefined;
 
       return (
-        <span>
+        <>
           <FormControl.Static>{_formatCollector(collector)}</FormControl.Static>
           <HelpBlock bsClass="warning">
             <b>Note:</b> Log Collector cannot change while the Configuration is in use. Clone the Configuration
             to test it using another Collector.
           </HelpBlock>
-        </span>
+        </>
       );
     }
 
     return (
-      <span>
+      <>
         <Select inputId="collector_id"
                 options={_formatCollectorOptions()}
                 value={collectorId}
@@ -260,7 +267,7 @@ const ConfigurationForm = ({
                 placeholder="Collector"
                 required />
         <HelpBlock>Choose the log collector this configuration is meant for.</HelpBlock>
-      </span>
+      </>
     );
   };
 
@@ -312,8 +319,6 @@ const ConfigurationForm = ({
               <FormGroup controlId="template"
                          validationState={_validationState('template')}>
                 <ControlLabel>Configuration</ControlLabel>
-                {/* TODO: Figure out issue with props */}
-                {/* @ts-ignore */}
                 <SourceCodeEditor id="template"
                                   height={400}
                                   value={formData.template || ''}
@@ -348,32 +353,6 @@ const ConfigurationForm = ({
       </Col>
     </Row>
   );
-};
-
-ConfigurationForm.propTypes = {
-  action: PropTypes.oneOf(['create', 'edit']),
-  configuration: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    color: PropTypes.string.isRequired,
-    collector_id: PropTypes.string.isRequired,
-    template: PropTypes.string.isRequired,
-    tags: PropTypes.array.isRequired,
-  }),
-  configurationSidecars: PropTypes.object,
-};
-
-ConfigurationForm.defaultProps = {
-  action: 'edit',
-  configuration: {
-    id: '',
-    name: '',
-    collector_id: '',
-    template: '',
-    color: '#FFFFFF',
-    tags: [],
-  },
-  configurationSidecars: {},
 };
 
 export default ConfigurationForm;

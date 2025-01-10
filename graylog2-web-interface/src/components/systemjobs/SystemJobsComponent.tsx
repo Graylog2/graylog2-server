@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 import { SystemJobsList } from 'components/systemjobs';
 import { Col, Row } from 'components/bootstrap';
@@ -23,7 +22,15 @@ import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
 
-const SystemJobsComponent = ({ jobs }) => {
+type SystemJobsComponentProps = {
+  jobs?: Record<string, {
+    jobs?: any[];
+  }>;
+};
+
+const SystemJobsComponent = ({
+  jobs,
+}: SystemJobsComponentProps) => {
   useEffect(() => {
     SystemJobsActions.list();
     const interval = setInterval(SystemJobsActions.list, 2000);
@@ -54,18 +61,6 @@ const SystemJobsComponent = ({ jobs }) => {
       </Col>
     </Row>
   );
-};
-
-SystemJobsComponent.propTypes = {
-  jobs: PropTypes.objectOf(
-    PropTypes.shape({
-      jobs: PropTypes.array,
-    }),
-  ),
-};
-
-SystemJobsComponent.defaultProps = {
-  jobs: undefined,
 };
 
 export default connect(SystemJobsComponent,

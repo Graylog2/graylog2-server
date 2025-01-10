@@ -17,7 +17,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import compact from 'lodash/compact';
-import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -29,7 +28,7 @@ import { Select, Spinner, ErrorAlert } from 'components/common';
 
 type Props = {
   assignedRolesIds: Immutable.Set<string>,
-  identifier: (role: Role) => string,
+  identifier?: (role: Role) => string
   onSubmit: (role: Immutable.Set<Role>) => Promise<void>,
   submitOnSelect?: boolean,
 };
@@ -90,7 +89,7 @@ const _loadRoles = (setPaginatedRoles) => {
   AuthzRolesDomain.loadRolesPaginated(getUnlimited).then(setPaginatedRoles);
 };
 
-const RolesSelector = ({ assignedRolesIds, onSubmit, identifier, submitOnSelect }: Props) => {
+const RolesSelector = ({ assignedRolesIds, onSubmit, identifier = (role) => role.id, submitOnSelect = false }: Props) => {
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [selectedRoleNames, setselectedRoleNames] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,8 +117,7 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier, submitOnSelect 
   return (
     <div>
       <FormElements>
-        <StyledSelect inputProps={{ 'aria-label': 'Search for roles' }}
-                      onChange={onChange}
+        <StyledSelect onChange={onChange}
                       optionRenderer={_renderRoleOption}
                       options={options}
                       placeholder="Search for roles"
@@ -141,17 +139,6 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier, submitOnSelect 
       </ErrorAlert>
     </div>
   );
-};
-
-RolesSelector.defaultProps = {
-  identifier: (role) => role.id,
-  submitOnSelect: false,
-};
-
-RolesSelector.propTypes = {
-  identifier: PropTypes.func,
-  onSubmit: PropTypes.func.isRequired,
-  submitOnSelect: PropTypes.bool,
 };
 
 export default RolesSelector;

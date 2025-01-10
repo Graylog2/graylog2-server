@@ -77,7 +77,7 @@ type Props = {
   minimal?: boolean,
 };
 
-const IndexerClusterHealth = ({ minimal }: Props) => {
+const IndexerClusterHealth = ({ minimal = false }: Props) => {
   const currentUser = useCurrentUser();
   const userHasRequiredPermissions = isPermitted(currentUser.permissions, 'indexercluster:read');
   const { health, name, loading, error, isSuccess } = useLoadHealthAndName(userHasRequiredPermissions);
@@ -106,10 +106,6 @@ const IndexerClusterHealth = ({ minimal }: Props) => {
       </Col>
     </Row>
   );
-};
-
-IndexerClusterHealth.defaultProps = {
-  minimal: false,
 };
 
 export default IndexerClusterHealth;

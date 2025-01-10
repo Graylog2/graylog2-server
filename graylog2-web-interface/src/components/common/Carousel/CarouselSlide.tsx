@@ -43,11 +43,4 @@ const CarouselSlide = ({ children, size, gap, className }: CarouselSlideProps) =
   </StyledSlide>
 );
 
-CarouselSlide.defaultProps = {
-  children: undefined,
-  className: undefined,
-  gap: undefined,
-  size: undefined,
-};
-
 export default CarouselSlide;

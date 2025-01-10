@@ -87,8 +87,4 @@ const UserDateTimeProvider = ({ children, tz: tzOverride }: Props) => (tzOverrid
   )
 );
 
-UserDateTimeProvider.defaultProps = {
-  tz: undefined,
-};
-
 export default UserDateTimeProvider;

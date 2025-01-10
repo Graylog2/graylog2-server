@@ -90,11 +90,4 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId, returnsAllRec
   );
 };
 
-TimerangeInfo.defaultProps = {
-  className: undefined,
-  activeQuery: undefined,
-  widgetId: undefined,
-  returnsAllRecords: undefined,
-};
-
 export default TimerangeInfo;

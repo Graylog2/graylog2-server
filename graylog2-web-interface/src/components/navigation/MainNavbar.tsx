@@ -54,7 +54,7 @@ const PluginRoute = ({
     requiredFeatureFlag,
     BadgeComponent,
   },
-  topLevel,
+  topLevel = false,
 }: PluginRouteProps) => {
   const currentUser = useCurrentUser();
   if (permissions && !isPermitted(currentUser.permissions, permissions)) return null;
@@ -69,10 +69,6 @@ const PluginRoute = ({
                     path={path}
                     topLevel={topLevel} />
   );
-};
-
-PluginRoute.defaultProps = {
-  topLevel: false,
 };
 
 type PluginNavDropdownProps = {
@@ -122,7 +118,7 @@ const _existingDropdownItemIndex = (existingNavigationItems: Array<PluginNavigat
     return -1;
   }
 
-  return existingNavigationItems.findIndex(({ description, children }) => newNavigationItem.description === description && children);
+  return existingNavigationItems.findIndex(({ description, perspective, children }) => newNavigationItem.description === description && newNavigationItem.perspective === perspective && children);
 };
 
 const mergeDuplicateDropdowns = (navigationItems: Array<PluginNavigation>): Array<PluginNavigation> => navigationItems.reduce((result, current) => {

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Table } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -23,7 +22,6 @@ import { Icon } from 'components/common';
 import RuleHelperStyle from './RuleHelper.css';
 import { functionSignature, niceType } from './helpers';
 
-import { blockDictPropType } from '../rule-builder/types';
 import type { BlockDict } from '../rule-builder/types';
 
 type Props = {
@@ -32,7 +30,7 @@ type Props = {
   onFunctionClick?: (functionName: string) => void
 }
 
-const RuleHelperTable = ({ entries, expanded, onFunctionClick } : Props) => {
+const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick } : Props) => {
   const parameters = (descriptor: BlockDict) => descriptor.params.map((p) => (
     <tr key={p.name}>
       <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
@@ -102,17 +100,6 @@ const RuleHelperTable = ({ entries, expanded, onFunctionClick } : Props) => {
       {renderFunctions(entries)}
     </Table>
   );
-};
-
-RuleHelperTable.propTypes = {
-  entries: PropTypes.arrayOf(blockDictPropType).isRequired,
-  expanded: PropTypes.objectOf(PropTypes.bool),
-  onFunctionClick: PropTypes.func,
-};
-
-RuleHelperTable.defaultProps = {
-  expanded: {},
-  onFunctionClick: undefined,
 };
 
 export default RuleHelperTable;

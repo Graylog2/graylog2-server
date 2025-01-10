@@ -16,16 +16,21 @@
  */
 import * as React from 'react';
 
+import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 export type PaginationQueryParameterObject = {
   pageSizes?: number[];
 };
 
-const withPaginationQueryParameter = <C extends React.ComponentType<React.ComponentProps<C>>>(Component: C, obj?: PaginationQueryParameterObject) => function WrappedComponent(props: any) {
+export type PaginationProps = {
+  paginationQueryParameter: PaginationQueryParameterResult;
+};
+
+const withPaginationQueryParameter = <Props extends PaginationProps>(Component: React.ComponentType<Props>, obj?: PaginationQueryParameterObject) => (function WrappedComponent(props: Omit<Props, keyof PaginationProps>) {
   const result = usePaginationQueryParameter(obj?.pageSizes);
 
-  return <Component {...props} paginationQueryParameter={result} />;
-};
+  return <Component {...props as Props} paginationQueryParameter={result} />;
+});
 
 export default withPaginationQueryParameter;

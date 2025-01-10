@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Field } from 'formik';
 
@@ -24,7 +23,7 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import AbsoluteDateInput from './AbsoluteDateInput';
 
 type Props = {
-  disabled: boolean,
+  disabled?: boolean
   range: 'to' | 'from',
   timeRange: AbsoluteTimeRange,
 };
@@ -37,7 +36,7 @@ const ErrorMessage = styled.span(({ theme }) => css`
   height: 1.5em;
 `);
 
-const AbsoluteTimestamp = ({ disabled, timeRange, range }: Props) => (
+const AbsoluteTimestamp = ({ disabled = false, timeRange, range }: Props) => (
   <Field name={`timeRangeTabs.absolute.${range}`}>
     {({ field: { value, onChange, name }, meta: { error } }) => {
       const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
@@ -56,15 +55,5 @@ const AbsoluteTimestamp = ({ disabled, timeRange, range }: Props) => (
     }}
   </Field>
 );
-
-AbsoluteTimestamp.propTypes = {
-  disabled: PropTypes.bool,
-  timeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
-  range: PropTypes.oneOf(['to', 'from']).isRequired,
-};
-
-AbsoluteTimestamp.defaultProps = {
-  disabled: false,
-};
 
 export default AbsoluteTimestamp;

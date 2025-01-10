@@ -20,15 +20,12 @@ import { ListGroup as BootstrapListGroup } from 'react-bootstrap';
 
 type Props = React.PropsWithChildren<{
   className?: string,
-  componentClass?: React.ElementType | undefined
+  componentClass?: React.ElementType | undefined,
+  bsClass?: React.ComponentProps<typeof BootstrapListGroup>['bsClass'],
+  style?: React.ComponentProps<typeof BootstrapListGroup>['style'],
 }>
 
 const ListGroup = ({ className, children, ...props }: Props) => <BootstrapListGroup bsClass={className} {...props}>{children}</BootstrapListGroup>;
-
-ListGroup.defaultProps = {
-  className: undefined,
-  componentClass: undefined,
-};
 
 /** @component */
 export default ListGroup;

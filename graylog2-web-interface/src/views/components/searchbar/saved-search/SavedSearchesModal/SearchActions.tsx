@@ -27,7 +27,7 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 const onDelete = (
   e: React.MouseEvent<HTMLButtonElement>,
   savedSearch: View,
-  deleteSavedSearch: (search: View) => Promise<View>,
+  deleteSavedSearch: (search: View) => Promise<void>,
   activeSavedSearchId: string, refetch: () => void,
   deselectEntity: (searchId: string) => void,
 ) => {
@@ -47,7 +47,7 @@ const onDelete = (
 
 type Props = {
   search: View,
-  onDeleteSavedSearch: (search: View) => Promise<View>,
+  onDeleteSavedSearch: (search: View) => Promise<void>,
   activeSavedSearchId: string,
   refetch: () => void,
 }

@@ -47,7 +47,13 @@ const Actions = styled(ButtonToolbar)`
   justify-content: flex-start;
 `;
 
-const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
+const LUTTableEntry = ({
+  table, cache, dataAdapter, errors = {
+    table: null,
+    cache: null,
+    dataAdapter: null,
+  },
+}: Props) => {
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
 
@@ -120,14 +126,6 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
       </tr>
     </tbody>
   );
-};
-
-LUTTableEntry.defaultProps = {
-  errors: {
-    table: null,
-    cache: null,
-    dataAdapter: null,
-  },
 };
 
 export default LUTTableEntry;

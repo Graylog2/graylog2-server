@@ -1,16 +1,16 @@
 ```js
-import createReactClass from 'create-react-class';
-
-const ColorPickerExample = createReactClass({
-  getInitialState() {
-    return {
+class ColorPickerExample extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       color: undefined,
     };
-  },
+    this.handleColorChange = this.handleColorChange.bind(this);
+  };
 
   handleColorChange(color) {
     this.setState({ color: color });
-  },
+  };
 
   render() {
     const { color } = this.state;
@@ -20,8 +20,8 @@ const ColorPickerExample = createReactClass({
         <ColorPicker color={color} onChange={this.handleColorChange} />
       </div>
     );
-  },
-});
+  };
+}
 
 <ColorPickerExample />
 ```

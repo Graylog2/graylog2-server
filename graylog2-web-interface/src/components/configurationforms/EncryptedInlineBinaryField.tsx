@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -24,9 +23,9 @@ import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 import type { EncryptedFieldValue, InlineBinaryField as InlineBinaryFieldType } from './types';
 
 type Props = {
-  autoFocus: boolean,
+  autoFocus?: boolean
   field: InlineBinaryFieldType,
-  dirty: boolean,
+  dirty?: boolean
   onChange: (title: string, value: any, dirty?: boolean) => void,
   title: string,
   typeName: string,
@@ -37,7 +36,7 @@ const FileContent = styled.span`
   vertical-align: middle;
 `;
 
-const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, value, autoFocus }: Props) => {
+const EncryptedInlineBinaryField = ({ field, title, typeName, dirty = false, onChange, value = {}, autoFocus = false }: Props) => {
   const [fileName, setFileName] = useState(undefined);
   const [isResetted, setIsResetted] = useState<boolean>(false);
   const isValuePresent = value.is_set;
@@ -156,22 +155,6 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, v
 
   return (
     showReadOnly ? readOnlyFileInput() : fileInput());
-};
-
-EncryptedInlineBinaryField.propTypes = {
-  autoFocus: PropTypes.bool,
-  dirty: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.object,
-};
-
-EncryptedInlineBinaryField.defaultProps = {
-  autoFocus: false,
-  dirty: false,
-  value: {},
 };
 
 export default EncryptedInlineBinaryField;

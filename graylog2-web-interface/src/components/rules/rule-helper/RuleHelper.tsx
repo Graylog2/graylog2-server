@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 
 import ObjectUtils from 'util/ObjectUtils';
 import connect from 'stores/connect';
@@ -42,12 +41,12 @@ then
 end`;
 
 type Props = {
-  functionDescriptors: Array<BlockDict>,
+  functionDescriptors?: Array<BlockDict>
   paginationQueryParameter: any,
-  hideExampleTab: boolean,
+  hideExampleTab?: boolean
 }
 
-const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExampleTab } : Props) => {
+const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExampleTab = false } : Props) => {
   const [expanded, setExpanded] = useState<{ [key: string]: boolean}>({});
   const [currentPage, setCurrentPage] = useState<number>(paginationQueryParameter.page);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -181,17 +180,6 @@ const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExample
       </Row>
     </Panel>
   );
-};
-
-RuleHelper.propTypes = {
-  functionDescriptors: PropTypes.array,
-  paginationQueryParameter: PropTypes.object.isRequired,
-  hideExampleTab: PropTypes.bool,
-};
-
-RuleHelper.defaultProps = {
-  functionDescriptors: undefined,
-  hideExampleTab: false,
 };
 
 export default connect(withPaginationQueryParameter(RuleHelper),

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import type QueryResult from 'views/logic/QueryResult';
 import { Icon } from 'components/common';
@@ -76,10 +75,6 @@ const ViewDescription = ({ results }: Props) => {
       </p>
     </>
   );
-};
-
-ViewDescription.propTypes = {
-  results: PropTypes.object.isRequired,
 };
 
 export default ViewDescription;

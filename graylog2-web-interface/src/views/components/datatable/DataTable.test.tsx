@@ -17,7 +17,6 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
-import 'helpers/mocking/react-dom_mock';
 import { Form, Formik } from 'formik';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

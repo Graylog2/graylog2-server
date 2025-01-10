@@ -1,30 +1,28 @@
 Using `Wizard` as uncontrolled component:
 ```js
-import createReactClass from 'create-react-class';
-
-const Component1 = createReactClass({
-
+class Component1 extends React.Component {
   render() {
     return (<span>
       Type 'hello': <input value={this.props.input_value} onChange={this.props.onChange} />
     </span>);
-  },
-});
+  }
+}
 
-const WizardExample = createReactClass({
-  getInitialState() {
-    return {
+class WizardExample extends React.Component {
+  constructor() {
+    this.state = {
       input_value: "",
     };
-  },
+    this.onChange = this.onChange.bind(this);
+  }
 
   onChange(e) {
     this.setState({ input_value: e.target.value });
-  },
+  };
 
   enableNext() {
     return this.state.input_value !== 'hello';
-  },
+  };
 
   render() {
     const steps = [
@@ -38,8 +36,8 @@ const WizardExample = createReactClass({
         <div>Preview: {this.state.input_value}</div>
       </Wizard>
     );
-  },
-});
+  }
+}
 
 <div>
     <WizardExample horizontal={false} />
@@ -51,28 +49,27 @@ const WizardExample = createReactClass({
 
 Using `Wizard` as controlled component with no previous/next buttons and no preview:
 ```js
-import createReactClass from 'create-react-class';
-
-const Component1 = createReactClass({
-
+class Component1 extends React.Component {
   render() {
     return (<span>
       Type 'hello': <input value={this.props.input_value} onChange={this.props.onChange} />
     </span>);
-  },
-});
+  }
+}
 
-const ControlledWizardExample = createReactClass({
-  getInitialState() {
-    return {
+class ControlledWizardExample extends React.Component {
+  constructor() {
+    this.state = {
       activeStep: 'Key3',
       input_value: "",
     };
-  },
+    this.onChange = this.onChange.bind(this);
+    this.changeStep = this.changeStep.bind(this);
+  }
 
   onChange(e) {
     this.setState({ input_value: e.target.value });
-  },
+  }
 
   changeStep(nextStep) {
     if (nextStep === 'Key2') {
@@ -81,7 +78,7 @@ const ControlledWizardExample = createReactClass({
     }
 
     this.setState({ activeStep: nextStep });
-  },
+  };
 
   render() {
     const steps = [
@@ -94,8 +91,8 @@ const ControlledWizardExample = createReactClass({
     return (
       <Wizard activeStep={this.state.activeStep} steps={steps} horizontal={this.props.horizontal} onStepChange={this.changeStep} hidePreviousNextButtons />
     );
-  },
-});
+  }
+}
 
 <div>
     <p>Goes to <em>Title3</em> when selecting <em>Title2</em>.</p>

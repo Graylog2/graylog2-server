@@ -46,7 +46,7 @@ type Props = {
   displayIcon?: boolean
 }
 
-const DocumentationLink = ({ page, title = '', text, displayIcon }: Props) => (
+const DocumentationLink = ({ page, title = '', text, displayIcon = false }: Props) => (
   <Container href={DocsHelper.toString(page)} title={title} target="_blank">
     <span className="documentation-link-text">{text}</span>
     {displayIcon && (
@@ -56,10 +56,5 @@ const DocumentationLink = ({ page, title = '', text, displayIcon }: Props) => (
     )}
   </Container>
 );
-
-DocumentationLink.defaultProps = {
-  title: '',
-  displayIcon: false,
-};
 
 export default DocumentationLink;

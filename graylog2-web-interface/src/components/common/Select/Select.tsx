@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import type { Theme as SelectTheme, InputActionMeta, GroupBase, SelectInstance } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import isEqual from 'lodash/isEqual';
@@ -43,11 +42,11 @@ const IndicatorSeparator = () => null;
 
 const DropdownIndicator = (props) => {
   const {
-    /* eslint-disable react/prop-types */
+
     children = <Icon name="arrow_drop_down" />,
     getStyles,
     innerProps: { ref, ...restInnerProps },
-    /* eslint-enable react/prop-types */
+
   } = props;
 
   return (
@@ -63,7 +62,6 @@ const Control = ({ children, ...props }: React.ComponentProps<typeof Components.
   <Components.Control {...props} className={CONTROL_CLASS}>{children}</Components.Control>
 );
 
-/* eslint-disable react/prop-types */
 const CustomOption = (optionRenderer: (option: Option, isSelected: boolean) => React.ReactElement) => (
   (props: React.ComponentProps<typeof Components.Option>): React.ReactElement => {
     const { data, isSelected } = props;
@@ -81,7 +79,6 @@ const CustomSingleValue = (valueRenderer: (option: Option) => React.ReactElement
 
   return <Components.SingleValue {...props}>{valueRenderer(data)}</Components.SingleValue>;
 };
-/* eslint-enable react/prop-types */
 
 const CustomInput = (inputProps: { [key: string]: any }) => (
   (props) => <Components.Input {...props} {...inputProps} />
@@ -146,7 +143,7 @@ const singleValueAndPlaceholder = ({ theme }) => (base) => ({
   fontWeight: 400,
 });
 
-const placeholder = ({ theme }) => (base) => ({
+const placeholderStyling = ({ theme }) => (base) => ({
   ...base,
   color: theme.colors.input.placeholder,
   lineHeight: '28px',
@@ -205,7 +202,7 @@ const _styles = ({ size, theme }) => ({
   menu,
   menuPortal,
   singleValue: singleValueAndPlaceholder({ theme }),
-  placeholder: placeholder({ theme }),
+  placeholder: placeholderStyling({ theme }),
   control: controlFocus({ size, theme }),
   valueContainer: valueContainer({ size }),
 });
@@ -216,6 +213,8 @@ type ComponentsProp = {
 };
 
 export type Props<OptionValue> = {
+  // The placeholder will be used by default for the aria label.
+  'aria-label'?: string,
   addLabelText?: string,
   allowCreate?: boolean,
   autoFocus?: boolean,
@@ -224,7 +223,7 @@ export type Props<OptionValue> = {
   components?: ComponentsProp | null | undefined,
   delimiter?: string,
   disabled?: boolean,
-  displayKey: string,
+  displayKey?: string,
   forwardedRef?: SelectRef,
   id?: string,
   ignoreAccents?: boolean,
@@ -232,6 +231,8 @@ export type Props<OptionValue> = {
   inputProps?: { [key: string]: any },
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
+  maxMenuHeight?: number,
+  menuPlacement?: 'bottom' | 'auto' | 'top',
   menuPortalTarget?: HTMLElement,
   menuIsOpen?: boolean,
   name?: string,
@@ -242,15 +243,15 @@ export type Props<OptionValue> = {
   onMenuClose?: () => void,
   optionRenderer?: (option: Option, isSelected?: boolean) => React.ReactElement,
   options: Array<Option>,
-  placeholder: string,
-  persistSelection: boolean,
+  placeholder?: string,
+  persistSelection?: boolean,
   // eslint-disable-next-line react/require-default-props
   ref?: SelectRef,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
   required?: boolean,
   value?: OptionValue,
-  valueKey: string,
+  valueKey?: string,
   valueRenderer?: (option: Option) => React.ReactElement,
   async?: boolean,
   total?: number,
@@ -291,103 +292,6 @@ const getCustomComponents = (inputProps?: { [key: string]: any }, optionRenderer
 };
 
 class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
-  static propTypes = {
-    /** Specifies if the user can create new entries in `multi` Selects. */
-    allowCreate: PropTypes.bool,
-    className: PropTypes.string,
-    /** Indicates if the Select value is clearable or not. */
-    clearable: PropTypes.bool,
-    /**
-     * A collection of custom `react-select` components from https://react-select.com/components
-     */
-    components: PropTypes.objectOf(PropTypes.elementType),
-    /** Delimiter to use as value separator in `multi` Selects. */
-    delimiter: PropTypes.string,
-    /** Indicates whether the Select component is disabled or not. */
-    disabled: PropTypes.bool,
-    /** Indicates which option object key contains the text to display in the select input. Same as react-select's `labelKey` prop. */
-    displayKey: PropTypes.string,
-    /** ID of Select container component */
-    id: PropTypes.string,
-    /** ID of underlying input */
-    inputId: PropTypes.string,
-    /** Indicates whether the auto-completion should return results including accents/diacritics when searching for their non-accent counterpart */
-    ignoreAccents: PropTypes.bool,
-    /**
-     * @deprecated Use `inputId` or custom components with the `components` prop instead.
-     * Custom attributes for the input (inside the Select).
-     */
-    inputProps: PropTypes.object,
-    /** Indicates which option property to filter on. */
-    matchProp: PropTypes.oneOf(['any', 'label', 'value']),
-    /** Specifies if multiple values can be selected or not. */
-    multi: PropTypes.bool,
-    /** name attribute for Select element */
-    name: PropTypes.string,
-    /** Callback when select has lost focus */
-    onBlur: PropTypes.func,
-    /**
-     * Callback when selected option changes. It receives the value of the
-     * selected option as an argument. If `multi` is enabled, the passed
-     * argument will be a string separated by `delimiter` with all selected
-     * options.
-     */
-    onChange: PropTypes.func.isRequired,
-    /**
-     * Callback when select input changes.
-     */
-    onInputChange: PropTypes.func,
-    /**
-     * Available options shown in the select field. It should be an array of objects,
-     * each one with a display key (specified in `displayKey`), and a value key
-     * (specified in `valueKey`).
-     * Options including an optional `disabled: true` key-value pair, will be disabled in the Select component.
-     */
-    options: PropTypes.array.isRequired,
-    /** Custom function to render the options in the menu. */
-    optionRenderer: PropTypes.func,
-    /** required attribute for input element */
-    required: PropTypes.bool,
-    /** Size of the select input. */
-    size: PropTypes.oneOf(['normal', 'small']),
-    /** @ignore */
-    theme: PropTypes.object.isRequired,
-    /**
-     * Value which can be the selected option or the value of the selected option.
-     * If `multi` is enabled, it must be a string containing all values separated by the `delimiter`.
-     */
-    value: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-      PropTypes.object,
-      PropTypes.arrayOf(PropTypes.object),
-    ]),
-    /** Indicates which option object key contains the value of the option. */
-    valueKey: PropTypes.string,
-    /** Custom function to render the selected option in the Select. */
-    valueRenderer: PropTypes.func,
-    /** Label text for add button */
-    addLabelText: PropTypes.string,
-    /** Automatically Focus on Select */
-    autoFocus: PropTypes.bool,
-    /** special onChange handler */
-    onReactSelectChange: PropTypes.func,
-    /** Select placeholder text */
-    placeholder: PropTypes.string,
-    /** Specify if the select should change its state on change */
-    persistSelection: PropTypes.bool,
-    /** Placement of the menu: "top", "bottom", "auto" */
-    menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
-    /** Max height of the menu */
-    maxMenuHeight: PropTypes.number,
-    /** Specifies if option are loaded asynchronously */
-    async: PropTypes.bool,
-    /** Specifies total number of options when using async */
-    total: PropTypes.number,
-    /** Specifies total number of options when using async */
-    loadOptions: PropTypes.func,
-  };
-
   static defaultProps = {
     addLabelText: undefined,
     allowCreate: false,
@@ -582,6 +486,8 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       total,
       onInputChange,
       loadOptions,
+      'aria-label': ariaLabel,
+      placeholder,
       ...rest
     } = this.props;
 
@@ -598,10 +504,13 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       async: boolean,
       loadOptions: () => void,
       total: number,
+
     } = {
       ...rest,
       onChange: onReactSelectChange || this._onChange,
       onInputChange,
+      'aria-label': ariaLabel ?? placeholder,
+      placeholder,
       async,
       isMulti,
       isDisabled,
@@ -627,4 +536,4 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   }
 }
 
-export default withTheme(Select);
+export default withTheme(Select) as unknown as React.ComponentType<Omit<Props<any>, 'theme'>>;

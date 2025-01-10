@@ -16,19 +16,22 @@
  */
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import 'helpers/mocking/react-dom_mock';
 import userEvent from '@testing-library/user-event';
+import type { Optional } from 'utility-types';
 
-import TokenList from 'components/users/TokenList';
+import OriginalTokenList from 'components/users/TokenList';
 
 jest.mock('components/common/ClipboardButton', () => 'clipboard-button');
 
-describe('<TokenList />', () => {
-  const tokens = [
-    { name: 'Acme', token: 'beef2001', id: 'abc1', last_access: '2020-12-08T16:46:00Z' },
-    { name: 'Hamfred', token: 'beef2002', id: 'abc2', last_access: '1970-01-01T00:00:00.000Z' },
-  ];
+const tokens = [
+  { name: 'Acme', token: 'beef2001', id: 'abc1', last_access: '2020-12-08T16:46:00Z' },
+  { name: 'Hamfred', token: 'beef2002', id: 'abc2', last_access: '1970-01-01T00:00:00.000Z' },
+];
+const TokenList = (props: Optional<React.ComponentProps<typeof OriginalTokenList>, 'onCreate' | 'onDelete'>) => (
+  <OriginalTokenList onCreate={async () => tokens[0]} onDelete={() => {}} {...props} />
+);
 
+describe('<TokenList />', () => {
   beforeAll(() => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date('2020-12-09T17:42:00Z'));

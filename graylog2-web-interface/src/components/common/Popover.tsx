@@ -20,7 +20,7 @@ import styled, { css, useTheme } from 'styled-components';
 
 const Popover = (props: React.ComponentProps<typeof MantinePopover>) => {
   const theme = useTheme();
-  // eslint-disable-next-line react/prop-types
+
   const arrowBackground = (!props.position || props.position.startsWith('bottom'))
     ? theme.colors.variant.lightest.default
     : theme.colors.global.contentBackground;
@@ -82,10 +82,6 @@ const Dropdown = ({ title, children, ...rest }: DropdownProps) => (
     </Children>
   </MantinePopover.Dropdown>
 );
-
-Dropdown.defaultProps = {
-  title: undefined,
-};
 
 Popover.Target = MantinePopover.Target;
 Popover.Dropdown = Dropdown;

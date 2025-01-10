@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 
 import TimeHelper from 'util/TimeHelper';
@@ -33,12 +32,6 @@ type Props = {
 };
 
 class MetricContainer extends React.Component<Props> {
-  static propTypes = {
-    metricsUpdatedAt: PropTypes.number,
-    name: PropTypes.string.isRequired,
-    zeroOnMissing: PropTypes.bool,
-  };
-
   static defaultProps = {
     metricsUpdatedAt: TimeHelper.nowInSeconds(),
     zeroOnMissing: true,

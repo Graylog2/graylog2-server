@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
-import MessagesWidgetConfig, { defaultSortDirection } from 'views/logic/widgets/MessagesWidgetConfig';
+import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import { defaultSortDirection } from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import { SortIcon } from 'components/common';
 
 type Props = {
@@ -88,13 +87,6 @@ const FieldSortIcon = ({ fieldName, config, onSortChange, setLoadingState }: Pro
               onChange={() => handleSortChange(changeSort)}
               title={tooltip(fieldName)} />
   );
-};
-
-FieldSortIcon.propTypes = {
-  config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-  fieldName: PropTypes.string.isRequired,
-  onSortChange: PropTypes.func.isRequired,
-  setLoadingState: PropTypes.func.isRequired,
 };
 
 export default FieldSortIcon;

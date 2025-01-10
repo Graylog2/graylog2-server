@@ -22,6 +22,7 @@ import type { RenewalPolicy } from 'preflight/types';
 import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { onSettled } from 'util/conditional/onError';
 
 export const QUERY_KEY = ['data-nodes', 'renewal-policy'];
 const fetchRenewalPolicy = (): Promise<RenewalPolicy> => (
@@ -46,22 +47,20 @@ const useRenewalPolicy = (): {
     isFetching,
   } = useQuery<RenewalPolicy, FetchError>({
     queryKey: QUERY_KEY,
-    queryFn: fetchRenewalPolicy,
-    initialData: undefined,
-    refetchInterval: 3000,
-    retry: false,
-    onError: (newError) => {
-      setMetaData({
-        error: newError,
-        isInitialLoading: false,
-      });
-    },
-    onSuccess: () => {
+    queryFn: () => onSettled(fetchRenewalPolicy(), () => {
       setMetaData({
         error: null,
         isInitialLoading: false,
       });
-    },
+    }, (newError: FetchError) => {
+      setMetaData({
+        error: newError,
+        isInitialLoading: false,
+      });
+    }),
+    initialData: undefined,
+    refetchInterval: 3000,
+    retry: false,
   });
 
   return {

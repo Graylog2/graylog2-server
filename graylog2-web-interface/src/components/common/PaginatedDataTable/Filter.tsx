@@ -23,9 +23,9 @@ type Props = {
   resetPagination: () => void,
   rows: Array<unknown>,
   id?: string,
-  filterKeys?: unknown,
-  displayKey?: unknown,
-  filterBy?: unknown,
+  filterKeys?: any[],
+  displayKey?: string,
+  filterBy?: string,
   filterLabel?: unknown,
 };
 
@@ -45,14 +45,6 @@ const Filter = ({ setFilteredRows, resetPagination, rows, ...filterProps }: Prop
                      rows={rows}
                      onDataFiltered={onDataFiltered} />
   );
-};
-
-Filter.defaultProps = {
-  id: undefined,
-  filterKeys: undefined,
-  displayKey: undefined,
-  filterBy: undefined,
-  filterLabel: undefined,
 };
 
 export default Filter;

@@ -130,12 +130,13 @@ type Props = {
   forceSideBarPinned?: boolean,
 };
 
-const Search = ({ forceSideBarPinned }: Props) => {
+const Search = ({ forceSideBarPinned = false }: Props) => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
-  const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar } = useSearchPageLayout();
+  const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar, synchronizeUrl = true } = useSearchPageLayout();
   const InfoBar = infoBar?.component;
   const SearchAreaContainer = searchAreaContainer?.component;
+  const SynchronizationComponent = synchronizeUrl ? SynchronizeUrl : React.Fragment;
 
   useEffect(() => {
     refreshSearch();
@@ -149,7 +150,7 @@ const Search = ({ forceSideBarPinned }: Props) => {
 
   return (
     <>
-      <SynchronizeUrl />
+      <SynchronizationComponent />
       <ExternalValueActionsProvider>
         <SearchExplainContextProvider>
           <WidgetFocusProvider>
@@ -216,10 +217,6 @@ const Search = ({ forceSideBarPinned }: Props) => {
       </ExternalValueActionsProvider>
     </>
   );
-};
-
-Search.defaultProps = {
-  forceSideBarPinned: false,
 };
 
 export default Search;

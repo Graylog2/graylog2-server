@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import isEqual from 'lodash/isEqual';
-import PropTypes from 'prop-types';
 import URI from 'urijs';
 
 import useLocation from 'routing/useLocation';
@@ -126,8 +125,11 @@ const useCleanupQueryParams = ({ focusUriParams, widgetIds, query, history }: Cl
   useEffect(() => {
     if ((focusUriParams?.id && !widgetIds.includes(focusUriParams.id) && focusUriParams.isPageShown) || (focusUriParams?.id === undefined)) {
       const baseURI = _clearURI(query);
+      const newQuery = baseURI.toString();
 
-      history.replace(baseURI.toString());
+      if (query !== newQuery) {
+        history.replace(newQuery);
+      }
     }
   }, [focusUriParams, widgetIds, query, history]);
 };
@@ -158,7 +160,9 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
       query,
     );
 
-    history.replace(newURI);
+    if (newURI !== query) {
+      history.replace(newURI);
+    }
   }, [history, query]);
 
   const setWidgetFocusing = useCallback((widgetId: string) => updateFocusQueryParams({
@@ -202,10 +206,6 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
       {children}
     </WidgetFocusContext.Provider>
   );
-};
-
-WidgetFocusProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default WidgetFocusProvider;

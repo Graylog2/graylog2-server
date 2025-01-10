@@ -46,13 +46,13 @@ const DragHandle = styled.div`
 `;
 
 const ListItem = forwardRef(<ItemType extends ListItemType>({
-  alignItemContent,
+  alignItemContent = 'flex-start',
   item,
   index,
   className,
   customListItemRender,
   customContentRender,
-  disableDragging,
+  disableDragging = false,
   draggableProps,
   dragHandleProps,
 }: Props<ItemType>, ref) => {
@@ -88,13 +88,5 @@ const ListItem = forwardRef(<ItemType extends ListItemType>({
     </StyledListGroupItem>
   );
 });
-
-ListItem.defaultProps = {
-  alignItemContent: 'flex-start',
-  className: undefined,
-  disableDragging: false,
-  customListItemRender: undefined,
-  customContentRender: undefined,
-};
 
 export default ListItem;

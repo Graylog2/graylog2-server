@@ -84,6 +84,10 @@ public abstract class WaitingRestOperation extends RestOperation {
                 final RequestSpecification req = RestAssured.given()
                         .accept(ContentType.JSON);
 
+                if(parameters.relaxedHTTPSValidation()) {
+                    req.relaxedHTTPSValidation();
+                }
+
                 Optional.ofNullable(parameters.truststore()).ifPresent(ts -> req.trustStore(parameters.truststore()));
 
                 parameters.addAuthorizationHeaders(req);

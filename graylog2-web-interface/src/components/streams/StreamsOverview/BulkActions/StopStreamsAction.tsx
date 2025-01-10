@@ -20,7 +20,7 @@ import * as React from 'react';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import MenuItem from 'components/bootstrap/MenuItem';
+import { MenuItem } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
@@ -54,10 +54,6 @@ const StopStreamsAction = ({ handleFailures, refetchStreams, descriptor, onSelec
   return (
     <MenuItem onSelect={onStopStreams}>Stop {descriptor}</MenuItem>
   );
-};
-
-StopStreamsAction.defaultProps = {
-  onSelect: undefined,
 };
 
 export default StopStreamsAction;

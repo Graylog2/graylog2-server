@@ -19,85 +19,101 @@ package org.graylog.security;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.BasicDBObject;
+import com.google.common.primitives.Ints;
+import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.database.users.User;
-import org.mongojack.DBQuery;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Filters.ne;
+import static com.mongodb.client.model.Filters.or;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public class DBGrantService extends PaginatedDbService<GrantDTO> {
+public class DBGrantService {
     public static final String COLLECTION_NAME = "grants";
 
-    private final GRNRegistry grnRegistry;
+    private final MongoCollection<GrantDTO> collection;
+    private final MongoUtils<GrantDTO> mongoUtils;
 
     @Inject
-    public DBGrantService(MongoConnection mongoConnection,
-                          MongoJackObjectMapperProvider mapper,
-                          GRNRegistry grnRegistry) {
-        super(mongoConnection, mapper, GrantDTO.class, COLLECTION_NAME);
-        this.grnRegistry = grnRegistry;
+    public DBGrantService(MongoCollections mongoCollections) {
+        collection = mongoCollections.collection(COLLECTION_NAME, GrantDTO.class);
+        mongoUtils = mongoCollections.utils(collection);
 
-        db.createIndex(new BasicDBObject(GrantDTO.FIELD_GRANTEE, 1));
-        db.createIndex(new BasicDBObject(GrantDTO.FIELD_TARGET, 1));
-        db.createIndex(
-                new BasicDBObject(GrantDTO.FIELD_GRANTEE, 1)
-                        .append(GrantDTO.FIELD_CAPABILITY, 1)
-                        .append(GrantDTO.FIELD_TARGET, 1),
-                new BasicDBObject("unique", true));
-        db.createIndex(
-                new BasicDBObject(GrantDTO.FIELD_GRANTEE, 1)
-                        .append(GrantDTO.FIELD_TARGET, 1),
-                new BasicDBObject("unique", true));
+        collection.createIndex(Indexes.ascending(GrantDTO.FIELD_GRANTEE));
+        collection.createIndex(Indexes.ascending(GrantDTO.FIELD_TARGET));
+        collection.createIndex(Indexes.ascending(
+                        GrantDTO.FIELD_GRANTEE,
+                        GrantDTO.FIELD_CAPABILITY,
+                        GrantDTO.FIELD_TARGET),
+                new IndexOptions().unique(true));
+        collection.createIndex(Indexes.ascending(
+                        GrantDTO.FIELD_GRANTEE,
+                        GrantDTO.FIELD_TARGET),
+                new IndexOptions().unique(true));
         // TODO: Add more indices
     }
 
     public ImmutableSet<GrantDTO> getForGranteesOrGlobal(Set<GRN> grantees) {
-        return streamQuery(DBQuery.or(
-                DBQuery.in(GrantDTO.FIELD_GRANTEE, grantees),
-                DBQuery.is(GrantDTO.FIELD_GRANTEE, GRNRegistry.GLOBAL_USER_GRN.toString())
-        )).collect(ImmutableSet.toImmutableSet());
+        final var iterable = collection.find(
+                or(
+                        in(GrantDTO.FIELD_GRANTEE, grantees),
+                        eq(GrantDTO.FIELD_GRANTEE, GRNRegistry.GLOBAL_USER_GRN.toString())
+                )
+        );
+        return ImmutableSet.copyOf(iterable);
     }
 
     public ImmutableSet<GrantDTO> getForGrantee(GRN grantee) {
-        return streamQuery(DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee))
-                .collect(ImmutableSet.toImmutableSet());
+        final var iterable = collection.find(eq(GrantDTO.FIELD_GRANTEE, grantee));
+        return ImmutableSet.copyOf(iterable);
     }
 
     public ImmutableSet<GrantDTO> getForGranteeWithCapability(GRN grantee, Capability capability) {
-        return streamQuery(DBQuery.and(
-                DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee),
-                DBQuery.is(GrantDTO.FIELD_CAPABILITY, capability)
-        )).collect(ImmutableSet.toImmutableSet());
+        final var iterable = collection.find(
+                and(
+                        eq(GrantDTO.FIELD_GRANTEE, grantee),
+                        eq(GrantDTO.FIELD_CAPABILITY, capability)
+                )
+        );
+        return ImmutableSet.copyOf(iterable);
     }
 
     public ImmutableSet<GrantDTO> getForGranteesOrGlobalWithCapability(Set<GRN> grantees, Capability capability) {
-        return streamQuery(DBQuery.and(
-                DBQuery.or(
-                        DBQuery.in(GrantDTO.FIELD_GRANTEE, grantees),
-                        DBQuery.is(GrantDTO.FIELD_GRANTEE, GRNRegistry.GLOBAL_USER_GRN.toString())
-                ),
-                DBQuery.is(GrantDTO.FIELD_CAPABILITY, capability)
-        )).collect(ImmutableSet.toImmutableSet());
+        final var iterable = collection.find(
+                and(
+                        or(
+                                in(GrantDTO.FIELD_GRANTEE, grantees),
+                                eq(GrantDTO.FIELD_GRANTEE, GRNRegistry.GLOBAL_USER_GRN.toString())
+                        ),
+                        eq(GrantDTO.FIELD_CAPABILITY, capability)
+                )
+        );
+        return ImmutableSet.copyOf(iterable);
     }
 
     public List<GrantDTO> getForTargetAndGrantee(GRN target, GRN grantee) {
@@ -105,9 +121,12 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     }
 
     public List<GrantDTO> getForTargetAndGrantees(GRN target, Set<GRN> grantees) {
-        return db.find(DBQuery.and(
-                DBQuery.is(GrantDTO.FIELD_TARGET, target),
-                DBQuery.in(GrantDTO.FIELD_GRANTEE, grantees))).toArray();
+        return collection.find(
+                and(
+                        eq(GrantDTO.FIELD_TARGET, target),
+                        in(GrantDTO.FIELD_GRANTEE, grantees)
+                )
+        ).into(new ArrayList<>());
     }
 
     public GrantDTO create(GrantDTO grantDTO, @Nullable User currentUser) {
@@ -170,47 +189,69 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
     }
 
     public ImmutableList<GrantDTO> getAll() {
-        try (final Stream<GrantDTO> stream = streamAll()) {
-            return stream.collect(ImmutableList.toImmutableList());
-        }
+        return ImmutableList.copyOf(collection.find());
     }
 
     public List<GrantDTO> getForTarget(GRN target) {
-        return db.find(DBQuery.is(GrantDTO.FIELD_TARGET, target.toString())).toArray();
+        return collection.find(eq(GrantDTO.FIELD_TARGET, target.toString())).into(new ArrayList<>());
     }
 
     public int deleteForGrantee(GRN grantee) {
-        return db.remove(DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee.toString())).getN();
+        return Ints.saturatedCast(
+                collection.deleteMany(eq(GrantDTO.FIELD_GRANTEE, grantee.toString())).getDeletedCount()
+        );
     }
 
     public int deleteForTarget(GRN target) {
-        return db.remove(DBQuery.is(GrantDTO.FIELD_TARGET, target.toString())).getN();
+        return Ints.saturatedCast(
+                collection.deleteMany(eq(GrantDTO.FIELD_TARGET, target.toString())).getDeletedCount()
+        );
     }
 
     public List<GrantDTO> getForTargetExcludingGrantee(GRN target, GRN grantee) {
-        return db.find(DBQuery.and(
-                DBQuery.is(GrantDTO.FIELD_TARGET, target.toString()),
-                DBQuery.notEquals(GrantDTO.FIELD_GRANTEE, grantee.toString())
-        )).toArray();
+        return collection.find(
+                and(
+                        eq(GrantDTO.FIELD_TARGET, target.toString()),
+                        ne(GrantDTO.FIELD_GRANTEE, grantee.toString())
+                )
+        ).into(new ArrayList<>());
     }
 
     public Map<GRN, Set<GRN>> getOwnersForTargets(Collection<GRN> targets) {
-        return db.find(DBQuery.and(
-                        DBQuery.in(GrantDTO.FIELD_TARGET, targets),
-                        DBQuery.is(GrantDTO.FIELD_CAPABILITY, Capability.OWN)
-                )).toArray()
-                .stream()
-                .collect(Collectors.groupingBy(
-                        GrantDTO::target,
-                        Collectors.mapping(GrantDTO::grantee, Collectors.toSet())
-                ));
+        final Bson filter = and(
+                in(GrantDTO.FIELD_TARGET, targets),
+                eq(GrantDTO.FIELD_CAPABILITY, Capability.OWN)
+        );
+        try (final var stream = MongoUtils.stream(collection.find(filter))) {
+            return stream.collect(Collectors.groupingBy(
+                    GrantDTO::target,
+                    Collectors.mapping(GrantDTO::grantee, Collectors.toSet())
+            ));
+        }
     }
 
     public boolean hasGrantFor(GRN grantee, Capability capability, GRN target) {
-        return db.findOne(DBQuery.and(
-                DBQuery.is(GrantDTO.FIELD_GRANTEE, grantee),
-                DBQuery.is(GrantDTO.FIELD_CAPABILITY, capability),
-                DBQuery.is(GrantDTO.FIELD_TARGET, target)
-        )) != null;
+        return collection.find(and(
+                eq(GrantDTO.FIELD_GRANTEE, grantee),
+                eq(GrantDTO.FIELD_CAPABILITY, capability),
+                eq(GrantDTO.FIELD_TARGET, target)
+        )).first() != null;
+    }
+
+    public GrantDTO save(GrantDTO grantDTO) {
+        return mongoUtils.save(grantDTO);
+    }
+
+    public Optional<GrantDTO> get(String id) {
+        return mongoUtils.getById(id);
+    }
+
+    @MustBeClosed
+    public Stream<GrantDTO> streamAll() {
+        return MongoUtils.stream(collection.find());
+    }
+
+    public int delete(String id) {
+        return mongoUtils.deleteById(id) ? 1 : 0;
     }
 }

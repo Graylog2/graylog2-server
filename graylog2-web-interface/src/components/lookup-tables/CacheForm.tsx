@@ -63,7 +63,7 @@ type Props = {
   validationErrors?: validationErrorsType,
 };
 
-const CacheForm = ({ type, saved, title, create, cache, validate, validationErrors }: Props) => {
+const CacheForm = ({ type, saved, title, create = true, cache = INIT_CACHE, validate = null, validationErrors = {} }: Props) => {
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
@@ -211,13 +211,6 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
       </Row>
     </>
   );
-};
-
-CacheForm.defaultProps = {
-  create: true,
-  cache: INIT_CACHE,
-  validate: null,
-  validationErrors: {},
 };
 
 export default CacheForm;

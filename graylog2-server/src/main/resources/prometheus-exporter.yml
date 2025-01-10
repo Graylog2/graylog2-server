@@ -961,19 +961,19 @@ metric_mappings:
     match_pattern: "org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter.httpURLErrors"
 
   - metric_name: "blocking_elasticsearch_output_batch_size"
-    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.batchSize"
+    match_pattern: "org.graylog2.outputs.BatchedMessageFilterOutput.batchSize"
 
   - metric_name: "blocking_elasticsearch_output_buffer_flushes"
-    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.bufferFlushes"
+    match_pattern: "org.graylog2.outputs.BatchedMessageFilterOutput.bufferFlushes"
 
   - metric_name: "blocking_elasticsearch_output_buffer_flushes_requested"
-    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.bufferFlushesRequested"
+    match_pattern: "org.graylog2.outputs.BatchedMessageFilterOutput.bufferFlushesRequested"
 
   - metric_name: "blocking_elasticsearch_output_buffer_flush_failures"
-    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.bufferFlushFailures"
+    match_pattern: "org.graylog2.outputs.BatchedMessageFilterOutput.bufferFlushFailures"
 
   - metric_name: "blocking_elasticsearch_output_process_time"
-    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.processTime"
+    match_pattern: "org.graylog2.outputs.BatchedMessageFilterOutput.processTime"
 
   - metric_name: "elasticsearch_output_failures"
     match_pattern: "org.graylog2.outputs.ElasticSearchOutput.failures"

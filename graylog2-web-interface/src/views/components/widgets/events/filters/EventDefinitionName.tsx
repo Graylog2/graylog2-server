@@ -28,7 +28,7 @@ type Props = {
   displayAsLink?: boolean,
 }
 
-const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
+const EventDefinitionName = ({ eventDefinitionId, displayAsLink = true }: Props) => {
   const currentUser = useCurrentUser();
   const canViewDefinition = isPermitted(currentUser.permissions, `eventdefinitions:read:${eventDefinitionId}`);
   const { data: eventDefinition, isFetching } = useEventDefinition(eventDefinitionId, canViewDefinition);
@@ -51,10 +51,6 @@ const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
   }
 
   return null;
-};
-
-EventDefinitionName.defaultProps = {
-  displayAsLink: true,
 };
 
 export default EventDefinitionName;

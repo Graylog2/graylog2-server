@@ -118,9 +118,9 @@ const InputsList = ({ permissions, node }: Props) => {
   return (
     <div>
       {!node && (
-      <IfPermitted permissions="inputs:create">
-        <CreateInputControl />
-      </IfPermitted>
+        <IfPermitted permissions="inputs:create">
+          <CreateInputControl />
+        </IfPermitted>
       )}
 
       <InputListRow id="filter-input" className="content">

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css, keyframes } from 'styled-components';
 import chroma from 'chroma-js';
 import type { ColorVariant } from '@graylog/sawmill';
@@ -29,13 +28,13 @@ type StyledBarProps = {
 };
 
 type ProgressBarProps = {
-  bars: Array<{
+  bars?: Array<{
     animated?: boolean,
     striped?: boolean,
     bsStyle?: ColorVariant,
     value: number,
     label?: string,
-  }>,
+  }>
   className?: string,
 };
 
@@ -115,7 +114,7 @@ const Bar = styled.div<StyledBarProps>(({ $animated, $striped, theme, value }) =
 `;
 });
 
-const ProgressBar = ({ bars, className }: ProgressBarProps) => (
+const ProgressBar = ({ bars = [DEFAULT_BAR], className }: ProgressBarProps) => (
   <ProgressWrap className={className}>
     {bars.map((bar, index) => {
       const { label, animated, bsStyle, striped, value } = { ...DEFAULT_BAR, ...bar };
@@ -137,22 +136,6 @@ const ProgressBar = ({ bars, className }: ProgressBarProps) => (
     })}
   </ProgressWrap>
 );
-
-ProgressBar.propTypes = {
-  bars: PropTypes.arrayOf(PropTypes.shape({
-    animated: PropTypes.bool,
-    bsStyle: PropTypes.string,
-    label: PropTypes.string,
-    striped: PropTypes.bool,
-    value: PropTypes.number,
-  })),
-  className: PropTypes.string,
-};
-
-ProgressBar.defaultProps = {
-  bars: [DEFAULT_BAR],
-  className: undefined,
-};
 
 export default ProgressBar;
 export { Bar };

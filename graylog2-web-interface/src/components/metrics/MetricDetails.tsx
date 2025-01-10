@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
 
@@ -99,11 +98,6 @@ const MetricDetails = ({ nodeId, metric, metric: { full_name: metricName } }: Pr
       </StyledMetricDetail>
     </div>
   );
-};
-
-MetricDetails.propTypes = {
-  metric: PropTypes.object.isRequired,
-  nodeId: PropTypes.string.isRequired,
 };
 
 export default MetricDetails;

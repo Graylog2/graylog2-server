@@ -114,6 +114,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String MESSAGE_INPUT_DELETE = PREFIX + "message_input:delete";
     public static final String MESSAGE_INPUT_START = PREFIX + "message_input:start";
     public static final String MESSAGE_INPUT_STOP = PREFIX + "message_input:stop";
+    public static final String MESSAGE_INPUT_SETUP = PREFIX + "message_input:setup";
     public static final String MESSAGE_INPUT_UPDATE = PREFIX + "message_input:update";
     public static final String MESSAGE_OUTPUT_CREATE = PREFIX + "message_output:create";
     public static final String MESSAGE_OUTPUT_DELETE = PREFIX + "message_output:delete";
@@ -266,6 +267,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(MESSAGE_INPUT_DELETE)
             .add(MESSAGE_INPUT_START)
             .add(MESSAGE_INPUT_STOP)
+            .add(MESSAGE_INPUT_SETUP)
             .add(MESSAGE_INPUT_UPDATE)
             .add(MESSAGE_OUTPUT_CREATE)
             .add(MESSAGE_OUTPUT_DELETE)

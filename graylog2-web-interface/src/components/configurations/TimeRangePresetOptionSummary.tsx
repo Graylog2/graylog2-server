@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -70,9 +69,5 @@ const TimeRangePresetOptionSummary = ({ options }: Props) => (
     ))}
   </StyledDL>
 );
-
-TimeRangePresetOptionSummary.propTypes = {
-  options: PropTypes.object.isRequired,
-};
 
 export default TimeRangePresetOptionSummary;

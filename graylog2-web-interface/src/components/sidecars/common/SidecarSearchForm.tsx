@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { SearchForm } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
@@ -62,16 +61,5 @@ const SidecarSearchForm = ({ query, onSearch, onReset, children }: Props) => (
     {children}
   </SearchForm>
 );
-
-SidecarSearchForm.propTypes = {
-  query: PropTypes.string.isRequired,
-  onSearch: PropTypes.func.isRequired,
-  onReset: PropTypes.func.isRequired,
-  children: PropTypes.element,
-};
-
-SidecarSearchForm.defaultProps = {
-  children: undefined,
-};
 
 export default SidecarSearchForm;

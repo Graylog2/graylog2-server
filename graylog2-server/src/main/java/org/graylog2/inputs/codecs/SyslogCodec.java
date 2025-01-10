@@ -38,6 +38,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.syslog4j.server.SyslogServerEventIF;
@@ -59,6 +60,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -89,9 +91,8 @@ public class SyslogCodec extends AbstractCodec {
         this.messageFactory = messageFactory;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         final String msg = new String(rawMessage.getPayload(), charset);
         try (Timer.Context ignored = this.decodeTime.time()) {
             final ResolvableInetSocketAddress address = rawMessage.getRemoteAddress();
@@ -101,10 +102,13 @@ public class SyslogCodec extends AbstractCodec {
             } else {
                 remoteAddress = address.getInetSocketAddress();
             }
-            return parse(msg, remoteAddress == null ? null : remoteAddress.getAddress(), rawMessage.getTimestamp());
+            return Optional.of(parse(msg, remoteAddress == null ? null : remoteAddress.getAddress(), rawMessage.getTimestamp()));
+        } catch (Exception e) {
+            throw InputProcessingException.create("Could not deserialize Syslog message.", e, rawMessage, msg);
         }
     }
 
+    @Nonnull
     private Message parse(String msg, InetAddress remoteAddress, DateTime receivedTimestamp) {
         /*
          * ZOMG funny 80s neckbeard protocols. We are now deciding if to parse
@@ -137,7 +141,7 @@ public class SyslogCodec extends AbstractCodec {
         } else if (CISCO_WITH_SEQUENCE_NUMBERS_PATTERN.matcher(msg).matches()) {
             e = new CiscoSyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         } else if (FORTIGATE_PATTERN.matcher(msg).matches()) {
-            e = new FortiGateSyslogEvent(msg, defaultTimeZone);
+            e = new FortiGateSyslogEvent(msg.trim(), defaultTimeZone);
         } else {
             e = new SyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         }

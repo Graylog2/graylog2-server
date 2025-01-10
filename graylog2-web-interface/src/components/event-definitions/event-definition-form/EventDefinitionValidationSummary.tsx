@@ -15,21 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 
 import commonStyles from '../common/commonStyles.css';
 
 type Props = {
-  validation: {
+  validation?: {
     errors: {
       [name: string]: any
     }
-  },
+  }
 }
 
-const EventDefinitionValidationSummary = ({ validation }: Props) => {
+const EventDefinitionValidationSummary = ({
+  validation = {
+    errors: [],
+  },
+}: Props) => {
   const fieldsWithErrors = Object.keys(validation.errors);
 
   if (fieldsWithErrors.length === 0) {
@@ -52,16 +55,6 @@ const EventDefinitionValidationSummary = ({ validation }: Props) => {
       </Col>
     </Row>
   );
-};
-
-EventDefinitionValidationSummary.propTypes = {
-  validation: PropTypes.object,
-};
-
-EventDefinitionValidationSummary.defaultProps = {
-  validation: {
-    errors: [],
-  },
 };
 
 export default EventDefinitionValidationSummary;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
@@ -45,9 +44,9 @@ const Wrapper = styled.button<{ disabled: boolean }>(({ theme, disabled }) => cs
 type Props = {
   focusable?: boolean,
   title: string,
-  onClick?: () => void,
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void,
   className?: string,
-  name: IconName,
+  name: IconName
   iconType?: IconType,
   disabled?: boolean,
   rotation?: RotateProp,
@@ -55,18 +54,18 @@ type Props = {
   size?: SizeProp,
 };
 
-const handleClick = (onClick: () => void | undefined) => {
+const handleClick = (onClick: (e: React.MouseEvent<HTMLButtonElement>) => void | undefined, e: React.MouseEvent<HTMLButtonElement>) => {
   if (typeof onClick === 'function') {
-    onClick();
+    onClick(e);
   }
 };
 
 const IconButton = React.forwardRef<HTMLButtonElement, Props>(({
   title,
   onClick,
-  focusable,
+  focusable = true,
   className,
-  disabled,
+  disabled = false,
   iconType,
   'data-testid': dataTestId,
   ...rest
@@ -76,30 +75,12 @@ const IconButton = React.forwardRef<HTMLButtonElement, Props>(({
            data-testid={dataTestId}
            title={title}
            aria-label={title}
-           onClick={() => handleClick(onClick)}
+           onClick={(e) => handleClick(onClick, e)}
            className={className}
            type="button"
            disabled={disabled}>
     <Icon type={iconType} {...rest} />
   </Wrapper>
 ));
-
-IconButton.propTypes = {
-  className: PropTypes.string,
-  onClick: PropTypes.func,
-  name: PropTypes.any,
-};
-
-IconButton.defaultProps = {
-  className: undefined,
-  focusable: true,
-  onClick: undefined,
-  name: undefined,
-  disabled: false,
-  rotation: undefined,
-  iconType: undefined,
-  'data-testid': undefined,
-  size: undefined,
-};
 
 export default IconButton;

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -34,6 +33,7 @@ import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { Plugin } from 'stores/system/SystemPluginsStore';
 import type { Input } from 'components/messageloaders/Types';
 import type { InputDescription } from 'stores/inputs/InputTypesStore';
+import type { SystemOverview } from 'stores/cluster/types';
 
 type InputState = {
   detailed_message:string,
@@ -58,29 +58,13 @@ type JvmInformation = {
   info: string
 }
 
-type ClusterOverview = {
-  facility: string
-  codename: string
-  node_id: string
-  cluster_id: string
-  version: string
-  started_at: string
-  hostname: string
-  lifecycle: string
-  lb_status: string
-  timezone: string
-  operating_system: string
-  is_processing: boolean
-  is_leader: boolean
-}
-
 type Props = {
   node: NodeInfo,
-  plugins: Array<Plugin>,
-  inputStates: Array<InputState>,
-  inputDescriptions: Array<InputDescription>,
-  jvmInformation: JvmInformation,
-  systemOverview: ClusterOverview,
+  plugins?: Array<Plugin>
+  inputStates?: Array<InputState>
+  inputDescriptions?: { [type: string]: InputDescription },
+  jvmInformation?: JvmInformation
+  systemOverview: SystemOverview,
 }
 
 const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInformation, systemOverview }: Props) => {
@@ -174,22 +158,6 @@ const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInform
       </Row>
     </div>
   );
-};
-
-NodeOverview.propTypes = {
-  node: PropTypes.object.isRequired,
-  systemOverview: PropTypes.object.isRequired,
-  jvmInformation: PropTypes.object,
-  plugins: PropTypes.array,
-  inputDescriptions: PropTypes.object,
-  inputStates: PropTypes.array,
-};
-
-NodeOverview.defaultProps = {
-  jvmInformation: undefined,
-  plugins: undefined,
-  inputDescriptions: undefined,
-  inputStates: undefined,
 };
 
 export default NodeOverview;

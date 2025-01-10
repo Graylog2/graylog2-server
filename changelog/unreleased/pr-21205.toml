@@ -1,0 +1,8 @@
+type = "a"
+message = "Enable defining required permissions for navigation web interface plugin."
+
+pulls = ["21205"]
+details.user = """
+Before it was only possible to define required permissions for a navigation dropdown item.
+"""
+

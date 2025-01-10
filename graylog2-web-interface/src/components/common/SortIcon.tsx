@@ -58,11 +58,11 @@ type Props<AscDirection extends string, DescDirection extends string> = {
 const SortIcon = <AscDirection extends string, DescDirection extends string>({
   activeDirection,
   onChange,
-  title,
+  title = 'Sort',
   order,
-  ascId,
-  descId,
-  className,
+  ascId = 'Ascending',
+  descId = 'Descending',
+  className = '',
 }: Props<AscDirection, DescDirection>) => {
   const handleSortChange = useCallback(() => onChange(activeDirection), [activeDirection, onChange]);
   const isAscSort = activeDirection === ascId && activeDirection !== descId;
@@ -79,14 +79,6 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
       {order && <Bulb>{order}</Bulb>}
     </StyledSortIcon>
   );
-};
-
-SortIcon.defaultProps = {
-  title: 'Sort',
-  order: undefined,
-  ascId: 'Ascending',
-  descId: 'Descending',
-  className: '',
 };
 
 export default SortIcon;

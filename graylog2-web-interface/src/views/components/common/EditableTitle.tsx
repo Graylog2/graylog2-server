@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import styles from './EditableTitle.css';
 
-const StyledStaticSpan = styled.span(({ theme }) => css`
+export const Title = styled.span(({ theme }) => css`
   border: 1px solid ${theme.colors.global.contentBackground};
   font-size: ${theme.fonts.size.large};
   text-overflow: ellipsis;
@@ -54,12 +53,6 @@ type State = {
 };
 
 export default class EditableTitle extends React.Component<Props, State> {
-  static propTypes = {
-    disabled: PropTypes.bool,
-    onChange: PropTypes.func,
-    value: PropTypes.string.isRequired,
-  };
-
   static defaultProps = {
     disabled: false,
     onChange: () => {},
@@ -126,6 +119,6 @@ export default class EditableTitle extends React.Component<Props, State> {
                        onChange={this._onChange} />
         </form>
       </span>
-    ) : <StyledStaticSpan onDoubleClick={this._toggleEditing} title={`${value} - Double click the title to edit it.`}>{value}</StyledStaticSpan>;
+    ) : <Title onDoubleClick={this._toggleEditing} title={`${value} - Double click the title to edit it.`}>{value}</Title>;
   }
 }

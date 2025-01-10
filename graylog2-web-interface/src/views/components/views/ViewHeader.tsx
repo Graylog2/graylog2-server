@@ -29,11 +29,12 @@ import useViewTitle from 'views/hooks/useViewTitle';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
 import { createGRN } from 'logic/permissions/GRN';
 import ExecutionInfo from 'views/components/views/ExecutionInfo';
+import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
+import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 
 const links = {
   [View.Type.Dashboard]: ({ id, title }) => [{
@@ -113,13 +114,9 @@ const StyledIcon = styled(Icon)`
 font-size: 0.5rem;
 `;
 
-const CrumbLink = ({ label, link, dataTestId }: { label: string, link: string | undefined, dataTestId?: string}) => (
+const CrumbLink = ({ label, link, dataTestId = undefined }: { label: string, link: string | undefined, dataTestId?: string}) => (
   link ? <Link target="_blank" to={link} data-testid={dataTestId}>{label}</Link> : <span data-testid={dataTestId}>{label}</span>
 );
-
-CrumbLink.defaultProps = {
-  dataTestId: undefined,
-};
 
 const ViewHeader = () => {
   const view = useView();
@@ -128,7 +125,8 @@ const ViewHeader = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
 
-  const { alertId, definitionId, definitionTitle, isAlert, isEventDefinition, isEvent } = useAlertAndEventDefinitionData();
+  const { alertId, definitionId, type } = useReplaySearchContext();
+  const { definitionTitle } = useAlertAndEventDefinitionData(alertId, definitionId);
   const dispatch = useAppDispatch();
   const _onSaveView = useCallback(async (updatedView: View) => {
     await dispatch(onSaveView(updatedView));
@@ -140,11 +138,16 @@ const ViewHeader = () => {
   const onChangeFavorite = useCallback((newValue: boolean) => dispatch(updateView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
 
   const breadCrumbs = useMemo(() => {
-    if (isAlert || isEvent) return links.alert({ id: alertId });
-    if (isEventDefinition) return links.eventDefinition({ id: definitionId, title: definitionTitle });
-
-    return links[view.type]({ id: view.id, title });
-  }, [alertId, definitionId, definitionTitle, isAlert, isEvent, isEventDefinition, view, title]);
+    switch (type) {
+      case 'alert':
+      case 'event':
+        return links.alert({ id: alertId });
+      case 'event_definition':
+        return links.eventDefinition({ id: definitionId, title: definitionTitle });
+      default:
+        return links[view.type]({ id: view.id, title });
+    }
+  }, [type, alertId, definitionId, definitionTitle, view.type, view.id, title]);
 
   const showExecutionInfo = view.type === 'SEARCH';
 

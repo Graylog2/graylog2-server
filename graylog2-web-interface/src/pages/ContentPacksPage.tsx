@@ -27,7 +27,6 @@ import ContentPacksList from 'components/content-packs/ContentPacksList';
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
 import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
 import { useStore } from 'stores/connect';
-import type { ContentPackInstallation, ContentPackMetadata } from 'components/content-packs/Types';
 
 const ConfigurationBundles = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
@@ -65,7 +64,7 @@ const _installContentPack = (contentPackId: string, contentPackRev: string, para
 };
 
 const ContentPacksPage = () => {
-  const { contentPacks, contentPackMetadata } = useStore<{ contentPacks: Array<ContentPackInstallation>, contentPackMetadata: ContentPackMetadata }>(ContentPacksStore);
+  const { contentPacks, contentPackMetadata } = useStore(ContentPacksStore);
 
   useEffect(() => {
     ContentPacksActions.list();

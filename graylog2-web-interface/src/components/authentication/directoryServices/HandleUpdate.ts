@@ -31,7 +31,9 @@ export default (payload: WizardSubmitPayload, formValues: WizardFormValues, back
     id: backendId,
   }).then((result) => {
     if (enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
-      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType).then(notifyOnSuccess);
+      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType)
+        .then(notifyOnSuccess)
+        .then(() => result);
     }
 
     notifyOnSuccess();

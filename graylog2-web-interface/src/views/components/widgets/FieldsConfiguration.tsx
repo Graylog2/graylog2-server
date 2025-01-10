@@ -50,21 +50,23 @@ type Props = {
   showDeSelectAll?: boolean,
   showListCollapseButton?: boolean
   showUnit?: boolean,
+  fieldSelect?: React.ComponentType<React.ComponentProps<typeof FieldSelect>>
 }
 
 const FieldsConfiguration = ({
-  createSelectPlaceholder,
-  displaySortableListOverlayInPortal,
+  createSelectPlaceholder = 'Add a field',
+  displaySortableListOverlayInPortal = false,
   menuPortalTarget,
   onChange,
   isFieldQualified,
   selectSize,
   selectedFields,
-  testPrefix,
-  showSelectAllRest,
-  showDeSelectAll,
-  showListCollapseButton,
-  showUnit,
+  testPrefix = '',
+  showSelectAllRest = false,
+  showDeSelectAll = false,
+  showListCollapseButton = false,
+  showUnit = false,
+  fieldSelect: FieldSelectComponent = FieldSelect,
 }: Props) => {
   const [showSelectedList, setShowSelectedList] = useState(true);
   const onAddField = useCallback((newField: string) => (
@@ -106,37 +108,24 @@ const FieldsConfiguration = ({
                           onChange={onChange}
                           showUnit={showUnit} />
       )}
-      <FieldSelect id="field-create-select"
-                   onChange={onAddField}
-                   clearable={false}
-                   isFieldQualified={isFieldQualified}
-                   persistSelection={false}
-                   name="field-create-select"
-                   value={undefined}
-                   size={selectSize}
-                   menuPortalTarget={menuPortalTarget}
-                   excludedFields={selectedFields ?? []}
-                   placeholder={createSelectPlaceholder}
-                   ariaLabel={createSelectPlaceholder}
-                   onSelectAllRest={showSelectAllRest && onSelectAllRest}
-                   showSelectAllRest={showSelectAllRest}
-                   onDeSelectAll={onDeselectAll}
-                   showDeSelectAll={showDeSelectAll && !!selectedFields.length} />
+      <FieldSelectComponent id="field-create-select"
+                            onChange={onAddField}
+                            clearable={false}
+                            isFieldQualified={isFieldQualified}
+                            persistSelection={false}
+                            name="field-create-select"
+                            value={undefined}
+                            size={selectSize}
+                            menuPortalTarget={menuPortalTarget}
+                            excludedFields={selectedFields ?? []}
+                            placeholder={createSelectPlaceholder}
+                            ariaLabel={createSelectPlaceholder}
+                            onSelectAllRest={showSelectAllRest && onSelectAllRest}
+                            showSelectAllRest={showSelectAllRest}
+                            onDeSelectAll={onDeselectAll}
+                            showDeSelectAll={showDeSelectAll && !!selectedFields.length} />
     </>
   );
-};
-
-FieldsConfiguration.defaultProps = {
-  createSelectPlaceholder: 'Add a field',
-  displaySortableListOverlayInPortal: false,
-  isFieldQualified: undefined,
-  selectSize: undefined,
-  menuPortalTarget: undefined,
-  testPrefix: '',
-  showSelectAllRest: false,
-  showDeSelectAll: false,
-  showListCollapseButton: false,
-  showUnit: false,
 };
 
 export default FieldsConfiguration;

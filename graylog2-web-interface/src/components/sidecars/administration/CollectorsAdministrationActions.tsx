@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
 import uniq from 'lodash/uniq';
 import styled from 'styled-components';
 
@@ -82,14 +81,6 @@ const CollectorsAdministrationActions = ({
       <CollectorProcessControl selectedSidecarCollectorPairs={selectedSidecarCollectorPairs} onProcessAction={onProcessAction} />
     </ButtonToolbar>
   );
-};
-
-CollectorsAdministrationActions.propTypes = {
-  collectors: PropTypes.array.isRequired,
-  configurations: PropTypes.array.isRequired,
-  selectedSidecarCollectorPairs: PropTypes.array.isRequired,
-  onConfigurationSelectionChange: PropTypes.func.isRequired,
-  onProcessAction: PropTypes.func.isRequired,
 };
 
 export default CollectorsAdministrationActions;

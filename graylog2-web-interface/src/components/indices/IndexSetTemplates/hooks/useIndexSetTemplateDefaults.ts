@@ -16,21 +16,18 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { IndexSetsDefaultConfiguration } from 'components/indices/IndexSetTemplates/types';
+import { defaultOnError } from 'util/conditional/onError';
 
 const fetchIndexSetTemplateDefaults: () => Promise<IndexSetsDefaultConfiguration> = () => fetch('GET', qualifyUrl('/system/indices/index_sets/templates/default_config'));
 
 const useIndexSetTemplateDefaults = () => {
   const { data, isLoading } = useQuery<IndexSetsDefaultConfiguration, Error>(
     ['index-templates-defaults'],
-    fetchIndexSetTemplateDefaults,
+    () => defaultOnError(fetchIndexSetTemplateDefaults(), 'Error fetching index default template'),
     {
-      onError: (fetchError: Error) => {
-        UserNotification.error(`Error fetching index default template: ${fetchError.message}`);
-      },
       retry: 1,
     },
   );

@@ -21,15 +21,15 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
-import type { Input } from 'components/messageloaders/Types';
+import type { Input, ConfiguredInput } from 'components/messageloaders/Types';
 
 type InputsActionsType = {
   list: () => Promise<{ inputs: Array<Input>, total: number }>,
   get: (id: string) => Promise<Input>,
   getOptional: (id: string, showError: boolean) => Promise<Input>,
-  create: (input: Input) => Promise<void>,
+  create: (input: ConfiguredInput) => Promise<void>,
   delete: (input: Input) => Promise<void>,
-  update: (id: string, input: Input) => Promise<void>,
+  update: (id: string, input: ConfiguredInput) => Promise<void>,
 }
 
 type InputsStoreState = {
