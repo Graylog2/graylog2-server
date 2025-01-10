@@ -62,7 +62,6 @@ const ShowDocumentsHandler = ({
     .query(createElasticsearchQueryString(query))
     .newId()
     .config(MessagesWidgetConfig.builder()
-      // @ts-ignore
       .fields([...messageListFields])
       .showMessageRow(true).build())
     .build();
