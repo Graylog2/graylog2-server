@@ -37,7 +37,6 @@ public class LuceneQueryParser {
 
     public ParsedQuery parse(final String query) throws ParseException {
         final TokenCollectingQueryParser parser = new TokenCollectingQueryParser(ParsedTerm.DEFAULT_FIELD, ANALYZER);
-        parser.setSplitOnWhitespace(true);
         parser.setAllowLeadingWildcard(allowLeadingWildcard);
 
         final Query parsed = parser.parse(query);

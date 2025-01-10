@@ -404,6 +404,28 @@ class PipelineRuleParserTest extends BaseParserTest {
         }
     }
 
+    @Test
+    void setFieldWithWhitespaceInName() {
+        final Rule rule = parseRuleWithOptionalCodegen();
+        Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
+        message.addField("response code", 500);
+        final Message processedMsg = evaluateRule(rule, message);
+
+        assertNotNull(processedMsg);
+        assertEquals("server_error", processedMsg.getField("response_category"));
+    }
+
+    @Test
+    void setFieldWithSlashInName() {
+        final Rule rule = parseRuleWithOptionalCodegen();
+        Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
+        message.addField("response/code", 500);
+        final Message processedMsg = evaluateRule(rule, message);
+
+        assertNotNull(processedMsg);
+        assertEquals("server_error", processedMsg.getField("response_category"));
+    }
+
     public static class CustomObject {
         private final String id;
 

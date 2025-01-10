@@ -87,7 +87,7 @@ public class MessageTest {
 
         metricRegistry = new MetricRegistry();
         originalTimestamp = Tools.nowUTC();
-        message = new Message("foo", "bar", originalTimestamp);
+        message = new Message("foo", "bar", originalTimestamp, true);
         invalidTimestampMeter = metricRegistry.meter("test");
 
     }
@@ -99,26 +99,26 @@ public class MessageTest {
 
     @Test
     public void testAddFieldDoesOnlyAcceptAlphanumericKeys() throws Exception {
-        Message m = new Message("foo", "bar", Tools.nowUTC());
+        Message m = new Message("foo", "bar", Tools.nowUTC(), true);
         m.addField("some_thing", "bar");
         assertEquals("bar", m.getField("some_thing"));
 
-        m = new Message("foo", "bar", Tools.nowUTC());
+        m = new Message("foo", "bar", Tools.nowUTC(), true);
         m.addField("some-thing", "bar");
         assertEquals("bar", m.getField("some-thing"));
 
-        m = new Message("foo", "bar", Tools.nowUTC());
+        m = new Message("foo", "bar", Tools.nowUTC(), true);
         m.addField("somethin$g", "bar");
         assertNull(m.getField("somethin$g"));
 
-        m = new Message("foo", "bar", Tools.nowUTC());
+        m = new Message("foo", "bar", Tools.nowUTC(), true);
         m.addField("someäthing", "bar");
         assertNull(m.getField("someäthing"));
     }
 
     @Test
     public void testAddFieldTrimsValue() throws Exception {
-        Message m = new Message("foo", "bar", Tools.nowUTC());
+        Message m = new Message("foo", "bar", Tools.nowUTC(), true);
         m.addField("something", " bar ");
         assertEquals("bar", m.getField("something"));
 
@@ -139,11 +139,11 @@ public class MessageTest {
                 "something_else", " "
         );
 
-        Message m = new Message((String) messageFields.get(Message.FIELD_MESSAGE), (String) messageFields.get(Message.FIELD_SOURCE), Tools.nowUTC());
+        Message m = new Message((String) messageFields.get(Message.FIELD_MESSAGE), (String) messageFields.get(Message.FIELD_SOURCE), Tools.nowUTC(), true);
         assertEquals("foo", m.getMessage());
         assertEquals("bar", m.getSource());
 
-        Message m2 = new Message(messageFields);
+        Message m2 = new Message(messageFields, true);
         assertEquals("foo", m2.getMessage());
         assertEquals("bar", m2.getSource());
         assertEquals("awesome", m2.getField("something"));
@@ -152,7 +152,7 @@ public class MessageTest {
 
     @Test
     public void testAddFieldWorksWithIntegers() throws Exception {
-        Message m = new Message("foo", "bar", Tools.nowUTC());
+        Message m = new Message("foo", "bar", Tools.nowUTC(), true);
         m.addField("something", 3);
         assertEquals(3, m.getField("something"));
     }
@@ -349,41 +349,75 @@ public class MessageTest {
     }
 
     @Test
-    public void testValidKeys() throws Exception {
+    public void testValidKeys() {
+        assertTrue(Message.validKey("a"));
         assertTrue(Message.validKey("foo123"));
         assertTrue(Message.validKey("foo-bar123"));
         assertTrue(Message.validKey("foo_bar123"));
         assertTrue(Message.validKey("foo.bar123"));
         assertTrue(Message.validKey("foo@bar"));
         assertTrue(Message.validKey("123"));
-        assertTrue(Message.validKey(""));
+        assertTrue(Message.validKey("foo bar"));
+        assertTrue(Message.validKey("foo/bar"));
+
+        assertFalse(Message.validKey(null));
+        assertFalse(Message.validKey(""));
+        assertFalse(Message.validKey(" "));
+        assertFalse(Message.validKey("  "));
         assertFalse(Message.validKey(" foo123"));
         assertFalse(Message.validKey("foo123 "));
-        assertFalse(Message.validKey("foo bar"));
+        assertFalse(Message.validKey("  foo123"));
+        assertFalse(Message.validKey("foo123  "));
         assertFalse(Message.validKey("foo+bar"));
         assertFalse(Message.validKey("foo$bar"));
-        assertFalse(Message.validKey(" "));
     }
 
     @Test
-    public void testCleanKey() throws Exception {
-        // Valid keys
-        assertEquals("foo123", Message.cleanKey("foo123"));
-        assertEquals("foo-bar123", Message.cleanKey("foo-bar123"));
-        assertEquals("foo_bar123", Message.cleanKey("foo_bar123"));
-        assertEquals("foo.bar123", Message.cleanKey("foo.bar123"));
-        assertEquals("foo@bar", Message.cleanKey("foo@bar"));
-        assertEquals("123", Message.cleanKey("123"));
-        assertEquals("", Message.cleanKey(""));
+    public void testCleanKeyWithWhitespaceAndSlashAllowed() {
+        Message message = new Message("message", "source", new DateTime(DateTimeZone.UTC), true);
+        // cleanup test for illegal chars, does not test if a key is valid
+        assertEquals("foo123", message.cleanKey("foo123"));
+        assertEquals("foo-bar123", message.cleanKey("foo-bar123"));
+        assertEquals("foo_bar123", message.cleanKey("foo_bar123"));
+        assertEquals("foo.bar123", message.cleanKey("foo.bar123"));
+        assertEquals("foo bar", message.cleanKey("foo bar"));
+        assertEquals("foo/bar", message.cleanKey("foo/bar"));
+        assertEquals("foo@bar", message.cleanKey("foo@bar"));
+        assertEquals("123", message.cleanKey("123"));
+        assertEquals(" ", message.cleanKey(" "));
+        assertEquals("  ", message.cleanKey("  "));
+        assertEquals("foo_bar", message.cleanKey("foo+bar"));
+        assertEquals("foo_bar", message.cleanKey("foo$bar"));
+        assertEquals("foo_bar", message.cleanKey("foo{bar"));
+        assertEquals("foo_bar", message.cleanKey("foo,bar"));
+        assertEquals("foo_bar", message.cleanKey("foo?bar"));
+        assertEquals("foo __bar", message.cleanKey("foo +?bar"));
+        assertEquals(" foo __bar", message.cleanKey(" foo +?bar"));
+        assertEquals("foo __bar ", message.cleanKey("foo +?bar "));
+    }
 
-        assertEquals("foo_bar", Message.cleanKey("foo bar"));
-        assertEquals("foo_bar", Message.cleanKey("foo+bar"));
-        assertEquals("foo_bar", Message.cleanKey("foo$bar"));
-        assertEquals("foo_bar", Message.cleanKey("foo{bar"));
-        assertEquals("foo_bar", Message.cleanKey("foo,bar"));
-        assertEquals("foo_bar", Message.cleanKey("foo?bar"));
-        assertEquals("foo___bar", Message.cleanKey("foo +?bar"));
-        assertEquals("_", Message.cleanKey(" "));
+    @Test
+    public void testCleanKeyWithWhitespaceAndSlashNotAllowed() {
+        Message message = new Message("message", "source", new DateTime(DateTimeZone.UTC), false);
+        // cleanup test for illegal chars, does not test if a key is valid
+        assertEquals("foo123", message.cleanKey("foo123"));
+        assertEquals("foo-bar123", message.cleanKey("foo-bar123"));
+        assertEquals("foo_bar123", message.cleanKey("foo_bar123"));
+        assertEquals("foo.bar123", message.cleanKey("foo.bar123"));
+        assertEquals("foo_bar", message.cleanKey("foo bar"));
+        assertEquals("foo_bar", message.cleanKey("foo/bar"));
+        assertEquals("foo@bar", message.cleanKey("foo@bar"));
+        assertEquals("123", message.cleanKey("123"));
+        assertEquals("_", message.cleanKey(" "));
+        assertEquals("__", message.cleanKey("  "));
+        assertEquals("foo_bar", message.cleanKey("foo+bar"));
+        assertEquals("foo_bar", message.cleanKey("foo$bar"));
+        assertEquals("foo_bar", message.cleanKey("foo{bar"));
+        assertEquals("foo_bar", message.cleanKey("foo,bar"));
+        assertEquals("foo_bar", message.cleanKey("foo?bar"));
+        assertEquals("foo___bar", message.cleanKey("foo +?bar"));
+        assertEquals("_foo___bar", message.cleanKey(" foo +?bar"));
+        assertEquals("foo___bar_", message.cleanKey("foo +?bar "));
     }
 
     @Test
@@ -452,7 +486,7 @@ public class MessageTest {
 
     @Test
     public void testToElasticsearchObjectAddsAccountedMessageSize() {
-        final Message message = new Message("message", "source", Tools.nowUTC());
+        final Message message = new Message("message", "source", Tools.nowUTC(), true);
 
         assertThat(message.toElasticSearchObject(objectMapper, invalidTimestampMeter).get("gl2_accounted_message_size"))
                 .isEqualTo(43L);
@@ -460,7 +494,7 @@ public class MessageTest {
 
     @Test
     public void messageSizes() {
-        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC(), true);
         assertThat(message.getSize()).isEqualTo(45);
 
         final Stream defaultStream = mock(Stream.class);
@@ -472,7 +506,7 @@ public class MessageTest {
 
     @Test
     public void testMessageSizeIgnoresIlluminateFields() {
-        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC(), true);
         assertThat(message.getSize()).isEqualTo(45);
 
         // this field should not be counted into the overall message size
@@ -487,19 +521,19 @@ public class MessageTest {
 
     @Test
     public void testIsComplete() throws Exception {
-        Message message = new Message("message", "source", Tools.nowUTC());
+        Message message = new Message("message", "source", Tools.nowUTC(), true);
         assertTrue(message.isComplete());
 
-        message = new Message("message", "", Tools.nowUTC());
+        message = new Message("message", "", Tools.nowUTC(), true);
         assertTrue(message.isComplete());
 
-        message = new Message("message", null, Tools.nowUTC());
+        message = new Message("message", null, Tools.nowUTC(), true);
         assertTrue(message.isComplete());
 
-        message = new Message("", "source", Tools.nowUTC());
+        message = new Message("", "source", Tools.nowUTC(), true);
         assertFalse(message.isComplete());
 
-        message = new Message(null, "source", Tools.nowUTC());
+        message = new Message(null, "source", Tools.nowUTC(), true);
         assertFalse(message.isComplete());
     }
 
@@ -547,7 +581,7 @@ public class MessageTest {
 
     @Test
     public void testDateConvertedToDateTime() {
-        final Message message = new Message("", "source", Tools.nowUTC());
+        final Message message = new Message("", "source", Tools.nowUTC(), true);
 
         final Date dateObject = DateTime.parse("2010-07-30T16:03:25Z").toDate();
         message.addField(Message.FIELD_TIMESTAMP, dateObject);
@@ -558,7 +592,7 @@ public class MessageTest {
 
     @Test
     public void getStreamIdsReturnsStreamsIdsIfFieldDoesNotExist() {
-        final Message message = new Message("", "source", Tools.nowUTC());
+        final Message message = new Message("", "source", Tools.nowUTC(), true);
         final Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("test");
         message.addStream(stream);
@@ -569,7 +603,7 @@ public class MessageTest {
 
     @Test
     public void getStreamIdsReturnsStreamsFieldContentsIfFieldDoesExist() {
-        final Message message = new Message("", "source", Tools.nowUTC());
+        final Message message = new Message("", "source", Tools.nowUTC(), true);
         final Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("test1");
         message.addField("streams", Collections.singletonList("test2"));
@@ -593,14 +627,14 @@ public class MessageTest {
 
     @Test
     public void assignZonedDateTimeAsTimestamp() {
-        final Message message = new Message("message", "source", Tools.nowUTC());
+        final Message message = new Message("message", "source", Tools.nowUTC(), true);
         message.addField(Message.FIELD_TIMESTAMP, ZonedDateTime.of(2018, 4, 19, 12, 0, 0, 0, ZoneOffset.UTC));
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2018, 4, 19, 12, 0, 0, 0, DateTimeZone.UTC));
     }
 
     @Test
     public void assignOffsetDateTimeAsTimestamp() {
-        final Message message = new Message("message", "source", Tools.nowUTC());
+        final Message message = new Message("message", "source", Tools.nowUTC(), true);
         message.addField(Message.FIELD_TIMESTAMP, OffsetDateTime.of(2018, 4, 19, 12, 0, 0, 0, ZoneOffset.UTC));
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2018, 4, 19, 12, 0, 0, 0, DateTimeZone.UTC));
     }
@@ -608,7 +642,7 @@ public class MessageTest {
     @Test
     @SuppressForbidden("Intentionally using system default time zone")
     public void assignLocalDateTimeAsTimestamp() {
-        final Message message = new Message("message", "source", Tools.nowUTC());
+        final Message message = new Message("message", "source", Tools.nowUTC(), true);
         message.addField(Message.FIELD_TIMESTAMP, LocalDateTime.of(2018, 4, 19, 12, 0, 0, 0));
         final DateTimeZone defaultTimeZone = DateTimeZone.getDefault();
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2018, 4, 19, 12, 0, 0, 0, defaultTimeZone).withZone(DateTimeZone.UTC));
@@ -617,7 +651,7 @@ public class MessageTest {
     @Test
     @SuppressForbidden("Intentionally using system default time zone")
     public void assignLocalDateAsTimestamp() {
-        final Message message = new Message("message", "source", Tools.nowUTC());
+        final Message message = new Message("message", "source", Tools.nowUTC(), true);
         message.addField(Message.FIELD_TIMESTAMP, LocalDate.of(2018, 4, 19));
         final DateTimeZone defaultTimeZone = DateTimeZone.getDefault();
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2018, 4, 19, 0, 0, 0, 0, defaultTimeZone).withZone(DateTimeZone.UTC));
@@ -625,21 +659,21 @@ public class MessageTest {
 
     @Test
     public void assignInstantAsTimestamp() {
-        final Message message = new Message("message", "source", Tools.nowUTC());
+        final Message message = new Message("message", "source", Tools.nowUTC(), true);
         message.addField(Message.FIELD_TIMESTAMP, Instant.ofEpochMilli(1524139200000L));
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2018, 4, 19, 12, 0, 0, 0, DateTimeZone.UTC));
     }
 
     @Test
     public void assignUnsupportedTemporalTypeAsTimestamp() {
-        final Message message = new Message("message", "source", Tools.nowUTC());
+        final Message message = new Message("message", "source", Tools.nowUTC(), true);
         message.addField(Message.FIELD_TIMESTAMP, ThaiBuddhistDate.of(0, 4, 19));
         assertThat(message.getTimestamp()).isGreaterThan(new DateTime(2018, 4, 19, 0, 0, 0, 0, DateTimeZone.UTC));
     }
 
     @Test
     public void testMetadata() throws NoSuchFieldException, IllegalAccessException {
-        final Message message = new Message("message", "source", Tools.nowUTC());
+        final Message message = new Message("message", "source", Tools.nowUTC(), true);
 
         // Ensure an exception is not thrown for an uninitialized metadata map.
         assertThat(message.getMetadataValue("stateKey")).isNull();
@@ -657,7 +691,7 @@ public class MessageTest {
 
     @Test
     public void testMetadataDefault() throws NoSuchFieldException, IllegalAccessException {
-        final Message message = new Message("message", "source", Tools.nowUTC());
+        final Message message = new Message("message", "source", Tools.nowUTC(), true);
 
         // Verify that appropriate default value is returned for uninitialized metadata.
         assertThat(message.getMetadataValue("nonExistentKey", "default")).isEqualTo("default");
@@ -673,7 +707,7 @@ public class MessageTest {
         final Message msg = new Message(new ImmutableMap.Builder<String, Object>()
                 .put(Message.FIELD_ID, "msg-id")
                 .put(Message.FIELD_TIMESTAMP, Tools.buildElasticSearchTimeFormat(Tools.nowUTC()))
-                .build());
+                .build(), true);
 
         final FailureCause cause1 = () -> "Cause 1";
         final FailureCause cause2 = () -> "Cause 2";
@@ -696,7 +730,7 @@ public class MessageTest {
         final Message msg = new Message(new ImmutableMap.Builder<String, Object>()
                 .put(Message.FIELD_ID, "msg-id")
                 .put(Message.FIELD_TIMESTAMP, Tools.buildElasticSearchTimeFormat(Tools.nowUTC()))
-                .build());
+                .build(), true);
 
         msg.addProcessingError(new Message.ProcessingError(() -> "Cause", "Failure Message #1", "Failure Details #1"));
 
@@ -714,7 +748,7 @@ public class MessageTest {
         final Message msg = new Message(new ImmutableMap.Builder<String, Object>()
                 .put(Message.FIELD_ID, "msg-id")
                 .put(Message.FIELD_TIMESTAMP, Tools.buildElasticSearchTimeFormat(Tools.nowUTC()))
-                .build());
+                .build(), true);
 
         msg.addProcessingError(new Message.ProcessingError(
                 () -> "Cause 1", "Failure Message #1", "Failure Details #1"
@@ -737,7 +771,7 @@ public class MessageTest {
         // Do not use fixed time from setUp() in this test
         DateTimeUtils.setCurrentMillisSystem();
 
-        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2), true);
         final DateTime previousTimestamp = message.getTimestamp();
 
         message.addField(Message.FIELD_TIMESTAMP, "1234");
@@ -759,7 +793,7 @@ public class MessageTest {
         // Do not use fixed time from setUp() in this test
         DateTimeUtils.setCurrentMillisSystem();
 
-        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2), true);
         final DateTime previousTimestamp = message.getTimestamp();
 
         message.addField(Message.FIELD_TIMESTAMP, null);
@@ -771,7 +805,7 @@ public class MessageTest {
 
     @Test
     public void testNullDateGetsReplacesWithCurrentDate() {
-        final Message message = new Message("message", "source", null);
+        final Message message = new Message("message", "source", null, true);
 
         assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
 
@@ -788,7 +822,7 @@ public class MessageTest {
         // Do not use fixed time from setUp() in this test
         DateTimeUtils.setCurrentMillisSystem();
 
-        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2), true);
         final LocalDateTime localDate = LocalDateTime.of(2021, Month.AUGUST, 19, 12, 0);
         final ZonedDateTime zonedDateTime = ZonedDateTime.of(localDate, ZoneOffset.UTC);
 

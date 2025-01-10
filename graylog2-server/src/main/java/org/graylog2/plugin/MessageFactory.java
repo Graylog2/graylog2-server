@@ -54,6 +54,6 @@ public interface MessageFactory {
      * @return a fake message
      */
     static Message createFakeMessage() {
-        return new Message("__fake", "__fake", DateTime.parse("2010-07-30T16:03:25Z")); // first Graylog release
+        return new Message("__fake", "__fake", DateTime.parse("2010-07-30T16:03:25Z"), true); // first Graylog release
     }
 }

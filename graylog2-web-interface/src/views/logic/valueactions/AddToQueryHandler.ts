@@ -19,7 +19,7 @@ import moment from 'moment-timezone';
 import { DATE_TIME_FORMATS } from 'util/DateTime';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
-import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
+import { escape, escapeField, addToQuery } from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { AppDispatch } from 'stores/useAppDispatch';
@@ -36,8 +36,8 @@ const formatNewQuery = (oldQuery: string, field: string, value: string | number,
     ? formatTimestampForES(value)
     : escape(value);
   const fieldPredicate = value === MISSING_BUCKET_NAME
-    ? `NOT _exists_:${field}`
-    : `${field}:${predicateValue}`;
+    ? `NOT _exists_:${escapeField(field)}`
+    : `${escapeField(field)}:${predicateValue}`;
 
   return addToQuery(oldQuery, fieldPredicate);
 };

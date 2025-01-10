@@ -241,6 +241,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "minimum_auto_refresh_interval", required = true)
     private Period minimumAutoRefreshInterval = Period.seconds(1);
 
+    @Parameter(value = "pipeline_rules_clean_key_keeps_space_and_slash")
+    private boolean pipelineRulesCleanKeyKeepsSpaceAndSlash = false;
+
     /**
      * Classes considered safe to load by name. A set of prefixes matched against the fully qualified class name.
      */
