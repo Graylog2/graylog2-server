@@ -93,7 +93,7 @@ const WidgetTitle = ({ onChange, editing, title, titleIcon }: WidgetTitleProps) 
         <TitleInput type="text"
                     id="widget-title"
                     onChange={(e) => onChange(e.target.value)}
-                    value={title}
+                    defaultValue={title}
                     required />
       </TitleInputWrapper>
     );
