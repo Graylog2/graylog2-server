@@ -160,7 +160,9 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
       query,
     );
 
-    history.replace(newURI);
+    if (newURI !== query) {
+      history.replace(newURI);
+    }
   }, [history, query]);
 
   const setWidgetFocusing = useCallback((widgetId: string) => updateFocusQueryParams({

@@ -61,7 +61,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @deprecated use {@link org.graylog2.database.MongoCollections} as an entrypoint for interacting with MongoDB.
  */
-@Deprecated
+@Deprecated(since = "6.2.0", forRemoval = true)
 public class JacksonDBCollection<T, K> {
 
     private final JacksonMongoCollection<T> delegate;

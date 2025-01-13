@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { DEFAULT_MESSAGE_FIELDS, MISSING_BUCKET_NAME } from 'views/Constants';
-import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
+import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
+import { escape, addToQuery, predicate } from 'views/logic/queries/QueryHelper';
 import TitleTypes from 'views/stores/TitleTypes';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { GetState } from 'views/types';
@@ -53,7 +53,7 @@ const ShowDocumentsHandler = ({
   const mergedObject = Object.fromEntries(valuePath.flatMap(Object.entries));
   const widgetQuery = widget && widget.query ? widget.query.query_string : '';
   const valuePathQuery = Object.entries(mergedObject)
-    .map(([k, v]) => (v === MISSING_BUCKET_NAME ? `NOT _exists_:${k}` : `${k}:${escape(String(v))}`))
+    .map(([k, v]) => (predicate(k, escape(v))))
     .reduce((prev: string, next: string) => addToQuery(prev, next), '');
   const query = addToQuery(widgetQuery, valuePathQuery);
   const valuePathFields = extractFieldsFromValuePath(valuePath);
@@ -62,7 +62,6 @@ const ShowDocumentsHandler = ({
     .query(createElasticsearchQueryString(query))
     .newId()
     .config(MessagesWidgetConfig.builder()
-      // @ts-ignore
       .fields([...messageListFields])
       .showMessageRow(true).build())
     .build();
