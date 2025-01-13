@@ -79,7 +79,7 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CREATED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: appSection,
-      app_action_value: 'new-filter-created',
+      app_action_value: 'filter-created',
       attribute_id: attributeId,
     });
 
