@@ -255,7 +255,7 @@ const QueryInput = React.forwardRef<Editor, Props>(({
     },
     {
       name: 'Show completions',
-      bindKey: { win: 'Alt-Space', mac: 'Alt-Space' },
+      bindKey: { win: 'Ctrl-Space', mac: 'Alt-Space' },
       exec: async (editor: Editor) => {
         if (editor.getValue()) {
           startAutocomplete(editor);
