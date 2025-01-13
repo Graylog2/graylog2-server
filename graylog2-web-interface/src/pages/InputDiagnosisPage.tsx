@@ -155,15 +155,15 @@ const InputDiagnosisPage = () => {
                 ))}
               </Col>
               <Col xs={3}>
-                <dt>Message Error at Input</dt>
+                <dt>Message Error at Input (per second)</dt>
                 <dd>{inputMetrics.failures_inputs_codecs}</dd>
               </Col>
               <Col xs={3}>
-                <dt>Message Failed to process</dt>
+                <dt>Message failed to process (per second)</dt>
                 <dd>{inputMetrics.failures_processing}</dd>
               </Col>
               <Col xs={3}>
-                <dt>Message Failed to index</dt>
+                <dt>Message failed to index (per second)</dt>
                 <dd>{inputMetrics.failures_indexing}</dd>
               </Col>
             </Row>
