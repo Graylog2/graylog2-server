@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed the issue when the streams link in the message table was not working on the streams page."
+
+issues=["20465"]
+pulls = [""]
