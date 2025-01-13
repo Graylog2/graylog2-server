@@ -44,14 +44,14 @@ const FilterCreation = styled.div`
 `;
 
 type Props = {
-  attributes: Attributes,
+  attributes?: Attributes,
   urlQueryFilters: UrlQueryFilters | undefined,
   setUrlQueryFilters: (urlQueryFilters: UrlQueryFilters) => void,
   filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode },
   appSection: string,
 }
 
-const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters, setUrlQueryFilters, appSection }: Props) => {
+const EntityFilters = ({ attributes = [], filterValueRenderers = undefined, urlQueryFilters, setUrlQueryFilters, appSection }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
