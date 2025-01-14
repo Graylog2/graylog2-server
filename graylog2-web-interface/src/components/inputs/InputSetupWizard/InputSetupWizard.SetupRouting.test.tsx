@@ -265,7 +265,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
     await selectEvent.select(streamSelect, 'Aloho');
 
-    const warning = await screen.findByText(/The selected stream has existing pipelines/i);
+    const warning = await screen.findByText(/Pipelines connected to target Stream/i);
     const warningPipeline1 = await screen.findByText(/Pipeline1/i);
     const warningPipeline2 = await screen.findByText(/Pipeline2/i);
 

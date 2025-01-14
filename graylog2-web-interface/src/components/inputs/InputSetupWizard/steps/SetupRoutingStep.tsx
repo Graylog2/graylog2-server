@@ -19,7 +19,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button, Row, Col } from 'components/bootstrap';
-import { Select } from 'components/common';
+import { Select, Tooltip } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
 import { defaultCompare } from 'logic/DefaultCompare';
@@ -45,12 +45,12 @@ const StyledHeading = styled.h3(({ theme }) => css`
 `);
 
 const ExistingStreamCol = styled(Col)(({ theme }) => css`
+  border-left: 1px solid ${theme.colors.cards.border};
   padding-top: ${theme.spacings.sm};
   padding-bottom: ${theme.spacings.md};
 `);
 
 const CreateStreamCol = styled(Col)(({ theme }) => css`
-  border-left: 1px solid ${theme.colors.cards.border};
   padding-top: ${theme.spacings.sm};
   padding-bottom: ${theme.spacings.md};
 `);
@@ -60,6 +60,13 @@ const ButtonCol = styled(Col)(({ theme }) => css`
   justify-content: flex-end;
   gap: ${theme.spacings.xs};
   margin-top: ${theme.spacings.lg};
+`);
+
+const StyledTooltip = styled(Tooltip)(({ theme }) => css`
+  &.mantine-Tooltip-tooltip {
+    background-color: ${theme.colors.global.background}!important;
+    font-size:  ${theme.fonts.size.small}!important;
+  }
 `);
 
 const ConntectedPipelinesList = styled.ul`
@@ -188,16 +195,22 @@ const SetupRoutingStep = () => {
         <Row>
           <DescriptionCol md={12}>
             <p>
-              Choose a Destination Stream to route Messages from this Input to. Messages that are not
-              routed to any Streams will be sent to the &quot;All Messages&quot; Stream.
+              Choose a Destination Stream to Route Messages from this Input to. Messages that are not routed to any Streams will be routed to the Default stream.
+            </p>
+            <p>
+              Via this setup dialog, Pipeline rules will be automatically created and attached to the Default Stream, to route messages to the selected Stream.
+            </p>
+            <p>
+              We recommend creating a new Stream for each new Input. This will help categorize your messages into a basic schema that will make it easier to target searches.
             </p>
           </DescriptionCol>
         </Row>
         {selectedStreamId && streamHasConnectedPipelines && (
           <Row>
             <Col md={12}>
-              <Alert title="Pipelines connected to stream" bsStyle="info">
-                The selected Stream has existing Pipelines connected to it:
+              <Alert title="Pipelines connected to target Stream"
+                     bsStyle="info">
+                We recommending checking the impact of these prior to completing the Input Setup. The target Stream has the following Pipelines connected to it:
                 <ConntectedPipelinesList>
                   {streamPipelinesData.map((pipeline) => <li key={pipeline.title}>{pipeline.title}</li>)}
                 </ConntectedPipelinesList>
@@ -224,6 +237,15 @@ const SetupRoutingStep = () => {
           </Row>
         ) : (
           <Row>
+            <CreateStreamCol md={6}>
+              <StyledHeading>Route to a new Stream</StyledHeading>
+              <StyledTooltip opened
+                             withArrow
+                             position="right"
+                             label="Recommended!">
+                <Button onClick={handleCreateStream} bsStyle="primary">Create Stream</Button>
+              </StyledTooltip>
+            </CreateStreamCol>
             <ExistingStreamCol md={6}>
               <StyledHeading>Choose an existing Stream</StyledHeading>
               {!isLoadingStreams && (
@@ -236,10 +258,6 @@ const SetupRoutingStep = () => {
                       value={selectedStreamId} />
               )}
             </ExistingStreamCol>
-            <CreateStreamCol md={6}>
-              <StyledHeading>Route to a new Stream</StyledHeading>
-              <Button onClick={handleCreateStream} bsStyle="primary">Create Stream</Button>
-            </CreateStreamCol>
           </Row>
         )}
         {(hasPreviousStep || hasNextStep || showNewStreamSection) && (
