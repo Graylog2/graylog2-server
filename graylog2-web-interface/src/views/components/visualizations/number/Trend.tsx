@@ -21,6 +21,8 @@ import numeral from 'numeral';
 
 import Icon from 'components/common/Icon';
 import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 
 type TrendDirection = 'good' | 'bad' | 'neutral';
 
@@ -28,6 +30,7 @@ type Props = {
   current: number,
   previous: number | undefined | null,
   trendPreference: TrendPreference,
+  unit?: FieldUnit,
 };
 
 const background = (theme: DefaultTheme, trend: TrendDirection = 'neutral') => ({
@@ -98,19 +101,22 @@ const diff = (current: number | undefined, previous: number | undefined): [numbe
   return [NaN, NaN];
 };
 
-const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, trendPreference }: Props, ref) => {
+const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, trendPreference, unit }: Props, ref) => {
   const [difference, differencePercent] = diff(current, previous);
 
   const backgroundTrend = _trendDirection(difference, trendPreference);
   const trendIcon = _trendIcon(difference);
 
-  const absoluteDifference = Number.isFinite(difference) ? numeral(difference).format('+0,0[.]0[000]') : '--';
+  const { value: prettyValue, unit: prettyUnit } = unit?.isDefined ? getPrettifiedValue(difference, { unitType: unit?.unitType, abbrev: unit?.abbrev }) : { value: difference, unit: { abbrev: '' } };
+  const { value: previousPretty, unit: previousPrettyUnit } = unit?.isDefined ? getPrettifiedValue(previous, { unitType: unit?.unitType, abbrev: unit?.abbrev }) : { value: previous, unit: { abbrev: '' } };
+
+  const absoluteDifference = Number.isFinite(prettyValue) ? `${numeral(prettyValue).format('+0,0[.]0[000]')} ${prettyUnit.abbrev}` : '--';
   const relativeDifference = Number.isFinite(differencePercent) ? numeral(differencePercent).format('+0[.]0[0]%') : '--';
 
   return (
     <Background trend={backgroundTrend} data-testid="trend-background">
       <TextContainer trend={backgroundTrend} ref={ref}>
-        <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" /> <span data-testid="trend-value" title={`Previous value: ${previous}`}>{absoluteDifference} / {relativeDifference}</span>
+        <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" /> <span data-testid="trend-value" title={`Previous value: ${previousPretty} ${previousPrettyUnit.abbrev}`}>{absoluteDifference} / {relativeDifference}</span>
       </TextContainer>
     </Background>
   );

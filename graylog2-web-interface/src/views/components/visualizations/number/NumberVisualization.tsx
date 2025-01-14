@@ -106,12 +106,12 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
   const { value } = _extractValueAndField(chartRows);
   const { value: previousValue } = _extractValueAndField(trendRows || []);
   const unit = useMemo(() => {
-    if (!unitFeatureEnabled || visualizationConfig.trend) return undefined;
+    if (!unitFeatureEnabled) return undefined;
 
     const fieldNameKey = parseSeries(field).field;
 
     return widgetUnits.getFieldUnit(fieldNameKey);
-  }, [field, unitFeatureEnabled, visualizationConfig.trend, widgetUnits]);
+  }, [field, unitFeatureEnabled, widgetUnits]);
 
   if (!field || (value !== 0 && !value)) {
     return <>N/A</>;
@@ -141,7 +141,8 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
               <Trend ref={targetRef}
                      current={value}
                      previous={previousValue}
-                     trendPreference={visualizationConfig.trendPreference} />
+                     trendPreference={visualizationConfig.trendPreference}
+                     unit={unit} />
             </AutoFontSizer>
           )}
         </TrendBox>
