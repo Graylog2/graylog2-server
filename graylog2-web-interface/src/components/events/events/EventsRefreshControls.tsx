@@ -24,9 +24,13 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import RefreshControls from 'components/common/RefreshControls';
-import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import type { RefreshConfig } from 'views/components/contexts/AutoRefreshContext';
+import { durationToMS } from 'util/DateTime';
+
+const defaultInterval = 'PT30S';
+const defaultRefreshConfig: RefreshConfig = { enabled: true, interval: durationToMS(defaultInterval) };
 
 const EventsRefreshControls = () => {
   const { refetch } = useTableFetchContext();
@@ -35,8 +39,6 @@ const EventsRefreshControls = () => {
   const { config } = useSearchConfiguration();
   const autoRefreshTimerangeOptions = config?.auto_refresh_timerange_options;
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
-
-  const defaultInterval = useDefaultInterval();
 
   const onSelectInterval = useCallback((interval: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_REFRESH_CONTROL_PRESET_SELECTED, {
@@ -63,7 +65,7 @@ const EventsRefreshControls = () => {
   const intervalOptions = autoRefreshTimerangeOptions ? Object.entries(autoRefreshTimerangeOptions) : [];
 
   return (
-    <AutoRefreshProvider onRefresh={refetch}>
+    <AutoRefreshProvider onRefresh={refetch} defaultRefreshConfig={defaultRefreshConfig}>
       <RefreshControls disable={false}
                        intervalOptions={intervalOptions}
                        isLoadingMinimumInterval={isLoadingMinimumInterval}
