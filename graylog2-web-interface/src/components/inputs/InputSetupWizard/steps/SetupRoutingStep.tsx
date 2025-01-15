@@ -244,27 +244,9 @@ const SetupRoutingStep = () => {
         {showNewStreamSection && (
         <Row>
           <Col md={12}>
-            <Row>
-              <DescriptionCol md={12}>
-                <StyledHeading>
-                  Create new Stream
-                </StyledHeading>
-                <StyledList>
-                  <li>
-                    Select a destination Stream to route messages from this input to.
-                  </li>
-                  <li>
-                    <strong>We recommend creating a new stream for each new input.</strong> This will help categorise your messages into a basic schema.
-                  </li>
-                  <li>
-                    Messages that are not routed to any Stream will be routed to the <strong>Default Stream</strong>.
-                  </li>
-                  <li>
-                    Pipeline rules can be automatically created and attached to the <strong>Default Stream</strong> by this Wizard.
-                  </li>
-                </StyledList>
-              </DescriptionCol>
-            </Row>
+            <StyledHeading>
+              Create new Stream
+            </StyledHeading>
             {newStream ? (
               <>
                 <p>This Input will use a new stream: &quot;{newStream.title}&quot;.</p>
