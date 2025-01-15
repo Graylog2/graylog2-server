@@ -172,7 +172,7 @@ const newPipelineConfig = {
 };
 
 const goToStartInputStep = async () => {
-  const nextButton = await screen.findByRole('button', { name: /Finish & Start Input/i, hidden: true });
+  const nextButton = await screen.findByRole('button', { name: /& Start Input/i, hidden: true });
 
   fireEvent.click(nextButton);
 };
@@ -252,6 +252,13 @@ describe('InputSetupWizard Start Input', () => {
 
   it('should start input when an existing stream is selected', async () => {
     renderWizard();
+
+    const selectStreamButton = await screen.findByRole('button', {
+      name: /Select Stream/i,
+      hidden: true,
+    });
+
+    fireEvent.click(selectStreamButton);
 
     const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
