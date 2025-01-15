@@ -17,12 +17,14 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback, useState, useContext, useRef } from 'react';
+import Immutable from 'immutable';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
+import type { ViewStateMap } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -50,6 +52,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
 import useHotkey from 'hooks/useHotkey';
+import type { SearchType } from 'views/logic/queries/SearchType';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -103,6 +106,31 @@ const usePluggableSearchAction = (loaded: boolean, view: View) => {
     ));
 
   return ({ actions, actionModals });
+};
+
+const moveFiltersToWidgets = (view: View): View => {
+  const { queries } = view.search;
+  const newQueries = queries.toArray().map((query) => {
+    const queryFilters = query.filters;
+    const searchTypes = query.searchTypes.map((searchType: SearchType): SearchType => ({ ...searchType, filters: queryFilters }));
+
+    return query.toBuilder().filters(null).searchTypes(searchTypes).build();
+  });
+
+  const search = view.search.toBuilder().queries(newQueries).build();
+  const viewWithSearch = view.toBuilder().search(search).build();
+
+  const state: ViewStateMap = viewWithSearch.state.map((viewState) => {
+    const widgets = viewState.widgets.map((widget) => {
+      const searchTypeFilters = viewWithSearch.getSearchTypeByWidgetId(widget.id).filters;
+
+      return widget.toBuilder().filters(Immutable.List(searchTypeFilters)).build();
+    }).toArray();
+
+    return viewState.toBuilder().widgets(widgets).build();
+  }).toMap();
+
+  return viewWithSearch.toBuilder().state(state).build();
 };
 
 const SearchActionsMenu = () => {
@@ -192,7 +220,8 @@ const SearchActionsMenu = () => {
     .catch((error) => UserNotification.error(`Deleting saved search failed: ${_extractErrorMessage(error)}`, 'Error!')), [history, view.id]);
 
   const _loadAsDashboard = useCallback(() => {
-    loadAsDashboard(history, view);
+    const updatedView = moveFiltersToWidgets(view);
+    loadAsDashboard(history, updatedView);
   }, [history, view]);
 
   useHotkey({
