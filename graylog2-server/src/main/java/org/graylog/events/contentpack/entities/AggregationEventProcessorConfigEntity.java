@@ -71,6 +71,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     @JsonProperty(FIELD_QUERY)
     public abstract ValueReference query();
 
+    @Nullable
     @JsonProperty(FIELD_QUERY_PARAMETERS)
     public abstract ImmutableSet<Parameter> queryParameters();
 
