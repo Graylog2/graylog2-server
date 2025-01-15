@@ -27,7 +27,7 @@ type ContentPackInstallEntityListProps = {
 };
 
 const ContentPackInstallEntityList = ({
-  entities,
+  entities = undefined,
   uninstall = false,
 }: ContentPackInstallEntityListProps) => {
   const rowFormatter = (entity: InstalledEntity) => (<tr><td>{entity.title}</td><td>{entity.type.name}</td></tr>);
