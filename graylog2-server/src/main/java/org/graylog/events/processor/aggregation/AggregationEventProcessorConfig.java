@@ -86,6 +86,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     @JsonProperty(FIELD_QUERY)
     public abstract String query();
 
+    @Nullable
     @JsonProperty(FIELD_QUERY_PARAMETERS)
     public abstract ImmutableSet<Parameter> queryParameters();
 
