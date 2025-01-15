@@ -76,3 +76,10 @@ export type ContentPackMetadata = {
     },
   },
 }
+
+export type InstalledEntity = {
+  title: string,
+  type: {
+    name: string
+  }
+}

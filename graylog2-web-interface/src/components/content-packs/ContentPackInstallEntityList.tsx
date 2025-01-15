@@ -18,11 +18,11 @@ import React from 'react';
 
 import Spinner from 'components/common/Spinner';
 import { DataTable } from 'components/common';
-
 import 'components/content-packs/ContentPackDetails.css';
+import type { InstalledEntity } from 'components/content-packs/Types';
 
 type ContentPackInstallEntityListProps = {
-  entities?: any[];
+  entities?: InstalledEntity[];
   uninstall?: boolean;
 };
 
@@ -30,7 +30,7 @@ const ContentPackInstallEntityList = ({
   entities,
   uninstall = false,
 }: ContentPackInstallEntityListProps) => {
-  const rowFormatter = (entity) => (<tr><td>{entity.title}</td><td>{entity.type.name}</td></tr>);
+  const rowFormatter = (entity: InstalledEntity) => (<tr><td>{entity.title}</td><td>{entity.type.name}</td></tr>);
   const headers = ['Title', 'Type'];
   const headerTitle = uninstall ? 'Entites to be uninstalled' : 'Installed Entities';
 
