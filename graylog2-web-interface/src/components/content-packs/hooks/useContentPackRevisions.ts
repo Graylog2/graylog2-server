@@ -4,6 +4,7 @@ import { SystemContentPacks } from '@graylog/server-api';
 
 import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 import { onError } from 'util/conditional/onError';
+import UserNotification from 'util/UserNotification';
 
 const fetchContentPackRevisions = async (id: string) => {
   const response = await SystemContentPacks.listContentPackRevisions(id);
@@ -17,7 +18,9 @@ const fetchContentPackRevisions = async (id: string) => {
   };
 };
 
-const useContentPackRevisions = (id: string, onFetchError: (e: Error) => void) => useQuery(
+const defaultErrorHandler = (error: Error) => UserNotification.error(`Error while fetching content pack revisions: ${error}`, 'Unable to fetch content pack');
+
+const useContentPackRevisions = (id: string, onFetchError: (e: Error) => void = defaultErrorHandler) => useQuery(
   ['content-packs', 'revisions', id],
   () => onError(fetchContentPackRevisions(id), onFetchError),
 );

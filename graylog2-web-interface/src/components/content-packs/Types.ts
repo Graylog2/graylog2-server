@@ -16,17 +16,17 @@
  */
 
 export type ContentPackInstallation = {
-  created_at: string,
+  created_at?: string,
   description: string,
   entities?: Array<ContentPackEntity>,
   id: string,
   name: string,
   parameters?: Array<any>,
   rev: number,
-  server_version: string,
+  server_version?: string,
   summary: string,
   url: string,
-  v: number,
+  v: string,
   vendor: string,
 }
 
@@ -70,9 +70,9 @@ export interface Constraint {
 }
 
 export type ContentPackMetadata = {
-  [key: number]: {
-    [key: number]: {
-      [key: string]: number,
+  [string: number]: {
+    [string: number]: {
+      installation_count: number,
     },
   },
 }
