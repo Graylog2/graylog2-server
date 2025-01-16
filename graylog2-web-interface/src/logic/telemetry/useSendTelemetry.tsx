@@ -18,6 +18,7 @@ import { useCallback, useContext } from 'react';
 import type { Optional } from 'utility-types';
 import { UNSAFE_DataRouterContext as DataRouterContext, matchRoutes } from 'react-router-dom';
 import type { DataRouterContextObject } from 'react-router/dist/lib/context';
+import throttle from 'lodash/throttle';
 
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
@@ -36,17 +37,26 @@ const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
   return stripPrefixFromPathname(matches?.at(-1)?.route.path);
 };
 
+const reportTelemetryException = throttle((error: unknown) => {
+  // eslint-disable-next-line no-console
+  console.warn('Unable to send telemetry: ', error);
+}, 5000);
+
 const useSendTelemetry = () => {
   const { sendTelemetry } = useContext(TelemetryContext);
   const dataRouterContext = useContext(DataRouterContext);
 
   return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
-    const route = retrieveCurrentRoute(dataRouterContext);
+    try {
+      const route = retrieveCurrentRoute(dataRouterContext);
 
-    return sendTelemetry(
-      eventType,
-      { app_path_pattern: route, ...event },
-    );
+      sendTelemetry(
+        eventType,
+        { app_path_pattern: route, ...event },
+      );
+    } catch (e) {
+      reportTelemetryException(e);
+    }
   }, [dataRouterContext, sendTelemetry]);
 };
 
