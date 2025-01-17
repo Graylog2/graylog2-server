@@ -48,7 +48,7 @@
     "react-router-bootstrap": "0.26.3",
     "react-router-dom": "6.27.0",
     "reflux": "0.2.13",
-    "styled-components": "6.1.1",
+    "styled-components": "6.1.14",
     "typescript": "5.7.3",
     "use-query-params": "^2.2.0",
     "webpack": "5.97.1",
