@@ -53,6 +53,7 @@ import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSea
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
 import useHotkey from 'hooks/useHotkey';
 import type { SearchType } from 'views/logic/queries/SearchType';
+import type { SearchTypeList } from 'views/logic/queries/Query';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -111,8 +112,8 @@ const usePluggableSearchAction = (loaded: boolean, view: View) => {
 const moveFiltersToWidgets = (view: View): View => {
   const { queries } = view.search;
   const newQueries = queries.toArray().map((query) => {
-    const queryFilters = query.filters;
-    const searchTypes = query.searchTypes.map((searchType: SearchType): SearchType => ({ ...searchType, filters: queryFilters }) as SearchType);
+    const queryFilters = query.filters.toArray();
+    const searchTypes: SearchTypeList = query.searchTypes.map((searchType: SearchType): SearchType => ({ ...searchType, filters: queryFilters }) as SearchType);
 
     return query.toBuilder().filters(null).searchTypes(searchTypes).build();
   });
