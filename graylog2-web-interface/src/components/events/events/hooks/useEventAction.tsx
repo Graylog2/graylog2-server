@@ -20,8 +20,9 @@ import usePluggableEventActions from 'components/events/events/hooks/usePluggabl
 import { MenuItem } from 'components/bootstrap';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 import useSendEventActionTelemetry from 'components/events/events/hooks/useSendEventActionTelemetry';
+import type { Event } from 'components/events/events/types';
 
-const useEventAction = (event) => {
+const useEventAction = (event: Event) => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions([event]);
   const sendEventActionTelemetry = useSendEventActionTelemetry();
   const hasReplayInfo = !!event.replay_info;
