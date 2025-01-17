@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix when in Event definition (dark mode) error message is hard to read"
+
+issues = ["Graylog2/graylog-plugin-enterprise#9336"]
+pulls = ["21376"]
