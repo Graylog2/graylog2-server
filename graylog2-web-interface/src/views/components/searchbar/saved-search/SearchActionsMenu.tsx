@@ -112,7 +112,7 @@ const moveFiltersToWidgets = (view: View): View => {
   const { queries } = view.search;
   const newQueries = queries.toArray().map((query) => {
     const queryFilters = query.filters;
-    const searchTypes = query.searchTypes.map((searchType: SearchType): SearchType => ({ ...searchType, filters: queryFilters }));
+    const searchTypes = query.searchTypes.map((searchType: SearchType): SearchType => ({ ...searchType, filters: queryFilters }) as SearchType);
 
     return query.toBuilder().filters(null).searchTypes(searchTypes).build();
   });
