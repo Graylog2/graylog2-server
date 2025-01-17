@@ -31,7 +31,7 @@ const ListItemContainer = styled.div`
   margin-top: 3px;
 `;
 
-const EditFieldSelect = styled(FieldSelect)`
+const EditFieldSelect = styled.div`
   flex: 1;
 `;
 
@@ -48,16 +48,18 @@ const DragHandle = styled.div`
 `;
 
 type ListItemProps = {
-  item: { id: string, title: string },
-  draggableProps: DraggableProps,
-  dragHandleProps: DragHandleProps,
   className: string,
+  dragHandleProps: DragHandleProps,
+  draggableProps: DraggableProps,
+  fieldSelect: React.ComponentType<React.ComponentProps<typeof FieldSelect>>
+  fieldSelectMenuPortalTarget: HTMLElement | undefined,
+  item: { id: string, title: string },
   onChange: (fieldName: string) => void,
   onRemove: () => void,
-  selectedFields: Array<string>,
   selectSize: 'normal' | 'small',
-  testIdPrefix: string,
+  selectedFields: Array<string>,
   showUnit: boolean,
+  testIdPrefix: string,
 }
 
 const Actions = styled.div`
@@ -65,16 +67,18 @@ const Actions = styled.div`
 `;
 
 const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
-  selectSize,
   className,
   dragHandleProps,
   draggableProps,
+  fieldSelect = FieldSelect,
+  fieldSelectMenuPortalTarget,
   item,
   onChange,
   onRemove,
+  selectSize,
   selectedFields,
-  testIdPrefix,
   showUnit,
+  testIdPrefix,
 }: ListItemProps, ref) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -87,12 +91,14 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
     <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
       {isEditing && (
         <EditFieldSelect id="add-field-select"
+                         as={fieldSelect}
                          onChange={_onChange}
                          onMenuClose={() => setIsEditing(false)}
                          autoFocus
                          openMenuOnFocus
                          clearable={false}
                          size={selectSize}
+                         menuPortalTarget={fieldSelectMenuPortalTarget}
                          excludedFields={selectedFields.filter((fieldName) => fieldName !== item.id)}
                          ariaLabel="Fields"
                          name="add-field-select"
@@ -118,15 +124,21 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
 });
 
 type Props = {
-  onChange: (newSelectedFields: Array<string>) => void,
   displayOverlayInPortal?: boolean,
-  selectedFields: Array<string>
-  testPrefix?: string,
+  fieldSelect?: React.ComponentType<React.ComponentProps<typeof FieldSelect>>
+  fieldSelectMenuPortalTarget?: HTMLElement,
+  onChange: (newSelectedFields: Array<string>) => void,
   selectSize?: 'normal' | 'small',
+  selectedFields: Array<string>
   showUnit?: boolean
+  testPrefix?: string,
 };
 
-const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, displayOverlayInPortal = false, showUnit = false }: Props) => {
+const SelectedFieldsList = ({
+  testPrefix = undefined, selectedFields, onChange, selectSize = undefined, displayOverlayInPortal = false,
+  showUnit = false, fieldSelect = undefined, fieldSelectMenuPortalTarget = undefined,
+
+}: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
@@ -147,13 +159,15 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, 
               selectSize={selectSize}
               selectedFields={selectedFields ?? []}
               item={item}
+              fieldSelectMenuPortalTarget={fieldSelectMenuPortalTarget}
+              fieldSelect={fieldSelect}
               testIdPrefix={`${testPrefix}-field-${index}`}
               dragHandleProps={dragHandleProps}
               draggableProps={draggableProps}
               className={className}
               ref={ref}
               showUnit={showUnit} />
-  ), [selectSize, selectedFields, testPrefix, showUnit, onChangeField, onRemoveField]);
+  ), [selectSize, selectedFields, fieldSelectMenuPortalTarget, fieldSelect, testPrefix, showUnit, onChangeField, onRemoveField]);
 
   const onSortChange = useCallback((newFieldsList: Array<{ id: string, title: string }>) => {
     onChange(newFieldsList.map(({ id }) => id));

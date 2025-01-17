@@ -65,6 +65,7 @@ import {
   IndexSetTemplateEditPage,
   IndicesPage,
   InputsPage,
+  InputDiagnosisPage,
   KeyboardShortcutsPage,
   LoggersPage,
   LUTCachesPage,
@@ -204,6 +205,7 @@ const AppRouter = () => {
             },
 
             enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
             !isCloud && { path: RoutePaths.node_inputs(':nodeId'), element: <NodeInputsPage /> },
             !isCloud && { path: RoutePaths.global_input_extractors(':inputId'), element: <ExtractorsPage /> },
             !isCloud && { path: RoutePaths.local_input_extractors(':nodeId', ':inputId'), element: <ExtractorsPage /> },

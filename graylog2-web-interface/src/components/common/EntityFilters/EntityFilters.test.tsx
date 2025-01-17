@@ -120,8 +120,8 @@ describe('<EntityFilters />', () => {
     },
   ];
 
-  const EntityFilters = (props: Optional<React.ComponentProps<typeof OriginalEntityFilters>, 'setUrlQueryFilters' | 'attributes'>) => (
-    <OriginalEntityFilters setUrlQueryFilters={setUrlQueryFilters} attributes={attributes} {...props} />
+  const EntityFilters = (props: Optional<React.ComponentProps<typeof OriginalEntityFilters>, 'setUrlQueryFilters' | 'attributes' | 'appSection'>) => (
+    <OriginalEntityFilters setUrlQueryFilters={setUrlQueryFilters} attributes={attributes} appSection="test-app-section" {...props} />
   );
 
   const dropdownIsHidden = (dropdownTitle: string) => expect(screen.queryByRole('heading', { name: new RegExp(dropdownTitle, 'i') })).not.toBeInTheDocument();
