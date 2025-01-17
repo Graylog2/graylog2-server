@@ -30,9 +30,13 @@ type FilterPreviewProps = {
 };
 
 type Message = {
-  timestamp: string,
-  message: string,
-  _id: string,
+  index: string,
+  message: {
+    timestamp: string,
+    _id: string,
+    message: string,
+  },
+
 }
 
 const Messages = ({ messages }: { messages: Array<Message> }) => messages.map(({ index, message }) => (
@@ -42,7 +46,7 @@ const Messages = ({ messages }: { messages: Array<Message> }) => messages.map(({
   </tr>
 ));
 
-const SearchResult = ({ searchResult, isFetchingData }: { isFetchingData: boolean, searchResult: { messages?: Array<Message> }} = {}) => {
+const SearchResult = ({ searchResult, isFetchingData }: { isFetchingData: boolean, searchResult: { messages?: Array<Message> }}) => {
   if (isFetchingData) return <Spinner text="Loading filter preview..." />;
 
   if (!searchResult.messages || searchResult.messages.length === 0) {
@@ -90,7 +94,7 @@ const FilterPreview = ({ searchResult = {}, displayPreview = false, errors = [],
       </HelpPanel>
 
       {displayPreview && (
-        <Panel className={styles.filterPreview} bsStyle={hasError > 0 ? 'danger' : 'default'}>
+        <Panel className={styles.filterPreview} bsStyle={hasError ? 'danger' : 'default'}>
           <Panel.Heading>
             <Panel.Title>Filter Preview</Panel.Title>
           </Panel.Heading>
