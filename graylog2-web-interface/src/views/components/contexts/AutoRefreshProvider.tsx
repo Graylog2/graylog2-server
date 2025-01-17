@@ -22,7 +22,7 @@ import { v4 as uuid } from 'uuid';
 import type { RefreshConfig } from 'views/components/contexts/AutoRefreshContext';
 import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
 
-const AutoRefreshProvider = ({ children, onRefresh, defaultRefreshConfig }: React.PropsWithChildren<{ defaultRefreshConfig?: RefreshConfig | null, onRefresh: () => void }>) => {
+const AutoRefreshProvider = ({ children = null, onRefresh, defaultRefreshConfig = null }: React.PropsWithChildren<{ defaultRefreshConfig?: RefreshConfig | null, onRefresh: () => void }>) => {
   const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(null);
   const [animationId, setAnimationId] = useState<string | null>(null);
   const startAutoRefresh = useCallback((interval: number) => {
