@@ -311,7 +311,7 @@ const StartInputStep = () => {
 
     if (startInputStatus === 'FAILED' || startInputStatus === 'ROLLING_BACK') {
       return (
-        <Button disabled={startInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary">Rollback Input</Button>
+        <Button disabled={startInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary" data-testid="rollback-input-button">Rollback Input</Button>
       );
     }
 

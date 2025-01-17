@@ -16,6 +16,8 @@
  */
 import { useMutation } from '@tanstack/react-query';
 
+import { Streams } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -39,11 +41,7 @@ type PipelineConfiguration = Pick<PipelineType,
   'source'
 >
 
-const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> => {
-  const url = qualifyUrl(ApiRoutes.StreamsApiController.create().url);
-
-  return fetch('POST', url, stream);
-};
+const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> => Streams.create(stream);
 
 const startStream = async (streamId) => {
   const url = qualifyUrl(ApiRoutes.StreamsApiController.resume(streamId).url);
