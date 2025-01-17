@@ -17,9 +17,7 @@
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import { act } from 'wrappedTestingLibrary/hooks';
 
-import suppressConsole from 'helpers/suppressConsole';
 import fetch from 'logic/rest/FetchProvider';
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
@@ -361,31 +359,24 @@ describe('InputSetupWizard Start Input', () => {
 
   describe('Rollback', () => {
     it('shows the rollback button', async () => {
-      // asMock(fetch).mockReturnValue('{ "id": 1 }', { status: 200, headers: { 'content-type': 'application/json' } });
-
-      asMock(fetch).mockRejectedValueOnce({});
+      asMock(fetch).mockRejectedValueOnce(new Error());
       asMock(fetch).mockReturnValue(Promise.resolve({}));
 
-      await suppressConsole(async () => {
-        try {
-          renderWizard();
-        } catch (_) {}
+      renderWizard();
 
-        const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
-        await selectEvent.openMenu(streamSelect);
+      await selectEvent.openMenu(streamSelect);
 
-        await selectEvent.select(streamSelect, 'One Stream');
+      await selectEvent.select(streamSelect, 'One Stream');
 
-        goToStartInputStep();
+      goToStartInputStep();
 
-        startInput()
-          .catch(() => {});
+      startInput();
 
-        const rollbackInputButton = await screen.findByTestId('rollback-input-button');
+      const rollbackInputButton = await screen.findByTestId('rollback-input-button');
 
-        fireEvent.click(rollbackInputButton);
-      });
+      fireEvent.click(rollbackInputButton);
     });
   });
 });
