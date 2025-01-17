@@ -120,12 +120,16 @@ const SidebarNavigation = ({ sections, activeSection, selectSidebarSection, side
           );
         })}
       </Section>
-      <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
-      <Section>
-        {actions.map(({ key, Component }) => (
-          <Component key={key} sidebarIsPinned={sidebarIsPinned} />
-        ))}
-      </Section>
+      {actions?.length > 0 && (
+        <>
+          <HorizontalRuleWrapper><hr /></HorizontalRuleWrapper>
+          <Section>
+            {actions.map(({ key, Component }) => (
+              <Component key={key} sidebarIsPinned={sidebarIsPinned} />
+            ))}
+          </Section>
+        </>
+      )}
     </Container>
   );
 };
