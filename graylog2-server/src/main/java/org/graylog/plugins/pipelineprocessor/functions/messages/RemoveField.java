@@ -73,14 +73,10 @@ public class RemoveField extends AbstractFunction<Void> {
                         "If no specific message is provided, it uses the currently processed message. " +
                         "This function is deprecated - use the more performant remove_single_field or remove_multiple_fields.")
                 .ruleBuilderEnabled()
-                .ruleBuilderName("Remove field (deprecated)")
+                .ruleBuilderName("Remove field")
                 .ruleBuilderTitle("Remove field '${field}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
+                .deprecated(true)
                 .build();
-    }
-
-    @Override
-    public boolean isDeprecated() {
-        return true;
     }
 }

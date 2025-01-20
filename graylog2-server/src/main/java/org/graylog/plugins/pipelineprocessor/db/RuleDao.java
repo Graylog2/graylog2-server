@@ -37,7 +37,6 @@ public abstract class RuleDao implements MongoEntity {
     public static final String FIELD_MODFIED_AT = "modfied_at";
     public static final String FIELD_RULEBUILDER = "rulebuilder";
     public static final String FIELD_SIMULATOR_MESSAGE = "simulator_message";
-    public static final String FIELD_IS_DEPRECATED = "is_deprecated";
 
     @JsonProperty
     public abstract String title();
@@ -65,10 +64,6 @@ public abstract class RuleDao implements MongoEntity {
     @Nullable
     public abstract String simulatorMessage();
 
-    @JsonProperty
-    @Nullable
-    public abstract Boolean isDeprecated();
-
     public static Builder builder() {
         return new AutoValue_RuleDao.Builder();
     }
@@ -83,8 +78,7 @@ public abstract class RuleDao implements MongoEntity {
                                  @JsonProperty(FIELD_CREATED_AT) @Nullable DateTime createdAt,
                                  @JsonProperty(FIELD_MODFIED_AT) @Nullable DateTime modifiedAt,
                                  @JsonProperty(FIELD_RULEBUILDER) @Nullable RuleBuilder ruleBuilder,
-                                 @JsonProperty(FIELD_SIMULATOR_MESSAGE) @Nullable String simulatorMessage,
-                                 @JsonProperty(FIELD_IS_DEPRECATED) @Nullable Boolean isDeprecated) {
+                                 @JsonProperty(FIELD_SIMULATOR_MESSAGE) @Nullable String simulatorMessage) {
         return builder()
                 .id(id)
                 .source(source)
@@ -94,7 +88,6 @@ public abstract class RuleDao implements MongoEntity {
                 .modifiedAt(modifiedAt)
                 .ruleBuilder(ruleBuilder)
                 .simulatorMessage(simulatorMessage)
-                .isDeprecated(isDeprecated)
                 .build();
     }
 
@@ -117,7 +110,5 @@ public abstract class RuleDao implements MongoEntity {
         public abstract Builder ruleBuilder(RuleBuilder ruleBuilder);
 
         public abstract Builder simulatorMessage(String simulatorMessage);
-
-        public abstract Builder isDeprecated(Boolean isDeprecated);
     }
 }

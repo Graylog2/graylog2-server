@@ -88,8 +88,4 @@ public interface Function<T> {
 
     FunctionDescriptor<T> descriptor();
 
-    default boolean isDeprecated() {
-        return false;
-    }
-
 }

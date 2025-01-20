@@ -64,7 +64,7 @@ public class FunctionExpression extends BaseExpression {
     @Override
     public Object evaluateUnsafe(EvaluationContext context) {
         try {
-            if (function.isDeprecated()) {
+            if (function.descriptor().deprecated()) {
                 LOG.warn("Using deprecated function {}", function.descriptor().name());
             }
             return descriptor.returnType().cast(function.evaluate(args, context));
