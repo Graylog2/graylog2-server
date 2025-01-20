@@ -25,6 +25,7 @@ import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import type { BulkEventReplayState } from 'views/pages/BulkEventReplayPage';
 import useLocation from 'routing/useLocation';
+import useSendEventActionTelemetry from 'components/events/events/hooks/useSendEventActionTelemetry';
 
 type Props = {
   selectedEntitiesData: { [eventId: string]: Event }
@@ -32,6 +33,7 @@ type Props = {
 
 const BulkActions = ({ selectedEntitiesData }: Props) => {
   const events = Object.values(selectedEntitiesData);
+  const sendEventActionTelemetry = useSendEventActionTelemetry();
   const { actions, pluggableActionModals } = useEventBulkActions(events);
 
   const location = useLocation();
@@ -40,8 +42,9 @@ const BulkActions = ({ selectedEntitiesData }: Props) => {
   const history = useHistory();
   const onReplaySearchClick = useCallback(() => {
     const eventIds = events.map((event) => event.id);
+    sendEventActionTelemetry('REPLAY_SEARCH', true);
     history.pushWithState<BulkEventReplayState>(Routes.ALERTS.BULK_REPLAY_SEARCH, { eventIds, returnUrl });
-  }, [events, history, returnUrl]);
+  }, [events, history, returnUrl, sendEventActionTelemetry]);
 
   return (
     <>
