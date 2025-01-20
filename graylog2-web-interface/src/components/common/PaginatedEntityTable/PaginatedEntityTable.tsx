@@ -107,6 +107,8 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
+  const appSection = `${tableLayout.entityTableId}-list`;
+
   const {
     onPageSizeChange,
     onSearch,
@@ -114,7 +116,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
     onColumnsChange,
     onSortChange,
   } = useTableEventHandlers({
-    appSection: `${tableLayout.entityTableId}-list`,
+    appSection,
     paginationQueryParameter,
     updateTableLayout,
     setQuery,
@@ -146,7 +148,8 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
               <EntityFilters attributes={attributes}
                              urlQueryFilters={urlQueryFilters}
                              setUrlQueryFilters={onChangeFilters}
-                             filterValueRenderers={filterValueRenderers} />
+                             filterValueRenderers={filterValueRenderers}
+                             appSection={appSection} />
             </div>
           </SearchForm>
           {topRightCol}
