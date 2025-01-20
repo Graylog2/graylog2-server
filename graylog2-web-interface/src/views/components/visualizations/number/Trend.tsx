@@ -137,7 +137,7 @@ const getTrendConvertedValues = (current: number, previous: number, fieldUNit: F
   });
 };
 
-const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, trendPreference, unit }: Props, ref) => {
+const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, trendPreference, unit = undefined }: Props, ref) => {
   const { differenceConverted, differencePercent, unitAbbrevString, previousConverted } = getTrendConvertedValues(current, previous, unit);
 
   const backgroundTrend = _trendDirection(differenceConverted, trendPreference);
