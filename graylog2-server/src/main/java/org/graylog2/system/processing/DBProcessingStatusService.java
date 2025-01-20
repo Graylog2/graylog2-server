@@ -19,27 +19,31 @@ package org.graylog2.system.processing;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.FindOneAndReplaceOptions;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.bson.types.ObjectId;
+import org.bson.conversions.Bson;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-import org.mongojack.JacksonDBCollection;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Indexes.ascending;
 import static org.graylog2.system.processing.ProcessingStatusDto.FIELD_UPDATED_AT;
 
 /**
@@ -53,27 +57,23 @@ public class DBProcessingStatusService {
     private final String nodeId;
     private final JobSchedulerClock clock;
     private final Duration updateThreshold;
-    private final JacksonDBCollection<ProcessingStatusDto, ObjectId> db;
     private final BaseConfiguration baseConfiguration;
+    private final MongoCollection<ProcessingStatusDto> collection;
 
     @Inject
-    public DBProcessingStatusService(MongoConnection mongoConnection,
+    public DBProcessingStatusService(MongoCollections mongoCollections,
                                      NodeId nodeId,
                                      JobSchedulerClock clock,
                                      @Named(ProcessingStatusConfig.UPDATE_THRESHOLD) Duration updateThreshold,
                                      @Named(ProcessingStatusConfig.JOURNAL_WRITE_RATE_THRESHOLD) int journalWriteRateThreshold,
-                                     MongoJackObjectMapperProvider mapper,
                                      BaseConfiguration baseConfiguration) {
         this.nodeId = nodeId.getNodeId();
         this.clock = clock;
         this.updateThreshold = updateThreshold;
         this.baseConfiguration = baseConfiguration;
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                ProcessingStatusDto.class,
-                ObjectId.class,
-                mapper.get());
+        this.collection = mongoCollections.collection(COLLECTION_NAME, ProcessingStatusDto.class);
 
-        db.createIndex(new BasicDBObject(ProcessingStatusDto.FIELD_NODE_ID, 1), new BasicDBObject("unique", true));
+        collection.createIndex(ascending(ProcessingStatusDto.FIELD_NODE_ID), new IndexOptions().unique(true));
 
         // Remove the old (3.1.0) index before creating the new one. This is needed, because mongodb >= 4.2 won't allow
         // the creation of identical indices with a different name. We don't use a migration,
@@ -81,8 +81,8 @@ public class DBProcessingStatusService {
         // TODO remove this in a future release (maybe at 3.5)
         final String OLD_INDEX_NAME = "updated_at_1_input_journal.uncommitted_entries_1_input_journal.written_messages_1m_rate_1";
         try {
-            if (db.getIndexInfo().stream().anyMatch(dbo -> dbo.get("name").equals(OLD_INDEX_NAME))) {
-                db.dropIndex(OLD_INDEX_NAME);
+            if (collection.listIndexes().into(new ArrayList<>()).stream().anyMatch(dbo -> dbo.get("name").equals(OLD_INDEX_NAME))) {
+                collection.dropIndex(OLD_INDEX_NAME);
             }
         } catch (MongoException ignored) {
             // index was either never created or already deleted
@@ -91,18 +91,22 @@ public class DBProcessingStatusService {
         // Use a custom index name to avoid the automatically generated index name which will be pretty long and
         // might cause errors due to the 127 character index name limit. (e.g. when using a long database name)
         // See: https://github.com/Graylog2/graylog2-server/issues/6322
-        db.createIndex(new BasicDBObject(FIELD_UPDATED_AT, 1)
-                .append(FIELD_UNCOMMITTED_ENTRIES, 1)
-                .append(FIELD_WRITTEN_MESSAGES_1M, 1), new BasicDBObject("name", "compound_0"));
+        collection.createIndex(
+                Indexes.compoundIndex(
+                        ascending(FIELD_UPDATED_AT),
+                        ascending(FIELD_UNCOMMITTED_ENTRIES),
+                        ascending(FIELD_WRITTEN_MESSAGES_1M)),
+                new IndexOptions().name("compound_0")
+        );
     }
 
     /**
-     * Rerturns all existing processing status entries from the database.
+     * Returns all existing processing status entries from the database.
      *
      * @return a list of all processing status entries
      */
     public List<ProcessingStatusDto> all() {
-        return ImmutableList.copyOf(db.find().sort(DBSort.asc("_id")).iterator());
+        return ImmutableList.copyOf(collection.find().sort(Sorts.ascending(("_id"))));
     }
 
     /**
@@ -111,7 +115,7 @@ public class DBProcessingStatusService {
      * @return the processing status entry or an empty optional if none exists
      */
     public Optional<ProcessingStatusDto> get() {
-        return Optional.ofNullable(db.findOne(DBQuery.is(ProcessingStatusDto.FIELD_NODE_ID, nodeId)));
+        return Optional.ofNullable(collection.find(eq(ProcessingStatusDto.FIELD_NODE_ID, nodeId)).first());
     }
 
     /**
@@ -130,14 +134,10 @@ public class DBProcessingStatusService {
         // TODO: Using a timestamp provided by the node for "updated_at" can be bad if the node clock is skewed.
         //       Ideally we would use MongoDB's "$currentDate" but there doesn't seem to be a way to use that
         //       with mongojack.
-        return db.findAndModify(
-                DBQuery.is(ProcessingStatusDto.FIELD_NODE_ID, nodeId),
-                null,
-                null,
-                false,
+        return collection.findOneAndReplace(
+                eq(ProcessingStatusDto.FIELD_NODE_ID, nodeId),
                 ProcessingStatusDto.of(nodeId, processingStatusRecorder, updatedAt, baseConfiguration.isMessageJournalEnabled()),
-                true, // We want to return the updated document to the caller
-                true);
+                new FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER).upsert(true));
     }
 
     /**
@@ -152,7 +152,7 @@ public class DBProcessingStatusService {
     public ProcessingNodesState calculateProcessingState(TimeRange timeRange) {
         final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
 
-        try (DBCursor<ProcessingStatusDto> statusCursor = db.find(activeNodes(updateThresholdTimestamp))) {
+        try (final var statusCursor = collection.find(activeNodes(updateThresholdTimestamp)).iterator()) {
             if (!statusCursor.hasNext()) {
                 return ProcessingNodesState.NONE_ACTIVE;
             }
@@ -188,8 +188,8 @@ public class DBProcessingStatusService {
         return nodeProcessingStatus.inputJournal().uncommittedEntries() > 0L || nodeProcessingStatus.processBufferUsage() > 0;
     }
 
-    private DBQuery.Query activeNodes(DateTime updateThresholdTimestamp) {
-        return DBQuery.greaterThan(FIELD_UPDATED_AT, updateThresholdTimestamp);
+    private Bson activeNodes(DateTime updateThresholdTimestamp) {
+        return Filters.gt(FIELD_UPDATED_AT, updateThresholdTimestamp);
     }
 
     public enum ProcessingNodesState {
