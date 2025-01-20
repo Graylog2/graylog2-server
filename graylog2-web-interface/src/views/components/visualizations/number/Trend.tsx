@@ -106,7 +106,12 @@ const diff = (current: number | undefined, previous: number | undefined): [numbe
   return [NaN, NaN];
 };
 
-const getTrendConvertedValues = (current: number, previous: number, fieldUNit: FieldUnit) => {
+const getTrendConvertedValues = (current: number, previous: number, fieldUNit: FieldUnit): {
+  previousConverted: number | string,
+  differenceConverted: number,
+  differencePercent: number,
+  unitAbbrevString: string,
+} => {
   const [difference, differencePercent] = diff(current, previous);
 
   if (!fieldUNit?.isDefined) {
@@ -129,15 +134,14 @@ const getTrendConvertedValues = (current: number, previous: number, fieldUNit: F
     unitAbbrevString: ` ${getUnitTextLabel(currentPrettyUnit.abbrev)}`,
     differenceConverted: prettyDiff,
     differencePercent,
-    difference,
   });
 };
 
 const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, trendPreference, unit }: Props, ref) => {
-  const { differenceConverted, difference, differencePercent, unitAbbrevString, previousConverted } = getTrendConvertedValues(current, previous, unit);
+  const { differenceConverted, differencePercent, unitAbbrevString, previousConverted } = getTrendConvertedValues(current, previous, unit);
 
-  const backgroundTrend = _trendDirection(difference, trendPreference);
-  const trendIcon = _trendIcon(difference);
+  const backgroundTrend = _trendDirection(differenceConverted, trendPreference);
+  const trendIcon = _trendIcon(differenceConverted);
 
   const absoluteDifference = Number.isFinite(differenceConverted) ? `${numeral(differenceConverted).format('+0,0[.]0[000]')}${unitAbbrevString}` : '--';
   const relativeDifference = Number.isFinite(differencePercent) ? numeral(differencePercent).format('+0[.]0[0]%') : '--';
