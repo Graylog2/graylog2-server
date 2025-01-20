@@ -180,7 +180,7 @@ const StartInputStep = () => {
     const routingStepData = getStepConfigOrData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
     const createdStreamId = createStreamMutation.data?.stream_id;
     const createdPipelineId = createPipelineMutation.data?.id;
-    const routingRuleId = updateRoutingMutation.data?.id;
+    const routingRuleId = updateRoutingMutation.data?.rule_id;
 
     switch (routingStepData.streamType) {
       case 'NEW':
