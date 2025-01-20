@@ -104,7 +104,7 @@
         <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
         <bouncycastle.version>1.79</bouncycastle.version>
         <byte-buddy.version>1.15.11</byte-buddy.version>
-        <caffeine.version>3.1.8</caffeine.version>
+        <caffeine.version>3.2.0</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.179</classgraph.version>
         <commons-codec.version>1.17.2</commons-codec.version>
