@@ -63,7 +63,6 @@ public class RemoveField extends AbstractFunction<Void> {
         return null;
     }
 
-
     @Override
     public FunctionDescriptor<Void> descriptor() {
         return FunctionDescriptor.<Void>builder()
@@ -78,5 +77,10 @@ public class RemoveField extends AbstractFunction<Void> {
                 .ruleBuilderTitle("Remove field '${field}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
+    }
+
+    @Override
+    public boolean isDeprecated() {
+        return true;
     }
 }

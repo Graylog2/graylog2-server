@@ -83,7 +83,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
                         "description",
                         ruleForTest(),
                         Tools.nowUTC(),
-                        null, null, null)
+                        null, null, null, false)
         ));
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
