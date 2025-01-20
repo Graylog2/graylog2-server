@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix missing Query Parameters in Event Definitions in Content Packs."
+
+pulls = ["21349"]
