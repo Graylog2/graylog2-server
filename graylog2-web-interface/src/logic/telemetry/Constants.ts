@@ -262,6 +262,7 @@ export const TELEMETRY_EVENT_TYPE = {
     SHOW_RECEIVED_MESSAGES_CLICKED: 'Inputs Show Received Messages Clicked',
     MANAGE_EXTRACTORS_CLICKED: 'Inputs Manage Extractors Clicked',
     SHOW_METRICS_CLICKED: 'Inputs Show Metrics Clicked',
+    INPUT_DIAGNOSIS_CLICKED: 'Inputs Input Diagnosis Clicked',
     INPUT_START_CLICKED: 'Inputs Input Start Clicked',
     INPUT_STOP_CLICKED: 'Inputs Input Stop Clicked',
     INPUT_SETUP_CLICKED: 'Inputs Input Setup Clicked',
@@ -404,5 +405,8 @@ export const TELEMETRY_EVENT_TYPE = {
     COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
     SORT_CHANGED: 'Entity Data Table Sort Changed',
     PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
+    FILTER_CREATED: 'Entity Data Table Filter Created',
+    FILTER_DELETED: 'Entity Data Table Filter Deleted',
+    FILTER_CHANGED: 'Entity Data Table Filter Changed',
   },
 } as const;
