@@ -103,12 +103,12 @@
         <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
         <bouncycastle.version>1.79</bouncycastle.version>
-        <byte-buddy.version>1.15.11</byte-buddy.version>
-        <caffeine.version>3.1.8</caffeine.version>
+        <byte-buddy.version>1.16.1</byte-buddy.version>
+        <caffeine.version>3.2.0</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.179</classgraph.version>
         <commons-codec.version>1.17.2</commons-codec.version>
-        <commons-csv.version>1.12.0</commons-csv.version>
+        <commons-csv.version>1.13.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.4.0</commons-exec.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
@@ -121,7 +121,7 @@
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.69.0</grpc.version>
+        <grpc.version>1.69.1</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.4.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -150,11 +150,11 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.24.3</log4j.version>
         <lucene.version>9.12.0</lucene.version>
-        <metrics.version>4.2.29</metrics.version>
-        <mongodb-driver.version>5.2.1</mongodb-driver.version>
+        <metrics.version>4.2.30</metrics.version>
+        <mongodb-driver.version>5.3.0</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.116.Final</netty.version>
+        <netty.version>4.1.117.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.69.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -173,7 +173,7 @@
         <siv-mode.version>1.6.0</siv-mode.version>
         <slf4j.version>2.0.16</slf4j.version>
         <streamex.version>0.8.3</streamex.version>
-        <swagger.version>1.6.14</swagger.version>
+        <swagger.version>1.6.15</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
@@ -188,10 +188,10 @@
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0.AM27</apacheds-server.version>
-        <assertj-core.version>3.27.2</assertj-core.version>
+        <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.2</awaitility.version>
-        <equalsverifier.version>3.18</equalsverifier.version>
+        <equalsverifier.version>3.18.1</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.11.4</junit-jupiter.version>
