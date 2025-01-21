@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import * as React from 'react';
+import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
@@ -25,8 +26,8 @@ import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
-import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
-import { useStore } from 'stores/connect';
+import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
+import useContentPacks from 'components/content-packs/hooks/useContentPacks';
 
 const ConfigurationBundles = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.body};
@@ -34,45 +35,43 @@ const ConfigurationBundles = styled.div(({ theme }) => css`
   margin-top: 15px;
 `);
 
-const _deleteContentPack = (contentPackId: string) => {
-  // eslint-disable-next-line no-alert
-  if (window.confirm('You are about to delete this Content Pack, are you sure?')) {
-    ContentPacksActions.delete(contentPackId).then(() => {
-      UserNotification.success('Content Pack deleted successfully.', 'Success');
-      ContentPacksActions.list();
-    }, (error) => {
-      let err_message = error.message;
-      const err_body = error.additional.body;
-
-      if (err_body && err_body.message) {
-        err_message = error.additional.body.message;
-      }
-
-      UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
-    });
-  }
-};
-
-const _installContentPack = (contentPackId: string, contentPackRev: string, parameters: unknown) => {
-  ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(() => {
-    UserNotification.success('Content Pack installed successfully.', 'Success');
-    ContentPacksActions.list();
-  }, (error) => {
-    UserNotification.error(`Installing content pack failed with status: ${error}.
-         Could not install Content Pack with ID: ${contentPackId}`);
-  });
-};
-
 const ContentPacksPage = () => {
-  const { contentPacks, contentPackMetadata } = useStore(ContentPacksStore);
+  const { data, isInitialLoading, refetch } = useContentPacks();
 
-  useEffect(() => {
-    ContentPacksActions.list();
-  }, []);
+  const _deleteContentPack = useCallback((contentPackId: string) => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm('You are about to delete this Content Pack, are you sure?')) {
+      ContentPacksActions.delete(contentPackId).then(() => {
+        UserNotification.success('Content Pack deleted successfully.', 'Success');
+        refetch();
+      }, (error) => {
+        let err_message = error.message;
+        const err_body = error.additional.body;
 
-  if (!contentPacks) {
+        if (err_body && err_body.message) {
+          err_message = error.additional.body.message;
+        }
+
+        UserNotification.error(`Deleting bundle failed: ${err_message}`, 'Error');
+      });
+    }
+  }, [refetch]);
+
+  const _installContentPack = useCallback((contentPackId: string, contentPackRev: string, parameters: unknown) => {
+    ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(() => {
+      UserNotification.success('Content Pack installed successfully.', 'Success');
+      refetch();
+    }, (error) => {
+      UserNotification.error(`Installing content pack failed with status: ${error}.
+         Could not install Content Pack with ID: ${contentPackId}`);
+    });
+  }, [refetch]);
+
+  if (isInitialLoading) {
     return (<Spinner />);
   }
+
+  const { content_packs: contentPacks, content_packs_metadata: contentPackMetadata } = data;
 
   return (
     <DocumentTitle title="Content Packs">
