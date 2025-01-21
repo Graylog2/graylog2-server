@@ -25,6 +25,8 @@ import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -38,8 +40,10 @@ import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -60,13 +64,15 @@ public class ViewService implements ViewUtils<ViewDTO> {
     private final MongoCollection<ViewDTO> collection;
     private final MongoPaginationHelper<ViewDTO> pagination;
     private final MongoUtils<ViewDTO> mongoUtils;
+    private final SearchFiltersReFetcher searchFiltersRefetcher;
 
     @Inject
     protected ViewService(ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
                           EntityOwnershipService entityOwnerShipService,
                           ViewSummaryService viewSummaryService,
-                          MongoCollections mongoCollections) {
+                          MongoCollections mongoCollections,
+                          SearchFiltersReFetcher searchFiltersRefetcher) {
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityOwnerShipService = entityOwnerShipService;
@@ -74,6 +80,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
         this.collection = mongoCollections.collection(COLLECTION_NAME, ViewDTO.class);
         this.pagination = mongoCollections.paginationHelper(this.collection);
         this.mongoUtils = mongoCollections.utils(collection);
+        this.searchFiltersRefetcher = searchFiltersRefetcher;
 
         new MongoDbIndexTools<>(collection).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
     }
@@ -96,7 +103,8 @@ public class ViewService implements ViewUtils<ViewDTO> {
 
     public Optional<ViewDTO> get(final SearchUser searchUser, final String id) {
         return findViews(searchUser, Filters.eq("_id", new ObjectId(id)), Sorts.ascending("_id"))
-                .findFirst();
+                .findFirst()
+                .map(this::getViewWithRefetchedFilters);//TODO: why requirementsForView is missing?
     }
 
     protected PaginatedList<ViewDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
@@ -197,11 +205,14 @@ public class ViewService implements ViewUtils<ViewDTO> {
     public Collection<ViewDTO> forSearch(String searchId) {
         return MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))
                 .map(this::requirementsForView)
+                .map(this::getViewWithRefetchedFilters)
                 .collect(Collectors.toSet());
     }
 
     public Optional<ViewDTO> get(String id) {
-        return mongoUtils.getById(id).map(this::requirementsForView);
+        return mongoUtils.getById(id)
+                .map(this::requirementsForView)
+                .map(this::getViewWithRefetchedFilters);
     }
 
     public Stream<ViewDTO> streamAll() {
@@ -252,6 +263,50 @@ public class ViewService implements ViewUtils<ViewDTO> {
     public ViewDTO requirementsForView(ViewDTO view) {
         return viewRequirementsFactory.create(view)
                 .rebuildRequirements(ViewDTO::requires, (v, newRequirements) -> v.toBuilder().requires(newRequirements).build());
+    }
+
+    private ViewDTO getViewWithRefetchedFilters(final ViewDTO viewDTO) {
+        if (searchFiltersRefetchNeeded(viewDTO)) {
+            return viewDTO.toBuilder()
+                    .state(viewDTO.state().entrySet().stream()
+                            .map(
+                                    entry -> new AbstractMap.SimpleEntry<>(
+                                            entry.getKey(),
+                                            getStateWithRefetchedFilters(entry.getValue())
+                                    )
+                            )
+                            .collect(Collectors.toMap(
+                                    Map.Entry::getKey,
+                                    Map.Entry::getValue
+                            )))
+                    .build();
+        } else {
+            return viewDTO;
+        }
+    }
+
+    private ViewStateDTO getStateWithRefetchedFilters(final ViewStateDTO stateDTO) {
+        return stateDTO.toBuilder()
+                .widgets(stateDTO.widgets().stream()
+                        .map(widgetDTO ->
+                                widgetDTO.toBuilder()
+                                        .filters(searchFiltersRefetcher.reFetch(widgetDTO.filters()))
+                                        .build()
+                        )
+                        .collect(Collectors.toSet()))
+                .build();
+    }
+
+    private boolean searchFiltersRefetchNeeded(final ViewDTO viewDTO) {
+        return searchFiltersRefetcher.turnedOn() &&
+                viewDTO.state().values()
+                        .stream()
+                        .anyMatch(state -> state.widgets()
+                                .stream()
+                                .anyMatch(
+                                        widgetDTO -> widgetDTO.filters() != null && widgetDTO.filters().stream().anyMatch(f -> f instanceof ReferencedSearchFilter)
+                                )
+                        );
     }
 
     @Override
