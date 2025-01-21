@@ -99,19 +99,19 @@ type Props = {
   message: Message,
   selectedFields?: Immutable.OrderedSet<string>,
   showMessageRow?: boolean,
-  toggleDetail: (string) => void,
+  toggleDetail: (messageId: string) => void,
 };
 
-const isDecoratedField = (field, decorationStats) => decorationStats
+const isDecoratedField = (field: string | number, decorationStats: Message['decoration_stats']) => decorationStats
   && (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
 
-const fieldType = (fieldName, { decoration_stats: decorationStats }: {
-  decoration_stats?: any
-}, fields) => (isDecoratedField(fieldName, decorationStats)
-  ? FieldType.Decorated
-  : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
+const fieldType = (fieldName: string, { decoration_stats: decorationStats }: Message, fields: FieldTypeMappingsList) => (
+  isDecoratedField(fieldName, decorationStats)
+    ? FieldType.Decorated
+    : ((fields?.find((f) => f.name === fieldName)) ?? { type: FieldType.Unknown }).type
+);
 
-const Strong = ({ children, strong = false }: React.PropsWithChildren<{ strong: boolean }>) => (strong
+const Strong = ({ children = undefined, strong }: React.PropsWithChildren<{ strong: boolean }>) => (strong
   ? <strong>{children}</strong>
 
   : <>{children}</>);
