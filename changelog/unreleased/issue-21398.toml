@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix an issue when was impossible to save search/dashboard after clearing the unit type"
+
+pulls = ["21399"]
+issues = ["21398"]
