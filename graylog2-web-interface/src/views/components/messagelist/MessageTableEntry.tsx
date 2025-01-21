@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { useStore } from 'stores/connect';
@@ -52,11 +52,11 @@ export const TableBody = styled.tbody<{ $expanded?: boolean, $highlighted?: bool
   && {
     border-top: 0;
 
-    ${$expanded ? css`
+    ${$expanded ? `
   border-left: 7px solid ${theme.colors.variant.light.info};
 ` : ''}
 
-    ${$highlighted ? css`
+    ${$highlighted ? `
   border-left: 7px solid ${theme.colors.variant.light.success};
 ` : ''}
   }
@@ -100,19 +100,19 @@ type Props = {
   message: Message,
   selectedFields?: Immutable.OrderedSet<string>,
   showMessageRow?: boolean,
-  toggleDetail: (string) => void,
+  toggleDetail: (messageId: string) => void,
 };
 
-const isDecoratedField = (field, decorationStats) => decorationStats
+const isDecoratedField = (field: string | number, decorationStats: Message['decoration_stats']) => decorationStats
   && (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
 
-const fieldType = (fieldName, { decoration_stats: decorationStats }: {
-  decoration_stats?: any
-}, fields) => (isDecoratedField(fieldName, decorationStats)
-  ? FieldType.Decorated
-  : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
+const fieldType = (fieldName: string, { decoration_stats: decorationStats }: Message, fields: FieldTypeMappingsList) => (
+  isDecoratedField(fieldName, decorationStats)
+    ? FieldType.Decorated
+    : ((fields?.find((f) => f.name === fieldName)) ?? { type: FieldType.Unknown }).type
+);
 
-const Strong = ({ children, strong = false }: React.PropsWithChildren<{ strong: boolean }>) => (strong
+const Strong = ({ children = undefined, strong }: React.PropsWithChildren<{ strong: boolean }>) => (strong
   ? <strong>{children}</strong>
 
   : <>{children}</>);
