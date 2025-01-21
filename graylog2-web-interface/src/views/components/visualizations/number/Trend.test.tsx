@@ -47,13 +47,13 @@ describe('Trend', () => {
   it('shows absolute delta if values are equal', async () => {
     renderTrend();
 
-    expect(await findTrend()).toMatch(/\+0/);
+    expect(await findTrend()).toMatch(/^0 \//);
   });
 
   it('shows relative delta as percentage if values are equal', async () => {
     renderTrend();
 
-    expect(await findTrend()).toMatch(/\+0%/);
+    expect(await findTrend()).toMatch(/0\.00%/);
   });
 
   it('shows negative absolute delta', async () => {
@@ -83,7 +83,7 @@ describe('Trend', () => {
   it('shows adequate results if current value is 0', async () => {
     renderTrend({ current: 0, previous: 42 });
 
-    expect(await findTrend()).toMatch(/-42 \/ -100%/);
+    expect(await findTrend()).toMatch(/-42 \/ -100\.00%/);
   });
 
   it('shows adequate results if current value is NaN', async () => {

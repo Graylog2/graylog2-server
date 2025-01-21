@@ -23,8 +23,8 @@ import StringUtils from 'util/StringUtils';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import { formatNumber } from 'util/NumberFormatting';
 
-import formatNumber from '../messagelist/FormatNumber';
 import isNumeric from '../messagelist/IsNumeric';
 
 export type HighlightRange = {
@@ -34,7 +34,7 @@ export type HighlightRange = {
 
 type Ranges = { [key: string]: Array<HighlightRange> };
 
-const highlight = (value: any, idx: number, style = {}) => <span key={`highlight-${idx}`} style={style}>{value}</span>;
+const highlight = (value: any, idx: number, style: React.CSSProperties = {}) => <span key={`highlight-${idx}`} style={style}>{value}</span>;
 
 type Props = {
   color?: HighlightingColor

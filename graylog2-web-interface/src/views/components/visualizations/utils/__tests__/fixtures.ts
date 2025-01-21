@@ -380,6 +380,7 @@ export const layoutsFor4axis = {
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
+    overlaying: undefined,
     position: 0,
     rangemode: 'tozero',
     side: 'left',
@@ -389,10 +390,10 @@ export const layoutsFor4axis = {
       size: 16,
     },
     ticktext: [
-      '52.4 ms',
-      '104.8 ms',
-      '157.1 ms',
-      '209.5 ms',
+      '52.38 ms',
+      '104.76 ms',
+      '157.14 ms',
+      '209.53 ms',
     ],
     tickvals: [
       0.0523815987933635,
@@ -423,9 +424,9 @@ export const layoutsFor4axis = {
       size: 16,
     },
     ticktext: [
-      '130.3 B',
+      '130.25 B',
       '260.5 B',
-      '390.8 B',
+      '390.75 B',
       '521.0 B',
     ],
     tickvals: [

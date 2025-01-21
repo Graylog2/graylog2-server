@@ -24,7 +24,7 @@ import useFeature from 'hooks/useFeature';
 
 jest.mock('hooks/useFeature');
 
-describe('SearchResult', () => {
+describe('TypeSpecificValue', () => {
   beforeEach(() => {
     asMock(useFeature).mockReturnValue(true);
   });
@@ -34,7 +34,7 @@ describe('SearchResult', () => {
       <TypeSpecificValue field="field1" value={6543.21} unit={FieldUnit.fromJSON({ abbrev: 'ms', unit_type: 'time' })} />,
     );
 
-    await screen.findByText('6.5 s');
+    await screen.findByText('6.54 s');
   });
 
   it('should render original value if unit not defined', async () => {
