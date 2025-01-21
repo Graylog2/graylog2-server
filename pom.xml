@@ -103,7 +103,7 @@
         <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
         <bouncycastle.version>1.79</bouncycastle.version>
-        <byte-buddy.version>1.15.11</byte-buddy.version>
+        <byte-buddy.version>1.16.1</byte-buddy.version>
         <caffeine.version>3.2.0</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.179</classgraph.version>
@@ -151,7 +151,7 @@
         <log4j.version>2.24.3</log4j.version>
         <lucene.version>9.12.0</lucene.version>
         <metrics.version>4.2.30</metrics.version>
-        <mongodb-driver.version>5.2.1</mongodb-driver.version>
+        <mongodb-driver.version>5.3.0</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.117.Final</netty.version>
@@ -173,7 +173,7 @@
         <siv-mode.version>1.6.0</siv-mode.version>
         <slf4j.version>2.0.16</slf4j.version>
         <streamex.version>0.8.3</streamex.version>
-        <swagger.version>1.6.14</swagger.version>
+        <swagger.version>1.6.15</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
