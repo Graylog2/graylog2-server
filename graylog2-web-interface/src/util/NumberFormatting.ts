@@ -26,6 +26,7 @@ const defaultOptions = {
 
 const defaultPercentageOptions = {
   ...defaultOptions,
+  minimumFractionDigits: 2,
   style: 'percent',
 } as const;
 

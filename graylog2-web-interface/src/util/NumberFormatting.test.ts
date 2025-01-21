@@ -43,21 +43,21 @@ describe('NumberFormatting', () => {
       const options = { percentage: true };
 
       expect(formatTrend(42.23 / 100, options)).toEqual('+42.23%');
-      expect(formatTrend(-42 / 100, options)).toEqual('-42%');
+      expect(formatTrend(-42 / 100, options)).toEqual('-42.00%');
       expect(formatTrend(-137.991 / 100, options)).toEqual('-137.99%');
-      expect(formatTrend(137.999 / 100, options)).toEqual('+138%');
+      expect(formatTrend(137.999 / 100, options)).toEqual('+138.00%');
       expect(formatTrend(-137.111 / 100, options)).toEqual('-137.11%');
       expect(formatTrend(137.115 / 100, options)).toEqual('+137.12%');
-      expect(formatTrend(0 / 100, options)).toEqual('0%');
+      expect(formatTrend(0 / 100, options)).toEqual('0.00%');
     });
   });
 
   describe('formatPercentage', () => {
     it('formats with 2 fraction digits by default', () => {
       expect(formatPercentage(42.23 / 100)).toEqual('42.23%');
-      expect(formatPercentage(42 / 100)).toEqual('42%');
+      expect(formatPercentage(42 / 100)).toEqual('42.00%');
       expect(formatPercentage(137.991 / 100)).toEqual('137.99%');
-      expect(formatPercentage(137.999 / 100)).toEqual('138%');
+      expect(formatPercentage(137.999 / 100)).toEqual('138.00%');
       expect(formatPercentage(137.111 / 100)).toEqual('137.11%');
       expect(formatPercentage(137.115 / 100)).toEqual('137.12%');
     });

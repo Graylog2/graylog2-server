@@ -29,7 +29,7 @@ const NumberCell = styled.span`
 `;
 
 const PercentageField = ({ value }: Props) => {
-  const formatted = useMemo(() => formatPercentage(value, { minimumFractionDigits: 2 }), [value]);
+  const formatted = useMemo(() => formatPercentage(value), [value]);
 
   return <NumberCell title={String(value)}>{formatted}</NumberCell>;
 };
