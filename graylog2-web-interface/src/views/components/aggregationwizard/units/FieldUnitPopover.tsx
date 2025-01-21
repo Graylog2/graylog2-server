@@ -70,10 +70,6 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
   const unitOptions = useMemo(() => currentUnitType && units[currentUnitType]
     .map(({ abbrev, name }: Unit) => ({ value: abbrev, label: capitalize(name) })), [currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
-  const onClear = useCallback(() => {
-    setFieldValue(`units.${field}`, undefined);
-    toggleShow();
-  }, [field, setFieldValue]);
   const onUnitTypeChange = useCallback((val: string) => {
     const fieldUnitSettings = val
       ? { unitType: val, abbrev: undefined }
@@ -94,6 +90,11 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
 
     return <>Unit <b>{unitName}</b> was defined for field <b>{field}</b> by Graylog. Changing this unit might represent data incorrectly on the charts</>;
   }, [field, predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType]);
+
+  const onClear = useCallback(() => {
+    setFieldValue(`units.${field}`, undefined);
+    toggleShow();
+  }, [field, setFieldValue]);
 
   return (
     <Popover position="right" opened={show} withArrow>
