@@ -19,7 +19,7 @@ package org.graylog2.users;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
@@ -111,7 +111,13 @@ public class RoleServiceImpl implements RoleService {
             try {
                 final RoleImpl savedRole = save(fixedAdmin);
                 return savedRole.getId();
-            } catch (DuplicateKeyException | ValidationException e) {
+            } catch (MongoException e) {
+                if (MongoUtils.isDuplicateKeyError(e)) {
+                    log.error("Unable to save fixed " + roleName + " role, please restart Graylog to fix this.", e);
+                } else {
+                    throw e;
+                }
+            } catch (ValidationException e) {
                 log.error("Unable to save fixed " + roleName + " role, please restart Graylog to fix this.", e);
             }
         }

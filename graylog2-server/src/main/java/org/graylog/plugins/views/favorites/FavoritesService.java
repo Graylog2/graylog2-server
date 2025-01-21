@@ -19,7 +19,7 @@ package org.graylog.plugins.views.favorites;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
@@ -129,8 +129,11 @@ public class FavoritesService {
         try {
             final var result = db.insertOne(favorite);
             return mongoUtils.getById(MongoUtils.insertedId(result));
-        } catch (DuplicateKeyException e) {
-            throw new IllegalStateException("Unable to create a Favorites collection, collection with this id already exists : " + favorite.id());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new IllegalStateException("Unable to create a Favorites collection, collection with this id already exists : " + favorite.id());
+            }
+            throw e;
         }
     }
 
