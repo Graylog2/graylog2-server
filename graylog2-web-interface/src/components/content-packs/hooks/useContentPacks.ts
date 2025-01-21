@@ -14,17 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const EventDefinitionPriorityEnum = {
-  LOW: 1,
-  MEDIUM: 2,
-  HIGH: 3,
-  CRITICAL: 4,
-  properties: {
-    1: { name: 'low' },
-    2: { name: 'medium' },
-    3: { name: 'high' },
-    4: { name: 'critical' },
-  },
-};
+import { useQuery } from '@tanstack/react-query';
 
-export default EventDefinitionPriorityEnum;
+import { SystemContentPacks } from '@graylog/server-api';
+
+const useContentPacks = () => useQuery(['content-packs', 'list'], () => SystemContentPacks.listContentPacks());
+export default useContentPacks;

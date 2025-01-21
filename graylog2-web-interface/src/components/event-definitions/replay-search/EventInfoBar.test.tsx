@@ -114,7 +114,7 @@ describe('<EventInfoBar />', () => {
     const field1Condition = await screen.findByTitle('count(field1)>500');
     const field2Condition = await screen.findByTitle('count(field2)<8000');
 
-    expect(priority).toHaveTextContent('Normal');
+    expect(priority).toHaveTextContent('Medium');
     expect(execution).toHaveTextContent('1 minute');
     expect(searchWithin).toHaveTextContent('1 minute');
     expect(description).toHaveTextContent('Test description');
