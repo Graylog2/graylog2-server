@@ -27,7 +27,7 @@ import type { Event } from 'components/events/events/types';
 
 jest.mock('hooks/usePluginEntities');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
-
+jest.mock('components/events/events/hooks/useSendEventActionTelemetry', () => () => jest.fn());
 const getEvent = (id: string): Event => ({
   id,
   event_definition_id: 'event_definition_id_1',
