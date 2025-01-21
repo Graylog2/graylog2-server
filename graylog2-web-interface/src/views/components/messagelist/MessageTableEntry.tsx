@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { useStore } from 'stores/connect';
@@ -53,11 +53,11 @@ export const TableBody = styled.tbody<{ $expanded?: boolean, $highlighted?: bool
   && {
     border-top: 0;
 
-    ${$expanded ? css`
+    ${$expanded ? `
   border-left: 7px solid ${theme.colors.variant.light.info};
 ` : ''}
 
-    ${$highlighted ? css`
+    ${$highlighted ? `
   border-left: 7px solid ${theme.colors.variant.light.success};
 ` : ''}
   }
