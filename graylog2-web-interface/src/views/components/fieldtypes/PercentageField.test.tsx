@@ -15,23 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
-import styled from 'styled-components';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import { formatPercentage } from 'util/NumberFormatting';
+import PercentageField from './PercentageField';
 
-type Props = {
-  value: number,
-}
-
-const NumberCell = styled.span`
-  float: right;
-`;
-
-const PercentageField = ({ value }: Props) => {
-  const formatted = useMemo(() => formatPercentage(value), [value]);
-
-  return <NumberCell title={String(value)}>{formatted}</NumberCell>;
-};
-
-export default PercentageField;
+describe('PercentageField', () => {
+  it('does not show very small values as `NaN%`', async () => {
+    render(<PercentageField value={2.744906525058769E-9} />);
+    await screen.findByText('0.00%');
+  });
+});
