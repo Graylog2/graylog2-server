@@ -95,7 +95,7 @@ public abstract class FunctionDescriptor<T> {
     }
 
     @AutoValue.Builder
-    public static abstract class Builder<T> {
+    public abstract static class Builder<T> {
         abstract FunctionDescriptor<T> autoBuild();
 
         public FunctionDescriptor<T> build() {

@@ -26,9 +26,6 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 public class FunctionExpression extends BaseExpression {
@@ -64,7 +61,7 @@ public class FunctionExpression extends BaseExpression {
     @Override
     public Object evaluateUnsafe(EvaluationContext context) {
         try {
-            if (function.descriptor().deprecated()) {
+            if (Boolean.TRUE.equals(function.descriptor().deprecated())) {
                 LOG.warn("Using deprecated function {}", function.descriptor().name());
             }
             return descriptor.returnType().cast(function.evaluate(args, context));
@@ -97,6 +94,6 @@ public class FunctionExpression extends BaseExpression {
 
     @Override
     public Iterable<Expression> children() {
-        return args.getArgs().entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+        return args.getArgs().values().stream().toList();
     }
 }
