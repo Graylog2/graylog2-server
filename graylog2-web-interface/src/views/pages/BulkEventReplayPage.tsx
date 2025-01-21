@@ -35,7 +35,7 @@ const useEventsById = (eventIds: Array<string>) => useQuery(['events', eventIds]
 
 const BulkEventReplayPage = () => {
   const location = useLocation<BulkEventReplayState>();
-  const { eventIds: initialEventIds = [], returnUrl } = location.state;
+  const { eventIds: initialEventIds = [], returnUrl } = (location?.state ?? {});
   const { data: events, isInitialLoading } = useEventsById(initialEventIds);
 
   const history = useHistory();

@@ -30,7 +30,7 @@ describe('<ContentPackListItem />', () => {
     server_version: '6.0.0-SNAPSHOT',
     summary: 'The Open Thread Exchange Lookup Table of the Threat Intel Plugin',
     url: 'https://github.com/Graylog2/graylog2-server',
-    v: 1,
+    v: '1',
     vendor: 'Graylog <hello@graylog.com>',
   };
 

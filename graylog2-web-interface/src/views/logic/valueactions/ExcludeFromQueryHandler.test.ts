@@ -41,6 +41,10 @@ jest.mock('views/logic/slices/viewSlice', () => ({
 }));
 
 describe('ExcludeFromQueryHandler', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   const defaultView = createSearch();
 
   const createViewWithQuery = (query: Query, type: ViewType = View.Type.Search) => {
