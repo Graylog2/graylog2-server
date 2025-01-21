@@ -42,7 +42,7 @@ const BulkActions = ({ selectedEntitiesData }: Props) => {
   const history = useHistory();
   const onReplaySearchClick = useCallback(() => {
     const eventIds = events.map((event) => event.id);
-    sendEventActionTelemetry('REPLAY_SEARCH', true);
+    sendEventActionTelemetry('REPLAY_SEARCH', true, { events_length: eventIds.length });
     history.pushWithState<BulkEventReplayState>(Routes.ALERTS.BULK_REPLAY_SEARCH, { eventIds, returnUrl });
   }, [events, history, returnUrl, sendEventActionTelemetry]);
 
