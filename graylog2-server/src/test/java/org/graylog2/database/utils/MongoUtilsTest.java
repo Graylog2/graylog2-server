@@ -237,6 +237,7 @@ class MongoUtilsTest {
                         assertThat(MongoUtils.isDuplicateKeyError(e)).isTrue());
 
         assertThatThrownBy(() -> legacyCollection.insert(document))
+                .isInstanceOf(DuplicateKeyException.class)
                 .isInstanceOfSatisfying(MongoException.class, e ->
                         assertThat(MongoUtils.isDuplicateKeyError(e)).isTrue());
     }
