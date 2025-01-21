@@ -30,7 +30,6 @@ import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityEvent;
 import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -73,9 +72,11 @@ public class FavoritesService {
                         .map(title -> new Favorite(i, title))
                 )
                 .flatMap(Optional::stream)
+                .skip(perPage * Math.max(0L, page - 1))
+                .limit(perPage)
                 .toList();
 
-        return PaginatedResponse.create("favorites", new PaginatedList<>(PaginatedDbService.getPage(items, page, perPage), items.size(), page, perPage));
+        return PaginatedResponse.create("favorites", new PaginatedList<>(items, items.size(), page, perPage));
     }
 
     public void save(FavoritesForUserDTO favorite) {
