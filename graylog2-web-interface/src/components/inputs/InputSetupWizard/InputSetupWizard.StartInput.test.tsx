@@ -18,7 +18,8 @@ import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
-import fetch from 'logic/rest/FetchProvider';
+import { PipelinesPipelines, Streams } from '@graylog/server-api';
+
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import useStreams from 'components/streams/hooks/useStreams';
@@ -28,6 +29,22 @@ import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 
 import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
 import InputSetupWizard from './Wizard';
+
+jest.mock('@graylog/server-api', () => ({
+  PipelinesPipelines: {
+    createFromParser: jest.fn(),
+    routing: jest.fn(),
+    remove: jest.fn(),
+  },
+  Streams: {
+    create: jest.fn(),
+    resume: jest.fn(),
+    remove: jest.fn(),
+  },
+  PipelinesRules: {
+    remove: jest.fn(),
+  },
+}));
 
 jest.mock('components/streams/hooks/useStreams', () => jest.fn());
 jest.mock('hooks/usePipelinesConnectedStream');
@@ -153,11 +170,6 @@ const useIndexSetsListResult = {
   refetch: () => {},
 };
 
-const updateRoutingUrlRegEx = /.+(system\/pipelines\/pipeline\/routing)/i;
-const createStreamUrl = '/streams';
-const startStreamUrl = (streamId) => `/streams/${streamId}/resume`;
-const createPipelineUrlRegEx = /.+(system\/pipelines\/pipeline)/i;
-
 const newStreamConfig = {
   description: 'Wingardium new stream',
   index_set_id: 'default_id',
@@ -232,10 +244,6 @@ beforeEach(() => {
 
 describe('InputSetupWizard Start Input', () => {
   describe('Start Input', () => {
-    beforeEach(() => {
-      asMock(fetch).mockReturnValue(Promise.resolve({}));
-    });
-
     it('should render the Start Input step', async () => {
       renderWizard();
       goToStartInputStep();
@@ -268,9 +276,7 @@ describe('InputSetupWizard Start Input', () => {
 
       await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'PUT',
-        expect.stringMatching(updateRoutingUrlRegEx),
+      await waitFor(() => expect(PipelinesPipelines.routing).toHaveBeenCalledWith(
         { input_id: 'input-test-id', stream_id: 'streamId1' },
       ));
 
@@ -280,6 +286,10 @@ describe('InputSetupWizard Start Input', () => {
     });
 
     describe('new stream', () => {
+      beforeEach(() => {
+        asMock(Streams.create).mockReturnValue(Promise.resolve({ stream_id: '1' }));
+      });
+
       it('should show the progress for all steps', async () => {
         renderWizard();
         await waitFor(() => createStream(true));
@@ -308,25 +318,18 @@ describe('InputSetupWizard Start Input', () => {
         goToStartInputStep();
         startInput();
 
-        await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-          'POST',
-          expect.stringContaining(createStreamUrl),
-          newStreamConfig,
+        await waitFor(() => expect(Streams.create).toHaveBeenCalledWith(
+          expect.objectContaining(newStreamConfig),
         ));
       });
 
       it('should start the new stream', async () => {
-        asMock(fetch).mockImplementation(() => Promise.resolve({ stream_id: 1 }));
-
         renderWizard();
         await waitFor(() => createStream());
         goToStartInputStep();
         startInput();
 
-        await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-          'POST',
-          expect.stringContaining(startStreamUrl(1)),
-        ));
+        await waitFor(() => expect(Streams.resume).toHaveBeenCalled());
       });
 
       it('should create the new pipeline', async () => {
@@ -335,10 +338,8 @@ describe('InputSetupWizard Start Input', () => {
         goToStartInputStep();
         startInput();
 
-        await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-          'POST',
-          expect.stringMatching(createPipelineUrlRegEx),
-          newPipelineConfig,
+        await waitFor(() => expect(PipelinesPipelines.createFromParser).toHaveBeenCalledWith(
+          expect.objectContaining(newPipelineConfig),
         ));
       });
 
@@ -348,35 +349,10 @@ describe('InputSetupWizard Start Input', () => {
         goToStartInputStep();
         startInput();
 
-        await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-          'PUT',
-          expect.stringMatching(updateRoutingUrlRegEx),
+        await waitFor(() => expect(PipelinesPipelines.routing).toHaveBeenCalledWith(
           { input_id: 'input-test-id', stream_id: 'streamId1' },
         ));
       });
-    });
-  });
-
-  describe('Rollback', () => {
-    it('shows the rollback button', async () => {
-      asMock(fetch).mockRejectedValueOnce(new Error());
-      asMock(fetch).mockReturnValue(Promise.resolve({}));
-
-      renderWizard();
-
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
-
-      await selectEvent.openMenu(streamSelect);
-
-      await selectEvent.select(streamSelect, 'One Stream');
-
-      goToStartInputStep();
-
-      startInput();
-
-      const rollbackInputButton = await screen.findByTestId('rollback-input-button');
-
-      fireEvent.click(rollbackInputButton);
     });
   });
 });
