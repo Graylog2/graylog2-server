@@ -71,7 +71,10 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
     .map(({ abbrev, name }: Unit) => ({ value: abbrev, label: capitalize(name) })), [currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {
-    setFieldValue(`units.${field}`, { unitType: val || undefined, abbrev: undefined });
+    const fieldUnitSettings = val
+      ? { unitType: val, abbrev: undefined }
+      : undefined;
+    setFieldValue(`units.${field}`, fieldUnitSettings);
   }, [field, setFieldValue]);
 
   const badgeLabel = useMemo(() => {
