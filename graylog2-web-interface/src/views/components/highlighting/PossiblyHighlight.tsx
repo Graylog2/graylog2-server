@@ -39,7 +39,7 @@ const highlight = (value: any, idx: number, style: React.CSSProperties = {}) => 
 type Props = {
   color?: HighlightingColor
   field: string,
-  value?: any,
+  value: string | number,
   highlightRanges?: Ranges
 };
 
@@ -54,7 +54,7 @@ function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
   return start === 0 && length === stringifiedValue.length;
 }
 
-const shouldBeFormatted = (field: string, value: any) => isFunction(field) && isNumeric(value);
+const shouldBeFormatted = (field: string, value: any): value is number => isFunction(field) && isNumeric(value);
 
 const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, highlightRanges = {} }: Props) => {
   const theme = useTheme();

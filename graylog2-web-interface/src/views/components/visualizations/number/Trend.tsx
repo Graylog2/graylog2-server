@@ -35,6 +35,7 @@ type Props = {
   current: number,
   previous: number | undefined | null,
   trendPreference: TrendPreference,
+  // eslint-disable-next-line react/require-default-props
   unit?: FieldUnit,
 };
 
