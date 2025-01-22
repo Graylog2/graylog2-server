@@ -1,5 +1,5 @@
 type = "f"
-message = "Fix an issue when was impossible to save search/dashboard after clearing the unit type"
+message = "Fix an issue causing saving searches/dashboards after clearing the unit type to fail with error."
 
 pulls = ["21399"]
 issues = ["21398"]
