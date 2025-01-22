@@ -14,24 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useMemo } from 'react';
-import styled from 'styled-components';
+import { useQuery } from '@tanstack/react-query';
 
-import { formatPercentage } from 'util/NumberFormatting';
+import { SystemContentPacks } from '@graylog/server-api';
 
-type Props = {
-  value: number,
-}
-
-const NumberCell = styled.span`
-  float: right;
-`;
-
-const PercentageField = ({ value }: Props) => {
-  const formatted = useMemo(() => formatPercentage(value), [value]);
-
-  return <NumberCell title={String(value)}>{formatted}</NumberCell>;
-};
-
-export default PercentageField;
+const useContentPacks = () => useQuery(['content-packs', 'list'], () => SystemContentPacks.listContentPacks());
+export default useContentPacks;
