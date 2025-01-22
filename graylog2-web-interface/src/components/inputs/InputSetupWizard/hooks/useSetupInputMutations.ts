@@ -18,9 +18,9 @@ import { useMutation } from '@tanstack/react-query';
 
 import { PipelinesPipelines, Streams, PipelinesRules } from '@graylog/server-api';
 
-import type { Stream } from 'logic/streams/types';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
+import type { Stream } from 'logic/streams/types';
+import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 
 export type RoutingParams = {
   stream_id?: string,
@@ -35,9 +35,8 @@ export type StreamConfiguration = Pick<Stream,
 
 type PipelineConfiguration = Pick<PipelineType,
   'title' |
-  'description' |
-  'source'
->
+  'description'
+> & Partial<Pick<PipelineType, 'source' | 'stages'>>;
 
 const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> => Streams.create({
   matching_type: undefined,
@@ -49,7 +48,21 @@ const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: s
 
 const startStream = async (streamId) => Streams.resume(streamId);
 
-const createPipeline = (pipeline: PipelineConfiguration): Promise<PipelineType> => PipelinesPipelines.createFromParser(SourceGenerator.generatePipeline(pipeline));
+const createPipeline = (pipeline: PipelineConfiguration): Promise<PipelineType> => {
+  const requestPipeline = {
+    id: undefined,
+    errors: undefined,
+    created_at: undefined,
+    modified_at: undefined,
+    stages: [{ stage: 0, rules: [], match: 'EITHER' } as StageType],
+    ...pipeline,
+  };
+
+  return PipelinesPipelines.createFromParser({
+    ...requestPipeline,
+    source: SourceGenerator.generatePipeline(requestPipeline),
+  });
+};
 
 const updateRouting = async (params: RoutingParams): Promise <{rule_id: string}> => PipelinesPipelines.routing({ remove_from_default: undefined, stream_id: undefined, ...params });
 

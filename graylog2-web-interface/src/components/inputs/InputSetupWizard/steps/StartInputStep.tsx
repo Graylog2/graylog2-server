@@ -27,7 +27,6 @@ import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, getStepConfigOrData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import type { RoutingStepData } from 'components/inputs/InputSetupWizard/steps/SetupRoutingStep';
-import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import ProgressMessage from 'components/inputs/InputSetupWizard/steps/components/ProgressMessage';
 
@@ -110,12 +109,7 @@ const StartInputStep = () => {
       description: `Pipeline for Stream: ${stream.title} created by the Input Setup Wizard.`,
     };
 
-    const requestPipeline = {
-      ...pipeline,
-      source: SourceGenerator.generatePipeline({ ...pipeline, stages: [{ stage: 0, rules: [], match: '' }] }),
-    };
-
-    return createPipelineMutation.mutateAsync(requestPipeline);
+    return createPipelineMutation.mutateAsync(pipeline);
   };
 
   const startInput = async () => {
@@ -163,8 +157,9 @@ const StartInputStep = () => {
 
         break;
       case 'EXISTING':
-        updateRoutingMutation.mutate({ input_id: inputId, stream_id: routingStepData.streamId });
-        startInput();
+        updateRoutingMutation.mutateAsync({ input_id: inputId, stream_id: routingStepData.streamId }).finally(() => {
+          startInput();
+        });
 
         break;
       case 'DEFAULT':
