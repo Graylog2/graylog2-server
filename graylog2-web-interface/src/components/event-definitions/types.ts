@@ -21,6 +21,8 @@ import type { SearchBarControl } from 'views/types';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
+export type AlertType = 'alert' | 'event' | 'event_definition';
+
 export interface EventDefinitionValidation {
   errors: {
     config?: unknown,
