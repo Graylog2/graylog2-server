@@ -24,6 +24,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import de.huxhorn.sulky.ulid.ULID;
 import jakarta.inject.Provider;
 import org.graylog.failure.FailureSubmissionService;
+import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.Message;
@@ -64,7 +65,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
     private final FailureSubmissionService failureSubmissionService;
-    private final ProcessorConfiguration processorConfiguration;
+    private final Configuration configuration;
     private volatile Message currentMessage;
 
     @AssistedInject
@@ -78,7 +79,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                                   @DefaultStream Provider<Stream> defaultStreamProvider,
                                   FailureSubmissionService failureSubmissionService,
                                   StreamMetrics streamMetrics,
-                                  ProcessorConfiguration processorConfiguration) {
+                                  Configuration configuration) {
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
         this.processingStatusRecorder = processingStatusRecorder;
@@ -92,7 +93,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
         processTime = metricRegistry.timer(name(ProcessBufferProcessor.class, "processTime"));
         this.streamMetrics = streamMetrics;
-        this.processorConfiguration = processorConfiguration;
+        this.configuration = configuration;
         currentMessage = null;
     }
 
@@ -172,7 +173,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
 
             message.getStreams().forEach(s -> streamMetrics.markIncomingMeter(s.getId()));
             message.ensureValidTimestamp();
-            message.normalizeTimestamp(processorConfiguration.getTimestampGracePeriod());
+            message.normalizeTimestamp(configuration.getTimestampGracePeriod());
 
             // If a message is received via the Cluster-to-Cluster Forwarder, it already has this field set
             if (!message.hasField(Message.FIELD_GL2_MESSAGE_ID) || isNullOrEmpty(message.getFieldAs(String.class, Message.FIELD_GL2_MESSAGE_ID))) {

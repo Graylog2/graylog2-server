@@ -19,13 +19,11 @@ package org.graylog2.plugin;
 import com.google.inject.AbstractModule;
 import org.graylog2.indexer.results.DefaultResultMessageFactory;
 import org.graylog2.indexer.results.ResultMessageFactory;
-import org.graylog2.shared.buffers.processors.ProcessorConfiguration;
 
 public class MessageBindings extends AbstractModule {
     @Override
     protected void configure() {
         bind(MessageFactory.class).to(DefaultMessageFactory.class).asEagerSingleton();
         bind(ResultMessageFactory.class).to(DefaultResultMessageFactory.class).asEagerSingleton();
-        bind(ProcessorConfiguration.class).to(ProcessorConfiguration.class).asEagerSingleton();
     }
 }

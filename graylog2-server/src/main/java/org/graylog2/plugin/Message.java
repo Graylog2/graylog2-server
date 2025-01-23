@@ -479,13 +479,6 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return obj;
     }
 
-    public void normalizeTimestamp(Duration gracePeriod) {
-        final DateTime timeStamp = getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
-        if (Tools.nowUTC().plus(gracePeriod.toMillis()).isBefore(timeStamp)) {
-            addField(FIELD_TIMESTAMP, fallBackForFutureTimestamp(timeStamp));
-        }
-    }
-
     public void ensureValidTimestamp() {
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         if (timestampValue instanceof DateTime) {
@@ -494,6 +487,13 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
         final DateTime dateTime = timestampValue == null ? fallbackForNullTimestamp() : convertToDateTime(timestampValue);
         addField(FIELD_TIMESTAMP, dateTime);
+    }
+
+    public void normalizeTimestamp(Duration gracePeriod) {
+        final DateTime timeStamp = getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
+        if (Tools.nowUTC().plus(gracePeriod.toMillis()).isBefore(timeStamp)) {
+            addField(FIELD_TIMESTAMP, fallBackForFutureTimestamp(timeStamp));
+        }
     }
 
     private DateTime convertToDateTime(@Nonnull Object value) {
