@@ -1,0 +1,5 @@
+type = "c"
+message = "Prevent messages from being ingested with timestamps that are in the future. Invalid timestamps will be forced to the current time."
+
+pulls = [""]
+issues = ["21408"]

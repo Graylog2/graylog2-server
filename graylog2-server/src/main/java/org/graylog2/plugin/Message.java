@@ -479,6 +479,13 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return obj;
     }
 
+    public void normalizeTimestamp(Duration gracePeriod) {
+        final DateTime timeStamp = getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
+        if (Tools.nowUTC().plus(gracePeriod.toMillis()).isBefore(timeStamp)) {
+            addField(FIELD_TIMESTAMP, fallBackForFutureTimestamp(timeStamp));
+        }
+    }
+
     public void ensureValidTimestamp() {
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         if (timestampValue instanceof DateTime) {
@@ -502,12 +509,21 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         }
     }
 
+    private DateTime fallBackForFutureTimestamp(DateTime timestamp) {
+        return fallbackTimestamp(
+                "future timestamp in message <" + getId() + ">, forcing to current time",
+                "value provided: " + timestamp);
+    }
+
     private DateTime fallbackForNullTimestamp() {
-        final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
+        return fallbackTimestamp(
+                "<null> value for field timestamp in message <" + getId() + ">, forcing to current time",
+                "<null> value provided");
+    }
+
+    private DateTime fallbackTimestamp(String error, String details) {
         LOG.trace(error);
-        addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
-                "Replaced invalid timestamp value in message <" + getId() + "> with current time",
-                "<null> value provided"));
+        addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, details));
         return Tools.nowUTC();
     }
 

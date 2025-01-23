@@ -14,18 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+package org.graylog2.shared.buffers.processors;
 
-import com.google.inject.AbstractModule;
-import org.graylog2.indexer.results.DefaultResultMessageFactory;
-import org.graylog2.indexer.results.ResultMessageFactory;
-import org.graylog2.shared.buffers.processors.ProcessorConfiguration;
+import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
+import org.graylog2.configuration.Documentation;
 
-public class MessageBindings extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(MessageFactory.class).to(DefaultMessageFactory.class).asEagerSingleton();
-        bind(ResultMessageFactory.class).to(DefaultResultMessageFactory.class).asEagerSingleton();
-        bind(ProcessorConfiguration.class).to(ProcessorConfiguration.class).asEagerSingleton();
+public class ProcessorConfiguration {
+    public java.time.Duration getTimestampGracePeriod() {
+        return java.time.Duration.ofMillis(timestampGracePeriod.toMilliseconds());
     }
+
+    @Documentation(visible = false)
+    @Parameter(value = "timestamp_grace_period", validators = PositiveDurationValidator.class)
+    final private Duration timestampGracePeriod = Duration.days(30);
 }
