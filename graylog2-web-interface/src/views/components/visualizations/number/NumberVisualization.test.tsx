@@ -24,7 +24,7 @@ import RenderCompletionCallback from 'views/components/widgets/RenderCompletionC
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import type { CurrentViewType } from 'views/components/CustomPropTypes';
+import type { CurrentViewType } from 'views/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 
