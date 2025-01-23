@@ -3,6 +3,7 @@
   "version": "6.2.0-SNAPSHOT",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
+  "packageManager": "yarn@1.22.22",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Graylog2/graylog-web-plugin.git"

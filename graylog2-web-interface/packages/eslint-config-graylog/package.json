@@ -3,6 +3,7 @@
   "version": "1.3.0",
   "description": "Graylog ESLint config for web interface plugin authors",
   "main": "index.js",
+  "packageManager": "yarn@1.22.22",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
