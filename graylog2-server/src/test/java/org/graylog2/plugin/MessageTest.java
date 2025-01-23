@@ -778,7 +778,7 @@ public class MessageTest {
         assertThat(message.processingErrors()).satisfies(e -> {
             assertThat(e).hasSize(1);
             assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
-            assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
+            assertThat(e.get(0).getMessage()).startsWith("<null> value for field timestamp");
             assertThat(e.get(0).getDetails()).startsWith("<null> value provided");
         });
     }

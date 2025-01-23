@@ -27,7 +27,7 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MessageTimestampTest {
+class MessageTimestampTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Test
