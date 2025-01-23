@@ -14,7 +14,7 @@
     "@jest/types": "29.6.3",
     "@testing-library/dom": "9.3.4",
     "@testing-library/jest-dom": "6.6.3",
-    "@testing-library/react": "14.3.0",
+    "@testing-library/react": "16.2.0",
     "@testing-library/react-hooks": "^8.0.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/enzyme": "3.10.18",
