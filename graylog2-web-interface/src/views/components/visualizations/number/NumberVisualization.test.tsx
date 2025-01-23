@@ -32,7 +32,7 @@ import NumberVisualization from './NumberVisualization';
 
 jest.mock('./AutoFontSizer', () => ({ children }: React.PropsWithChildren<{}>) => children);
 
-jest.mock('views/components/highlighting/CustomHighlighting', () => ({ children }: React.PropsWithChildren<{}>) => <div>{children}</div>);
+jest.mock('views/components/highlighting/CustomHighlighting', () => ({ children = undefined }: React.PropsWithChildren<{}>) => <div>{children}</div>);
 
 jest.mock('views/components/Value', () => ({ value }: { value: string }) => <div>{value}</div>);
 
