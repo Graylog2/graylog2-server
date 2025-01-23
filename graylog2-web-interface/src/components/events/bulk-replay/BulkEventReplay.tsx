@@ -124,7 +124,7 @@ const ReplayedSearch = ({ total, completed, selectedEvent }: React.PropsWithChil
   if (!selectedEvent && total === completed) {
     return (
       <Center>
-        You are done investigating all events. You can now select a bulk action to apply to all remaining events, or close the page to return to the events list.
+        You are done reviewing all events. You can now select a bulk action to apply to all remaining events, or close the page to return to the events list.
       </Center>
     );
   }
@@ -163,7 +163,7 @@ const BulkEventReplay = ({ initialEventIds, events: _events, onClose }: Props) =
         <Headline>Replay Search</Headline>
         <p>
           The following list contains all of the events/alerts you selected in the previous step, allowing you to
-          investigate the replayed search for each of them.
+          review the replayed search for each of them.
         </p>
         <i>Investigation of {completed}/{total} events completed.</i>
         <StyledList>
