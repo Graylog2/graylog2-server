@@ -96,7 +96,7 @@ const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading, edit
           <TitleInput type="text"
                       id="widget-title"
                       onChange={(e) => onRename(e.target.value)}
-                      value={title}
+                      defaultValue={title}
                       required />
         </TitleInputWrapper>
       ) : (
