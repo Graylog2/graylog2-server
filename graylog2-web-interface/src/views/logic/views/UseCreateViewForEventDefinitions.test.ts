@@ -22,7 +22,7 @@ import {
   mockEventDefinitionOneAggregation,
   mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
-import UseCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForEventDefinition';
+import UseCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForEvent';
 import generateId from 'logic/generateId';
 import asMock from 'helpers/mocking/AsMock';
 import type View from 'views/logic/views/View';

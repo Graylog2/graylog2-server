@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import numeral from 'numeral';
+import { formatNumber as _formatNumber } from 'util/NumberFormatting';
 
-const formatNumber = (value: number): string => numeral(value).format('0,0.[0000000]');
+const formatNumber = (value: number): string => _formatNumber(value, { maximumFractionDigits: 7 });
 
 export default formatNumber;

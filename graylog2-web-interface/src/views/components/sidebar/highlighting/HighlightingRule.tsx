@@ -19,15 +19,13 @@ import { forwardRef, useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
-import type Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type { Condition, Value, Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type HighlightingRuleClass from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { ColorPickerPopover, Icon, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
-import { updateHighlightingRule, removeHighlightingRule } from 'views/logic/slices/highlightActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -69,17 +67,6 @@ const DragHandle = styled.div`
   width: 25px;
 `;
 
-const updateColor = (rule: Rule, newColor: HighlightingColor, hidePopover: () => void) => async (dispatch: AppDispatch) => dispatch(updateHighlightingRule(rule, { color: newColor })).then(hidePopover);
-
-const onDelete = (rule: Rule) => async (dispatch: AppDispatch) => {
-  // eslint-disable-next-line no-alert
-  if (window.confirm('Do you really want to remove this highlighting?')) {
-    return dispatch(removeHighlightingRule(rule));
-  }
-
-  return Promise.resolve();
-};
-
 type RuleColorPreviewProps = {
   color: HighlightingColor,
   onChange: (newColor: HighlightingColor, hidePopover: () => void) => void,
@@ -107,21 +94,24 @@ const RuleColorPreview = ({ color, onChange }: RuleColorPreviewProps) => {
 };
 
 type Props = {
-  rule: Rule,
+  rule: HighlightingRuleClass,
   className?: string,
   draggableProps?: DraggableProps;
   dragHandleProps?: DragHandleProps;
+  onUpdate: (existingRule: HighlightingRuleClass, field: string, value: Value, condition: Condition, color: Color) => Promise<void>,
+  onDelete: (rule: HighlightingRuleClass) => Promise<void>,
 };
 
 const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
   rule,
-  className,
-  draggableProps,
-  dragHandleProps,
+  className = undefined,
+  draggableProps = undefined,
+  dragHandleProps = undefined,
+  onUpdate,
+  onDelete,
 }, ref) => {
   const { field, value, color, condition } = rule;
   const [showForm, setShowForm] = useState(false);
-  const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
 
@@ -131,16 +121,21 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
       app_action_value: 'search-sidebar-highlight-color-update',
     });
 
-    return dispatch(updateColor(rule, newColor, hidePopover));
-  }, [dispatch, location.pathname, rule, sendTelemetry]);
-  const _onDelete = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_DELETED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_action_value: 'search-sidebar-highlight-delete',
-    });
+    return onUpdate(rule, rule.field, rule.value, rule.condition, newColor).then(hidePopover);
+  }, [location.pathname, onUpdate, rule, sendTelemetry]);
 
-    return dispatch(onDelete(rule));
-  }, [dispatch, location.pathname, rule, sendTelemetry]);
+  const _onDelete = useCallback(() => {
+    if (window.confirm('Do you really want to remove this highlighting?')) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_DELETED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_action_value: 'search-sidebar-highlight-delete',
+      });
+
+      return onDelete(rule);
+    }
+
+    return Promise.resolve();
+  }, [location.pathname, onDelete, rule, sendTelemetry]);
 
   return (
     <Container className={className} ref={ref} {...(draggableProps ?? {})}>
@@ -159,7 +154,11 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
           )}
         </ButtonContainer>
       </RightCol>
-      {showForm && <HighlightForm onClose={() => setShowForm(false)} rule={rule} />}
+      {showForm && (
+        <HighlightForm onClose={() => setShowForm(false)}
+                       rule={rule}
+                       onSubmit={(newField, newValue, newCondition, newColor) => onUpdate(rule, newField, newValue, newCondition, newColor)} />
+      )}
     </Container>
   );
 });

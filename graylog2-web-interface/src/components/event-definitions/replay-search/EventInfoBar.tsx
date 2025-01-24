@@ -21,9 +21,10 @@ import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { FlatContentRow, Icon } from 'components/common';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
+import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import assertUnreachable from 'logic/assertUnreachable';
 
 const Header = styled.div`
   display: flex;
@@ -55,7 +56,7 @@ const Value = styled.div`
 `;
 
 const EventInfoBar = () => {
-  const { isEventDefinition, isEvent, isAlert } = useAlertAndEventDefinitionData();
+  const { type } = useReplaySearchContext();
   const [open, setOpen] = useState<boolean>(true);
 
   const toggleOpen = useCallback((e: SyntheticEvent) => {
@@ -66,12 +67,13 @@ const EventInfoBar = () => {
   const infoAttributes = useAttributeComponents();
 
   const currentTypeText = useMemo(() => {
-    if (isEventDefinition) return 'event definition';
-    if (isAlert) return 'alert';
-    if (isEvent) return 'event';
-
-    return '';
-  }, [isAlert, isEvent, isEventDefinition]);
+    switch (type) {
+      case 'alert': return 'alert';
+      case 'event': return 'event';
+      case 'event_definition': return 'event definition';
+      default: return assertUnreachable(type, `Invalid replay type: ${type}`);
+    }
+  }, [type]);
 
   return (
     <FlatContentRow>

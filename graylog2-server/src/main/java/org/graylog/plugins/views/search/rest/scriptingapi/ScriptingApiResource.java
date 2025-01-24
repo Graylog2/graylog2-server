@@ -117,15 +117,15 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @ApiOperation(value = "Execute query specified by query parameters", nickname = "messagesByQueryParameters")
     @Path("messages")
     @NoAuditEvent("Creating audit event manually in method body.")
-    public TabularResponse executeQuery(@ApiParam(name = "query") @QueryParam("query") String query,
-                                        @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
-                                        @ApiParam(name = "stream_categories") @QueryParam("stream_categories") Set<String> streamCategories,
-                                        @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
-                                        @ApiParam(name = "fields") @QueryParam("fields") List<String> fields,
-                                        @ApiParam(name = "sort") @QueryParam("sort") String sort,
-                                        @ApiParam(name = "sort") @QueryParam("sortOrder") SortSpec.Direction sortOrder,
-                                        @ApiParam(name = "from") @QueryParam("from") int from,
-                                        @ApiParam(name = "size") @QueryParam("size") int size,
+    public TabularResponse executeQuery(@ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+                                        @ApiParam(name = "streams", value = "Comma separated list of streams to search in") Set<String> streams,
+                                        @ApiParam(name = "stream_categories", value = "Comma separated list of streams categories to search in") @QueryParam("stream_categories") Set<String> streamCategories,
+                                        @ApiParam(name = "timerange", value = "Timeframe to search in. See method description.", required = true) @QueryParam("timerange") String timerangeKeyword,
+                                        @ApiParam(name = "fields", value = "Fields from the message to show as columns in result") @QueryParam("fields") List<String> fields,
+                                        @ApiParam(name = "sort", value = "Field to sort on") @QueryParam("sort") String sort,
+                                        @ApiParam(name = "sortOrder", value = "Sort order - asc/desc") @QueryParam("sortOrder") SortSpec.Direction sortOrder,
+                                        @ApiParam(name = "from", value = "For paging results. Starting from result") @QueryParam("from") int from,
+                                        @ApiParam(name = "size", value = "Page size") @QueryParam("size") int size,
                                         @Context SearchUser searchUser) {
 
         try {
@@ -171,12 +171,12 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @ApiOperation(value = "Execute aggregation specified by query parameters", nickname = "aggregateForQueryParameters")
     @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
-    public TabularResponse executeQuery(@ApiParam(name = "query") @QueryParam("query") String query,
-                                        @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
-                                        @ApiParam(name = "stream_categories") @QueryParam("stream_categories") Set<String> streamCategories,
-                                        @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
-                                        @ApiParam(name = "groups") @QueryParam("groups") List<String> groups,
-                                        @ApiParam(name = "metrics") @QueryParam("metrics") List<String> metrics,
+    public TabularResponse executeQuery(@ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+                                        @ApiParam(name = "streams", value = "Comma separated list of streams to search in (can be empty)", required = true) @QueryParam("streams") Set<String> streams,
+                                        @ApiParam(name = "stream_categories", value = "Comma separated list of streams categories to search in (can be empty)", required = true) @QueryParam("stream_categories") Set<String> streamCategories,
+                                        @ApiParam(name = "timerange", value = "Timeframe to search in. See method description.", required = true) @QueryParam("timerange") String timerangeKeyword,
+                                        @ApiParam(name = "group_by", value = "Group aggregation by fields/limits.", required = true) @QueryParam("groups") List<String> groups,
+                                        @ApiParam(name = "metrics", value = "Metrics to be used.", required = true) @QueryParam("metrics") List<String> metrics,
                                         @Context SearchUser searchUser) {
         try {
             AggregationRequestSpec aggregationRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(
