@@ -27,7 +27,7 @@ import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefi
 import useScopePermissions from 'hooks/useScopePermissions';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
-import { SYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
+import { SYSTEM_EVENT_DEFINITION_TYPE as mockSYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 
 import EventDefinitionFormContainer from './EventDefinitionFormContainer';
 
@@ -75,7 +75,7 @@ jest.mock('stores/connect', () => ({
     stores: { [key: string]: any },
     _mapProps: (args: { [key: string]: any }) => any,
   ) => {
-    const storeProps = Object.entries(stores).reduce((acc, [key, store]) => ({ ...acc, [key]: store.getInitialState() }), {});
+    const storeProps = Object.fromEntries(Object.entries(stores).map(([key, store]) => [key, store.getInitialState()]));
     const componentProps = {
       ...storeProps,
       eventDefinition: {
@@ -98,7 +98,7 @@ jest.mock('stores/event-definitions/AvailableEventDefinitionTypesStore', () => (
     getInitialState: () => ({
       aggregation_functions: ['avg', 'card', 'count', 'max', 'min', 'sum', 'stddev', 'sumofsquares', 'variance', 'percentage', 'percentile', 'latest'],
       field_provider_types: ['template-v1', 'lookup-v1'],
-      processor_types: ['aggregation-v1', SYSTEM_EVENT_DEFINITION_TYPE, 'correlation-v1', 'anomaly-v1', 'sigma-v1'],
+      processor_types: ['aggregation-v1', mockSYSTEM_EVENT_DEFINITION_TYPE, 'correlation-v1', 'anomaly-v1', 'sigma-v1'],
       storage_handler_types: ['persist-to-streams-v1'],
     }),
   },
