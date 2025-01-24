@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Babel preset for the Graylog project",
   "main": "index.js",
+  "packageManager": "yarn@1.22.22",
   "repository": "https://github.com/Graylog2/graylog2-server",
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "SSPL-1.0",
