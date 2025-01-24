@@ -93,7 +93,7 @@ const MessageRenderer = ({ message, eventId }: { message: string, eventId: strin
 
   const toggleExtraSection = () => toggleSection(eventId, 'restFieldsExpandedSection');
 
-  return <StyledDiv onClick={toggleExtraSection}>{message}</StyledDiv>;
+  return <StyledDiv role="button" onClick={toggleExtraSection}>{message}</StyledDiv>;
 };
 
 const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => (eventData.timerange_start && eventData.timerange_end ? (
