@@ -61,7 +61,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * Helper class to hold configuration of Graylog
  */
 @SuppressWarnings("FieldMayBeFinal")
-public class Configuration extends CaConfiguration {
+public class Configuration extends CaConfiguration implements CommonNodeConfiguration {
     public static final String SAFE_CLASSES = "safe_classes";
 
     public static final String CONTENT_PACKS_DIR = "content_packs_dir";
@@ -666,4 +666,13 @@ public class Configuration extends CaConfiguration {
         return Math.round(Tools.availableProcessors() * 0.162f + 0.625f);
     }
 
+    @Override
+    public boolean withPlugins() {
+        return true;
+    }
+
+    @Override
+    public boolean withInputs() {
+        return true;
+    }
 }

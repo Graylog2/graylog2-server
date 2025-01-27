@@ -146,7 +146,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         try {
             super.fire(trigger);
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            LOG.error("Failed to fire event " + trigger, e);
             super.fire(errorEvent);
         }
     }

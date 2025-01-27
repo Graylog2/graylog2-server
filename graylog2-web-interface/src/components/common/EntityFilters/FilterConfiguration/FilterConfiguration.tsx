@@ -16,52 +16,74 @@
  */
 import * as React from 'react';
 
-import type { Attribute } from 'stores/PaginationTypes';
-import type { Filters, Filter } from 'components/common/EntityFilters/types';
-import MenuItem from 'components/bootstrap/MenuItem';
+import type { FilterComponentProps } from 'stores/PaginationTypes';
+import { MenuItem } from 'components/bootstrap';
 import {
   isAttributeWithFilterOptions,
-  isAttributeWithRelatedCollection, isDateAttribute,
+  isAttributeWithRelatedCollection, isDateAttribute, isCustomComponentFilter,
 } from 'components/common/EntityFilters/helpers/AttributeIdentification';
 
+import SuggestionsListFilter from './SuggestionsListFilter';
+import GenericFilterInput from './GenericFilterInput';
 import StaticOptionsList from './StaticOptionsList';
-import SuggestionsList from './SuggestionsList';
 import DateRangeForm from './DateRangeForm';
 
-type Props = {
-  attribute: Attribute,
-  filter?: Filter,
-  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: { title: string, value: string }, closeDropdown?: boolean) => void,
-  allActiveFilters: Filters | undefined,
-}
+const FilterComponent = ({ allActiveFilters, attribute, filter = undefined, filterValueRenderer, onSubmit }: FilterComponentProps) => {
+  if (isCustomComponentFilter(attribute)) {
+    const CustomFilterComponent = attribute.filter_component;
 
-export const FilterConfiguration = ({
-  allActiveFilters,
-  attribute,
-  filter,
-  filterValueRenderer,
-  onSubmit,
-}: Props) => (
-  <>
-    <MenuItem header>{filter ? 'Edit' : 'Create'} {attribute.title.toLowerCase()} filter</MenuItem>
-    {isAttributeWithFilterOptions(attribute) && (
+    return (
+      <CustomFilterComponent attribute={attribute}
+                             filterValueRenderer={filterValueRenderer}
+                             onSubmit={onSubmit}
+                             allActiveFilters={allActiveFilters}
+                             filter={filter} />
+    );
+  }
+
+  if (isAttributeWithFilterOptions(attribute)) {
+    return (
       <StaticOptionsList attribute={attribute}
                          filterValueRenderer={filterValueRenderer}
                          onSubmit={onSubmit}
                          allActiveFilters={allActiveFilters} />
-    )}
-    {isAttributeWithRelatedCollection(attribute) && (
-      <SuggestionsList attribute={attribute}
-                       filterValueRenderer={filterValueRenderer}
-                       onSubmit={onSubmit}
-                       allActiveFilters={allActiveFilters}
-                       filter={filter} />
-    )}
-    {isDateAttribute(attribute) && (
+    );
+  }
+
+  if (isAttributeWithRelatedCollection(attribute)) {
+    return (
+      <SuggestionsListFilter attribute={attribute}
+                             filterValueRenderer={filterValueRenderer}
+                             onSubmit={onSubmit}
+                             allActiveFilters={allActiveFilters}
+                             filter={filter} />
+    );
+  }
+
+  if (isDateAttribute(attribute)) {
+    return (
       <DateRangeForm onSubmit={onSubmit}
                      filter={filter} />
-    )}
+    );
+  }
+
+  return <GenericFilterInput filter={filter} onSubmit={onSubmit} />;
+};
+
+export const FilterConfiguration = ({
+  allActiveFilters,
+  attribute,
+  filter = undefined,
+  filterValueRenderer,
+  onSubmit,
+}: FilterComponentProps) => (
+  <>
+    <MenuItem header>{filter ? 'Edit' : 'Create'} {attribute.title.toLowerCase()} filter</MenuItem>
+    <FilterComponent attribute={attribute}
+                     filterValueRenderer={filterValueRenderer}
+                     onSubmit={onSubmit}
+                     allActiveFilters={allActiveFilters}
+                     filter={filter} />
   </>
 );
 

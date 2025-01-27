@@ -39,7 +39,7 @@ const useTableEventHandlers = ({
   const sendTelemetry = useSendTelemetry();
 
   const onPageSizeChange = useCallback((newPageSize: number) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.PAGE_SIZE_CHANGED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.PAGE_SIZE_CHANGED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: appSection,
       app_action_value: 'page-size-select',
@@ -60,7 +60,7 @@ const useTableEventHandlers = ({
   }, [onSearch]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.COLUMNS_CHANGED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: appSection,
       app_action_value: 'columns-select',
@@ -71,7 +71,7 @@ const useTableEventHandlers = ({
   }, [appSection, pathname, sendTelemetry, updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.SORT_CHANGED, {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SORT_CHANGED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: appSection,
       app_action_value: 'sort-select',

@@ -21,12 +21,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
+import com.mongodb.client.MongoCollection;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoEntity;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +42,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
 @ExtendWith(MongoDBExtension.class)
 class EncryptedValueTest {
@@ -58,7 +61,8 @@ class EncryptedValueTest {
                 InputConfigurationBeanDeserializerModifier.withoutConfig()
         ).get();
 
-        this.dbService = new TestService(mongodb.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper));
+        this.dbService = new TestService(new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
+                mongodb.mongoConnection()));
     }
 
     @Test
@@ -154,7 +158,7 @@ class EncryptedValueTest {
                 .isDeleteValue(false)
                 .build();
 
-        final String savedId = dbService.save(TestDTO.create(value)).id();
+        final String savedId = dbService.create(TestDTO.create(value));
         final TestDTO dto = dbService.get(savedId).orElse(null);
 
         assertThat(dto).isNotNull();
@@ -167,7 +171,7 @@ class EncryptedValueTest {
 
     @Test
     void testUnsetWithDatabase() {
-        final String savedId = dbService.save(TestDTO.create(EncryptedValue.createUnset())).id();
+        final String savedId = dbService.create(TestDTO.create(EncryptedValue.createUnset()));
         final TestDTO dto = dbService.get(savedId).orElse(null);
 
         assertThat(dto).isNotNull();
@@ -178,19 +182,26 @@ class EncryptedValueTest {
         assertThat(dto.passwordValue().salt()).isEmpty();
     }
 
-    static class TestService extends PaginatedDbService<TestDTO> {
-        @Override
-        public Optional<TestDTO> get(String id) {
-            return super.get(id);
+    static class TestService {
+        private final MongoCollection<TestDTO> collection;
+        private final MongoUtils<TestDTO> utils;
+
+        protected TestService(MongoCollections mongoCollections) {
+            collection = mongoCollections.collection("test_collection", TestDTO.class);
+            utils = mongoCollections.utils(collection);
         }
 
-        protected TestService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapperProvider) {
-            super(mongoConnection, mapperProvider, TestDTO.class, "test_collection");
+        public Optional<TestDTO> get(String id) {
+            return utils.getById(id);
+        }
+
+        public String create(TestDTO testDTO) {
+            return insertedIdAsString(collection.insertOne(testDTO));
         }
     }
 
     @AutoValue
-    static abstract class TestDTO {
+    static abstract class TestDTO implements MongoEntity {
         @Id
         @ObjectId
         @Nullable

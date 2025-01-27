@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import debounce from 'lodash/debounce';
 import styled, { css } from 'styled-components';
 
@@ -23,14 +23,7 @@ import type { Attribute } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import { PaginatedList, NoSearchResult } from 'components/common';
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
-import useFilterValueSuggestions from 'components/common/EntityFilters/hooks/useFilterValueSuggestions';
 import Spinner from 'components/common/Spinner';
-
-const DEFAULT_SEARCH_PARAMS = {
-  query: '',
-  pageSize: 10,
-  page: 1,
-};
 
 const Container = styled.div(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
@@ -50,25 +43,40 @@ const Hint = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 
+type SearchParams = {
+  query: string,
+  page: number,
+  pageSize: number,
+}
+
+type Suggestion = {
+  id: string,
+  value: string,
+}
+
 type Props = {
   allActiveFilters: Filters | undefined,
   attribute: Attribute,
   filter: Filter | undefined
   filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
   onSubmit: (filter: { title: string, value: string }, closeDropdown: boolean) => void,
+  suggestions: Array<Suggestion>,
+  isLoading: boolean,
+  total: number,
+  page: number,
+  pageSize: number,
+  setSearchParams: (updater: (current: SearchParams) => SearchParams) => void,
 }
 
-const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, filter }: Props) => {
+const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, filter, isLoading, suggestions, total, setSearchParams, page, pageSize }: Props) => {
   const isShiftHeld = useIsKeyHeld('Shift');
-  const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
-  const { data: { pagination, suggestions }, isInitialLoading } = useFilterValueSuggestions(attribute.id, attribute.related_collection, searchParams, attribute.related_property);
   const handleSearchChange = useCallback((newSearchQuery: string) => {
-    setSearchParams((cur) => ({ ...cur, page: DEFAULT_SEARCH_PARAMS.page, query: newSearchQuery }));
+    setSearchParams((cur) => ({ ...cur, page: 1, query: newSearchQuery }));
   }, [setSearchParams]);
 
-  const handlePaginationChange = useCallback((page: number) => {
-    setSearchParams((cur) => ({ ...cur, page }));
-  }, []);
+  const handlePaginationChange = useCallback((newPage: number) => {
+    setSearchParams((cur) => ({ ...cur, page: newPage }));
+  }, [setSearchParams]);
 
   const debounceOnSearch = debounce((value: string) => handleSearchChange(value), 1000);
 
@@ -79,15 +87,15 @@ const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFi
                    formGroupClassName=""
                    placeholder={`Search for ${attribute.title.toLowerCase()}`}
                    onChange={({ target: { value } }) => debounceOnSearch(value)} />
-      {isInitialLoading && <Spinner />}
+      {isLoading && <Spinner />}
 
       {!!suggestions?.length && (
         <PaginatedList showPageSizeSelect={false}
-                       totalItems={pagination.total}
+                       totalItems={total}
                        hidePreviousAndNextPageLinks
                        hideFirstAndLastPageLinks
-                       activePage={searchParams.page}
-                       pageSize={searchParams.pageSize}
+                       activePage={page}
+                       pageSize={pageSize}
                        onChange={handlePaginationChange}
                        useQueryParameter={false}>
           <StyledListGroup>

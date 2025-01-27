@@ -18,25 +18,29 @@ import React, { useRef } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { EventActionComponentProps } from 'views/types';
+import type { Event } from 'components/events/events/types';
 
-const usePluggableEventActions = (eventId: string) => {
+const usePluggableEventActions = (events: Array<Event>, onlyBulk: boolean = false) => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.eventActions');
   const availableActions = pluggableActions.filter(
-    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
+    (perspective) => (onlyBulk ? perspective.isBulk : true) && (perspective.useCondition ? !!perspective.useCondition(events) : true),
   );
+
   const actions = availableActions.map(({ component: PluggableEventAction, key }: { component: React.ComponentType<EventActionComponentProps>, key: string }) => (
     <PluggableEventAction key={`event-action-${key}`}
-                          eventId={eventId}
-                          modalRef={() => modalRefs.current[key]} />
+                          events={events}
+                          modalRef={() => modalRefs.current[key]}
+                          fromBulk={onlyBulk} />
   ));
 
   const actionModals = availableActions
     .filter(({ modal }) => !!modal)
     .map(({ modal: ActionModal, key }) => (
       <ActionModal key={`event-action-modal-${key}`}
-                   eventId={eventId}
-                   ref={(r) => { modalRefs.current[key] = r; }} />
+                   events={events}
+                   ref={(r) => { modalRefs.current[key] = r; }}
+                   fromBulk={onlyBulk} />
     ));
 
   return ({ actions, actionModals });

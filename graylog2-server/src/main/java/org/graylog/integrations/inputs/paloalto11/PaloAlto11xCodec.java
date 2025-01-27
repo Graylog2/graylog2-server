@@ -44,6 +44,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class PaloAlto11xCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(PaloAlto11xCodec.class);
@@ -71,9 +72,8 @@ public class PaloAlto11xCodec implements Codec {
         this.rawMessageParser = rawMessageParser;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         String rawMessageString = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
         LOG.trace("Received raw message: {}", rawMessageString);
 
@@ -111,7 +111,7 @@ public class PaloAlto11xCodec implements Codec {
             message.addField(Message.FIELD_FULL_MESSAGE, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
         }
         LOG.trace("Successfully processed [{}] message with [{}] fields.", panType, message.getFieldCount());
-        return message;
+        return Optional.of(message);
     }
 
     private String getRawMessageSource(RawMessage rawMessage) {

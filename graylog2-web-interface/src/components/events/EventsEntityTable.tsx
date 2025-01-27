@@ -25,20 +25,24 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useQuery from 'routing/useQuery';
 import useColumnRenderers from 'components/events/events/ColumnRenderers';
+import EventsRefreshControls from 'components/events/events/EventsRefreshControls';
+import QueryHelper from 'components/common/QueryHelper';
 
-import QueryHelper from '../common/QueryHelper';
+const additionalSearchFields = {
+  key: 'The key of the event',
+};
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
 
   const columnRenderers = useColumnRenderers();
   const _fetchEvents = useCallback((searchParams: SearchParams) => fetchEvents(searchParams, streamId as string), [streamId]);
-  const { entityActions, expandedSections } = useTableElements({ defaultLayout: eventsTableElements.defaultLayout });
+  const { entityActions, expandedSections, bulkSelection } = useTableElements({ defaultLayout: eventsTableElements.defaultLayout });
 
   return (
     <PaginatedEntityTable<Event, EventsAdditionalData> humanName="events"
                                                        columnsOrder={eventsTableElements.columnOrder}
-                                                       queryHelpComponent={<QueryHelper entityName="events" />}
+                                                       queryHelpComponent={<QueryHelper entityName="event" fieldMap={additionalSearchFields} />}
                                                        entityActions={entityActions}
                                                        tableLayout={eventsTableElements.defaultLayout}
                                                        fetchEntities={_fetchEvents}
@@ -47,7 +51,9 @@ const EventsEntityTable = () => {
                                                        expandedSectionsRenderer={expandedSections}
                                                        entityAttributesAreCamelCase={false}
                                                        filterValueRenderers={FilterValueRenderers}
-                                                       columnRenderers={columnRenderers} />
+                                                       columnRenderers={columnRenderers}
+                                                       bulkSelection={bulkSelection}
+                                                       topRightCol={<EventsRefreshControls />} />
   );
 };
 

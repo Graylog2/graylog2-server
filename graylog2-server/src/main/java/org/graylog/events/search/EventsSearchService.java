@@ -18,31 +18,35 @@ package org.graylog.events.search;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
+import org.apache.lucene.search.TermRangeQuery;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.database.Persisted;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
-import jakarta.inject.Inject;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
 public class EventsSearchService {
+    private static final Collector<CharSequence, ?, String> joiningQueriesWithAND = Collectors.joining(" AND ");
+    private static final Collector<CharSequence, ?, String> joiningQueriesWithOR = Collectors.joining(" OR ");
     private final MoreSearch moreSearch;
     private final StreamService streamService;
     private final DBEventDefinitionService eventDefinitionService;
@@ -64,17 +68,34 @@ public class EventsSearchService {
     }
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
-        final ImmutableSet.Builder<String> filterBuilder = ImmutableSet.<String>builder()
-                // Make sure we only filter for actual events and ignore anything else that might be in the event
-                // indices. (fixes an issue when users store non-event messages in event indices)
-                .add("_exists_:" + EventDto.FIELD_EVENT_DEFINITION_ID);
+        final var filterBuilder = new ArrayList<String>();
+        // Make sure we only filter for actual events and ignore anything else that might be in the event
+        // indices. (fixes an issue when users store non-event messages in event indices)
+        filterBuilder.add("_exists_:" + EventDto.FIELD_EVENT_DEFINITION_ID);
 
         if (!parameters.filter().eventDefinitions().isEmpty()) {
             final String eventDefinitionFilter = parameters.filter().eventDefinitions().stream()
                     .map(this::eventDefinitionFilter)
-                    .collect(Collectors.joining(" OR "));
+                    .collect(joiningQueriesWithOR);
 
-            filterBuilder.addAll(Collections.singleton("(" + eventDefinitionFilter + ")"));
+            filterBuilder.add(eventDefinitionFilter);
+        }
+
+        if (!parameters.filter().priority().isEmpty()) {
+            filterBuilder.add(parameters.filter().priority().stream()
+                    .map(this::mapPriority)
+                    .map(priority -> EventDto.FIELD_PRIORITY + ":" + priority)
+                    .collect(joiningQueriesWithOR));
+        }
+
+        parameters.filter().aggregationTimerange()
+                .filter(range -> !range.isAllMessages())
+                .ifPresent(aggregationTimerange -> filterBuilder.add(createTimeRangeFilter(aggregationTimerange)));
+
+        if (!parameters.filter().key().isEmpty()) {
+            filterBuilder.add(parameters.filter().key().stream()
+                    .map(keyFilter -> EventDto.FIELD_KEY_TUPLE + ":" + quote(keyFilter))
+                    .collect(joiningQueriesWithOR));
         }
 
         switch (parameters.filter().alerts()) {
@@ -89,7 +110,9 @@ public class EventsSearchService {
                 break;
         }
 
-        final String filter = String.join(" AND ", filterBuilder.build());
+        final String filter = filterBuilder.stream()
+                .map(query -> "(" + query + ")")
+                .collect(joiningQueriesWithAND);
         final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
         final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
@@ -121,6 +144,72 @@ public class EventsSearchService {
                 .build();
     }
 
+    private String createTimeRangeFilter(TimeRange aggregationTimerange) {
+        final var formattedFrom = aggregationTimerange.getFrom().toString(ES_DATE_FORMAT_FORMATTER);
+        final var formattedTo = aggregationTimerange.getTo().toString(ES_DATE_FORMAT_FORMATTER);
+        return or(
+                group(
+                        or(
+                                TermRangeQuery.newStringRange(
+                                        EventDto.FIELD_TIMERANGE_START,
+                                        quote(formattedFrom),
+                                        quote(formattedTo),
+                                        true,
+                                        true).toString()
+                                ,
+                                TermRangeQuery.newStringRange(
+                                        EventDto.FIELD_TIMERANGE_END,
+                                        quote(formattedFrom),
+                                        quote(formattedTo),
+                                        true,
+                                        true).toString()
+                        )
+                ),
+                group(
+                        and(
+                                TermRangeQuery.newStringRange(
+                                        EventDto.FIELD_TIMERANGE_START,
+                                        quote("1970-01-01 00:00:00.000"),
+                                        quote(formattedFrom),
+                                        true,
+                                        true).toString()
+                                ,
+                                TermRangeQuery.newStringRange(
+                                        EventDto.FIELD_TIMERANGE_END,
+                                        quote(formattedTo),
+                                        quote("2038-01-01 00:00:00.000"),
+                                        true,
+                                        true).toString()
+                        )
+                )
+        );
+    }
+
+    private String quote(String s) {
+        return "\"" + s + "\"";
+    }
+
+    private String group(String s) {
+        return "(" + s + ")";
+    }
+
+    private String or(String... queries) {
+        return Arrays.stream(queries).collect(joiningQueriesWithOR);
+    }
+
+    private String and(String... queries) {
+        return Arrays.stream(queries).collect(joiningQueriesWithAND);
+    }
+
+    private long mapPriority(String priorityFilter) {
+        return switch (priorityFilter) {
+            case "high", "3" -> 3;
+            case "normal", "2" -> 2;
+            case "low", "1" -> 1;
+            default -> throw new IllegalStateException("Invalid priority: " + priorityFilter);
+        };
+    }
+
     // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is
     //       more efficient. Doing a separate ES query to get all source streams that would be in the result is
     //       most probably not more efficient.
@@ -139,23 +228,14 @@ public class EventsSearchService {
     }
 
     private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams) {
-        return streams.stream()
-                .map(streamId -> {
-                    try {
-                        return streamService.load(streamId);
-                    } catch (NotFoundException e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
+        return streamService.loadByIds(streams)
+                .stream()
                 .collect(Collectors.toMap(Persisted::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
     }
 
     private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions) {
-        return eventDefinitions.stream()
-                .map(eventDefinitionService::get)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        return eventDefinitionService.getByIds(eventDefinitions)
+                .stream()
                 .collect(Collectors.toMap(EventDefinitionDto::id,
                         d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description(), d.remediationSteps())));
     }

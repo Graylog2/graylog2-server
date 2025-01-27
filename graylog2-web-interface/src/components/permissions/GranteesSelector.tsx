@@ -130,8 +130,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
               <StyledSelectGroup>
                 <Field name="granteeId" validate={_isRequired('grantee')}>
                   {({ field: { name, value, onChange } }) => (
-                    <GranteesSelect inputProps={{ 'aria-label': 'Search for users and teams' }}
-                                    onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
+                    <GranteesSelect onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
                                     optionRenderer={_renderGranteesSelectOption}
                                     options={granteesOptions}
                                     placeholder="Search for users and teams"

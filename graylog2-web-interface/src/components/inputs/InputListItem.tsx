@@ -22,7 +22,7 @@ import { useStore } from 'stores/connect';
 import AppConfig from 'util/AppConfig';
 import { LinkContainer } from 'components/common/router';
 import { isPermitted } from 'util/PermissionsMixin';
-import { DropdownButton, MenuItem, Col, Button } from 'components/bootstrap';
+import { DropdownButton, MenuItem, Col, Button, DeleteMenuItem } from 'components/bootstrap';
 import { ConfirmDialog, EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
 import { ConfigurationWell } from 'components/configurationforms';
 import Routes from 'routing/Routes';
@@ -45,7 +45,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useFeature from 'hooks/useFeature';
-import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
+import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from 'components/inputs/InputSetupWizard';
 
 type Props = {
   input: Input,
@@ -68,11 +68,20 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState<boolean>(false);
   const [showStaticFieldForm, setShowStaticFieldForm] = useState<boolean>(false);
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
+  const [showWizard, setShowWizard] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const { inputTypes, inputDescriptions } = useStore(InputTypesStore);
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+
+  const openWizard = () => {
+    setShowWizard(true);
+  };
+
+  const closeWizard = () => {
+    setShowWizard(false);
+  };
 
   const deleteInput = () => {
     setShowConfirmDeleteDialog(true);
@@ -187,7 +196,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       );
     }
 
-    actions.push(<InputStateControl key={`input-state-control-${input.id}`} input={input} />);
+    actions.push(<InputStateControl key={`input-state-control-${input.id}`} input={input} openWizard={openWizard} />);
   }
 
   actions.push(
@@ -201,6 +210,19 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
                   disabled={definition === undefined}>
           Edit input
         </MenuItem>
+
+        <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
+          <MenuItem key={`input-diagnosis-${input.id}`}
+                    onClick={() => {
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_DIAGNOSIS_CLICKED, {
+                        app_pathname: getPathnameWithoutId(pathname),
+                        app_action_value: 'input-diagnosis',
+                      });
+                    }}>
+            Input Diagnosis
+          </MenuItem>
+        </LinkContainer>
+
         {inputSetupFeatureFlagIsEnabled && (
           isInputInSetupMode(inputStates, input.id) ? (
             <MenuItem key={`remove-setup-mode-${input.id}`}
@@ -220,7 +242,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
         )}
       </IfPermitted>
 
-      {input.global && (
+      {input.global && input.node && (
         <LinkContainer to={Routes.filtered_metrics(input.node, input.id)}>
           <MenuItem key={`show-metrics-${input.id}`}
                     onClick={() => {
@@ -244,7 +266,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
         <MenuItem key={`divider-${input.id}`} divider />
       </IfPermitted>
       <IfPermitted permissions="inputs:terminate">
-        <MenuItem key={`delete-input-${input.id}`} onSelect={deleteInput}>Delete input</MenuItem>
+        <DeleteMenuItem key={`delete-input-${input.id}`} onSelect={deleteInput}>Delete input</DeleteMenuItem>
       </IfPermitted>
     </DropdownButton>,
   );
@@ -261,6 +283,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
 
   const additionalContent = (
     <div>
+      {inputSetupFeatureFlagIsEnabled && showWizard && (<InputSetupWizard input={input} show={showWizard} onClose={closeWizard} />)}
       <Col md={8}>
         <ConfigurationWell id={input.id}
                            configuration={input.attributes}

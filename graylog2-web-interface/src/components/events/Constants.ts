@@ -14,24 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import type { Sort, Attribute } from 'stores/PaginationTypes';
+import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
-export const detailsAttributes: Array<Attribute> = [
-  {
-    id: 'id',
-    title: 'ID',
-    type: 'STRING',
-    sortable: true,
-  },
+export const commonEventAttributes: Array<Attribute> = [
   {
     id: 'priority',
     title: 'Priority',
     type: 'STRING',
     sortable: true,
     searchable: false,
+    filterable: true,
+    filter_options: Object.keys(EventDefinitionPriorityEnum.properties)
+      .map((num) => ({ value: num, title: num })),
   },
   {
     id: 'timestamp',
@@ -46,21 +43,14 @@ export const detailsAttributes: Array<Attribute> = [
     type: 'STRING',
     sortable: false,
     searchable: false,
+    filterable: true,
+    related_collection: 'event_definitions',
   },
   {
     id: 'event_definition_type',
     title: 'Event Definition Type',
     type: 'STRING',
     sortable: true,
-  },
-  {
-    id: 'remediation_steps',
-    title: 'Remediation Steps',
-    sortable: false,
-  },
-  {
-    id: 'timerange_start',
-    title: 'Aggregation time range',
   },
   {
     id: 'key',
@@ -70,18 +60,41 @@ export const detailsAttributes: Array<Attribute> = [
     searchable: false,
   },
   {
-    id: 'fields',
-    title: 'Additional Fields',
-    type: 'STRING',
-    sortable: false,
-  },
-  {
     id: 'group_by_fields',
     title: 'Group-By Fields',
     sortable: false,
   },
 ];
-export const additionalAttributes: Array<Attribute> = [
+export const detailsAttributes: Array<Attribute> = [
+  ...commonEventAttributes,
+  {
+    id: 'remediation_steps',
+    title: 'Remediation Steps',
+    sortable: false,
+  },
+  {
+    id: 'timerange_start',
+    title: 'Aggregation time range',
+    sortable: true,
+    type: 'DATE',
+    filterable: true,
+  },
+  {
+    id: 'id',
+    title: 'ID',
+    type: 'STRING',
+    sortable: true,
+    searchable: true,
+    filterable: true,
+  },
+  {
+    id: 'fields',
+    title: 'Additional Fields',
+    type: 'STRING',
+    sortable: false,
+  },
+];
+export const eventsTableSpecificAttributes: Array<Attribute> = [
   {
     id: 'message',
     title: 'Description',
@@ -97,6 +110,9 @@ export const additionalAttributes: Array<Attribute> = [
     filterable: true,
     filter_options: [{ value: 'false', title: 'Event' }, { value: 'true', title: 'Alert' }],
   },
+];
+export const additionalAttributes: Array<Attribute> = [
+  ...eventsTableSpecificAttributes,
   ...detailsAttributes,
 ];
 
