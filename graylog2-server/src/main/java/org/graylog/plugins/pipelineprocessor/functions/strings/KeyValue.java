@@ -154,7 +154,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
          * or after the escape char '\'.
          *
          * @param charMatcher the char matcher
-         * @return a char matcher that can handle double and single quotes
+         * @return a char matcher that can handle double, single quotes, and escape characters
          */
         static CharMatcher withQuoteAndEscapeHandling(CharMatcher charMatcher) {
             return new DelimiterCharMatcher('"')
