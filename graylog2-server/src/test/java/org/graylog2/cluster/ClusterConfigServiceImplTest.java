@@ -71,7 +71,7 @@ public class ClusterConfigServiceImplTest {
     private MongoJackObjectMapperProvider mapperProvider;
 
     @Before
-    public void setUpService() throws Exception {
+    public void setUpService() {
         DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
 
         this.mongoConnection = mongodb.mongoConnection();
@@ -95,7 +95,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void getReturnsExistingConfig() throws Exception {
+    public void getReturnsExistingConfig() {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
                 .add("payload", Collections.singletonMap("text", "TEST"))
@@ -113,7 +113,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void getReturnsNullOnNonExistingConfig() throws Exception {
+    public void getReturnsNullOnNonExistingConfig() {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         assertThat(collection.count()).isEqualTo(0L);
@@ -122,7 +122,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void getReturnsNullOnInvalidPayload() throws Exception {
+    public void getReturnsNullOnInvalidPayload() {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
                 .add("payload", "wrong payload")
@@ -139,7 +139,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void getWithKeyReturnsExistingConfig() throws Exception {
+    public void getWithKeyReturnsExistingConfig() {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", "foo")
                 .add("payload", Collections.singletonMap("text", "TEST"))
@@ -158,7 +158,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void getWithKeyReturnsNullOnNonExistingConfig() throws Exception {
+    public void getWithKeyReturnsNullOnNonExistingConfig() {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         assertThat(collection.count()).isEqualTo(0L);
@@ -167,7 +167,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void getOrDefaultReturnsExistingConfig() throws Exception {
+    public void getOrDefaultReturnsExistingConfig() {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
                 .add("payload", Collections.singletonMap("text", "TEST"))
@@ -188,7 +188,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void getOrDefaultReturnsDefaultValueOnNonExistingConfig() throws Exception {
+    public void getOrDefaultReturnsDefaultValueOnNonExistingConfig() {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         assertThat(collection.count()).isEqualTo(0L);
@@ -200,7 +200,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void getOrDefaultReturnsDefaultValueOnInvalidPayload() throws Exception {
+    public void getOrDefaultReturnsDefaultValueOnInvalidPayload() {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
                 .add("payload", "wrong payload")
@@ -220,7 +220,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void writeIgnoresNull() throws Exception {
+    public void writeIgnoresNull() {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         assertThat(collection.count()).isEqualTo(0L);
@@ -231,7 +231,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void writePersistsClusterConfig() throws Exception {
+    public void writePersistsClusterConfig() {
         CustomConfig customConfig = new CustomConfig();
         customConfig.text = "TEST";
 
@@ -244,12 +244,13 @@ public class ClusterConfigServiceImplTest {
         assertThat(collection.count()).isEqualTo(1L);
 
         DBObject dbObject = collection.findOne();
+        assertThat(dbObject).isNotNull();
         assertThat((String) dbObject.get("type")).isEqualTo(CustomConfig.class.getCanonicalName());
         assertThat((String) dbObject.get("last_updated_by")).isEqualTo("ID");
     }
 
     @Test
-    public void writeWithCustomKeyPersistsClusterConfig() throws Exception {
+    public void writeWithCustomKeyPersistsClusterConfig() {
         CustomConfig customConfig = new CustomConfig();
         customConfig.text = "TEST";
 
@@ -262,12 +263,13 @@ public class ClusterConfigServiceImplTest {
         assertThat(collection.count()).isEqualTo(1L);
 
         DBObject dbObject = collection.findOne();
+        assertThat(dbObject).isNotNull();
         assertThat((String) dbObject.get("type")).isEqualTo("foobar");
         assertThat((String) dbObject.get("last_updated_by")).isEqualTo("ID");
     }
 
     @Test
-    public void writeUpdatesExistingClusterConfig() throws Exception {
+    public void writeUpdatesExistingClusterConfig() {
         CustomConfig customConfig = new CustomConfig();
         customConfig.text = "TEST";
 
@@ -287,6 +289,7 @@ public class ClusterConfigServiceImplTest {
         assertThat(collection.count()).isEqualTo(1L);
 
         DBObject dbObject = collection.findOne();
+        assertThat(dbObject).isNotNull();
         assertThat((String) dbObject.get("type")).isEqualTo(CustomConfig.class.getCanonicalName());
         assertThat((String) dbObject.get("last_updated_by")).isEqualTo("ID");
 
@@ -297,7 +300,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void writePostsClusterConfigChangedEvent() throws Exception {
+    public void writePostsClusterConfigChangedEvent() {
         CustomConfig customConfig = new CustomConfig();
         customConfig.text = "TEST";
 
@@ -320,7 +323,7 @@ public class ClusterConfigServiceImplTest {
 
 
     @Test
-    public void prepareCollectionCreatesIndexesOnExistingCollection() throws Exception {
+    public void prepareCollectionCreatesIndexesOnExistingCollection() {
         @SuppressWarnings("deprecation")
         DBCollection original = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         original.dropIndexes();
@@ -334,7 +337,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void prepareCollectionCreatesCollectionIfItDoesNotExist() throws Exception {
+    public void prepareCollectionCreatesCollectionIfItDoesNotExist() {
         @SuppressWarnings("deprecation")
         final DB database = mongoConnection.getDatabase();
         database.getCollection(COLLECTION_NAME).drop();
@@ -347,7 +350,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void removeDoesNothingIfConfigDoesNotExist() throws Exception {
+    public void removeDoesNothingIfConfigDoesNotExist() {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
 
@@ -356,7 +359,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void removeSuccessfullyRemovesConfig() throws Exception {
+    public void removeSuccessfullyRemovesConfig() {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())
                 .add("payload", Collections.singletonMap("text", "TEST"))
@@ -373,7 +376,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void listReturnsAllClasses() throws Exception {
+    public void listReturnsAllClasses() {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         collection.save(new BasicDBObjectBuilder()
@@ -396,7 +399,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void listIgnoresInvalidClasses() throws Exception {
+    public void listIgnoresInvalidClasses() {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         collection.save(new BasicDBObjectBuilder()
@@ -419,7 +422,7 @@ public class ClusterConfigServiceImplTest {
     }
 
     @Test
-    public void listIgnoresUnsafeClasses() throws Exception {
+    public void listIgnoresUnsafeClasses() {
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
         collection.save(new BasicDBObjectBuilder()
