@@ -51,6 +51,8 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
     private final ParameterDescriptor<String, String> duplicateHandlingParam;
     private final ParameterDescriptor<String, CharMatcher> trimCharactersParam;
     private final ParameterDescriptor<String, CharMatcher> trimValueCharactersParam;
+    private final ParameterDescriptor<Boolean, Boolean> useEscapeCharacter;
+
 
     public KeyValue() {
         valueParam = string("value").ruleBuilderVariable().description("The string to extract key/value pairs from").build();
@@ -70,6 +72,11 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                 .optional()
                 .description("The characters to trim from values, default is not to trim")
                 .build();
+        useEscapeCharacter = bool("use_escape_char").
+                optional()
+                .description("Whether to make use of the escape character '\\' or treat it as a normal character, defaults to false treating '\\' as a normal character.")
+                .defaultValue(Optional.of(false))
+                .build();
     }
 
     @Override
@@ -81,7 +88,10 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
         final CharMatcher kvPairsMatcher = splitParam.optional(args, context).orElse(CharMatcher.whitespace());
         final CharMatcher kvDelimMatcher = valueSplitParam.optional(args, context).orElse(CharMatcher.anyOf("="));
 
-        Splitter outerSplitter = Splitter.on(DelimiterCharMatcher.withQuoteHandling(kvPairsMatcher))
+        final boolean allowEscaping = useEscapeCharacter.optional(args, context).orElse(false);
+        Splitter outerSplitter = Splitter.on(
+                        allowEscaping ? DelimiterCharMatcher.withQuoteAndEscapeHandling(kvPairsMatcher) : DelimiterCharMatcher.withQuoteHandling(kvPairsMatcher)
+                )
                 .omitEmptyStrings()
                 .trimResults();
 
@@ -139,6 +149,20 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                     .and(charMatcher);
         }
 
+        /**
+         * An implementation that doesn't split when the given delimiter char matcher appears in double or single quotes
+         * or after the escape char '\'.
+         *
+         * @param charMatcher the char matcher
+         * @return a char matcher that can handle double and single quotes
+         */
+        static CharMatcher withQuoteAndEscapeHandling(CharMatcher charMatcher) {
+            return new DelimiterCharMatcher('"')
+                    .and(new DelimiterCharMatcher('\''))
+                    .and(new NotEscapedCharMatcher())
+                    .and(charMatcher);
+        }
+
         private DelimiterCharMatcher(char wrapperChar) {
             this.wrapperChar = wrapperChar;
         }
@@ -149,6 +173,26 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                 inWrapper = !inWrapper;
             }
             return !inWrapper;
+        }
+    }
+
+    private static class NotEscapedCharMatcher extends CharMatcher {
+        private char lastChar = '\u0000';
+
+        @Override
+        public boolean matches(char c) {
+            if (lastChar == '\u0000') {
+                lastChar = c;
+                return true;
+            } else {
+                if (lastChar == '\\') {
+                    lastChar = c;
+                    return false;
+                } else {
+                    lastChar = c;
+                    return true;
+                }
+            }
         }
     }
 
