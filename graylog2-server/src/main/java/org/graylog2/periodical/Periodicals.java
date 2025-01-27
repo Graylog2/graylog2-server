@@ -43,7 +43,7 @@ public class Periodicals {
     private static final Logger LOG = LoggerFactory.getLogger(Periodicals.class);
 
     private final List<Periodical> periodicals;
-    private final Map<Periodical, ScheduledFuture> futures;
+    private final Map<Periodical, ScheduledFuture<?>> futures;
     private final ScheduledExecutorService scheduler;
     private final ScheduledExecutorService daemonScheduler;
 
@@ -138,7 +138,7 @@ public class Periodicals {
     /**
      * @return a copy of the map of all executor futures
      */
-    public Map<Periodical, ScheduledFuture> getFutures() {
+    public Map<Periodical, ScheduledFuture<?>> getFutures() {
         return Maps.newHashMap(futures);
     }
 
