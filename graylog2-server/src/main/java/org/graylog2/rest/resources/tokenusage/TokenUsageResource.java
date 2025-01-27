@@ -60,15 +60,15 @@ public class TokenUsageResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put(TokenUsageDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put(TokenUsageDTO.FIELD_USERNAME, SearchQueryField.create(TokenUsageDTO.FIELD_USERNAME))
-            .put(TokenUsageDTO.FIELD_NAME, SearchQueryField.create(TokenUsageDTO.FIELD_NAME))
+            .put(TokenUsage.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
+            .put(TokenUsage.FIELD_USERNAME, SearchQueryField.create(TokenUsage.FIELD_USERNAME))
+            .put(TokenUsage.FIELD_NAME, SearchQueryField.create(TokenUsage.FIELD_NAME))
             .build();
 
     @Inject
     public TokenUsageResource(TokenUsageService tokenUsageService) {
         this.tokenUsageService = tokenUsageService;
-        this.searchQueryParser = new SearchQueryParser(TokenUsageDTO.FIELD_NAME, SEARCH_FIELD_MAPPING);
+        this.searchQueryParser = new SearchQueryParser(TokenUsage.FIELD_NAME, SEARCH_FIELD_MAPPING);
     }
 
     @GET
@@ -77,16 +77,16 @@ public class TokenUsageResource extends RestResource {
     @ApiOperation(value = "Get paginated list of tokens")
     @RequiresPermissions(RestPermissions.TOKEN_USAGE_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public PaginatedResponse<TokenUsage> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                 @ApiParam(name = "sort",
-                                                           value = "The field to sort the result on",
-                                                           required = true,
-                                                           allowableValues = "title,description")
-                                                 @DefaultValue(TokenUsageDTO.FIELD_NAME) @QueryParam("sort") String sort,
-                                                 @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                 @DefaultValue("asc") @QueryParam("order") SortOrder order) {
+    public PaginatedResponse<TokenUsageDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                    @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                    @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                    @ApiParam(name = "sort",
+                                                              value = "The field to sort the result on",
+                                                              required = true,
+                                                              allowableValues = "userName,name")
+                                                    @DefaultValue(TokenUsage.FIELD_NAME) @QueryParam("sort") String sort,
+                                                    @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                    @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         LOG.debug("Incoming request to list token usages{}, on page {} with {} items per page.", query.isEmpty() ? "" : " matching " + query, page, perPage);
         final SearchQuery searchQuery;
         try {
@@ -94,7 +94,7 @@ public class TokenUsageResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        final PaginatedList<TokenUsage> tokenUsages = tokenUsageService.loadTokenUsage(page, perPage, searchQuery, sort, order);
+        final PaginatedList<TokenUsageDTO> tokenUsages = tokenUsageService.loadTokenUsage(page, perPage, searchQuery, sort, order);
         LOG.debug("Found {} token usages for incoming request. Converting to response.", tokenUsages.size());
         return PaginatedResponse.create("token_usage", tokenUsages, query);
     }

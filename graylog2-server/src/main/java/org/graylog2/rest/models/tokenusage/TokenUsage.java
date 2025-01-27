@@ -16,37 +16,83 @@
  */
 package org.graylog2.rest.models.tokenusage;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.autovalue.WithBeanGetter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
-@WithBeanGetter
-public record TokenUsage(
-        @JsonProperty("token_id") String tokenId,
-        @JsonProperty("username") String username,
-        @JsonProperty("user_id") String userId,
-        @JsonProperty("token_name") String tokenName,
-        @Nullable @JsonProperty("created_at") DateTime createdAt,
-        @JsonProperty("last_access") DateTime lastAccess,
-        @JsonProperty("user_is_external") boolean userIsExternal,
-        @JsonProperty("auth_backend") String authBackend) {
+@AutoValue
+@JsonDeserialize(builder = TokenUsage.Builder.class)
+public abstract class TokenUsage implements MongoEntity {
 
-    public static TokenUsage create(@JsonProperty("token_id") String tokenId,
-                                    @JsonProperty("username") String username,
-                                    @JsonProperty("user_id") String userId,
-                                    @JsonProperty("token_name") String tokenName,
-                                    @Nullable @JsonProperty("created_at") DateTime createdAt,
-                                    @JsonProperty("last_access") DateTime lastAccess,
-                                    @JsonProperty("user_is_external") boolean userIsExternal,
-                                    @Nullable @JsonProperty("auth_backend") String authBackend) {
-        return new TokenUsage(tokenId, username, userId,
-                tokenName,
-                createdAt,
-                lastAccess,
-                userIsExternal,
-                authBackend);
+    public static final String FIELD_ID = "_id";
+    public static final String FIELD_USERNAME = "username";
+    public static final String FIELD_NAME = "NAME";
+
+    public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_LAST_ACCESS = "last_access";
+    public static final String FIELD_EXPIRES_AT = "expires_at";
+
+    @Id
+    @ObjectId
+    @Nullable
+    @Override
+    @JsonProperty(FIELD_ID)
+    public abstract String id();
+
+    @JsonProperty(FIELD_USERNAME)
+    public abstract String userName();
+
+    @JsonProperty(FIELD_NAME)
+    public abstract String name();
+
+    @Nullable
+    @JsonProperty(FIELD_CREATED_AT)
+    public abstract DateTime createdAt();
+
+    @JsonProperty(FIELD_LAST_ACCESS)
+    public abstract DateTime lastAccess();
+
+    @Nullable
+    @JsonProperty(FIELD_EXPIRES_AT)
+    public abstract DateTime expiresAt();
+
+    @AutoValue.Builder
+    @JsonIgnoreProperties({"token", "token_type"})
+    public static abstract class Builder {
+
+        @JsonCreator
+        public static TokenUsage.Builder create() {
+            return new AutoValue_TokenUsage.Builder();
+        }
+
+        @Id
+        @ObjectId
+        @JsonProperty(FIELD_ID)
+        public abstract Builder id(String id);
+
+        @JsonProperty(FIELD_USERNAME)
+        public abstract Builder userName(String username);
+
+        @JsonProperty(FIELD_NAME)
+        public abstract Builder name(String name);
+
+        @JsonProperty(FIELD_CREATED_AT)
+        public abstract Builder createdAt(@Nullable DateTime createdAt);
+
+        @JsonProperty(FIELD_LAST_ACCESS)
+        public abstract Builder lastAccess(DateTime lastAccess);
+
+        @JsonProperty(FIELD_EXPIRES_AT)
+        public abstract Builder expiresAt(@Nullable DateTime expiresAt);
+
+        public abstract TokenUsage build();
     }
-
 }

@@ -60,19 +60,19 @@ public class TokenUsageResourceTest {
     @Test
     public void callingEndpointCallsService() {
         final String query = "";
-        when(tokenUsageService.loadTokenUsage(eq(PAGE), eq(PER_PAGE), any(SearchQuery.class), eq(TokenUsageDTO.FIELD_NAME), eq(SortOrder.ASCENDING)))
+        when(tokenUsageService.loadTokenUsage(eq(PAGE), eq(PER_PAGE), any(SearchQuery.class), eq(TokenUsage.FIELD_NAME), eq(SortOrder.ASCENDING)))
                 .thenReturn(mkPaginatedList());
 
-        final PaginatedResponse<TokenUsage> actual = testee.getPage(PAGE, PER_PAGE, query, TokenUsageDTO.FIELD_NAME, SortOrder.ASCENDING);
+        final PaginatedResponse<TokenUsageDTO> actual = testee.getPage(PAGE, PER_PAGE, query, TokenUsage.FIELD_NAME, SortOrder.ASCENDING);
 
-        final PaginatedResponse<TokenUsage> expected = PaginatedResponse.create("token_usage", mkPaginatedList(), query);
+        final PaginatedResponse<TokenUsageDTO> expected = PaginatedResponse.create("token_usage", mkPaginatedList(), query);
         //Sorry. the PaginatedResponse doesn't have a proper equals():
         assertTrue(new ReflectionEquals(expected).matches(actual));
 
-        verify(tokenUsageService, times(1)).loadTokenUsage(eq(PAGE), eq(PER_PAGE), any(SearchQuery.class), eq(TokenUsageDTO.FIELD_NAME), eq(SortOrder.ASCENDING));
+        verify(tokenUsageService, times(1)).loadTokenUsage(eq(PAGE), eq(PER_PAGE), any(SearchQuery.class), eq(TokenUsage.FIELD_NAME), eq(SortOrder.ASCENDING));
     }
 
-    private PaginatedList<TokenUsage> mkPaginatedList() {
+    private PaginatedList<TokenUsageDTO> mkPaginatedList() {
         return PaginatedList.emptyList(PAGE, PER_PAGE);
     }
 }

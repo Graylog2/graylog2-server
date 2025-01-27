@@ -54,16 +54,16 @@ public class TokenUsageServiceImpl implements TokenUsageService {
     }
 
     @Override
-    public PaginatedList<TokenUsage> loadTokenUsage(int page,
-                                                    int perPage,
-                                                    SearchQuery searchQuery,
-                                                    String sort,
-                                                    SortOrder order) {
-        final PaginatedList<TokenUsageDTO> currentPage = this.paginatedTokenUsageService.findPaginated(searchQuery, page, perPage, sort, order);
+    public PaginatedList<TokenUsageDTO> loadTokenUsage(int page,
+                                                       int perPage,
+                                                       SearchQuery searchQuery,
+                                                       String sort,
+                                                       SortOrder order) {
+        final PaginatedList<TokenUsage> currentPage = this.paginatedTokenUsageService.findPaginated(searchQuery, page, perPage, sort, order);
 
         //We loaded all matching tokens, let's now extract the respective users having created these tokens and (if applicable) their authentication-backend:
         final Map<String, User> usersOfThisPage = currentPage.stream()
-                .map(TokenUsageDTO::userName)
+                .map(TokenUsage::userName)
                 .distinct()
                 .map(userService::load)
                 .filter(Objects::nonNull)
@@ -80,8 +80,8 @@ public class TokenUsageServiceImpl implements TokenUsageService {
                 .collect(Collectors.toMap(AuthServiceBackendDTO::id, AuthServiceBackendDTO::title));
 
         //Build up the resulting objects:
-        final List<TokenUsage> tokenUsage = currentPage.stream()
-                .map(dto -> toTokenUsage(dto, usersOfThisPage, authServiceIdToTitle))
+        final List<TokenUsageDTO> tokenUsage = currentPage.stream()
+                .map(usage -> toDTO(usage, usersOfThisPage, authServiceIdToTitle))
                 .toList();
 
         return new PaginatedList<>(tokenUsage, currentPage.pagination().total(), page, perPage);
@@ -89,7 +89,7 @@ public class TokenUsageServiceImpl implements TokenUsageService {
     }
 
     @Nonnull
-    private TokenUsage toTokenUsage(TokenUsageDTO dto, Map<String, User> usersOfThisPage, Map<String, String> authServiceIdToTitle) {
+    private TokenUsageDTO toDTO(TokenUsage dto, Map<String, User> usersOfThisPage, Map<String, String> authServiceIdToTitle) {
         final String username = dto.userName();
         final User user = usersOfThisPage.get(username);
         final boolean isExternal = user.isExternalUser();
@@ -102,6 +102,6 @@ public class TokenUsageServiceImpl implements TokenUsageService {
             authBackend = "";
         }
 
-        return TokenUsage.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess(), isExternal, authBackend);
+        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess(), isExternal, authBackend);
     }
 }

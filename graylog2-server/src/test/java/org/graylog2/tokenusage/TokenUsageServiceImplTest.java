@@ -62,7 +62,7 @@ import static org.mockito.Mockito.when;
 public class TokenUsageServiceImplTest {
     private static final int PAGE = 1;
     private static final int PER_PAGE = 10;
-    private static final String SORT = TokenUsageDTO.FIELD_NAME;
+    private static final String SORT = TokenUsage.FIELD_NAME;
     private static final SortOrder SORT_ORDER = SortOrder.ASCENDING;
 
     @Rule
@@ -92,9 +92,9 @@ public class TokenUsageServiceImplTest {
         when(paginatedTokenUsageService.findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER)))
                 .thenReturn(PaginatedList.emptyList(PAGE, PER_PAGE));
         when(dbAuthServiceBackendService.streamByIds(Collections.emptySet())).thenReturn(Stream.empty());
-        final PaginatedList<TokenUsage> expected = new PaginatedList<>(Collections.emptyList(), 0, PAGE, PER_PAGE);
+        final PaginatedList<TokenUsageDTO> expected = new PaginatedList<>(Collections.emptyList(), 0, PAGE, PER_PAGE);
 
-        final PaginatedList<TokenUsage> actual = testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER);
+        final PaginatedList<TokenUsageDTO> actual = testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER);
         assertEquals(expected, actual);
 
         verify(paginatedTokenUsageService).findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER));
@@ -104,8 +104,8 @@ public class TokenUsageServiceImplTest {
 
     @Test
     public void onlyLocalUsersDoesntHitTheAuthBackendService() {
-        final TokenUsageDTO token1 = mkToken(1);
-        final TokenUsageDTO token2 = mkToken(2);
+        final TokenUsage token1 = mkToken(1);
+        final TokenUsage token2 = mkToken(2);
         final User user1 = mkUser(1, false);
         final User user2 = mkUser(2, false);
         when(paginatedTokenUsageService.findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER)))
@@ -113,9 +113,9 @@ public class TokenUsageServiceImplTest {
         when(userService.load("userName1")).thenReturn(user1);
         when(userService.load("userName2")).thenReturn(user2);
         when(dbAuthServiceBackendService.streamByIds(Collections.emptySet())).thenReturn(Stream.empty());
-        final PaginatedList<TokenUsage> expected = new PaginatedList<>(List.of(mkTokenUsage(token1, user1, null), mkTokenUsage(token2, user2, null)), 2, PAGE, PER_PAGE);
+        final PaginatedList<TokenUsageDTO> expected = new PaginatedList<>(List.of(mkTokenUsage(token1, user1, null), mkTokenUsage(token2, user2, null)), 2, PAGE, PER_PAGE);
 
-        final PaginatedList<TokenUsage> actual = testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER);
+        final PaginatedList<TokenUsageDTO> actual = testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER);
         assertEquals(expected, actual);
 
         verify(paginatedTokenUsageService).findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER));
@@ -127,8 +127,8 @@ public class TokenUsageServiceImplTest {
 
     @Test
     public void tokensFromExternalUsersShowAuthBackends() {
-        final TokenUsageDTO token1 = mkToken(1);
-        final TokenUsageDTO token2 = mkToken(2);
+        final TokenUsage token1 = mkToken(1);
+        final TokenUsage token2 = mkToken(2);
         final User user1 = mkUser(1, true);
         final User user2 = mkUser(2, true);
         final AuthServiceBackendDTO authService1 = mkAuthService();
@@ -137,9 +137,9 @@ public class TokenUsageServiceImplTest {
         when(userService.load("userName1")).thenReturn(user1);
         when(userService.load("userName2")).thenReturn(user2);
         when(dbAuthServiceBackendService.streamByIds(Set.of("auth-backend-id1", "auth-backend-id2"))).thenReturn(Stream.of(mkAuthService()));
-        final PaginatedList<TokenUsage> expected = new PaginatedList<>(List.of(mkTokenUsage(token1, user1, authService1.title()), mkTokenUsage(token2, user2, "<auth-backend-id2> (DELETED)")), 2, PAGE, PER_PAGE);
+        final PaginatedList<TokenUsageDTO> expected = new PaginatedList<>(List.of(mkTokenUsage(token1, user1, authService1.title()), mkTokenUsage(token2, user2, "<auth-backend-id2> (DELETED)")), 2, PAGE, PER_PAGE);
 
-        final PaginatedList<TokenUsage> actual = testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER);
+        final PaginatedList<TokenUsageDTO> actual = testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER);
         assertEquals(expected, actual);
 
         verify(paginatedTokenUsageService).findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER));
@@ -153,8 +153,8 @@ public class TokenUsageServiceImplTest {
     //Just some helper methods
 
 
-    private TokenUsageDTO mkToken(int number) {
-        return TokenUsageDTO.Builder.create()
+    private TokenUsage mkToken(int number) {
+        return TokenUsage.Builder.create()
                 .id("tokenId" + number)
                 .name("tokenName" + number)
                 .userName("userName" + number)
@@ -184,7 +184,7 @@ public class TokenUsageServiceImplTest {
                 .build();
     }
 
-    private TokenUsage mkTokenUsage(TokenUsageDTO dto, User user, @Nullable String authBackendName) {
+    private TokenUsageDTO mkTokenUsage(TokenUsage dto, User user, @Nullable String authBackendName) {
         final String username = dto.userName();
         final boolean isExternal = user.isExternalUser();
         final String authBackend;
@@ -196,7 +196,7 @@ public class TokenUsageServiceImplTest {
             authBackend = "";
         }
 
-        return TokenUsage.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess(), isExternal, authBackend);
+        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess(), isExternal, authBackend);
     }
 
     public static class UserFactory implements UserImpl.Factory {
