@@ -71,7 +71,10 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
     .map(({ abbrev, name }: Unit) => ({ value: abbrev, label: capitalize(name) })), [currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {
-    setFieldValue(`units.${field}`, { unitType: val || undefined, abbrev: undefined });
+    const fieldUnitSettings = val
+      ? { unitType: val, abbrev: undefined }
+      : undefined;
+    setFieldValue(`units.${field}`, fieldUnitSettings);
   }, [field, setFieldValue]);
 
   const badgeLabel = useMemo(() => {
@@ -123,7 +126,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
           <Field name={`units.${field}.abbrev`}>
             {({ field: { name, value, onChange }, meta: { error } }) => (
               <Input id="metric-unit-field"
-                     label={<span>Unit <HoverForHelp displayLeftMargin>Unit which is used to format values of metric in charts</HoverForHelp></span>}
+                     label={<span>Unit <HoverForHelp displayLeftMargin>Unit used to calculate the displayed value on charts.</HoverForHelp></span>}
                      error={error}
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9">
