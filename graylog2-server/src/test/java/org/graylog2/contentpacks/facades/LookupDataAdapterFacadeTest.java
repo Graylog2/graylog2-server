@@ -134,7 +134,7 @@ public class LookupDataAdapterFacadeTest {
                         ReferenceMapUtils.toReferenceMap(Collections.emptyMap())
                 ), JsonNode.class))
                 .build();
-        assertThat(dataAdapterService.findAll()).isEmpty();
+        assertThat(dataAdapterService.streamAll()).isEmpty();
 
         final NativeEntity<DataAdapterDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
 
@@ -144,7 +144,7 @@ public class LookupDataAdapterFacadeTest {
         assertThat(nativeEntity.entity().title()).isEqualTo("HTTP DSV");
         assertThat(nativeEntity.entity().description()).isEqualTo("HTTP DSV");
 
-        assertThat(dataAdapterService.findAll()).hasSize(1);
+        assertThat(dataAdapterService.streamAll()).hasSize(1);
     }
 
     @Test
@@ -193,10 +193,10 @@ public class LookupDataAdapterFacadeTest {
     public void delete() {
         final Optional<DataAdapterDto> dataAdapterDto = dataAdapterService.get("5adf24a04b900a0fdb4e52c8");
 
-        assertThat(dataAdapterService.findAll()).hasSize(1);
+        assertThat(dataAdapterService.streamAll()).hasSize(1);
         dataAdapterDto.ifPresent(facade::delete);
 
-        assertThat(dataAdapterService.findAll()).isEmpty();
+        assertThat(dataAdapterService.streamAll()).isEmpty();
         assertThat(dataAdapterService.get("5adf24a04b900a0fdb4e52c8")).isEmpty();
     }
 

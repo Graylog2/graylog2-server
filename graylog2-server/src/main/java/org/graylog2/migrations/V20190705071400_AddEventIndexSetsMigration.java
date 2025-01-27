@@ -207,23 +207,25 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void ensureSystemNotificationEventsDefinition() {
-        if (dbService.getSystemEventDefinitions().isEmpty()) {
-            EventDefinitionDto eventDto =
-                    EventDefinitionDto.builder()
-                            .title("System notification events")
-                            .description("Reserved event definition for system notification events")
-                            .alert(false)
-                            .priority(1)
-                            .keySpec(ImmutableList.of())
-                            .notificationSettings(EventNotificationSettings.builder()
-                                    .gracePeriodMs(0) // Defaults to 0 in the UI
-                                    .backlogSize(0) // Defaults to 0 in the UI
-                                    .build())
-                            .config(SystemNotificationEventProcessorConfig.builder().build())
-                            .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
-                            .scope(SystemNotificationEventEntityScope.NAME)
-                            .build();
-            dbService.save(eventDto);
+        try (java.util.stream.Stream<EventDefinitionDto> eventDefinitionStream = dbService.streamSystemEventDefinitions()) {
+            if (eventDefinitionStream.findAny().isEmpty()) {
+                EventDefinitionDto eventDto =
+                        EventDefinitionDto.builder()
+                                .title("System notification events")
+                                .description("Reserved event definition for system notification events")
+                                .alert(false)
+                                .priority(1)
+                                .keySpec(ImmutableList.of())
+                                .notificationSettings(EventNotificationSettings.builder()
+                                        .gracePeriodMs(0) // Defaults to 0 in the UI
+                                        .backlogSize(0) // Defaults to 0 in the UI
+                                        .build())
+                                .config(SystemNotificationEventProcessorConfig.builder().build())
+                                .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
+                                .scope(SystemNotificationEventEntityScope.NAME)
+                                .build();
+                dbService.save(eventDto);
+            }
         }
     }
 }

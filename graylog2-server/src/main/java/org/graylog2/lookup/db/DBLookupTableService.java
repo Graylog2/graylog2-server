@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
@@ -94,22 +95,43 @@ public class DBLookupTableService {
         clusterEventBus.post(LookupTablesUpdated.create(tables));
     }
 
+    @Deprecated
     public Collection<LookupTableDto> findAll() {
-        return stream(collection.find()).toList();
+        try (Stream<LookupTableDto> stream = streamAll()) {
+            return stream.toList();
+        }
+    }
+
+    public Stream<LookupTableDto> streamAll() {
+        return stream(collection.find());
     }
 
     public PaginatedList<LookupTableDto> findPaginated(Bson query, Bson sort, int page, int perPage) {
         return paginationHelper.filter(query).sort(sort).perPage(perPage).page(page);
     }
 
+    @Deprecated
     public Collection<LookupTableDto> findByCacheIds(Collection<String> cacheIds) {
-        Bson query = in("cache", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()));
-        return stream(collection.find(query)).toList();
+        try (Stream<LookupTableDto> stream = streamByCacheIds(cacheIds)) {
+            return stream.toList();
+        }
     }
 
+    public Stream<LookupTableDto> streamByCacheIds(Collection<String> cacheIds) {
+        Bson query = in("cache", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()));
+        return stream(collection.find(query));
+    }
+
+    @Deprecated
     public Collection<LookupTableDto> findByDataAdapterIds(Collection<String> dataAdapterIds) {
+        try (Stream<LookupTableDto> stream = streamByDataAdapterIds(dataAdapterIds)) {
+            return stream.toList();
+        }
+    }
+
+    public Stream<LookupTableDto> streamByDataAdapterIds(Collection<String> dataAdapterIds) {
         Bson query = in("data_adapter", dataAdapterIds.stream().map(ObjectId::new).collect(Collectors.toList()));
-        return stream(collection.find(query)).toList();
+        return stream(collection.find(query));
     }
 
     public void deleteAndPostEvent(String idOrName) {

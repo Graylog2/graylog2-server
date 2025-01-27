@@ -36,6 +36,7 @@ import org.graylog2.lookup.events.DataAdaptersUpdated;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog2.database.utils.MongoUtils.idEq;
@@ -124,12 +125,26 @@ public class DBDataAdapterService {
         });
     }
 
+    @Deprecated
     public Collection<DataAdapterDto> findByIds(Set<String> idSet) {
-        return stream(collection.find(stringIdsIn(idSet))).toList();
+        try (Stream<DataAdapterDto> stream = streamByIds(idSet)) {
+            return stream.toList();
+        }
 
     }
 
+    public Stream<DataAdapterDto> streamByIds(Set<String> idSet) {
+        return stream(collection.find(stringIdsIn(idSet)));
+    }
+
+    @Deprecated
     public Collection<DataAdapterDto> findAll() {
-        return stream(collection.find()).toList();
+        try (Stream<DataAdapterDto> stream = streamAll()) {
+            return stream.toList();
+        }
+    }
+
+    public Stream<DataAdapterDto> streamAll() {
+        return stream(collection.find());
     }
 }

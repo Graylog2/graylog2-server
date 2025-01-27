@@ -36,11 +36,11 @@ import org.graylog2.lookup.events.CachesUpdated;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog2.database.utils.MongoUtils.stream;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
-
 
 public class DBCacheService {
     public static final String COLLECTION_NAME = "lut_caches";
@@ -115,11 +115,25 @@ public class DBCacheService {
         });
     }
 
+    @Deprecated
     public Collection<CacheDto> findByIds(Set<String> idSet) {
-        return stream(collection.find(stringIdsIn(idSet))).toList();
+        try (Stream<CacheDto> stream = streamByIds(idSet)) {
+            return stream.toList();
+        }
     }
 
+    public Stream<CacheDto> streamByIds(Set<String> idSet) {
+        return stream(collection.find(stringIdsIn(idSet)));
+    }
+
+    @Deprecated
     public Collection<CacheDto> findAll() {
-        return stream(collection.find()).toList();
+        try (Stream<CacheDto> stream = streamAll()) {
+            return stream.toList();
+        }
+    }
+
+    public Stream<CacheDto> streamAll() {
+        return stream(collection.find());
     }
 }

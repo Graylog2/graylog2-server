@@ -443,7 +443,7 @@ public class EventDefinitionHandlerTest {
     public void schedule() {
         assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isPresent();
         assertThat(jobDefinitionService.streamAll().count()).isEqualTo(0);
-        assertThat(jobTriggerService.all()).isEmpty();
+        assertThat(jobTriggerService.streamAll()).isEmpty();
 
         handler.schedule("54e3deadbeefdeadbeef0000");
 

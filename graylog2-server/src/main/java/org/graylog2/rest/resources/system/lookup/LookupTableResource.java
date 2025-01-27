@@ -279,8 +279,11 @@ public class LookupTableResource extends RestResource {
                     dataAdapterIds.add(dto.dataAdapterId());
                 });
 
-                dbCacheService.findByIds(cacheIds.build()).forEach(cacheDto -> caches.add(CacheApi.fromDto(cacheDto)));
-                dbDataAdapterService.findByIds(dataAdapterIds.build()).forEach(dataAdapterDto -> dataAdapters.add(DataAdapterApi.fromDto(dataAdapterDto)));
+                try (Stream<DataAdapterDto> dataAdapterStream = dbDataAdapterService.streamByIds(dataAdapterIds.build());
+                     Stream<CacheDto> cacheStream = dbCacheService.streamByIds(cacheIds.build())) {
+                    dataAdapterStream.forEach(dataAdapterDto -> dataAdapters.add(DataAdapterApi.fromDto(dataAdapterDto)));
+                    cacheStream.forEach(cacheDto -> caches.add(CacheApi.fromDto(cacheDto)));
+                }
             }
 
             return new LookupTablePage(query,
@@ -311,8 +314,11 @@ public class LookupTableResource extends RestResource {
         Set<DataAdapterApi> adapters = Collections.emptySet();
 
         if (resolveObjects) {
-            caches = dbCacheService.findByIds(Collections.singleton(tableDto.cacheId())).stream().map(CacheApi::fromDto).collect(Collectors.toSet());
-            adapters = dbDataAdapterService.findByIds(Collections.singleton(tableDto.dataAdapterId())).stream().map(DataAdapterApi::fromDto).collect(Collectors.toSet());
+            try (Stream<DataAdapterDto> dataAdapterStream = dbDataAdapterService.streamByIds(Collections.singleton(tableDto.dataAdapterId()));
+                 Stream<CacheDto> cacheStream = dbCacheService.streamByIds(Collections.singleton(tableDto.cacheId()))) {
+                caches = cacheStream.map(CacheApi::fromDto).collect(Collectors.toSet());
+                adapters = dataAdapterStream.map(DataAdapterApi::fromDto).collect(Collectors.toSet());
+            }
         }
 
         final PaginatedList<LookupTableApi> result = PaginatedList.singleton(LookupTableApi.fromDto(tableDto), 1, 1);
@@ -570,12 +576,15 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Delete the given data adapter", notes = "The data adapter cannot be in use by any lookup table, otherwise the request will fail.")
     public DataAdapterApi deleteAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
-        if (!dataAdapterDto.isPresent()) {
+        if (dataAdapterDto.isEmpty()) {
             throw new NotFoundException();
         }
         DataAdapterDto dto = dataAdapterDto.get();
         checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, dto.id());
-        boolean unused = dbTableService.findByDataAdapterIds(singleton(dto.id())).isEmpty();
+        final boolean unused;
+        try (Stream<LookupTableDto> lookupTableStream = dbTableService.streamByDataAdapterIds(singleton(dto.id()))) {
+            unused = lookupTableStream.findAny().isEmpty();
+        }
         if (!unused) {
             throw new BadRequestException("The adapter is still in use, cannot delete.");
         }
@@ -720,12 +729,15 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Delete the given cache", notes = "The cache cannot be in use by any lookup table, otherwise the request will fail.")
     public CacheApi deleteCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
-        if (!cacheDto.isPresent()) {
+        if (cacheDto.isEmpty()) {
             throw new NotFoundException();
         }
         CacheDto dto = cacheDto.get();
         checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, dto.id());
-        boolean unused = dbTableService.findByCacheIds(singleton(dto.id())).isEmpty();
+        final boolean unused;
+        try (Stream<LookupTableDto> lookupTableStream = dbTableService.streamByCacheIds(singleton(dto.id()))) {
+            unused = lookupTableStream.findAny().isEmpty();
+        }
         if (!unused) {
             throw new BadRequestException("The cache is still in use, cannot delete.");
         }

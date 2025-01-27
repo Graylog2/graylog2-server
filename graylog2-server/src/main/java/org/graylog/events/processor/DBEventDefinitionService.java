@@ -178,31 +178,71 @@ public class DBEventDefinitionService {
     /**
      * Returns the list of event definitions that is using the given notification ID.
      *
+     * @deprecated Use {@link #streamByNotificationId(String notificationId)} instead and be sure to close the stream.
      * @param notificationId the notification ID
      * @return the event definitions with the given notification ID
      */
+    @Deprecated
     public List<EventDefinitionDto> getByNotificationId(String notificationId) {
+        try (Stream<EventDefinitionDto> stream = streamByNotificationId(notificationId)) {
+            return stream.toList();
+        }
+    }
+
+    /**
+     * Returns the stream of event definitions that is using the given notification ID.
+     *
+     * @param notificationId the notification ID
+     * @return stream of the event definitions with the given notification ID
+     */
+    public Stream<EventDefinitionDto> streamByNotificationId(String notificationId) {
         final String field = String.format(Locale.US, "%s.%s",
                 EventDefinitionDto.FIELD_NOTIFICATIONS,
                 EventNotificationConfig.FIELD_NOTIFICATION_ID);
-        return stream(collection.find(eq(field, notificationId))).toList();
+        return stream(collection.find(eq(field, notificationId)));
     }
 
     /**
      * Returns the list of system event definitions
      *
+     * @deprecated Use {@link #streamSystemEventDefinitions()} instead and be sure to close the stream.
      * @return the matching event definitions
      */
+    @Deprecated
     public List<EventDefinitionDto> getSystemEventDefinitions() {
-        return stream(collection.find(eq(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME))).toList();
+        try (Stream<EventDefinitionDto> stream = streamSystemEventDefinitions()) {
+            return stream.toList();
+        }
+    }
+
+    /**
+     * Returns the stream of system event definitions
+     *
+     * @return stream of the matching event definitions
+     */
+    public Stream<EventDefinitionDto> streamSystemEventDefinitions() {
+        return stream(collection.find(eq(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME)));
     }
 
     /**
      * Returns the list of event definitions that contain the given value in the specified array field
+     *
+     * @deprecated Use {@link #streamByArrayValue(String arrayField, String field, String value)} instead.
      */
+    @Deprecated
     @NotNull
     public List<EventDefinitionDto> getByArrayValue(String arrayField, String field, String value) {
-        return stream(collection.find(elemMatch(arrayField, eq(field, value)))).toList();
+        try (Stream<EventDefinitionDto> stream = streamByArrayValue(arrayField, field, value)) {
+            return stream.toList();
+        }
+    }
+
+    /**
+     * Returns the stream of event definitions that contain the given value in the specified array field.
+     */
+    @NotNull
+    public Stream<EventDefinitionDto> streamByArrayValue(String arrayField, String field, String value) {
+        return stream(collection.find(elemMatch(arrayField, eq(field, value))));
     }
 
     public boolean isMutable(EventDefinitionDto eventDefinition) {
