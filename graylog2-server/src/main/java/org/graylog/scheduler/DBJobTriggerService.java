@@ -19,6 +19,7 @@ package org.graylog.scheduler;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.primitives.Ints;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
@@ -162,6 +163,7 @@ public class DBJobTriggerService {
      *
      * @return stream of records
      */
+    @MustBeClosed
     public Stream<JobTriggerDto> streamAll() {
         return stream(collection.find().sort(descending(FIELD_ID)));
     }
@@ -205,6 +207,7 @@ public class DBJobTriggerService {
         }
     }
 
+    @MustBeClosed
     public Stream<JobTriggerDto> streamAllForJob(String jobDefinitionId) {
         if (isNullOrEmpty(jobDefinitionId)) {
             throw new IllegalArgumentException("jobDefinitionId cannot be null or empty");
@@ -595,6 +598,7 @@ public class DBJobTriggerService {
      * @param query The query
      * @return Stream of all found JobTriggers
      */
+    @MustBeClosed
     public Stream<JobTriggerDto> streamByQuery(Bson query) {
         return stream(collection.find(query).sort(descending(FIELD_UPDATED_AT)));
     }

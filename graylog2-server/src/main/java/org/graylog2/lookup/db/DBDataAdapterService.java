@@ -16,6 +16,7 @@
  */
 package org.graylog2.lookup.db;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -133,6 +134,7 @@ public class DBDataAdapterService {
 
     }
 
+    @MustBeClosed
     public Stream<DataAdapterDto> streamByIds(Set<String> idSet) {
         return stream(collection.find(stringIdsIn(idSet)));
     }
@@ -144,6 +146,7 @@ public class DBDataAdapterService {
         }
     }
 
+    @MustBeClosed
     public Stream<DataAdapterDto> streamAll() {
         return stream(collection.find());
     }

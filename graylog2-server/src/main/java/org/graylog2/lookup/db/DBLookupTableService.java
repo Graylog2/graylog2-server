@@ -16,6 +16,7 @@
  */
 package org.graylog2.lookup.db;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -102,6 +103,7 @@ public class DBLookupTableService {
         }
     }
 
+    @MustBeClosed
     public Stream<LookupTableDto> streamAll() {
         return stream(collection.find());
     }
@@ -117,6 +119,7 @@ public class DBLookupTableService {
         }
     }
 
+    @MustBeClosed
     public Stream<LookupTableDto> streamByCacheIds(Collection<String> cacheIds) {
         Bson query = in("cache", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()));
         return stream(collection.find(query));
@@ -129,6 +132,7 @@ public class DBLookupTableService {
         }
     }
 
+    @MustBeClosed
     public Stream<LookupTableDto> streamByDataAdapterIds(Collection<String> dataAdapterIds) {
         Bson query = in("data_adapter", dataAdapterIds.stream().map(ObjectId::new).collect(Collectors.toList()));
         return stream(collection.find(query));

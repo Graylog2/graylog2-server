@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
@@ -195,6 +196,7 @@ public class DBEventDefinitionService {
      * @param notificationId the notification ID
      * @return stream of the event definitions with the given notification ID
      */
+    @MustBeClosed
     public Stream<EventDefinitionDto> streamByNotificationId(String notificationId) {
         final String field = String.format(Locale.US, "%s.%s",
                 EventDefinitionDto.FIELD_NOTIFICATIONS,
@@ -220,6 +222,7 @@ public class DBEventDefinitionService {
      *
      * @return stream of the matching event definitions
      */
+    @MustBeClosed
     public Stream<EventDefinitionDto> streamSystemEventDefinitions() {
         return stream(collection.find(eq(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME)));
     }
@@ -241,6 +244,7 @@ public class DBEventDefinitionService {
      * Returns the stream of event definitions that contain the given value in the specified array field.
      */
     @NotNull
+    @MustBeClosed
     public Stream<EventDefinitionDto> streamByArrayValue(String arrayField, String field, String value) {
         return stream(collection.find(elemMatch(arrayField, eq(field, value))));
     }
@@ -249,6 +253,7 @@ public class DBEventDefinitionService {
         return scopedEntityMongoUtils.isMutable(eventDefinition);
     }
 
+    @MustBeClosed
     public Stream<EventDefinitionDto> streamAll() {
         return stream(collection.find());
     }
