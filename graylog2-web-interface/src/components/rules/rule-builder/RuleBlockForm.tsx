@@ -19,7 +19,7 @@ import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { FormSubmit, Icon, OverlayTrigger, Select, NestedForm } from 'components/common';
-import { Button, Col, Row } from 'components/bootstrap';
+import { Button, Col, Label, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
@@ -32,7 +32,7 @@ import type { BlockType, RuleBlock, BlockDict, BlockFieldDict, OutputVariables }
 
 import RuleHelperTable from '../rule-helper/RulerHelperTable';
 
-type Option = { label: string, value: any, description?: string | null };
+type Option = { label: string, value: any, description?: string | null, deprecated?: boolean };
 
 type Props = {
   existingBlock?: RuleBlock,
@@ -80,6 +80,11 @@ const OptionDescription = styled.p<{ $isSelected: boolean }>(({ theme, $isSelect
   white-space: nowrap;
   overflow: hidden;
 `);
+
+const OptionContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
 
 const RuleBlockForm = ({
   existingBlock,
@@ -166,7 +171,10 @@ const RuleBlockForm = ({
 
   const optionRenderer = (option: Option, isSelected: boolean) => (
     <>
-      <OptionTitle>{option.label}</OptionTitle>
+      <OptionContainer>
+        <OptionTitle>{option.label}</OptionTitle>
+        <span>{option.deprecated && <Label bsStyle="warning" bsSize="xs">Deprecated</Label>}</span>
+      </OptionContainer>
       {option.description && (<OptionDescription $isSelected={isSelected}>{option.description}</OptionDescription>)}
     </>
   );

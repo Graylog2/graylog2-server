@@ -20,6 +20,7 @@ import { RuleBuilderTypes } from './types';
 const conditionsBlockDict: BlockDict[] = [
   {
     name: 'has_field_less_or_equal',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.Boolean,
     params: [
@@ -50,6 +51,7 @@ const conditionsBlockDict: BlockDict[] = [
   },
   {
     name: 'has_field',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.Boolean,
     params: [
@@ -80,6 +82,7 @@ const conditionsBlockDict: BlockDict[] = [
   },
   {
     name: 'has_field_greater_or_equal',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.Boolean,
     params: [
@@ -111,6 +114,7 @@ const conditionsBlockDict: BlockDict[] = [
   },
   {
     name: 'has_field_equals',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.Boolean,
     params: [
@@ -144,6 +148,7 @@ const conditionsBlockDict: BlockDict[] = [
 const actionsBlockDict: BlockDict[] = [
   {
     name: 'has_field',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.Boolean,
     params: [
@@ -174,6 +179,7 @@ const actionsBlockDict: BlockDict[] = [
   },
   {
     name: 'to_long',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.Number,
     params: [
@@ -204,6 +210,7 @@ const actionsBlockDict: BlockDict[] = [
   },
   {
     name: 'get_field',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.Object,
     params: [
@@ -234,6 +241,7 @@ const actionsBlockDict: BlockDict[] = [
   },
   {
     name: 'set_grok_to_fields',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.Void,
     params: [
@@ -291,6 +299,7 @@ const actionsBlockDict: BlockDict[] = [
   },
   {
     name: 'substring',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.String,
     params: [
@@ -330,6 +339,7 @@ const actionsBlockDict: BlockDict[] = [
   },
   {
     name: 'to_string',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.String,
     params: [
@@ -360,6 +370,7 @@ const actionsBlockDict: BlockDict[] = [
   },
   {
     name: 'set_field',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.Void,
     params: [
@@ -426,6 +437,7 @@ const actionsBlockDict: BlockDict[] = [
   },
   {
     name: 'format_date',
+    deprecated: false,
     pure: false,
     return_type: RuleBuilderTypes.String,
     params: [

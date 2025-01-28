@@ -210,7 +210,7 @@ const RuleBuilderBlock = ({
 
   const isBlockNegatable = (): boolean => type === 'condition';
 
-  const options = blockDict.map(({ name, description, rule_builder_name }) => ({ label: rule_builder_name, value: name, description: description }));
+  const options = blockDict.map(({ name, description, rule_builder_name, deprecated }) => ({ label: rule_builder_name, value: name, description, deprecated  }));
 
   const showForm = !block || editMode;
 
