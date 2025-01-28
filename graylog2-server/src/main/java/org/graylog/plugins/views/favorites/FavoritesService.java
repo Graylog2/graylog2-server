@@ -132,7 +132,7 @@ public class FavoritesService {
             return mongoUtils.getById(MongoUtils.insertedId(result));
         } catch (MongoException e) {
             if (MongoUtils.isDuplicateKeyError(e)) {
-                throw new IllegalStateException("Unable to create a Favorites collection, collection with this id already exists : " + favorite.id());
+                throw new IllegalStateException("Unable to create favorites. Favorites with this id already exist: " + favorite.id());
             }
             throw e;
         }
