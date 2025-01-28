@@ -18,6 +18,7 @@ package org.graylog2.inputs.persistence;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.primitives.Ints;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.ReplaceOptions;
 import jakarta.inject.Inject;
@@ -71,7 +72,7 @@ public class MongoInputStatusService implements InputStatusService {
 
     @Override
     public int delete(String inputId) {
-        return (int) collection.deleteOne(MongoUtils.idEq(inputId)).getDeletedCount();
+        return Ints.saturatedCast(collection.deleteOne(MongoUtils.idEq(inputId)).getDeletedCount());
     }
 
     /**

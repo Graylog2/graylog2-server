@@ -19,6 +19,7 @@ package org.graylog2.users;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -201,7 +202,7 @@ public class RoleServiceImpl implements RoleService {
         final var nameMatchesAndNotReadonly = Filters.and(
                 eq(READ_ONLY, false),
                 eq(NAME_LOWER, roleName.toLowerCase(Locale.ENGLISH)));
-        return (int) collection.deleteOne(nameMatchesAndNotReadonly).getDeletedCount();
+        return Ints.saturatedCast(collection.deleteOne(nameMatchesAndNotReadonly).getDeletedCount());
     }
 
     @Override
