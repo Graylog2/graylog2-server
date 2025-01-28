@@ -23,11 +23,10 @@ import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import ReplaySearch from 'components/events/ReplaySearch';
 import type { Event } from 'components/events/events/types';
 import Button from 'components/bootstrap/Button';
-import DropdownButton from 'components/bootstrap/DropdownButton';
-import useEventBulkActions from 'components/events/events/hooks/useEventBulkActions';
 import Center from 'components/common/Center';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
+import type { RemainingBulkActionsProps } from 'components/events/bulk-replay/types';
 
 const Container = styled.div`
   display: flex;
@@ -78,28 +77,8 @@ type Props = {
   initialEventIds: Array<string>;
   events: { [eventId: string]: { event: Event } };
   onClose: () => void;
+  BulkActions: React.ComponentType<RemainingBulkActionsProps>;
 }
-
-type RemainingBulkActionsProps = {
-  events: Event[];
-  completed: boolean;
-}
-
-const RemainingBulkActions = ({ completed, events }: RemainingBulkActionsProps) => {
-  const { actions, pluggableActionModals } = useEventBulkActions(events);
-
-  return (
-    <>
-      <DropdownButton title="Bulk actions"
-                      bsStyle={completed ? 'success' : 'default'}
-                      id="bulk-actions-dropdown"
-                      disabled={!events?.length}>
-        {actions}
-      </DropdownButton>
-      {pluggableActionModals}
-    </>
-  );
-};
 
 const searchPageLayout: Partial<LayoutState> = {
   sidebar: {
@@ -149,7 +128,7 @@ const Headline = styled.h2`
   margin-bottom: 10px;
 `;
 
-const BulkEventReplay = ({ initialEventIds, events: _events, onClose }: Props) => {
+const BulkEventReplay = ({ initialEventIds, events: _events, onClose, BulkActions }: Props) => {
   const [events] = useState<Props['events']>(_events);
   const { eventIds, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents(initialEventIds);
   const selectedEvent = events?.[selectedId];
@@ -178,7 +157,7 @@ const BulkEventReplay = ({ initialEventIds, events: _events, onClose }: Props) =
           ))}
         </StyledList>
         <ActionsBar>
-          <RemainingBulkActions events={remainingEvents} completed={total > 0 && total === completed} />
+          <BulkActions events={remainingEvents} completed={total > 0 && total === completed} />
           <Button onClick={onClose}>Close</Button>
         </ActionsBar>
       </EventsListSidebar>
