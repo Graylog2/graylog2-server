@@ -32,6 +32,7 @@ import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import usePluginEntities from 'hooks/usePluginEntities';
 
@@ -57,8 +58,6 @@ const ViewEventDefinitionPage = () => {
   const CoreSigmaModal = pluggableSigmaModal
     ? pluggableSigmaModal.component as React.FC<{ ruleId: string, onCancel: () => void, onConfirm: () => void }>
     : null;
-
-  const isSystemEventDefinition = (): boolean => eventDefinition?.config?.type === 'system-notifications-v1';
 
   useEffect(() => {
     if (currentUser && isPermitted(currentUser.permissions, `eventdefinitions:read:${params.definitionId}`) && refetch) {
@@ -131,7 +130,7 @@ const ViewEventDefinitionPage = () => {
                         <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
                           <Button bsStyle="success" onClick={onEditEventDefinition}>Edit Event Definition</Button>
                         </IfPermitted>
-                        {!isSystemEventDefinition() && (
+                        {!isSystemEventDefinition(eventDefinition) && (
                           <IfPermitted permissions="eventdefinitions:create">
                             <Button onClick={() => setShowDialog(true)} bsStyle="success">Duplicate Event
                               Definition
