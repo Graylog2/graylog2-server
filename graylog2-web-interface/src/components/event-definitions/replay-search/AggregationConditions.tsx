@@ -21,15 +21,16 @@ import { useMemo, useCallback } from 'react';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { ColorPickerPopover, Icon } from 'components/common';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
-import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { conditionToExprMapper, exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
 import useAppSelector from 'stores/useAppSelector';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import { updateHighlightingRule, createHighlightingRules } from 'views/logic/slices/highlightActions';
 import { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import useAppDispatch from 'stores/useAppDispatch';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
+import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+
+import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionData';
 
 const List = styled.div`
   display: flex;
@@ -53,10 +54,11 @@ const useHighlightingRules = () => useAppSelector(selectHighlightingRules);
 
 const AggregationConditions = () => {
   const dispatch = useAppDispatch();
-  const { aggregations } = useAlertAndEventDefinitionData();
+  const { alertId, definitionId } = useReplaySearchContext();
+  const { aggregations } = useAlertAndEventDefinitionData(alertId, definitionId);
   const highlightingRules = useHighlightingRules();
 
-  const aggregationsMap = useMemo(() => new Map(aggregations.map((agg) => [
+  const aggregationsMap = useMemo(() => Object.fromEntries(aggregations.map((agg) => [
     `${agg.fnSeries}${agg.expr}${agg.value}`, agg,
   ])), [aggregations]);
 
@@ -64,7 +66,7 @@ const AggregationConditions = () => {
     if (rule) {
       dispatch(updateHighlightingRule(rule, { color: StaticColor.create(newColor) }));
     } else {
-      const { value, fnSeries, expr } = aggregationsMap.get(condition);
+      const { value, fnSeries, expr } = aggregationsMap[condition];
 
       dispatch(createHighlightingRules([
         {
@@ -77,33 +79,27 @@ const AggregationConditions = () => {
     }
   }, [aggregationsMap, dispatch]);
 
-  const highlightedAggregations = useMemo<Map<string, HighlightingRule>>(() => {
-    const initial = new Map<string, HighlightingRule>(aggregations.map(
-      ({ fnSeries, value, expr }) => [
-        `${fnSeries}${expr}${value}`, undefined,
-      ],
-    ));
+  const validAggregations = aggregations.map(({ fnSeries, value, expr }) => `${fnSeries}${expr}${value}`);
 
-    return highlightingRules.reduce((acc, rule) => {
+  const highlightedAggregations = useMemo(() => Object.fromEntries(highlightingRules
+    .map((rule) => {
       const { field, value, condition } = rule;
-      const expr = conditionToExprMapper?.[condition];
-      let result = acc;
+      const expr = conditionToExprMapper[condition];
 
       if (expr) {
         const key = `${field}${expr}${value}`;
 
-        if (acc.has(key)) {
-          result = result.set(key, rule);
-        }
+        return [key, rule] as const;
       }
 
-      return result;
-    }, initial);
-  }, [aggregations, highlightingRules]);
+      return undefined;
+    })
+    .filter((rule) => rule !== undefined && validAggregations.includes(rule[0]))),
+  [highlightingRules, validAggregations]);
 
-  return highlightedAggregations?.size ? (
+  return Object.keys(highlightedAggregations).length ? (
     <List>
-      {Array.from(highlightedAggregations).map(([condition, rule]) => {
+      {Object.entries(highlightedAggregations).map(([condition, rule]) => {
         const color = rule?.color as StaticColor;
         const hexColor = color?.color;
 

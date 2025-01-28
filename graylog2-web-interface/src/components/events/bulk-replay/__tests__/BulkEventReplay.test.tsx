@@ -19,9 +19,9 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { PluginManifest } from 'graylog-web-plugin/plugin';
 
-import type { Event } from 'components/events/events/types';
 import { usePlugin } from 'views/test/testPlugins';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
+import RemainingBulkActions from 'components/events/bulk-replay/RemainingBulkActions';
 
 import events from './events.fixtures';
 
@@ -33,7 +33,7 @@ const initialEventIds = [
   '01JH0029TS9PX5ED87TZ1RVRT2',
 ];
 
-jest.mock('components/events/bulk-replay/ReplaySearch', () => ({ event }: { event: Event }) => <span>Replaying search for event {event.id}</span>);
+jest.mock('components/events/ReplaySearch', () => ({ alertId }: { alertId: string }) => <span>Replaying search for event {alertId}</span>);
 
 const markEventAsInvestigated = async (eventId: string) => {
   const markAsInvestigatedButton = await screen.findByRole('button', { name: new RegExp(`mark event "${eventId}" as investigated`, 'i') });
@@ -53,7 +53,7 @@ const eventByIndex = (index: number) => events[initialEventIds[index]].event;
 const eventMessage = (index: number) => eventByIndex(index).message;
 
 const SUT = (props: Partial<React.ComponentProps<typeof BulkEventReplay>>) => (
-  <BulkEventReplay events={events} initialEventIds={initialEventIds} onClose={() => {}} {...props} />
+  <BulkEventReplay events={events} initialEventIds={initialEventIds} onClose={() => {}} BulkActions={RemainingBulkActions} {...props} />
 );
 
 const bulkAction = jest.fn();

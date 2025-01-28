@@ -25,6 +25,9 @@ import Spinner from 'components/common/Spinner';
 import BulkEventReplay from 'components/events/bulk-replay/BulkEventReplay';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
+import type { RemainingBulkActionsProps } from 'components/events/bulk-replay/types';
+import RemainingBulkActions from 'components/events/bulk-replay/RemainingBulkActions';
+import { singleton } from 'logic/singleton';
 
 export type BulkEventReplayState = {
   eventIds: Array<string>;
@@ -33,9 +36,13 @@ export type BulkEventReplayState = {
 
 const useEventsById = (eventIds: Array<string>) => useQuery(['events', eventIds], () => Events.getByIds({ event_ids: eventIds }));
 
-const BulkEventReplayPage = () => {
+type Props = {
+  BulkActions?: React.ComponentType<RemainingBulkActionsProps>;
+}
+
+const BulkEventReplayPage = ({ BulkActions = RemainingBulkActions }: Props) => {
   const location = useLocation<BulkEventReplayState>();
-  const { eventIds: initialEventIds = [], returnUrl } = location.state;
+  const { eventIds: initialEventIds = [], returnUrl } = (location?.state ?? {});
   const { data: events, isInitialLoading } = useEventsById(initialEventIds);
 
   const history = useHistory();
@@ -45,7 +52,7 @@ const BulkEventReplayPage = () => {
 
   return isInitialLoading
     ? <Spinner />
-    : <BulkEventReplay events={events} initialEventIds={initialEventIds} onClose={onClose} />;
+    : <BulkEventReplay events={events} initialEventIds={initialEventIds} onClose={onClose} BulkActions={BulkActions} />;
 };
 
-export default BulkEventReplayPage;
+export default singleton('pages.BulkEventReplayPage', () => BulkEventReplayPage);
