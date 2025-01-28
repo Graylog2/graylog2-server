@@ -244,9 +244,11 @@ public class DBJobTriggerServiceTest {
                 .hasMessageContaining("54e3deadbeefdeadbeefaff3");
 
         // But we can also obtain all by calling following method:
-        assertThat(dbJobTriggerService.streamAllForJob("54e3deadbeefdeadbeefaff3"))
-                .hasSize(2)
-                .allSatisfy(trigger -> assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff3"));
+        try (var stream = dbJobTriggerService.streamAllForJob("54e3deadbeefdeadbeefaff3")) {
+            assertThat(stream)
+                    .hasSize(2)
+                    .allSatisfy(trigger -> assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff3"));
+        }
     }
 
 
