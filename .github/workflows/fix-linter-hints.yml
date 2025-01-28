@@ -36,7 +36,7 @@ jobs:
         continue-on-error: true
         working-directory: graylog2-web-interface
         run: yarn lint --fix -o /tmp/report.json -f json
-      - name: Runt prettier
+      - name: Run prettier
         working-directory: graylog2-web-interface
         run: yarn format
       - name: Run lint:styles --fix
