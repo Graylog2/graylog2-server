@@ -186,8 +186,7 @@ public class OpenSearchClient {
     }
 
     private OpenSearchException exceptionFrom(Exception e, String errorMessage) {
-        if (e instanceof OpenSearchException) {
-            final OpenSearchException openSearchException = (OpenSearchException) e;
+        if (e instanceof OpenSearchException openSearchException) {
             if (isIndexNotFoundException(openSearchException)) {
                 throw IndexNotFoundException.create(errorMessage + openSearchException.getResourceId(), openSearchException.getIndex().getName());
             }
@@ -208,12 +207,23 @@ public class OpenSearchClient {
                 throw new MapperParsingException(openSearchException.getMessage());
             }
             if (isCircuitBreakerException(openSearchException)) {
-                throw new CircuitBreakerException(openSearchException.getMessage());
+                throw new CircuitBreakerException(openSearchException.getMessage(), durabilityFrom(openSearchException));
             }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
             throw new BatchSizeTooLargeException(e.getMessage());
         }
         return new OpenSearchException(errorMessage, e);
+    }
+
+    private CircuitBreakerException.Durability durabilityFrom(OpenSearchException openSearchException) {
+        return Optional.ofNullable(openSearchException.getMetadata("opensearch.durability"))
+                .map(durabilities -> durabilities.get(0))
+                .map(durability -> switch (durability) {
+                    case "TRANSIENT" -> CircuitBreakerException.Durability.Transient;
+                    case "PERMANENT" -> CircuitBreakerException.Durability.Permanent;
+                    default -> throw new IllegalStateException("Invalid durability: " + durability);
+                })
+                .orElse(CircuitBreakerException.Durability.Permanent);
     }
 
     private boolean isCircuitBreakerException(OpenSearchException openSearchException) {

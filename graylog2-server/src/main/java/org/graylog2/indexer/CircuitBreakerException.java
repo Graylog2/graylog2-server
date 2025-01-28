@@ -17,7 +17,19 @@
 package org.graylog2.indexer;
 
 public class CircuitBreakerException extends ElasticsearchException {
-    public CircuitBreakerException(String message) {
+    public enum Durability {
+        Transient,
+        Permanent
+    }
+
+    private final Durability durability;
+
+    public Durability getDurability() {
+        return durability;
+    }
+
+    public CircuitBreakerException(String message, Durability durability) {
         super(message);
+        this.durability = durability;
     }
 }

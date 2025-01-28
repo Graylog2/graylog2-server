@@ -186,8 +186,7 @@ public class ElasticsearchClient {
     }
 
     private ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
-        if (e instanceof ElasticsearchException) {
-            final ElasticsearchException elasticsearchException = (ElasticsearchException) e;
+        if (e instanceof ElasticsearchException elasticsearchException) {
             if (isIndexNotFoundException(elasticsearchException)) {
                 throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }
@@ -208,12 +207,23 @@ public class ElasticsearchClient {
                 throw new MapperParsingException(elasticsearchException.getMessage());
             }
             if (isCircuitBreakerException(elasticsearchException)) {
-                throw new CircuitBreakerException(elasticsearchException.getMessage());
+                throw new CircuitBreakerException(elasticsearchException.getMessage(), durabilityFrom(elasticsearchException));
             }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
             throw new BatchSizeTooLargeException(e.getMessage());
         }
         return new ElasticsearchException(errorMessage, e);
+    }
+
+    private CircuitBreakerException.Durability durabilityFrom(ElasticsearchException elasticsearchException) {
+        return Optional.ofNullable(elasticsearchException.getMetadata("es.durability"))
+                .map(durabilities -> durabilities.get(0))
+                .map(durability -> switch (durability) {
+                    case "TRANSIENT" -> CircuitBreakerException.Durability.Transient;
+                    case "PERMANENT" -> CircuitBreakerException.Durability.Permanent;
+                    default -> throw new IllegalStateException("Invalid durability: " + durability);
+                })
+                .orElse(CircuitBreakerException.Durability.Permanent);
     }
 
     private boolean isCircuitBreakerException(ElasticsearchException elasticsearchException) {
