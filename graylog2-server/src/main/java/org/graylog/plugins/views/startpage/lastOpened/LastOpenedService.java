@@ -61,7 +61,7 @@ public class LastOpenedService {
             db.insertOne(lastOpenedItems);
         } catch (MongoException e) {
             if (MongoUtils.isDuplicateKeyError(e)) {
-                throw new IllegalStateException("Unable to create a last opened collection, collection with this id already exists : " + lastOpenedItems.id());
+                throw new IllegalStateException("Unable to create record of last opened items. Record with this id already exists : " + lastOpenedItems.id());
             }
             throw e;
         }
