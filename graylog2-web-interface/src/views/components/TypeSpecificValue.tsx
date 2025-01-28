@@ -63,7 +63,7 @@ const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit
   return <span title={value.toString()}>{formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev)}</span>;
 };
 
-const FormattedValue = ({ field, value, truncate = false, render = defaultComponent, unit, type }: TypeSpecificValueProps) => {
+const FormattedValue = ({ field, value = undefined, truncate = false, render = defaultComponent, unit = undefined, type = undefined }: TypeSpecificValueProps) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const shouldRenderValueWithUnit = unitFeatureEnabled && unit?.isDefined && value && value !== MISSING_BUCKET_NAME && unitFeatureEnabled;
   if (shouldRenderValueWithUnit) return <ValueWithUnitRenderer value={value} unit={unit} />;
@@ -71,7 +71,7 @@ const FormattedValue = ({ field, value, truncate = false, render = defaultCompon
   return _formatValue(field, value, truncate, render, type);
 };
 
-const TypeSpecificValue = ({ field, value, render = defaultComponent, type = FieldType.Unknown, truncate = false, unit }: TypeSpecificValueProps) => {
+const TypeSpecificValue = ({ field, value = undefined, render = defaultComponent, type = FieldType.Unknown, truncate = false, unit = undefined }: TypeSpecificValueProps) => {
   const Component = render;
 
   if (value === undefined) {

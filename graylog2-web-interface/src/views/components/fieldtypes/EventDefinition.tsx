@@ -15,20 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { create, keyResolver, windowScheduler } from "@yornaath/batshit";
+import { useQuery } from '@tanstack/react-query';
 
-import useEventDefinition from 'hooks/useEventDefinition';
+import { EventsDefinitions} from '@graylog/server-api';
+
 import Spinner from 'components/common/Spinner';
 
+const fetchEventDefinition = create({
+  fetcher: async (ids: Array<string>) => EventsDefinitions.getById({ event_definition_ids: ids }),
+  resolver: keyResolver("id"),
+  scheduler: windowScheduler(10),
+});
+
 const EventDefinition = ({ value }: { value: string }) => {
-  const { data, isLoading } = useEventDefinition(value);
+  const { data: eventDefinition, isLoading } = useQuery(['event-definitions', 'batched', value], () => fetchEventDefinition.fetch(value));
 
   if (isLoading) {
     return <Spinner />;
   }
 
-  const { eventDefinition } = data;
-
-  return <span>{eventDefinition?.title ?? value}</span>;
+  return eventDefinition?.title
+    ? <span>{eventDefinition.title}</span>
+    : <i>Missing Event Definition: {value}</i>;
 };
 
 export default EventDefinition;
