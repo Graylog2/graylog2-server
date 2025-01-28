@@ -10,6 +10,6 @@
     "docs:server": "styleguidist server"
   },
   "devDependencies": {
-    "react-styleguidist": "^13.1.3"
+    "react-styleguidist": "^13.1.4"
   }
 }

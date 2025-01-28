@@ -15,14 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
-import { useTimeout } from '@mantine/hooks';
 
 import { Button } from 'components/bootstrap';
 import type { BsSize } from 'components/bootstrap/types';
 import type { StyleProps } from 'components/bootstrap/Button';
-import copyToClipboard from 'util/copyToClipboard';
-import Tooltip from 'components/common/Tooltip';
+import ClipboardContainer from 'components/common/ClipboardContainer';
 
 /**
  * Component that renders a button to copy some text in the clipboard when pressed.
@@ -40,48 +37,25 @@ type Props = {
   title: React.ReactNode,
 }
 
-type Args = {
-  copied: boolean,
-  copy: () => void,
-}
-type CopyButtonProps = {
-  value: string,
-  timeout: number,
-  children: (args: Args) => React.ReactElement,
-};
-
-const CopyButton = ({ children, value, timeout }: CopyButtonProps) => {
-  const [copied, setCopied] = useState(false);
-  const { start } = useTimeout(() => setCopied(false), timeout);
-  const copy = useCallback(() => copyToClipboard(value).then(() => { setCopied(true); start(); }), [start, value]);
-
-  return children({ copied, copy });
-};
-
-const ClipboardButton = ({ bsSize, bsStyle, buttonTitle, className, disabled, onSuccess, text, title }: Props) => {
-  const button = (copy: () => void) => (
-    <Button bsSize={bsSize}
-            bsStyle={bsStyle}
-            className={className}
-            disabled={disabled}
-            title={buttonTitle}
-            onClick={() => {
-              copy();
-              onSuccess?.();
-            }}>
-      {title}
-    </Button>
-  );
-
-  return (
-    <CopyButton value={text} timeout={2000}>
-      {({ copied, copy }) => (copied ? (
-        <Tooltip label="Copied!" withArrow position="top" opened>
-          {button(copy)}
-        </Tooltip>
-      ) : button(copy))}
-    </CopyButton>
-  );
-};
+const ClipboardButton = ({
+  bsSize = undefined, bsStyle = undefined, buttonTitle = undefined, className = undefined,
+  disabled = undefined, onSuccess = undefined, text, title,
+}: Props) => (
+  <ClipboardContainer text={text}>
+    {({ copy }) => (
+      <Button bsSize={bsSize}
+              bsStyle={bsStyle}
+              className={className}
+              disabled={disabled}
+              title={buttonTitle}
+              onClick={() => {
+                copy();
+                onSuccess?.();
+              }}>
+        {title}
+      </Button>
+    )}
+  </ClipboardContainer>
+);
 
 export default ClipboardButton;

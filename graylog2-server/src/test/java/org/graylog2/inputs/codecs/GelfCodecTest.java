@@ -22,31 +22,25 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.hamcrest.Matchers.isA;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assume.assumeTrue;
 
+@ExtendWith(MockitoExtension.class)
 public class GelfCodecTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private GelfChunkAggregator aggregator;
@@ -61,14 +55,14 @@ public class GelfCodecTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void decodeDoesNotThrowIllegalArgumentExceptionIfJsonIsInvalid() throws Exception {
+    public void decodeDoesNotThrowIllegalArgumentExceptionIfJsonIsInvalid() {
         // this fails gelf parsing, but empty Payloads are now ok.
         final RawMessage rawMessage = new RawMessage(new byte[0]);
-        codec.decode(rawMessage);
+        codec.decodeSafe(rawMessage);
     }
 
     @Test
-    public void decodeFiltersOutVersionField() throws Exception {
+    public void decodeFiltersOutVersionField() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -76,7 +70,7 @@ public class GelfCodecTest {
                 + "}";
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
-        final Message message = codec.decode(rawMessage);
+        final Message message = codec.decodeSafe(rawMessage).get();
 
         assertThat(message).isNotNull();
         assertThat(message.getField("version")).isNull();
@@ -84,7 +78,7 @@ public class GelfCodecTest {
     }
 
     @Test
-    public void decodeAllowsSettingCustomVersionField() throws Exception {
+    public void decodeAllowsSettingCustomVersionField() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -93,7 +87,7 @@ public class GelfCodecTest {
                 + "}";
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
-        final Message message = codec.decode(rawMessage);
+        final Message message = codec.decodeSafe(rawMessage).get();
 
         assertThat(message).isNotNull();
         assertThat(message.getField("version")).isEqualTo("3.11");
@@ -101,7 +95,7 @@ public class GelfCodecTest {
     }
 
     @Test
-    public void decodeBuildsValidMessageObject() throws Exception {
+    public void decodeBuildsValidMessageObject() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -115,7 +109,7 @@ public class GelfCodecTest {
                 + "}";
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
-        final Message message = codec.decode(rawMessage);
+        final Message message = codec.decodeSafe(rawMessage).get();
 
         assertThat(message).isNotNull();
         assertThat(message.getField("source")).isEqualTo("example.org");
@@ -125,51 +119,51 @@ public class GelfCodecTest {
                 "_id", "source", "message", "full_message", "timestamp", "level",
                 "user_id", "some_info", "some_env_var");
     }
+
     @Test
     public void decodeLargeCompressedMessageFails() throws Exception {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("JSON is null/could not be parsed (invalid JSON)");
-        expectedException.expectCause(isA(JsonParseException.class));
-
         final Configuration configuration = new Configuration(Collections.singletonMap("decompress_size_limit", 100));
         final GelfCodec codec = new GelfCodec(configuration, aggregator, messageFactory);
         final String json = "{"
-            + "\"version\": \"1.1\","
-            + "\"host\": \"example.org\","
-            + "\"short_message\": \"A short message that helps you identify what is going on\","
-            + "\"full_message\": \"Backtrace here\\n\\nMore stuff\","
-            + "\"timestamp\": 1385053862.3072,"
-            + "\"level\": 1,"
-            + "\"_some_bytes1\": \"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, \","
-            + "\"_some_bytes2\": \"sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, \","
-            + "\"_some_bytes2\": \"sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.\""
-            + "}";
+                + "\"version\": \"1.1\","
+                + "\"host\": \"example.org\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\","
+                + "\"full_message\": \"Backtrace here\\n\\nMore stuff\","
+                + "\"timestamp\": 1385053862.3072,"
+                + "\"level\": 1,"
+                + "\"_some_bytes1\": \"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, \","
+                + "\"_some_bytes2\": \"sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, \","
+                + "\"_some_bytes2\": \"sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.\""
+                + "}";
 
         final byte[] payload = TestHelper.zlibCompress(json);
         assumeTrue(payload.length > 100);
         final RawMessage rawMessage = new RawMessage(payload);
-        codec.decode(rawMessage);
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasCauseInstanceOf(JsonParseException.class)
+                .hasMessage("JSON is null/could not be parsed (invalid JSON)");
     }
 
     @Test
-    public void getAggregatorReturnsGelfChunkAggregator() throws Exception {
+    public void getAggregatorReturnsGelfChunkAggregator() {
         assertThat(codec.getAggregator()).isSameAs(aggregator);
     }
 
     @Test
-    public void decodeSucceedsWithoutHost() throws Exception {
+    public void decodeSucceedsWithoutHost() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"short_message\": \"A short message that helps you identify what is going on\""
                 + "}";
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        final Message message = codec.decode(rawMessage);
+        final Message message = codec.decodeSafe(rawMessage).get();
         assertThat(message).isNotNull();
     }
 
     @Test
-    public void decodeFailsWithWrongTypeForHost() throws Exception {
+    public void decodeFailsWithWrongTypeForHost() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": 42,"
@@ -178,13 +172,13 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has invalid \"host\": 42");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> has invalid \"host\": 42");
     }
 
     @Test
-    public void decodeFailsWithEmptyHost() throws Exception {
+    public void decodeFailsWithEmptyHost() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"\","
@@ -193,13 +187,13 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"host\" field.");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"host\" field.");
     }
 
     @Test
-    public void decodeFailsWithBlankHost() throws Exception {
+    public void decodeFailsWithBlankHost() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"      \","
@@ -208,13 +202,13 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"host\" field.");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"host\" field.");
     }
 
     @Test
-    public void decodeFailsWithoutShortMessage() throws Exception {
+    public void decodeFailsWithoutShortMessage() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\""
@@ -222,13 +216,13 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> is missing mandatory \"short_message\" or \"message\" field.");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> is missing mandatory \"short_message\" or \"message\" field.");
     }
 
     @Test
-    public void decodeSucceedsWithoutShortMessageButWithMessage() throws Exception {
+    public void decodeSucceedsWithoutShortMessageButWithMessage() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -237,12 +231,11 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        final Message message = codec.decode(rawMessage);
-        assertThat(message).isNotNull();
+        assertThat(codec.decodeSafe(rawMessage)).isNotEmpty();
     }
 
     @Test
-    public void decodeSucceedsWithEmptyShortMessageButWithMessage() throws Exception {
+    public void decodeSucceedsWithEmptyShortMessageButWithMessage() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -252,12 +245,11 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        final Message message = codec.decode(rawMessage);
-        assertThat(message).isNotNull();
+        assertThat(codec.decodeSafe(rawMessage)).isNotEmpty();
     }
 
     @Test
-    public void decodeFailsWithWrongTypeForShortMessage() throws Exception {
+    public void decodeFailsWithWrongTypeForShortMessage() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -266,13 +258,13 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has invalid \"short_message\": 42");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> has invalid \"short_message\": 42");
     }
 
     @Test
-    public void decodeFailsWithWrongTypeForMessage() throws Exception {
+    public void decodeFailsWithWrongTypeForMessage() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -281,13 +273,13 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has invalid \"message\": 42");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> has invalid \"message\": 42");
     }
 
     @Test
-    public void decodeFailsWithEmptyShortMessage() throws Exception {
+    public void decodeFailsWithEmptyShortMessage() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -296,13 +288,13 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"short_message\" field.");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"short_message\" field.");
     }
 
     @Test
-    public void decodeFailsWithEmptyMessage() throws Exception {
+    public void decodeFailsWithEmptyMessage() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -311,13 +303,13 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"message\" field.");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"message\" field.");
     }
 
     @Test
-    public void decodeFailsWithBlankShortMessage() throws Exception {
+    public void decodeFailsWithBlankShortMessage() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -326,13 +318,13 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"short_message\" field.");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"short_message\" field.");
     }
 
     @Test
-    public void decodeFailsWithBlankMessage() throws Exception {
+    public void decodeFailsWithBlankMessage() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -341,13 +333,13 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"message\" field.");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> has empty mandatory \"message\" field.");
     }
 
     @Test
-    public void decodeSucceedsWithWrongTypeForTimestamp() throws Exception {
+    public void decodeSucceedsWithWrongTypeForTimestamp() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -361,7 +353,7 @@ public class GelfCodecTest {
     }
 
     @Test
-    public void decodeIncludesSourceAddressIfItFails() throws Exception {
+    public void decodeIncludesSourceAddressIfItFails() {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\""
@@ -369,25 +361,25 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8), new InetSocketAddress("198.51.100.42", 24783));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> \\(received from <198\\.51\\.100\\.42:24783>\\) is missing mandatory \"short_message\" or \"message\" field.");
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageMatching("GELF message <[0-9a-f-]+> \\(received from <198\\.51\\.100\\.42:24783>\\) is missing mandatory \"short_message\" or \"message\" field.");
     }
 
     @Test
-    public void decodeSucceedsWithMinimalMessages() throws Exception {
-        assertThat(codec.decode(new RawMessage("{\"short_message\":\"0\"}".getBytes(StandardCharsets.UTF_8)))).isNotNull();
-        assertThat(codec.decode(new RawMessage("{\"message\":\"0\"}".getBytes(StandardCharsets.UTF_8)))).isNotNull();
+    public void decodeSucceedsWithMinimalMessages() {
+        assertThat(codec.decodeSafe(new RawMessage("{\"short_message\":\"0\"}".getBytes(StandardCharsets.UTF_8)))).isNotEmpty();
+        assertThat(codec.decodeSafe(new RawMessage("{\"message\":\"0\"}".getBytes(StandardCharsets.UTF_8)))).isNotEmpty();
     }
 
     @Test
-    public void decodeSucceedsWithTrailingComma() throws Exception {
-        assertThat(codec.decode(new RawMessage("{\"short_message\":\"0\",}".getBytes(StandardCharsets.UTF_8)))).isNotNull();
-        assertThat(codec.decode(new RawMessage("{\"message\":\"0\",}".getBytes(StandardCharsets.UTF_8)))).isNotNull();
+    public void decodeSucceedsWithTrailingComma() {
+        assertThat(codec.decodeSafe(new RawMessage("{\"short_message\":\"0\",}".getBytes(StandardCharsets.UTF_8)))).isNotEmpty();
+        assertThat(codec.decodeSafe(new RawMessage("{\"message\":\"0\",}".getBytes(StandardCharsets.UTF_8)))).isNotEmpty();
     }
 
     @Test
-    public void decodeSucceedsWithValidTimestampIssue4027() throws Exception {
+    public void decodeSucceedsWithValidTimestampIssue4027() {
         // https://github.com/Graylog2/graylog2-server/issues/4027
         final String json = "{"
                 + "\"version\": \"1.1\","
@@ -397,13 +389,13 @@ public class GelfCodecTest {
                 + "}";
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        final Message message = codec.decode(rawMessage);
+        final Message message = codec.decodeSafe(rawMessage).get();
         assertThat(message).isNotNull();
         assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2017-07-21T14:23:00.661Z"));
     }
 
     @Test
-    public void decodeSucceedsWithValidTimestampAsStringIssue4027() throws Exception {
+    public void decodeSucceedsWithValidTimestampAsStringIssue4027() {
         // https://github.com/Graylog2/graylog2-server/issues/4027
         final String json = "{"
                 + "\"version\": \"1.1\","
@@ -413,7 +405,7 @@ public class GelfCodecTest {
                 + "}";
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        final Message message = codec.decode(rawMessage);
+        final Message message = codec.decodeSafe(rawMessage).get();
         assertThat(message).isNotNull();
         assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2017-07-21T14:23:00.661Z"));
     }

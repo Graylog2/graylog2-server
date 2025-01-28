@@ -16,8 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
-import { useQueryParam, QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { useQueryParam } from 'use-query-params';
 
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
@@ -29,6 +28,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { overriddenIndexField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const getData = (list = [defaultField]) => (
   {
@@ -41,11 +41,11 @@ const getData = (list = [defaultField]) => (
 );
 
 const renderIndexSetFieldTypesPage = () => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
+  <DefaultQueryParamProvider>
     <TestStoreProvider>
       <IndexSetFieldTypesPage />
     </TestStoreProvider>,
-  </QueryParamProvider>,
+  </DefaultQueryParamProvider>,
 );
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());

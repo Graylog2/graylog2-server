@@ -21,13 +21,15 @@ import upperFirst from 'lodash/upperFirst';
 
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Timestamp, HoverForHelp } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 
-import AggregationConditions from '../AggreagtionConditions';
+import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
+
+import AggregationConditions from '../AggregationConditions';
 import Notifications from '../Notifications';
 
 const AlertTimestamp = styled(Timestamp)(({ theme }) => css`
@@ -35,9 +37,12 @@ const AlertTimestamp = styled(Timestamp)(({ theme }) => css`
 `);
 
 const useAttributeComponents = () => {
-  const { eventData, eventDefinition, isEventDefinition } = useAlertAndEventDefinitionData();
+  const { alertId, definitionId, type } = useReplaySearchContext();
+  const { eventData, eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
 
   return useMemo(() => {
+    const isEventDefinition = type === 'event_definition';
+
     if (!eventDefinition) {
       return [
         { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
@@ -46,7 +51,7 @@ const useAttributeComponents = () => {
 
     const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
-    const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
+    const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
 
     return [
       { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
@@ -89,11 +94,7 @@ const useAttributeComponents = () => {
         content: <AggregationConditions />,
       },
     ];
-  }, [
-    eventData?.timestamp,
-    eventDefinition,
-    isEventDefinition,
-  ]);
+  }, [eventData?.timestamp, eventDefinition, type]);
 };
 
 export default useAttributeComponents;

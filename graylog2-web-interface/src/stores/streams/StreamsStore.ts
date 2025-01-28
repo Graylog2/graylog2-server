@@ -58,6 +58,16 @@ type AlertConditionSummary = {
   title: string | null | undefined,
 };
 
+export type StreamConfiguration = Pick<Stream,
+'index_set_id' |
+'title' |
+'matching_type' |
+'remove_matches_from_default_stream' |
+'description' |
+'rules' |
+'content_pack'
+>
+
 type AlertReceiver = {
   emails: string[],
   users: string[],
@@ -223,7 +233,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
 
     return promise;
   },
-  save(stream: any, callback: ((streamId: string) => void)) {
+  save(stream: StreamConfiguration, callback: ((streamId: string) => void)) {
     const failCallback = (errorThrown) => {
       UserNotification.error(`Saving Stream failed with status: ${errorThrown}`,
         'Could not save Stream');

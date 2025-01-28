@@ -25,6 +25,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,8 +50,7 @@ public class ContentPackInstallationPersistenceServiceTest {
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         persistenceService = new ContentPackInstallationPersistenceService(
-                mongoJackObjectMapperProvider,
-                mongodb.mongoConnection());
+                new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
     }
 
     @Test

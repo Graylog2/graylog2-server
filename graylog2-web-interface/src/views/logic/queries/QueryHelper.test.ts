@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { concatQueryStrings, escape } from './QueryHelper';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
+
+import { concatQueryStrings, escape, predicate } from './QueryHelper';
 
 describe('QueryHelper', () => {
   it('quotes $ in values', () => {
@@ -50,6 +52,21 @@ describe('QueryHelper', () => {
       const result = concatQueryStrings([undefined, 'field1:value1 OR field2:value2', null, '']);
 
       expect(result).toEqual('field1:value1 OR field2:value2');
+    });
+  });
+
+  describe('predicate', () => {
+    it('creates simple field/value predicate for strings', () => {
+      expect(predicate('foo', 'bar')).toEqual('foo:bar');
+    });
+
+    it('creates simple field/value predicate for numbers', () => {
+      expect(predicate('foo', 23)).toEqual('foo:23');
+    });
+
+    it('treats missing value bucket correctly', () => {
+      expect(predicate('foo', MISSING_BUCKET_NAME)).toEqual('NOT _exists_:foo');
+      expect(predicate('foo', escape(MISSING_BUCKET_NAME))).toEqual('NOT _exists_:foo');
     });
   });
 });

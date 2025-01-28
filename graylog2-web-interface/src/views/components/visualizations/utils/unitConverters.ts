@@ -130,20 +130,28 @@ const _convertValueToUnit = (units: FieldUnitTypes, value: number, fromParams: C
 export const _getPrettifiedValue = (units: FieldUnitTypes, initValue: number | string, params: ConversionParams): ConvertedResult => {
   const currentUnit = units?.[params?.unitType] ?? null;
 
-  const value = initValue === null ? null : toNumber(initValue);
-  if (!(value && currentUnit)) return ({ value, unit: currentUnit ? currentUnit.find(({ abbrev }) => abbrev === params.abbrev) : null });
+  const _value = initValue === null ? null : toNumber(initValue);
+  if (!(_value && currentUnit)) return ({ value: _value, unit: currentUnit ? currentUnit.find(({ abbrev }) => abbrev === params.abbrev) : null });
 
-  const allConvertedValues = Object.values(currentUnit).map((unit: Unit) => _convertValueToUnit(units, value, params, { abbrev: unit.abbrev, unitType: unit.unitType }));
+  const sign = Math.sign(_value);
+  const absolutValue = Math.abs(_value);
+
+  const allConvertedValues = Object.values(currentUnit).map((unit: Unit) => _convertValueToUnit(units, absolutValue, params, { abbrev: unit.abbrev, unitType: unit.unitType }));
 
   const filtratedValues = allConvertedValues.filter(({ value: val, unit }) => val >= 1 && unit.useInPrettier);
 
+  let result: ConvertedResult;
+
   if (filtratedValues.length > 0) {
-    return minBy(filtratedValues, ({ value: val }) => val);
+    result = minBy(filtratedValues, ({ value: val }) => val);
+  } else {
+    const filtratedValuesLower = allConvertedValues.filter(({ value: val, unit }) => val < 1 && unit.useInPrettier);
+    result = maxBy(filtratedValuesLower, ({ value: val }) => val);
   }
 
-  const filtratedValuesLower = allConvertedValues.filter(({ value: val, unit }) => val < 1 && unit.useInPrettier);
+  result.value *= sign;
 
-  return maxBy(filtratedValuesLower, ({ value: val }) => val);
+  return result;
 };
 
 export type ConvertValueToUnit = (value: number, fromParams: ConversionParams, toParams: ConversionParams) => ConvertedResult

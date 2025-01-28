@@ -14,32 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import moment from 'moment-timezone';
-
-import { DATE_TIME_FORMATS } from 'util/DateTime';
-import { MISSING_BUCKET_NAME } from 'views/Constants';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
-import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
+import { escape, addToQuery, formatTimestamp, predicate } from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState } from 'views/types';
 
-const formatTimestampForES = (value: string | number) => {
-  const utc = moment(value).tz('UTC');
-
-  return `"${utc.format(DATE_TIME_FORMATS.internalIndexer)}"`;
-};
-
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
   const predicateValue = type.type === 'date'
-    ? formatTimestampForES(value)
+    ? formatTimestamp(value)
     : escape(value);
-  const fieldPredicate = value === MISSING_BUCKET_NAME
-    ? `NOT _exists_:${field}`
-    : `${field}:${predicateValue}`;
 
-  return addToQuery(oldQuery, fieldPredicate);
+  return addToQuery(oldQuery, predicate(field, predicateValue));
 };
 
 type Arguments = {
