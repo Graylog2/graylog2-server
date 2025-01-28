@@ -42,7 +42,12 @@ public class CIDRLookupTrie {
     public void insertCIDR(String cidr, String rangeName) {
         final String[] parts = cidr.split("/");
         final String ip = parts[0];
-        final int prefixLength = Integer.parseInt(parts[1]);
+        final int prefixLength;
+        try {
+            prefixLength = Integer.parseInt(parts[1]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("Unable to parse invalid CIDR range: " + cidr);
+        }
 
         // Get binary representation of the IP
         final String binaryIP = toBinaryString(ip, prefixLength);
@@ -105,40 +110,43 @@ public class CIDRLookupTrie {
 
     // Convert an IP address to a binary string (supports both IPv4 and IPv6)
     private String toBinaryString(String ip, int prefixLength) {
-        if (ip.contains(".")) {
-            // IPv4
-            StringBuilder binary = new StringBuilder();
-            String[] octets = ip.split("\\.");
-            for (String octet : octets) {
-                String binaryOctet = String.format(Locale.ROOT, "%8s", Integer.toBinaryString(Integer.parseInt(octet))).replace(' ', '0');
-                binary.append(binaryOctet);
-            }
-            return binary.toString();
-        } else if (ip.contains(":")) {
-            // IPv6
-            StringBuilder binary = new StringBuilder();
-            String[] hextets = ip.split(":");
-            for (String hextet : hextets) {
-                if (!hextet.isEmpty()) {
-                    String binaryHextet = String.format(Locale.ROOT, "%16s", Integer.toBinaryString(Integer.parseInt(hextet, 16))).replace(' ', '0');
-                    binary.append(binaryHextet);
-                } else {
-                    // Handle "::" shorthand for consecutive zero groups
-                    int missingGroups = 8 - hextets.length + 1;
-                    binary.append("0000000000000000".repeat(Math.max(0, missingGroups)));
+        final boolean isIPv6 = ip.contains(":");
+        try {
+            if (!isIPv6) {
+                // IPv4
+                StringBuilder binary = new StringBuilder();
+                String[] octets = ip.split("\\.");
+                for (String octet : octets) {
+                    String binaryOctet = String.format(Locale.ROOT, "%8s", Integer.toBinaryString(Integer.parseInt(octet))).replace(' ', '0');
+                    binary.append(binaryOctet);
                 }
+                return binary.toString();
+            } else {
+                // IPv6
+                StringBuilder binary = new StringBuilder();
+                String[] hextets = ip.split(":");
+                for (String hextet : hextets) {
+                    if (!hextet.isEmpty()) {
+                        String binaryHextet = String.format(Locale.ROOT, "%16s", Integer.toBinaryString(Integer.parseInt(hextet, 16))).replace(' ', '0');
+                        binary.append(binaryHextet);
+                    } else {
+                        // Handle "::" shorthand for consecutive zero groups
+                        int missingGroups = 8 - hextets.length + 1;
+                        binary.append("0000000000000000".repeat(Math.max(0, missingGroups)));
+                    }
+                }
+                // If the prefix length is larger than the resulting binary string, append 0 until the length matches. This
+                // will avoid index out of range exceptions when inserting the range into the trie.
+                if (binary.length() < prefixLength) {
+                    binary.append("0".repeat(prefixLength - binary.length()));
+                }
+                // When getting binary string of individual IPv6 addresses, ensure binary string is complete 128 digits.
+                if (prefixLength == -1) {
+                    binary.append("0".repeat(Math.max(0, 128 - binary.length())));
+                }
+                return binary.toString();
             }
-            // If the prefix length is larger than the resulting binary string, append 0 until the length matches. This
-            // will avoid index out of range exceptions when inserting the range into the trie.
-            if (binary.length() < prefixLength) {
-                binary.append("0".repeat(prefixLength - binary.length()));
-            }
-            // When getting binary string of individual IPv6 addresses, ensure binary string is complete 128 digits.
-            if (prefixLength == -1) {
-                binary.append("0".repeat(Math.max(0, 128 - binary.length())));
-            }
-            return binary.toString();
-        } else {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Invalid IP address format: " + ip);
         }
     }

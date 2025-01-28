@@ -19,6 +19,7 @@ package org.graylog2.utilities;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class CIDRLookupTrieTest {
 
@@ -59,6 +60,14 @@ public class CIDRLookupTrieTest {
         assertThat(trie.longestPrefixRangeLookup("2001:db8:abcd::1")).isEqualTo("IPv6 Range 1");
         assertThat(trie.longestPrefixRangeLookup("2404:6800:4001:abcd::1")).isEqualTo("IPv6 Range 2");
         assertThat(trie.longestPrefixRangeLookup("77f:8b7a:3e82:6fb3:ba15:9b68:7fe0:a695")).isEqualTo("IPv6 Range 4");
+    }
+
+    @Test
+    public void testBadEntry() {
+        final CIDRLookupTrie trie = new CIDRLookupTrie();
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> trie.insertCIDR("127.a.3.21/12", "Bad Range 1"));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> trie.insertCIDR("not.an.ip.address/12", "Bad Range 2"));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> trie.insertCIDR("127.0.0.0", "Bad Range 3"));
     }
 
     private static CIDRLookupTrie buildTrie() {
