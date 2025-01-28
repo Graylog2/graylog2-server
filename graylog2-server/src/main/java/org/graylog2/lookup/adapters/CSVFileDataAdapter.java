@@ -31,6 +31,10 @@ import com.google.common.collect.Multimap;
 import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
@@ -39,17 +43,12 @@ import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.utilities.FileInfo;
+import org.graylog2.utilities.CIDRLookupTrie;
 import org.graylog2.utilities.IpSubnet;
 import org.graylog2.utilities.ReservedIpChecker;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,6 +86,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private final Config config;
     private final AllowedAuxiliaryPathChecker pathChecker;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
+    private final AtomicReference<CIDRLookupTrie> cidrLookupRef = new AtomicReference<>(new CIDRLookupTrie());
     private final String name;
 
     private FileInfo fileInfo = FileInfo.empty();
@@ -168,6 +168,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         final InputStream inputStream = Files.newInputStream(Paths.get(config.path()));
         final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         final ImmutableMap.Builder<String, String> newLookupBuilder = ImmutableMap.builder();
+        final CIDRLookupTrie cidrLookupTrie = new CIDRLookupTrie();
 
         try (final CSVReader csvReader = new CSVReader(fileReader, config.separatorAsChar(), config.quotecharAsChar())) {
             int line = 0;
@@ -225,12 +226,12 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     } else {
                         Optional<IpSubnet> optSubnet = ReservedIpChecker.stringToSubnet(key);
                         if (optSubnet.isPresent()) {
-                            newLookupBuilder.put(key, value);
+                            cidrLookupTrie.insertCIDR(key, value);
                         } else {
                             // If key in a CIDR lookup adapter is not already a valid CIDR range, check if it is an IP
                             String cidr = ipAddressToCIDR(key);
                             if (cidr != null) {
-                                newLookupBuilder.put(cidr, value);
+                                cidrLookupTrie.insertCIDR(cidr, value);
                             }
                         }
                     }
@@ -243,6 +244,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             throw new IllegalStateException(e);
         }
 
+        if (config.isCidrLookup()) {
+            cidrLookupRef.set(cidrLookupTrie);
+        }
         return newLookupBuilder.build();
     }
 
@@ -288,21 +292,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     public LookupResult getResultForCIDRRange(Object ip) {
         LookupResult result = getEmptyResult();
         try {
-            // Convert directly to InetAddress to avoid long timeouts using name service lookups
-            InetAddress address = InetAddresses.forString(String.valueOf(ip));
-            int longestMatch = 0;
-            for (Map.Entry<String, String> entry : lookupRef.get().entrySet()) {
-                String range = entry.getKey();
-                Optional<IpSubnet> optSubnet = ReservedIpChecker.stringToSubnet(range);
-                if (optSubnet.isEmpty()) {
-                    LOG.debug("CIDR range '{}' in data adapter '{}' is not a valid subnet, skipping this key in lookup.", entry, name);
-                } else {
-                    IpSubnet subnet = optSubnet.get();
-                    if (subnet.contains(address) && (result.isEmpty() || longestMatch < subnet.getPrefixLength())) {
-                        longestMatch = subnet.getPrefixLength();
-                        result = LookupResult.single(entry.getValue());
-                    }
-                }
+            final String resultValue = cidrLookupRef.get().longestPrefixRangeLookup(String.valueOf(ip));
+            if (resultValue != null) {
+                result = LookupResult.single(resultValue);
             }
         } catch (IllegalArgumentException e) {
             LOG.debug("Attempted to do a CIDR range lookup on invalid IP '{}'", ip);
