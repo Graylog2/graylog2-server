@@ -46,9 +46,9 @@ type Props = {
 const RuleBuilderBlock = ({
   type,
   blockDict,
-  block,
+  block = undefined,
   order,
-  outputVariableList,
+  outputVariableList = [],
   addBlock,
   updateBlock,
   deleteBlock,
@@ -210,7 +210,7 @@ const RuleBuilderBlock = ({
 
   const isBlockNegatable = (): boolean => type === 'condition';
 
-  const options = blockDict.map(({ name, description, rule_builder_name, deprecated }) => ({ label: rule_builder_name, value: name, description, deprecated  }));
+  const options = blockDict.map(({ name, description, rule_builder_name, deprecated }) => ({ label: rule_builder_name, value: name, description, deprecated }));
 
   const showForm = !block || editMode;
 
@@ -236,7 +236,7 @@ const RuleBuilderBlock = ({
                             onDuplicate={onDuplicate}
                             onInsertAbove={onInsertAbove}
                             onInsertBelow={onInsertBelow}
-                            returnType={currentBlockDict?.return_type}
+                            selectedBlockDict={currentBlockDict}
                             negatable={isBlockNegatable()}
                             type={type} />
           {Boolean(insertMode) && (

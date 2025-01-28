@@ -86,16 +86,20 @@ const OptionContainer = styled.div`
   justify-content: space-between;
 `;
 
+const DeprecatedLabel = styled.span`
+  float: right;
+`;
+
 const RuleBlockForm = ({
-  existingBlock,
+  existingBlock = undefined,
   onAdd,
   onCancel,
   onSelect,
   onUpdate,
   options,
   order,
-  outputVariableList,
-  selectedBlockDict,
+  outputVariableList = [],
+  selectedBlockDict = undefined,
   type,
 }: Props) => {
   const [initialValues, setInitialValues] = useState<{}>({});
@@ -218,6 +222,9 @@ const RuleBlockForm = ({
                                   data-testid="funcSyntaxHelpIcon" />
                           </Button>
                         </OverlayTrigger>
+                        {selectedBlockDict.deprecated && (
+                          <DeprecatedLabel>&nbsp;<Label bsStyle="warning" bsSize="xs">Deprecated</Label></DeprecatedLabel>
+                        )}
                       </h5>
                       <BlockDescription>{selectedBlockDict.description}</BlockDescription>
                     </Col>
@@ -233,8 +240,7 @@ const RuleBlockForm = ({
                                           blockType={type}
                                           resetField={(fieldName) => resetField(fieldName, setFieldValue)} />
                     </Row>
-                  ),
-                  )}
+                  ))}
 
                   <Errors objectWithErrors={existingBlock} />
                   <FormSubmit bsSize="small"
@@ -245,7 +251,6 @@ const RuleBlockForm = ({
                                 resetForm();
                                 onCancel();
                               }} />
-
                 </SelectedBlock>
               )}
             </NestedForm>
