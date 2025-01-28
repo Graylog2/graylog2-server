@@ -24,7 +24,7 @@
     "lint:changes": "./dev/lintChanges.sh",
     "test": "jest --maxWorkers=50%",
     "check-production-build": "node checkProductionBuild.js",
-    "format": "prettier --write src"
+    "format": "prettier --write src test docs"
   },
   "eslintConfig": {
     "extends": "graylog"
