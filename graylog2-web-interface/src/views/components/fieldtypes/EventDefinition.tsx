@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { create, keyResolver, windowScheduler } from "@yornaath/batshit";
+import { create, keyResolver, windowScheduler } from '@yornaath/batshit';
 import { useQuery } from '@tanstack/react-query';
 
-import { EventsDefinitions} from '@graylog/server-api';
+import { EventsDefinitions } from '@graylog/server-api';
 
 import Spinner from 'components/common/Spinner';
 
 const fetchEventDefinition = create({
   fetcher: async (ids: Array<string>) => EventsDefinitions.getById({ event_definition_ids: ids }),
-  resolver: keyResolver("id"),
+  resolver: keyResolver('id'),
   scheduler: windowScheduler(10),
 });
 
