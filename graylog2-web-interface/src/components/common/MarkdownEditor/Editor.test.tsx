@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, act } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import Editor from './Editor';
@@ -53,11 +53,10 @@ describe('MarkdownEditor', () => {
 
     const editor = await screen.findByRole('textbox');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.paste(editor, '# this would be a title');
-    });
+    await userEvent.paste(editor, '# this would be a title');
 
-    expect(onChange).toHaveBeenLastCalledWith('# this would be a title');
+    await waitFor(() => {
+      expect(onChange).toHaveBeenLastCalledWith('# this would be a title');
+    });
   });
 });

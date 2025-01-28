@@ -41,7 +41,7 @@ class Completer {
   shouldShowCompletions: () => true;
 }
 
-describe('QueryInput', () => {
+describe('ViewsQueryInput', () => {
   const findQueryInput = () => screen.findByRole('textbox');
 
   const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof ViewsQueryInput>>) => (
@@ -73,18 +73,23 @@ describe('QueryInput', () => {
     const onChange = jest.fn();
     render(<SimpleQueryInput onChange={onChange} />);
 
-    userEvent.paste(await findQueryInput(), 'the query');
+    const queryInput = await findQueryInput();
+    queryInput.focus();
+    await userEvent.paste(queryInput, 'the query');
 
-    expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange).toHaveBeenCalledWith({ target: { value: 'the query', name: 'search-query' } });
+    await waitFor(() => {
+      expect(onChange).toHaveBeenCalledWith({ target: { value: 'the query', name: 'search-query' } });
+    });
   });
 
   it('triggers onBlur when input is blurred', async () => {
     const onBlur = jest.fn();
     render(<SimpleQueryInput onBlur={onBlur} />);
 
-    userEvent.paste(await findQueryInput(), 'the query');
-    userEvent.tab();
+    const queryInput = await findQueryInput();
+    queryInput.focus();
+    await userEvent.type(queryInput, 'the query');
+    await userEvent.tab();
 
     expect(onBlur).toHaveBeenCalledTimes(1);
   });

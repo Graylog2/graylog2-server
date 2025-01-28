@@ -76,10 +76,10 @@ describe('RuleBuilder', () => {
     const titleInput = await screen.findByLabelText('Title');
     const descriptionInput = await screen.findByLabelText('Description');
 
-    userEvent.paste(titleInput, title);
-    userEvent.paste(descriptionInput, description);
+    await userEvent.type(titleInput, title);
+    await userEvent.type(descriptionInput, description);
     const createRuleButton = await screen.findByRole('button', { name: 'Create rule' });
-    userEvent.click(createRuleButton);
+    await userEvent.click(createRuleButton);
 
     expect(createRule).toHaveBeenCalledWith({
       title,
@@ -88,7 +88,7 @@ describe('RuleBuilder', () => {
     });
   });
 
-  it('should update Title and Description', () => {
+  it('should update Title and Description', async () => {
     const updateRule = jest.fn();
     const title = 'title';
     const description = 'description';
@@ -111,10 +111,10 @@ describe('RuleBuilder', () => {
     const titleInput = getByLabelText('Title');
     const descriptionInput = getByLabelText('Description');
 
-    userEvent.paste(titleInput, title);
-    userEvent.paste(descriptionInput, description);
+    await userEvent.type(titleInput, title);
+    await userEvent.type(descriptionInput, description);
     const updateRuleButton = getByRole('button', { name: 'Update rule' });
-    userEvent.click(updateRuleButton);
+    await userEvent.click(updateRuleButton);
 
     expect(updateRule).toHaveBeenCalledWith({
       title,

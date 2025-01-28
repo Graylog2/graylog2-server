@@ -314,8 +314,8 @@ describe('<EntityFilters />', () => {
       const timeRangeForm = await screen.findByTestId('time-range-form');
 
       const fromInput = within(timeRangeForm).getByRole('textbox', { name: /from/i });
-      userEvent.clear(fromInput);
-      userEvent.paste(fromInput, '2020-01-01 00:55:00.000');
+      await userEvent.clear(fromInput);
+      await userEvent.type(fromInput, '2020-01-01 00:55:00.000');
 
       const submitButton = within(timeRangeForm).getByRole('button', {
         name: /create filter/i,
