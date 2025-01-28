@@ -32,6 +32,7 @@ import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.Configuration.SafeClassesValidator;
 import org.graylog2.configuration.Documentation;
 import org.graylog2.plugin.Tools;
@@ -57,7 +58,7 @@ import java.util.Set;
  * Helper class to hold configuration of DataNode
  */
 @SuppressWarnings("FieldMayBeFinal")
-public class Configuration {
+public class Configuration implements CommonNodeConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
     public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
     public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";
@@ -254,7 +255,14 @@ public class Configuration {
     @Parameter(value = "metrics_policy")
     private String metricsPolicy = "gl-datanode-metrics-ism";
 
-    @Documentation(value = "Cache size for searchable snaphots")
+    /**
+     * @see <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/searchable_snapshot/#configuring-a-node-to-use-searchable-snapshots}">Searchable snapshots</a>
+     */
+    @Documentation(value = """
+            Cache size for searchable snapshots. This space will be automatically reserved
+            if you have either S3 or shared filesystem repositories enabled and configured.
+            See s3_client_* configuration options and path_repo.
+            """)
     @Parameter(value = "node_search_cache_size")
     private String searchCacheSize = "10gb";
 
@@ -271,7 +279,7 @@ public class Configuration {
 
     @Documentation("The list of the opensearch node’s roles.")
     @Parameter(value = "node_roles", converter = StringListConverter.class)
-    private List<String> nodeRoles = List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search");
+    private List<String> nodeRoles = List.of("cluster_manager", "data", "ingest", "remote_cluster_client");
 
     @Documentation(visible = false)
     @Parameter(value = "async_eventbus_processors")
@@ -651,5 +659,15 @@ public class Configuration {
 
     public String getOpensearchHeap() {
         return opensearchHeap;
+    }
+
+    @Override
+    public String getEnvironmentVariablePrefix() {
+        return "GRAYLOG_DATANODE_";
+    }
+
+    @Override
+    public String getSystemPropertyPrefix() {
+        return "graylog.datanode.";
     }
 }

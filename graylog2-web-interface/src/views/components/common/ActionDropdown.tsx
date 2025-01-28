@@ -29,7 +29,7 @@ type Props = {
 
 const ActionDropdown = ({ children, element, 'data-testid': dataTestid, header = 'Actions' }: Props) => (
   <StopPropagation data-testid={dataTestid}>
-    <Menu position="bottom" withinPortal>
+    <Menu position="bottom" withinPortal zIndex={1051}>
       <Menu.Target>
         {element}
       </Menu.Target>

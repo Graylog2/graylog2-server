@@ -15,6 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import InputSetupWizard from './InputSetupWizard';
-
-export default InputSetupWizard;
+export { default as InputSetupWizard } from './InputSetupWizard';
+export * from './types';
+export { INPUT_SETUP_MODE_FEATURE_FLAG } from './constants';

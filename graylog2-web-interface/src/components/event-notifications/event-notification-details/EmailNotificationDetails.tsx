@@ -38,6 +38,27 @@ const EmailNotificationDetails = ({
       <ReadOnlyFormGroup label="Email Recipients Lookup Table Key" value={notification.config.recipients_lut_key} />
     </>
   );
+  const ccEmails = (
+    <ReadOnlyFormGroup label="CC Emails"
+                       value={notification.config.cc_emails.join(', ') || 'No email addresses are configured to be cc\'d on this notification.'} />
+  );
+  const ccLookupInfo = (
+    <>
+      <ReadOnlyFormGroup label="CC Emails Lookup Table Name" value={notification.config.cc_emails_lut_name} />
+      <ReadOnlyFormGroup label="CC Emails Lookup Table Key" value={notification.config.cc_emails_lut_key} />
+    </>
+  );
+
+  const bccEmails = (
+    <ReadOnlyFormGroup label="BCC Emails"
+                       value={notification.config.bcc_emails.join(', ') || 'No email addresses are configured to be bcc\'d on this notification.'} />
+  );
+  const bccLookupInfo = (
+    <>
+      <ReadOnlyFormGroup label="BCC Emails Lookup Table Name" value={notification.config.bcc_emails_lut_name} />
+      <ReadOnlyFormGroup label="BCC Emails Lookup Table Key" value={notification.config.bcc_emails_lut_key} />
+    </>
+  );
   const sender = (
     <ReadOnlyFormGroup label="Sender" value={notification.config.sender} />
   );
@@ -59,6 +80,7 @@ const EmailNotificationDetails = ({
 
   return (
     <>
+      <ReadOnlyFormGroup label="Send as Single Email" value={notification.config.single_email ? 'Yes' : 'No'} />
       <ReadOnlyFormGroup label="Use Lookup Table for Sender" value={notification.config.lookup_sender_email ? 'Yes' : 'No'} />
       {notification.config.lookup_sender_email ? senderLookupInfo : sender}
       <ReadOnlyFormGroup label="Subject" value={notification.config.subject} />
@@ -67,6 +89,12 @@ const EmailNotificationDetails = ({
       <ReadOnlyFormGroup label="User Recipients" value={notification.config.user_recipients.join(', ') || 'No users will receive this notification.'} />
       <ReadOnlyFormGroup label="Use Lookup Table for Email Recipients" value={notification.config.lookup_recipient_emails ? 'Yes' : 'No'} />
       {notification.config.lookup_recipient_emails ? recipientLookupInfo : recipients}
+      <ReadOnlyFormGroup label="CC Users" value={notification.config.cc_users.join(', ') || 'No users will be cc\'d on this notification.'} />
+      <ReadOnlyFormGroup label="Use Lookup Table for CC Emails" value={notification.config.lookup_cc_emails ? 'Yes' : 'No'} />
+      {notification.config.lookup_cc_emails ? ccLookupInfo : ccEmails}
+      <ReadOnlyFormGroup label="BCC Users" value={notification.config.bcc_users.join(', ') || 'No users will be bcc\'d on this notification.'} />
+      <ReadOnlyFormGroup label="Use Lookup Table for BCC Emails" value={notification.config.lookup_bcc_emails ? 'Yes' : 'No'} />
+      {notification.config.lookup_bcc_emails ? bccLookupInfo : bccEmails}
       <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />
       <ReadOnlyFormGroup label="Email Body"
                          value={(

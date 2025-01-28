@@ -16,42 +16,20 @@
  */
 import * as React from 'react';
 
-import { Modal } from 'components/bootstrap';
-import { Wizard } from 'components/common';
-import { INPUT_WIZARD_STEPS } from 'contexts/InputSetupWizardContext';
-import useInputSetupWizard from 'hooks/useInputSetupWizard';
+import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
+import Wizard from './Wizard';
+import type { WizardData } from './types';
 
-import CategoryStep from './CategoryStep';
+type Props = {
+  show: boolean,
+  input: WizardData['input'],
+  onClose: () => void,
+}
 
-const InputSetupWizard = () => {
-  const { activeStep, setActiveStep, show, closeWizard } = useInputSetupWizard();
-
-  const steps = [{
-    key: INPUT_WIZARD_STEPS.SELECT_CATEGORY,
-    title: (
-      <>
-        Title
-      </>
-    ),
-    component: (
-      <CategoryStep />
-    ),
-  }];
-
-  if (!show) return null;
-
-  return (
-    <Modal show onHide={closeWizard}>
-      <Modal.Body>
-        <Wizard activeStep={activeStep}
-                hidePreviousNextButtons
-                horizontal
-                justified
-                onStepChange={setActiveStep}
-                steps={steps} />
-      </Modal.Body>
-    </Modal>
-  );
-};
+const InputSetupWizard = ({ show, input, onClose }: Props) => (
+  <InputSetupWizardProvider>
+    <Wizard show={show} input={input} onClose={onClose} />
+  </InputSetupWizardProvider>
+);
 
 export default InputSetupWizard;

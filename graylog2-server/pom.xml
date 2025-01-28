@@ -1267,16 +1267,6 @@
                                     <arguments>test</arguments>
                                 </configuration>
                             </execution>
-                            <execution>
-                                <id>yarn test:integration</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <phase>test</phase>
-                                <configuration>
-                                    <arguments>test:integration</arguments>
-                                </configuration>
-                            </execution>
                         </executions>
                     </plugin>
                     <plugin>

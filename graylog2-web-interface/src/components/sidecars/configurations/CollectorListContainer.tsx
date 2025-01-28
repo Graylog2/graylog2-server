@@ -48,7 +48,7 @@ class CollectorListContainer extends React.Component<CollectorListContainerProps
     loadCollectors();
   }
 
-  handleClone = (collector, name, callback) => {
+  handleClone = (collector: string, name: string, callback: () => void) => {
     const { sendTelemetry } = this.props;
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.LOG_COLLECTOR_CLONED, {
@@ -73,7 +73,7 @@ class CollectorListContainer extends React.Component<CollectorListContainerProps
     await CollectorsActions.delete(collector);
   };
 
-  handlePageChange = (page, pageSize) => {
+  handlePageChange = (page: number, pageSize: number) => {
     const { query } = this.props.collectors;
 
     CollectorsActions.list({ query: query, page: page, pageSize: pageSize });

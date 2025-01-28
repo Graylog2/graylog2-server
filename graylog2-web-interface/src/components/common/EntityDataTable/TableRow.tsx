@@ -50,7 +50,7 @@ type Props<Entity extends EntityBase> = {
   isEntitySelectable: (entity: Entity) => boolean,
 };
 
-const TableRow = <Entity extends EntityBase>({
+const TableRow = <Entity extends EntityBase, Meta>({
   columns,
   columnRenderersByAttribute,
   displaySelect,
@@ -83,11 +83,11 @@ const TableRow = <Entity extends EntityBase>({
         const columnRenderer = columnRenderersByAttribute[column.id];
 
         return (
-          <TableCell columnRenderer={columnRenderer}
-                     entityAttributesAreCamelCase={entityAttributesAreCamelCase}
-                     entity={entity}
-                     column={column}
-                     key={`${entity.id}-${column.id}`} />
+          <TableCell<Entity, Meta> columnRenderer={columnRenderer}
+                                   entityAttributesAreCamelCase={entityAttributesAreCamelCase}
+                                   entity={entity}
+                                   column={column}
+                                   key={`${entity.id}-${column.id}`} />
         );
       })}
       {displayActions ? (
@@ -99,4 +99,4 @@ const TableRow = <Entity extends EntityBase>({
   );
 };
 
-export default React.memo(TableRow);
+export default React.memo(TableRow) as typeof TableRow;

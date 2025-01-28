@@ -65,10 +65,14 @@ const PipelineDetailsPage = () => {
   };
 
   const _onStagesChange = (newStages, callback) => {
-    const newPipeline = {
+    const pipelineWithNewStages = {
       ...pipeline,
       stages: newStages,
-      source: SourceGenerator.generatePipeline(pipeline),
+    };
+
+    const newPipeline = {
+      ...pipelineWithNewStages,
+      source: SourceGenerator.generatePipeline(pipelineWithNewStages),
     };
 
     PipelinesActions.update(newPipeline);
@@ -81,7 +85,7 @@ const PipelineDetailsPage = () => {
   const _savePipeline = (_pipeline, callback) => {
     const requestPipeline = {
       ..._pipeline,
-      source: SourceGenerator.generatePipeline(pipeline),
+      source: SourceGenerator.generatePipeline(_pipeline),
     };
 
     const promise = requestPipeline.id

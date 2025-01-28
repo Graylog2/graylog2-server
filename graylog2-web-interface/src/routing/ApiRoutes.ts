@@ -194,6 +194,7 @@ const ApiRoutes = {
     list: () => ({ url: '/cluster/inputstates' }),
     start: (inputId: string) => ({ url: `/cluster/inputstates/${inputId}` }),
     stop: (inputId: string) => ({ url: `/cluster/inputstates/${inputId}` }),
+    setup: (inputId: string) => ({ url: `/cluster/inputstates/setup/${inputId}` }),
   },
   ClusterLoggersResource: {
     loggers: () => ({ url: '/cluster/system/loggers' }),
@@ -255,7 +256,6 @@ const ApiRoutes = {
     delete: (streamId: string) => ({ url: `/streams/${streamId}` }),
     pause: (streamId: string) => ({ url: `/streams/${streamId}/pause` }),
     resume: (streamId: string) => ({ url: `/streams/${streamId}/resume` }),
-    stream_connected_pipelines: (streamId: string) => ({ url: `/streams/${streamId}/pipelines` }),
     testMatch: (streamId: string) => ({ url: `/streams/${streamId}/testMatch` }),
   },
   StreamOutputsApiController: {
@@ -421,6 +421,7 @@ const ApiRoutes = {
     update: (pipelineId: string) => ({ url: `/system/pipelines/pipeline/${pipelineId}` }),
     delete: (pipelineId: string) => ({ url: `/system/pipelines/pipeline/${pipelineId}` }),
     parse: () => ({ url: '/system/pipelines/pipeline/parse' }),
+    updateRouting: () => ({ url: '/system/pipelines/pipeline/routing' }),
   },
   RulesController: {
     list: () => ({ url: '/system/pipelines/rule' }),

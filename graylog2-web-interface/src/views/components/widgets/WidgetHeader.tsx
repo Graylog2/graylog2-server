@@ -18,7 +18,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Spinner, Icon } from 'components/common';
-import EditableTitle from 'views/components/common/EditableTitle';
+import EditableTitle, { Title } from 'views/components/common/EditableTitle';
 import { Input } from 'components/bootstrap';
 
 const LoadingSpinner = styled(Spinner)`
@@ -75,6 +75,41 @@ const TitleInput = styled(Input)(({ theme }) => css`
   width: 100%;
 `);
 
+type WidgetTitleProps = {
+  onChange?: (newTitle: string) => void,
+  editing: boolean,
+  title: string,
+  titleIcon?: React.ReactNode,
+}
+
+const WidgetTitle = ({ onChange = undefined, editing, title, titleIcon = undefined }: WidgetTitleProps) => {
+  if (typeof onChange !== 'function') {
+    return <><Title>{title}</Title>{titleIcon}</>;
+  }
+
+  if (editing) {
+    return (
+      <TitleInputWrapper>
+        <TitleInput type="text"
+                    id="widget-title"
+                    onChange={(e) => onChange(e.target.value)}
+                    defaultValue={title}
+                    required />
+      </TitleInputWrapper>
+    );
+  }
+
+  return (
+    <>
+      <EditableTitle key={title}
+                     disabled={!onChange}
+                     value={title}
+                     onChange={onChange} />
+      {titleIcon}
+    </>
+  );
+};
+
 type Props = {
   children?: React.ReactNode
   onRename?: (newTitle: string) => unknown
@@ -82,26 +117,22 @@ type Props = {
   title: string,
   loading?: boolean
   editing: boolean,
+  titleIcon?: React.ReactNode,
 };
 
-const WidgetHeader = ({ children = null, onRename, hideDragHandle = false, title, loading = false, editing }: Props) => (
+const WidgetHeader = ({
+  title,
+  editing,
+  hideDragHandle = false,
+  loading = false,
+  children = undefined,
+  titleIcon = undefined,
+  onRename = undefined,
+}: Props) => (
   <Container>
     <Col>
       {hideDragHandle || <DragHandleContainer className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="drag_indicator" /></DragHandleContainer>}
-      {editing ? (
-        <TitleInputWrapper>
-          <TitleInput type="text"
-                      id="widget-title"
-                      onChange={(e) => onRename(e.target.value)}
-                      value={title}
-                      required />
-        </TitleInputWrapper>
-      ) : (
-        <EditableTitle key={title}
-                       disabled={!onRename}
-                       value={title}
-                       onChange={onRename} />
-      )}
+      <WidgetTitle editing={editing} title={title} titleIcon={titleIcon} onChange={onRename} />
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>
     <WidgetActionDropdown>

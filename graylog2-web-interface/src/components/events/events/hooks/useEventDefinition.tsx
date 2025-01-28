@@ -18,8 +18,8 @@ import { useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import { defaultOnError } from 'util/conditional/onError';
 
 export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Promise<EventDefinition> => (
   fetch('GET', qualifyUrl(`/events/definitions/${eventDefinitionId}`))
@@ -28,10 +28,7 @@ export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Pr
 const useEventDefinition = (eventDefId: string, enabled = true) => {
   const { data, isFetching, isInitialLoading } = useQuery({
     queryKey: ['get-event-definition-details', eventDefId],
-    queryFn: () => fetchEventDefinitionDetails(eventDefId),
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading archives failed with status: ${errorThrown}`);
-    },
+    queryFn: () => defaultOnError(fetchEventDefinitionDetails(eventDefId), 'Loading archives failed with status'),
     retry: 0,
     keepPreviousData: true,
     enabled: !!eventDefId && enabled,

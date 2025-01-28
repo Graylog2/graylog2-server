@@ -22,6 +22,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import type { DataNodes } from 'preflight/types';
 import type FetchError from 'logic/errors/FetchError';
+import { onSettled } from 'util/conditional/onError';
 
 const DEFAULT_DATA = [];
 export const DATA_NODES_OVERVIEW_QUERY_KEY = ['data-nodes', 'overview'];
@@ -48,21 +49,19 @@ const useDataNodes = (): {
   } = useQuery<DataNodes, FetchError>(
     {
       queryKey: DATA_NODES_OVERVIEW_QUERY_KEY,
-      queryFn: fetchDataNodes,
-      refetchInterval: 3000,
-      keepPreviousData: true,
-      onError: (newError) => {
-        setMetaData({
-          error: newError,
-          isInitialLoading: false,
-        });
-      },
-      onSuccess: () => {
+      queryFn: () => onSettled(fetchDataNodes(), () => {
         setMetaData({
           error: null,
           isInitialLoading: false,
         });
-      },
+      }, (newError: FetchError) => {
+        setMetaData({
+          error: newError,
+          isInitialLoading: false,
+        });
+      }),
+      refetchInterval: 3000,
+      keepPreviousData: true,
       retry: false,
     });
 

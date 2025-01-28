@@ -131,7 +131,7 @@ public class LegacyAlertConditionMigratorTest {
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-        final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoConnection, mongoJackObjectMapperProvider);
+        final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(new MongoCollections(mongoJackObjectMapperProvider, mongoConnection), mongoJackObjectMapperProvider);
         final MongoCollections mongoCollections = new MongoCollections(mongoJackObjectMapperProvider, mongoConnection);
         final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoCollections, new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), clock, schedulerCapabilitiesService, Duration.minutes(5));
         notificationService = new DBNotificationService(mongoCollections, mock(EntityOwnershipService.class));

@@ -15,10 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import trim from 'lodash/trim';
+import moment from 'moment-timezone';
 
-const isPhrase = (searchTerm: string | undefined | null) => String(searchTerm).indexOf(' ') !== -1;
+import { DATE_TIME_FORMATS } from 'util/DateTime';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
 
-const escape = (searchTerm: string | number | undefined | null) => {
+export const isPhrase = (searchTerm: string | undefined | null) => String(searchTerm).indexOf(' ') !== -1;
+
+export const escape = (searchTerm: string | number | undefined | null) => {
   let escapedTerm = String(searchTerm);
 
   // Replace newlines.
@@ -37,7 +41,7 @@ const escape = (searchTerm: string | number | undefined | null) => {
   return escapedTerm;
 };
 
-const addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND') => {
+export const addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND') => {
   if (trim(oldQuery) === '*' || trim(oldQuery) === '') {
     return newTerm;
   }
@@ -49,11 +53,21 @@ const addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND')
   return `${oldQuery} ${operator} ${newTerm}`;
 };
 
-const concatQueryStrings = (queryStrings: Array<string>, { operator = 'AND', withBrackets = true } = {}): string => {
+export const concatQueryStrings = (queryStrings: Array<string>, { operator = 'AND', withBrackets = true } = {}): string => {
   const withRemovedEmpty = queryStrings.filter((s: string) => !!(s?.trim()));
   const showBracketsForChild = withBrackets && withRemovedEmpty.length > 1;
 
   return withRemovedEmpty.map((s) => (showBracketsForChild ? `(${s})` : s)).join(` ${operator} `);
 };
 
-export { isPhrase, escape, addToQuery, concatQueryStrings };
+export const formatTimestamp = (value: string | number) => {
+  const utc = moment(value).tz('UTC');
+
+  return `"${utc.format(DATE_TIME_FORMATS.internalIndexer)}"`;
+};
+
+export const predicate = (field: string, value: string | number) => ((value === MISSING_BUCKET_NAME || value === escape(MISSING_BUCKET_NAME))
+  ? `NOT _exists_:${field}`
+  : `${field}:${value}`);
+
+export const not = (query:string) => `NOT ${query}`.replace(/^NOT NOT /, '');

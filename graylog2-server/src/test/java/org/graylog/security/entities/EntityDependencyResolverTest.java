@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
+import org.graylog2.database.MongoCollections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,7 +65,7 @@ class EntityDependencyResolverTest {
                MongoJackObjectMapperProvider objectMapperProvider) {
 
         this.grnRegistry = grnRegistry;
-        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, this.grnRegistry);
+        DBGrantService dbGrantService = new DBGrantService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
         this.contentPackService = contentPackService;
         this.grnDescriptorService = grnDescriptorService;
         entityDependencyResolver = new EntityDependencyResolver(contentPackService, grnRegistry, grnDescriptorService, dbGrantService);

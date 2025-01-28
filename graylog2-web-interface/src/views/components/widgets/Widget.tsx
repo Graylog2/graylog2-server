@@ -45,6 +45,7 @@ import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import FullSizeContainer from 'views/components/aggregationbuilder/FullSizeContainer';
+import type WidgetType from 'views/logic/widgets/Widget';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -152,13 +153,14 @@ type EditWrapperProps = {
   editing: boolean,
   fields: FieldTypeMappingsList,
   id: string,
-  onToggleEdit: () => void,
   onCancelEdit: () => void,
+  onToggleEdit: () => void,
   onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => void,
+  showQueryControls?: boolean,
   type: string,
 };
 
-const EditWrapper = ({
+export const EditWrapper = ({
   children,
   config,
   editing,
@@ -168,18 +170,31 @@ const EditWrapper = ({
   onCancelEdit,
   onWidgetConfigChange,
   type,
+  showQueryControls,
 }: EditWrapperProps) => {
   const EditComponent = useMemo(() => _editComponentForType(type), [type]);
   const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
+  const dispatch = useAppDispatch();
+  const onSubmitEdit = useCallback((newWidget: WidgetType, hasChanges: boolean) => {
+    if (hasChanges) {
+      return dispatch(updateWidget(newWidget.id, newWidget)).then(() => onToggleEdit());
+    }
+
+    onToggleEdit();
+
+    return Promise.resolve();
+  }, [dispatch, onToggleEdit]);
 
   return editing ? (
-    <EditWidgetFrame onSubmit={onToggleEdit} onCancel={onCancelEdit} displaySubmitActions={!hasOwnSubmitButton}>
+    <EditWidgetFrame onSubmit={onSubmitEdit}
+                     onCancel={onCancelEdit}
+                     displaySubmitActions={!hasOwnSubmitButton}
+                     showQueryControls={showQueryControls}>
       <EditComponent config={config}
                      fields={fields}
                      editing={editing}
                      id={id}
                      type={type}
-                     onSubmit={onToggleEdit}
                      onCancel={onCancelEdit}
                      onChange={onWidgetConfigChange}>
         {children}
@@ -251,18 +266,21 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
 
   const { config } = widget;
   const isFocused = focusedWidget?.id === id;
+  const titleIcon = (
+    <IfDashboard>
+      {!editing && (
+        <WidgetWarmTierAlert widgetId={id} activeQuery={activeQuery} />
+      )}
+    </IfDashboard>
+  );
 
   return (
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
-        <IfDashboard>
-          {!editing && (
-            <WidgetWarmTierAlert widgetId={id} activeQuery={activeQuery} />
-          )}
-        </IfDashboard>
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader title={title}
+                          titleIcon={titleIcon}
                           hideDragHandle={!interactive || isFocused}
                           loading={loading}
                           editing={editing}
@@ -279,6 +297,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
         </InteractiveContext.Consumer>
         <EditWrapper onToggleEdit={onToggleEdit}
                      onCancelEdit={onCancelEdit}
+                     showQueryControls={isDashboard}
                      onWidgetConfigChange={onWidgetConfigChange}
                      config={config}
                      editing={editing}

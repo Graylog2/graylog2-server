@@ -96,18 +96,18 @@ export const SidecarsStore = singletonStore(
       order: undefined,
     },
 
-    init() {
-      this.propagateChanges();
-    },
-
-    propagateChanges() {
-      this.trigger({
+    getInitialState() {
+      return {
         sidecars: this.sidecars,
         query: this.query,
         onlyActive: this.onlyActive,
         pagination: this.pagination,
         sort: this.sort,
-      });
+      };
+    },
+
+    propagateChanges() {
+      this.trigger(this.getInitialState());
     },
 
     listPaginated({ query = '', page = 1, pageSize = 50, onlyActive = false, sortField = 'node_name', order = 'asc' }) {

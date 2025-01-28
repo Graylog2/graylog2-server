@@ -18,26 +18,29 @@ import * as React from 'react';
 import styled from 'styled-components';
 import camelCase from 'lodash/camelCase';
 
+import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
+
 import type { Column, ColumnRenderer, EntityBase } from './types';
 
 const Td = styled.td`
   word-break: break-word;
 `;
 
-const TableCell = <Entity extends EntityBase>({
+const TableCell = <Entity extends EntityBase, Meta>({
   column,
   columnRenderer,
   entity,
   entityAttributesAreCamelCase,
 }: {
   column: Column
-  columnRenderer: ColumnRenderer<Entity> | undefined,
+  columnRenderer: ColumnRenderer<Entity, Meta> | undefined,
   entity: Entity,
   entityAttributesAreCamelCase: boolean,
 }) => {
+  const { meta } = useMetaDataContext<Meta>();
   const attributeKey = entityAttributesAreCamelCase ? camelCase(column.id) : column.id;
   const attributeValue = entity[attributeKey];
-  const content = typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(attributeValue, entity, column) : attributeValue;
+  const content = typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(attributeValue, entity, column, meta) : attributeValue;
 
   return (<Td>{content}</Td>);
 };

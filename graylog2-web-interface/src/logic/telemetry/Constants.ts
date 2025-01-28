@@ -28,6 +28,8 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_STREAM_INPUT_CHANGED: 'Search Stream Input Changed',
   SEARCH_REFRESH_CONTROL_PRESET_SELECTED: 'Search Refresh Control Preset Selected',
   SEARCH_REFRESH_CONTROL_TOGGLED: 'Search Refresh Control Toggled',
+  ALERTS_REFRESH_CONTROL_PRESET_SELECTED: 'Alerts Refresh Control Preset Selected',
+  ALERTS_REFRESH_CONTROL_TOGGLED: 'Alerts Refresh Control Toggled',
   SEARCH_BUTTON_CLICKED: 'Search Button Clicked',
   SEARCH_WIDGET_EXPORT_DOWNLOADED: 'Search Widget Export Downloaded',
   SEARCH_TIMERANGE_PRESET_ADD_QUICK_ACCESS: 'Search TimeRange Preset Add Quick Access',
@@ -260,6 +262,7 @@ export const TELEMETRY_EVENT_TYPE = {
     SHOW_RECEIVED_MESSAGES_CLICKED: 'Inputs Show Received Messages Clicked',
     MANAGE_EXTRACTORS_CLICKED: 'Inputs Manage Extractors Clicked',
     SHOW_METRICS_CLICKED: 'Inputs Show Metrics Clicked',
+    INPUT_DIAGNOSIS_CLICKED: 'Inputs Input Diagnosis Clicked',
     INPUT_START_CLICKED: 'Inputs Input Start Clicked',
     INPUT_STOP_CLICKED: 'Inputs Input Stop Clicked',
     INPUT_SETUP_CLICKED: 'Inputs Input Setup Clicked',
@@ -397,5 +400,16 @@ export const TELEMETRY_EVENT_TYPE = {
     REMOTEREINDEX_RUNNING_RETRY_CLICKED: 'Datanode Migration RemoteReindex Running Retry Clicked',
     REMOTEREINDEX_RUNNING_RETRY_CONFIRM_CLICKED: 'Datanode Migration RemoteReindex Running Retry Confirm Clicked',
     REMOTEREINDEX_SHUTDOWN_OLD_CLUSTER_NEXT_CLICKED: 'Datanode Migration RemoteReindex Shutdown Old Cluster Next Clicked',
+  },
+  ALERTS_AND_EVENTS: {
+    ACTION_RAN: 'Alerts And Events Action Ran',
+  },
+  ENTITY_DATA_TABLE: {
+    COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
+    SORT_CHANGED: 'Entity Data Table Sort Changed',
+    PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
+    FILTER_CREATED: 'Entity Data Table Filter Created',
+    FILTER_DELETED: 'Entity Data Table Filter Deleted',
+    FILTER_CHANGED: 'Entity Data Table Filter Changed',
   },
 } as const;

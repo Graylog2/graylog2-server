@@ -16,12 +16,12 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { Stream } from 'stores/streams/StreamsStore';
 import type FetchError from 'logic/errors/FetchError';
+import { defaultOnError } from 'util/conditional/onError';
 
 const fetchStream = (streamId: string) => fetch('GET', qualifyUrl(ApiRoutes.StreamsApiController.get(streamId).url));
 
@@ -33,12 +33,8 @@ const useStream = (streamId: string): {
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery<Stream, FetchError>(
     ['stream', streamId],
-    () => fetchStream(streamId),
+    () => defaultOnError(fetchStream(streamId), 'Loading stream failed with status', 'Could not load stream.'),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading stream failed with status: ${errorThrown}`,
-          'Could not load stream.');
-      },
       notifyOnChangeProps: ['data', 'error'],
     },
   );

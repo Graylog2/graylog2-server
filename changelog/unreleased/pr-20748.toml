@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Optimize widgets warnings"
+
+issues = ["graylog-plugin-enterprise#8213"]
+pulls = ["20748"]

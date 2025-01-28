@@ -41,6 +41,7 @@ import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useQuery from 'routing/useQuery';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import StreamDataRoutingIntake from './StreamDataRoutingIntake';
 import StreamDataRoutingProcessing from './StreamDataRoutingProcessing';
@@ -163,6 +164,7 @@ const StreamDetails = ({ stream }: Props) => {
   const { indexSets } = useStore(IndexSetsStore);
   const queryClient = useQueryClient();
   const history = useHistory();
+  const currentUser = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
 
   const updateURLStepQueryParam = (nextSegment: DetailsSegment) => {
@@ -199,7 +201,7 @@ const StreamDetails = ({ stream }: Props) => {
 
   return (
     <>
-      {DataWarehouseJobComponent && <DataWarehouseJobComponent streamId={stream.id} />}
+      {DataWarehouseJobComponent && <DataWarehouseJobComponent permissions={currentUser.permissions} streamId={stream.id} />}
       <Container>
         <Header>
           <LeftCol>

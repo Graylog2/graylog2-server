@@ -20,6 +20,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { Spinner } from 'components/common';
 import type { PlotLayout } from 'views/components/visualizations/GenericPlot';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
+import AppConfig from 'util/AppConfig';
 
 type Props = {
   traffic: { [key: string]: number },
@@ -36,8 +37,9 @@ const GraphWrapper = styled.div<{
   width: ${$width}px
 `);
 
-const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
+const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
   const theme = useTheme();
+  const isCloud = AppConfig.isCloud();
 
   const getMaxDailyValue = (arr) => arr.reduce((a, b) => Math.max(a, b));
 
@@ -105,6 +107,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
       namelength: -1,
     },
     yaxis: {
+      range: isCloud ? [0, range] : null,
       title: {
         text: 'Bytes',
       },
@@ -116,7 +119,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
       {
         buttons: [
           {
-            args: ['yaxis.range', [0, range]],
+            args: ['yaxis.range', [0, isCloud ? trafficLimit : range]],
             args2: [{ 'yaxis.autorange': 'True' }, { 'yaxis.range': null }],
             label: 'Zoom/Reset',
             method: 'relayout',

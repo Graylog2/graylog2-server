@@ -89,7 +89,6 @@ public class DatanodeContainerizedBackend {
                 .nodeName(nodeName)
                 .network(network)
                 .passwordSecret(ContainerizedGraylogBackend.PASSWORD_SECRET)
-                .rootPasswordSha2(ContainerizedGraylogBackend.ROOT_PASSWORD_SHA_2)
                 .customizer(customizer)
                 .build();
     }

@@ -24,6 +24,8 @@ import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
 import type { ColumnRenderer } from 'components/common/EntityDataTable/types';
+import type { StepType } from 'components/common/Wizard';
+import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 
 interface PluginRoute {
   path: string;
@@ -54,6 +56,7 @@ type PluginNavigation = {
   perspective?: string;
   BadgeComponent?: React.ComponentType<{ text: string }>;
   position?: 'last' | undefined,
+  permissions?: string | Array<string>,
   useIsValidLicense?: () => boolean,
 } & (PluginNavigationLink | PluginNavigationDropdown)
 
@@ -149,6 +152,12 @@ type DataTiering = {
   }>,
 }
 
+type InputSetupWizard = {
+  steps: {
+    [key in InputSetupWizardStep]?: StepType
+  }
+}
+
 type License = {
   EnterpriseTrafficGraph: React.ComponentType,
   LicenseGraphWithMetrics: React.ComponentType,
@@ -185,7 +194,9 @@ export type FieldValueProvider = {
 }
 
 interface PluginDataWarehouse {
-  StreamDataWarehouse: React.ComponentType,
+  StreamDataWarehouse: React.ComponentType<{
+    permissions: Immutable.List<string>,
+  }>,
   DataWarehouseStatus: React.ComponentType<{
     datawareHouseEnabled: boolean;
   }>,
@@ -193,6 +204,7 @@ interface PluginDataWarehouse {
     nodeId: string,
   }>,
   DataWarehouseJobs: React.ComponentType<{
+    permissions: Immutable.List<string>,
     streamId: string,
   }>,
   StreamIlluminateProcessingSection: React.ComponentType<{
@@ -234,6 +246,7 @@ declare module 'graylog-web-plugin/plugin' {
     globalNotifications?: Array<GlobalNotification>;
     fieldValueProviders?:Array<FieldValueProvider>;
     license?: Array<License>,
+    inputSetupWizard?: Array<InputSetupWizard>;
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
