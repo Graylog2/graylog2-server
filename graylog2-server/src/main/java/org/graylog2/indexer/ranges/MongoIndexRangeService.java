@@ -23,16 +23,15 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
@@ -43,18 +42,19 @@ import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.DBUpdate;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.exists;
+import static com.mongodb.client.model.Filters.gte;
+import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Filters.or;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_DELETE;
 import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
@@ -68,11 +68,10 @@ public class MongoIndexRangeService implements IndexRangeService {
     private final IndexSetRegistry indexSetRegistry;
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
-    private final JacksonDBCollection<MongoIndexRange, ObjectId> collection;
+    private final MongoCollection<MongoIndexRange> collection;
 
     @Inject
-    public MongoIndexRangeService(MongoConnection mongoConnection,
-                                  MongoJackObjectMapperProvider objectMapperProvider,
+    public MongoIndexRangeService(MongoCollections mongoCollections,
                                   Indices indices,
                                   IndexSetRegistry indexSetRegistry,
                                   AuditEventSender auditEventSender,
@@ -82,27 +81,20 @@ public class MongoIndexRangeService implements IndexRangeService {
         this.indexSetRegistry = indexSetRegistry;
         this.auditEventSender = auditEventSender;
         this.nodeId = nodeId;
-        this.collection = JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                MongoIndexRange.class,
-                ObjectId.class,
-                objectMapperProvider.get());
+        this.collection = mongoCollections.nonEntityCollection(COLLECTION_NAME, MongoIndexRange.class);
 
         eventBus.register(this);
 
-        collection.createIndex(new BasicDBObject(MongoIndexRange.FIELD_INDEX_NAME, 1));
-        collection.createIndex(BasicDBObjectBuilder.start()
-                .add(MongoIndexRange.FIELD_BEGIN, 1)
-                .add(MongoIndexRange.FIELD_END, 1)
-                .get());
+        collection.createIndex(Indexes.ascending(MongoIndexRange.FIELD_INDEX_NAME));
+        collection.createIndex(Indexes.ascending(MongoIndexRange.FIELD_BEGIN, MongoIndexRange.FIELD_END));
     }
 
     @Override
     public IndexRange get(String index) throws NotFoundException {
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.notExists("start"),
-                DBQuery.is(IndexRange.FIELD_INDEX_NAME, index));
-        final MongoIndexRange indexRange = collection.findOne(query);
+        final var query = and(
+                exists("start", false),
+                eq(IndexRange.FIELD_INDEX_NAME, index));
+        final MongoIndexRange indexRange = collection.find(query).first();
         if (indexRange == null) {
             throw new NotFoundException("Index range for index <" + index + "> not found.");
         }
@@ -112,36 +104,30 @@ public class MongoIndexRangeService implements IndexRangeService {
 
     @Override
     public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
-        final DBQuery.Query query = DBQuery.or(
-                DBQuery.and(
-                        DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
-                        DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, end.getMillis()),
-                        DBQuery.greaterThanEquals(IndexRange.FIELD_END, begin.getMillis())
+        final var query = or(
+                and(
+                        exists("start", false),  // "start" has been used by the old index ranges in MongoDB
+                        lte(IndexRange.FIELD_BEGIN, end.getMillis()),
+                        gte(IndexRange.FIELD_END, begin.getMillis())
                 ),
-                DBQuery.and(
-                        DBQuery.notExists("start"),  // "start" has been used by the old index ranges in MongoDB
-                        DBQuery.lessThanEquals(IndexRange.FIELD_BEGIN, 0L),
-                        DBQuery.greaterThanEquals(IndexRange.FIELD_END, 0L)
+                and(
+                        exists("start", false),  // "start" has been used by the old index ranges in MongoDB
+                        lte(IndexRange.FIELD_BEGIN, 0L),
+                        gte(IndexRange.FIELD_END, 0L)
                 )
         );
 
-        try (DBCursor<MongoIndexRange> indexRanges = collection.find(query)) {
-            return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) indexRanges);
-        }
+        return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, collection.find(query));
     }
 
     @Override
     public SortedSet<IndexRange> findAll() {
-        try (DBCursor<MongoIndexRange> cursor = collection.find(DBQuery.notExists("start"))) {
-            return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) cursor);
-        }
+        return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, collection.find(exists("start", false)));
     }
 
     @Override
     public SortedSet<IndexRange> find(Bson query) {
-        try (DBCursor<MongoIndexRange> cursor = collection.find(query)) {
-            return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, (Iterator<? extends IndexRange>) cursor);
-        }
+        return ImmutableSortedSet.copyOf(IndexRange.COMPARATOR, collection.find(query));
     }
 
     @Override
@@ -166,24 +152,22 @@ public class MongoIndexRangeService implements IndexRangeService {
     }
 
     @Override
-    public WriteResult<MongoIndexRange, ObjectId> save(IndexRange indexRange) {
+    public void save(IndexRange indexRange) {
         remove(indexRange.indexName());
-        final WriteResult<MongoIndexRange, ObjectId> save = collection.save(MongoIndexRange.create(indexRange));
-        return save;
+        collection.insertOne(MongoIndexRange.create(indexRange));
     }
 
     @Override
     public boolean renameIndex(String from, String to) {
-        return collection.updateMulti(
-                        DBQuery.is(IndexRange.FIELD_INDEX_NAME, from),
-                        DBUpdate.set(IndexRange.FIELD_INDEX_NAME, to))
-                .getN() > 0;
+        return collection.updateMany(
+                        eq(IndexRange.FIELD_INDEX_NAME, from),
+                        Updates.set(IndexRange.FIELD_INDEX_NAME, to))
+                .getMatchedCount() > 0;
     }
 
     @Override
     public boolean remove(String index) {
-        final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
-        return remove.getN() > 0;
+        return collection.deleteMany(in(IndexRange.FIELD_INDEX_NAME, index)).getDeletedCount() > 0;
     }
 
     @Subscribe
