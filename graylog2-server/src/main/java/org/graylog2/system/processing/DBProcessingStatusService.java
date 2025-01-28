@@ -106,7 +106,7 @@ public class DBProcessingStatusService {
      * @return a list of all processing status entries
      */
     public List<ProcessingStatusDto> all() {
-        return ImmutableList.copyOf(collection.find().sort(Sorts.ascending(("_id"))));
+        return ImmutableList.copyOf(collection.find().sort(Sorts.ascending("_id")));
     }
 
     /**
