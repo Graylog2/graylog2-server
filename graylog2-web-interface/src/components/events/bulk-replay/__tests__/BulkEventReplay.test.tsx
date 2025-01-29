@@ -21,6 +21,7 @@ import { PluginManifest } from 'graylog-web-plugin/plugin';
 
 import { usePlugin } from 'views/test/testPlugins';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
+import RemainingBulkActions from 'components/events/bulk-replay/RemainingBulkActions';
 
 import events from './events.fixtures';
 
@@ -52,7 +53,7 @@ const eventByIndex = (index: number) => events[initialEventIds[index]].event;
 const eventMessage = (index: number) => eventByIndex(index).message;
 
 const SUT = (props: Partial<React.ComponentProps<typeof BulkEventReplay>>) => (
-  <BulkEventReplay events={events} initialEventIds={initialEventIds} onClose={() => {}} {...props} />
+  <BulkEventReplay events={events} initialEventIds={initialEventIds} onClose={() => {}} BulkActions={RemainingBulkActions} {...props} />
 );
 
 const bulkAction = jest.fn();

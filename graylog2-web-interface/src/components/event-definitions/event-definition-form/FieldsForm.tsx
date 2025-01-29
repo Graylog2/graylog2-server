@@ -29,6 +29,7 @@ import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
 
 import type { EventDefinition } from '../event-definitions-types';
+import { isSystemEventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
 type Props = {
@@ -86,8 +87,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
     toggleFieldForm();
   };
 
-  const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
-  const canEditCondition = canEdit && !isSystemEventDefinition;
+  const canEditCondition = canEdit && !isSystemEventDefinition(eventDefinition);
 
   if (showFieldForm) {
     return (
