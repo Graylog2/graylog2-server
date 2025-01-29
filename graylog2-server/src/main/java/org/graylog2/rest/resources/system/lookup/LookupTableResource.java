@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -54,6 +54,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.lookup.CachePurge;
 import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
@@ -340,8 +341,11 @@ public class LookupTableResource extends RestResource {
             LookupTableDto saved = dbTableService.saveAndPostEvent(lookupTable.toDto());
 
             return LookupTableApi.fromDto(saved);
-        } catch (DuplicateKeyException e) {
-            throw new BadRequestException(e.getMessage());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new BadRequestException(e.getMessage());
+            }
+            throw e;
         }
     }
 
@@ -565,8 +569,11 @@ public class LookupTableResource extends RestResource {
             DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(dto);
 
             return DataAdapterApi.fromDto(saved);
-        } catch (DuplicateKeyException e) {
-            throw new BadRequestException(e.getMessage());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new BadRequestException(e.getMessage());
+            }
+            throw e;
         }
     }
 
@@ -718,8 +725,11 @@ public class LookupTableResource extends RestResource {
         try {
             final CacheDto saved = dbCacheService.saveAndPostEvent(newCache.toDto());
             return CacheApi.fromDto(saved);
-        } catch (DuplicateKeyException e) {
-            throw new BadRequestException(e.getMessage());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new BadRequestException(e.getMessage());
+            }
+            throw e;
         }
     }
 

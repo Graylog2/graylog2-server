@@ -18,7 +18,7 @@ package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -29,6 +29,7 @@ import org.graylog.events.processor.systemnotification.SystemNotificationEventEn
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.MongoIndexSet;
@@ -177,9 +178,12 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
             LOG.info("Successfully created events index-set <{}/{}>", savedIndexSet.id(), savedIndexSet.title());
 
             return mongoIndexSetFactory.create(savedIndexSet);
-        } catch (DuplicateKeyException e) {
-            LOG.error("Couldn't create index-set <{}/{}>", indexSetTitle, indexPrefix);
-            throw new RuntimeException(e.getMessage());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                LOG.error("Couldn't create index-set <{}/{}>", indexSetTitle, indexPrefix);
+                throw new RuntimeException(e.getMessage());
+            }
+            throw e;
         }
     }
 
