@@ -83,7 +83,7 @@ public class TokenUsageResource extends RestResource {
                                                     @ApiParam(name = "sort",
                                                               value = "The field to sort the result on",
                                                               required = true,
-                                                              allowableValues = "userName,name")
+                                                              allowableValues = "username,NAME")
                                                     @DefaultValue(TokenUsage.FIELD_NAME) @QueryParam("sort") String sort,
                                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                     @DefaultValue("asc") @QueryParam("order") SortOrder order) {
