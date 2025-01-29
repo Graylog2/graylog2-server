@@ -93,7 +93,7 @@ const DeprecatedLabel = styled(Label)`
   padding: 2px 8px;
 `;
 
-const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, selectedBlockDict, type } : Props) => {
+const RuleBlockDisplay = ({ block = undefined, negatable = false, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, selectedBlockDict = undefined, type } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
@@ -126,13 +126,10 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
     });
 
     return (partsWithHighlight.map((item, index) => (
-
-      (
-
-        <React.Fragment key={index}>
-          {item}
-        </React.Fragment>
-      )
+      // eslint-disable-next-line react/no-array-index-key
+      <React.Fragment key={index}>
+        {item}
+      </React.Fragment>
     )));
   };
 
