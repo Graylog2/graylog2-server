@@ -148,7 +148,7 @@ const conditionsBlockDict: BlockDict[] = [
 const actionsBlockDict: BlockDict[] = [
   {
     name: 'has_field',
-    deprecated: false,
+    deprecated: true,
     pure: false,
     return_type: RuleBuilderTypes.Boolean,
     params: [

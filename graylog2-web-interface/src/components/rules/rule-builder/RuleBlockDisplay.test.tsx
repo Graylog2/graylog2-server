@@ -115,4 +115,24 @@ describe('RuleBlockDisplay', () => {
 
     expect(screen.getByText('wrong 1, not right 2')).toBeInTheDocument();
   });
+
+  it('displays errors when existing', async () => {
+    render(
+      <RuleBuilderProvider>
+        <RuleBlockDisplay block={{ ...block, errors: ['wrong 1', 'not right 2'] }} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+      </RuleBuilderProvider>,
+    );
+
+    expect(screen.getByText('wrong 1, not right 2')).toBeInTheDocument();
+  });
+
+  it('shows a deprecated label for deprecating pipeline functions', async () => {
+    render(
+      <RuleBuilderProvider>
+        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} selectedBlockDict={actionsBlockDict[0]} type={type} />
+      </RuleBuilderProvider>,
+    );
+
+    expect(screen.getByText('Deprecated')).toBeInTheDocument();
+  });
 });
