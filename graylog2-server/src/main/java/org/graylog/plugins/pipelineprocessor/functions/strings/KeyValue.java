@@ -133,6 +133,8 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
     }
 
     private static class DelimiterCharMatcher extends CharMatcher {
+        private static final CharMatcher BASE_MATCHER = new DelimiterCharMatcher('"')
+                .and(new DelimiterCharMatcher('\''));
         private final char wrapperChar;
 
         private boolean inWrapper = false;
@@ -144,9 +146,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
          * @return a char matcher that can handle double and single quotes
          */
         static CharMatcher withQuoteHandling(CharMatcher charMatcher) {
-            return new DelimiterCharMatcher('"')
-                    .and(new DelimiterCharMatcher('\''))
-                    .and(charMatcher);
+            return BASE_MATCHER.and(charMatcher);
         }
 
         /**
@@ -157,8 +157,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
          * @return a char matcher that can handle double, single quotes, and escape characters
          */
         static CharMatcher withQuoteAndEscapeHandling(CharMatcher charMatcher) {
-            return new DelimiterCharMatcher('"')
-                    .and(new DelimiterCharMatcher('\''))
+            return BASE_MATCHER
                     .and(new NotEscapedCharMatcher())
                     .and(charMatcher);
         }
