@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Graylog jest preset, contains the jest configuration and dependencies to setup the test environment for the web interface",
   "main": "jest-preset.js",
+  "packageManager": "yarn@1.22.22",
   "keywords": [
     "graylog",
     "jest"

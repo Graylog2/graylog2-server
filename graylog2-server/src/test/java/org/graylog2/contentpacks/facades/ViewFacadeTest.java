@@ -116,11 +116,8 @@ public class ViewFacadeTest {
     }
 
     public static class TestViewSummaryService extends ViewSummaryService {
-        protected TestViewSummaryService(MongoConnection mongoConnection,
-                                         MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                                         MongoCollections mongoCollections) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mongoCollections);
-
+        protected TestViewSummaryService(MongoCollections mongoCollections) {
+            super(mongoCollections);
         }
     }
 
@@ -154,7 +151,7 @@ public class ViewFacadeTest {
         final MongoCollections mongoCollections = new MongoCollections(mapper, mongoConnection);
         searchDbService = new TestSearchDBService(mongoConnection, mapper);
         viewService = new TestViewService(null, mongoCollections);
-        viewSummaryService = new TestViewSummaryService(mongoConnection, mapper, mongoCollections);
+        viewSummaryService = new TestViewSummaryService(mongoCollections);
         userService = mock(UserService.class);
 
         facade = new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService);
