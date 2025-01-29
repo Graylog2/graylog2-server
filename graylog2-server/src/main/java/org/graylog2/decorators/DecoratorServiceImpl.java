@@ -17,59 +17,55 @@
 package org.graylog2.decorators;
 
 import com.google.common.base.Strings;
-import com.mongodb.DBCollection;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.DbEntity;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.NotFoundException;
-import org.mongojack.DBQuery;
-import org.mongojack.JacksonDBCollection;
-
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
+import org.graylog2.database.DbEntity;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.utils.MongoUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class DecoratorServiceImpl implements DecoratorService {
-    private final JacksonDBCollection<DecoratorImpl, String> coll;
+    private final MongoCollection<DecoratorImpl> collection;
+    private final MongoUtils<DecoratorImpl> mongoUtils;
 
     @Inject
-    public DecoratorServiceImpl(MongoConnection mongoConnection, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
+    public DecoratorServiceImpl(MongoCollections mongoCollections) {
         final String collectionName = DecoratorImpl.class.getAnnotation(DbEntity.class).collection();
-        final DBCollection dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
-        this.coll = JacksonDBCollection.wrap(dbCollection, DecoratorImpl.class, String.class, mongoJackObjectMapperProvider.get());
+        collection = mongoCollections.collection(collectionName, DecoratorImpl.class);
+        mongoUtils = mongoCollections.utils(collection);
     }
 
     @Override
     public List<Decorator> findForStream(String streamId) {
-        return toInterfaceList(coll.find(DBQuery.is(DecoratorImpl.FIELD_STREAM, Optional.of(streamId))).toArray());
+        return collection.find(Filters.eq(DecoratorImpl.FIELD_STREAM, streamId)).into(new ArrayList<>());
     }
 
     @Override
     public List<Decorator> findForGlobal() {
-        return toInterfaceList(coll.find(DBQuery.or(
-                DBQuery.notExists(DecoratorImpl.FIELD_STREAM),
-                DBQuery.is(DecoratorImpl.FIELD_STREAM, Optional.empty())
-        )).toArray());
+        return collection.find(Filters.or(
+                Filters.exists(DecoratorImpl.FIELD_STREAM, false),
+                Filters.eq(DecoratorImpl.FIELD_STREAM, Optional.empty())
+        )).into(new ArrayList<>());
     }
 
     @Override
     public Decorator findById(String decoratorId) throws NotFoundException {
-        final Decorator result = coll.findOneById(decoratorId);
-        if (result == null) {
-            throw new NotFoundException("Decorator with id " + decoratorId + " not found.");
-        }
-
-        return result;
+        return mongoUtils.getById(decoratorId).orElseThrow(() ->
+                new NotFoundException("Decorator with id " + decoratorId + " not found.")
+        );
     }
 
     @Override
     public List<Decorator> findAll() {
-        return toInterfaceList(coll.find().toArray());
+        return collection.find().into(new ArrayList<>());
     }
 
     @Override
@@ -86,18 +82,15 @@ public class DecoratorServiceImpl implements DecoratorService {
     public Decorator save(Decorator decorator) {
         checkArgument(decorator instanceof DecoratorImpl, "Argument must be an instance of DecoratorImpl, not %s", decorator.getClass());
         if (!Strings.isNullOrEmpty(decorator.id())) {
-            this.coll.updateById(decorator.id(), (DecoratorImpl) decorator);
-            return this.coll.findOneById(decorator.id());
+            collection.replaceOne(MongoUtils.idEq(decorator.id()), (DecoratorImpl) decorator);
+            return decorator;
         }
-        return this.coll.save((DecoratorImpl) decorator).getSavedObject();
+        return mongoUtils.save((DecoratorImpl) decorator);
     }
 
     @Override
     public int delete(String id) {
-        return this.coll.removeById(id).getN();
+        return mongoUtils.deleteById(id) ? 1 : 0;
     }
 
-    private List<Decorator> toInterfaceList(List<DecoratorImpl> concreteList) {
-        return concreteList.stream().collect(Collectors.toList());
-    }
 }
