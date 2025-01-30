@@ -457,7 +457,11 @@ const exports: PluginExports = {
   'views.components.widgets.events.filterComponents': eventsFilterComponents,
   'views.components.widgets.events.attributes': eventsAttributes,
   'views.reducers': viewsReducers,
-  'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
+  'views.elements.validationErrorExplanation': [{
+    component: WarmTierQueryValidation,
+    key: 'warm-tier',
+    useCondition: () => true,
+  }],
   'views.widgets.actions': [ExportMessageWidgetAction, ExportWidgetAction],
 };
 

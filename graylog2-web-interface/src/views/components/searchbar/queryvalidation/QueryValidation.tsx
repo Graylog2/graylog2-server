@@ -29,6 +29,8 @@ import QueryValidationActions from 'views/actions/QueryValidationActions';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import usePluginEntities from 'hooks/usePluginEntities';
+import usePluggableValidationExplanations
+  from 'views/components/searchbar/queryvalidation/usePluggableValidationExplanations';
 
 const Container = styled.div`
   margin-left: 5px;
@@ -174,7 +176,6 @@ const deduplicateExplanations = (explanations: Explanations | undefined): Explan
 };
 
 const QueryValidation = () => {
-  const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
   const [shakingPopover, shake] = useShakeTemporarily();
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
@@ -187,6 +188,7 @@ const QueryValidation = () => {
   const deduplicatedExplanations = useMemo(() => [...deduplicateExplanations(explanations)], [explanations]);
   const hasExplanations = validationState && (validationState?.status !== 'OK');
   const isInfo = validationState && (validationState.status === 'INFO');
+  const { explanationModals, explanationComponents } = usePluggableValidationExplanations(validationState);
 
   const validationTitle = () => {
     if (!validationState) return '';
@@ -201,26 +203,29 @@ const QueryValidation = () => {
     }
   };
 
+  console.log({ explanationModals, explanationComponents });
+
   return (
-    <Popover opened={hasExplanations && showExplanation} position="bottom" width={500} withArrow>
-      <Popover.Target>
-        <Container ref={explanationTriggerRef}>
-          {hasExplanations ? (
-            <ExplanationTrigger title={`Toggle validation ${validationTitle()}`}
-                                onClick={toggleShow}
-                                $clickable
-                                tabIndex={0}
-                                type="button">
-              <ErrorIcon $status={status} name={isInfo ? 'database' : 'error'} />
-            </ExplanationTrigger>
-          ) : (
-            <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                               title="Search query syntax documentation"
-                               text={<Icon name="lightbulb_circle" />} />
-          )}
-        </Container>
-      </Popover.Target>
-      {hasExplanations && showExplanation && (
+    <>
+      <Popover onChange={toggleShow} opened={hasExplanations && showExplanation} position="bottom" width={500} withArrow>
+        <Popover.Target>
+          <Container ref={explanationTriggerRef}>
+            {hasExplanations ? (
+              <ExplanationTrigger title={`Toggle validation ${validationTitle()}`}
+                                  onClick={toggleShow}
+                                  $clickable
+                                  tabIndex={0}
+                                  type="button">
+                <ErrorIcon $status={status} name={isInfo ? 'database' : 'error'} />
+              </ExplanationTrigger>
+            ) : (
+              <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                                 title="Search query syntax documentation"
+                                 text={<Icon name="lightbulb_circle" />} />
+            )}
+          </Container>
+        </Popover.Target>
+        {hasExplanations && showExplanation && (
         <StyledPopoverDropdown id="query-validation-error-explanation"
                                title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                                $shaking={shakingPopover}>
@@ -235,14 +240,13 @@ const QueryValidation = () => {
                 )}
               </Explanation>
             ))}
-            {plugableValidationExplanation?.map((PlugableExplanation, index) => (
-              // eslint-disable-next-line react/no-array-index-key
-              (<PlugableExplanation validationState={validationState} key={index} />)),
-            )}
+            {explanationComponents}
           </div>
         </StyledPopoverDropdown>
-      )}
-    </Popover>
+        )}
+      </Popover>
+      <>{explanationModals}</>
+    </>
   );
 };
 

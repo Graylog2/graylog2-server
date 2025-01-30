@@ -326,6 +326,22 @@ export type EventAction<T = unknown> = {
   isBulk?: boolean
 }
 
+export type ValidationErrorExplanationComponentProps<T = unknown> = {
+  validationState: QueryValidationState,
+  modalRef?: () => T,
+}
+
+export type ValidationErrorExplanationModalProps = React.PropsWithRef<QueryValidationState> & {
+  ref: React.LegacyRef<unknown>
+}
+
+export type ValidationErrorExplanation<T = unknown> = {
+  useCondition: (validationState?: QueryValidationState) => boolean,
+  modal?: React.ComponentType<ValidationErrorExplanationModalProps>,
+  component: React.ComponentType<ValidationErrorExplanationComponentProps<T>>,
+  key: string,
+}
+
 type EventWidgetAction<T> = {
   key: string,
   component: React.ComponentType<EventWidgetActionComponentProps<T>>,
@@ -516,7 +532,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;
     'views.elements.header'?: Array<React.ComponentType>;
     'views.elements.queryBar'?: Array<React.ComponentType>;
-    'views.elements.validationErrorExplanation'?: Array<React.ComponentType<{ validationState: QueryValidationState }>>;
+    'views.elements.validationErrorExplanation'?: Array<ValidationErrorExplanation>;
     'views.export.formats'?: Array<ExportFormat>;
     'views.hooks.confirmDeletingDashboard'?: Array<(view: View) => Promise<boolean | null>>,
     'views.hooks.confirmDeletingDashboardPage'?: Array<(dashboardId: string, queryId: string, widgetIds: { [queryId: string]: Array<string> }) => Promise<boolean | null>>,
