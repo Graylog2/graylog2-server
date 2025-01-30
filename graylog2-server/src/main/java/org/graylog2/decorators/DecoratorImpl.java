@@ -21,15 +21,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotBlank;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.DbEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotBlank;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,7 +41,8 @@ import static org.graylog2.shared.security.RestPermissions.DECORATORS_READ;
 @DbEntity(collection = "decorators",
           titleField = NO_TITLE,
           readPermission = DECORATORS_READ)
-public abstract class DecoratorImpl implements Decorator, Comparable<DecoratorImpl> {
+public abstract class DecoratorImpl implements Decorator, Comparable<DecoratorImpl>,
+        BuildableMongoEntity<DecoratorImpl, DecoratorImpl.Builder> {
     static final String FIELD_ID = "id";
     static final String FIELD_TYPE = "type";
     static final String FIELD_CONFIG = "config";
@@ -109,7 +109,7 @@ public abstract class DecoratorImpl implements Decorator, Comparable<DecoratorIm
     }
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements BuildableMongoEntity.Builder<DecoratorImpl, Builder> {
         public abstract Builder id(String id);
 
         abstract Builder type(String type);

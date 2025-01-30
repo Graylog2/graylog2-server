@@ -835,6 +835,25 @@
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <RestrictImports>
+                            <groups>
+                                <group>
+                                    <reason>Data Node packages must be allowed for the data-node/ module.</reason>
+                                    <allowedImports>
+                                        <allowedImport>org.graylog.datanode.**</allowedImport>
+                                    </allowedImports>
+                                </group>
+                            </groups>
+                        </RestrictImports>
+                    </rules>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

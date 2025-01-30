@@ -14,30 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.ranges;
+import type { Event } from 'components/events/events/types';
 
-import org.bson.conversions.Bson;
-import org.graylog2.database.NotFoundException;
-import org.joda.time.DateTime;
-
-import java.util.SortedSet;
-
-public interface IndexRangeService {
-    IndexRange get(String index) throws NotFoundException;
-
-    SortedSet<IndexRange> find(DateTime begin, DateTime end);
-
-    SortedSet<IndexRange> findAll();
-
-    SortedSet<IndexRange> find(Bson query);
-
-    void save(IndexRange indexRange);
-
-    boolean renameIndex(String from, String to);
-
-    boolean remove(String index);
-
-    IndexRange calculateRange(String index);
-
-    IndexRange createUnknownRange(String index);
+export type RemainingBulkActionsProps = {
+  events: Event[];
+  completed: boolean;
 }

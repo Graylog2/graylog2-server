@@ -24,6 +24,7 @@ import { Icon } from 'components/common';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 import type { EventDefinition } from '../event-definitions-types';
+import { isSystemEventDefinition } from '../event-definitions-types';
 
 const StatusLabel = styled(Label)<{ $clickable: boolean }>(({ $clickable }) => css`
   cursor: ${$clickable ? 'pointer' : 'default'};
@@ -53,7 +54,7 @@ const StatusCell = ({ eventDefinition } : Props) => {
   const [showConfirmDisableModal, setShowConfirmDisableModal] = useState<boolean>(false);
   const { refetch: refetchEventDefinitions } = useTableFetchContext();
   const isEnabled = eventDefinition?.state === 'ENABLED';
-  const disableChange = eventDefinition?.config?.type === 'system-notifications-v1';
+  const disableChange = isSystemEventDefinition(eventDefinition);
   const description = isEnabled ? 'enabled' : 'disabled';
   const title = _title(!isEnabled, disableChange, description);
 
