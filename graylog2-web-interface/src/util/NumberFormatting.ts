@@ -20,7 +20,7 @@ type Options = {
   minimumDigits?: number,
 };
 
-const desiredFractionDigits = 2;
+const desiredFractionDigits = 1;
 
 const defaultPercentageOptions = {
   minimumFractionDigits: desiredFractionDigits,

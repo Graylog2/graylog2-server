@@ -34,7 +34,7 @@ describe('TypeSpecificValue', () => {
       <TypeSpecificValue field="field1" value={6543.21} unit={FieldUnit.fromJSON({ abbrev: 'ms', unit_type: 'time' })} />,
     );
 
-    await screen.findByText('6.54 s');
+    await screen.findByText('6.5 s');
   });
 
   it('should render original value if unit not defined', async () => {

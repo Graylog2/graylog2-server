@@ -26,12 +26,12 @@ const expectFormattedPercentage = (num: number) => expect(formatPercentage(num /
 describe('NumberFormatting', () => {
   describe('formatNumber', () => {
     it('formats with 2 fraction digits by default', () => {
-      expectFormattedNumber(42.23).toEqual('42.23');
+      expectFormattedNumber(42.23).toEqual('42.2');
       expectFormattedNumber(42).toEqual('42');
-      expectFormattedNumber(137.991).toEqual('137.99');
+      expectFormattedNumber(137.991).toEqual('138');
       expectFormattedNumber(137.999).toEqual('138');
-      expectFormattedNumber(137.111).toEqual('137.11');
-      expectFormattedNumber(137.115).toEqual('137.12');
+      expectFormattedNumber(137.111).toEqual('137.1');
+      expectFormattedNumber(137.115).toEqual('137.1');
       expectFormattedNumber(0.23).toEqual('0.23');
     });
 
@@ -44,36 +44,36 @@ describe('NumberFormatting', () => {
 
   describe('formatTrend', () => {
     it('does show sign', () => {
-      expectFormattedTrend(42.23).toEqual('+42.23');
+      expectFormattedTrend(42.23).toEqual('+42.2');
       expectFormattedTrend(-42).toEqual('-42');
-      expectFormattedTrend(-137.991).toEqual('-137.99');
+      expectFormattedTrend(-137.991).toEqual('-138');
       expectFormattedTrend(137.999).toEqual('+138');
-      expectFormattedTrend(-137.111).toEqual('-137.11');
-      expectFormattedTrend(137.115).toEqual('+137.12');
+      expectFormattedTrend(-137.111).toEqual('-137.1');
+      expectFormattedTrend(137.115).toEqual('+137.1');
       expectFormattedTrend(0).toEqual('0');
     });
 
     it('does show percentage', () => {
       const options = { percentage: true };
 
-      expectFormattedTrend(42.23 / 100, options).toEqual('+42.23%');
-      expectFormattedTrend(-42 / 100, options).toEqual('-42.00%');
-      expectFormattedTrend(-137.991 / 100, options).toEqual('-137.99%');
-      expectFormattedTrend(137.999 / 100, options).toEqual('+138.00%');
-      expectFormattedTrend(-137.111 / 100, options).toEqual('-137.11%');
-      expectFormattedTrend(137.115 / 100, options).toEqual('+137.12%');
-      expectFormattedTrend(0 / 100, options).toEqual('0.00%');
+      expectFormattedTrend(42.23 / 100, options).toEqual('+42.2%');
+      expectFormattedTrend(-42 / 100, options).toEqual('-42.0%');
+      expectFormattedTrend(-137.991 / 100, options).toEqual('-138.0%');
+      expectFormattedTrend(137.999 / 100, options).toEqual('+138.0%');
+      expectFormattedTrend(-137.111 / 100, options).toEqual('-137.1%');
+      expectFormattedTrend(137.115 / 100, options).toEqual('+137.1%');
+      expectFormattedTrend(0 / 100, options).toEqual('0.0%');
     });
   });
 
   describe('formatPercentage', () => {
     it('formats with 2 fraction digits by default', () => {
-      expectFormattedPercentage(42.23).toEqual('42.23%');
-      expectFormattedPercentage(42).toEqual('42.00%');
-      expectFormattedPercentage(137.991).toEqual('137.99%');
-      expectFormattedPercentage(137.999).toEqual('138.00%');
-      expectFormattedPercentage(137.111).toEqual('137.11%');
-      expectFormattedPercentage(137.115).toEqual('137.12%');
+      expectFormattedPercentage(42.23).toEqual('42.2%');
+      expectFormattedPercentage(42).toEqual('42.0%');
+      expectFormattedPercentage(137.991).toEqual('138.0%');
+      expectFormattedPercentage(137.999).toEqual('138.0%');
+      expectFormattedPercentage(137.111).toEqual('137.1%');
+      expectFormattedPercentage(137.115).toEqual('137.1%');
       expectFormattedPercentage(0.684).toEqual('0.68%');
     });
 
