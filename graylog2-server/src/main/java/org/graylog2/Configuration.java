@@ -276,14 +276,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES, validators = PositiveIntegerValidator.class)
     private int installOutputBufferDrainingMaxRetries = DEFAULT_INSTALL_RETRIES;
 
-
-    @Parameter(value = "timestamp_grace_period", validators = PositiveDurationValidator.class)
-    private Duration timestampGracePeriod = Duration.days(30);
-
-    public java.time.Duration getTimestampGracePeriod() {
-        return java.time.Duration.ofMillis(timestampGracePeriod.toMilliseconds());
-    }
-
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
     }
@@ -683,5 +675,4 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     public boolean withInputs() {
         return true;
     }
-
 }

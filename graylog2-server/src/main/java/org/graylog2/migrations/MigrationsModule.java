@@ -71,5 +71,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20240312140000_RemoveFieldTypeMappingsManagerRole.class);
         addMigration(V202404170856_UpdateIndexSetTemplates.class);
         addMigration(V20240927120300_DataNodeMigrationIndexSet.class);
+        addMigration(V202501301750_DefaultTimeStampConfig.class);
     }
 }

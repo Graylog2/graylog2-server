@@ -16,11 +16,14 @@
  */
 package org.graylog2.shared.buffers.processors;
 
+import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -48,21 +51,18 @@ class MessageTimestampTest {
 
     @Test
     void testExceedsGracePeriod() {
-        DateTime now = Tools.nowUTC();
-        DateTime time = now.plusDays(50);
+        final DateTime initialTime = new DateTime(2014, 1, 1, 1, 59, 59, 0, DateTimeZone.UTC);
+        final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
+        DateTimeUtils.setCurrentMillisProvider(clock);
+
+        DateTime time = initialTime.plusDays(50);
         Message msg = messageFactory.createMessage("test message", "localhost", time);
         normalize(msg, Duration.ofDays(30));
-        assertThat(fuzzyEquals(msg.getTimestamp(), now)).isTrue();
+        assertThat(msg.getTimestamp()).isEqualTo(initialTime);
     }
 
     void normalize(Message msg, Duration gracePeriod) {
         msg.ensureValidTimestamp();
         msg.normalizeTimestamp(gracePeriod);
-    }
-
-    final static long fuzzyMillis = 100;
-
-    boolean fuzzyEquals(DateTime d1, DateTime d2) {
-        return (d1.isAfter(d2.minus(fuzzyMillis))) && (d1.isBefore(d2.plus(fuzzyMillis)));
     }
 }

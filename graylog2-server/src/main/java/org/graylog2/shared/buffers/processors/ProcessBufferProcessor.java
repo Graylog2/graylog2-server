@@ -21,16 +21,15 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import de.huxhorn.sulky.ulid.ULID;
 import jakarta.inject.Provider;
 import org.graylog.failure.FailureSubmissionService;
-import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.MessageEvent;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
@@ -41,12 +40,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Suppliers.memoizeWithExpiration;
 
 public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
@@ -60,12 +63,11 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
 
     private final OutputBuffer outputBuffer;
     private final ProcessingStatusRecorder processingStatusRecorder;
-    private final ULID ulid;
     private final MessageULIDGenerator messageULIDGenerator;
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
     private final FailureSubmissionService failureSubmissionService;
-    private final Configuration configuration;
+    private final Supplier<Duration> timestampGracePeriod;
     private volatile Message currentMessage;
 
     @AssistedInject
@@ -73,17 +75,15 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                                   OrderedMessageProcessors orderedMessageProcessors,
                                   OutputBuffer outputBuffer,
                                   ProcessingStatusRecorder processingStatusRecorder,
-                                  ULID ulid,
                                   MessageULIDGenerator messageULIDGenerator,
                                   @Assisted DecodingProcessor decodingProcessor,
                                   @DefaultStream Provider<Stream> defaultStreamProvider,
                                   FailureSubmissionService failureSubmissionService,
                                   StreamMetrics streamMetrics,
-                                  Configuration configuration) {
+                                  ClusterConfigService clusterConfigService) {
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
         this.processingStatusRecorder = processingStatusRecorder;
-        this.ulid = ulid;
         this.messageULIDGenerator = messageULIDGenerator;
         this.decodingProcessor = decodingProcessor;
         this.defaultStreamProvider = defaultStreamProvider;
@@ -93,8 +93,9 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
         processTime = metricRegistry.timer(name(ProcessBufferProcessor.class, "processTime"));
         this.streamMetrics = streamMetrics;
-        this.configuration = configuration;
         currentMessage = null;
+
+        this.timestampGracePeriod = memoizeWithExpiration(() -> clusterConfigService.get(TimeStampConfig.class).gracePeriod(), 30, TimeUnit.SECONDS);
     }
 
     @Override
@@ -173,7 +174,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
 
             message.getStreams().forEach(s -> streamMetrics.markIncomingMeter(s.getId()));
             message.ensureValidTimestamp();
-            message.normalizeTimestamp(configuration.getTimestampGracePeriod());
+            message.normalizeTimestamp(timestampGracePeriod.get());
 
             // If a message is received via the Cluster-to-Cluster Forwarder, it already has this field set
             if (!message.hasField(Message.FIELD_GL2_MESSAGE_ID) || isNullOrEmpty(message.getFieldAs(String.class, Message.FIELD_GL2_MESSAGE_ID))) {
@@ -191,7 +192,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             }
         }
     }
-
+    
     public interface Factory {
         ProcessBufferProcessor create(DecodingProcessor decodingProcessor);
     }

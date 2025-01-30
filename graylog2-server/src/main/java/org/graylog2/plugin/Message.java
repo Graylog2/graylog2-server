@@ -157,6 +157,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public static final String FIELD_GL2_RECEIVE_TIMESTAMP = "gl2_receive_timestamp";
 
     /**
+     * Will be set to the original timestamp of the message, if the timestamp was normalized.
+     */
+    public static final String FIELD_GL2_ORIGINAL_TIMESTAMP = "gl2_original_timestamp";
+
+    /**
      * Reflects the time span from receiving the message till sending it to the output in milliseconds.
      * Will be set after all message processors have been run.
      */
@@ -489,11 +494,32 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         addField(FIELD_TIMESTAMP, dateTime);
     }
 
+    /**
+     * Normalize the timestamp of the message if it is (significantly) in the future:
+     * - use the receive time, if it is available and viable
+     * - otherwise clamp to current time
+     * Default behavior is do nothing.
+     *
+     * @param gracePeriod do nothing if the timestamp is within this grace period
+     */
     public void normalizeTimestamp(Duration gracePeriod) {
+        if (gracePeriod == null) {
+            return;
+        }
         final DateTime timeStamp = getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
         if (Tools.nowUTC().plus(gracePeriod.toMillis()).isBefore(timeStamp)) {
-            addField(FIELD_TIMESTAMP, fallBackForFutureTimestamp(timeStamp));
+            DateTime receiveTimeStamp = getReceiveTime();
+            if (receiveTimeStamp != null && Tools.nowUTC().plus(gracePeriod.toMillis()).isAfter(receiveTimeStamp)) {
+                updateTimeStamp(timeStamp, receiveTimeStamp);
+            } else {
+                updateTimeStamp(timeStamp, Tools.nowUTC());
+            }
         }
+    }
+
+    private void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
+        addField(FIELD_TIMESTAMP, newTimeStamp);
+        addField(FIELD_GL2_ORIGINAL_TIMESTAMP, oldTimeStamp);
     }
 
     private DateTime convertToDateTime(@Nonnull Object value) {
@@ -509,21 +535,9 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         }
     }
 
-    private DateTime fallBackForFutureTimestamp(DateTime timestamp) {
-        return fallbackTimestamp(
-                "future timestamp in message <" + getId() + ">, forcing to current time",
-                "value provided: " + timestamp);
-    }
-
     private DateTime fallbackForNullTimestamp() {
-        return fallbackTimestamp(
-                "<null> value for field timestamp in message <" + getId() + ">, forcing to current time",
-                "<null> value provided");
-    }
-
-    private DateTime fallbackTimestamp(String error, String details) {
+        final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
         LOG.trace(error);
-        addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException, error, details));
         return Tools.nowUTC();
     }
 
@@ -545,7 +559,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         final StringBuilder sb = new StringBuilder();
         sb.append("source: ").append(getField(FIELD_SOURCE)).append(" | ");
 
-        final String message = getField(FIELD_MESSAGE).toString().replaceAll("\\n", "").replaceAll("\\t", "");
+        final String message = getField(FIELD_MESSAGE).toString().replace("\\n", "").replace("\\t", "");
         sb.append("message: ");
 
         if (truncate && message.length() > 225) {
@@ -946,7 +960,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     public boolean hasRecordings() {
-        return recordings != null && recordings.size() > 0;
+        return recordings != null && recordings.isEmpty();
     }
 
     private void lazyInitRecordings() {
@@ -996,7 +1010,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return true;
     }
 
-    public static abstract class Recording {
+    public abstract static class Recording {
         static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
