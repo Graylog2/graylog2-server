@@ -1019,7 +1019,7 @@ public class DBJobTriggerServiceTest {
 
         assertThat(lockedTrigger.isCancelled()).isFalse();
 
-        assertThat(dbJobTriggerService.cancelTriggerByQuery(Filters.eq("_id", "54e3deadbeefdeadbeef0001"))).isPresent();
+        assertThat(dbJobTriggerService.cancelTriggerByQuery(MongoUtils.idEq("54e3deadbeefdeadbeef0001"))).isPresent();
 
         final JobTriggerDto cancelledTrigger = dbJobTriggerService.get(lockedTrigger.id()).orElseThrow(AssertionError::new);
 
