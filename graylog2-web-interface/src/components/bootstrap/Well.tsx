@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import Alert from './Alert';
 
-type Padding = 'small' | 'large';
+type Padding = 'small';
 
 const StyledAlert = styled(Alert)<{ $padding: Padding }>(({ theme, $padding }) => css`
   background-color: ${theme.colors.variant.lightest.default};
