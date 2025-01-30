@@ -14,16 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+package org.graylog.datanode.bootstrap.plugin;
 
-import org.graylog2.shared.plugins.PluginLoader;
+import org.graylog2.plugin.Plugin;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SpecificNodePlugin {
-
-    PluginLoader.NodeType value();
-
+/**
+ * Service loader interface for data node specific plugins
+ */
+public interface DatanodePlugin extends Plugin {
 }

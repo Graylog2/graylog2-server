@@ -20,8 +20,6 @@ import org.graylog2.plugin.ServerStatus;
 
 import java.util.Set;
 
-import org.graylog2.shared.plugins.PluginLoader;
-
 /**
  * Helper class to hold configuration shared by all Graylog node types
  */
@@ -65,11 +63,6 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
     @Override
     default boolean isMessageRecordingsEnabled() {
         return false;
-    }
-
-    @Override
-    default PluginLoader.NodeType getPluginNodeType() {
-        return null;
     }
 
     @Override

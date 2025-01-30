@@ -22,7 +22,6 @@ import jakarta.annotation.Nonnull;
 import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.shared.plugins.PluginLoader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,11 +82,6 @@ public class MinimalNodeCommandTest {
             @Override
             public boolean withPlugins() {
                 return false;
-            }
-
-            @Override
-            public PluginLoader.NodeType getPluginNodeType() {
-                return null;
             }
 
             @Override

@@ -295,7 +295,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         featureFlags = getFeatureFlags(metricRegistry);
 
         if (configuration.withPlugins()) {
-            pluginLoader = getPluginLoader(getPluginLoaderConfig(configFile), chainingClassLoader, configuration.getPluginNodeType());
+            pluginLoader = getPluginLoader(getPluginLoaderConfig(configFile), chainingClassLoader);
         }
 
         installCommandConfig();
@@ -358,8 +358,8 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         startCommand();
     }
 
-    protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader, PluginLoader.NodeType nodeType) {
-        return new PluginLoader(pluginLoaderConfig.getPluginDir().toFile(), classLoader, nodeType);
+    protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader) {
+        return new PluginLoader(pluginLoaderConfig.getPluginDir().toFile(), classLoader);
     }
 
     private void installPluginBootstrapConfig(PluginLoader pluginLoader) {
