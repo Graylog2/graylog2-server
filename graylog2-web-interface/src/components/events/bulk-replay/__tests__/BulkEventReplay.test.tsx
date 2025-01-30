@@ -35,10 +35,10 @@ const initialEventIds = [
 
 jest.mock('components/events/ReplaySearch', () => ({ alertId }: { alertId: string }) => <span>Replaying search for event {alertId}</span>);
 
-const markEventAsInvestigated = async (eventId: string) => {
-  const markAsInvestigatedButton = await screen.findByRole('button', { name: new RegExp(`mark event "${eventId}" as investigated`, 'i') });
+const markEventAsReviewed = async (eventId: string) => {
+  const markAsReviewedButton = await screen.findByRole('button', { name: new RegExp(`mark event "${eventId}" as reviewed`, 'i') });
 
-  return userEvent.click(markAsInvestigatedButton);
+  return userEvent.click(markAsReviewedButton);
 };
 
 const removeEvent = async (eventId: string) => {
@@ -101,17 +101,17 @@ describe('BulkEventReplay', () => {
     expect(screen.queryByText(eventMessage(0))).not.toBeInTheDocument();
   });
 
-  it('marking events as investigated jumps to next one', async () => {
+  it('marking events as reviewed jumps to next one', async () => {
     render(<SUT />);
-    await markEventAsInvestigated(initialEventIds[0]);
+    await markEventAsReviewed(initialEventIds[0]);
 
     await expectReplayingEvent(initialEventIds[1]);
 
-    await markEventAsInvestigated(initialEventIds[1]);
+    await markEventAsReviewed(initialEventIds[1]);
     await expectReplayingEvent(initialEventIds[2]);
 
-    await markEventAsInvestigated(initialEventIds[2]);
-    await screen.findByText('You are done investigating all events. You can now select a bulk action to apply to all remaining events, or close the page to return to the events list.');
+    await markEventAsReviewed(initialEventIds[2]);
+    await screen.findByText('You are done reviewing all events. You can now select a bulk action to apply to all remaining events, or close the page to return to the events list.');
   });
 
   it('allows jumping to specific events', async () => {
@@ -130,14 +130,14 @@ describe('BulkEventReplay', () => {
   it('skips removed event when jumping to next one', async () => {
     render(<SUT />);
     await removeEvent(initialEventIds[1]);
-    await markEventAsInvestigated(initialEventIds[0]);
+    await markEventAsReviewed(initialEventIds[0]);
     await expectReplayingEvent(initialEventIds[2]);
   });
 
-  it('skips event marked as investigated when jumping to next one', async () => {
+  it('skips event marked as reviewed when jumping to next one', async () => {
     render(<SUT />);
-    await markEventAsInvestigated(initialEventIds[1]);
-    await markEventAsInvestigated(initialEventIds[0]);
+    await markEventAsReviewed(initialEventIds[1]);
+    await markEventAsReviewed(initialEventIds[0]);
     await expectReplayingEvent(initialEventIds[2]);
   });
 

@@ -16,7 +16,7 @@
  */
 package org.graylog2.security;
 
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +24,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.database.ValidationException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -200,12 +202,15 @@ public class AccessTokenServiceImplTest {
         assertEquals(token.getToken(), newToken.getToken());
     }
 
-    @Test(expected = DuplicateKeyException.class)
+    @Test
     @MongoDBFixtures("accessTokensSingleToken.json")
     public void testExceptionForMultipleTokens() throws ValidationException {
         final AccessToken existingToken = accessTokenService.load("foobar");
         final AccessToken newToken = accessTokenService.create("user", "foobar");
         newToken.setToken(existingToken.getToken());
-        accessTokenService.save(newToken);
+        assertThatThrownBy(() -> accessTokenService.save(newToken))
+                .isInstanceOfSatisfying(MongoException.class, e ->
+                        assertThat(MongoUtils.isDuplicateKeyError(e)).isTrue()
+                );
     }
 }
