@@ -31,7 +31,7 @@ type Props = {
   configuration: {
     [key: string]: ConfigurationFieldValue,
   };
-  typeDefinition: {
+  typeDefinition?: {
     requested_configuration: {
       [key: string]: ConfigurationField,
     }
@@ -71,7 +71,7 @@ const PasswordField = ({ id, name }: { id: string, name: string }) => (
 
 const isPasswordField = (field: ConfigurationField) => field?.type === 'text' && (field.attributes.includes('is_password') || field.attributes.includes('is_sensitive'));
 
-const Configuration = ({ id: _id, config, typeDefinition }: { id: string, config: Props['configuration'], typeDefinition: Props['typeDefinition'] }) => {
+const Configuration = ({ id: _id, config, typeDefinition = undefined }: { id: string, config: Props['configuration'], typeDefinition?: Props['typeDefinition'] }) => {
   if (!config) {
     return ('');
   }
@@ -143,7 +143,7 @@ const StyledWell = styled(Well)(({ theme }) => css`
   }
 `);
 
-const ConfigurationWell = ({ id, configuration, typeDefinition }: Props) => (
+const ConfigurationWell = ({ id, configuration, typeDefinition = undefined }: Props) => (
   <StyledWell bsSize="small">
     <Configuration id={id} config={configuration} typeDefinition={typeDefinition} />
   </StyledWell>
