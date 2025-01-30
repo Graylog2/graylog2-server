@@ -152,7 +152,7 @@
         <lucene.version>9.12.0</lucene.version>
         <metrics.version>4.2.30</metrics.version>
         <mongodb-driver.version>5.3.1</mongodb-driver.version>
-        <mongojack.version>4.11.0</mongojack.version>
+        <mongojack.version>5.0.2</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.117.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.69.Final</netty-tcnative-boringssl-static.version>
