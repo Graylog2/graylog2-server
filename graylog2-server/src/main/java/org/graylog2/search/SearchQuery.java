@@ -21,7 +21,6 @@ import com.google.common.collect.Multimap;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.mongojack.DBQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,39 +47,6 @@ public class SearchQuery {
 
     public Multimap<String, SearchQueryParser.FieldValue> getQueryMap() {
         return queryMap;
-    }
-
-    @Deprecated(since = "6.2.0", forRemoval = true)
-    public DBQuery.Query toDBQuery() {
-        if (queryMap.isEmpty()) {
-            return DBQuery.empty();
-        }
-
-        final List<DBQuery.Query> dbQueries = new ArrayList<>();
-
-        for (Map.Entry<String, Collection<SearchQueryParser.FieldValue>> entry : queryMap.asMap().entrySet()) {
-            final List<DBQuery.Query> queries = new ArrayList<>();
-
-            final List<SearchQueryParser.FieldValue> include = selectValues(entry.getValue(), value -> !value.isNegate());
-            final List<SearchQueryParser.FieldValue> exclude = selectValues(entry.getValue(), SearchQueryParser.FieldValue::isNegate);
-
-            if (!include.isEmpty()) {
-                queries.add(DBQuery.or(toQuery(entry.getKey(), include)));
-            }
-            if (!exclude.isEmpty()) {
-                queries.add(DBQuery.nor(toQuery(entry.getKey(), exclude)));
-            }
-
-            dbQueries.add(DBQuery.and(queries.toArray(new DBQuery.Query[0])));
-        }
-
-        return DBQuery.and(dbQueries.toArray(new DBQuery.Query[0]));
-    }
-
-    private DBQuery.Query[] toQuery(String field, List<SearchQueryParser.FieldValue> values) {
-        return values.stream()
-                .map(value -> value.getOperator().buildQuery(field, value.getValue()))
-                .toArray(DBQuery.Query[]::new);
     }
 
     public Bson toBson() {

@@ -38,7 +38,6 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
-import org.mongojack.InitializationRequiredForTransformation;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -273,24 +272,4 @@ public class MongoUtils<T extends MongoEntity> {
             return orig;
         }
     }
-
-    /**
-     * Utility method to help moving away from the deprecated MongoJack Bson objects, like
-     * {@link org.mongojack.DBQuery.Query}. These objects require initialization before they can be used as regular
-     * {@link org.bson.conversions.Bson} objects with the MongoDB driver.
-     * <p>
-     * The {@link org.mongojack.JacksonMongoCollection} would usually take care of that, but because we cannot use it,
-     * and instead use a regular {@link org.mongojack.MongoCollection}, we have to use this method.
-     *
-     * @deprecated This method is only meant as an interim solution. Rewrite your deprecated MongoJack objects so that
-     * you don't have to use it.
-     */
-    @Deprecated
-    public void initializeLegacyMongoJackBsonObject(InitializationRequiredForTransformation mongoJackBsonObject) {
-        mongoJackBsonObject.initialize(
-                objectMapper,
-                objectMapper.constructType(collection.getDocumentClass()),
-                codecRegistry);
-    }
-
 }

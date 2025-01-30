@@ -26,7 +26,6 @@ import org.bson.conversions.Bson;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
-import org.mongojack.InitializationRequiredForTransformation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,9 +78,6 @@ public class DBJobDefinitionService {
     }
 
     public List<JobDefinitionDto> getByQuery(Bson query) {
-        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
-            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
-        }
         return collection.find(query).into(new ArrayList<>());
     }
 

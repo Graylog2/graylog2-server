@@ -36,7 +36,6 @@ import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.streams.StreamService;
-import org.mongojack.InitializationRequiredForTransformation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,9 +108,6 @@ public class MongoIndexSetService implements IndexSetService {
      */
     @Override
     public Optional<IndexSetConfig> findOne(Bson query) {
-        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
-            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
-        }
         return Optional.ofNullable(collection.find(query).first());
     }
 
@@ -130,9 +126,6 @@ public class MongoIndexSetService implements IndexSetService {
 
     @Override
     public List<IndexSetConfig> findMany(Bson query) {
-        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
-            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
-        }
         return ImmutableList.copyOf(collection.find(query).sort(Sorts.ascending(FIELD_TITLE)));
     }
 

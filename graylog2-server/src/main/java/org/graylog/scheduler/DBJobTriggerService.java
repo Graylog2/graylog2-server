@@ -41,7 +41,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
-import org.mongojack.InitializationRequiredForTransformation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -332,16 +331,10 @@ public class DBJobTriggerService {
      * internal data structure of triggers.
      */
     public int deleteByQuery(Bson query) {
-        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
-            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
-        }
         return Ints.saturatedCast(collection.deleteMany(query).getDeletedCount());
     }
 
     public long countByQuery(Bson query) {
-        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
-            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
-        }
         return collection.countDocuments(query);
     }
 
@@ -534,10 +527,6 @@ public class DBJobTriggerService {
      * @return an Optional of the trigger that was cancelled. Empty if no matching trigger was found.
      */
     public Optional<JobTriggerDto> cancelTriggerByQuery(Bson query) {
-        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
-            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
-        }
-
         final var update = set(FIELD_IS_CANCELLED, true);
 
         return Optional.ofNullable(collection.findOneAndUpdate(query, update));
@@ -550,9 +539,6 @@ public class DBJobTriggerService {
      * @return All found JobTriggers
      */
     public List<JobTriggerDto> findByQuery(Bson query) {
-        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
-            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
-        }
         return stream(collection.find(query).sort(descending(FIELD_UPDATED_AT))).toList();
     }
 
