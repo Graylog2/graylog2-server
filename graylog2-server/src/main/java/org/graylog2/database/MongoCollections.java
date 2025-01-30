@@ -103,7 +103,7 @@ public class MongoCollections {
      * Provides utility methods like getting documents by ID, etc.
      */
     public <T extends MongoEntity> MongoUtils<T> utils(MongoCollection<T> collection) {
-        return new MongoUtils<>(collection, objectMapper);
+        return new MongoUtils<>(collection);
     }
 
     /**
