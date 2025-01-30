@@ -21,10 +21,8 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Maps;
-import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.Map;
