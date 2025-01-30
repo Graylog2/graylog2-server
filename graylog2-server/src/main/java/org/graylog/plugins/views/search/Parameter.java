@@ -21,6 +21,10 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.Maps;
+import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -41,7 +45,7 @@ import java.util.Objects;
         property = Parameter.TYPE_FIELD,
         visible = true,
         defaultImpl = ValueParameter.class)
-public interface Parameter {
+public interface Parameter extends ContentPackable<Parameter> {
     String TYPE_FIELD = "type";
 
     @JsonProperty(TYPE_FIELD)
@@ -73,6 +77,10 @@ public interface Parameter {
     Binding binding();
 
     Parameter applyBindings(Map<String,  Parameter.Binding> bindings);
+
+    default Parameter toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        return this;
+    }
 
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)
