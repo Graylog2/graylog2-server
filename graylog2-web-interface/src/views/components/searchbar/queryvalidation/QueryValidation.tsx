@@ -202,7 +202,7 @@ const QueryValidation = () => {
   };
 
   return (
-    <Popover onChange={toggleShow} opened={hasExplanations && showExplanation} position="bottom" width={500} withArrow>
+    <Popover opened={hasExplanations && showExplanation} position="bottom" width={500} withArrow>
       <Popover.Target>
         <Container ref={explanationTriggerRef}>
           {hasExplanations ? (
