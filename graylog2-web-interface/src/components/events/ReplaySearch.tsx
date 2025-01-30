@@ -27,9 +27,11 @@ import ReplaySearchContext from 'components/event-definitions/replay-search/Repl
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import Spinner from 'components/common/Spinner';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Event } from 'components/events/events/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
+import Center from 'components/common/Center';
 
 type ReplaySearchProps = {
   alertId: string,
@@ -79,14 +81,33 @@ type Props = {
   forceSidebarPinned?: boolean,
 }
 
+const canReplayEvent = (event: Event, eventDefinition: EventDefinition) => {
+  const systemEvent = isSystemEventDefinition(eventDefinition);
+
+  if (systemEvent) {
+    return 'Event is a system event, these have no query/stream/time range attached.';
+  }
+
+  if (!event?.replay_info) {
+    return 'Event is missing replay information.';
+  }
+
+  return true;
+};
+
 const LoadingBarrier = ({
   alertId, definitionId, replayEventDefinition = false, searchPageLayout = defaultSearchPageLayout, forceSidebarPinned = false,
 }: Props) => {
   const { eventDefinition, aggregations, eventData, isLoading } = useAlertAndEventDefinitionData(alertId, definitionId);
 
-  return isLoading
-    ? <Spinner />
-    : (
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  const canReplay = canReplayEvent(eventData, eventDefinition);
+
+  return canReplay === true
+    ? (
       <ReplaySearch alertId={alertId}
                     definitionId={definitionId}
                     eventDefinition={eventDefinition}
@@ -95,7 +116,8 @@ const LoadingBarrier = ({
                     searchPageLayout={searchPageLayout}
                     replayEventDefinition={replayEventDefinition}
                     forceSidebarPinned={forceSidebarPinned} />
-    );
+    )
+    : <Center>Cannot replay this event: {canReplay} Please select a different one.</Center>;
 };
 
 export default LoadingBarrier;

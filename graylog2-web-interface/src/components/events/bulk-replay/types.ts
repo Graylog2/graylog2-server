@@ -14,24 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = {
-  customSyntax: 'postcss-styled-syntax',
-  extends: [
-    'stylelint-config-standard',
-  ],
-  rules: {
-    'declaration-empty-line-before': null,
-    'function-name-case': null,
-    'media-query-no-invalid': null,
-    'no-descending-specificity': null,
-    'no-empty-source': null,
-    'property-no-vendor-prefix': [true, {
-      ignoreProperties: ['grid-rows', 'grid-columns', 'grid-row', 'grid-column'],
-    }],
-    'selector-class-pattern': null,
-    'value-no-vendor-prefix': [true, {
-      ignoreValues: ['grid', 'inline-grid'],
-    }],
-    'value-keyword-case': null,
-  },
-};
+import type { Event } from 'components/events/events/types';
+
+export type RemainingBulkActionsProps = {
+  events: Event[];
+  completed: boolean;
+}

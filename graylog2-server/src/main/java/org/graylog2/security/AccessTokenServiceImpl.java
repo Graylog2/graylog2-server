@@ -24,11 +24,14 @@ import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.joda.time.DateTime;
@@ -36,10 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -135,7 +134,11 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             accessToken = new AccessTokenImpl(fields);
             try {
                 id = saveWithoutValidation(encrypt(accessToken));
-            } catch (DuplicateKeyException ignore) {
+            } catch (MongoException e) {
+                // ignore duplicate key errors
+                if (!MongoUtils.isDuplicateKeyError(e)) {
+                    throw e;
+                }
             }
         } while (iterations++ < 10 && id == null);
         if (id == null) {
