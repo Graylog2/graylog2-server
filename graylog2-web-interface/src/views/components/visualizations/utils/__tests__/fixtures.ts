@@ -390,10 +390,10 @@ export const layoutsFor4axis = {
       size: 16,
     },
     ticktext: [
-      '52.38 ms',
-      '104.76 ms',
-      '157.14 ms',
-      '209.53 ms',
+      '52.4 ms',
+      '104.8 ms',
+      '157.1 ms',
+      '209.5 ms',
     ],
     tickvals: [
       0.0523815987933635,
@@ -424,9 +424,9 @@ export const layoutsFor4axis = {
       size: 16,
     },
     ticktext: [
-      '130.25 B',
+      '130.3 B',
       '260.5 B',
-      '390.75 B',
+      '390.8 B',
       '521.0 B',
     ],
     tickvals: [
