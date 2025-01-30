@@ -41,7 +41,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
-import org.mongojack.DBQuery;
+import org.mongojack.InitializationRequiredForTransformation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -332,23 +332,17 @@ public class DBJobTriggerService {
      * internal data structure of triggers.
      */
     public int deleteByQuery(Bson query) {
+        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
+            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
+        }
         return Ints.saturatedCast(collection.deleteMany(query).getDeletedCount());
     }
 
-    @Deprecated
-    public int deleteByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return deleteByQuery((Bson) query);
-    }
-
     public long countByQuery(Bson query) {
+        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
+            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
+        }
         return collection.countDocuments(query);
-    }
-
-    @Deprecated
-    public long countByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return countByQuery((Bson) query);
     }
 
     /**
@@ -540,17 +534,14 @@ public class DBJobTriggerService {
      * @return an Optional of the trigger that was cancelled. Empty if no matching trigger was found.
      */
     public Optional<JobTriggerDto> cancelTriggerByQuery(Bson query) {
+        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
+            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
+        }
+
         final var update = set(FIELD_IS_CANCELLED, true);
 
         return Optional.ofNullable(collection.findOneAndUpdate(query, update));
     }
-
-    @Deprecated
-    public Optional<JobTriggerDto> cancelTriggerByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return cancelTriggerByQuery((Bson) query);
-    }
-
 
     /**
      * Find triggers by using the provided query. Use judiciously!
@@ -559,13 +550,10 @@ public class DBJobTriggerService {
      * @return All found JobTriggers
      */
     public List<JobTriggerDto> findByQuery(Bson query) {
+        if (query instanceof InitializationRequiredForTransformation legacyQuery) {
+            mongoUtils.initializeLegacyMongoJackBsonObject(legacyQuery);
+        }
         return stream(collection.find(query).sort(descending(FIELD_UPDATED_AT))).toList();
-    }
-
-    @Deprecated
-    public List<JobTriggerDto> findByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return findByQuery((Bson) query);
     }
 
     private record OverdueTrigger(@JsonProperty("_id") String type, @JsonProperty("count") long count) {}

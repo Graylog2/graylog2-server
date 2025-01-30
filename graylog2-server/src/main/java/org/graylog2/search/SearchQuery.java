@@ -50,6 +50,7 @@ public class SearchQuery {
         return queryMap;
     }
 
+    @Deprecated(since = "6.2.0", forRemoval = true)
     public DBQuery.Query toDBQuery() {
         if (queryMap.isEmpty()) {
             return DBQuery.empty();
