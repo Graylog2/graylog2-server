@@ -25,7 +25,7 @@ const StyledAlert = styled(Alert)<{ $padding: Padding }>(({ theme, $padding }) =
   background-color: ${theme.colors.variant.lightest.default};
   border-color: ${theme.colors.variant.light.default};
   margin-top: 0;
-  padding: ${$padding === 'small' ? theme.spacings.sm : theme.spacings.lg};
+  padding: ${$padding === 'small' ? theme.spacings.sm : theme.spacings.md};
 
   .mantine-Alert-message {
     color: ${theme.colors.variant.darker.default};
