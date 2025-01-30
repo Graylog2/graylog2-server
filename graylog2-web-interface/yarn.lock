@@ -3985,10 +3985,15 @@ accepts@~1.3.4, accepts@~1.3.5, accepts@~1.3.8:
     mime-types "~2.1.34"
     negotiator "0.6.3"
 
-ace-builds@1.36.4, ace-builds@^1.32.8:
+ace-builds@1.36.4:
   version "1.36.4"
   resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.36.4.tgz#c859de4a7701aa86a1e708d38cebe66807d0d84c"
   integrity sha512-eE+iAsLRfNsq30yd34cezKSob6/N9mQatWs44Bp5LUDgKZ3rJtQds/YtcbnwbEWMTe7yCIxG/Cfezd4BsKIiFg==
+
+ace-builds@^1.36.3:
+  version "1.37.5"
+  resolved "https://registry.yarnpkg.com/ace-builds/-/ace-builds-1.37.5.tgz#8cf3c3a2e869f32a193d314c8f4346e6218bfdae"
+  integrity sha512-VMJ4Cnhq6L9dwvOCyuyyvQuiVTSwdZC7zDKJBBBJJax0wGQ7MvzQZFoi0gMmCm2I4Zuv/ZbtwU/dlglIhCNLhw==
 
 acorn-globals@^4.1.0:
   version "4.3.4"
@@ -13455,12 +13460,12 @@ re-resizable@6.9.2:
   dependencies:
     fast-memoize "^2.5.1"
 
-react-ace@12.0.0:
-  version "12.0.0"
-  resolved "https://registry.yarnpkg.com/react-ace/-/react-ace-12.0.0.tgz#d40afc7382092109eead7227d9426f55dcc2209d"
-  integrity sha512-PstU6CSMfYIJknb4su2Fa0WgLXzq2ufQgR6fjcSWuGT1hGTHkBzuKw+SncV8PuLCdSJBJc1VehPhyeXlWByG/g==
+react-ace@13.0.0:
+  version "13.0.0"
+  resolved "https://registry.yarnpkg.com/react-ace/-/react-ace-13.0.0.tgz#e69c2aa4ccf1a81c758adba9ba2b4b3e3d929a69"
+  integrity sha512-PPk2O/ArHzDtbnK82QImfHYXwuiitRgHJf5AxwMQh9zciojbWsPmKJm1tMgWOYLCtGEz8/Dh3MxRxrXe7QcstQ==
   dependencies:
-    ace-builds "^1.32.8"
+    ace-builds "^1.36.3"
     diff-match-patch "^1.0.5"
     lodash.get "^4.4.2"
     lodash.isequal "^4.5.0"
