@@ -19,9 +19,9 @@ package org.graylog2.rest.resources.tokenusage;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.SortOrder;
-import org.graylog2.rest.models.tokenusage.TokenUsage;
 import org.graylog2.rest.models.tokenusage.TokenUsageDTO;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.security.AccessTokenEntity;
 import org.graylog2.shared.tokenusage.TokenUsageService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,16 +60,16 @@ public class TokenUsageResourceTest {
     @Test
     public void callingEndpointCallsService() {
         final String query = "";
-        when(tokenUsageService.loadTokenUsage(eq(PAGE), eq(PER_PAGE), any(SearchQuery.class), eq(TokenUsage.FIELD_NAME), eq(SortOrder.ASCENDING)))
+        when(tokenUsageService.loadTokenUsage(eq(PAGE), eq(PER_PAGE), any(SearchQuery.class), eq(AccessTokenEntity.FIELD_NAME), eq(SortOrder.ASCENDING)))
                 .thenReturn(mkPaginatedList());
 
-        final PaginatedResponse<TokenUsageDTO> actual = testee.getPage(PAGE, PER_PAGE, query, TokenUsage.FIELD_NAME, SortOrder.ASCENDING);
+        final PaginatedResponse<TokenUsageDTO> actual = testee.getPage(PAGE, PER_PAGE, query, AccessTokenEntity.FIELD_NAME, SortOrder.ASCENDING);
 
         final PaginatedResponse<TokenUsageDTO> expected = PaginatedResponse.create("token_usage", mkPaginatedList(), query);
         //Sorry. the PaginatedResponse doesn't have a proper equals():
         assertTrue(new ReflectionEquals(expected).matches(actual));
 
-        verify(tokenUsageService, times(1)).loadTokenUsage(eq(PAGE), eq(PER_PAGE), any(SearchQuery.class), eq(TokenUsage.FIELD_NAME), eq(SortOrder.ASCENDING));
+        verify(tokenUsageService, times(1)).loadTokenUsage(eq(PAGE), eq(PER_PAGE), any(SearchQuery.class), eq(AccessTokenEntity.FIELD_NAME), eq(SortOrder.ASCENDING));
     }
 
     private PaginatedList<TokenUsageDTO> mkPaginatedList() {

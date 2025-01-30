@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.tokenusage;
+package org.graylog2.security;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -29,8 +29,8 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 
 @AutoValue
-@JsonDeserialize(builder = TokenUsage.Builder.class)
-public abstract class TokenUsage implements MongoEntity {
+@JsonDeserialize(builder = AccessTokenEntity.Builder.class)
+public abstract class AccessTokenEntity implements MongoEntity {
 
     public static final String FIELD_ID = "_id";
     public static final String FIELD_USERNAME = "username";
@@ -66,11 +66,11 @@ public abstract class TokenUsage implements MongoEntity {
 
     @AutoValue.Builder
     @JsonIgnoreProperties({"token", "token_type"})
-    public static abstract class Builder {
+    public abstract static class Builder {
 
         @JsonCreator
-        public static TokenUsage.Builder create() {
-            return new AutoValue_TokenUsage.Builder();
+        public static AccessTokenEntity.Builder create() {
+            return new AutoValue_AccessTokenEntity.Builder();
         }
 
         @Id
@@ -93,6 +93,6 @@ public abstract class TokenUsage implements MongoEntity {
         @JsonProperty(FIELD_EXPIRES_AT)
         public abstract Builder expiresAt(@Nullable DateTime expiresAt);
 
-        public abstract TokenUsage build();
+        public abstract AccessTokenEntity build();
     }
 }

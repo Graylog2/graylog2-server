@@ -35,11 +35,11 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.SortOrder;
-import org.graylog2.rest.models.tokenusage.TokenUsage;
 import org.graylog2.rest.models.tokenusage.TokenUsageDTO;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.security.AccessTokenEntity;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.tokenusage.TokenUsageService;
@@ -60,15 +60,15 @@ public class TokenUsageResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put(TokenUsage.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put(TokenUsage.FIELD_USERNAME, SearchQueryField.create(TokenUsage.FIELD_USERNAME))
-            .put(TokenUsage.FIELD_NAME, SearchQueryField.create(TokenUsage.FIELD_NAME))
+            .put(AccessTokenEntity.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
+            .put(AccessTokenEntity.FIELD_USERNAME, SearchQueryField.create(AccessTokenEntity.FIELD_USERNAME))
+            .put(AccessTokenEntity.FIELD_NAME, SearchQueryField.create(AccessTokenEntity.FIELD_NAME))
             .build();
 
     @Inject
     public TokenUsageResource(TokenUsageService tokenUsageService) {
         this.tokenUsageService = tokenUsageService;
-        this.searchQueryParser = new SearchQueryParser(TokenUsage.FIELD_NAME, SEARCH_FIELD_MAPPING);
+        this.searchQueryParser = new SearchQueryParser(AccessTokenEntity.FIELD_NAME, SEARCH_FIELD_MAPPING);
     }
 
     @GET
@@ -84,7 +84,7 @@ public class TokenUsageResource extends RestResource {
                                                               value = "The field to sort the result on",
                                                               required = true,
                                                               allowableValues = "username,NAME")
-                                                    @DefaultValue(TokenUsage.FIELD_NAME) @QueryParam("sort") String sort,
+                                                        @DefaultValue(AccessTokenEntity.FIELD_NAME) @QueryParam("sort") String sort,
                                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                     @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         LOG.debug("Incoming request to list token usages{}, on page {} with {} items per page.", query.isEmpty() ? "" : " matching " + query, page, perPage);

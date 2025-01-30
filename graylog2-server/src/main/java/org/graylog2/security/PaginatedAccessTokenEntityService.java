@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.tokenusage;
+package org.graylog2.security;
 
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
@@ -22,22 +22,20 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.rest.models.SortOrder;
-import org.graylog2.rest.models.tokenusage.TokenUsage;
 import org.graylog2.search.SearchQuery;
-import org.graylog2.security.AccessTokenImpl;
 
-public class PaginatedTokenUsageService {
+public class PaginatedAccessTokenEntityService {
     private static final String COLLECTION_NAME = AccessTokenImpl.COLLECTION_NAME;
-    private final MongoPaginationHelper<TokenUsage> paginationHelper;
+    private final MongoPaginationHelper<AccessTokenEntity> paginationHelper;
 
     @Inject
-    public PaginatedTokenUsageService(MongoCollections mongoCollections) {
-        MongoCollection<TokenUsage> collection = mongoCollections.collection(COLLECTION_NAME, TokenUsage.class);
+    public PaginatedAccessTokenEntityService(MongoCollections mongoCollections) {
+        MongoCollection<AccessTokenEntity> collection = mongoCollections.collection(COLLECTION_NAME, AccessTokenEntity.class);
         paginationHelper = mongoCollections.paginationHelper(collection);
     }
 
-    public PaginatedList<TokenUsage> findPaginated(SearchQuery searchQuery, int page,
-                                                   int perPage, String sortField, SortOrder order) {
+    public PaginatedList<AccessTokenEntity> findPaginated(SearchQuery searchQuery, int page,
+                                                          int perPage, String sortField, SortOrder order) {
         return paginationHelper
                 .filter(searchQuery.toBson())
                 .sort(order.toBsonSort(sortField))

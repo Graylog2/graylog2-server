@@ -23,9 +23,10 @@ import org.graylog.security.authservice.DBAuthServiceBackendService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.SortOrder;
-import org.graylog2.rest.models.tokenusage.TokenUsage;
 import org.graylog2.rest.models.tokenusage.TokenUsageDTO;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.security.AccessTokenEntity;
+import org.graylog2.security.AccessTokenService;
 import org.graylog2.shared.tokenusage.TokenUsageService;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
@@ -40,15 +41,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TokenUsageServiceImpl implements TokenUsageService {
-    public static final Logger LOG = LoggerFactory.getLogger(TokenUsageServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TokenUsageServiceImpl.class);
 
-    private final PaginatedTokenUsageService paginatedTokenUsageService;
+    private final AccessTokenService accessTokenService;
     private final UserService userService;
     private final DBAuthServiceBackendService dbAuthServiceBackendService;
 
     @Inject
-    public TokenUsageServiceImpl(PaginatedTokenUsageService paginatedTokenUsageService, UserService userService, DBAuthServiceBackendService dbAuthServiceBackendService) {
-        this.paginatedTokenUsageService = paginatedTokenUsageService;
+    public TokenUsageServiceImpl(AccessTokenService accessTokenService, UserService userService, DBAuthServiceBackendService dbAuthServiceBackendService) {
+        this.accessTokenService = accessTokenService;
         this.userService = userService;
         this.dbAuthServiceBackendService = dbAuthServiceBackendService;
     }
@@ -59,21 +60,27 @@ public class TokenUsageServiceImpl implements TokenUsageService {
                                                        SearchQuery searchQuery,
                                                        String sort,
                                                        SortOrder order) {
-        final PaginatedList<TokenUsage> currentPage = this.paginatedTokenUsageService.findPaginated(searchQuery, page, perPage, sort, order);
+        final PaginatedList<AccessTokenEntity> currentPage = this.accessTokenService.findPaginated(searchQuery, page, perPage, sort, order);
+        if (LOG.isInfoEnabled()) {
+            final String logSearch = searchQuery.getQueryMap().isEmpty() ? "" : ", query \"" + searchQuery.getQueryString() + "\", sort by " + sort + ", ordering " + order;
+            LOG.info("Loaded {} tokens in page {} containing max {} items{}.", currentPage.pagination().count(), page, perPage, logSearch);
+        }
 
         //We loaded all matching tokens, let's now extract the respective users having created these tokens and (if applicable) their authentication-backend:
         final Map<String, User> usersOfThisPage = currentPage.stream()
-                .map(TokenUsage::userName)
+                .map(AccessTokenEntity::userName)
                 .distinct()
                 .map(userService::load)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(User::getName, Function.identity()));
+        LOG.debug("Found {} distinct users for current page of access tokens.", usersOfThisPage.size());
 
         //Collect all auth-service ids of the current page's users:
         final Set<String> allAuthServiceIds = usersOfThisPage.values().stream()
                 .map(User::getAuthServiceId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableSet());
+        LOG.debug("Found {} distinct authentication services used by users of current page of access tokens.", allAuthServiceIds.size());
 
         //Load corresponding auth-services and extract the title:
         final Map<String, String> authServiceIdToTitle = dbAuthServiceBackendService.streamByIds(allAuthServiceIds)
@@ -89,7 +96,7 @@ public class TokenUsageServiceImpl implements TokenUsageService {
     }
 
     @Nonnull
-    private TokenUsageDTO toDTO(TokenUsage dto, Map<String, User> usersOfThisPage, Map<String, String> authServiceIdToTitle) {
+    private TokenUsageDTO toDTO(AccessTokenEntity dto, Map<String, User> usersOfThisPage, Map<String, String> authServiceIdToTitle) {
         final String username = dto.userName();
         final User user = usersOfThisPage.get(username);
         final boolean isExternal = user.isExternalUser();
