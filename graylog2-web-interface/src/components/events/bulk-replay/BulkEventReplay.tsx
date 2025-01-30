@@ -144,7 +144,7 @@ const BulkEventReplay = ({ initialEventIds, events: _events, onClose, BulkAction
           The following list contains all of the events/alerts you selected in the previous step, allowing you to
           review the replayed search for each of them.
         </p>
-        <i>Investigation of {completed}/{total} events completed.</i>
+        <i>Review of {completed}/{total} events completed.</i>
         <StyledList>
           {eventIds.map(({ id: eventId, status }) => (
             <EventListItem key={`bulk-replay-search-item-${eventId}`}
