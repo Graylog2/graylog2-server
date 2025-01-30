@@ -11729,10 +11729,10 @@ material-colors@^1.2.1:
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
-material-symbols@^0.22.0:
-  version "0.22.2"
-  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.22.2.tgz#a51f82aa4c3b8a0483bef186abb51f0707fd5fae"
-  integrity sha512-guN2+CzAwxUfdXiuVHcdogDmvhzvRYxMakKd39WmYuyTPaN73UuNC5cH4d4/JVNaLT1EMM8W/4PqHqVBye3ZiA==
+material-symbols@^0.28.1:
+  version "0.28.1"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.28.1.tgz#9c506b133878fc4a2faa7fd2304c371aceb115f7"
+  integrity sha512-oLaBgTunF04BQEcUP5z+6FStqdfXrNVnYo2CB4Ej8d2RqrhYxSKllcHvXRYWjNNl/hRmlHJF9B62YWuZ4kHYpA==
 
 math-intrinsics@^1.0.0, math-intrinsics@^1.1.0:
   version "1.1.0"
