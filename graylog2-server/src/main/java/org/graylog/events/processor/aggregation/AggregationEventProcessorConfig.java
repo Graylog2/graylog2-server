@@ -358,7 +358,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .build();
             mutableGraph.putEdge(entityDescriptor, depStream);
         });
-        queryParameters().forEach(parameter -> parameter.resolveNativeEntity(entityDescriptor, mutableGraph));
+        // attribute is tagged @Nullable, so do a null check first
+        if(queryParameters() != null) {
+            queryParameters().forEach(parameter -> parameter.resolveNativeEntity(entityDescriptor, mutableGraph));
+        }
         filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 
