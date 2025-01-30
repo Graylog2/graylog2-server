@@ -18,32 +18,32 @@ import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
-import { Button } from 'components/bootstrap';
 import { asMock } from 'helpers/mocking';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
-import { useInputSetupWizard, InputSetupWizardProvider, INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard';
-import type { WizardData } from 'components/inputs/InputSetupWizard';
 import useStreams from 'components/streams/hooks/useStreams';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 
-import InputSetupWizard from './InputSetupWizard';
+import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
+import InputSetupWizard from './Wizard';
 
-const OpenWizardTestButton = ({ wizardData } : { wizardData: WizardData}) => {
-  const { openWizard, setActiveStep } = useInputSetupWizard();
-
-  const open = () => {
-    setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);
-    openWizard(wizardData);
-  };
-
-  return (<Button onClick={() => open()}>Open Wizard!</Button>);
+const input = {
+  id: 'inputId',
+  title: 'inputTitle',
+  type: 'type',
+  global: false,
+  name: 'inputName',
+  created_at: '',
+  creator_user_id: 'creatorId',
+  static_fields: { },
+  attributes: { },
 };
 
-const renderWizard = (wizardData: WizardData = {}) => (
+const onClose = jest.fn();
+
+const renderWizard = () => (
   render(
     <InputSetupWizardProvider>
-      <OpenWizardTestButton wizardData={wizardData} />
-      <InputSetupWizard />
+      <InputSetupWizard show input={input} onClose={onClose} />
     </InputSetupWizardProvider>,
   )
 );
@@ -170,12 +170,6 @@ const getStreamCreateFormFields = async () => {
   };
 };
 
-const openWizard = async () => {
-  const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
-
-  fireEvent.click(openButton);
-};
-
 beforeEach(() => {
   asMock(useStreams).mockReturnValue(useStreamsResult());
   asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
@@ -185,11 +179,10 @@ beforeEach(() => {
 describe('InputSetupWizard Setup Routing', () => {
   it('should render the Setup Routing step', async () => {
     renderWizard();
-    openWizard();
 
-    const wizard = await screen.findByText('Setup Routing');
+    const routingStepText = await screen.findByText(/Choose a Destination Stream to route Messages from this Input to./i);
 
-    expect(wizard).toBeInTheDocument();
+    expect(routingStepText).toBeInTheDocument();
   });
 
   it('should only show editable existing streams', async () => {
@@ -201,7 +194,6 @@ describe('InputSetupWizard Setup Routing', () => {
     ));
 
     renderWizard();
-    openWizard();
 
     const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
@@ -223,7 +215,6 @@ describe('InputSetupWizard Setup Routing', () => {
     ));
 
     renderWizard();
-    openWizard();
 
     const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
@@ -245,7 +236,6 @@ describe('InputSetupWizard Setup Routing', () => {
     ));
 
     renderWizard();
-    openWizard();
 
     const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
@@ -268,7 +258,6 @@ describe('InputSetupWizard Setup Routing', () => {
     ]));
 
     renderWizard();
-    openWizard();
 
     const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
@@ -290,7 +279,6 @@ describe('InputSetupWizard Setup Routing', () => {
       asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
 
       renderWizard();
-      openWizard();
 
       const createStreamButton = await screen.findByRole('button', {
         name: /Create Stream/i,
@@ -328,7 +316,6 @@ describe('InputSetupWizard Setup Routing', () => {
       asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
 
       renderWizard();
-      openWizard();
 
       const createStreamButton = await screen.findByRole('button', {
         name: /Create Stream/i,
@@ -369,7 +356,6 @@ describe('InputSetupWizard Setup Routing', () => {
       asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
 
       renderWizard();
-      openWizard();
 
       const createStreamButton = await screen.findByRole('button', {
         name: /Create Stream/i,

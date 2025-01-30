@@ -21,11 +21,11 @@ import keyBy from 'lodash/keyBy';
 import EventActions from 'components/events/events/EventActions';
 import type { Event } from 'components/events/events/types';
 import ExpandedSection from 'components/events/ExpandedSection';
-import type useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import BulkActions from 'components/events/events/BulkActions';
+import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
 const useTableElements = ({ defaultLayout }: {
-  defaultLayout: Parameters<typeof useTableLayout>[0],
+  defaultLayout: DefaultLayout,
 }) => {
   const entityActions = useCallback((event: Event) => (
     <EventActions event={event} />

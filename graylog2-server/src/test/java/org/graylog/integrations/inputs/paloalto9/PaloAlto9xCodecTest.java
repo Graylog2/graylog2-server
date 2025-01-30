@@ -18,6 +18,7 @@ package org.graylog.integrations.inputs.paloalto9;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.assertj.core.api.Assertions;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageBase;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageType;
 import org.graylog.integrations.inputs.paloalto.PaloAltoParser;
@@ -25,6 +26,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -213,9 +215,7 @@ public class PaloAlto9xCodecTest {
         givenGoodInputRawMessage();
         givenRawParserReturnsNull();
 
-        whenDecodeIsCalled();
-
-        thenOutputMessageIsNull();
+        Assertions.assertThatThrownBy(this::whenDecodeIsCalled).isInstanceOf(InputProcessingException.class);
     }
 
     // GIVENs
@@ -243,7 +243,7 @@ public class PaloAlto9xCodecTest {
 
     // WHENs
     private void whenDecodeIsCalled() {
-        out = cut.decode(in);
+        out = cut.decodeSafe(in).get();
     }
 
     // THENs
@@ -270,9 +270,5 @@ public class PaloAlto9xCodecTest {
         } else {
             assertThat(out.getField(Message.FIELD_FULL_MESSAGE), nullValue());
         }
-    }
-
-    private void thenOutputMessageIsNull() {
-        assertThat(out, nullValue());
     }
 }

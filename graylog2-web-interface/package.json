@@ -82,7 +82,7 @@
     "plotly.js": "2.35.2",
     "posthog-js": "^1.52.0",
     "qs": "^6.3.0",
-    "react-ace": "12.0.0",
+    "react-ace": "13.0.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.14.0",
     "react-day-picker": "^7.4.8",
@@ -178,6 +178,6 @@
   "resolutions": {
     "@types/react": "18.3.12",
     "nth-check": "2.0.1",
-    "typescript": "5.7.2"
+    "typescript": "5.7.3"
   }
 }

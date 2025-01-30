@@ -3,6 +3,7 @@
   "version": "6.2.0-SNAPSHOT",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
+  "packageManager": "yarn@1.22.22",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Graylog2/graylog-web-plugin.git"
@@ -41,7 +42,7 @@
     "jest-preset-graylog": "file:../jest-preset-graylog",
     "jquery": "3.7.1",
     "moment": "2.30.1",
-    "moment-timezone": "0.5.46",
+    "moment-timezone": "0.5.47",
     "prop-types": "15.8.1",
     "react": "18.3.1",
     "react-dom": "18.2.0",
@@ -49,7 +50,7 @@
     "react-router-dom": "6.27.0",
     "reflux": "0.2.13",
     "styled-components": "6.1.1",
-    "typescript": "5.7.2",
+    "typescript": "5.7.3",
     "use-query-params": "^2.2.0",
     "webpack": "5.97.1",
     "webpack-cli": "5.1.4",
