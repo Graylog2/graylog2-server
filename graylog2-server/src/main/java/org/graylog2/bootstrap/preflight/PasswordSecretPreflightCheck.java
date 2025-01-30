@@ -20,8 +20,8 @@ import jakarta.inject.Inject;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.Optional;
 
 /**
@@ -59,7 +59,7 @@ public class PasswordSecretPreflightCheck implements PreflightCheck {
         clusterConfigService.write(new PreflightEncryptedSecret(encryptedValue));
     }
 
-    private void validateSecret(@NotNull PreflightEncryptedSecret preflightEncryptedSecret) {
+    private void validateSecret(@Nonnull PreflightEncryptedSecret preflightEncryptedSecret) {
         final EncryptedValue encryptedSecret = preflightEncryptedSecret.encryptedSecret();
 
         try {
