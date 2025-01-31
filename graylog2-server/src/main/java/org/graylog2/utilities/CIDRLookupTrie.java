@@ -16,6 +16,9 @@
  */
 package org.graylog2.utilities;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import java.util.Locale;
 
 /**
@@ -29,17 +32,23 @@ public class CIDRLookupTrie {
         String rangeName = null;
         // Whether the range is an IPv4 or IPv6 CIDR range, only matters for nodes representing the end of a range.
         boolean rangeIsIPv6 = false;
+        // Time to live in millis for the node
+        long ttl = 0L;
     }
 
     private final TrieNode root = new TrieNode();
 
+    public void insertCIDR(String cidr, String rangeName) {
+        insertCIDR(cidr, rangeName, 0L);
+    }
+
     /**
-     * Insert a CIDR range into the trie
+     * Insert a CIDR range into the trie with a time-to-live
      *
      * @param cidr properly formatted CIDR address (must include '/rangePrefix' even if it is a single address
      * @param rangeName the name of the CIDR range
      */
-    public void insertCIDR(String cidr, String rangeName) {
+    public void insertCIDR(String cidr, String rangeName, long ttlMillis) {
         final String[] parts = cidr.split("/");
         final String ip = parts[0];
         final int prefixLength;
@@ -63,6 +72,11 @@ public class CIDRLookupTrie {
 
         currentNode.rangeName = rangeName;
         currentNode.rangeIsIPv6 = ip.contains(":");
+        currentNode.ttl = ttlMillis;
+    }
+
+    public String longestPrefixRangeLookup(String ip) {
+        return longestPrefixRangeLookupWithTtl(ip, 0L);
     }
 
     /**
@@ -70,9 +84,10 @@ public class CIDRLookupTrie {
      * exist.
      *
      * @param ip IP address to check against the collection of ranges
+     * @param lookupTimeMillis time lookup was performed in milliseconds or 0 if TTL is not a concern
      * @return the name of the range with the longest prefix that contains the IP if it exists, null otherwise
      */
-    public String longestPrefixRangeLookup(String ip) {
+    public String longestPrefixRangeLookupWithTtl(String ip, long lookupTimeMillis) {
         final String binaryIP = toBinaryString(ip, -1);
         final boolean ipIsIPv6 = ip.contains(":");
         TrieNode currentNode = root;
@@ -87,7 +102,9 @@ public class CIDRLookupTrie {
 
             currentNode = currentNode.children[bit];
 
-            if (currentNode.rangeName != null && (currentNode.rangeIsIPv6 == ipIsIPv6)) {
+            // Current node has a range name, is the same protocol, and TTL is either not a concern or is valid.
+            if (currentNode.rangeName != null && currentNode.rangeIsIPv6 == ipIsIPv6
+                    && (lookupTimeMillis == 0L || currentNode.ttl == 0 || lookupTimeMillis <= currentNode.ttl)) {
                 longestMatchRangeName = currentNode.rangeName;
             }
         }
@@ -106,6 +123,33 @@ public class CIDRLookupTrie {
         final int prefixLength = Integer.parseInt(parts[1]);
         final String binaryIP = toBinaryString(ip, prefixLength);
         remove(root, binaryIP, 0, prefixLength);
+    }
+
+    public void cleanupExpiredNodes() {
+        cleanupNode(root, DateTime.now(DateTimeZone.UTC).getMillis());
+    }
+
+    private boolean cleanupNode(TrieNode node, long now) {
+        if (node == null) {
+            return true;
+        }
+
+        // Determine if this node has expired
+        boolean nodeExpired = node.ttl > 0L && node.ttl < now;
+        // Recursively cleanup child nodes
+        boolean leftExpired = cleanupNode(node.children[0], now);
+        boolean rightExpired = cleanupNode(node.children[1], now);
+
+        // If both child nodes and this node are expired, return true
+        if (nodeExpired && leftExpired && rightExpired) {
+            return true;
+        }
+
+        // Cleanup expired child nodes
+        if (leftExpired) node.children[0] = null;
+        if (rightExpired) node.children[1] = null;
+
+        return false;
     }
 
     // Convert an IP address to a binary string (supports both IPv4 and IPv6)
