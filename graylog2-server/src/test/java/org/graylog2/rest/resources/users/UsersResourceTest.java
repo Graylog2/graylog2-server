@@ -65,7 +65,6 @@ import java.util.Map;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -75,13 +74,14 @@ import static org.mockito.Mockito.when;
 
 public class UsersResourceTest {
 
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
-    public static final String EMAIL = "test@graylog.com";
-    public static final String FIRST_NAME = "First";
-    public static final String LAST_NAME = "Last";
-    public static final String TIMEZONE = "Europe/Berlin";
-    public static final long SESSION_TIMEOUT = 0L;
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private static final String EMAIL = "test@graylog.com";
+    private static final String FIRST_NAME = "First";
+    private static final String LAST_NAME = "Last";
+    private static final String TIMEZONE = "Europe/Berlin";
+    private static final long SESSION_TIMEOUT = 0L;
+    private static final String TOKEN_NAME = "tokenName";
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -117,7 +117,7 @@ public class UsersResourceTest {
     UserImplFactory userImplFactory;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         userImplFactory = new UserImplFactory(new Configuration(),
                 new Permissions(ImmutableSet.of(new RestPermissions())));
         usersResource = new TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
@@ -140,7 +140,7 @@ public class UsersResourceTest {
     @Test
     public void savePreferencesSuccess() throws ValidationException {
         when(subject.isPermitted(anyString())).thenReturn(true);
-        when(userManagementService.load(eq(USERNAME))).thenReturn(userImplFactory.create(new HashMap<>()));
+        when(userManagementService.load(USERNAME)).thenReturn(userImplFactory.create(new HashMap<>()));
         usersResource.savePreferences(USERNAME, UpdateUserPreferences.create(new HashMap<>()));
         verify(userManagementService, times(1)).save(isA(UserImpl.class));
     }
@@ -148,24 +148,14 @@ public class UsersResourceTest {
     @Test
     public void createTokenForInternalUserSucceeds() {
         final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME);
-        final String tokenName = "tokenName";
-        final String token = "someToken";
-        final DateTime lastAccess = Tools.nowUTC();
-        final Map<String, Object> tokenProps = Map.of(AccessTokenImpl.NAME, tokenName, AccessTokenImpl.TOKEN, token, AccessTokenImpl.LAST_ACCESS, lastAccess);
-        final ObjectId tokenId = new ObjectId();
-        final AccessToken accessToken = new AccessTokenImpl(tokenId, tokenProps);
-        final Token expected = Token.create(tokenId.toHexString(), tokenName, token, lastAccess);
-
-        when(userManagementService.loadById(eq(USERNAME))).thenReturn(userImplFactory.create(userProps));
-        when(subject.isPermitted(eq(USERS_TOKENCREATE + ":" + USERNAME))).thenReturn(true);
-        when(accessTokenService.create(USERNAME, tokenName)).thenReturn(accessToken);
+        final Token expected = createTokenAndPrepareMocks(userProps);
 
         try {
-            final Token actual = usersResource.generateNewToken(USERNAME, tokenName, "{}");
+            final Token actual = usersResource.generateNewToken(USERNAME, UsersResourceTest.TOKEN_NAME, "{}");
             assertEquals(expected, actual);
         } finally {
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
-            verify(accessTokenService).create(USERNAME, tokenName);
+            verify(accessTokenService).create(USERNAME, UsersResourceTest.TOKEN_NAME);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
         }
     }
@@ -173,15 +163,11 @@ public class UsersResourceTest {
     @Test(expected = ForbiddenException.class)
     public void createTokenForExternalUserFailsIfConfigured() {
         final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME, UserImpl.EXTERNAL_USER, "TRUE");
-        final String tokenName = "tokenName";
 
-        when(userManagementService.loadById(eq(USERNAME))).thenReturn(userImplFactory.create(userProps));
-        when(subject.isPermitted(eq(USERS_TOKENCREATE + ":" + USERNAME))).thenReturn(true);
-        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false));
+        prepareMocks(userProps, null, false);
 
         try {
-            usersResource.generateNewToken(USERNAME, tokenName, "{}");
+            usersResource.generateNewToken(USERNAME, TOKEN_NAME, "{}");
         } finally {
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
@@ -192,27 +178,15 @@ public class UsersResourceTest {
     @Test
     public void createTokenForExternalUserSucceedsIfConfigured() {
         final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME, UserImpl.EXTERNAL_USER, "TRUE");
-        final String tokenName = "tokenName";
-        final String token = "someToken";
-        final DateTime lastAccess = Tools.nowUTC();
-        final Map<String, Object> tokenProps = Map.of(AccessTokenImpl.NAME, tokenName, AccessTokenImpl.TOKEN, token, AccessTokenImpl.LAST_ACCESS, lastAccess);
-        final ObjectId tokenId = new ObjectId();
-        final AccessToken accessToken = new AccessTokenImpl(tokenId, tokenProps);
-        final Token expected = Token.create(tokenId.toHexString(), tokenName, token, lastAccess);
-
-        when(userManagementService.loadById(eq(USERNAME))).thenReturn(userImplFactory.create(userProps));
-        when(subject.isPermitted(eq(USERS_TOKENCREATE + ":" + USERNAME))).thenReturn(true);
-        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), true));
-        when(accessTokenService.create(USERNAME, tokenName)).thenReturn(accessToken);
+        final Token expected = createTokenAndPrepareMocks(userProps);
 
         try {
-            final Token actual = usersResource.generateNewToken(USERNAME, tokenName, "{}");
+            final Token actual = usersResource.generateNewToken(USERNAME, TOKEN_NAME, "{}");
             assertEquals(expected, actual);
         } finally {
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
-            verify(accessTokenService).create(USERNAME, tokenName);
+            verify(accessTokenService).create(USERNAME, TOKEN_NAME);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
         }
     }
@@ -222,6 +196,26 @@ public class UsersResourceTest {
                 FIRST_NAME, LAST_NAME, Collections.singletonList(""),
                 TIMEZONE, SESSION_TIMEOUT,
                 startPage, Collections.emptyList(), false);
+    }
+
+    private Token createTokenAndPrepareMocks(Map<String, Object> userProps) {
+        final String token = "someToken";
+        final DateTime lastAccess = Tools.nowUTC();
+        final Map<String, Object> tokenProps = Map.of(AccessTokenImpl.NAME, TOKEN_NAME, AccessTokenImpl.TOKEN, token, AccessTokenImpl.LAST_ACCESS, lastAccess);
+        final ObjectId tokenId = new ObjectId();
+        final AccessToken accessToken = new AccessTokenImpl(tokenId, tokenProps);
+
+        prepareMocks(userProps, accessToken, true);
+
+        return Token.create(tokenId.toHexString(), TOKEN_NAME, token, lastAccess);
+    }
+
+    private void prepareMocks(Map<String, Object> userProps, AccessToken accessToken, boolean allowExternalUser) {
+        when(userManagementService.loadById(USERNAME)).thenReturn(userImplFactory.create(userProps));
+        when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(true);
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
+                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), allowExternalUser));
+        when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME)).thenReturn(accessToken);
     }
 
     /**
