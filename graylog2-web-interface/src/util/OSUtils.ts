@@ -16,4 +16,4 @@
  */
 
 // eslint-disable-next-line import/prefer-default-export
-export const isMacOS = () => navigator.userAgent.indexOf('Mac OS X') !== -1;
+export const isMacOS = () => /Macintosh|MacIntel/.test(navigator.userAgent);

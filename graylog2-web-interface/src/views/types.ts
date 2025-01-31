@@ -429,6 +429,10 @@ export type CustomCommandContextProvider<T extends keyof CustomCommandContext> =
   provider: () => CustomCommandContext[T],
 }
 
+export type CurrentViewType = {
+  activeQuery: string,
+};
+
 export interface ViewState {
   activeQuery: QueryId;
   view: View;
