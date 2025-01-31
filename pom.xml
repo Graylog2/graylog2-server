@@ -99,7 +99,7 @@
         <auto-value.version>1.11.0</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.29.3</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.30.4</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
         <bouncycastle.version>1.80</bouncycastle.version>
@@ -107,7 +107,7 @@
         <caffeine.version>3.2.0</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.179</classgraph.version>
-        <commons-codec.version>1.17.2</commons-codec.version>
+        <commons-codec.version>1.18.0</commons-codec.version>
         <commons-csv.version>1.13.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.4.0</commons-exec.version>
@@ -121,7 +121,7 @@
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.69.1</grpc.version>
+        <grpc.version>1.70.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.4.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -151,7 +151,7 @@
         <log4j.version>2.24.3</log4j.version>
         <lucene.version>9.12.0</lucene.version>
         <metrics.version>4.2.30</metrics.version>
-        <mongodb-driver.version>5.3.0</mongodb-driver.version>
+        <mongodb-driver.version>5.3.1</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.117.Final</netty.version>
@@ -169,7 +169,7 @@
         <shiro.version>2.0.2</shiro.version>
         <snakeyaml.version>2.3</snakeyaml.version>
         <snappy-java.version>1.1.10.7</snappy-java.version>
-        <oshi.version>6.6.5</oshi.version>
+        <oshi.version>6.6.6</oshi.version>
         <siv-mode.version>1.6.0</siv-mode.version>
         <slf4j.version>2.0.16</slf4j.version>
         <streamex.version>0.8.3</streamex.version>
@@ -191,7 +191,7 @@
         <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.2</awaitility.version>
-        <equalsverifier.version>3.18.1</equalsverifier.version>
+        <equalsverifier.version>3.18.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.11.4</junit-jupiter.version>
@@ -731,6 +731,16 @@
                                         <ignore>org.graylog.plugins</ignore>
                                     </ignores>
                                 </banDynamicVersions>
+                                <RestrictImports>
+                                    <groups>
+                                        <group>
+                                            <reason>Data Node packages must not be used outside the data-node/ module.</reason>
+                                            <bannedImports>
+                                                <bannedImport>org.graylog.datanode.**</bannedImport>
+                                            </bannedImports>
+                                        </group>
+                                    </groups>
+                                </RestrictImports>
                                 <requireMavenVersion>
                                     <!-- Enforce the same version we define in the maven wrapper -->
                                     <version>[3.9.6,3.99.99]</version>
@@ -745,6 +755,14 @@
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>de.skuzzle.enforcer</groupId>
+                        <artifactId>restrict-imports-enforcer-rule</artifactId>
+                        <version>2.6.0</version>
+                        <scope>compile</scope>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>de.thetaphi</groupId>

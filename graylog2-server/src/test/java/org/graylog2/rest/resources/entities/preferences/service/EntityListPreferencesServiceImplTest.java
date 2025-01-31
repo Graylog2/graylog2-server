@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.entities.preferences.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.SingleFieldSortPreferences;
@@ -57,7 +58,7 @@ public class EntityListPreferencesServiceImplTest {
     public void setUp() {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
-        this.toTest = new EntityListPreferencesServiceImpl(mongoConnection, objectMapperProvider);
+        this.toTest = new EntityListPreferencesServiceImpl(new MongoCollections(objectMapperProvider, mongoConnection));
     }
 
     @Test

@@ -16,8 +16,8 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { useQueryParam } from 'use-query-params';
 
+import { useQueryParam } from 'routing/QueryParams';
 import type { MigrationState, MigrationStateItem } from 'components/datanode/Types';
 import { asMock } from 'helpers/mocking';
 
@@ -25,8 +25,8 @@ import RemoteReindexingMigration from './RemoteReindexingMigration';
 
 import { MIGRATION_STATE } from '../Constants';
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 
