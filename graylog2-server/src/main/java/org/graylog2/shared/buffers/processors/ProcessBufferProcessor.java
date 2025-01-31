@@ -44,7 +44,6 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -53,9 +52,9 @@ import static com.google.common.base.Suppliers.memoizeWithExpiration;
 
 public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
+    private static final Duration CACHE_DURATION = Duration.ofSeconds(30);
 
     private final Meter incomingMessages;
-
     private final Timer processTime;
     private final StreamMetrics streamMetrics;
     private final Meter outgoingMessages;
@@ -68,6 +67,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final Provider<Stream> defaultStreamProvider;
     private final FailureSubmissionService failureSubmissionService;
     private final Supplier<Duration> timestampGracePeriod;
+    private final ClusterConfigService clusterConfigService;
     private volatile Message currentMessage;
 
     @AssistedInject
@@ -88,6 +88,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         this.decodingProcessor = decodingProcessor;
         this.defaultStreamProvider = defaultStreamProvider;
         this.failureSubmissionService = failureSubmissionService;
+        this.clusterConfigService = clusterConfigService;
 
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
@@ -95,7 +96,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         this.streamMetrics = streamMetrics;
         currentMessage = null;
 
-        this.timestampGracePeriod = memoizeWithExpiration(() -> clusterConfigService.get(TimeStampConfig.class).gracePeriod(), 30, TimeUnit.SECONDS);
+        this.timestampGracePeriod = memoizeWithExpiration(() -> clusterConfigService.get(TimeStampConfig.class).gracePeriod(), CACHE_DURATION);
     }
 
     @Override
@@ -192,7 +193,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             }
         }
     }
-    
+
     public interface Factory {
         ProcessBufferProcessor create(DecodingProcessor decodingProcessor);
     }
