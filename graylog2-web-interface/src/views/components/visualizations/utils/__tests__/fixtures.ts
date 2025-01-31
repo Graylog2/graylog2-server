@@ -380,6 +380,7 @@ export const layoutsFor4axis = {
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
+    overlaying: undefined,
     position: 0,
     rangemode: 'tozero',
     side: 'left',

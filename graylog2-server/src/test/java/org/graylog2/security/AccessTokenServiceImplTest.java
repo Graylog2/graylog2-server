@@ -32,6 +32,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +50,9 @@ public class AccessTokenServiceImplTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
+    @Mock
+    private PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
+
     private AccessTokenService accessTokenService;
 
     @Before
@@ -58,7 +62,7 @@ public class AccessTokenServiceImplTest {
         when(accessTokenCipher.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
         when(accessTokenCipher.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
 
-        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), accessTokenCipher);
+        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher);
     }
 
     @After
