@@ -25,6 +25,7 @@ import Immutable from 'immutable';
 
 import type { ScopeName, ActiveHotkeys, HotkeyCollections, Options } from 'contexts/HotkeysContext';
 import HotkeysContext from 'contexts/HotkeysContext';
+import { isMacOS } from 'util/OSUtils';
 
 const viewActions = {
   undo: { keys: 'mod+shift+z', description: 'Undo last action' },
@@ -68,7 +69,7 @@ export const hotKeysCollections: HotkeyCollections = {
       'submit-search': { keys: 'return', description: 'Execute the search' },
       'insert-newline': { keys: 'shift+return', description: 'Create a new line' },
       'create-search-filter': { keys: 'alt+return', description: 'Create search filter based on current query' },
-      'show-suggestions': { keys: 'alt+space', description: 'Show suggestions, displays query history when input is empty' },
+      'show-suggestions': { keys: isMacOS() ? 'alt+space' : 'mod+space', description: 'Show suggestions, displays query history when input is empty' },
       'show-history': { keys: 'alt+shift+h', description: 'View your search query history' },
     },
   },

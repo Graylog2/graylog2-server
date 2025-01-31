@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { MemoryRouter } from 'react-router-dom';
 
 import DefaultQueryClientProvider from './DefaultQueryClientProvider';
@@ -34,9 +33,5 @@ const WrappingContainer = ({ children }: Props) => (
     </MemoryRouter>
   </DefaultQueryClientProvider>
 );
-
-WrappingContainer.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 export default WrappingContainer;
