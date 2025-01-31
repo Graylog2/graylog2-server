@@ -106,7 +106,7 @@ public class LookupDataAdapterRefreshService extends AbstractIdleService {
             // ConcurrentMap#computeIfAbsent() does not work here because scheduling a job is not idempotent.
             synchronized (futures) {
                 if (!futures.containsKey(instanceId)) {
-                    LOG.info("Adding job for <{}/{}/@{}> [interval={}ms]", dataAdapter.name(), dataAdapter.id(), instanceId, interval.getMillis());
+                    LOG.debug("Adding job for <{}/{}/@{}> [interval={}ms]", dataAdapter.name(), dataAdapter.id(), instanceId, interval.getMillis());
                     futures.put(instanceId, schedule(dataAdapter, interval));
                 } else {
                     LOG.warn("Job for <{}/{}/@{}> already exists, not adding it again.", dataAdapter.name(), dataAdapter.id(), instanceId);
@@ -128,7 +128,7 @@ public class LookupDataAdapterRefreshService extends AbstractIdleService {
         // Using the adapter object ID here to make it possible to have multiple jobs for the same adapter
         final String instanceId = objectId(dataAdapter);
         if (futures.containsKey(instanceId)) {
-            LOG.info("Removing job for <{}/{}/@{}>", dataAdapter.name(), dataAdapter.id(), instanceId);
+            LOG.debug("Removing job for <{}/{}/@{}>", dataAdapter.name(), dataAdapter.id(), instanceId);
         }
         // Try to cancel the job even if the check above fails to avoid race conditions
         cancel(futures.remove(instanceId));
