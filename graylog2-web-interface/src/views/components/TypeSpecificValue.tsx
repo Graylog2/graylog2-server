@@ -31,6 +31,7 @@ import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import useFeature from 'hooks/useFeature';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
+import EventDefinition from 'views/components/fieldtypes/EventDefinition';
 
 import EmptyValue from './EmptyValue';
 import type { ValueRendererProps, ValueRenderer } from './messagelist/decoration/ValueRenderer';
@@ -62,7 +63,7 @@ const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit
   return <span title={value.toString()}>{formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev)}</span>;
 };
 
-const FormattedValue = ({ field, value, truncate = false, render = defaultComponent, unit, type }: TypeSpecificValueProps) => {
+const FormattedValue = ({ field, value = undefined, truncate = false, render = defaultComponent, unit = undefined, type = undefined }: TypeSpecificValueProps) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const shouldRenderValueWithUnit = unitFeatureEnabled && unit?.isDefined && value && value !== MISSING_BUCKET_NAME && unitFeatureEnabled;
   if (shouldRenderValueWithUnit) return <ValueWithUnitRenderer value={value} unit={unit} />;
@@ -70,7 +71,7 @@ const FormattedValue = ({ field, value, truncate = false, render = defaultCompon
   return _formatValue(field, value, truncate, render, type);
 };
 
-const TypeSpecificValue = ({ field, value, render = defaultComponent, type = FieldType.Unknown, truncate = false, unit }: TypeSpecificValueProps) => {
+const TypeSpecificValue = ({ field, value = undefined, render = defaultComponent, type = FieldType.Unknown, truncate = false, unit = undefined }: TypeSpecificValueProps) => {
   const Component = render;
 
   if (value === undefined) {
@@ -88,6 +89,7 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
     case 'node': return <NodeField value={String(value)} />;
     case 'streams': return <StreamsField value={value} />;
     case 'percentage': return <PercentageField value={value} />;
+    case 'event-definition-id': return <EventDefinition value={value} />;
     default: return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
   }
 };
