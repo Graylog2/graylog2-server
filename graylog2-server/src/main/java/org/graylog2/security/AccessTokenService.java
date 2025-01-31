@@ -16,8 +16,11 @@
  */
 package org.graylog2.security;
 
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -28,13 +31,11 @@ import java.util.concurrent.TimeUnit;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface AccessTokenService extends PersistedService {
-    @SuppressWarnings("unchecked")
     AccessToken load(String token);
 
     @Nullable
     AccessToken loadById(String id);
 
-    @SuppressWarnings("unchecked")
     List<AccessToken> loadAll(String username);
 
     AccessToken create(String username, String name);
@@ -45,5 +46,8 @@ public interface AccessTokenService extends PersistedService {
 
     int deleteAllForUser(String username);
 
-    public void setLastAccessCache(long duration, TimeUnit unit);
+    void setLastAccessCache(long duration, TimeUnit unit);
+
+    PaginatedList<AccessTokenEntity> findPaginated(SearchQuery searchQuery, int page,
+                                                   int perPage, String sortField, SortOrder order);
 }
