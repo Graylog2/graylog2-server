@@ -14,22 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import { kebabCase } from 'lodash';
+import { useQueryParams, useQueryParam, StringParam, NumberParam, ArrayParam } from 'use-query-params';
 
-export default (name) => {
-  const MockComponent = ({ children, ...rest }) => React.createElement(kebabCase(name), rest, children);
-
-  MockComponent.propTypes = {
-    children: PropTypes.node,
-  };
-
-  MockComponent.defaultProps = {
-    children: null,
-  };
-
-  MockComponent.displayName = name;
-
-  return MockComponent;
+const parseNestedObject = (fieldQueryString: string) => {
+  try {
+    return JSON.parse(decodeURIComponent(fieldQueryString));
+  } catch (_error) {
+    return undefined;
+  }
 };
+
+const NestedObjectParam = {
+  encode: (object: Object | null | undefined) => encodeURIComponent(JSON.stringify(object)),
+  decode: (objectStr: string | null | undefined) => parseNestedObject(objectStr),
+};
+
+export { useQueryParams, useQueryParam, StringParam, NumberParam, NestedObjectParam, ArrayParam };

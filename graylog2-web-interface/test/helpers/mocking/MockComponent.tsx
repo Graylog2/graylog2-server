@@ -14,24 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import * as React from 'react';
+import kebabCase from 'lodash/kebabCase';
 
-import DefaultQueryClientProvider from './DefaultQueryClientProvider';
-import DefaultProviders from './DefaultProviders';
+export default (name: string) => {
+  const MockComponent = ({ children, ...rest }) => React.createElement(kebabCase(name), rest, children);
 
-type Props = {
-  children: React.ReactNode,
-}
+  MockComponent.displayName = name;
 
-const WrappingContainer = ({ children }: Props) => (
-  <DefaultQueryClientProvider>
-    <MemoryRouter>
-      <DefaultProviders>
-        {children}
-      </DefaultProviders>
-    </MemoryRouter>
-  </DefaultQueryClientProvider>
-);
-
-export default WrappingContainer;
+  return MockComponent;
+};

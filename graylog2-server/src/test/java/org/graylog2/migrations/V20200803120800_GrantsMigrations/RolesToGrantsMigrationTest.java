@@ -81,7 +81,8 @@ class RolesToGrantsMigrationTest {
 
         this.grnRegistry = grnRegistry;
 
-        roleService = new RoleServiceImpl(mongodb.mongoConnection(), mongoJackObjectMapperProvider, permissions, validator);
+        roleService = new RoleServiceImpl(
+                new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()), permissions, validator);
 
         this.dbGrantService = new DBGrantService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
         this.userService = userService;
