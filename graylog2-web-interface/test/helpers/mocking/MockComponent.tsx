@@ -14,8 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { formatNumber as _formatNumber } from 'util/NumberFormatting';
+import * as React from 'react';
+import kebabCase from 'lodash/kebabCase';
 
-const formatNumber = (value: number): string => _formatNumber(value, { maximumFractionDigits: 7 });
+export default (name: string) => {
+  const MockComponent = ({ children, ...rest }) => React.createElement(kebabCase(name), rest, children);
 
-export default formatNumber;
+  MockComponent.displayName = name;
+
+  return MockComponent;
+};

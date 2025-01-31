@@ -17,7 +17,6 @@
 import * as React from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
-import numeral from 'numeral';
 
 import Icon from 'components/common/Icon';
 import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -28,6 +27,7 @@ import {
 } from 'views/components/visualizations/utils/unitConverters';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
+import { formatTrend } from 'util/NumberFormatting';
 
 type TrendDirection = 'good' | 'bad' | 'neutral';
 
@@ -35,6 +35,7 @@ type Props = {
   current: number,
   previous: number | undefined | null,
   trendPreference: TrendPreference,
+  // eslint-disable-next-line react/require-default-props
   unit?: FieldUnit,
 };
 
@@ -143,8 +144,8 @@ const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, tre
   const backgroundTrend = _trendDirection(differenceConverted, trendPreference);
   const trendIcon = _trendIcon(differenceConverted);
 
-  const absoluteDifference = Number.isFinite(differenceConverted) ? `${numeral(differenceConverted).format('+0,0[.]0[000]')}${unitAbbrevString}` : '--';
-  const relativeDifference = Number.isFinite(differencePercent) ? numeral(differencePercent).format('+0[.]0[0]%') : '--';
+  const absoluteDifference = Number.isFinite(differenceConverted) ? `${formatTrend(differenceConverted)}${unitAbbrevString}` : '--';
+  const relativeDifference = Number.isFinite(differencePercent) ? formatTrend(differencePercent, { percentage: true }) : '--';
 
   return (
     <Background trend={backgroundTrend} data-testid="trend-background">
@@ -157,5 +158,6 @@ const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, tre
     </Background>
   );
 });
+Trend.displayName = 'Trend';
 
 export default Trend;

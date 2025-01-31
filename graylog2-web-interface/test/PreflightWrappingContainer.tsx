@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { MemoryRouter } from 'react-router-dom';
 
 import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
@@ -38,9 +37,5 @@ const PreflightWrappingContainer = ({ children }: Props) => (
     </DefaultQueryClientProvider>
   </PreflightThemeProvider>
 );
-
-PreflightWrappingContainer.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 export default PreflightWrappingContainer;
