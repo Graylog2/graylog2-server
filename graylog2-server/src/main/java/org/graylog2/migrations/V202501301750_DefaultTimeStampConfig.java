@@ -18,6 +18,7 @@ package org.graylog2.migrations;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.buffers.processors.TimeStampConfig;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ import java.time.ZonedDateTime;
  */
 public class V202501301750_DefaultTimeStampConfig extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V202501301750_DefaultTimeStampConfig.class);
-
+    private static final boolean IS_BEFORE_VERSION_7_0 = !Version.CURRENT_CLASSPATH.sameOrHigher(Version.from(7, 0, 0));
     private final boolean isFreshInstallation;
     private final ClusterConfigService clusterConfigService;
 
@@ -49,9 +50,8 @@ public class V202501301750_DefaultTimeStampConfig extends Migration {
 
     @Override
     public void upgrade() {
-        // Do not run for existing installations.
-        // TODO: consider making this default for 7.0 and beyond.
-        if (!isFreshInstallation) {
+        // Do not run for existing installations pre-7.0.
+        if (!isFreshInstallation && IS_BEFORE_VERSION_7_0) {
             return;
         }
         // Do not run again if the configuration can already be found in the database.
