@@ -34,7 +34,6 @@ import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.events.DataAdaptersDeleted;
 import org.graylog2.lookup.events.DataAdaptersUpdated;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -126,24 +125,9 @@ public class DBDataAdapterService {
         });
     }
 
-    @Deprecated
-    public Collection<DataAdapterDto> findByIds(Set<String> idSet) {
-        try (Stream<DataAdapterDto> stream = streamByIds(idSet)) {
-            return stream.toList();
-        }
-
-    }
-
     @MustBeClosed
     public Stream<DataAdapterDto> streamByIds(Set<String> idSet) {
         return stream(collection.find(stringIdsIn(idSet)));
-    }
-
-    @Deprecated
-    public Collection<DataAdapterDto> findAll() {
-        try (Stream<DataAdapterDto> stream = streamAll()) {
-            return stream.toList();
-        }
     }
 
     @MustBeClosed

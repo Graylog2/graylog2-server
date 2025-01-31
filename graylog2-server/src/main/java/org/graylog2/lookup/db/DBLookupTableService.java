@@ -96,13 +96,6 @@ public class DBLookupTableService {
         clusterEventBus.post(LookupTablesUpdated.create(tables));
     }
 
-    @Deprecated
-    public Collection<LookupTableDto> findAll() {
-        try (Stream<LookupTableDto> stream = streamAll()) {
-            return stream.toList();
-        }
-    }
-
     @MustBeClosed
     public Stream<LookupTableDto> streamAll() {
         return stream(collection.find());
@@ -112,24 +105,10 @@ public class DBLookupTableService {
         return paginationHelper.filter(query).sort(sort).perPage(perPage).page(page);
     }
 
-    @Deprecated
-    public Collection<LookupTableDto> findByCacheIds(Collection<String> cacheIds) {
-        try (Stream<LookupTableDto> stream = streamByCacheIds(cacheIds)) {
-            return stream.toList();
-        }
-    }
-
     @MustBeClosed
     public Stream<LookupTableDto> streamByCacheIds(Collection<String> cacheIds) {
         Bson query = in("cache", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()));
         return stream(collection.find(query));
-    }
-
-    @Deprecated
-    public Collection<LookupTableDto> findByDataAdapterIds(Collection<String> dataAdapterIds) {
-        try (Stream<LookupTableDto> stream = streamByDataAdapterIds(dataAdapterIds)) {
-            return stream.toList();
-        }
     }
 
     @MustBeClosed

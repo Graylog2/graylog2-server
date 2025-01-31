@@ -177,20 +177,6 @@ public class DBEventDefinitionService {
     }
 
     /**
-     * Returns the list of event definitions that is using the given notification ID.
-     *
-     * @deprecated Use {@link #streamByNotificationId(String notificationId)} instead and be sure to close the stream.
-     * @param notificationId the notification ID
-     * @return the event definitions with the given notification ID
-     */
-    @Deprecated
-    public List<EventDefinitionDto> getByNotificationId(String notificationId) {
-        try (Stream<EventDefinitionDto> stream = streamByNotificationId(notificationId)) {
-            return stream.toList();
-        }
-    }
-
-    /**
      * Returns the stream of event definitions that is using the given notification ID.
      *
      * @param notificationId the notification ID
@@ -205,19 +191,6 @@ public class DBEventDefinitionService {
     }
 
     /**
-     * Returns the list of system event definitions
-     *
-     * @deprecated Use {@link #streamSystemEventDefinitions()} instead and be sure to close the stream.
-     * @return the matching event definitions
-     */
-    @Deprecated
-    public List<EventDefinitionDto> getSystemEventDefinitions() {
-        try (Stream<EventDefinitionDto> stream = streamSystemEventDefinitions()) {
-            return stream.toList();
-        }
-    }
-
-    /**
      * Returns the stream of system event definitions
      *
      * @return stream of the matching event definitions
@@ -225,19 +198,6 @@ public class DBEventDefinitionService {
     @MustBeClosed
     public Stream<EventDefinitionDto> streamSystemEventDefinitions() {
         return stream(collection.find(eq(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME)));
-    }
-
-    /**
-     * Returns the list of event definitions that contain the given value in the specified array field
-     *
-     * @deprecated Use {@link #streamByArrayValue(String arrayField, String field, String value)} instead.
-     */
-    @Deprecated
-    @NotNull
-    public List<EventDefinitionDto> getByArrayValue(String arrayField, String field, String value) {
-        try (Stream<EventDefinitionDto> stream = streamByArrayValue(arrayField, field, value)) {
-            return stream.toList();
-        }
     }
 
     /**

@@ -147,18 +147,6 @@ public class DBJobTriggerService {
     }
 
     /**
-     * Loads all existing records and returns them.
-     *
-     * @deprecated Use {@link #streamAll()} instead and be sure to close the stream.
-     * @return list of records
-     */
-    public List<JobTriggerDto> all() {
-        try (Stream<JobTriggerDto> stream = streamAll()) {
-            return stream.toList();
-        }
-    }
-
-    /**
      * Streams all existing records and returns the stream.
      *
      * @return stream of records
@@ -197,13 +185,6 @@ public class DBJobTriggerService {
                 throw new IllegalStateException("More than one trigger for job definition <" + jobDefinitionId + ">");
             }
             return triggers.stream().findFirst();
-        }
-    }
-
-    @Deprecated
-    public List<JobTriggerDto> getAllForJob(String jobDefinitionId) {
-        try (Stream<JobTriggerDto> stream = streamAllForJob(jobDefinitionId)) {
-            return stream.toList();
         }
     }
 
@@ -575,22 +556,6 @@ public class DBJobTriggerService {
         mongoUtils.initializeLegacyMongoJackBsonObject(query);
         return cancelTriggerByQuery((Bson) query);
     }
-
-
-    /**
-     * Find triggers by using the provided query. Use judiciously!
-     *
-     * @deprecated Use {@link #streamByQuery(Bson query)} instead and be sure to close the stream.
-     * @param query The query
-     * @return All found JobTriggers
-     */
-    @Deprecated
-    public List<JobTriggerDto> findByQuery(Bson query) {
-        try (Stream<JobTriggerDto> stream = streamByQuery(query)) {
-            return stream.toList();
-        }
-    }
-
 
     /**
      * Stream triggers by using the provided query. Use judiciously!

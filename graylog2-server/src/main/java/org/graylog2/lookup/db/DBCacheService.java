@@ -34,7 +34,6 @@ import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.events.CachesDeleted;
 import org.graylog2.lookup.events.CachesUpdated;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -116,23 +115,9 @@ public class DBCacheService {
         });
     }
 
-    @Deprecated
-    public Collection<CacheDto> findByIds(Set<String> idSet) {
-        try (Stream<CacheDto> stream = streamByIds(idSet)) {
-            return stream.toList();
-        }
-    }
-
     @MustBeClosed
     public Stream<CacheDto> streamByIds(Set<String> idSet) {
         return stream(collection.find(stringIdsIn(idSet)));
-    }
-
-    @Deprecated
-    public Collection<CacheDto> findAll() {
-        try (Stream<CacheDto> stream = streamAll()) {
-            return stream.toList();
-        }
     }
 
     @MustBeClosed

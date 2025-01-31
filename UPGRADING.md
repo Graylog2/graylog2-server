@@ -23,9 +23,24 @@ Alternatively the `SaveOrCancelButtons` component can be used in the edit compon
 
 The following Java Code API changes have been made.
 
-| File/method                                    | Description |
-|------------------------------------------------|-------------|
-| `org.graylog.scheduler.JobSchedule#toDBUpdate` | removed     |
+| File/method                                                                       | Description                              |
+|-----------------------------------------------------------------------------------|------------------------------------------|
+| `org.graylog.scheduler.JobSchedule#toDBUpdate`                                    | removed                                  |
+| `org.graylog.scheduler.DBJobTriggerService#all`                                   | replaced by streamAll                    |
+| `org.graylog.scheduler.DBJobTriggerService#getAllForJob`                          | replaced by streamAllForJob              |
+| `org.graylog.scheduler.DBJobTriggerService#findByQuery`                           | replaced by streamByQuery                |
+| `org.graylog.events.processor.DBEventDefinitionService#getByNotificationId`       | replaced by streamByNotificationId       |
+| `org.graylog.events.processor.DBEventDefinitionService#getSystemEventDefinitions` | replaced by streamSystemEventDefinitions |
+| `org.graylog.events.processor.DBEventDefinitionService#getByArrayValue`           | replaced by streamByArrayValue           |
+| `org.graylog2.lookup.db.DBCacheService#findByIds`                                 | replaced by streamByIds                  |
+| `org.graylog2.lookup.db.DBCacheService#findAll`                                   | replaced by streamAll                    |
+| `org.graylog2.lookup.db.DBDataAdapterService#findByIds`                           | replaced by streamByIds                  |
+| `org.graylog2.lookup.db.DBDataAdapterService#findAll`                             | replaced by streamAll                    |
+| `org.graylog2.lookup.db.DBLookupTableService#findByCacheIds`                      | replaced by streamByCacheIds             |
+| `org.graylog2.lookup.db.DBLookupTableService#findByDataAdapterIds`                | replaced by streamByDataAdapterIds       |
+| `org.graylog2.lookup.db.DBLookupTableService#findAll`                             | replaced by streamAll                    |
+
+DBService classes' new streaming methods require streams to be closed after using - recommend using try-with-resource statements.
 
 ## REST API Endpoint Changes
 
