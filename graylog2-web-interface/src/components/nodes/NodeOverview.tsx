@@ -68,7 +68,7 @@ type Props = {
 }
 
 const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInformation, systemOverview }: Props) => {
-  const DataWareHouseJournal = PluginStore.exports('dataWarehouse')?.[0]?.DataWarehouseJournal;
+  const DataLakeJournal = PluginStore.exports('dataLake')?.[0]?.DataLakeJournal;
   const pluginCount = `${plugins?.length || 0} plugins installed`;
 
   const runningInputs = inputStates?.filter((inputState) => inputState.state.toUpperCase() === 'RUNNING');
@@ -124,7 +124,7 @@ const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInform
           <JournalDetails nodeId={node.node_id} />
         </Col>
       </Row>
-      {DataWareHouseJournal && <DataWareHouseJournal nodeId={node.node_id} />}
+      {DataLakeJournal && <DataLakeJournal nodeId={node.node_id} />}
       <Row className="content">
         <Col md={6}>
           <h2>System</h2>

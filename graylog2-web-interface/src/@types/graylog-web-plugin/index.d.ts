@@ -193,32 +193,32 @@ export type FieldValueProvider = {
   requiredFields: string[],
 }
 
-interface PluginDataWarehouse {
-  StreamDataWarehouse: React.ComponentType<{
+interface PluginDataLake {
+  StreamDataLake: React.ComponentType<{
     permissions: Immutable.List<string>,
   }>,
-  DataWarehouseStatus: React.ComponentType<{
-    datawareHouseEnabled: boolean;
+  DataLakeStatus: React.ComponentType<{
+    DataLakeareHouseEnabled: boolean;
   }>,
-  DataWarehouseJournal: React.ComponentType<{
+  DataLakeJournal: React.ComponentType<{
     nodeId: string,
   }>,
-  DataWarehouseJobs: React.ComponentType<{
+  DataLakeJobs: React.ComponentType<{
     permissions: Immutable.List<string>,
     streamId: string,
   }>,
   StreamIlluminateProcessingSection: React.ComponentType<{
     stream: Stream,
   }>,
-  StreamIndexSetDataWarehouseWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
-  fetchStreamDataWarehouseStatus: (streamId: string) => Promise<{
+  StreamIndexSetDataLakeWarning: React.ComponentType<{streamId: string, isArchivingEnabled: boolean}>,
+  fetchStreamDataLakeStatus: (streamId: string) => Promise<{
     id: string,
     archive_name: string,
     enabled: boolean,
     stream_id: string,
     retention_time: number,
   }>,
-  fetchStreamDataWarehouse: (streamId: string) => Promise<{
+  fetchStreamDataLake: (streamId: string) => Promise<{
     id: string,
     archive_config_id: string,
     message_count: number,
@@ -228,18 +228,18 @@ interface PluginDataWarehouse {
     restore_history: Array<{id:string}>,
 
   }>;
-  getStreamDataWarehouseTableElements: (permission: Immutable.List<string>) => {
+  getStreamDataLakeTableElements: (permission: Immutable.List<string>) => {
     attributeName: string,
     attributes: Array<{ id: string, title: string }>,
-    columnRenderer: { datawarehouse: ColumnRenderer<Stream> },
+    columnRenderer: { data_lake: ColumnRenderer<Stream> },
   },
-  DataWarehouseStreamDeleteWarning: React.ComponentType,
+  DataLakeStreamDeleteWarning: React.ComponentType,
 }
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
-    dataWarehouse?: Array<PluginDataWarehouse>
+    dataLake?: Array<PluginDataLake>
     dataTiering?: Array<DataTiering>
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
