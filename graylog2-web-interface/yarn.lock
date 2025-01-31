@@ -9022,7 +9022,6 @@ graphemer@^1.4.0:
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.47"
-    prop-types "15.8.1"
     react "18.3.1"
     react-dom "18.2.0"
     react-router-bootstrap "0.26.3"
@@ -13190,9 +13189,9 @@ postcss@^8.5.1:
     source-map-js "^1.2.1"
 
 posthog-js@^1.52.0:
-  version "1.176.0"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.176.0.tgz#39841ab213aa9c5500982659dc6d537a407f7205"
-  integrity sha512-T5XKNtRzp7q6CGb7Vc7wAI76rWap9fiuDUPxPsyPBPDkreKya91x9RIsSapAVFafwD1AEin1QMczCmt9Le9BWw==
+  version "1.214.0"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.214.0.tgz#e78a304b17db822bcbfb29affbc94b63b292d01a"
+  integrity sha512-zJpTAB/85wkr2YtpeH6K/JLeenVRoFnyA4pj8Yern3sGkLj1bRao4AzFJuTvY5IduDRUIkKup5pr5NxjZ0QPnw==
   dependencies:
     core-js "^3.38.1"
     fflate "^0.4.8"
@@ -13286,7 +13285,7 @@ prop-types-extra@^1.0.1:
     react-is "^16.3.2"
     warning "^4.0.0"
 
-prop-types@15.8.1, prop-types@15.x, prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@15.x, prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -15632,7 +15631,6 @@ styled-components@6.1.1:
     stylelint "16.14.1"
     stylelint-config-recommended "15.0.0"
     stylelint-config-standard "36.0.1"
-    stylelint-config-styled-components "0.1.1"
 
 stylelint-config-recommended@15.0.0:
   version "15.0.0"
@@ -15650,11 +15648,6 @@ stylelint-config-standard@36.0.1:
   integrity sha512-8aX8mTzJ6cuO8mmD5yon61CWuIM4UD8Q5aBcWKGSf6kg+EC3uhB+iOywpTK4ca6ZL7B49en8yanOFtUW0qNzyw==
   dependencies:
     stylelint-config-recommended "^14.0.1"
-
-stylelint-config-styled-components@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/stylelint-config-styled-components/-/stylelint-config-styled-components-0.1.1.tgz#b408388d7c687833ab4be4c4e6522d97d2827ede"
-  integrity sha512-z5Xz/9GmvxO6e/DLzBMwkB85zHxEEjN6K7Cj80Bi+o/9vR9eS3GX3E9VuMnX9WLFYulqbqLtTapGGY28JBiy9Q==
 
 stylelint@16.14.1:
   version "16.14.1"
