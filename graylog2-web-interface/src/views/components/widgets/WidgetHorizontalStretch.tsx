@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -26,12 +26,12 @@ import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const StyledIconButton = styled(IconButton)<{ $stretched: boolean }>(({ $stretched }) => css`
+const StyledIconButton = styled(IconButton)`
   span {
     position: relative;
-    left: ${$stretched ? '-1px' : 0};
+    left: -1px;
   }
-`);
+`;
 
 type PositionType = {
   col: number,
@@ -79,7 +79,6 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
     <StyledIconButton onClick={onClick}
                       name={icon}
                       title={title}
-                      $stretched={stretched}
                       rotation={90} />
   );
 };
