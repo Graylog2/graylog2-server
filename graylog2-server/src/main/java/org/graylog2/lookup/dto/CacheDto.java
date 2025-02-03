@@ -55,6 +55,8 @@ public abstract class CacheDto extends ScopedEntity {
         return new AutoValue_CacheDto.Builder();
     }
 
+    public abstract Builder toBuilder();
+
     @JsonAutoDetect
     @AutoValue.Builder
     public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
