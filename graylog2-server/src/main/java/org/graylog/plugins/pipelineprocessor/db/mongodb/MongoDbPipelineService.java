@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
+import com.google.common.eventbus.Subscribe;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
@@ -27,6 +28,7 @@ import org.bson.conversions.Bson;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
+import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.utils.MongoUtils;
@@ -61,6 +63,7 @@ public class MongoDbPipelineService implements PipelineService {
         this.mongoUtils = mongoCollections.utils(collection);
 
         collection.createIndex(Indexes.ascending("title"), new IndexOptions().unique(true));
+        clusterBus.register(this);
     }
 
     @Override
@@ -120,4 +123,17 @@ public class MongoDbPipelineService implements PipelineService {
     public long count(Bson filter) {
         return collection.countDocuments(filter);
     }
+
+    @Subscribe
+    public void handleRuleChanges(RulesChangedEvent event) {
+        event.deletedRuleIds().forEach(id -> {
+        });
+        event.updatedRuleIds().forEach(id -> {
+
+        });
+
+        //TODO clusterBus.post(PipelinesChangedEvent.updatedPipelineId(toSave.id()));
+    }
+
+
 }

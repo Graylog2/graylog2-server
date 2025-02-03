@@ -73,12 +73,15 @@ public class PipelineResourceTest {
     @Mock
     private StreamService streamService;
 
+    @Mock
+    private InputRoutingService inputRoutingService;
 
     private PipelineResource pipelineResource;
 
     @Before
     public void setup() {
-        pipelineResource = new PipelineResource(pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, ruleService, streamService);
+        pipelineResource = new PipelineResource(
+                pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, streamService, inputRoutingService);
     }
 
     @Test
