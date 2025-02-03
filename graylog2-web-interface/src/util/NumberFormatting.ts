@@ -16,22 +16,31 @@
  */
 type Options = {
   signDisplay?: 'auto' | 'always' | 'exceptZero',
-  maximumFractionDigits?: number,
-  minimumFractionDigits?: number,
+  digits?: number,
+  minimumDigits?: number,
 };
 
-const defaultOptions = {
-  maximumFractionDigits: 2,
-} as const;
+const desiredFractionDigits = 1;
 
 const defaultPercentageOptions = {
-  ...defaultOptions,
-  minimumFractionDigits: 2,
+  minimumFractionDigits: desiredFractionDigits,
   style: 'percent',
 } as const;
 
-export const formatNumber = (num: number, options: Options = {}) => new Intl.NumberFormat(undefined, { ...defaultOptions, ...options }).format(num);
-export const formatPercentage = (num: number, options: Options = {}) => new Intl.NumberFormat(undefined, { ...defaultPercentageOptions, ...options }).format(num);
+const exponent = (s: string | number) => Number(Number(s).toExponential().split('e')[1]);
+
+const fractionDigitsFor = (s: string | number, defaultDigits: number) => {
+  const e = exponent(s);
+
+  return e <= (-1 * defaultDigits)
+    ? (-1 * e) + 1
+    : defaultDigits;
+};
+
+const format = (num: number, options: Intl.NumberFormatOptions) => new Intl.NumberFormat(undefined, options).format(num);
+
+export const formatNumber = (num: number, { digits, ...options }: Options = {}) => format(num, { minimumFractionDigits: options.minimumDigits, maximumFractionDigits: fractionDigitsFor(num, digits ?? desiredFractionDigits), ...options });
+export const formatPercentage = (num: number, { digits, ...options }: Options = {}) => format(num, { ...defaultPercentageOptions, maximumFractionDigits: fractionDigitsFor(num * 100, digits ?? desiredFractionDigits), ...options });
 
 type TrendOptions = {
   percentage?: boolean,
