@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestJobTriggerData;
@@ -44,7 +45,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mongojack.DBQuery;
 
 import java.util.Collections;
 import java.util.List;
@@ -981,14 +981,14 @@ public class DBJobTriggerServiceTest {
         dbJobTriggerService.create(triggerBuilder
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
-        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+        dbJobTriggerService.deleteByQuery(Filters.empty());
 
         // two unfulfilled constraints
         dbJobTriggerService.create(triggerBuilder
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
-        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+        dbJobTriggerService.deleteByQuery(Filters.empty());
 
         // two fulfilled constraints
         when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER"));
@@ -996,7 +996,7 @@ public class DBJobTriggerServiceTest {
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
-        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+        dbJobTriggerService.deleteByQuery(Filters.empty());
 
         // more capabilities than constraints
         when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER", "ANOTHER_CAPABITILITY"));
@@ -1004,7 +1004,7 @@ public class DBJobTriggerServiceTest {
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
-        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+        dbJobTriggerService.deleteByQuery(Filters.empty());
 
         // more constraints than capabilities
         when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER"));
@@ -1012,7 +1012,7 @@ public class DBJobTriggerServiceTest {
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE", "ANOTHER_CONSTRAINT"))
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
-        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+        dbJobTriggerService.deleteByQuery(Filters.empty());
     }
 
     @Test
@@ -1033,13 +1033,13 @@ public class DBJobTriggerServiceTest {
     @MongoDBFixtures("locked-job-triggers.json")
     public void cancelTriggerByQuery() {
         // Must return an empty Optional if the query didn't match any trigger
-        assertThat(dbJobTriggerService.cancelTriggerByQuery(DBQuery.is("foo", "bar"))).isEmpty();
+        assertThat(dbJobTriggerService.cancelTriggerByQuery(Filters.eq("foo", "bar"))).isEmpty();
 
         final JobTriggerDto lockedTrigger = dbJobTriggerService.get("54e3deadbeefdeadbeef0001").orElseThrow(AssertionError::new);
 
         assertThat(lockedTrigger.isCancelled()).isFalse();
 
-        assertThat(dbJobTriggerService.cancelTriggerByQuery(DBQuery.is("_id", "54e3deadbeefdeadbeef0001"))).isPresent();
+        assertThat(dbJobTriggerService.cancelTriggerByQuery(MongoUtils.idEq("54e3deadbeefdeadbeef0001"))).isPresent();
 
         final JobTriggerDto cancelledTrigger = dbJobTriggerService.get(lockedTrigger.id()).orElseThrow(AssertionError::new);
 

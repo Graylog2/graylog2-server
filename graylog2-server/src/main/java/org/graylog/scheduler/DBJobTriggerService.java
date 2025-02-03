@@ -42,7 +42,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
-import org.mongojack.DBQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -341,20 +340,8 @@ public class DBJobTriggerService {
         return Ints.saturatedCast(collection.deleteMany(query).getDeletedCount());
     }
 
-    @Deprecated
-    public int deleteByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return deleteByQuery((Bson) query);
-    }
-
     public long countByQuery(Bson query) {
         return collection.countDocuments(query);
-    }
-
-    @Deprecated
-    public long countByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return countByQuery((Bson) query);
     }
 
     /**
@@ -551,12 +538,6 @@ public class DBJobTriggerService {
         return Optional.ofNullable(collection.findOneAndUpdate(query, update));
     }
 
-    @Deprecated
-    public Optional<JobTriggerDto> cancelTriggerByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return cancelTriggerByQuery((Bson) query);
-    }
-
     /**
      * Stream triggers by using the provided query. Use judiciously!
      *
@@ -566,14 +547,6 @@ public class DBJobTriggerService {
     @MustBeClosed
     public Stream<JobTriggerDto> streamByQuery(Bson query) {
         return stream(collection.find(query).sort(descending(FIELD_UPDATED_AT)));
-    }
-
-    @Deprecated
-    public List<JobTriggerDto> findByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        try (Stream<JobTriggerDto> stream = streamByQuery(query)) {
-            return stream.toList();
-        }
     }
 
     private record OverdueTrigger(@JsonProperty("_id") String type, @JsonProperty("count") long count) {}
