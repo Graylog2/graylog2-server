@@ -23,6 +23,7 @@ import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -72,8 +73,7 @@ public class MongoDbGrokPatternServiceTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         service = new MongoDbGrokPatternService(
-                mongodb.mongoConnection(),
-                mapperProvider,
+                new MongoCollections(mapperProvider, mongodb.mongoConnection()),
                 clusterEventBus);
     }
 

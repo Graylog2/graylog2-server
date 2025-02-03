@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { formatNumber as _formatNumber } from 'util/NumberFormatting';
+import type { Event } from 'components/events/events/types';
 
-const formatNumber = (value: number): string => _formatNumber(value, { maximumFractionDigits: 7 });
-
-export default formatNumber;
+export type RemainingBulkActionsProps = {
+  events: Event[];
+  completed: boolean;
+}

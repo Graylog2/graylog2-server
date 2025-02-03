@@ -43,6 +43,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 import type { EventDefinition } from '../event-definitions-types';
+import { isAggregationEventDefinition, isSystemEventDefinition, isSigmaEventDefinition } from '../event-definitions-types';
 
 type SigmaEventDefinitionConfig = EventDefinition['config'] & {
   sigma_rule_id: string,
@@ -93,18 +94,12 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
 
   const showActions = (): boolean => scopePermissions?.is_mutable;
 
-  const isSystemEventDefinition = (): boolean => eventDefinition?.config?.type === 'system-notifications-v1';
-
-  const isAggregationEventDefinition = (): boolean => eventDefinition?.config?.type === 'aggregation-v1';
-
-  const isSigmaEventDefinition = (): boolean => eventDefinition?.config?.type === 'sigma-v1';
-
   const getDeleteActionTitle = () => {
-    if (isSystemEventDefinition()) {
+    if (isSystemEventDefinition(eventDefinition)) {
       return 'System Event Definition cannot be deleted';
     }
 
-    if (isSigmaEventDefinition()) {
+    if (isSigmaEventDefinition(eventDefinition)) {
       return 'Sigma Rules must be deleted from the Sigma Rules page';
     }
 
@@ -232,7 +227,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   };
 
   const onEditEventDefinition = () => {
-    if (isSigmaEventDefinition()) {
+    if (isSigmaEventDefinition(eventDefinition)) {
       setShowSigmaModal(true);
     } else {
       navigate(Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id));
@@ -259,27 +254,27 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               Edit
             </MenuItem>
           </IfPermitted>
-          {!isSystemEventDefinition() && !isSigmaEventDefinition() && (
+          {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
             <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
           )}
           <MenuItem divider />
-          <MenuItem disabled={isSystemEventDefinition()}
-                    title={isSystemEventDefinition() ? 'System Event Definition cannot be disabled' : undefined}
-                    onClick={isSystemEventDefinition() ? undefined : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
+          <MenuItem disabled={isSystemEventDefinition(eventDefinition)}
+                    title={isSystemEventDefinition(eventDefinition) ? 'System Event Definition cannot be disabled' : undefined}
+                    onClick={isSystemEventDefinition(eventDefinition) ? undefined : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
             {isEnabled ? 'Disable' : 'Enable'}
           </MenuItem>
 
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
-              <DeleteMenuItem disabled={isSystemEventDefinition() || isSigmaEventDefinition()}
+              <DeleteMenuItem disabled={isSystemEventDefinition(eventDefinition) || isSigmaEventDefinition(eventDefinition)}
                               title={getDeleteActionTitle()}
-                              onClick={isSystemEventDefinition() || isSigmaEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
+                              onClick={isSystemEventDefinition(eventDefinition) || isSigmaEventDefinition(eventDefinition) ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
                               data-testid="delete-button" />
             </IfPermitted>
           )}
           {
-            isAggregationEventDefinition() && (
+            isAggregationEventDefinition(eventDefinition) && (
               <>
                 <MenuItem divider />
                 <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
