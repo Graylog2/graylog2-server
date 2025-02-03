@@ -27,6 +27,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
@@ -35,7 +36,6 @@ import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.streams.StreamService;
-import org.mongojack.DBQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,8 +107,7 @@ public class MongoIndexSetService implements IndexSetService {
      * {@inheritDoc}
      */
     @Override
-    public Optional<IndexSetConfig> findOne(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
+    public Optional<IndexSetConfig> findOne(Bson query) {
         return Optional.ofNullable(collection.find(query).first());
     }
 
@@ -126,8 +125,7 @@ public class MongoIndexSetService implements IndexSetService {
     }
 
     @Override
-    public List<IndexSetConfig> findMany(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
+    public List<IndexSetConfig> findMany(Bson query) {
         return ImmutableList.copyOf(collection.find(query).sort(Sorts.ascending(FIELD_TITLE)));
     }
 
