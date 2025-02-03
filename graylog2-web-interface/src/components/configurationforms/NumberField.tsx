@@ -18,7 +18,7 @@ import React from 'react';
 
 import Input from 'components/bootstrap/Input';
 import { getValueFromInput } from 'util/FormsUtils';
-import { optionalMarker } from 'components/configurationforms/FieldHelpers';
+import { optionableLabel } from 'components/configurationforms/FieldHelpers';
 
 import type { NumberField as NumberFieldType } from './types';
 
@@ -66,11 +66,9 @@ const NumberField = ({ autoFocus = false, field, onChange, title, typeName, valu
   const isRequired = !field.is_optional;
   const validationSpecs = validationSpec();
 
-  const label = <>{field.human_name} {optionalMarker(field)}</>;
-
   return (
     <Input id={`${typeName}-${title}`}
-           label={label}
+           label={optionableLabel(field)}
            type="number"
            name={`configuration[${title}]`}
            required={isRequired}
