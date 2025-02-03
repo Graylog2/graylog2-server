@@ -19,6 +19,7 @@ package org.graylog2.decorators;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -42,7 +43,7 @@ public class DecoratorServiceImplTest {
     public void setUp() {
         final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
         final MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapperProvider.get());
-        decoratorService = new DecoratorServiceImpl(mongodb.mongoConnection(), provider);
+        decoratorService = new DecoratorServiceImpl(new MongoCollections(provider, mongodb.mongoConnection()));
     }
 
     @Test
