@@ -14,8 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import numeral from 'numeral';
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-const formatNumber = (value: number): string => numeral(value).format('0,0.[0000000]');
+import PercentageField from './PercentageField';
 
-export default formatNumber;
+describe('PercentageField', () => {
+  it('does not show very small values as `NaN%`', async () => {
+    render(<PercentageField value={2.744906525058769E-9} />);
+    await screen.findByText('0.00000027%');
+  });
+});

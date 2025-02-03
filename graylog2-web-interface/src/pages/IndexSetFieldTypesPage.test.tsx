@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
-import { useQueryParam } from 'use-query-params';
 
+import { useQueryParam } from 'routing/QueryParams';
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
@@ -53,8 +53,8 @@ jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 

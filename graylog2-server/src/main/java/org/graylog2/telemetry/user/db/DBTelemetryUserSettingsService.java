@@ -16,13 +16,11 @@
  */
 package org.graylog2.telemetry.user.db;
 
-import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.mongojack.DBQuery;
-import org.mongojack.JacksonDBCollection;
-
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 
 import java.util.Optional;
 
@@ -32,26 +30,24 @@ public class DBTelemetryUserSettingsService {
 
     public static final String COLLECTION_NAME = "telemetry_user_settings";
 
-    private final JacksonDBCollection<TelemetryUserSettingsDto, ObjectId> db;
+    private final MongoCollection<TelemetryUserSettingsDto> collection;
+    private final MongoUtils<TelemetryUserSettingsDto> mongoUtils;
 
     @Inject
-    public DBTelemetryUserSettingsService(MongoConnection mongoConnection,
-                                          MongoJackObjectMapperProvider mapper) {
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                TelemetryUserSettingsDto.class,
-                ObjectId.class,
-                mapper.get());
+    public DBTelemetryUserSettingsService(MongoCollections mongoCollections) {
+        collection = mongoCollections.collection(COLLECTION_NAME, TelemetryUserSettingsDto.class);
+        mongoUtils = mongoCollections.utils(collection);
     }
 
     public Optional<TelemetryUserSettingsDto> findByUserId(String userId) {
-        return Optional.ofNullable(db.findOne(DBQuery.is(FIELD_USER_ID, userId)));
+        return Optional.ofNullable(collection.find(Filters.eq(FIELD_USER_ID, userId)).first());
     }
 
     public void save(TelemetryUserSettingsDto dto) {
-        db.save(dto);
+        mongoUtils.save(dto);
     }
 
     public void delete(String userId) {
-        db.remove(DBQuery.is(FIELD_USER_ID, userId));
+        collection.deleteMany(Filters.eq(FIELD_USER_ID, userId));
     }
 }

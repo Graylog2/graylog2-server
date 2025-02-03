@@ -14,22 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import { kebabCase } from 'lodash';
+import { useQuery } from '@tanstack/react-query';
 
-export default (name) => {
-  const MockComponent = ({ children, ...rest }) => React.createElement(kebabCase(name), rest, children);
+import { SystemContentPacks } from '@graylog/server-api';
 
-  MockComponent.propTypes = {
-    children: PropTypes.node,
-  };
-
-  MockComponent.defaultProps = {
-    children: null,
-  };
-
-  MockComponent.displayName = name;
-
-  return MockComponent;
-};
+const useContentPackInstallations = (id: string) => useQuery(
+  ['content-packs', 'installations', id],
+  () => SystemContentPacks.listContentPackInstallationsById(id),
+);
+export default useContentPackInstallations;
