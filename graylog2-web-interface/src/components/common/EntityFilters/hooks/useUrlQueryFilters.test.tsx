@@ -17,25 +17,25 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { OrderedMap } from 'immutable';
 import * as React from 'react';
-import { useQueryParam, QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { MemoryRouter } from 'react-router-dom';
 
+import { useQueryParam } from 'routing/QueryParams';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import { asMock } from 'helpers/mocking';
 
 import useUrlQueryFilters from './useUrlQueryFilters';
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 
 describe('useUrlQueryFilters', () => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <MemoryRouter>
-      <QueryParamProvider adapter={ReactRouter6Adapter}>
+      <DefaultQueryParamProvider>
         {children}
-      </QueryParamProvider>
+      </DefaultQueryParamProvider>
     </MemoryRouter>
   );
 

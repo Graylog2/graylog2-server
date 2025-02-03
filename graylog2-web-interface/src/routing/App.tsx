@@ -18,8 +18,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import { Outlet } from 'react-router-dom';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
-import { QueryParamProvider } from 'use-query-params';
 
 import { ScratchpadProvider } from 'contexts/ScratchpadProvider';
 import { Icon, Spinner } from 'components/common';
@@ -34,6 +32,7 @@ import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import PageContextProviders from 'components/page/contexts/PageContextProviders';
 import { singleton } from 'logic/singleton';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const AppLayout = styled.div`
   display: flex;
@@ -66,7 +65,7 @@ const ScrollToHint = styled.div(({ theme }) => css`
 `);
 
 const App = () => (
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
+  <DefaultQueryParamProvider>
     <CurrentUserContext.Consumer>
       {(currentUser) => {
         if (!currentUser) {
@@ -103,7 +102,7 @@ const App = () => (
         );
       }}
     </CurrentUserContext.Consumer>
-  </QueryParamProvider>
+  </DefaultQueryParamProvider>
 );
 
 export default singleton('components.App', () => App);

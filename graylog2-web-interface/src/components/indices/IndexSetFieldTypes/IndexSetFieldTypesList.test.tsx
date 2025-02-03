@@ -16,9 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
-import { useQueryParam, QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
+import { useQueryParam } from 'routing/QueryParams';
 import { MockStore } from 'helpers/mocking';
 import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
@@ -40,6 +39,7 @@ import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/usePr
 import useIndexProfileWithMappingsByField
   from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const getData = (list = [defaultField]) => (
   {
@@ -52,11 +52,11 @@ const getData = (list = [defaultField]) => (
 );
 
 const renderIndexSetFieldTypesList = () => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
+  <DefaultQueryParamProvider>
     <TestStoreProvider>
       <IndexSetFieldTypesList />
     </TestStoreProvider>,
-  </QueryParamProvider>,
+  </DefaultQueryParamProvider>,
 );
 
 jest.mock('stores/indices/IndexSetsStore', () => ({
@@ -80,8 +80,8 @@ jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfile');
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField');
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions');
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 

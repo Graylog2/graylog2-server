@@ -51,6 +51,7 @@ import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import useParameters from 'views/hooks/useParameters';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import useViewTitle from 'views/hooks/useViewTitle';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
@@ -84,10 +85,11 @@ const SearchArea = styled(PageContentLayout)(() => {
 `;
 });
 
-const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results'>) => {
+const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results' | 'title'>) => {
   const results = useAppSelector(selectCurrentQueryResults);
+  const title = useViewTitle();
 
-  return <Sidebar results={results} {...props} />;
+  return <Sidebar results={results} title={title} {...props} />;
 };
 
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -133,9 +135,10 @@ type Props = {
 const Search = ({ forceSideBarPinned = false }: Props) => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
-  const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar } = useSearchPageLayout();
+  const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar, synchronizeUrl = true } = useSearchPageLayout();
   const InfoBar = infoBar?.component;
   const SearchAreaContainer = searchAreaContainer?.component;
+  const SynchronizationComponent = synchronizeUrl ? SynchronizeUrl : React.Fragment;
 
   useEffect(() => {
     refreshSearch();
@@ -149,7 +152,7 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
 
   return (
     <>
-      <SynchronizeUrl />
+      <SynchronizationComponent />
       <ExternalValueActionsProvider>
         <SearchExplainContextProvider>
           <WidgetFocusProvider>

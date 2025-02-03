@@ -51,6 +51,11 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
     }
 
     @Override
+    default boolean withInputs() {
+        return false;
+    }
+
+    @Override
     default Set<ServerStatus.Capability> withCapabilities() {
         return Set.of(ServerStatus.Capability.SERVER);
     }

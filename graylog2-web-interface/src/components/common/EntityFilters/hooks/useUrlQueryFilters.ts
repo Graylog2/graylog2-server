@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQueryParam, ArrayParam } from 'use-query-params';
 import { useMemo, useCallback } from 'react';
 import { OrderedMap } from 'immutable';
 
+import { useQueryParam, ArrayParam } from 'routing/QueryParams';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 const useUrlQueryFilters = (): [UrlQueryFilters, (filters: UrlQueryFilters) => void] => {

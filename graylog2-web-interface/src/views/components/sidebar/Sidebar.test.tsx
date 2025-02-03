@@ -80,7 +80,7 @@ describe('<Sidebar />', () => {
 
   const renderSidebar = () => render(
     <TestStoreProvider>
-      <Sidebar results={queryResult}>
+      <Sidebar results={queryResult} title="Sidebar Title">
         <TestComponent />
       </Sidebar>
     </TestStoreProvider>,
@@ -227,7 +227,7 @@ describe('<Sidebar />', () => {
 
     await screen.findByText('Execution');
 
-    fireEvent.click(await screen.findByText('Query Title'));
+    fireEvent.click(await screen.findByText('Sidebar Title'));
 
     expect(screen.queryByText('Execution')).toBeNull();
   });

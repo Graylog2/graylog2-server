@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.configuration;
 
-import org.graylog.datanode.OpensearchDistribution;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 
 /**
@@ -27,7 +26,6 @@ public record DatanodeConfiguration(
         OpensearchDistributionProvider opensearchDistributionProvider,
         DatanodeDirectories datanodeDirectories,
         int processLogsBufferSize,
-        String opensearchHeap,
         IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider
 ) {
 }

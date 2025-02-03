@@ -24,22 +24,24 @@ import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -60,12 +62,14 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
     private static final SecureRandom RANDOM = new SecureRandom();
+    private final PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
     private final AccessTokenCipher cipher;
     private LoadingCache<String, DateTime> lastAccessCache;
 
     @Inject
-    public AccessTokenServiceImpl(MongoConnection mongoConnection, AccessTokenCipher accessTokenCipher) {
+    public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService, AccessTokenCipher accessTokenCipher) {
         super(mongoConnection);
+        this.paginatedAccessTokenEntityService = paginatedAccessTokenEntityService;
         this.cipher = accessTokenCipher;
         setLastAccessCache(30, TimeUnit.SECONDS);
 
@@ -135,7 +139,11 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             accessToken = new AccessTokenImpl(fields);
             try {
                 id = saveWithoutValidation(encrypt(accessToken));
-            } catch (DuplicateKeyException ignore) {
+            } catch (MongoException e) {
+                // ignore duplicate key errors
+                if (!MongoUtils.isDuplicateKeyError(e)) {
+                    throw e;
+                }
             }
         } while (iterations++ < 10 && id == null);
         if (id == null) {
@@ -214,5 +222,10 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
                         return now;
                     }
                 });
+    }
+
+    @Override
+    public PaginatedList<AccessTokenEntity> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, SortOrder order) {
+        return this.paginatedAccessTokenEntityService.findPaginated(searchQuery, page, perPage, sortField, order);
     }
 }

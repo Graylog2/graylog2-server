@@ -40,7 +40,6 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
                 opensearchDistributionProvider,
                 DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
                 localConfiguration.getProcessLogsBufferSize(),
-                localConfiguration.getOpensearchHeap(),
                 jwtTokenProvider
         );
     }
