@@ -63,6 +63,11 @@ public abstract class SystemNotificationEventProcessorConfig implements EventPro
     }
 
     @Override
+    public boolean isContentPackExportable() {
+        return false;
+    }
+
+    @Override
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
     }
 }
