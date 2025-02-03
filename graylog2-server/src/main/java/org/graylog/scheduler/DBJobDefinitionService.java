@@ -26,7 +26,6 @@ import org.bson.conversions.Bson;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
-import org.mongojack.DBQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -76,12 +75,6 @@ public class DBJobDefinitionService {
     private static Bson buildConfigFieldQuery(String configField, Object value) {
         final String field = String.format(Locale.US, "%s.%s", JobDefinitionDto.FIELD_CONFIG, configField);
         return Filters.eq(field, value);
-    }
-
-    @Deprecated
-    public List<JobDefinitionDto> getByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return getByQuery((Bson) query);
     }
 
     public List<JobDefinitionDto> getByQuery(Bson query) {
