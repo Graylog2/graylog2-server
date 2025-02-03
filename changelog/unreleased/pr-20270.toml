@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix various issues in AMQP input"
+
+issues = [""]
+pulls = ["20270"]
