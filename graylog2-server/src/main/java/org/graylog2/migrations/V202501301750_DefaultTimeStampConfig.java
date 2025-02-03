@@ -24,7 +24,6 @@ import org.graylog2.shared.buffers.processors.TimeStampConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
 
 /**
@@ -50,18 +49,17 @@ public class V202501301750_DefaultTimeStampConfig extends Migration {
 
     @Override
     public void upgrade() {
-        // Do not run for existing installations pre-7.0.
+        // Do not apply to existing installations pre-7.0.
         if (!isFreshInstallation && IS_BEFORE_VERSION_7_0) {
             return;
         }
-        // Do not run again if the configuration can already be found in the database.
+        // Do not overwrite existing config.
         if (clusterConfigService.get(TimeStampConfig.class) != null) {
             return;
         }
 
-        clusterConfigService.write(new TimeStampConfig(Duration.ofDays(2)));
-
-        LOG.debug("Successfully set timestamp handling default values.");
+        clusterConfigService.write(TimeStampConfig.DEFAULT);
+        LOG.debug("Successfully set timestamp handling config to {}", TimeStampConfig.DEFAULT);
     }
 
 }

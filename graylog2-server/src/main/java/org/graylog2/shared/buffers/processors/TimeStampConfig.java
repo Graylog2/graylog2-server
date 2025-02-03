@@ -21,4 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Duration;
 
 public record TimeStampConfig(@JsonProperty("grace_period") Duration gracePeriod) {
+    public static final TimeStampConfig NONE = new TimeStampConfig(Duration.ofSeconds(0));
+    public static final TimeStampConfig DEFAULT = new TimeStampConfig(Duration.ofDays(2));
 }

@@ -19,11 +19,14 @@ package org.graylog2.shared.buffers.processors;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import jakarta.inject.Provider;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.buffers.OutputBuffer;
+import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
@@ -44,15 +47,12 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.base.Suppliers.memoizeWithExpiration;
 
 public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
-    private static final Duration CACHE_DURATION = Duration.ofSeconds(30);
 
     private final Meter incomingMessages;
     private final Timer processTime;
@@ -66,9 +66,10 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
     private final FailureSubmissionService failureSubmissionService;
-    private final Supplier<Duration> timestampGracePeriod;
     private final ClusterConfigService clusterConfigService;
+
     private volatile Message currentMessage;
+    private volatile Duration cachedGracePeriod = null;
 
     @AssistedInject
     public ProcessBufferProcessor(MetricRegistry metricRegistry,
@@ -80,7 +81,8 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                                   @DefaultStream Provider<Stream> defaultStreamProvider,
                                   FailureSubmissionService failureSubmissionService,
                                   StreamMetrics streamMetrics,
-                                  ClusterConfigService clusterConfigService) {
+                                  ClusterConfigService clusterConfigService,
+                                  final EventBus eventBus) {
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
         this.processingStatusRecorder = processingStatusRecorder;
@@ -96,7 +98,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         this.streamMetrics = streamMetrics;
         currentMessage = null;
 
-        this.timestampGracePeriod = memoizeWithExpiration(() -> clusterConfigService.get(TimeStampConfig.class).gracePeriod(), CACHE_DURATION);
+        eventBus.register(this);
     }
 
     @Override
@@ -175,7 +177,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
 
             message.getStreams().forEach(s -> streamMetrics.markIncomingMeter(s.getId()));
             message.ensureValidTimestamp();
-            message.normalizeTimestamp(timestampGracePeriod.get());
+            message.normalizeTimestamp(getTimeStampGracePeriod());
 
             // If a message is received via the Cluster-to-Cluster Forwarder, it already has this field set
             if (!message.hasField(Message.FIELD_GL2_MESSAGE_ID) || isNullOrEmpty(message.getFieldAs(String.class, Message.FIELD_GL2_MESSAGE_ID))) {
@@ -191,6 +193,21 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             if (failureSubmissionService.submitProcessingErrors(message)) {
                 outputBuffer.insertBlocking(message);
             }
+        }
+    }
+
+    public Duration getTimeStampGracePeriod() {
+        if (cachedGracePeriod == null) {
+            cachedGracePeriod = clusterConfigService.getOrDefault(TimeStampConfig.class, TimeStampConfig.NONE).gracePeriod();
+        }
+        return cachedGracePeriod;
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleGracePeriodUpdated(ClusterConfigChangedEvent event) {
+        if (TimeStampConfig.class.getCanonicalName().equals(event.type())) {
+            cachedGracePeriod = null;
         }
     }
 

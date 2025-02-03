@@ -42,6 +42,7 @@ import java.time.Duration;
 import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 class MessageTimestampTest {
@@ -112,6 +113,7 @@ class MessageTimestampTest {
 
         ClusterConfigService clusterConfigService = Mockito.mock(ClusterConfigService.class);
         when(clusterConfigService.get(TimeStampConfig.class)).thenReturn(new TimeStampConfig(gracePeriod));
+        when(clusterConfigService.getOrDefault(eq(TimeStampConfig.class), Mockito.any())).thenReturn(new TimeStampConfig(gracePeriod));
 
         return new ProcessBufferProcessor(
                 metricRegistry,
@@ -123,7 +125,8 @@ class MessageTimestampTest {
                 defaultStreamProvider,
                 Mockito.mock(FailureSubmissionService.class),
                 streamMetrics,
-                clusterConfigService
+                clusterConfigService,
+                Mockito.mock(EventBus.class)
         );
     }
 }
