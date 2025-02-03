@@ -17,6 +17,7 @@
 package org.graylog2.inputs.codecs;
 
 import com.eaio.uuid.UUID;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,6 +62,7 @@ public class GelfCodec extends AbstractCodec {
     private final GelfChunkAggregator aggregator;
     private final MessageFactory messageFactory;
     private final ObjectMapper objectMapper;
+    private final JsonFactory jsonFactory;
     private final long decompressSizeLimit;
 
     @Inject
@@ -71,6 +73,7 @@ public class GelfCodec extends AbstractCodec {
         this.objectMapper = new ObjectMapper().enable(
                 JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS,
                 JsonParser.Feature.ALLOW_TRAILING_COMMA);
+        this.jsonFactory = objectMapper.getFactory();
         this.decompressSizeLimit = configuration.getInt(CK_DECOMPRESS_SIZE_LIMIT, DEFAULT_DECOMPRESS_SIZE_LIMIT);
     }
 
@@ -131,10 +134,19 @@ public class GelfCodec extends AbstractCodec {
         final JsonNode node;
 
         try {
-            node = objectMapper.readTree(json);
-            if (node == null) {
+            final JsonParser parser = jsonFactory.createParser(json);
+            node = objectMapper.readTree(parser);
+
+            if (parser.nextToken() != null) {
+                throw new IllegalArgumentException("Extra unexpected JSON detected after first valid JSON. Please enable bulk Receiving");
+            }
+
+            if (node.isEmpty() || node == null) {
                 throw new IOException("null result");
             }
+
+        } catch (final IllegalArgumentException illegalArgumentException) {
+            throw InputProcessingException.create(illegalArgumentException.getMessage(), illegalArgumentException, rawMessage, json);
         } catch (final Exception e) {
             throw InputProcessingException.create("JSON is null/could not be parsed (invalid JSON)",
                     e, rawMessage, json);

@@ -409,4 +409,30 @@ public class GelfCodecTest {
         assertThat(message).isNotNull();
         assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2017-07-21T14:23:00.661Z"));
     }
+
+    @Test
+    public void decodeFailsWhenMultipleMessages() {
+        final String json = "{\"short_message\":\"Bulk message 1\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
+                "\n" +
+                "{\"short_message\":\"Bulk message 2\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
+                "\n" +
+                "{\"short_message\":\"Bulk message 3\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
+                "\n" +
+                "{\"short_message\":\"Bulk message 4\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
+                "\n" +
+                "{\"short_message\":\"Bulk message 5\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageContaining("Extra unexpected JSON detected after first valid JSON. Please enable bulk Receiving");
+    }
+
+    @Test
+    public void decodeFailsOnEmptyNode() {
+        final RawMessage rawMessage = new RawMessage("null".getBytes(StandardCharsets.UTF_8));
+        assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageContaining("JSON is null/could not be parsed (invalid JSON)");
+    }
 }
