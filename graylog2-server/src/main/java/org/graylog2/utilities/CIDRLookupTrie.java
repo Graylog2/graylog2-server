@@ -32,8 +32,8 @@ public class CIDRLookupTrie {
         String rangeName = null;
         // Whether the range is an IPv4 or IPv6 CIDR range, only matters for nodes representing the end of a range.
         boolean rangeIsIPv6 = false;
-        // Time to live in millis for the node
-        long ttl = 0L;
+        // Time in millis after which the node is considered expired
+        long expireAfter = 0L;
     }
 
     private final TrieNode root = new TrieNode();
@@ -47,8 +47,9 @@ public class CIDRLookupTrie {
      *
      * @param cidr properly formatted CIDR address (must include '/rangePrefix' even if it is a single address
      * @param rangeName the name of the CIDR range
+     * @param expireAfter epoch time in millis after which the CIDR should be expired
      */
-    public void insertCIDR(String cidr, String rangeName, long ttlMillis) {
+    public void insertCIDR(String cidr, String rangeName, long expireAfter) {
         final String[] parts = cidr.split("/");
         final String ip = parts[0];
         final int prefixLength;
@@ -72,7 +73,7 @@ public class CIDRLookupTrie {
 
         currentNode.rangeName = rangeName;
         currentNode.rangeIsIPv6 = ip.contains(":");
-        currentNode.ttl = ttlMillis;
+        currentNode.expireAfter = expireAfter;
     }
 
     public String longestPrefixRangeLookup(String ip) {
@@ -84,7 +85,7 @@ public class CIDRLookupTrie {
      * exist.
      *
      * @param ip IP address to check against the collection of ranges
-     * @param lookupTimeMillis time lookup was performed in milliseconds or 0 if TTL is not a concern
+     * @param lookupTimeMillis time lookup was performed in epoch time milliseconds or 0 if node expiry is not a concern
      * @return the name of the range with the longest prefix that contains the IP if it exists, null otherwise
      */
     public String longestPrefixRangeLookupWithTtl(String ip, long lookupTimeMillis) {
@@ -104,7 +105,7 @@ public class CIDRLookupTrie {
 
             // Current node has a range name, is the same protocol, and TTL is either not a concern or is valid.
             if (currentNode.rangeName != null && currentNode.rangeIsIPv6 == ipIsIPv6
-                    && (lookupTimeMillis == 0L || currentNode.ttl == 0 || lookupTimeMillis <= currentNode.ttl)) {
+                    && (lookupTimeMillis == 0L || currentNode.expireAfter == 0 || lookupTimeMillis <= currentNode.expireAfter)) {
                 longestMatchRangeName = currentNode.rangeName;
             }
         }
@@ -135,7 +136,7 @@ public class CIDRLookupTrie {
         }
 
         // Determine if this node has expired
-        boolean nodeExpired = node.ttl > 0L && node.ttl < now;
+        boolean nodeExpired = node.expireAfter > 0L && node.expireAfter < now;
         // Recursively cleanup child nodes
         boolean leftExpired = cleanupNode(node.children[0], now);
         boolean rightExpired = cleanupNode(node.children[1], now);
