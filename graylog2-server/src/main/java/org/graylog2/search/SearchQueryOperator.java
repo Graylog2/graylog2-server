@@ -18,14 +18,12 @@ package org.graylog2.search;
 
 import com.mongodb.client.model.Filters;
 import org.bson.conversions.Bson;
-import org.mongojack.DBQuery;
 
 import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 public abstract class SearchQueryOperator {
-    public abstract DBQuery.Query buildQuery(String key, Object value);
     public abstract Bson buildBson(String key, Object value);
 
     @Override
@@ -35,22 +33,12 @@ public abstract class SearchQueryOperator {
 
     public static class Equals extends SearchQueryOperator {
         @Override
-        public DBQuery.Query buildQuery(String key, Object value) {
-            return DBQuery.is(key, value);
-        }
-
-        @Override
         public Bson buildBson(String key, Object value) {
             return Filters.eq(key, value);
         }
     }
 
     public static class Regexp extends SearchQueryOperator {
-        @Override
-        public DBQuery.Query buildQuery(String key, Object value) {
-            return DBQuery.regex(key, Pattern.compile(Pattern.quote(value.toString()), CASE_INSENSITIVE));
-        }
-
         @Override
         public Bson buildBson(String key, Object value) {
             return Filters.regex(key, Pattern.compile(Pattern.quote(value.toString()), CASE_INSENSITIVE));
@@ -59,22 +47,12 @@ public abstract class SearchQueryOperator {
 
     public static class Greater extends SearchQueryOperator {
         @Override
-        public DBQuery.Query buildQuery(String key, Object value) {
-            return DBQuery.greaterThan(key, value);
-        }
-
-        @Override
         public Bson buildBson(String key, Object value) {
             return Filters.gt(key, value);
         }
     }
 
     public static class GreaterEquals extends SearchQueryOperator {
-        @Override
-        public DBQuery.Query buildQuery(String key, Object value) {
-            return DBQuery.greaterThanEquals(key, value);
-        }
-
         @Override
         public Bson buildBson(String key, Object value) {
             return Filters.gte(key, value);
@@ -83,22 +61,12 @@ public abstract class SearchQueryOperator {
 
     public static class Less extends SearchQueryOperator {
         @Override
-        public DBQuery.Query buildQuery(String key, Object value) {
-            return DBQuery.lessThan(key, value);
-        }
-
-        @Override
         public Bson buildBson(String key, Object value) {
             return Filters.lt(key, value);
         }
     }
 
     public static class LessEquals extends SearchQueryOperator {
-        @Override
-        public DBQuery.Query buildQuery(String key, Object value) {
-            return DBQuery.lessThanEquals(key, value);
-        }
-
         @Override
         public Bson buildBson(String key, Object value) {
             return Filters.lte(key, value);

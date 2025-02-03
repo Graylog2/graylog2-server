@@ -14,11 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/**
- * This package contains a compatibility layer to support old code using the Mongojack 2.x API. It is destined for
- * removal as soon as all code has been migrated to use the MongoDB driver API directly.
- * <p>
- * Instead of the classes from this package, use {@link org.graylog2.database.MongoCollections} as an entrypoint for
- * interacting with MongoDB.
- */
-package org.graylog2.database.jackson.legacy;
+import * as React from 'react';
+import kebabCase from 'lodash/kebabCase';
+
+export default (name: string) => {
+  const MockComponent = ({ children, ...rest }) => React.createElement(kebabCase(name), rest, children);
+
+  MockComponent.displayName = name;
+
+  return MockComponent;
+};

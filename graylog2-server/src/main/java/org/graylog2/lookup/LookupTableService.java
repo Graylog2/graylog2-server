@@ -23,6 +23,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Service;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -43,11 +46,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -84,6 +82,7 @@ public class LookupTableService extends AbstractIdleService {
     private final Map<String, LookupDataAdapter.Factory> adapterFactories;
     private final Map<String, LookupDataAdapter.Factory2> adapterFactories2;
     private final Map<String, LookupDataAdapter.Factory2> systemAdapterFactories;
+    private final Map<String, LookupCache.Factory> systemCacheFactories;
     private final ScheduledExecutorService scheduler;
     private final EventBus eventBus;
     private final LookupDataAdapterRefreshService adapterRefreshService;
@@ -102,6 +101,7 @@ public class LookupTableService extends AbstractIdleService {
                               Map<String, LookupDataAdapter.Factory> adapterFactories,
                               Map<String, LookupDataAdapter.Factory2> adapterFactories2,
                               @SystemEntity Map<String, LookupDataAdapter.Factory2> systemAdapterFactories,
+                              @SystemEntity Map<String, LookupCache.Factory> systemCacheFactories,
                               @Named("daemonScheduler") ScheduledExecutorService scheduler,
                               EventBus eventBus) {
         this.configService = configService;
@@ -109,6 +109,7 @@ public class LookupTableService extends AbstractIdleService {
         this.adapterFactories = adapterFactories;
         this.adapterFactories2 = adapterFactories2;
         this.systemAdapterFactories = systemAdapterFactories;
+        this.systemCacheFactories = systemCacheFactories;
         this.scheduler = scheduler;
         this.eventBus = eventBus;
         this.adapterRefreshService = new LookupDataAdapterRefreshService(scheduler, liveTables);
@@ -451,12 +452,17 @@ public class LookupTableService extends AbstractIdleService {
     private LookupCache createCache(CacheDto dto) {
         try {
             final LookupCache.Factory<? extends LookupCache> factory = cacheFactories.get(dto.config().type());
-            if (factory == null) {
+            final LookupCache.Factory<? extends LookupCache> systemFactory = systemCacheFactories.get(dto.config().type());
+            final LookupCache cache;
+            if (factory != null) {
+                cache = factory.create(dto.id(), dto.name(), dto.config());
+            } else if (systemFactory != null) {
+                cache = systemFactory.create(dto.id(), dto.name(), dto.config());
+            } else {
                 LOG.warn("Unable to load cache {} of type {}, missing a factory. Is a required plugin missing?", dto.name(), dto.config().type());
                 // TODO system notification
                 return null;
             }
-            final LookupCache cache = factory.create(dto.id(), dto.name(), dto.config());
             cache.addListener(new LoggingServiceListener(
                             "Cache",
                             String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(cache)),
