@@ -24,6 +24,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentstream.db.DBContentStreamUserSettingsService;
 import org.graylog2.contentstream.rest.ContentStreamService;
 import org.graylog2.contentstream.rest.ContentStreamSettings;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.junit.Before;
@@ -63,7 +64,8 @@ public class ContentStreamServiceWithDbTest {
     public void setUp() {
         MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
         contentStreamService = new ContentStreamService(
-                new DBContentStreamUserSettingsService(mongodb.mongoConnection(), mongoJackObjectMapperProvider),
+                new DBContentStreamUserSettingsService(
+                        new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection())),
                 contentStreamFeedTags,
                 eventBus
         );
