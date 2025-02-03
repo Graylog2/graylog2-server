@@ -17,10 +17,8 @@
 package org.graylog2.indexer.ranges;
 
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.joda.time.DateTime;
-import org.mongojack.WriteResult;
 
 import java.util.SortedSet;
 
@@ -33,7 +31,7 @@ public interface IndexRangeService {
 
     SortedSet<IndexRange> find(Bson query);
 
-    WriteResult<MongoIndexRange, ObjectId> save(IndexRange indexRange);
+    void save(IndexRange indexRange);
 
     boolean renameIndex(String from, String to);
 

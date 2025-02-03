@@ -88,6 +88,7 @@ export type BlockFieldDict = {
 export type BlockDict = {
   name: string,
   pure: boolean,
+  deprecated: boolean,
   return_type: RuleBuilderTypes,
   params: Array<BlockFieldDict>,
   description: string | null,

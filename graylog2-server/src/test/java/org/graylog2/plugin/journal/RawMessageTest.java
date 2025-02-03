@@ -20,7 +20,6 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -29,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class RawMessageTest {
     @Test
-    public void minimalEncodeDecode() throws IOException {
+    public void minimalEncodeDecode() {
         final RawMessage rawMessage = new RawMessage("testmessage".getBytes(StandardCharsets.UTF_8));
         rawMessage.addSourceNode("inputid", new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"));
         rawMessage.setCodecName("raw");

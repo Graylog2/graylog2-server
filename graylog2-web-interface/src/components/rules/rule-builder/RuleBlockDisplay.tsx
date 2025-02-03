@@ -22,7 +22,7 @@ import { IconButton } from 'components/common';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
-import type { BlockType, RuleBlock } from './types';
+import type { BlockDict, BlockType, RuleBlock } from './types';
 import { RuleBuilderTypes } from './types';
 import { useRuleBuilder } from './RuleBuilderContext';
 
@@ -35,7 +35,7 @@ type Props = {
   onDuplicate: () => void,
   onInsertAbove: () => void,
   onInsertBelow: () => void,
-  returnType?: RuleBuilderTypes,
+  selectedBlockDict?: BlockDict,
   type: BlockType,
 }
 
@@ -89,7 +89,11 @@ const EditIconButton = styled(IconButton)(({ theme }) => css`
   margin-right: ${theme.spacings.xs};
 `);
 
-const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType, type } : Props) => {
+const DeprecatedLabel = styled(Label)`
+  padding: 2px 8px;
+`;
+
+const RuleBlockDisplay = ({ block = undefined, negatable = false, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, selectedBlockDict = undefined, type } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
@@ -108,7 +112,7 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
     }
   };
 
-  const returnTypeLabel = readableReturnType(returnType);
+  const returnTypeLabel = readableReturnType(selectedBlockDict?.return_type);
 
   const highlightedRuleTitle = (termToHighlight: string, title: string = '') => {
     const parts = title.split(/('\$.*?')/);
@@ -122,13 +126,10 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
     });
 
     return (partsWithHighlight.map((item, index) => (
-
-      (
-
-        <React.Fragment key={index}>
-          {item}
-        </React.Fragment>
-      )
+      // eslint-disable-next-line react/no-array-index-key
+      <React.Fragment key={index}>
+        {item}
+      </React.Fragment>
     )));
   };
 
@@ -147,6 +148,9 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
               {highlightedOutput ? (
                 highlightedRuleTitle(highlightedOutput, block?.step_title)
               ) : block?.step_title}
+              {selectedBlockDict?.deprecated && (
+                <span>&nbsp;<DeprecatedLabel bsStyle="warning" bsSize="xs">Deprecated</DeprecatedLabel></span>
+              )}
               {block?.errors?.length > 0 && (
                 <ErrorMessage title={errorMessage}>{errorMessage}</ErrorMessage>
               )}

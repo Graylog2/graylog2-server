@@ -41,7 +41,7 @@ const DescriptionCol = styled(Col)(({ theme }) => css`
 `);
 
 const StyledHeading = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
+  margin-bottom: ${theme.spacings.sm};
 `);
 
 const ExistingStreamCol = styled(Col)(({ theme }) => css`
@@ -73,6 +73,15 @@ const StyledList = styled.ul`
   list-style-type: disc;
   padding-left: 20px;
 `;
+
+const StyledLabel = styled.label(({ theme }) => css`
+  font-weight: normal;
+  line-height: 1.1;
+  margin-bottom: ${theme.spacings.sm};
+  display: inline-block;
+  font-size: ${theme.fonts.size.h3};
+  background: none;
+`);
 
 export type RoutingStepData = {
   streamId?: string,
@@ -263,7 +272,7 @@ const SetupRoutingStep = () => {
           <>
             <Row>
               <DescriptionCol md={12}>
-                <StyledHeading>Route to an existing Stream</StyledHeading>
+                <StyledLabel>Choose an existing Stream</StyledLabel>
                 <StyledList>
                   <li>Route messages from this input to an existing stream is selected.</li>
                   <li>Pipeline Rules will be created when the <strong>Finish & Start Input</strong> button is pressed.</li>
