@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Fix when in Event definition (dark mode) error message is hard to read"
+message = "Improve readability of filter preview error message in event definition wizard (dark mode)."
 
 issues = ["Graylog2/graylog-plugin-enterprise#9336"]
 pulls = ["21376"]
