@@ -19,7 +19,9 @@ package org.graylog2.migrations;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.MongoException;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
@@ -42,7 +44,6 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,9 +132,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void checkIndexPrefixConflicts(String indexPrefix, String configKey) {
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.notEquals(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
-                DBQuery.is(FIELD_INDEX_PREFIX, indexPrefix)
+        final Bson query = Filters.and(
+                Filters.ne(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
+                Filters.eq(FIELD_INDEX_PREFIX, indexPrefix)
         );
 
         if (indexSetService.findOne(query).isPresent()) {
@@ -144,9 +145,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private Optional<IndexSetConfig> getEventsIndexSetConfig(String indexPrefix) {
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.is(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
-                DBQuery.is(FIELD_INDEX_PREFIX, indexPrefix)
+        final Bson query = Filters.and(
+                Filters.eq(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
+                Filters.eq(FIELD_INDEX_PREFIX, indexPrefix)
         );
         return indexSetService.findOne(query);
     }

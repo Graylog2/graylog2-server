@@ -29,6 +29,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.WriteResult;
+import com.mongodb.client.model.Projections;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
@@ -50,7 +51,6 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.streams.events.StreamDeletedEvent;
 import org.graylog2.streams.events.StreamsChangedEvent;
-import org.mongojack.DBProjection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -322,9 +322,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     @Override
     public Set<String> mapCategoriesToIds(Collection<String> categories) {
         final DBObject query = QueryBuilder.start(StreamImpl.FIELD_CATEGORIES).in(categories).get();
-        final DBObject onlyIdField = DBProjection.include(FIELD_ID);
-        try (var cursor = collection(StreamImpl.class).find(query, onlyIdField);
-             var stream = StreamSupport.stream(cursor.spliterator(), false)) {
+        final DBObject onlyIdField = new BasicDBObject(Projections.include(FIELD_ID).toBsonDocument());
+        try (var cursor = collection(StreamImpl.class).find(query, onlyIdField); var stream = StreamSupport.stream(cursor.spliterator(), false)) {
             return stream.map(s -> s.get(FIELD_ID).toString()).collect(Collectors.toSet());
         }
     }
@@ -340,7 +339,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         final DBObject query = QueryBuilder.start(StreamImpl.FIELD_ID).in(objectIds).get();
-        final DBObject onlyIndexSetIdField = DBProjection.include(FIELD_INDEX_SET_ID);
+        final DBObject onlyIndexSetIdField = new BasicDBObject(Projections.include(FIELD_INDEX_SET_ID).toBsonDocument());
         Set<String> indexSets = StreamSupport.stream(collection(StreamImpl.class).find(query, onlyIndexSetIdField).spliterator(), false)
                 .map(s -> s.get(FIELD_INDEX_SET_ID).toString())
                 .collect(Collectors.toSet());
