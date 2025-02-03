@@ -82,7 +82,7 @@ type Props = {
   title: string,
   loading: boolean,
   editing: boolean,
-  titleIcon?: React.ReactNode,
+  titleIcon: React.ReactNode,
 };
 
 const WidgetHeader = ({
