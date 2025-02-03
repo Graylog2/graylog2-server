@@ -37,6 +37,12 @@ type SUTProps = {
 }
 
 describe('QueryValidation', () => {
+  beforeEach(() => {
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({
+      'views.elements.validationErrorExplanation': [],
+    }[entityKey]));
+  });
+
   const validationErrorIconTitle = /Toggle validation/;
 
   const openExplanation = async () => {
@@ -93,7 +99,10 @@ describe('QueryValidation', () => {
     const ExampleComponent = ({ validationState }: { validationState: QueryValidationState }) => (
       <>Plugable validation explanation for {validationState.explanations.map(({ errorTitle }) => errorTitle).join()}</>
     );
-    asMock(usePluginEntities).mockImplementation((entityKey) => (entityKey === 'views.elements.validationErrorExplanation' ? [ExampleComponent] : []));
+
+    asMock(usePluginEntities).mockImplementation((entityKey) => (entityKey === 'views.elements.validationErrorExplanation'
+      ? [{ component: ExampleComponent, key: 'test', useCondition: () => true }] : []));
+
     render(<SUT error={validationError} />);
 
     await openExplanation();
