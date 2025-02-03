@@ -31,7 +31,7 @@ type Props = {
   value?: Array<string> | string
 };
 
-const ListField = ({ autoFocus = false, field, onChange, title, typeName, value }: Props) => {
+const ListField = ({ autoFocus = false, field, onChange, title, typeName, value = undefined }: Props) => {
   const handleChange = (nextValue) => {
     const values = (nextValue === '' ? [] : nextValue.split(','));
 
