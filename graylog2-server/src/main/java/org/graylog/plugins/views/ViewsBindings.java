@@ -58,6 +58,7 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamCategoryFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.jobs.periodical.SearchJobStateCleanupPeriodical;
 import org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService;
 import org.graylog.plugins.views.search.querystrings.MongoLastUsedQueryStringsService;
 import org.graylog.plugins.views.search.rest.DashboardsResource;
@@ -233,6 +234,7 @@ public class ViewsBindings extends ViewsModule {
         registerVisualizationConfigSubtypes();
 
         addPeriodical(SearchesCleanUpJob.class);
+        addPeriodical(SearchJobStateCleanupPeriodical.class);
 
         addMigration(V20181220133700_AddViewsAdminRole.class);
         addMigration(V20190304102700_MigrateMessageListStructure.class);
