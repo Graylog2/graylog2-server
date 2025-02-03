@@ -50,21 +50,23 @@ type Props = {
   showDeSelectAll?: boolean,
   showListCollapseButton?: boolean
   showUnit?: boolean,
+  fieldSelect?: React.ComponentType<React.ComponentProps<typeof FieldSelect>>
 }
 
 const FieldsConfiguration = ({
   createSelectPlaceholder = 'Add a field',
   displaySortableListOverlayInPortal = false,
-  menuPortalTarget,
+  menuPortalTarget = undefined,
   onChange,
-  isFieldQualified,
-  selectSize,
+  isFieldQualified = undefined,
+  selectSize = undefined,
   selectedFields,
   testPrefix = '',
   showSelectAllRest = false,
   showDeSelectAll = false,
   showListCollapseButton = false,
   showUnit = false,
+  fieldSelect: FieldSelectComponent = FieldSelect,
 }: Props) => {
   const [showSelectedList, setShowSelectedList] = useState(true);
   const onAddField = useCallback((newField: string) => (
@@ -90,38 +92,40 @@ const FieldsConfiguration = ({
   return (
     <>
       {_showListCollapseButton && (
-      <ToggleButton bsStyle="link"
-                    bsSize="xs"
-                    onClick={() => {
-                      setShowSelectedList((cur) => !cur);
-                    }}>
-        {showSelectedList ? `Hide ${selectedFields.length} selected fields` : `Show ${selectedFields.length} selected fields`}<ToggleIcon name={showSelectedList ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-      </ToggleButton>
+        <ToggleButton bsStyle="link"
+                      bsSize="xs"
+                      onClick={() => {
+                        setShowSelectedList((cur) => !cur);
+                      }}>
+          {showSelectedList ? `Hide ${selectedFields.length} selected fields` : `Show ${selectedFields.length} selected fields`}<ToggleIcon name={showSelectedList ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+        </ToggleButton>
       )}
       {showSelectedList && (
-      <SelectedFieldsList testPrefix={testPrefix}
-                          selectedFields={selectedFields}
-                          selectSize={selectSize}
-                          displayOverlayInPortal={displaySortableListOverlayInPortal}
-                          onChange={onChange}
-                          showUnit={showUnit} />
+        <SelectedFieldsList testPrefix={testPrefix}
+                            selectedFields={selectedFields}
+                            selectSize={selectSize}
+                            displayOverlayInPortal={displaySortableListOverlayInPortal}
+                            onChange={onChange}
+                            fieldSelectMenuPortalTarget={menuPortalTarget}
+                            fieldSelect={FieldSelectComponent}
+                            showUnit={showUnit} />
       )}
-      <FieldSelect id="field-create-select"
-                   onChange={onAddField}
-                   clearable={false}
-                   isFieldQualified={isFieldQualified}
-                   persistSelection={false}
-                   name="field-create-select"
-                   value={undefined}
-                   size={selectSize}
-                   menuPortalTarget={menuPortalTarget}
-                   excludedFields={selectedFields ?? []}
-                   placeholder={createSelectPlaceholder}
-                   ariaLabel={createSelectPlaceholder}
-                   onSelectAllRest={showSelectAllRest && onSelectAllRest}
-                   showSelectAllRest={showSelectAllRest}
-                   onDeSelectAll={onDeselectAll}
-                   showDeSelectAll={showDeSelectAll && !!selectedFields.length} />
+      <FieldSelectComponent id="field-create-select"
+                            onChange={onAddField}
+                            clearable={false}
+                            isFieldQualified={isFieldQualified}
+                            persistSelection={false}
+                            name="field-create-select"
+                            value={undefined}
+                            size={selectSize}
+                            menuPortalTarget={menuPortalTarget}
+                            excludedFields={selectedFields ?? []}
+                            placeholder={createSelectPlaceholder}
+                            ariaLabel={createSelectPlaceholder}
+                            onSelectAllRest={showSelectAllRest && onSelectAllRest}
+                            showSelectAllRest={showSelectAllRest}
+                            onDeSelectAll={onDeselectAll}
+                            showDeSelectAll={showDeSelectAll && !!selectedFields.length} />
     </>
   );
 };

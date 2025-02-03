@@ -24,7 +24,6 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.joda.time.DateTime;
@@ -60,10 +59,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
     private SearchDbService searchDbService;
 
     static class TestViewService extends ViewSummaryService {
-        TestViewService(MongoConnection mongoConnection,
-                        MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                        MongoCollections mongoCollections) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mongoCollections);
+        TestViewService(MongoCollections mongoCollections) {
+            super(mongoCollections);
         }
     }
 
@@ -73,8 +70,6 @@ public class SearchesCleanUpJobWithDBServicesTest {
 
 
         final ViewSummaryService viewService = new TestViewService(
-                mongodb.mongoConnection(),
-                mapperProvider,
                 new MongoCollections(mapperProvider, mongodb.mongoConnection())
         );
         this.searchDbService = spy(

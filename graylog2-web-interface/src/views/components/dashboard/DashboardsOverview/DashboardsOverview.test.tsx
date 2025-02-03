@@ -16,15 +16,15 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
-import { useQueryParam, QueryParamProvider } from 'use-query-params';
 
+import { useQueryParam } from 'routing/QueryParams';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { asMock } from 'helpers/mocking';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import DashboardsOverview from './DashboardsOverview';
 
@@ -43,8 +43,8 @@ jest.mock('views/stores/ViewManagementStore', () => ({
   },
 }));
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 
@@ -98,9 +98,9 @@ const loadDashboardsResponse = (count = 1) => {
 
 describe('DashboardsOverview', () => {
   const SUT = () => (
-    <QueryParamProvider adapter={ReactRouter6Adapter}>
+    <DefaultQueryParamProvider>
       <DashboardsOverview />
-    </QueryParamProvider>
+    </DefaultQueryParamProvider>
   );
 
   beforeEach(() => {

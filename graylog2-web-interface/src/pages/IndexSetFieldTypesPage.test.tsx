@@ -16,9 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
-import { useQueryParam, QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
+import { useQueryParam } from 'routing/QueryParams';
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
@@ -29,6 +28,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { overriddenIndexField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const getData = (list = [defaultField]) => (
   {
@@ -41,11 +41,11 @@ const getData = (list = [defaultField]) => (
 );
 
 const renderIndexSetFieldTypesPage = () => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
+  <DefaultQueryParamProvider>
     <TestStoreProvider>
       <IndexSetFieldTypesPage />
     </TestStoreProvider>,
-  </QueryParamProvider>,
+  </DefaultQueryParamProvider>,
 );
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
@@ -53,8 +53,8 @@ jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 

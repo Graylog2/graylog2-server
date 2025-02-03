@@ -38,6 +38,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -210,5 +211,11 @@ public class DBEventDefinitionService {
 
     public Stream<EventDefinitionDto> streamAll() {
         return stream(collection.find());
+    }
+
+    public List<EventDefinitionDto> getByIds(Collection<String> ids) {
+        return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(ids)))
+                .map(this::getEventDefinitionWithRefetchedFilters)
+                .toList();
     }
 }

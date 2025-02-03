@@ -61,6 +61,7 @@ import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
+import type { Event } from 'components/events/events/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -83,7 +84,6 @@ export interface EditWidgetComponentProps<Config extends WidgetConfig = WidgetCo
   type: string;
   fields: Immutable.List<FieldTypeMapping>,
   onChange: (newConfig: Config) => void,
-  onSubmit: () => void,
   onCancel: () => void,
 }
 
@@ -280,8 +280,15 @@ type DashboardActionModalProps<T> = React.PropsWithRef<{
   ref: React.LegacyRef<T>
 };
 
-type EventActionModalProps<T> = React.PropsWithRef<{
+type EventWidgetActionModalProps<T> = React.PropsWithRef<{
   eventId: string,
+}> & {
+  ref: React.LegacyRef<T>,
+}
+
+export type EventActionModalProps<T> = React.PropsWithRef<{
+  events: Array<Event>,
+  fromBulk?: boolean,
 }> & {
   ref: React.LegacyRef<T>,
 }
@@ -311,17 +318,18 @@ type DashboardAction<T> = {
   useCondition?: () => boolean,
 }
 
-type EventAction = {
-  useCondition: () => boolean,
-  modal?: React.ComponentType<EventActionModalProps<unknown>>,
-  component: React.ComponentType<EventActionComponentProps>,
+export type EventAction<T = unknown> = {
+  useCondition: (events: Array<Event>) => boolean,
+  modal?: React.ComponentType<EventActionModalProps<T>>,
+  component: React.ComponentType<EventActionComponentProps<T>>,
   key: string,
+  isBulk?: boolean
 }
 
 type EventWidgetAction<T> = {
   key: string,
   component: React.ComponentType<EventWidgetActionComponentProps<T>>,
-  modal?: React.ComponentType<EventActionModalProps<T>>,
+  modal?: React.ComponentType<EventWidgetActionModalProps<T>>,
   useCondition?: () => boolean,
 }
 
@@ -330,9 +338,10 @@ type AssetInformation = {
   key: string,
 }
 
-export type EventActionComponentProps = {
-  eventId: string,
-  modalRef: () => unknown,
+export type EventActionComponentProps<T = unknown> = {
+  events: Array<Event>,
+  modalRef: () => T,
+  fromBulk?: boolean,
 }
 
 type MessageActionComponentProps = {
@@ -403,6 +412,10 @@ export type CustomCommandContextProvider<T extends keyof CustomCommandContext> =
   key: T,
   provider: () => CustomCommandContext[T],
 }
+
+export type CurrentViewType = {
+  activeQuery: string,
+};
 
 export interface ViewState {
   activeQuery: QueryId;
@@ -484,7 +497,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>
-    'views.components.eventActions'?: Array<EventAction>;
+    'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<MessageDetailContextProviderProps>>>;

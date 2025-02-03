@@ -159,7 +159,7 @@ const StreamActions = ({
 
   return (
     <ButtonToolbar>
-      <IfPermitted permissions={`streams:edit:${stream.id}`}>
+      <IfPermitted permissions={`streams:read:${stream.id}`}>
         <LinkContainer to={Routes.stream_view(stream.id)}>
           <Button disabled={isNotEditable}
                   bsStyle="primary"
@@ -168,7 +168,8 @@ const StreamActions = ({
                     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_CLICKED, {
                       app_pathname: 'stream',
                     });
-                  }}>Data Routing
+                  }}>
+            Data routing
           </Button>
         </LinkContainer>
       </IfPermitted>

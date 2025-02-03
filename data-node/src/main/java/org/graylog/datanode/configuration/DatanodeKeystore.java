@@ -21,6 +21,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.KeyPair;
@@ -28,6 +29,7 @@ import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
+import org.graylog.security.certutil.keystore.storage.KeystoreUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -163,6 +166,16 @@ public class DatanodeKeystore {
             keystore.load(fis, passwordSecret.toCharArray());
             return keystore;
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
+            throw new DatanodeKeystoreException(e);
+        }
+    }
+
+    public synchronized InMemoryKeystoreInformation getSafeCopy() throws DatanodeKeystoreException {
+        final char[] randomKeystorePassword = RandomStringUtils.randomAlphabetic(256).toCharArray();
+        try {
+            final KeyStore reencrypted = KeystoreUtils.newStoreCopyContent(loadKeystore(), passwordSecret.toCharArray(), randomKeystorePassword);
+            return new InMemoryKeystoreInformation(reencrypted, randomKeystorePassword);
+        } catch (GeneralSecurityException | IOException e) {
             throw new DatanodeKeystoreException(e);
         }
     }

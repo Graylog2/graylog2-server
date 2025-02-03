@@ -14,21 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-import type { InputSetupWizardStep, WizardData } from 'components/inputs/InputSetupWizard/types';
+import type { InputSetupWizardStep, WizardData, StepsConfig } from 'components/inputs/InputSetupWizard/types';
 
 type InputSetupWizardContextType = {
   activeStep: InputSetupWizardStep | undefined,
-  setActiveStep: (InputSetupWizardStep) => void,
-  getStepData: (stepName: InputSetupWizardStep) => object | undefined;
-  setStepData: (stepName: InputSetupWizardStep, data: object) => void,
+  setActiveStep: (step: InputSetupWizardStep) => void,
+  stepsConfig: StepsConfig,
+  setStepsConfig: (stepsConfig: StepsConfig) => void,
   wizardData: WizardData,
-  setWizardDataAttribute: (key: keyof WizardData, value: WizardData[typeof key]) => void,
-  show: boolean,
-  openWizard: (data?: WizardData) => void,
-  closeWizard: () => void,
+  setWizardData: (wizardData: WizardData) => void;
+  orderedSteps: Array<InputSetupWizardStep>,
+  setOrderedSteps: (steps: Array<InputSetupWizardStep>) => void,
+  goToPreviousStep: () => void,
+  goToNextStep: (step?: InputSetupWizardStep) => void,
 };
 
 const InputSetupWizardContext = React.createContext<InputSetupWizardContextType | undefined>(undefined);

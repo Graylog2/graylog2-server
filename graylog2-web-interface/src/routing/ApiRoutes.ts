@@ -256,7 +256,6 @@ const ApiRoutes = {
     delete: (streamId: string) => ({ url: `/streams/${streamId}` }),
     pause: (streamId: string) => ({ url: `/streams/${streamId}/pause` }),
     resume: (streamId: string) => ({ url: `/streams/${streamId}/resume` }),
-    stream_connected_pipelines: (streamId: string) => ({ url: `/streams/${streamId}/pipelines` }),
     testMatch: (streamId: string) => ({ url: `/streams/${streamId}/testMatch` }),
   },
   StreamOutputsApiController: {
@@ -422,6 +421,7 @@ const ApiRoutes = {
     update: (pipelineId: string) => ({ url: `/system/pipelines/pipeline/${pipelineId}` }),
     delete: (pipelineId: string) => ({ url: `/system/pipelines/pipeline/${pipelineId}` }),
     parse: () => ({ url: '/system/pipelines/pipeline/parse' }),
+    updateRouting: () => ({ url: '/system/pipelines/pipeline/routing' }),
   },
   RulesController: {
     list: () => ({ url: '/system/pipelines/rule' }),
