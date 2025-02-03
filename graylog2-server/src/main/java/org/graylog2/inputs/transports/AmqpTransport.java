@@ -340,7 +340,7 @@ public class AmqpTransport extends ThrottleableTransport2 {
                             CK_QUEUE,
                             "Queue",
                             defaultQueueName(),
-                            "Name of queue that is created.",
+                            "Name of queue that is created. Supports placeholder %d to be substituted with the queue number (starting at 0). Example: " + defaultQueueName() + "-%d",
                             ConfigurationField.Optional.NOT_OPTIONAL
                     )
             );
@@ -377,9 +377,9 @@ public class AmqpTransport extends ThrottleableTransport2 {
             cr.addField(
                     new NumberField(
                             CK_PARALLEL_QUEUES,
-                            "Number of Queues",
+                            "Number of consumers/queues",
                             1,
-                            "Number of parallel Queues",
+                            "Number of parallel consumers for the queue. When using placeholder %d in queue name: Number of separate queues to be created, with one consumer per queue.",
                             ConfigurationField.Optional.NOT_OPTIONAL
                     )
             );
