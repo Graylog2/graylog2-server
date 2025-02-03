@@ -425,7 +425,7 @@ public class GelfCodecTest {
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
         assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
                 .isInstanceOf(InputProcessingException.class)
-                .hasMessageContaining("Extra unexpected JSON detected after first valid JSON. Please enable bulk Receiving");
+                .hasMessageContaining("Extra unexpected JSON detected after first valid JSON. Please enable bulk receiving");
     }
 
     @Test

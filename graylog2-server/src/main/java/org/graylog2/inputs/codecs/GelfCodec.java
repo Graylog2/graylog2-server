@@ -138,10 +138,10 @@ public class GelfCodec extends AbstractCodec {
             node = objectMapper.readTree(parser);
 
             if (parser.nextToken() != null) {
-                throw new IllegalArgumentException("Extra unexpected JSON detected after first valid JSON. Please enable bulk Receiving");
+                throw new IllegalArgumentException("Extra unexpected JSON detected after first valid JSON. Please enable bulk receiving");
             }
 
-            if (node.isEmpty() || node == null) {
+            if (node == null || node.isEmpty()) {
                 throw new IOException("null result");
             }
 
