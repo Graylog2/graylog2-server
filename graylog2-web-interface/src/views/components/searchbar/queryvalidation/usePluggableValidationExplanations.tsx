@@ -22,7 +22,7 @@ import type { ValidationErrorExplanation } from 'views/types';
 
 const usePluggableValidationExplanations = (validationState: QueryValidationState) => {
   const modalRefs = useRef({});
-  const pluggableValidationExplanations = usePluginEntities<Array<ValidationErrorExplanation>>('views.elements.validationErrorExplanation');
+  const pluggableValidationExplanations = usePluginEntities('views.elements.validationErrorExplanation');
   const availableExplanations: Array<ValidationErrorExplanation> = pluggableValidationExplanations.filter(
     (validationError) => {
       if (typeof validationError?.useCondition === 'function') {

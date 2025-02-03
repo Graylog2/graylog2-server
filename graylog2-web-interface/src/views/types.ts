@@ -331,7 +331,7 @@ export type ValidationErrorExplanationComponentProps<T = unknown> = {
   modalRef?: () => T,
 }
 
-export type ValidationErrorExplanationModalProps = React.PropsWithRef<QueryValidationState> & {
+export type ValidationErrorExplanationModalProps = React.PropsWithRef<{ validationState: QueryValidationState }> & {
   ref: React.LegacyRef<unknown>
 }
 

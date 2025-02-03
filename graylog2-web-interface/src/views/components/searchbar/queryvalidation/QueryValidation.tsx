@@ -28,7 +28,6 @@ import DocsHelper from 'util/DocsHelper';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
-import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableValidationExplanations
   from 'views/components/searchbar/queryvalidation/usePluggableValidationExplanations';
 
@@ -202,8 +201,6 @@ const QueryValidation = () => {
         return 'error explanation';
     }
   };
-
-  console.log({ explanationModals, explanationComponents });
 
   return (
     <>
