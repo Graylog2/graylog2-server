@@ -44,7 +44,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.15.0</opensearch.version>
+        <opensearch.version>2.19.0</opensearch.version>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -548,10 +548,10 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
+                                https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.19.0/10783/linux/x64/tar/dist/opensearch/opensearch-2.19.0-linux-x64.tar.gz
                             </url>
                             <sha512>
-                                a72f218b581903b1ddf1072498560bc5304516ed57feb39735f920985740366c2779ed9174251a13b9a9dabdfc184119c325bb387dadf96485dc7964ecf32d54
+                                4cd9a597d6e43c0f921c38cbbbcfaf04e9666a28f55b96b79280a0255438b31e1b77041a60589f424604d2b069aa742691c66317409b790ae748b2f8d2996fb6
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -572,10 +572,10 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
+                                https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.19.0/10783/linux/arm64/tar/dist/opensearch/opensearch-2.19.0-linux-arm64.tar.gz
                             </url>
                             <sha512>
-                                866c348ac39b7b35e671917349269383c75e1f9d10768742067807569180d1914fd09c6ae7e71d5e74bd77c8c8165ea17c19290b71f887f074dfe8e68dff66bb
+                                d10d7e786c437729130d8a13f62cc9653899ec358ce04e9c6415bd6e5c617e283d286cdfe029aaec0797501117bf2bd53dde2beebf0799e669d484c8bfce4188
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
