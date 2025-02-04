@@ -26,40 +26,38 @@ type Props = {
   dataNodes: any,
 }
 
-const ClusterConfigurationTableView = ({ graylogNodes, dataNodes }: Props) => {
-  return (
-    <Table>
-      <thead>
+const ClusterConfigurationTableView = ({ graylogNodes, dataNodes }: Props) => (
+  <Table>
+    <thead>
+      <tr>
+        <th>Node</th>
+        <th>Type</th>
+        <th>Role</th>
+        <th>State</th>
+        <th className="text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {graylogNodes.map((graylogNode) => (
         <tr>
-          <th>Node</th>
-          <th>Type</th>
-          <th>Role</th>
-          <th>State</th>
-          <th className="text-right">Actions</th>
+          <td>{graylogNode.nodeName}</td>
+          <td>{graylogNode.type}</td>
+          <td>{graylogNode.role}</td>
+          <td><ClusterConfigurationStatusLabel status={graylogNode.state} /></td>
+          <td align='right'><MoreActions /></td>
         </tr>
-      </thead>
-      <tbody>
-        {graylogNodes.map((graylogNode) => (
-          <tr>
-            <td>{graylogNode.nodeName}</td>
-            <td>{graylogNode.type}</td>
-            <td>{graylogNode.role}</td>
-            <td><ClusterConfigurationStatusLabel status={graylogNode.state} /></td>
-            <td align='right'><MoreActions /></td>
-          </tr>
-        ))}
-        {dataNodes.map((dataNode) => (
-          <tr>
-            <td>{dataNode.nodeName}</td>
-            <td>{dataNode.type}</td>
-            <td>{dataNode.role}</td>
-            <td><ClusterConfigurationStatusLabel status={dataNode.state} /></td>
-            <td align='right'><MoreActions /></td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
-  );
-};
+      ))}
+      {dataNodes.map((dataNode) => (
+        <tr>
+          <td>{dataNode.nodeName}</td>
+          <td>{dataNode.type}</td>
+          <td>{dataNode.role}</td>
+          <td><ClusterConfigurationStatusLabel status={dataNode.state} /></td>
+          <td align='right'><MoreActions /></td>
+        </tr>
+      ))}
+    </tbody>
+  </Table>
+);
 
 export default ClusterConfigurationTableView;

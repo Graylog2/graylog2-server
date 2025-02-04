@@ -61,10 +61,10 @@ const ClusterConfigurationPage = () => {
                               onChange={(newViewType) => setViewType(newViewType)} />
           </Col>
           <Col md={12}>
-            {viewType == 'list' && (
+            {viewType === 'list' && (
               <ClusterConfigurationTableView graylogNodes={graylogNodes} dataNodes={dataNodes} />
             )}
-            {viewType == 'cards' && (
+            {viewType === 'cards' && (
               <ClusterConfigurationClusterView graylogNodes={graylogNodes} dataNodes={dataNodes} />
             )}
           </Col>
