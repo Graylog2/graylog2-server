@@ -74,7 +74,7 @@ describe('InputSetupWizard', () => {
   it('should render the wizard and shows routing step as first step', async () => {
     renderWizard();
 
-    const wizard = await screen.findByText('Setup Routing');
+    const wizard = await screen.findByText('Routing');
 
     expect(wizard).toBeInTheDocument();
   });

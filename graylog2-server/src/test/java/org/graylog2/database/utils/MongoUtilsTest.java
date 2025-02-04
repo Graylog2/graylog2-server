@@ -20,8 +20,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoClientException;
+import com.mongodb.MongoException;
 import com.mongodb.MongoWriteException;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcernResult;
@@ -45,6 +48,7 @@ import org.mongojack.Id;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -216,6 +220,26 @@ class MongoUtilsTest {
         assertThat(MongoUtils.isDuplicateKeyError(madeUpServerException)).isFalse();
         assertThat(MongoUtils.isDuplicateKeyError(dupKeyException)).isTrue();
         assertThat(MongoUtils.isDuplicateKeyError(legacyDupKeyException)).isTrue();
+    }
+
+    @Test
+    void testReproduceDuplicateKeyError(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
+        final DBCollection legacyCollection = mongoDBTestService.mongoConnection().getDatabase()
+                .getCollection("test");
+
+        final var dto = new DTO(new ObjectId().toHexString(), "test");
+        final var document = new BasicDBObject(Map.of("_id", new ObjectId(dto.id()), "name", "test"));
+
+        collection.insertOne(dto);
+
+        assertThatThrownBy(() -> collection.insertOne(dto))
+                .isInstanceOfSatisfying(MongoException.class, e ->
+                        assertThat(MongoUtils.isDuplicateKeyError(e)).isTrue());
+
+        assertThatThrownBy(() -> legacyCollection.insert(document))
+                .isInstanceOf(DuplicateKeyException.class)
+                .isInstanceOfSatisfying(MongoException.class, e ->
+                        assertThat(MongoUtils.isDuplicateKeyError(e)).isTrue());
     }
 
     @AutoValue

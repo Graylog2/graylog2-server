@@ -38,7 +38,7 @@ const emptyPipeline: PipelineType = {
   id: undefined,
   title: '',
   description: '',
-  stages: [{ stage: 0, rules: [], match: '' }],
+  stages: [{ stage: 0, rules: [], match: 'EITHER' }],
   source: '',
   created_at: '',
   modified_at: '',

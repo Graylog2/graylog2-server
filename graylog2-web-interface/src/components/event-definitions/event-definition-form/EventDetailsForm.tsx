@@ -32,6 +32,7 @@ import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { EventDefinition } from '../event-definitions-types';
+import { isSystemEventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
 const priorityOptions = map(EventDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: upperFirst(value.name) }))
@@ -70,7 +71,7 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Pr
   };
 
   const readOnly = !canEdit
-    || eventDefinition.config.type === 'system-notifications-v1'
+    || isSystemEventDefinition(eventDefinition)
     || eventDefinition.config.type === 'sigma-v1';
 
   return (
