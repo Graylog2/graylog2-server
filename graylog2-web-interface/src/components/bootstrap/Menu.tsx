@@ -83,6 +83,7 @@ const StyledMenuDivider = styled(MantineMenu.Divider)(({ theme }) => css`
 
 const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
   font-size: ${theme.fonts.size.navigation};
+  color: ${theme.colors.global.textSecondary};
 `);
 
 Menu.Target = MantineMenu.Target;
