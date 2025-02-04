@@ -80,7 +80,6 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
                 .filter(message -> !message.destinations().get(FILTER_KEY).isEmpty())
                 .toList();
 
-        writes.mark(messages.size());
         ignores.mark(filteredMessages.size() - messages.size());
 
         writeMessageEntries(messages);

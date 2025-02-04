@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.outputs.events.OutputChangedEvent;
@@ -59,8 +60,7 @@ public class OutputServiceImplTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         outputService = new OutputServiceImpl(
-                mongodb.mongoConnection(),
-                mapperProvider,
+                new MongoCollections(mapperProvider, mongodb.mongoConnection()),
                 streamService,
                 clusterEventBus);
     }

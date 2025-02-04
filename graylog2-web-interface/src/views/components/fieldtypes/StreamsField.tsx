@@ -33,7 +33,7 @@ const StreamsList = styled.span`
 const StreamsField = ({ value }: Props) => {
   const streams = useContext(StreamsContext);
   const streamsMap = useMemo(() => Object.fromEntries(streams.map((stream) => [stream.id, stream]) ?? []), [streams]);
-  const renderStream = useCallback((streamId: string) => <span title={streamId}>{streamsMap[streamId]?.title ?? streamId}</span>, [streamsMap]);
+  const renderStream = useCallback((streamId: string) => <span key={streamId} title={streamId}>{streamsMap[streamId]?.title ?? streamId}</span>, [streamsMap]);
 
   return Array.isArray(value)
     ? <StreamsList>{value.map(renderStream)}</StreamsList>

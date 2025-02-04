@@ -38,7 +38,7 @@ import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  eventDefinition: Omit<EventDefinition, 'id'>,
+  eventDefinition: EventDefinition,
   notifications: Array<EventNotification>,
   validation?: {
     errors: {
@@ -91,12 +91,13 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     return PluginStore.exports(name).find((edt) => edt.type === type);
   };
 
-  const renderCondition = (config: EventDefinition['config']) => {
+  const renderCondition = (config: EventDefinition['config'], definitionId: string) => {
     const conditionPlugin = getPlugin('eventDefinitionTypes', config.type);
     const component = (conditionPlugin?.summaryComponent
       ? React.createElement(conditionPlugin.summaryComponent, {
         config,
         currentUser,
+        definitionId,
       })
       : <p>Condition plugin <em>{config.type}</em> does not provide a summary.</p>
     );
@@ -252,7 +253,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
 
           {!isSystemEventDefinition && (
             <Col md={5} mdOffset={1}>
-              {renderCondition(eventDefinition.config)}
+              {renderCondition(eventDefinition.config, eventDefinition.id)}
             </Col>
           )}
         </Row>

@@ -317,7 +317,7 @@ const StartInputStep = () => {
 
     if (hasNextStep) {
       return (
-        <Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={onNextStep} bsStyle="primary">Input Diagnosis</Button>
+        <Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={onNextStep} bsStyle="primary" data-testid="input-diagnosis-button">Input Diagnosis</Button>
       );
     }
 
