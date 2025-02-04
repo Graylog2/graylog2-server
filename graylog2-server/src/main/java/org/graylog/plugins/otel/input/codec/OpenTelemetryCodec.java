@@ -31,15 +31,11 @@ import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.utilities.ExceptionUtils;
-import org.slf4j.Logger;
 
 import java.util.Optional;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class OpenTelemetryCodec implements Codec {
     public static final String NAME = "OpenTelemetry";
-    private static final Logger LOG = getLogger(OpenTelemetryCodec.class);
     private final Configuration configuration;
     private final LogsCodec logsCodec;
 
@@ -71,14 +67,14 @@ public class OpenTelemetryCodec implements Codec {
         try {
             journalRecord = Journal.Record.parseFrom(rawMessage.getPayload());
         } catch (InvalidProtocolBufferException e) {
-            throw InputProcessingException.create("Error parsing OpenTelemetry message", ExceptionUtils.getRootCause(e), rawMessage);
+            throw InputProcessingException.create(
+                    "Error parsing OpenTelemetry message", ExceptionUtils.getRootCause(e), rawMessage);
         }
 
         return switch (journalRecord.getPayloadCase()) {
             case LOG -> logsCodec.decode(journalRecord.getLog());
-            case PAYLOAD_NOT_SET -> {
-                throw InputProcessingException.create("Error handling OpenTelemetry message. No payload set.", rawMessage);
-            }
+            case PAYLOAD_NOT_SET -> throw InputProcessingException.create(
+                    "Error handling OpenTelemetry message. No payload set.", rawMessage);
         };
     }
 
