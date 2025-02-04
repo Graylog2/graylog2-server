@@ -19,10 +19,11 @@ import React from 'react';
 import { Col, Row } from 'components/bootstrap';
 
 import ClusterConfigurationStatusLabel from './ClusterConfigurationStatusLabel';
+import type { ClusterNode } from './useClusterNodes';
 
 type Props = {
-  graylogNodes: any,
-  dataNodes: any,
+  graylogNodes: ClusterNode[],
+  dataNodes: ClusterNode[],
 }
 
 const ClusterConfigurationClusterView = ({ graylogNodes, dataNodes }: Props) => (

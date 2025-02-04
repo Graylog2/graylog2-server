@@ -20,10 +20,11 @@ import { Table } from 'components/bootstrap';
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 import ClusterConfigurationStatusLabel from './ClusterConfigurationStatusLabel';
+import type { ClusterNode } from './useClusterNodes';
 
 type Props = {
-  graylogNodes: any,
-  dataNodes: any,
+  graylogNodes: ClusterNode[],
+  dataNodes: ClusterNode[],
 }
 
 const ClusterConfigurationTableView = ({ graylogNodes, dataNodes }: Props) => (

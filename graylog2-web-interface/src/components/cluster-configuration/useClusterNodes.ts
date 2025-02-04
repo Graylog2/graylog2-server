@@ -18,7 +18,7 @@ import { useStore } from 'stores/connect';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
 import { NodesStore } from 'stores/nodes/NodesStore';
 
-type ClusterNode = {
+export type ClusterNode = {
   nodeName: string,
   type: string,
   role: string,
