@@ -213,6 +213,8 @@ public class AmqpTransport extends ThrottleableTransport2 {
                 inputFailureRecorder.setRunning();
             } catch (TimeoutException e) {
                 inputFailureRecorder.setFailing(getClass(), "Timeout while opening new AMQP connection", e);
+            } catch (IOException e) {
+                inputFailureRecorder.setFailing(getClass(), "Error while opening new AMQP connection", e.getCause());
             } catch (Exception e) {
                 inputFailureRecorder.setFailing(getClass(), "Could not launch AMQP consumer.", e);
             }
