@@ -40,12 +40,10 @@ describe('<DropdownField>', () => {
   it('should render an empty field', () => {
     render(<SUT />);
 
-    const fieldLabel = screen.getByText(dropdownField.human_name, { exact: true });
-    const optionalMarker = screen.getByText(/(optional)/);
+    const fieldLabel = screen.getByText(`${dropdownField.human_name} (optional)`);
     const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
     expect(fieldLabel).toBeInTheDocument();
-    expect(optionalMarker).toBeInTheDocument();
     expect(select).toBeInTheDocument();
 
     const selectedValue = Object.keys(dropdownField.attributes.values)[0];

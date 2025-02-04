@@ -18,8 +18,6 @@
 import minBy from 'lodash/minBy';
 import maxBy from 'lodash/maxBy';
 import mapValues from 'lodash/mapValues';
-import get from 'lodash/get';
-import keyBy from 'lodash/keyBy';
 import isNumber from 'lodash/isNumber';
 import toNumber from 'lodash/toNumber';
 
@@ -159,5 +157,3 @@ export const convertValueToBaseUnit = (value: number, params: ConversionParams) 
 export const convertValueToUnit: ConvertValueToUnit = (value, fromParams, toParams) => _convertValueToUnit(mappedUnitsFromJSON, value, fromParams, toParams);
 export const getPrettifiedValue = (value: number, params: ConversionParams) => _getPrettifiedValue(mappedUnitsFromJSON, value, params);
 export const getBaseUnit = (fieldType: FieldUnitType) => _getBaseUnit(mappedUnitsFromJSON, fieldType);
-export const unitsByAbbrev = mapValues(mappedUnitsFromJSON, (list) => keyBy(list, 'abbrev'));
-export const getUnitInfo = (unitType: FieldUnitType, abbrev: string) => get(unitsByAbbrev, [unitType, abbrev]);
