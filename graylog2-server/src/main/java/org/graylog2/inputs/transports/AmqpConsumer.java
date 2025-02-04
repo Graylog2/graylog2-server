@@ -64,6 +64,7 @@ import static org.graylog2.inputs.transports.AmqpTransport.CK_PASSWORD;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_PORT;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_PREFETCH;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_QUEUE;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_QUEUE_DECLARE_PASSIVE;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_REQUEUE_INVALID_MESSAGES;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_ROUTING_KEY;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_TLS;
@@ -84,6 +85,7 @@ public class AmqpConsumer {
     private final int prefetchCount;
 
     private final String queue;
+    private final boolean queueDeclarePassive;
     private final String exchange;
     private final boolean exchangeBind;
     private final String routingKey;
@@ -125,6 +127,7 @@ public class AmqpConsumer {
         this.password = configuration.getEncryptedValue(CK_PASSWORD);
         this.prefetchCount = configuration.getInt(CK_PREFETCH);
         this.queue = configuration.getString(CK_QUEUE);
+        this.queueDeclarePassive = configuration.getBoolean(CK_QUEUE_DECLARE_PASSIVE);
         this.exchange = configuration.getString(CK_EXCHANGE);
         this.exchangeBind = configuration.getBoolean(CK_EXCHANGE_BIND);
         this.routingKey = configuration.getString(CK_ROUTING_KEY);
@@ -148,10 +151,17 @@ public class AmqpConsumer {
 
         for (int i = 0; i < parallelQueues; i++) {
             final String queueName = String.format(Locale.ENGLISH, queue, i);
-            channel.queueDeclare(queueName, true, false, false, null);
+
+            if (queueDeclarePassive) {
+                channel.queueDeclarePassive(queueName);
+            } else {
+                channel.queueDeclare(queueName, true, false, false, null);
+            }
+
             if (exchangeBind) {
                 channel.queueBind(queueName, exchange, routingKey);
             }
+
             channel.basicConsume(queueName, false, new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {

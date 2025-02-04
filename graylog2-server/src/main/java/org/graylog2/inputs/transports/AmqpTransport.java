@@ -64,6 +64,7 @@ public class AmqpTransport extends ThrottleableTransport2 {
     public static final String CK_EXCHANGE = "exchange";
     public static final String CK_EXCHANGE_BIND = "exchange_bind";
     public static final String CK_QUEUE = "queue";
+    public static final String CK_QUEUE_DECLARE_PASSIVE = "queue_declare_passive";
     public static final String CK_ROUTING_KEY = "routing_key";
     public static final String CK_PARALLEL_QUEUES = "parallel_queues";
     public static final String CK_TLS = "tls";
@@ -342,6 +343,15 @@ public class AmqpTransport extends ThrottleableTransport2 {
                             defaultQueueName(),
                             "Name of queue that is created. Supports placeholder %d to be substituted with the queue number (starting at 0). Example: " + defaultQueueName() + "-%d",
                             ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            cr.addField(
+                    new BooleanField(
+                            CK_QUEUE_DECLARE_PASSIVE,
+                            "Passive queue declaration",
+                            false,
+                            "A passive declaration checks that the queue with the provided name exists, but does not create it."
                     )
             );
 
