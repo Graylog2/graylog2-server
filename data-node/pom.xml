@@ -596,12 +596,12 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.version}/repository-s3-${opensearch.version}.zip
+                                https://artifacts.opensearch.org/releases/plugins/repository-s3/2.18.0/repository-s3-2.18.0.zip
                             </url>
-                            <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
+                            <outputFileName>repository-s3-2.18.0.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                de44a181133a33a08703e8464b52aa2ac29d1d9918d9478c307b98909a571baaaf0c9dcb664349802c3dd85fa53275bd2228248fd129179631b9096d470eb8d5
+                                9bd810fb48dca8b643e8b97d6ee87702435200c3ad9f72bdeb34cd5466a92b1271266888321d60d3698a2d7495a77e26f371ad54f4db0de4a52cd179b63251c3
                             </sha512>
                         </configuration>
                     </execution>
