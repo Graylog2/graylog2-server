@@ -30,10 +30,13 @@ import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,12 +62,14 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
     private static final SecureRandom RANDOM = new SecureRandom();
+    private final PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
     private final AccessTokenCipher cipher;
     private LoadingCache<String, DateTime> lastAccessCache;
 
     @Inject
-    public AccessTokenServiceImpl(MongoConnection mongoConnection, AccessTokenCipher accessTokenCipher) {
+    public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService, AccessTokenCipher accessTokenCipher) {
         super(mongoConnection);
+        this.paginatedAccessTokenEntityService = paginatedAccessTokenEntityService;
         this.cipher = accessTokenCipher;
         setLastAccessCache(30, TimeUnit.SECONDS);
 
@@ -217,5 +222,10 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
                         return now;
                     }
                 });
+    }
+
+    @Override
+    public PaginatedList<AccessTokenEntity> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, SortOrder order) {
+        return this.paginatedAccessTokenEntityService.findPaginated(searchQuery, page, perPage, sortField, order);
     }
 }
