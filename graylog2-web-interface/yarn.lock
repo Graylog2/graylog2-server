@@ -1954,6 +1954,11 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.8.tgz#21a907684723bbbaa5f0974cf7730bd797eb8e62"
   integrity sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig==
 
+"@graylog/prettier-config@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@graylog/prettier-config/-/prettier-config-1.0.2.tgz#82d4059a587356b92ea8001f19b417a534636793"
+  integrity sha512-gmhMFE7dDjXkZzse90uQLTb6zHsarL0E+ijIo/VjQ5VTqERv/h2brk+TW1+4Fw4qxCn9tuR/XsPhwAD/6U4OaQ==
+
 "@graylog/sawmill@2.0.23":
   version "2.0.23"
   resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.23.tgz#838050a9ed4b065d2b42bd8e13753be7658deca4"
@@ -3562,6 +3567,11 @@
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.2.tgz#6286b4c7228d58ab7866d19716f3696e03a09397"
   integrity sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==
+
+"@types/trusted-types@^2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.7.tgz#baccb07a970b91707df3a3e8ba6896c57ead2d11"
+  integrity sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==
 
 "@types/ua-parser-js@^0.7.36":
   version "0.7.39"
@@ -6543,9 +6553,11 @@ domhandler@^4.0.0, domhandler@^4.2.0:
     domelementtype "^2.2.0"
 
 dompurify@^3.0.0:
-  version "3.1.7"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.1.7.tgz#711a8c96479fb6ced93453732c160c3c72418a6a"
-  integrity sha512-VaTstWtsneJY8xzy7DekmYWEOZcmzIe3Qb3zPd4STve1OBTa+e+WmS1ITQec1fZYXI3HCsOZZiSMpG6oxoWMWQ==
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.2.4.tgz#af5a5a11407524431456cf18836c55d13441cd8e"
+  integrity sha512-ysFSFEDVduQpyhzAob/kkuJjf5zWkZD8/A9ywSp1byueyuCfHamrCBa14/Oc2iiB0e51B+NpxSl5gmzn+Ms/mg==
+  optionalDependencies:
+    "@types/trusted-types" "^2.0.7"
 
 domutils@1.5.1:
   version "1.5.1"
@@ -7447,6 +7459,7 @@ eslint-config-airbnb@19.0.4:
     "@typescript-eslint/parser" "8.22.0"
     eslint "8.57.0"
     eslint-config-airbnb "19.0.4"
+    eslint-config-prettier "9.1.0"
     eslint-import-resolver-webpack "0.13.10"
     eslint-plugin-compat "4.2.0"
     eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
@@ -7458,6 +7471,11 @@ eslint-config-airbnb@19.0.4:
     eslint-plugin-react "7.37.4"
     eslint-plugin-react-hooks "5.1.0"
     eslint-plugin-testing-library "7.1.1"
+
+eslint-config-prettier@9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-9.1.0.tgz#31af3d94578645966c082fcb71a5846d3c94867f"
+  integrity sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==
 
 eslint-import-resolver-node@^0.3.6:
   version "0.3.6"
@@ -13222,6 +13240,11 @@ prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
   integrity sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ=
+
+prettier@^3.3.3:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.4.2.tgz#a5ce1fb522a588bf2b78ca44c6e6fe5aa5a2b13f"
+  integrity sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ==
 
 pretty-error@^4.0.0:
   version "4.0.0"
