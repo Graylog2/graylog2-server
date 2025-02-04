@@ -18,11 +18,13 @@ import * as React from 'react';
 import { useEffect, useState, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import type { UseMutationResult } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import Routes from 'routing/Routes';
 import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Button, Row, Col } from 'components/bootstrap';
@@ -61,7 +63,8 @@ const StartInputStep = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData, stepsConfig } = useInputSetupWizard();
+  const { goToPreviousStep, orderedSteps, activeStep, wizardData, stepsConfig } = useInputSetupWizard();
+  const navigateTo = useNavigate();
   const { stepsData } = useInputSetupWizardSteps();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
@@ -250,8 +253,12 @@ const StartInputStep = () => {
     rollback();
   };
 
-  const onNextStep = () => {
-    goToNextStep();
+  const goToInputDiagnosis = () => {
+    const { input } = wizardData;
+
+    if (!input) return;
+
+    navigateTo(Routes.SYSTEM.INPUT_DIAGNOSIS(input.id));
   };
 
   const handleBackClick = () => {
@@ -327,7 +334,7 @@ const StartInputStep = () => {
 
     if (hasNextStep) {
       return (
-        <Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={onNextStep} bsStyle="primary" data-testid="input-diagnosis-button">Input Diagnosis</Button>
+        <Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={goToInputDiagnosis} bsStyle="primary" data-testid="input-diagnosis-button">Input Diagnosis</Button>
       );
     }
 
