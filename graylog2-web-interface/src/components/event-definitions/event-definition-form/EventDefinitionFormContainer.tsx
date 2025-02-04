@@ -64,7 +64,7 @@ const EventDefinitionFormContainer = ({
   eventDefinition: eventDefinitionInitial = {
     title: '',
     description: '',
-    priority: EventDefinitionPriorityEnum.NORMAL,
+    priority: EventDefinitionPriorityEnum.MEDIUM,
     // @ts-ignore
     config: {},
     field_spec: {},
@@ -77,12 +77,12 @@ const EventDefinitionFormContainer = ({
     notifications: [],
     alert: false,
   },
-  formControls,
+  formControls = undefined,
   initialStep = STEP_KEYS[0],
-  onCancel,
-  onChangeStep,
+  onCancel = undefined,
+  onChangeStep = undefined,
   onEventDefinitionChange = () => {},
-  onSubmit,
+  onSubmit = undefined,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);

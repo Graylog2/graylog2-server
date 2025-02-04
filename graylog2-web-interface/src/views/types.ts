@@ -286,8 +286,9 @@ type EventWidgetActionModalProps<T> = React.PropsWithRef<{
   ref: React.LegacyRef<T>,
 }
 
-type EventActionModalProps<T> = React.PropsWithRef<{
+export type EventActionModalProps<T> = React.PropsWithRef<{
   events: Array<Event>,
+  fromBulk?: boolean,
 }> & {
   ref: React.LegacyRef<T>,
 }
@@ -340,6 +341,7 @@ type AssetInformation = {
 export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>,
   modalRef: () => T,
+  fromBulk?: boolean,
 }
 
 type MessageActionComponentProps = {
@@ -410,6 +412,10 @@ export type CustomCommandContextProvider<T extends keyof CustomCommandContext> =
   key: T,
   provider: () => CustomCommandContext[T],
 }
+
+export type CurrentViewType = {
+  activeQuery: string,
+};
 
 export interface ViewState {
   activeQuery: QueryId;

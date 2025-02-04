@@ -41,7 +41,7 @@ const DescriptionCol = styled(Col)(({ theme }) => css`
 `);
 
 const StyledHeading = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
+  margin-bottom: ${theme.spacings.sm};
 `);
 
 const ExistingStreamCol = styled(Col)(({ theme }) => css`
@@ -66,6 +66,15 @@ const ConntectedPipelinesList = styled.ul`
   list-style-type: disc;
   padding-left: 20px;
 `;
+
+const StyledLabel = styled.label(({ theme }) => css`
+  font-weight: normal;
+  line-height: 1.1;
+  margin-bottom: ${theme.spacings.sm};
+  display: inline-block;
+  font-size: ${theme.fonts.size.h3};
+  background: none;
+`);
 
 export type RoutingStepData = {
   streamId?: string,
@@ -225,7 +234,8 @@ const SetupRoutingStep = () => {
         ) : (
           <Row>
             <ExistingStreamCol md={6}>
-              <StyledHeading>Choose an existing Stream</StyledHeading>
+              <StyledLabel>Choose an existing Stream</StyledLabel>
+
               {!isLoadingStreams && (
               <Select inputId="streams"
                       onChange={handleStreamSelect}
