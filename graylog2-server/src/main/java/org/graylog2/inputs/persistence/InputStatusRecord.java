@@ -42,6 +42,8 @@ public abstract class InputStatusRecord {
         return new AutoValue_InputStatusRecord.Builder();
     }
 
+    public abstract Builder toBuilder();
+
     @AutoValue.Builder
     public static abstract class Builder {
         @Id

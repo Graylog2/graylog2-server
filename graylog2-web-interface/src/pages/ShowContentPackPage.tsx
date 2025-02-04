@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, ButtonToolbar, BootstrapModalConfirm } from 'components/bootstrap';
@@ -27,39 +27,45 @@ import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';
 import ContentPackInstallEntityList from 'components/content-packs/ContentPackInstallEntityList';
-import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
-import { useStore } from 'stores/connect';
+import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 import useHistory from 'routing/useHistory';
 import useParams from 'routing/useParams';
+import useContentPackRevisions from 'components/content-packs/hooks/useContentPackRevisions';
+import useContentPackInstallations from 'components/content-packs/hooks/useContentPackInstallations';
+import type FetchError from 'logic/errors/FetchError';
 
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
 const ShowContentPackPage = () => {
-  const { contentPackRevisions, installations, constraints, selectedVersion: currentVersion } = useStore(ContentPacksStore);
   const history = useHistory();
   const params = useParams<{ contentPackId: string }>();
+  const onFetchError = useCallback((error: FetchError) => {
+    if (error.status === 404) {
+      UserNotification.error(
+        `Cannot find Content Pack with the id ${params.contentPackId} and may have been deleted.`,
+      );
+    } else {
+      UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
+    }
+
+    history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
+  }, [history, params?.contentPackId]);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState(undefined);
   const [uninstallEntities, setUninstallEntities] = useState(undefined);
   const [uninstallContentPackId, setUninstallContentPackId] = useState(undefined);
   const [uninstallInstallId, setUninstallInstallId] = useState(undefined);
-
-  useEffect(() => {
-    ContentPacksActions.get(params.contentPackId).catch((error) => {
-      if (error.status === 404) {
-        UserNotification.error(
-          `Cannot find Content Pack with the id ${params.contentPackId} and may have been deleted.`,
-        );
-      } else {
-        UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
-      }
-
-      history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
-    });
-
-    ContentPacksActions.installList(params.contentPackId);
-  }, [history, params?.contentPackId]);
+  const {
+    data: contentPack,
+    isInitialLoading: isLoadingContentPack,
+    refetch: refetchContentPack,
+  } = useContentPackRevisions(params?.contentPackId, onFetchError);
+  const {
+    data: contentPackInstallations,
+    isInitialLoading: isLoadingInstallations,
+    refetch: refetchInstallations,
+  } = useContentPackInstallations(params?.contentPackId);
 
   const _onVersionChanged = (newVersion) => {
     setSelectedVersion(newVersion);
@@ -71,13 +77,7 @@ const ShowContentPackPage = () => {
       ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
         UserNotification.success('Content pack revision deleted successfully.', 'Success');
 
-        ContentPacksActions.get(contentPackId).catch((error) => {
-          if (error.status !== 404) {
-            UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
-          }
-
-          history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
-        });
+        refetchContentPack();
       }, (error) => {
         let errMessage = error.message;
 
@@ -108,11 +108,9 @@ const ShowContentPackPage = () => {
   };
 
   const _uninstallContentPackRev = () => {
-    const contentPackId = uninstallContentPackId;
-
     ContentPacksActions.uninstall(uninstallContentPackId, uninstallInstallId).then(() => {
       UserNotification.success('Content Pack uninstalled successfully.', 'Success');
-      ContentPacksActions.installList(contentPackId);
+      refetchInstallations();
       _clearUninstall();
     }, () => {
       UserNotification.error('Uninstall content pack failed, please check your logs for more information.', 'Error');
@@ -122,16 +120,19 @@ const ShowContentPackPage = () => {
   const _installContentPack = (contentPackId: string, contentPackRev: string, parameters) => {
     ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(() => {
       UserNotification.success('Content Pack installed successfully.', 'Success');
-      ContentPacksActions.installList(contentPackId);
+      refetchInstallations();
     }, (error) => {
       UserNotification.error(`Installing content pack failed with status: ${error}.
          Could not install content pack with ID: ${contentPackId}`);
     });
   };
 
-  if (!contentPackRevisions) {
+  if (isLoadingContentPack || isLoadingInstallations) {
     return (<Spinner />);
   }
+
+  const { contentPackRevisions, constraints, selectedVersion: currentVersion } = contentPack;
+  const { installations } = contentPackInstallations;
 
   return (
     <DocumentTitle title="Content packs">
@@ -174,7 +175,6 @@ const ShowContentPackPage = () => {
             </div>
           </Col>
           <Col md={8} className="content">
-            {/* @ts-ignore */}
             <ContentPackDetails contentPack={contentPackRevisions.contentPack(selectedVersion ?? currentVersion)}
                                 constraints={constraints[selectedVersion ?? currentVersion]}
                                 showConstraints

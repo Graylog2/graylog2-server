@@ -31,7 +31,6 @@ import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, getStepConfigOrData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import type { RoutingStepData } from 'components/inputs/InputSetupWizard/steps/SetupRoutingStep';
-import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import ProgressMessage from 'components/inputs/InputSetupWizard/steps/components/ProgressMessage';
 
@@ -117,12 +116,7 @@ const StartInputStep = () => {
       description: `Pipeline for Stream: ${stream.title} created by the Input Setup Wizard.`,
     };
 
-    const requestPipeline = {
-      ...pipeline,
-      source: SourceGenerator.generatePipeline({ ...pipeline, stages: [{ stage: 0, rules: [], match: '' }] }),
-    };
-
-    return createPipelineMutation.mutateAsync(requestPipeline);
+    return createPipelineMutation.mutateAsync(pipeline);
   };
 
   const startInput = async () => {
@@ -197,7 +191,7 @@ const StartInputStep = () => {
     const routingStepData = getStepConfigOrData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
     const createdStreamId = createStreamMutation.data?.stream_id;
     const createdPipelineId = createPipelineMutation.data?.id;
-    const routingRuleId = updateRoutingMutation.data?.id;
+    const routingRuleId = updateRoutingMutation.data?.rule_id;
 
     switch (routingStepData.streamType) {
       case 'NEW':
@@ -327,13 +321,13 @@ const StartInputStep = () => {
 
     if (startInputStatus === 'FAILED' || startInputStatus === 'ROLLING_BACK') {
       return (
-        <Button disabled={startInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary">Rollback Input</Button>
+        <Button disabled={startInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary" data-testid="rollback-input-button">Rollback Input</Button>
       );
     }
 
     if (hasNextStep) {
       return (
-        <Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={onNextStep} bsStyle="primary">Input Diagnosis</Button>
+        <Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={onNextStep} bsStyle="primary" data-testid="input-diagnosis-button">Input Diagnosis</Button>
       );
     }
 
