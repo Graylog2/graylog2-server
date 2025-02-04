@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Fix various issues in AMQP input"
+message = "Fix various issues in AMQP input: allow passive queue declaration, fix leaks in thread execution and connection handling, expose client metrics, set proper connection name, clarify parallelQueues option"
 
-issues = [""]
+issues = ["6827", "7747"]
 pulls = ["20270"]
