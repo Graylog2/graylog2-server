@@ -191,10 +191,23 @@ describe('InputSetupWizard Setup Routing', () => {
 
     it('should render the Setup Routing step', async () => {
       renderWizard();
+    const routingStepText = await screen.findByText(/Select a destination Stream to route messages from this input to./i);
 
-      const routingStepText = await screen.findByText(/Choose a Destination Stream to route Messages from this Input to./i);
 
       expect(routingStepText).toBeInTheDocument();
+    });
+   
+  describe('Stream Selection', () => {
+    it('should show the stream select when clicking on choose stream', async () => {
+      renderWizard();
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(selectStreamButton);
+
+      await screen.findByLabelText(/All messages \(Default\)/i);
     });
 
     it('should only show editable existing streams', async () => {
@@ -206,6 +219,12 @@ describe('InputSetupWizard Setup Routing', () => {
       ));
 
       renderWizard();
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(selectStreamButton);
 
       const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
@@ -228,6 +247,13 @@ describe('InputSetupWizard Setup Routing', () => {
 
       renderWizard();
 
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(selectStreamButton);
+
       const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
       await selectEvent.openMenu(streamSelect);
@@ -249,16 +275,21 @@ describe('InputSetupWizard Setup Routing', () => {
 
       renderWizard();
 
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(selectStreamButton);
+
       const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
       await selectEvent.openMenu(streamSelect);
-
       await selectEvent.select(streamSelect, 'Aloho');
     });
 
-    it('should show a warning if the selected stream has connected pipelines', async () => {
-      asMock(useStreamsByIndexSet).mockReturnValue(useStreamByIndexSetResult());
 
+    it('should show a warning if the selected stream has connected pipelines', async () => {
       asMock(useStreams).mockReturnValue(useStreamsResult(
         [
           { id: 'alohoid', title: 'Aloho', is_editable: true },
@@ -273,13 +304,20 @@ describe('InputSetupWizard Setup Routing', () => {
 
       renderWizard();
 
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(selectStreamButton);
+
       const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
       await selectEvent.openMenu(streamSelect);
 
       await selectEvent.select(streamSelect, 'Aloho');
 
-      const warning = await screen.findByText(/The selected stream has existing pipelines/i);
+      const warning = await screen.findByText(/Pipelines connected to target Stream/i);
       const warningPipeline1 = await screen.findByText(/Pipeline1/i);
       const warningPipeline2 = await screen.findByText(/Pipeline2/i);
 
@@ -288,6 +326,7 @@ describe('InputSetupWizard Setup Routing', () => {
       expect(warningPipeline2).toBeInTheDocument();
     });
   });
+});
 
   describe('Stream creation', () => {
     beforeEach(() => {
@@ -389,7 +428,7 @@ describe('InputSetupWizard Setup Routing', () => {
       });
 
       const nextStepButton = await screen.findByRole('button', {
-        name: /Finish & Start Input/i,
+        name: /Skip & Start Input/i,
         hidden: true,
       });
 

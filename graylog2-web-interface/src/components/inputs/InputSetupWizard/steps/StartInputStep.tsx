@@ -18,7 +18,9 @@ import * as React from 'react';
 import { useEffect, useState, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import type { UseMutationResult } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Button, Row, Col } from 'components/bootstrap';
@@ -54,7 +56,8 @@ const ButtonCol = styled(Col)(({ theme }) => css`
 export type ProcessingSteps = 'createStream' | 'startStream' | 'createPipeline' | 'setupRouting' | 'deleteStream' | 'deletePipeline' | 'deleteRouting' | 'result';
 
 const StartInputStep = () => {
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData, stepsConfig } = useInputSetupWizard();
+  const navigateTo = useNavigate();
+  const { goToPreviousStep, orderedSteps, activeStep, wizardData, stepsConfig } = useInputSetupWizard();
   const { stepsData } = useInputSetupWizardSteps();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
@@ -234,8 +237,12 @@ const StartInputStep = () => {
     rollback();
   };
 
-  const onNextStep = () => {
-    goToNextStep();
+  const goToInputDiagnosis = () => {
+    const { input } = wizardData;
+
+    if (!input) return;
+
+    navigateTo(Routes.SYSTEM.INPUT_DIAGNOSIS(input.id));
   };
 
   const handleBackClick = () => {
@@ -311,7 +318,7 @@ const StartInputStep = () => {
 
     if (hasNextStep) {
       return (
-        <Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={onNextStep} bsStyle="primary" data-testid="input-diagnosis-button">Input Diagnosis</Button>
+        <Button disabled={isNextStepDisabled || startInputStatus === 'RUNNING'} onClick={goToInputDiagnosis} bsStyle="primary" data-testid="input-diagnosis-button">Input Diagnosis</Button>
       );
     }
 
