@@ -30,7 +30,7 @@ import EventDefinitionReplaySearchPage, { onErrorHandler } from 'views/pages/Eve
 import useEventDefinition from 'hooks/useEventDefinition';
 import {
   mockedMappedAggregation,
-  mockEventDefinitionTwoAggregations,
+  mockEventDefinitionTwoAggregations, mockEventData,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
 import type { Stream } from 'logic/streams/types';
@@ -91,7 +91,7 @@ describe('EventDefinitionReplaySearchPage', () => {
 
   it('should run useEventDefinition, UseCreateViewForEvent with correct parameters', async () => {
     asMock(useAlertAndEventDefinitionData).mockReturnValue({
-      eventData: undefined,
+      eventData: mockEventData.event,
       eventDefinition: mockEventDefinitionTwoAggregations,
       aggregations: mockedMappedAggregation,
       alertId: undefined,
@@ -108,7 +108,7 @@ describe('EventDefinitionReplaySearchPage', () => {
 
     await waitFor(() => {
       expect(UseCreateViewForEvent).toHaveBeenCalledWith({
-        eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,
+        eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation, eventData: mockEventData.event,
       });
     });
   });

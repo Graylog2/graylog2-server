@@ -56,10 +56,10 @@ type Props = {
 const FieldsConfiguration = ({
   createSelectPlaceholder = 'Add a field',
   displaySortableListOverlayInPortal = false,
-  menuPortalTarget,
+  menuPortalTarget = undefined,
   onChange,
-  isFieldQualified,
-  selectSize,
+  isFieldQualified = undefined,
+  selectSize = undefined,
   selectedFields,
   testPrefix = '',
   showSelectAllRest = false,
@@ -92,21 +92,23 @@ const FieldsConfiguration = ({
   return (
     <>
       {_showListCollapseButton && (
-      <ToggleButton bsStyle="link"
-                    bsSize="xs"
-                    onClick={() => {
-                      setShowSelectedList((cur) => !cur);
-                    }}>
-        {showSelectedList ? `Hide ${selectedFields.length} selected fields` : `Show ${selectedFields.length} selected fields`}<ToggleIcon name={showSelectedList ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-      </ToggleButton>
+        <ToggleButton bsStyle="link"
+                      bsSize="xs"
+                      onClick={() => {
+                        setShowSelectedList((cur) => !cur);
+                      }}>
+          {showSelectedList ? `Hide ${selectedFields.length} selected fields` : `Show ${selectedFields.length} selected fields`}<ToggleIcon name={showSelectedList ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+        </ToggleButton>
       )}
       {showSelectedList && (
-      <SelectedFieldsList testPrefix={testPrefix}
-                          selectedFields={selectedFields}
-                          selectSize={selectSize}
-                          displayOverlayInPortal={displaySortableListOverlayInPortal}
-                          onChange={onChange}
-                          showUnit={showUnit} />
+        <SelectedFieldsList testPrefix={testPrefix}
+                            selectedFields={selectedFields}
+                            selectSize={selectSize}
+                            displayOverlayInPortal={displaySortableListOverlayInPortal}
+                            onChange={onChange}
+                            fieldSelectMenuPortalTarget={menuPortalTarget}
+                            fieldSelect={FieldSelectComponent}
+                            showUnit={showUnit} />
       )}
       <FieldSelectComponent id="field-create-select"
                             onChange={onAddField}
