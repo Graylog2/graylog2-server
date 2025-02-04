@@ -15,12 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import styled from 'styled-components';
 
 import { DocumentTitle, Icon, PageHeader } from 'components/common';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
 import ClusterConfigurationClusterView from 'components/cluster-configuration/ClusterConfigurationClusterView';
 import ClusterConfigurationTableView from 'components/cluster-configuration/ClusterConfigurationTableView';
+
+const ViewTypeSwitchContainer = styled(Col)`
+  display: flex;
+  justify-content: right;
+`;
 
 const VIEW_TYPES_SEGMENTS = [
   {
@@ -54,12 +60,12 @@ const ClusterConfigurationPage = () => {
           <Col xs={6}>
             <h2>Nodes</h2>
           </Col>
-          <Col xs={6} style={{ display: 'flex', justifyContent: 'right' }}>
+          <ViewTypeSwitchContainer xs={6}>
             <SegmentedControl data={VIEW_TYPES_SEGMENTS}
                               radius="sm"
                               value={viewType}
                               onChange={(newViewType) => setViewType(newViewType)} />
-          </Col>
+          </ViewTypeSwitchContainer>
           <Col md={12}>
             {viewType === 'list' && (
               <ClusterConfigurationTableView graylogNodes={graylogNodes} dataNodes={dataNodes} />
