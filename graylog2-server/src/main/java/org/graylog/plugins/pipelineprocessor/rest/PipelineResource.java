@@ -100,7 +100,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
     private final PipelineService pipelineService;
     private final PipelineRuleParser pipelineRuleParser;
     private final PipelineStreamConnectionsService connectionsService;
-    private final StreamService streamService;
     private final InputRoutingService inputRoutingService;
 
     @Inject
@@ -115,7 +114,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
         this.paginatedPipelineService = paginatedPipelineService;
         this.searchQueryParser = new SearchQueryParser(PipelineDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.connectionsService = connectionsService;
-        this.streamService = streamService;
         this.inputRoutingService = inputRoutingService;
     }
 
