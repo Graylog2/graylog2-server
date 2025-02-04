@@ -67,7 +67,7 @@ type Props = {
   systemOverview: SystemOverview,
 }
 
-const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInformation, systemOverview }: Props) => {
+const NodeOverview = ({ node, plugins = null, inputStates = null, inputDescriptions = null, jvmInformation = null, systemOverview }: Props) => {
   const DataLakeJournal = PluginStore.exports('dataLake')?.[0]?.DataLakeJournal;
   const pluginCount = `${plugins?.length || 0} plugins installed`;
 
