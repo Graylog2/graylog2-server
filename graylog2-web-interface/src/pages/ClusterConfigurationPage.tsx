@@ -24,19 +24,19 @@ import ClusterConfigurationTableView from 'components/cluster-configuration/Clus
 
 const VIEW_TYPES_SEGMENTS = [
   {
-    value: 'cards' as const,
-    label: (<Icon name="account_tree" type='regular' />),
-  },
-  {
     value: 'list' as const,
     label: (<Icon name="list" />),
+  },
+  {
+    value: 'cards' as const,
+    label: (<Icon name="account_tree" type='regular' />),
   },
 ];
 
 type ViewTypesSegments = 'list' | 'cards';
 
 const ClusterConfigurationPage = () => {
-  const [viewType, setViewType] = useState<ViewTypesSegments>('cards');
+  const [viewType, setViewType] = useState<ViewTypesSegments>('list');
   const { graylogNodes, dataNodes } = useClusterNodes();
 
   return (
