@@ -199,6 +199,24 @@ public class AmqpConsumer {
     }
 
     public void connect() throws IOException, TimeoutException {
+        if (connection == null) {
+            establishConnection();
+        }
+
+        channel = connection.createChannel();
+
+        if (null == channel) {
+            LOG.error("No channel descriptor available!");
+        }
+
+        if (null != channel && prefetchCount > 0) {
+            channel.basicQos(prefetchCount);
+
+            LOG.debug("AMQP prefetch count overriden to <{}>.", prefetchCount);
+        }
+    }
+
+    private void establishConnection() throws IOException, TimeoutException {
         this.executorService = Executors.newFixedThreadPool(parallelQueues, new ThreadFactoryBuilder()
                 .setNameFormat("amqp-consumer-%d " + sourceInput.toIdentifier())
                 .setDaemon(true)
@@ -247,19 +265,7 @@ public class AmqpConsumer {
             factory.setUsername(username);
             factory.setPassword(encryptedValueService.decrypt(password));
         }
-        connection = factory.newConnection(f("graylog-node-%s-input%s", nodeId.getNodeId(), sourceInput.toIdentifier()));
-        channel = connection.createChannel();
-
-        if (null == channel) {
-            LOG.error("No channel descriptor available!");
-        }
-
-        if (null != channel && prefetchCount > 0) {
-            channel.basicQos(prefetchCount);
-
-            LOG.debug("AMQP prefetch count overriden to <{}>.", prefetchCount);
-        }
-
+        connection = factory.newConnection(f("graylog-node-%s-input%s-%s", nodeId.getNodeId(), sourceInput.toIdentifier(), hashCode()));
         connection.addShutdownListener(cause -> {
             if (cause.isInitiatedByApplication()) {
                 LOG.info("Shutting down AMPQ consumer.");
