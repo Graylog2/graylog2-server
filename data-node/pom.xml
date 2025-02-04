@@ -598,7 +598,7 @@
                             <url>
                                 https://artifacts.opensearch.org/releases/plugins/repository-s3/2.18.0/repository-s3-2.18.0.zip
                             </url>
-                            <outputFileName>repository-s3-2.18.0.zip</outputFileName>
+                            <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
                                 9bd810fb48dca8b643e8b97d6ee87702435200c3ad9f72bdeb34cd5466a92b1271266888321d60d3698a2d7495a77e26f371ad54f4db0de4a52cd179b63251c3
