@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
-import { hasAttribute, optionalMarker } from 'components/configurationforms/FieldHelpers';
+import { hasAttribute, optionableLabel } from 'components/configurationforms/FieldHelpers';
 import { getValueFromInput } from 'util/FormsUtils';
 
 import type { TextField as TextFieldType, EncryptedFieldValue } from './types';
@@ -38,8 +38,6 @@ const TextField = ({ field, title, typeName, dirty = false, onChange, value = ''
   const fieldType = (!hasAttribute(field.attributes, 'textarea') && (hasAttribute(field.attributes, 'is_password') || showReadOnlyEncrypted) ? 'password' : 'text');
   const fieldId = `${typeName}-${title}`;
   const [isResetted, setIsResetted] = useState<boolean>(false);
-
-  const labelContent = <>{field.human_name} {optionalMarker(field)}</>;
 
   const getFieldValue = () => {
     if (showReadOnlyEncrypted) return 'encrypted placeholder';
@@ -98,7 +96,7 @@ const TextField = ({ field, title, typeName, dirty = false, onChange, value = ''
       <Input id={fieldId}
              type="textarea"
              rows={10}
-             label={labelContent}
+             label={optionableLabel(field)}
              name={`configuration[${title}]`}
              required={isRequired}
              help={field.description}
@@ -112,7 +110,7 @@ const TextField = ({ field, title, typeName, dirty = false, onChange, value = ''
     <Input id={fieldId}
            type={fieldType}
            name={`configuration[${title}]`}
-           label={labelContent}
+           label={optionableLabel(field)}
            required={isRequired}
            help={field.description}
            value={getFieldValue()}

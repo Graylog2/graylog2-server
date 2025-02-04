@@ -170,4 +170,10 @@ describe('RuleBlockForm', () => {
     expect(screen.getByText('wrong 1')).toBeInTheDocument();
     expect(screen.getByText('not right 2')).toBeInTheDocument();
   });
+
+  it('shows a deprecated label for deprecating pipeline functions', async () => {
+    render(comp({ selectedBlockDict: actionsBlockDict[0] }));
+
+    expect(screen.getByText('Deprecated')).toBeInTheDocument();
+  });
 });

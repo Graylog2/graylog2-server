@@ -45,6 +45,8 @@ const iconName = (type: string) => {
       return 'fork_right';
     case 'input':
       return 'cell_tower';
+    case 'event-definition-id':
+      return 'edit_document';
     default:
       return 'help';
   }
