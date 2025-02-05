@@ -197,7 +197,9 @@ public class InputsResource extends AbstractInputsResource {
     public void terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
         final Input input = inputService.find(inputId);
-        inputService.destroy(input);
+        if (0 < inputService.destroy(input)) {
+            clusterEventBus.post(new InputDeletedEvent(input.getId(), input.getTitle()));
+        }
     }
 
     @PUT

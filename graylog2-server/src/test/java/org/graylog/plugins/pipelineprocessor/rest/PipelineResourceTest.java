@@ -140,7 +140,7 @@ public class PipelineResourceTest {
                 "id0", "title0", "description0", "",
                 Collections.emptyList(),
                 null, null);
-        String pipelineString = PipelineResource.createPipelineString(pipelineSource);
+        String pipelineString = PipelineUtils.createPipelineString(pipelineSource);
         assertThat(pipelineString).isEqualTo("pipeline \"title0\"\nend");
     }
 
@@ -152,7 +152,7 @@ public class PipelineResourceTest {
                         StageSource.builder()
                                 .stage(0).rules(java.util.List.of("rule1", "rule2")).match(EITHER).build()),
                 null, null);
-        String pipelineString = PipelineResource.createPipelineString(pipelineSource);
+        String pipelineString = PipelineUtils.createPipelineString(pipelineSource);
         assertThat(pipelineString).isEqualTo("pipeline \"title1\"\nstage 0 match EITHER\nrule \"rule1\"\nrule \"rule2\"\nend");
     }
 
@@ -166,7 +166,7 @@ public class PipelineResourceTest {
                         StageSource.builder()
                                 .stage(1).rules(java.util.List.of("rule3", "rule4")).match(ALL).build()),
                 null, null);
-        String pipelineString = PipelineResource.createPipelineString(pipelineSource);
+        String pipelineString = PipelineUtils.createPipelineString(pipelineSource);
         assertThat(pipelineString).isEqualTo(
                 "pipeline \"title2\"\nstage 0 match EITHER\nrule \"rule1\"\nrule \"rule2\"\nstage 1 match ALL\nrule \"rule3\"\nrule \"rule4\"\nend");
     }

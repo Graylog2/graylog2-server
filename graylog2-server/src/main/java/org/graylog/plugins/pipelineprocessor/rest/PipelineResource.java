@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
@@ -97,7 +96,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
     private final SearchQueryParser searchQueryParser;
     private final PaginatedPipelineService paginatedPipelineService;
-
     private final PipelineService pipelineService;
     private final PipelineRuleParser pipelineRuleParser;
     private final PipelineStreamConnectionsService connectionsService;
@@ -241,30 +239,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     public PipelineSource update(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
-
-        final PipelineDao dao = pipelineService.load(id);
-        final Pipeline pipeline;
-        try {
-            pipeline = pipelineRuleParser.parsePipeline(update.id(), update.source());
-        } catch (ParseException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
-        }
-        final PipelineDao toSave = dao.toBuilder()
-                .title(pipeline.name())
-                .description(update.description())
-                .source(update.source())
-                .modifiedAt(DateTime.now(DateTimeZone.UTC))
-                .build();
-
-        final PipelineDao savedPipeline;
-        try {
-            savedPipeline = pipelineService.save(toSave);
-        } catch (IllegalArgumentException e) {
-            log.error(e.getMessage(), e);
-            throw new BadRequestException(e.getMessage());
-        }
-
-        return PipelineSource.fromDao(pipelineRuleParser, savedPipeline);
+        return PipelineUtils.update(pipelineService, pipelineRuleParser, id, update);
     }
 
     public record RoutingRequest(
@@ -301,7 +276,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
         if (rules0.stream().filter(ruleRef -> ruleRef.equals(ruleDao.title())).findFirst().isEmpty()) {
             rules0.add(ruleDao.title());
             pipelineSource = pipelineSource.toBuilder()
-                    .source(createPipelineString(pipelineSource))
+                    .source(PipelineUtils.createPipelineString(pipelineSource))
                     .build();
             update(pipelineDao.id(), pipelineSource);
         } else {
@@ -338,21 +313,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
         }
         pipelineConnections.pipelineIds().add(pipelineId);
         connectionsService.save(pipelineConnections);
-    }
-
-    @VisibleForTesting
-    public static String createPipelineString(PipelineSource pipelineSource) {
-        StringBuilder result = new StringBuilder("pipeline \"" + pipelineSource.title() + "\"\n");
-        for (int stageNr = 0; stageNr < pipelineSource.stages().size(); stageNr++) {
-            StageSource currStage = pipelineSource.stages().get(stageNr);
-            result.append("stage ").append(stageNr).append(" match ").append(currStage.match()).append('\n');
-            for (String rule : currStage.rules()) {
-                result.append("rule \"").append(rule).append("\"\n");
-            }
-        }
-        result.append("end");
-
-        return result.toString();
     }
 
     @ApiOperation(value = "Delete a processing pipeline", notes = "It can take up to a second until the change is applied")

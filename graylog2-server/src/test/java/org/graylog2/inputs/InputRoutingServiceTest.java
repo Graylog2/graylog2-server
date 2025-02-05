@@ -18,15 +18,16 @@ package org.graylog2.inputs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
+import org.apache.commons.io.IOUtils;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -65,7 +66,8 @@ class InputRoutingServiceTest {
         final RuleDao expected = objectMapper.readValue(ruleDaoFixture, RuleDao.class);
 
         InputRoutingService inputRoutingService = new InputRoutingService(
-                ruleService, inputService, streamService, null, mock(EventBus.class));
+                ruleService, inputService, streamService, null,
+                mock(PipelineRuleParser.class), mock(EventBus.class));
         RuleDao actual = inputRoutingService.createRoutingRule(new PipelineResource.RoutingRequest(INPUT_ID, STREAM_ID, false));
 
         assertThat(actual.title()).isEqualTo(expected.title());

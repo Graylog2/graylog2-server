@@ -23,14 +23,19 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineUtils;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.rest.PipelineResource.GL_INPUT_ROUTING_PIPELINE;
@@ -45,6 +50,7 @@ public class InputRoutingService {
     private final InputService inputService;
     private final StreamService streamService;
     private final PipelineService pipelineService;
+    private final PipelineRuleParser pipelineRuleParser;
 
     @Inject
     public InputRoutingService(
@@ -52,11 +58,13 @@ public class InputRoutingService {
             InputService inputService,
             StreamService streamService,
             PipelineService pipelineService,
+            PipelineRuleParser pipelineRuleParser,
             EventBus eventBus) {
         this.ruleService = ruleService;
         this.inputService = inputService;
         this.streamService = streamService;
         this.pipelineService = pipelineService;
+        this.pipelineRuleParser = pipelineRuleParser;
 
         eventBus.register(this);
     }
@@ -117,7 +125,7 @@ public class InputRoutingService {
         return ruleName.matches(GL_ROUTING_RULE_REGEX);
     }
 
-    private boolean isSystemRulePattern(String ruleName, String inputName) {
+    private boolean isSystemRulePatternInput(String ruleName, String inputName) {
         return ruleName.matches(GL_ROUTING_RULE_PREFIX + inputName + "_to_.*");
     }
 
@@ -127,7 +135,7 @@ public class InputRoutingService {
     @Subscribe
     public void handleInputRenamed(InputRenamedEvent event) {
         ruleService.loadAll().stream()
-                .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.oldTitle()))
+                .filter(ruleDao -> isSystemRulePatternInput(ruleDao.title(), event.oldTitle()))
                 .forEach(ruleDao -> {
                     String oldRuleTitle = ruleDao.title();
                     String newRuleTitle = ruleDao.title().replace(event.oldTitle(), event.newTitle());
@@ -158,4 +166,35 @@ public class InputRoutingService {
         }
     }
 
+    /**
+     * Update routing rules when an input is deleted.
+     */
+    @Subscribe
+    public void handleInputDeleted(InputDeletedEvent event) {
+        ruleService.loadAll().stream()
+                .filter(ruleDao -> isSystemRulePatternInput(ruleDao.title(), event.title()))
+                .filter(ruleDao -> ruleDao.source().contains(event.inputId()))
+                .forEach(ruleDao -> {
+                    ruleService.delete(ruleDao.id());
+                    handleRuleDeleted(ruleDao.id(), ruleDao.title());
+                });
+    }
+
+    private void handleRuleDeleted(String ruleId, String ruleTitle) {
+        try {
+            PipelineDao pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
+            PipelineSource pipelineSource = PipelineSource.fromDao(pipelineRuleParser, pipelineDao);
+            final List<String> rules0 = pipelineSource.stages().get(0).rules();
+            rules0.stream()
+                    .filter(ruleRef -> ruleRef.equals(ruleTitle))
+                    .findFirst()
+                    .ifPresent(rules0::remove);
+            pipelineSource = pipelineSource.toBuilder()
+                    .source(PipelineUtils.createPipelineString(pipelineSource))
+                    .build();
+            PipelineUtils.update(pipelineService, pipelineRuleParser, pipelineDao.id(), pipelineSource);
+        } catch (NotFoundException e) {
+            log.warn("Unable to load pipeline {}", GL_INPUT_ROUTING_PIPELINE, e);
+        }
+    }
 }
