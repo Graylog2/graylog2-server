@@ -719,6 +719,10 @@
                                         <exclude>javax.inject:*</exclude>
                                         <exclude>javax.ws.rs:javax.*</exclude>
                                         <exclude>com.fasterxml.jackson.jaxrs:*</exclude>
+                                        <!-- Ban bouncycastle jdk15on dependencies. We are using jdk18on equivalents instead. -->
+                                        <exclude>org.bouncycastle:bcprov-jdk15on</exclude>
+                                        <exclude>org.bouncycastle:bcpkix-jdk15on</exclude>
+                                        <exclude>org.bouncycastle:bcutil-jdk15on</exclude>
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>
