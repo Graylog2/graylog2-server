@@ -198,7 +198,7 @@ interface PluginDataLake {
     permissions: Immutable.List<string>,
   }>,
   DataLakeStatus: React.ComponentType<{
-    DataLakeareHouseEnabled: boolean;
+    dataLakeEnabled: boolean;
   }>,
   DataLakeJournal: React.ComponentType<{
     nodeId: string,
