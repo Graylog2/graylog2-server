@@ -100,7 +100,7 @@
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.30.4</aws-java-sdk-2.version>
-        <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
+        <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
         <bouncycastle.version>1.80</bouncycastle.version>
@@ -142,7 +142,7 @@
         <jdot.version>1.0</jdot.version>
         <jersey.version>3.1.10</jersey.version>
         <jmte.version>7.0.3</jmte.version>
-        <joda-time.version>2.13.0</joda-time.version>
+        <joda-time.version>2.13.1</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-org.version>20250107</json-org.version>
         <json-path.version>2.9.0</json-path.version>
