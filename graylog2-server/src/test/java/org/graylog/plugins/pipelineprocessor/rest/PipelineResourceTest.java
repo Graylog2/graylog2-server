@@ -27,6 +27,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog2.inputs.InputRoutingService;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;

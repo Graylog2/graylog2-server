@@ -55,6 +55,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.inputs.InputRoutingService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;

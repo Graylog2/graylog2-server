@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.pipelineprocessor.rest;
+package org.graylog2.inputs;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -23,9 +23,8 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.inputs.Input;
-import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
 import org.graylog2.streams.StreamService;
@@ -40,6 +39,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class InputRoutingService {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InputRoutingService.class);
     public static final String GL_ROUTING_RULE_PREFIX = "gl_route_";
+    public static final String GL_ROUTING_RULE_REGEX = GL_ROUTING_RULE_PREFIX + ".*_to_.*";
 
     private final RuleService ruleService;
     private final InputService inputService;
@@ -61,6 +61,10 @@ public class InputRoutingService {
         eventBus.register(this);
     }
 
+    /**
+     * Create a routing rule for the given input and stream ID.
+     * The rule is immune to renaming of the input or stream, since it only references the IDs.
+     */
     public RuleDao createRoutingRule(PipelineResource.RoutingRequest request) throws NotFoundException {
         Stream stream;
         try {
@@ -110,13 +114,16 @@ public class InputRoutingService {
     }
 
     private boolean isSystemRulePattern(String ruleName) {
-        return ruleName.matches(GL_ROUTING_RULE_PREFIX + ".*_to_.*");
+        return ruleName.matches(GL_ROUTING_RULE_REGEX);
     }
 
     private boolean isSystemRulePattern(String ruleName, String inputName) {
         return ruleName.matches(GL_ROUTING_RULE_PREFIX + inputName + "_to_.*");
     }
 
+    /**
+     * Update routing rules when an input is renamed.
+     */
     @Subscribe
     public void handleInputRenamed(InputRenamedEvent event) {
         ruleService.loadAll().stream()
@@ -131,7 +138,7 @@ public class InputRoutingService {
     }
 
     /**
-     * Update default pipeline when a rule is renamed.
+     * Update default pipeline when a routing rule is renamed.
      * Generally, this is an expensive operation since pipelines are stored as strings and we have no mapping from rules
      * to pipelines that reference them. We therefore limit this operation to system routing rules in the default pipeline.
      */

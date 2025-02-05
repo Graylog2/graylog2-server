@@ -1,0 +1,6 @@
+{
+  "id":null,
+  "title":"gl_route_inputName_to_streamName",
+  "description":"Input setup wizard routing rule",
+  "source":"rule \"gl_route_inputName_to_streamName\"\nwhen has_field(\"gl2_source_input\") AND to_string($message.gl2_source_input)==\"inputId\"\nthen\nroute_to_stream(id:\"streamId\", remove_from_default: true);\nend\n"
+}

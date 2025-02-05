@@ -22,7 +22,6 @@ import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.periodical.LegacyDefaultStreamMigration;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
-import org.graylog.plugins.pipelineprocessor.rest.InputRoutingService;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnectionsResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
@@ -55,7 +54,5 @@ public class PipelineProcessorModule extends PluginModule {
         install(new FactoryModuleBuilder().build(PipelineResolver.Factory.class));
 
         addAuditEventTypes(PipelineProcessorAuditEventTypes.class);
-
-        bind(InputRoutingService.class);
     }
 }
