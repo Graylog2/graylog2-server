@@ -18,8 +18,7 @@ import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
 import RuleBlockDisplay from './RuleBlockDisplay';
-import { buildRuleBlock } from './fixtures';
-import { RuleBuilderTypes } from './types';
+import { actionsBlockDict, buildRuleBlock } from './fixtures';
 import RuleBuilderProvider from './RuleBuilderProvider';
 
 const block = buildRuleBlock({
@@ -52,7 +51,7 @@ describe('RuleBlockDisplay', () => {
   it('shows the outputvariable and its return type', async () => {
     render(
       <RuleBuilderProvider>
-        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} returnType={RuleBuilderTypes.Number} type={type} />
+        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} selectedBlockDict={actionsBlockDict[1]} type={type} />
       </RuleBuilderProvider>,
     );
 
@@ -115,5 +114,15 @@ describe('RuleBlockDisplay', () => {
     );
 
     expect(screen.getByText('wrong 1, not right 2')).toBeInTheDocument();
+  });
+
+  it('shows a deprecated label for deprecating pipeline functions', async () => {
+    render(
+      <RuleBuilderProvider>
+        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} selectedBlockDict={actionsBlockDict[0]} type={type} />
+      </RuleBuilderProvider>,
+    );
+
+    expect(screen.getByText('Deprecated')).toBeInTheDocument();
   });
 });
