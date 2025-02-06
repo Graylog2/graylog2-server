@@ -82,7 +82,7 @@ public class PipelineResourceTest {
     @Before
     public void setup() {
         pipelineResource = new PipelineResource(
-                pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, streamService, inputRoutingService);
+                pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, inputRoutingService);
     }
 
     @Test

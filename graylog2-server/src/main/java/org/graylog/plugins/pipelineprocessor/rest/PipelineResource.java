@@ -62,7 +62,6 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -106,7 +105,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
                             PaginatedPipelineService paginatedPipelineService,
                             PipelineRuleParser pipelineRuleParser,
                             PipelineStreamConnectionsService connectionsService,
-                            StreamService streamService,
                             InputRoutingService inputRoutingService) {
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
