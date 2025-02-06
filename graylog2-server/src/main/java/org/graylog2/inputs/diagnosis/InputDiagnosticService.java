@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.inputs;
+package org.graylog2.inputs.diagnosis;
 
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
@@ -36,6 +36,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.inputs.Input;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.models.system.inputs.responses.InputDiagnostics;
 import org.graylog2.streams.StreamService;
