@@ -403,36 +403,12 @@ public class SupportBundleService {
     }
 
     private void fetchDataNodeLogs(DataNodeDto datanode, Path nodeDir) {
-        getProxiedLog(datanode, nodeDir, "opensearch.log", RemoteDataNodeStatusResource::opensearchStdOut);
-        getProxiedLog(datanode, nodeDir, "opensearch.err", RemoteDataNodeStatusResource::opensearchStdErr);
-        getProxiedLogStream(datanode, nodeDir, "datanode.log", RemoteDataNodeStatusResource::datanodeInternalLogs);
+        getProxiedLog(datanode, nodeDir, "datanode.log", RemoteDataNodeStatusResource::datanodeInternalLogs);
     }
 
-    private void getProxiedLog(DataNodeDto datanode, Path nodeDir, String logfile, Function<RemoteDataNodeStatusResource, Call<List<String>>> function) {
+    private void getProxiedLog(DataNodeDto datanode, Path nodeDir, String logfile, Function<RemoteDataNodeStatusResource, Call<ResponseBody>> function) {
         try (var opensearchLog = new FileOutputStream(nodeDir.resolve(logfile).toFile())) {
-
-            Map<String, List<String>> opensearchOut = datanodeProxy
-                    .remoteInterface(datanode.getHostname(), RemoteDataNodeStatusResource.class, function);
-            if (opensearchOut.containsKey(datanode.getHostname())) {
-                opensearchOut.get(datanode.getHostname()).stream()
-                        .map(line -> line + System.lineSeparator())
-                        .forEach(line -> {
-                            try {
-                                opensearchLog.write(line.getBytes(StandardCharsets.UTF_8));
-                            } catch (IOException e) {
-                                LOG.warn("Failed to write line <{}>", line, e);
-                            }
-                        });
-            }
-        } catch (Exception e) {
-            LOG.warn("Failed to get logs from data node <{}>", datanode.getHostname(), e);
-        }
-    }
-
-    private void getProxiedLogStream(DataNodeDto datanode, Path nodeDir, String logfile, Function<RemoteDataNodeStatusResource, Call<ResponseBody>> function) {
-        try (var opensearchLog = new FileOutputStream(nodeDir.resolve(logfile).toFile())) {
-            Map<String, ResponseBody> opensearchOut = datanodeProxy
-                    .remoteInterface(datanode.getHostname(), RemoteDataNodeStatusResource.class, function);
+            Map<String, ResponseBody> opensearchOut = datanodeProxy.remoteInterface(datanode.getHostname(), RemoteDataNodeStatusResource.class, function);
             if (opensearchOut.containsKey(datanode.getHostname())) {
                 opensearchLog.write(opensearchOut.get(datanode.getHostname()).bytes());
             }
