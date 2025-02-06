@@ -56,10 +56,6 @@ public class OpenTelemetryGrpcInput extends MessageInput {
     }
 
     public static class Descriptor extends MessageInput.Descriptor {
-        public boolean isForwarderCompatible() {
-            return false;
-        }
-
         public Descriptor() {
             super(NAME, false, "");
         }
