@@ -118,7 +118,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
         // Set file info before parsing the data for the first time
         fileInfo = getNewFileInfo();
-        lookupRef.set(parseCSVFile());
+        setLookupRefFromCSV();
     }
 
     @Override
@@ -152,7 +152,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             }
 
             LOG.debug("CSV file {} has changed, updating data", config.path());
-            lookupRef.set(parseCSVFile());
+            setLookupRefFromCSV();
             cachePurge.purgeAll();
             // If the file has been moved, then moved back, the fileInfo might have been disconnected.
             // In this case, create a new fileInfo.
@@ -164,7 +164,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
     }
 
-    private Map<String, String> parseCSVFile() throws IOException {
+    private void setLookupRefFromCSV() throws IOException {
         final InputStream inputStream = Files.newInputStream(Paths.get(config.path()));
         final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         final ImmutableMap.Builder<String, String> newLookupBuilder = ImmutableMap.builder();
@@ -237,6 +237,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     }
                 }
             }
+
         } catch (Exception e) {
             LOG.error("Couldn't parse CSV file {} (settings separator=<{}> quotechar=<{}> key_column=<{}> value_column=<{}>)", config.path(),
                     config.separator(), config.quotechar(), config.keyColumn(), config.valueColumn(), e);
@@ -246,8 +247,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
         if (config.isCidrLookup()) {
             cidrLookupRef.set(cidrLookupTrie);
+        } else {
+            lookupRef.set(newLookupBuilder.build());
         }
-        return newLookupBuilder.build();
     }
 
     private String ipAddressToCIDR(String ip) {

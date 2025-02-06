@@ -23,6 +23,8 @@ import java.util.Locale;
 
 /**
  * Binary tree used to for efficient lookups in CIDR data adapters.
+ * NOTE: This class is NOT thread-safe. Use {@link #copy()} to clone the trie, make modifications, and then atomically
+ * replace the in-use copy if needed.
  */
 public class CIDRLookupTrie {
     private static class TrieNode {
@@ -34,9 +36,30 @@ public class CIDRLookupTrie {
         boolean rangeIsIPv6 = false;
         // Time in millis after which the node is considered expired
         long expireAfter = 0L;
+
+        TrieNode deepCopy() {
+            TrieNode newNode = new TrieNode();
+            newNode.rangeName = this.rangeName;
+            newNode.rangeIsIPv6 = this.rangeIsIPv6;
+            newNode.expireAfter = this.expireAfter;
+            if (this.children[0] != null) {
+                newNode.children[0] = this.children[0].deepCopy();
+            }
+            if (this.children[1] != null) {
+                newNode.children[1] = this.children[1].deepCopy();
+            }
+
+            return newNode;
+        }
     }
 
-    private final TrieNode root = new TrieNode();
+    private TrieNode root = new TrieNode();
+
+    public CIDRLookupTrie copy() {
+        final CIDRLookupTrie copy = new CIDRLookupTrie();
+        copy.root = this.root.deepCopy();
+        return copy;
+    }
 
     public void insertCIDR(String cidr, String rangeName) {
         insertCIDR(cidr, rangeName, 0L);
@@ -45,8 +68,8 @@ public class CIDRLookupTrie {
     /**
      * Insert a CIDR range into the trie with a time-to-live
      *
-     * @param cidr properly formatted CIDR address (must include '/rangePrefix' even if it is a single address
-     * @param rangeName the name of the CIDR range
+     * @param cidr        properly formatted CIDR address (must include '/rangePrefix' even if it is a single address
+     * @param rangeName   the name of the CIDR range
      * @param expireAfter epoch time in millis after which the CIDR should be expired
      */
     public void insertCIDR(String cidr, String rangeName, long expireAfter) {
@@ -84,7 +107,7 @@ public class CIDRLookupTrie {
      * Returns the rangeName of the range with the longest prefix that contains the IP address or null if one does not
      * exist.
      *
-     * @param ip IP address to check against the collection of ranges
+     * @param ip               IP address to check against the collection of ranges
      * @param lookupTimeMillis time lookup was performed in epoch time milliseconds or 0 if node expiry is not a concern
      * @return the name of the range with the longest prefix that contains the IP if it exists, null otherwise
      */
