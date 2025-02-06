@@ -18,7 +18,10 @@ package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoWriteException;
+import com.mongodb.ServerAddress;
+import com.mongodb.WriteError;
+import org.bson.BsonDocument;
 import org.graylog.testing.TestUserService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -176,7 +179,10 @@ public class MigrationHelpersTest {
     @Test
     public void ensureBuiltinRoleWithSaveError() throws Exception {
         when(roleService.load("test-role")).thenThrow(NotFoundException.class);
-        when(roleService.save(any(Role.class))).thenThrow(DuplicateKeyException.class); // Throw database error
+        final var duplicateKeyException = new MongoWriteException(
+                new WriteError(11000, "", new BsonDocument()), new ServerAddress(), Collections.emptySet()
+        );
+        when(roleService.save(any(Role.class))).thenThrow(duplicateKeyException);
 
         assertThat(migrationHelpers.ensureBuiltinRole("test-role", "description", ImmutableSet.of("a", "b")))
                 .isNull();

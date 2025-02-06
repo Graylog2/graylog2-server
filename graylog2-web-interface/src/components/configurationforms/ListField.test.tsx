@@ -40,12 +40,10 @@ describe('<ListField>', () => {
   it('should render an empty field', async () => {
     render(<SUT />);
 
-    const fieldLabel = await screen.findByText(listField.human_name, { exact: true });
-    const optionalMarker = screen.getByText(/(optional)/);
+    const fieldLabel = await screen.findByText(`${listField.human_name} (optional)`);
     const select = screen.getByLabelText(listField.human_name, { exact: false });
 
     expect(fieldLabel).toBeInTheDocument();
-    expect(optionalMarker).toBeInTheDocument();
     expect(select).toBeInTheDocument();
   });
 

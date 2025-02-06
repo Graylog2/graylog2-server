@@ -24,6 +24,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
@@ -111,7 +112,7 @@ public class TelemetryServiceWithDbTest {
                 elasticClusterAdapter,
                 elasticsearchVersion,
                 new TelemetryResponseFactory(new ObjectMapperProvider().get()),
-                new DBTelemetryUserSettingsService(mongodb.mongoConnection(), mongoJackObjectMapperProvider),
+                new DBTelemetryUserSettingsService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection())),
                 eventBus,
                 telemetryClusterService,
                 "unknown",

@@ -16,8 +16,8 @@
  */
 package org.graylog2.indexer.indexset;
 
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.mongojack.DBQuery;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,11 +47,11 @@ public interface IndexSetService {
     IndexSetConfig getDefault();
 
     /**
-     * Retrieve an index set based on the given {@link DBQuery.Query}.
+     * Retrieve an index set based on the given MongoDB query.
      *
      * @return index set
      */
-    Optional<IndexSetConfig> findOne(DBQuery.Query query);
+    Optional<IndexSetConfig> findOne(Bson query);
 
     /**
      * Retrieve all index sets.
@@ -67,7 +67,7 @@ public interface IndexSetService {
      */
     List<IndexSetConfig> findByIds(Set<String> ids);
 
-    List<IndexSetConfig> findMany(DBQuery.Query query);
+    List<IndexSetConfig> findMany(Bson query);
 
     /**
      * Retrieve a paginated set of index set.

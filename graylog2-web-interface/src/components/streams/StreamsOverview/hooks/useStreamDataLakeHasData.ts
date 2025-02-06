@@ -14,22 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import { kebabCase } from 'lodash';
+import { useQuery } from '@tanstack/react-query';
 
-export default (name) => {
-  const MockComponent = ({ children, ...rest }) => React.createElement(kebabCase(name), rest, children);
+import usePluginEntities from 'hooks/usePluginEntities';
 
-  MockComponent.propTypes = {
-    children: PropTypes.node,
-  };
+const useStreamDataLakeHasData = (streamId: string, enabled: boolean) => {
+  const { fetchStreamDataLake } = usePluginEntities('dataLake')[0] ?? {};
+  const { data: dataLake, isError, isLoading } = useQuery(['stream', 'data-lake', streamId],
+    () => fetchStreamDataLake(streamId),
+    { enabled: fetchStreamDataLake && enabled },
+  );
 
-  MockComponent.defaultProps = {
-    children: null,
-  };
-
-  MockComponent.displayName = name;
-
-  return MockComponent;
+  return (isLoading || isError) ? undefined : (
+    dataLake?.message_count > 1 || dataLake?.restore_history?.length > 0
+  );
 };
+
+export default useStreamDataLakeHasData;

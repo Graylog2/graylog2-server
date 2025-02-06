@@ -14,8 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { formatNumber as _formatNumber } from 'util/NumberFormatting';
+import { useQueryParams, useQueryParam, StringParam, NumberParam, ArrayParam } from 'use-query-params';
 
-const formatNumber = (value: number): string => _formatNumber(value, { maximumFractionDigits: 7 });
+const parseNestedObject = (fieldQueryString: string) => {
+  try {
+    return JSON.parse(decodeURIComponent(fieldQueryString));
+  } catch (_error) {
+    return undefined;
+  }
+};
 
-export default formatNumber;
+const NestedObjectParam = {
+  encode: (object: Object | null | undefined) => encodeURIComponent(JSON.stringify(object)),
+  decode: (objectStr: string | null | undefined) => parseNestedObject(objectStr),
+};
+
+export { useQueryParams, useQueryParam, StringParam, NumberParam, NestedObjectParam, ArrayParam };

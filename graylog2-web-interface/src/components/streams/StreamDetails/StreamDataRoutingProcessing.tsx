@@ -43,7 +43,7 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
   const hasConnectedPipelines = !isLoadingConnectPipelines && connectedPipelines?.length > 0;
   const { data: pipelines } = usePipelines();
   const sortPipelines = (pipelinesList: StreamConnectedPipelines) => pipelinesList.sort((s1, s2) => naturalSort(s1.title, s2.title));
-  const StreamIlluminateProcessingSection = PluginStore.exports('dataWarehouse')?.[0]?.StreamIlluminateProcessingSection;
+  const StreamIlluminateProcessingSection = PluginStore.exports('dataLake')?.[0]?.StreamIlluminateProcessingSection;
 
   return (
     <>

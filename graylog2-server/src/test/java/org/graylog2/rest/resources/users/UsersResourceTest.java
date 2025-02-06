@@ -17,6 +17,8 @@
 package org.graylog2.rest.resources.users;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
@@ -24,11 +26,15 @@ import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
+import org.graylog2.rest.models.users.responses.Token;
+import org.graylog2.security.AccessToken;
+import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -39,7 +45,9 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
+import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,29 +56,32 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import jakarta.ws.rs.core.Response;
-
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class UsersResourceTest {
 
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
-    public static final String EMAIL = "test@graylog.com";
-    public static final String FIRST_NAME = "First";
-    public static final String LAST_NAME = "Last";
-    public static final String TIMEZONE = "Europe/Berlin";
-    public static final long SESSION_TIMEOUT = 0L;
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private static final String EMAIL = "test@graylog.com";
+    private static final String FIRST_NAME = "First";
+    private static final String LAST_NAME = "Last";
+    private static final String TIMEZONE = "Europe/Berlin";
+    private static final long SESSION_TIMEOUT = 0L;
+    private static final String TOKEN_NAME = "tokenName";
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -100,16 +111,18 @@ public class UsersResourceTest {
     private DefaultSecurityManager securityManager;
     @Mock
     private GlobalAuthServiceConfig globalAuthServiceConfig;
+    @Mock
+    private ClusterConfigService clusterConfigService;
 
     UserImplFactory userImplFactory;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         userImplFactory = new UserImplFactory(new Configuration(),
                 new Permissions(ImmutableSet.of(new RestPermissions())));
         usersResource = new TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
                 roleService, sessionService, new HttpConfiguration(), subject,
-                sessionTerminationService, securityManager, globalAuthServiceConfig);
+                sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService);
     }
 
     /**
@@ -127,9 +140,55 @@ public class UsersResourceTest {
     @Test
     public void savePreferencesSuccess() throws ValidationException {
         when(subject.isPermitted(anyString())).thenReturn(true);
-        when(userManagementService.load(eq(USERNAME))).thenReturn(userImplFactory.create(new HashMap<>()));
+        when(userManagementService.load(USERNAME)).thenReturn(userImplFactory.create(new HashMap<>()));
         usersResource.savePreferences(USERNAME, UpdateUserPreferences.create(new HashMap<>()));
         verify(userManagementService, times(1)).save(isA(UserImpl.class));
+    }
+
+    @Test
+    public void createTokenForInternalUserSucceeds() {
+        final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME);
+        final Token expected = createTokenAndPrepareMocks(userProps);
+
+        try {
+            final Token actual = usersResource.generateNewToken(USERNAME, UsersResourceTest.TOKEN_NAME, "{}");
+            assertEquals(expected, actual);
+        } finally {
+            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
+            verify(accessTokenService).create(USERNAME, UsersResourceTest.TOKEN_NAME);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    @Test(expected = ForbiddenException.class)
+    public void createTokenForExternalUserFailsIfConfigured() {
+        final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME, UserImpl.EXTERNAL_USER, "TRUE");
+
+        prepareMocks(userProps, null, false);
+
+        try {
+            usersResource.generateNewToken(USERNAME, TOKEN_NAME, "{}");
+        } finally {
+            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
+            verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    @Test
+    public void createTokenForExternalUserSucceedsIfConfigured() {
+        final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME, UserImpl.EXTERNAL_USER, "TRUE");
+        final Token expected = createTokenAndPrepareMocks(userProps);
+
+        try {
+            final Token actual = usersResource.generateNewToken(USERNAME, TOKEN_NAME, "{}");
+            assertEquals(expected, actual);
+        } finally {
+            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
+            verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
+            verify(accessTokenService).create(USERNAME, TOKEN_NAME);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
     }
 
     private CreateUserRequest buildCreateUserRequest() {
@@ -137,6 +196,26 @@ public class UsersResourceTest {
                 FIRST_NAME, LAST_NAME, Collections.singletonList(""),
                 TIMEZONE, SESSION_TIMEOUT,
                 startPage, Collections.emptyList(), false);
+    }
+
+    private Token createTokenAndPrepareMocks(Map<String, Object> userProps) {
+        final String token = "someToken";
+        final DateTime lastAccess = Tools.nowUTC();
+        final Map<String, Object> tokenProps = Map.of(AccessTokenImpl.NAME, TOKEN_NAME, AccessTokenImpl.TOKEN, token, AccessTokenImpl.LAST_ACCESS, lastAccess);
+        final ObjectId tokenId = new ObjectId();
+        final AccessToken accessToken = new AccessTokenImpl(tokenId, tokenProps);
+
+        prepareMocks(userProps, accessToken, true);
+
+        return Token.create(tokenId.toHexString(), TOKEN_NAME, token, lastAccess);
+    }
+
+    private void prepareMocks(Map<String, Object> userProps, AccessToken accessToken, boolean allowExternalUser) {
+        when(userManagementService.loadById(USERNAME)).thenReturn(userImplFactory.create(userProps));
+        when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(true);
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
+                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), allowExternalUser));
+        when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME)).thenReturn(accessToken);
     }
 
     /**
@@ -151,9 +230,10 @@ public class UsersResourceTest {
                                  AccessTokenService accessTokenService, RoleService roleService,
                                  MongoDBSessionService sessionService, HttpConfiguration configuration,
                                  Subject subject, UserSessionTerminationService sessionTerminationService,
-                                 DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig) {
+                                 DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig,
+                                 ClusterConfigService clusterConfigService) {
             super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService,
-                    sessionTerminationService, securityManager, globalAuthServiceConfig);
+                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService);
             this.subject = subject;
             super.configuration = configuration;
         }
