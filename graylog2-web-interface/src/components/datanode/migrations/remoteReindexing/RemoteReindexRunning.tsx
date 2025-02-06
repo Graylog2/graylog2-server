@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
-import { useQueryParam, StringParam } from 'use-query-params';
 
+import { useQueryParam, StringParam } from 'routing/QueryParams';
 import { ConfirmDialog } from 'components/common';
 import { Alert, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';

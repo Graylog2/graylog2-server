@@ -16,8 +16,8 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { useQueryParam } from 'use-query-params';
 
+import { useQueryParam } from 'routing/QueryParams';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { asMock } from 'helpers/mocking';
@@ -43,8 +43,8 @@ jest.mock('views/stores/ViewManagementStore', () => ({
   },
 }));
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 
