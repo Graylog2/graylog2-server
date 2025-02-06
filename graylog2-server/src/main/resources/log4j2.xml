@@ -28,13 +28,12 @@
         <Logger name="org.apache.kafka.clients.producer.ProducerConfig" level="warn"/>
         <!-- Silence useless session validation messages -->
         <Logger name="org.apache.shiro.session.mgt.AbstractValidatingSessionManager" level="warn"/>
-        <!-- Silence informational Azure SDK messages -->
+        <!-- Silence Azure SDK messages -->
         <Logger name="com.azure" level="warn"/>
         <Logger name="reactor.core.publisher.Operators" level="off"/>
         <Logger name="com.azure.messaging.eventhubs.PartitionPumpManager" level="off"/>
         <Logger name="com.azure.core.amqp.implementation.ReactorReceiver" level="off"/>
         <Logger name="com.azure.core.amqp.implementation.ReactorDispatcher" level="off"/>
-        <Logger name="com.azure.core.amqp.implementation.MessageFlux" level="off"/>
         <!-- Silence Apache Hadoop/Avro log chatter -->
         <Logger name="org.apache.hadoop" level="warn"/>
         <Logger name="org.apache.parquet.hadoop.InternalParquetRecordReader" level="warn"/>
