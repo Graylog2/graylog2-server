@@ -16,5 +16,5 @@
  */
 package org.graylog2.rest.resources.system.inputs;
 
-public record InputDeletedEvent(String inputId, String title) {
+public record InputDeletedEvent(String inputId, String inputTitle) {
 }

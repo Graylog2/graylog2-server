@@ -83,6 +83,7 @@ class InputRoutingServiceTest {
         when(streamService.load(STREAM_ID)).thenReturn(stream);
 
         final Input input = mock(Input.class);
+        when(input.getId()).thenReturn(INPUT_ID);
         when(input.getTitle()).thenReturn(INPUT_NAME);
         when(inputService.find(INPUT_ID)).thenReturn(input);
 

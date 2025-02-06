@@ -16,5 +16,5 @@
  */
 package org.graylog2.rest.resources.system.inputs;
 
-public record InputRenamedEvent(String inputId, String oldTitle, String newTitle) {
+public record InputRenamedEvent(String inputId, String oldInputTitle, String newInputTitle) {
 }

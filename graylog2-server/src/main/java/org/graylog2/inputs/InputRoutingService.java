@@ -37,14 +37,16 @@ import org.joda.time.DateTimeZone;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.graylog.plugins.pipelineprocessor.rest.PipelineResource.GL_INPUT_ROUTING_PIPELINE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class InputRoutingService {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InputRoutingService.class);
-    public static final String GL_ROUTING_RULE_PREFIX = "gl_route_";
-    public static final String GL_ROUTING_RULE_REGEX = GL_ROUTING_RULE_PREFIX + ".*_to_.*";
+    private static final String GL_ROUTING_RULE_PREFIX = "gl_route_";
+    private static final Pattern GL_ROUTING_RULE_REGEX = Pattern.compile(GL_ROUTING_RULE_PREFIX + "(\\w+)\\[(\\w+)\\]_to_(\\w+)");
 
     private final RuleService ruleService;
     private final InputService inputService;
@@ -71,7 +73,7 @@ public class InputRoutingService {
 
     /**
      * Create a routing rule for the given input and stream ID.
-     * The rule is immune to renaming of the input or stream, since it only references the IDs.
+     * Note that the rule title includes the name of the input and stream. If either are renamed, rule references are invalidated.
      */
     public RuleDao createRoutingRule(PipelineResource.RoutingRequest request) throws NotFoundException {
         Stream stream;
@@ -92,7 +94,7 @@ public class InputRoutingService {
         } catch (NotFoundException e) {
             throw new NotFoundException(f("Unable to load input %s", request.inputId()), e);
         }
-        String ruleName = getSystemRuleName(input.getTitle(), stream.getTitle());
+        String ruleName = getSystemRuleName(input.getTitle(), input.getId(), stream.getTitle());
 
         final Optional<RuleDao> ruleDaoOpt = ruleService.findByName(ruleName);
         if (ruleDaoOpt.isPresent()) {
@@ -117,16 +119,31 @@ public class InputRoutingService {
         return ruleService.save(ruleDao);
     }
 
-    private String getSystemRuleName(String inputName, String streamName) {
-        return GL_ROUTING_RULE_PREFIX + inputName + "_to_" + streamName;
+    private String getSystemRuleName(String inputName, String inputId, String streamName) {
+        return GL_ROUTING_RULE_PREFIX + inputName + "[" + inputId + "]_to_" + streamName;
     }
 
     private boolean isSystemRulePattern(String ruleName) {
-        return ruleName.matches(GL_ROUTING_RULE_REGEX);
+        Matcher matcher = GL_ROUTING_RULE_REGEX.matcher(ruleName);
+        return matcher.matches();
     }
 
-    private boolean isSystemRulePatternInput(String ruleName, String inputName) {
-        return ruleName.matches(GL_ROUTING_RULE_PREFIX + inputName + "_to_.*");
+    private boolean isSystemRulePattern(String ruleName, String inputId, String inputName) {
+        return ruleName.matches(GL_ROUTING_RULE_PREFIX + inputName + "\\[" + inputId + "\\]_to_.*");
+    }
+
+    private String replaceInputName(String ruleName, String oldInputName, String newInputName) {
+        Matcher matcher = GL_ROUTING_RULE_REGEX.matcher(ruleName);
+        if (matcher.matches()) {
+            String inputName = matcher.group(1); // "input"
+            String inputId = matcher.group(2); // "123"
+            String streamName = matcher.group(3); // "stream"
+
+            if (inputName.equals(oldInputName)) {
+                return getSystemRuleName(newInputName, inputId, streamName);
+            }
+        }
+        throw new IllegalArgumentException("Unexpected rule name not matching naming pattern: " + ruleName);
     }
 
     /**
@@ -135,10 +152,10 @@ public class InputRoutingService {
     @Subscribe
     public void handleInputRenamed(InputRenamedEvent event) {
         ruleService.loadAll().stream()
-                .filter(ruleDao -> isSystemRulePatternInput(ruleDao.title(), event.oldTitle()))
+                .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.inputId(), event.oldInputTitle()))
                 .forEach(ruleDao -> {
                     String oldRuleTitle = ruleDao.title();
-                    String newRuleTitle = ruleDao.title().replace(event.oldTitle(), event.newTitle());
+                    String newRuleTitle = replaceInputName(oldRuleTitle, event.oldInputTitle(), event.newInputTitle());
                     String newSource = ruleDao.source().replace(oldRuleTitle, newRuleTitle);
                     ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build());
                     handleRuleRenamed(oldRuleTitle, newRuleTitle);
@@ -172,15 +189,17 @@ public class InputRoutingService {
     @Subscribe
     public void handleInputDeleted(InputDeletedEvent event) {
         ruleService.loadAll().stream()
-                .filter(ruleDao -> isSystemRulePatternInput(ruleDao.title(), event.title()))
-                .filter(ruleDao -> ruleDao.source().contains(event.inputId()))
+                .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.inputId(), event.inputTitle()))
                 .forEach(ruleDao -> {
                     ruleService.delete(ruleDao.id());
-                    handleRuleDeleted(ruleDao.id(), ruleDao.title());
+                    handleRuleDeleted(ruleDao.title());
                 });
     }
 
-    private void handleRuleDeleted(String ruleId, String ruleTitle) {
+    /**
+     * Update default pipeline when a routing rule is deleted.
+     */
+    private void handleRuleDeleted(String ruleTitle) {
         try {
             PipelineDao pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
             PipelineSource pipelineSource = PipelineSource.fromDao(pipelineRuleParser, pipelineDao);
