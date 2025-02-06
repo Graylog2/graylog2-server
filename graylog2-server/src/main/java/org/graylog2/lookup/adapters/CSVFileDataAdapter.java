@@ -43,7 +43,7 @@ import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.utilities.FileInfo;
-import org.graylog2.utilities.CIDRLookupTrie;
+import org.graylog2.utilities.CIDRPatriciaTrie;
 import org.graylog2.utilities.IpSubnet;
 import org.graylog2.utilities.ReservedIpChecker;
 import org.joda.time.Duration;
@@ -86,7 +86,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private final Config config;
     private final AllowedAuxiliaryPathChecker pathChecker;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
-    private final AtomicReference<CIDRLookupTrie> cidrLookupRef = new AtomicReference<>(new CIDRLookupTrie());
+    private final AtomicReference<CIDRPatriciaTrie> cidrLookupRef = new AtomicReference<>(new CIDRPatriciaTrie());
     private final String name;
 
     private FileInfo fileInfo = FileInfo.empty();
@@ -168,7 +168,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         final InputStream inputStream = Files.newInputStream(Paths.get(config.path()));
         final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         final ImmutableMap.Builder<String, String> newLookupBuilder = ImmutableMap.builder();
-        final CIDRLookupTrie cidrLookupTrie = new CIDRLookupTrie();
+        final CIDRPatriciaTrie cidrLookupTrie = new CIDRPatriciaTrie();
 
         try (final CSVReader csvReader = new CSVReader(fileReader, config.separatorAsChar(), config.quotecharAsChar())) {
             int line = 0;
