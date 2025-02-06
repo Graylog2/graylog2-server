@@ -984,10 +984,9 @@
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <minimizeJar>false</minimizeJar>
                     <filters>
-                        <!-- Bouncycastle's JARs are signed. When building a shaded JAR, either remove the signatures, or
-                             add dependency to the main JAR's manifest. Otherwise running the application will fail. -->
+                        <!-- Exclude all signature files from the shaded JARs to avoid server startup failure. -->
                         <filter>
-                            <artifact>org.bouncycastle:*</artifact>
+                            <artifact>*</artifact>
                             <excludes>
                                 <exclude>META-INF/*.SF</exclude>
                                 <exclude>META-INF/*.DSA</exclude>
