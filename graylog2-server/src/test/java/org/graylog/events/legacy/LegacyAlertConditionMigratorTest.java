@@ -177,7 +177,9 @@ public class LegacyAlertConditionMigratorTest {
         // Make sure we use the NotificationResourceHandler to create the notifications
         verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class), any(Optional.class));
 
-        assertThat(eventDefinitionService.streamAll().count()).isEqualTo(migratedConditions);
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.count()).isEqualTo(migratedConditions);
+        }
         assertThat(notificationService.streamAll().count()).isEqualTo(migratedCallbacks);
 
         final NotificationDto httpNotification = notificationService.streamAll()
@@ -253,370 +255,390 @@ public class LegacyAlertConditionMigratorTest {
             assertThat(config.configuration().get("short_mode")).isEqualTo(false);
         });
 
-        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Message Count - MORE")).findFirst())
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.filter(ed -> ed.title().equals("Message Count - MORE")).findFirst())
                 .get()
-                .satisfies(eventDefinition -> {
-                    assertThat(eventDefinition.alert()).isTrue();
-                    assertThat(eventDefinition.priority()).isEqualTo(2);
-                    assertThat(eventDefinition.keySpec()).isEmpty();
-                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(120000);
-                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(10);
+                    .satisfies(eventDefinition -> {
+                        assertThat(eventDefinition.alert()).isTrue();
+                        assertThat(eventDefinition.priority()).isEqualTo(2);
+                        assertThat(eventDefinition.keySpec()).isEmpty();
+                        assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(120000);
+                        assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(10);
 
-                    assertThat(eventDefinition.notifications()).hasSize(2);
-                    assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toList()))
-                            .containsOnly(httpNotification.id(), httpNotificationWithoutTitle.id());
+                        assertThat(eventDefinition.notifications()).hasSize(2);
+                        assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toList()))
+                                .containsOnly(httpNotification.id(), httpNotificationWithoutTitle.id());
 
-                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
-                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0001");
-                        assertThat(config.query()).isEqualTo("hello:world");
-                        assertThat(config.groupBy()).isEmpty();
-                        assertThat(config.searchWithinMs()).isEqualTo(10 * 60 * 1000);
-                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                            assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0001");
+                            assertThat(config.query()).isEqualTo("hello:world");
+                            assertThat(config.groupBy()).isEmpty();
+                            assertThat(config.searchWithinMs()).isEqualTo(10 * 60 * 1000);
+                            assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
 
-                        assertThat(config.series()).hasSize(1);
-                        assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
-                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
+                            assertThat(config.series()).hasSize(1);
+                            assertThat(config.series().get(0).id()).isNotBlank();
+                            assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
+                            assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
-                        assertThat(config.conditions()).get().satisfies(conditions -> {
-                            assertThat(conditions.expression()).get().satisfies(expression -> {
-                                assertThat(expression).isInstanceOf(Expr.Greater.class);
+                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                                assertThat(conditions.expression()).get().satisfies(expression -> {
+                                    assertThat(expression).isInstanceOf(Expr.Greater.class);
 
-                                final Expr.Greater greater = (Expr.Greater) expression;
+                                    final Expr.Greater greater = (Expr.Greater) expression;
 
-                                assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
-                                assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(1));
+                                    assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                    assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(1));
+                                });
                             });
                         });
                     });
-                });
+        }
 
-        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Message Count - LESS")).findFirst())
-                .get()
-                .satisfies(eventDefinition -> {
-                    assertThat(eventDefinition.alert()).isTrue();
-                    assertThat(eventDefinition.priority()).isEqualTo(2);
-                    assertThat(eventDefinition.keySpec()).isEmpty();
-                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(0);
-                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(0);
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.filter(ed -> ed.title().equals("Message Count - LESS")).findFirst())
+                    .get()
+                    .satisfies(eventDefinition -> {
+                        assertThat(eventDefinition.alert()).isTrue();
+                        assertThat(eventDefinition.priority()).isEqualTo(2);
+                        assertThat(eventDefinition.keySpec()).isEmpty();
+                        assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(0);
+                        assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(0);
 
-                    assertThat(eventDefinition.notifications()).hasSize(2);
-                    assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toList()))
-                            .containsOnly(httpNotification.id(), httpNotificationWithoutTitle.id());
+                        assertThat(eventDefinition.notifications()).hasSize(2);
+                        assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toList()))
+                                .containsOnly(httpNotification.id(), httpNotificationWithoutTitle.id());
 
-                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
-                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0001");
-                        assertThat(config.query()).isEmpty();
-                        assertThat(config.groupBy()).isEmpty();
-                        assertThat(config.searchWithinMs()).isEqualTo(4 * 60 * 1000);
-                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                            assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0001");
+                            assertThat(config.query()).isEmpty();
+                            assertThat(config.groupBy()).isEmpty();
+                            assertThat(config.searchWithinMs()).isEqualTo(4 * 60 * 1000);
+                            assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
 
-                        assertThat(config.series()).hasSize(1);
-                        assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
-                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
+                            assertThat(config.series()).hasSize(1);
+                            assertThat(config.series().get(0).id()).isNotBlank();
+                            assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
+                            assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
-                        assertThat(config.conditions()).get().satisfies(conditions -> {
-                            assertThat(conditions.expression()).get().satisfies(expression -> {
-                                assertThat(expression).isInstanceOf(Expr.Lesser.class);
+                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                                assertThat(conditions.expression()).get().satisfies(expression -> {
+                                    assertThat(expression).isInstanceOf(Expr.Lesser.class);
 
-                                final Expr.Lesser lesser = (Expr.Lesser) expression;
+                                    final Expr.Lesser lesser = (Expr.Lesser) expression;
 
-                                assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
-                                assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(42));
+                                    assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                    assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(42));
+                                });
                             });
                         });
                     });
-                });
+        }
 
-        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Field Value - HIGHER - MEAN")).findFirst())
-                .get()
-                .satisfies(eventDefinition -> {
-                    assertThat(eventDefinition.alert()).isTrue();
-                    assertThat(eventDefinition.priority()).isEqualTo(2);
-                    assertThat(eventDefinition.keySpec()).isEmpty();
-                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(60000);
-                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(15);
-                    assertThat(eventDefinition.notifications()).isEmpty();
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.filter(ed -> ed.title().equals("Field Value - HIGHER - MEAN")).findFirst())
+                    .get()
+                    .satisfies(eventDefinition -> {
+                        assertThat(eventDefinition.alert()).isTrue();
+                        assertThat(eventDefinition.priority()).isEqualTo(2);
+                        assertThat(eventDefinition.keySpec()).isEmpty();
+                        assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(60000);
+                        assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(15);
+                        assertThat(eventDefinition.notifications()).isEmpty();
 
-                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
-                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0002");
-                        assertThat(config.query()).isEqualTo("*");
-                        assertThat(config.groupBy()).isEmpty();
-                        assertThat(config.searchWithinMs()).isEqualTo(5 * 60 * 1000);
-                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                            assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0002");
+                            assertThat(config.query()).isEqualTo("*");
+                            assertThat(config.groupBy()).isEmpty();
+                            assertThat(config.searchWithinMs()).isEqualTo(5 * 60 * 1000);
+                            assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
 
-                        assertThat(config.series()).hasSize(1);
-                        assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).type()).isEqualTo(Average.NAME);
-                        assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
+                            assertThat(config.series()).hasSize(1);
+                            assertThat(config.series().get(0).id()).isNotBlank();
+                            assertThat(config.series().get(0).type()).isEqualTo(Average.NAME);
+                            assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
-                        assertThat(config.conditions()).get().satisfies(conditions -> {
-                            assertThat(conditions.expression()).get().satisfies(expression -> {
-                                assertThat(expression).isInstanceOf(Expr.Greater.class);
+                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                                assertThat(conditions.expression()).get().satisfies(expression -> {
+                                    assertThat(expression).isInstanceOf(Expr.Greater.class);
 
-                                final Expr.Greater greater = (Expr.Greater) expression;
+                                    final Expr.Greater greater = (Expr.Greater) expression;
 
-                                assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
-                                assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(23));
+                                    assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                    assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(23));
+                                });
                             });
                         });
                     });
-                });
+        }
 
-        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Field Value - LOWER - SUM")).findFirst())
-                .get()
-                .satisfies(eventDefinition -> {
-                    assertThat(eventDefinition.alert()).isTrue();
-                    assertThat(eventDefinition.priority()).isEqualTo(2);
-                    assertThat(eventDefinition.keySpec()).isEmpty();
-                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(60000);
-                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(15);
-                    assertThat(eventDefinition.notifications()).isEmpty();
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.filter(ed -> ed.title().equals("Field Value - LOWER - SUM")).findFirst())
+                    .get()
+                    .satisfies(eventDefinition -> {
+                        assertThat(eventDefinition.alert()).isTrue();
+                        assertThat(eventDefinition.priority()).isEqualTo(2);
+                        assertThat(eventDefinition.keySpec()).isEmpty();
+                        assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(60000);
+                        assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(15);
+                        assertThat(eventDefinition.notifications()).isEmpty();
 
-                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
-                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0002");
-                        assertThat(config.query()).isEqualTo("*");
-                        assertThat(config.groupBy()).isEmpty();
-                        assertThat(config.searchWithinMs()).isEqualTo(5 * 60 * 1000);
-                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                            assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0002");
+                            assertThat(config.query()).isEqualTo("*");
+                            assertThat(config.groupBy()).isEmpty();
+                            assertThat(config.searchWithinMs()).isEqualTo(5 * 60 * 1000);
+                            assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
 
-                        assertThat(config.series()).hasSize(1);
-                        assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).type()).isEqualTo(Sum.NAME);
-                        assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
+                            assertThat(config.series()).hasSize(1);
+                            assertThat(config.series().get(0).id()).isNotBlank();
+                            assertThat(config.series().get(0).type()).isEqualTo(Sum.NAME);
+                            assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
-                        assertThat(config.conditions()).get().satisfies(conditions -> {
-                            assertThat(conditions.expression()).get().satisfies(expression -> {
-                                assertThat(expression).isInstanceOf(Expr.Lesser.class);
+                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                                assertThat(conditions.expression()).get().satisfies(expression -> {
+                                    assertThat(expression).isInstanceOf(Expr.Lesser.class);
 
-                                final Expr.Lesser lesser = (Expr.Lesser) expression;
+                                    final Expr.Lesser lesser = (Expr.Lesser) expression;
 
-                                assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
-                                assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(23));
+                                    assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                    assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(23));
+                                });
                             });
                         });
                     });
-                });
+        }
 
-        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Field Value - LOWER - MIN")).findFirst())
-                .get()
-                .satisfies(eventDefinition -> {
-                    assertThat(eventDefinition.alert()).isTrue();
-                    assertThat(eventDefinition.priority()).isEqualTo(2);
-                    assertThat(eventDefinition.keySpec()).isEmpty();
-                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(60000);
-                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(15);
-                    assertThat(eventDefinition.notifications()).isEmpty();
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.filter(ed -> ed.title().equals("Field Value - LOWER - MIN")).findFirst())
+                    .get()
+                    .satisfies(eventDefinition -> {
+                        assertThat(eventDefinition.alert()).isTrue();
+                        assertThat(eventDefinition.priority()).isEqualTo(2);
+                        assertThat(eventDefinition.keySpec()).isEmpty();
+                        assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(60000);
+                        assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(15);
+                        assertThat(eventDefinition.notifications()).isEmpty();
 
-                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
-                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0002");
-                        assertThat(config.query()).isEqualTo("*");
-                        assertThat(config.groupBy()).isEmpty();
-                        assertThat(config.searchWithinMs()).isEqualTo(5 * 60 * 1000);
-                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                            assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0002");
+                            assertThat(config.query()).isEqualTo("*");
+                            assertThat(config.groupBy()).isEmpty();
+                            assertThat(config.searchWithinMs()).isEqualTo(5 * 60 * 1000);
+                            assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
 
-                        assertThat(config.series()).hasSize(1);
-                        assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).type()).isEqualTo(Min.NAME);
-                        assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
+                            assertThat(config.series()).hasSize(1);
+                            assertThat(config.series().get(0).id()).isNotBlank();
+                            assertThat(config.series().get(0).type()).isEqualTo(Min.NAME);
+                            assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
-                        assertThat(config.conditions()).get().satisfies(conditions -> {
-                            assertThat(conditions.expression()).get().satisfies(expression -> {
-                                assertThat(expression).isInstanceOf(Expr.Lesser.class);
+                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                                assertThat(conditions.expression()).get().satisfies(expression -> {
+                                    assertThat(expression).isInstanceOf(Expr.Lesser.class);
 
-                                final Expr.Lesser lesser = (Expr.Lesser) expression;
+                                    final Expr.Lesser lesser = (Expr.Lesser) expression;
 
-                                assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
-                                assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(23));
+                                    assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                    assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(23));
+                                });
                             });
                         });
                     });
-                });
+        }
 
-        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Field Value - LOWER - MAX")).findFirst())
-                .get()
-                .satisfies(eventDefinition -> {
-                    assertThat(eventDefinition.alert()).isTrue();
-                    assertThat(eventDefinition.priority()).isEqualTo(2);
-                    assertThat(eventDefinition.keySpec()).isEmpty();
-                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(60000);
-                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(15);
-                    assertThat(eventDefinition.notifications()).isEmpty();
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.filter(ed -> ed.title().equals("Field Value - LOWER - MAX")).findFirst())
+                    .get()
+                    .satisfies(eventDefinition -> {
+                        assertThat(eventDefinition.alert()).isTrue();
+                        assertThat(eventDefinition.priority()).isEqualTo(2);
+                        assertThat(eventDefinition.keySpec()).isEmpty();
+                        assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(60000);
+                        assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(15);
+                        assertThat(eventDefinition.notifications()).isEmpty();
 
-                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
-                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0002");
-                        assertThat(config.query()).isEqualTo("*");
-                        assertThat(config.groupBy()).isEmpty();
-                        assertThat(config.searchWithinMs()).isEqualTo(5 * 60 * 1000);
-                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                            assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0002");
+                            assertThat(config.query()).isEqualTo("*");
+                            assertThat(config.groupBy()).isEmpty();
+                            assertThat(config.searchWithinMs()).isEqualTo(5 * 60 * 1000);
+                            assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
 
-                        assertThat(config.series()).hasSize(1);
-                        assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).type()).isEqualTo(Max.NAME);
-                        assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
+                            assertThat(config.series()).hasSize(1);
+                            assertThat(config.series().get(0).id()).isNotBlank();
+                            assertThat(config.series().get(0).type()).isEqualTo(Max.NAME);
+                            assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
-                        assertThat(config.conditions()).get().satisfies(conditions -> {
-                            assertThat(conditions.expression()).get().satisfies(expression -> {
-                                assertThat(expression).isInstanceOf(Expr.Lesser.class);
+                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                                assertThat(conditions.expression()).get().satisfies(expression -> {
+                                    assertThat(expression).isInstanceOf(Expr.Lesser.class);
 
-                                final Expr.Lesser lesser = (Expr.Lesser) expression;
+                                    final Expr.Lesser lesser = (Expr.Lesser) expression;
 
-                                assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
-                                assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(23));
+                                    assertThat(lesser.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                    assertThat(lesser.right()).isEqualTo(Expr.NumberValue.create(23));
+                                });
                             });
                         });
                     });
-                });
+        }
 
-        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Field Value - LOWER - STDDEV")).findFirst())
-                .get()
-                .satisfies(eventDefinition -> {
-                    assertThat(eventDefinition.alert()).isTrue();
-                    assertThat(eventDefinition.priority()).isEqualTo(2);
-                    assertThat(eventDefinition.keySpec()).isEmpty();
-                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(60000);
-                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(15);
-                    assertThat(eventDefinition.notifications()).isEmpty();
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.filter(ed -> ed.title().equals("Field Value - LOWER - STDDEV")).findFirst())
+                    .get()
+                    .satisfies(eventDefinition -> {
+                        assertThat(eventDefinition.alert()).isTrue();
+                        assertThat(eventDefinition.priority()).isEqualTo(2);
+                        assertThat(eventDefinition.keySpec()).isEmpty();
+                        assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(60000);
+                        assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(15);
+                        assertThat(eventDefinition.notifications()).isEmpty();
 
-                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
-                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0002");
-                        assertThat(config.query()).isEqualTo("*");
-                        assertThat(config.groupBy()).isEmpty();
-                        assertThat(config.searchWithinMs()).isEqualTo(5 * 60 * 1000);
-                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                            assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0002");
+                            assertThat(config.query()).isEqualTo("*");
+                            assertThat(config.groupBy()).isEmpty();
+                            assertThat(config.searchWithinMs()).isEqualTo(5 * 60 * 1000);
+                            assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
 
-                        assertThat(config.series()).hasSize(1);
-                        assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).type()).isEqualTo(StdDev.NAME);
-                        assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
+                            assertThat(config.series()).hasSize(1);
+                            assertThat(config.series().get(0).id()).isNotBlank();
+                            assertThat(config.series().get(0).type()).isEqualTo(StdDev.NAME);
+                            assertThat(((HasField) config.series().get(0)).field()).isEqualTo("test_field_1");
 
-                        assertThat(config.conditions()).get().satisfies(conditions -> {
-                            assertThat(conditions.expression()).get().satisfies(expression -> {
-                                assertThat(expression).isInstanceOf(Expr.Greater.class);
+                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                                assertThat(conditions.expression()).get().satisfies(expression -> {
+                                    assertThat(expression).isInstanceOf(Expr.Greater.class);
 
-                                final Expr.Greater greater = (Expr.Greater) expression;
+                                    final Expr.Greater greater = (Expr.Greater) expression;
 
-                                assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
-                                assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(23));
+                                    assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                    assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(23));
+                                });
                             });
                         });
                     });
-                });
+        }
 
-        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Field Content - WITHOUT QUERY")).findFirst())
-                .get()
-                .satisfies(eventDefinition -> {
-                    assertThat(eventDefinition.alert()).isTrue();
-                    assertThat(eventDefinition.priority()).isEqualTo(2);
-                    assertThat(eventDefinition.keySpec()).isEmpty();
-                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(120000);
-                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(100);
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.filter(ed -> ed.title().equals("Field Content - WITHOUT QUERY")).findFirst())
+                    .get()
+                    .satisfies(eventDefinition -> {
+                        assertThat(eventDefinition.alert()).isTrue();
+                        assertThat(eventDefinition.priority()).isEqualTo(2);
+                        assertThat(eventDefinition.keySpec()).isEmpty();
+                        assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(120000);
+                        assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(100);
 
-                    assertThat(eventDefinition.notifications()).hasSize(2);
-                    assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toSet()))
-                            .containsOnly(emailNotification.id(), slackNotification.id());
+                        assertThat(eventDefinition.notifications()).hasSize(2);
+                        assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toSet()))
+                                .containsOnly(emailNotification.id(), slackNotification.id());
 
-                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
-                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0003");
-                        assertThat(config.query()).isEqualTo("test_field_2:\"hello\"");
-                        assertThat(config.groupBy()).isEmpty();
-                        assertThat(config.searchWithinMs()).isEqualTo(CHECK_INTERVAL * 1000);
-                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                            assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0003");
+                            assertThat(config.query()).isEqualTo("test_field_2:\"hello\"");
+                            assertThat(config.groupBy()).isEmpty();
+                            assertThat(config.searchWithinMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                            assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
 
-                        assertThat(config.series()).hasSize(1);
-                        assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
-                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
+                            assertThat(config.series()).hasSize(1);
+                            assertThat(config.series().get(0).id()).isNotBlank();
+                            assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
+                            assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
-                        assertThat(config.conditions()).get().satisfies(conditions -> {
-                            assertThat(conditions.expression()).get().satisfies(expression -> {
-                                assertThat(expression).isInstanceOf(Expr.Greater.class);
+                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                                assertThat(conditions.expression()).get().satisfies(expression -> {
+                                    assertThat(expression).isInstanceOf(Expr.Greater.class);
 
-                                final Expr.Greater greater = (Expr.Greater) expression;
+                                    final Expr.Greater greater = (Expr.Greater) expression;
 
-                                assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
-                                assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(0));
+                                    assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                    assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(0));
+                                });
                             });
                         });
                     });
-                });
+        }
 
-        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Field Content - WITH QUERY")).findFirst())
-                .get()
-                .satisfies(eventDefinition -> {
-                    assertThat(eventDefinition.alert()).isTrue();
-                    assertThat(eventDefinition.priority()).isEqualTo(2);
-                    assertThat(eventDefinition.keySpec()).isEmpty();
-                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(0);
-                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(0);
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.filter(ed -> ed.title().equals("Field Content - WITH QUERY")).findFirst())
+                    .get()
+                    .satisfies(eventDefinition -> {
+                        assertThat(eventDefinition.alert()).isTrue();
+                        assertThat(eventDefinition.priority()).isEqualTo(2);
+                        assertThat(eventDefinition.keySpec()).isEmpty();
+                        assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(0);
+                        assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(0);
 
-                    assertThat(eventDefinition.notifications()).hasSize(2);
-                    assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toSet()))
-                            .containsOnly(emailNotification.id(), slackNotification.id());
+                        assertThat(eventDefinition.notifications()).hasSize(2);
+                        assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toSet()))
+                                .containsOnly(emailNotification.id(), slackNotification.id());
 
-                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
-                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0003");
-                        assertThat(config.query()).isEqualTo("test_field_3:\"foo\" AND foo:bar");
-                        assertThat(config.groupBy()).isEmpty();
-                        assertThat(config.searchWithinMs()).isEqualTo(CHECK_INTERVAL * 1000);
-                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                            assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0003");
+                            assertThat(config.query()).isEqualTo("test_field_3:\"foo\" AND foo:bar");
+                            assertThat(config.groupBy()).isEmpty();
+                            assertThat(config.searchWithinMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                            assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
 
-                        assertThat(config.series()).hasSize(1);
-                        assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
-                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
+                            assertThat(config.series()).hasSize(1);
+                            assertThat(config.series().get(0).id()).isNotBlank();
+                            assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
+                            assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
-                        assertThat(config.conditions()).get().satisfies(conditions -> {
-                            assertThat(conditions.expression()).get().satisfies(expression -> {
-                                assertThat(expression).isInstanceOf(Expr.Greater.class);
+                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                                assertThat(conditions.expression()).get().satisfies(expression -> {
+                                    assertThat(expression).isInstanceOf(Expr.Greater.class);
 
-                                final Expr.Greater greater = (Expr.Greater) expression;
+                                    final Expr.Greater greater = (Expr.Greater) expression;
 
-                                assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
-                                assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(0));
+                                    assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                    assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(0));
+                                });
                             });
                         });
                     });
-                });
+        }
 
-        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Untitled")).findFirst())
-                .get()
-                .satisfies(eventDefinition -> {
-                    assertThat(eventDefinition.alert()).isTrue();
-                    assertThat(eventDefinition.priority()).isEqualTo(2);
-                    assertThat(eventDefinition.keySpec()).isEmpty();
-                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(0);
-                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(0);
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.filter(ed -> ed.title().equals("Untitled")).findFirst())
+                    .get()
+                    .satisfies(eventDefinition -> {
+                        assertThat(eventDefinition.alert()).isTrue();
+                        assertThat(eventDefinition.priority()).isEqualTo(2);
+                        assertThat(eventDefinition.keySpec()).isEmpty();
+                        assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(0);
+                        assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(0);
 
-                    assertThat(eventDefinition.notifications()).hasSize(2);
-                    assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toSet()))
-                            .containsOnly(emailNotification.id(), slackNotification.id());
+                        assertThat(eventDefinition.notifications()).hasSize(2);
+                        assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toSet()))
+                                .containsOnly(emailNotification.id(), slackNotification.id());
 
-                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
-                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0003");
-                        assertThat(config.query()).isEqualTo("test_field_3:\"foo\" AND foo:bar");
-                        assertThat(config.groupBy()).isEmpty();
-                        assertThat(config.searchWithinMs()).isEqualTo(CHECK_INTERVAL * 1000);
-                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                            assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0003");
+                            assertThat(config.query()).isEqualTo("test_field_3:\"foo\" AND foo:bar");
+                            assertThat(config.groupBy()).isEmpty();
+                            assertThat(config.searchWithinMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                            assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
 
-                        assertThat(config.series()).hasSize(1);
-                        assertThat(config.series().get(0).id()).isNotBlank();
-                        assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
-                        assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
+                            assertThat(config.series()).hasSize(1);
+                            assertThat(config.series().get(0).id()).isNotBlank();
+                            assertThat(config.series().get(0).type()).isEqualTo(Count.NAME);
+                            assertThat(((HasOptionalField) config.series().get(0)).field()).isEmpty();
 
-                        assertThat(config.conditions()).get().satisfies(conditions -> {
-                            assertThat(conditions.expression()).get().satisfies(expression -> {
-                                assertThat(expression).isInstanceOf(Expr.Greater.class);
+                            assertThat(config.conditions()).get().satisfies(conditions -> {
+                                assertThat(conditions.expression()).get().satisfies(expression -> {
+                                    assertThat(expression).isInstanceOf(Expr.Greater.class);
 
-                                final Expr.Greater greater = (Expr.Greater) expression;
+                                    final Expr.Greater greater = (Expr.Greater) expression;
 
-                                assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
-                                assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(0));
+                                    assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                    assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(0));
+                                });
                             });
                         });
                     });
-                });
+        }
     }
 
     @Test
@@ -652,7 +674,9 @@ public class LegacyAlertConditionMigratorTest {
         // Make sure we use the NotificationResourceHandler to create the notifications
         verify(notificationResourceHandler, times(migratedCallbacks)).create(any(NotificationDto.class), any(Optional.class));
 
-        assertThat(eventDefinitionService.streamAll().count()).isEqualTo(migratedConditions);
+        try (var stream = eventDefinitionService.streamAll()) {
+            assertThat(stream.count()).isEqualTo(migratedConditions);
+        }
         assertThat(notificationService.streamAll().count()).isEqualTo(migratedCallbacks);
     }
 }
