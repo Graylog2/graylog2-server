@@ -18,16 +18,16 @@ import { useQuery } from '@tanstack/react-query';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const useStreamDataWarehouseHasData = (streamId: string, enabled: boolean) => {
-  const { fetchStreamDataWarehouse } = usePluginEntities('dataWarehouse')[0] ?? {};
-  const { data: dataWarehouse, isError, isLoading } = useQuery(['stream', 'data-warehouse', streamId],
-    () => fetchStreamDataWarehouse(streamId),
-    { enabled: fetchStreamDataWarehouse && enabled },
+const useStreamDataLakeHasData = (streamId: string, enabled: boolean) => {
+  const { fetchStreamDataLake } = usePluginEntities('dataLake')[0] ?? {};
+  const { data: dataLake, isError, isLoading } = useQuery(['stream', 'data-lake', streamId],
+    () => fetchStreamDataLake(streamId),
+    { enabled: fetchStreamDataLake && enabled },
   );
 
   return (isLoading || isError) ? undefined : (
-    dataWarehouse?.message_count > 1 || dataWarehouse?.restore_history?.length > 0
+    dataLake?.message_count > 1 || dataLake?.restore_history?.length > 0
   );
 };
 
-export default useStreamDataWarehouseHasData;
+export default useStreamDataLakeHasData;

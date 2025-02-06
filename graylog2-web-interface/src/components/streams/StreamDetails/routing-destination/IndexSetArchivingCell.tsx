@@ -32,7 +32,7 @@ const StyledDiv = styled.div`
 `;
 
 const IndexSetArchivingCell = ({ isArchivingEnabled, streamId }: Props) => {
-  const StreamIndexSetDataWarehouseWarning = PluginStore.exports('dataWarehouse')?.[0]?.StreamIndexSetDataWarehouseWarning;
+  const StreamIndexSetDataLakeWarning = PluginStore.exports('dataLake')?.[0]?.StreamIndexSetDataLakeWarning;
 
   return (
     <StyledDiv>
@@ -41,7 +41,7 @@ const IndexSetArchivingCell = ({ isArchivingEnabled, streamId }: Props) => {
           <Icon name={isArchivingEnabled ? 'check_circle' : 'cancel'} />
         </Wrapper>
       </Tooltip>
-      {StreamIndexSetDataWarehouseWarning && (<StreamIndexSetDataWarehouseWarning streamId={streamId} isArchivingEnabled={isArchivingEnabled} />)}
+      {StreamIndexSetDataLakeWarning && (<StreamIndexSetDataLakeWarning streamId={streamId} isArchivingEnabled={isArchivingEnabled} />)}
     </StyledDiv>
   );
 };
