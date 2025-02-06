@@ -14,11 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/**
- * This package contains a compatibility layer to support old code using the Mongojack 2.x API. It is destined for
- * removal as soon as all code has been migrated to use the MongoDB driver API directly.
- * <p>
- * Instead of the classes from this package, use {@link org.graylog2.database.MongoCollections} as an entrypoint for
- * interacting with MongoDB.
- */
-package org.graylog2.database.jackson.legacy;
+import { useQuery } from '@tanstack/react-query';
+
+import usePluginEntities from 'hooks/usePluginEntities';
+
+const useStreamDataLakeHasData = (streamId: string, enabled: boolean) => {
+  const { fetchStreamDataLake } = usePluginEntities('dataLake')[0] ?? {};
+  const { data: dataLake, isError, isLoading } = useQuery(['stream', 'data-lake', streamId],
+    () => fetchStreamDataLake(streamId),
+    { enabled: fetchStreamDataLake && enabled },
+  );
+
+  return (isLoading || isError) ? undefined : (
+    dataLake?.message_count > 1 || dataLake?.restore_history?.length > 0
+  );
+};
+
+export default useStreamDataLakeHasData;
