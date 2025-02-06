@@ -17,8 +17,11 @@
 package org.graylog2.shared.rest.resources.system;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
+import retrofit2.http.Streaming;
 
 import java.util.List;
 
@@ -32,5 +35,10 @@ public interface RemoteDataNodeStatusResource {
 
     @GET("/logs/stderr")
     Call<List<String>> opensearchStdErr();
+
+    @Streaming
+    @Headers({"Accept: */*"})
+    @GET("/logs/internal")
+    Call<ResponseBody> datanodeInternalLogs();
 
 }
