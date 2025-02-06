@@ -23,6 +23,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import jakarta.inject.Inject;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
@@ -45,12 +46,11 @@ import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
 
-import jakarta.inject.Inject;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     public static final ModelType TYPE_V1 = ModelTypes.LOOKUP_TABLE_V1;
@@ -202,9 +202,11 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return lookupTableService.findAll().stream()
-                .map(this::createExcerpt)
-                .collect(Collectors.toSet());
+        try (Stream<LookupTableDto> lookupTableStream = lookupTableService.streamAll()) {
+            return lookupTableStream
+                    .map(this::createExcerpt)
+                    .collect(Collectors.toSet());
+        }
     }
 
     @Override
