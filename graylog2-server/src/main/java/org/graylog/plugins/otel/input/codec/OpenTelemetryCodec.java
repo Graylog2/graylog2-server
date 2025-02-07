@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import org.graylog.plugins.otel.input.Journal;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
@@ -59,6 +60,14 @@ public class OpenTelemetryCodec implements Codec {
 
     @ConfigClass
     public static class Config extends AbstractCodec.Config {
+
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            // Keep only source override config. Charset override is not being used.
+            final ConfigurationRequest cr = new ConfigurationRequest();
+            cr.addField(super.getRequestedConfiguration().getField(CK_OVERRIDE_SOURCE));
+            return cr;
+        }
     }
 
     @Override
