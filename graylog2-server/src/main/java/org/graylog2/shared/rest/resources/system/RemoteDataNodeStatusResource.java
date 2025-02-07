@@ -30,14 +30,8 @@ public interface RemoteDataNodeStatusResource {
     @GET("/")
     Call<JsonNode> status();
 
-    @GET("/logs/stdout")
-    Call<List<String>> opensearchStdOut();
-
-    @GET("/logs/stderr")
-    Call<List<String>> opensearchStdErr();
-
     @Streaming
-    @Headers({"Accept: */*"})
+    @Headers({"Accept: text/plain"})
     @GET("/logs/internal")
     Call<ResponseBody> datanodeInternalLogs();
 
