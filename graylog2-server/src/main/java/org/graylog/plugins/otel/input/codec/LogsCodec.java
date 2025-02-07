@@ -61,11 +61,11 @@ public class LogsCodec {
         this.objectMapper = objectMapper;
     }
 
-    public Optional<Message> decode(@Nonnull Journal.Log log) {
+    public Optional<Message> decode(@Nonnull Journal.Log log, DateTime receiveTimestamp) {
         final var logRecord = log.getLogRecord();
 
         final String body = asString("body", logRecord.getBody()).orElse("");
-        final Message message = messageFactory.createMessage(body, source(log), timestamp(logRecord));
+        final Message message = messageFactory.createMessage(body, source(log), timestamp(logRecord).orElse(receiveTimestamp));
 
         message.addField("trace_id", Hex.encodeHexString(logRecord.getTraceId().toByteArray()));
         message.addField("span_id", Hex.encodeHexString(logRecord.getSpanId().toByteArray()));
@@ -89,14 +89,14 @@ public class LogsCodec {
         return Optional.of(message);
     }
 
-    private DateTime timestamp(LogRecord logRecord) {
+    private Optional<DateTime> timestamp(LogRecord logRecord) {
         if (logRecord.getTimeUnixNano() > 0) {
-            return dateTime(logRecord.getTimeUnixNano());
+            return Optional.of(dateTime(logRecord.getTimeUnixNano()));
         }
         if (logRecord.getObservedTimeUnixNano() > 0) {
-            return dateTime(logRecord.getObservedTimeUnixNano());
+            return Optional.of(dateTime(logRecord.getObservedTimeUnixNano()));
         }
-        return DateTime.now(DateTimeZone.UTC);
+        return Optional.empty();
     }
 
     private static DateTime dateTime(long timeUnixNano) {

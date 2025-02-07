@@ -25,6 +25,7 @@ import org.graylog.plugins.otel.input.codec.LogsCodec;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +54,7 @@ class LogsCodecTest {
     // encoded string to a base64 encoded string in order to correctly parse the file with the generic protobuf utils
     @Test
     void decodeOfficialExample() throws IOException {
-        final var decoded = codec.decode(parseFixture("logs.json"));
+        final var decoded = codec.decode(parseFixture("logs.json"), new DateTime(DateTimeZone.UTC));
         assertThat(decoded).isNotEmpty();
 
         final var message = decoded.get();
@@ -84,7 +85,7 @@ class LogsCodecTest {
 
     @Test
     void decodeDeeplyNested() throws IOException {
-        final var decoded = codec.decode(parseFixture("deeply_nested_log_record.json"));
+        final var decoded = codec.decode(parseFixture("deeply_nested_log_record.json"), new DateTime(DateTimeZone.UTC));
         assertThat(decoded).isNotEmpty();
         final var message = decoded.get();
 
@@ -97,7 +98,7 @@ class LogsCodecTest {
 
     @Test
     void decodeComplexResourceAndBody() throws IOException {
-        final var decoded = codec.decode(parseFixture("complex_source_and_body.json"));
+        final var decoded = codec.decode(parseFixture("complex_source_and_body.json"), new DateTime(DateTimeZone.UTC));
         assertThat(decoded).isNotEmpty();
         final var message = decoded.get();
 
@@ -115,7 +116,7 @@ class LogsCodecTest {
 
     @Test
     void decodeArrayFlavors() throws IOException {
-        final var decoded = codec.decode(parseFixture("log_record_array_flavors.json"));
+        final var decoded = codec.decode(parseFixture("log_record_array_flavors.json"), new DateTime(DateTimeZone.UTC));
         assertThat(decoded).isNotEmpty();
         final var message = decoded.get();
 
@@ -150,6 +151,16 @@ class LogsCodecTest {
                     final var parsed = objectMapper.readValue(value, List.class);
                     assertThat(parsed).isEqualTo(List.of("a", List.of("a", "b")));
                 });
+    }
+
+    @Test
+    void fallbackToReceiveTimestamp() throws IOException {
+        final DateTime receiveTimestamp = new DateTime(2025, 2, 7, 14, 0, 0, DateTimeZone.UTC);
+        final var decoded = codec.decode(parseFixture("empty_record.json"), receiveTimestamp);
+        assertThat(decoded).isNotEmpty();
+        final var message = decoded.get();
+
+        assertThat(message.getTimestamp()).isEqualTo(receiveTimestamp);
     }
 
     private Journal.Log parseFixture(String filename) throws IOException {
