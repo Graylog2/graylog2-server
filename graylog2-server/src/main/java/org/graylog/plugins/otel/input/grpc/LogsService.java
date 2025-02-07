@@ -55,6 +55,7 @@ public class LogsService extends LogsServiceGrpc.LogsServiceImplBase {
             return;
         }
 
+        // TODO: get client IP and use RawMessage(byte[], java.net.InetSocketAddress) constructor
         journalRecordFactory.createFromRequest(request).forEach(record ->
                 input.processRawMessage(new RawMessage(record.toByteArray())));
 
