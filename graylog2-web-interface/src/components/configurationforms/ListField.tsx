@@ -20,7 +20,7 @@ import React from 'react';
 import type { ListField as ListFieldType } from 'components/configurationforms/types';
 import { MultiSelect } from 'components/common';
 import { Input } from 'components/bootstrap';
-import { optionalMarker } from 'components/configurationforms/FieldHelpers';
+import { optionableLabel } from 'components/configurationforms/FieldHelpers';
 
 type Props = {
   autoFocus?: boolean,
@@ -31,7 +31,7 @@ type Props = {
   value?: Array<string> | string
 };
 
-const ListField = ({ autoFocus = false, field, onChange, title, typeName, value }: Props) => {
+const ListField = ({ autoFocus = false, field, onChange, title, typeName, value = undefined }: Props) => {
   const handleChange = (nextValue) => {
     const values = (nextValue === '' ? [] : nextValue.split(','));
 
@@ -44,13 +44,11 @@ const ListField = ({ autoFocus = false, field, onChange, title, typeName, value 
   const formattedOptions = Object.entries(options)
     .map(([label, optionValue]) => ({ value: optionValue, label: label }));
 
-  const label = <>{field.human_name} {optionalMarker(field)}</>;
-
   const selectValue = Array.isArray(value) ? value.join(',') : value;
 
   return (
     <Input id={`${typeName}-${title}`}
-           label={label}
+           label={optionableLabel(field)}
            help={field.description}>
       <MultiSelect inputId={`${typeName}-${title}`}
                    name={`configuration[${title}]`}

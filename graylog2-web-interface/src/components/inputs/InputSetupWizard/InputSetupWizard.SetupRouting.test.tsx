@@ -180,98 +180,139 @@ describe('InputSetupWizard Setup Routing', () => {
   it('should render the Setup Routing step', async () => {
     renderWizard();
 
-    const routingStepText = await screen.findByText(/Choose a Destination Stream to route Messages from this Input to./i);
+    const routingStepText = await screen.findByText(/Select a destination Stream to route messages from this input to./i);
 
     expect(routingStepText).toBeInTheDocument();
   });
 
-  it('should only show editable existing streams', async () => {
-    asMock(useStreams).mockReturnValue(useStreamsResult(
-      [
-        { id: 'alohoid', title: 'Aloho', is_editable: true },
-        { id: 'moraid', title: 'Mora', is_editable: false },
-      ],
-    ));
+  describe('Stream Selection', () => {
+    it('should show the stream select when clicking on choose stream', async () => {
+      renderWizard();
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
 
-    renderWizard();
+      fireEvent.click(selectStreamButton);
 
-    const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+      await screen.findByLabelText(/All messages \(Default\)/i);
+    });
 
-    await selectEvent.openMenu(streamSelect);
+    it('should only show editable existing streams', async () => {
+      asMock(useStreams).mockReturnValue(useStreamsResult(
+        [
+          { id: 'alohoid', title: 'Aloho', is_editable: true },
+          { id: 'moraid', title: 'Mora', is_editable: false },
+        ],
+      ));
 
-    const alohoOption = await screen.findByText(/Aloho/i);
-    const moraOption = screen.queryByText(/Mora/i);
+      renderWizard();
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
 
-    expect(alohoOption).toBeInTheDocument();
-    expect(moraOption).not.toBeInTheDocument();
-  });
+      fireEvent.click(selectStreamButton);
 
-  it('should not show existing default stream in select', async () => {
-    asMock(useStreams).mockReturnValue(useStreamsResult(
-      [
-        { id: 'alohoid', title: 'Aloho', is_editable: true, is_default: true },
-        { id: 'moraid', title: 'Mora', is_editable: true },
-      ],
-    ));
+      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
-    renderWizard();
+      await selectEvent.openMenu(streamSelect);
 
-    const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+      const alohoOption = await screen.findByText(/Aloho/i);
+      const moraOption = screen.queryByText(/Mora/i);
 
-    await selectEvent.openMenu(streamSelect);
+      expect(alohoOption).toBeInTheDocument();
+      expect(moraOption).not.toBeInTheDocument();
+    });
 
-    const moraOption = await screen.findByText(/Mora/i);
-    const alohoOption = screen.queryByText(/Aloho/i);
+    it('should not show existing default stream in select', async () => {
+      asMock(useStreams).mockReturnValue(useStreamsResult(
+        [
+          { id: 'alohoid', title: 'Aloho', is_editable: true, is_default: true },
+          { id: 'moraid', title: 'Mora', is_editable: true },
+        ],
+      ));
 
-    expect(moraOption).toBeInTheDocument();
-    expect(alohoOption).not.toBeInTheDocument();
-  });
+      renderWizard();
 
-  it('should allow the user to select a stream', async () => {
-    asMock(useStreams).mockReturnValue(useStreamsResult(
-      [
-        { id: 'alohoid', title: 'Aloho', is_editable: true },
-        { id: 'moraid', title: 'Mora', is_editable: true },
-      ],
-    ));
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
 
-    renderWizard();
+      fireEvent.click(selectStreamButton);
 
-    const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
-    await selectEvent.openMenu(streamSelect);
+      await selectEvent.openMenu(streamSelect);
 
-    await selectEvent.select(streamSelect, 'Aloho');
-  });
+      const moraOption = await screen.findByText(/Mora/i);
+      const alohoOption = screen.queryByText(/Aloho/i);
 
-  it('should show a warning if the selected stream has connected pipelines', async () => {
-    asMock(useStreams).mockReturnValue(useStreamsResult(
-      [
-        { id: 'alohoid', title: 'Aloho', is_editable: true },
-        { id: 'moraid', title: 'Mora', is_editable: true },
-      ],
-    ));
+      expect(moraOption).toBeInTheDocument();
+      expect(alohoOption).not.toBeInTheDocument();
+    });
 
-    asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock([
-      { id: 'pipeline1', title: 'Pipeline1' },
-      { id: 'pipeline2', title: 'Pipeline2' },
-    ]));
+    it('should allow the user to select a stream', async () => {
+      asMock(useStreams).mockReturnValue(useStreamsResult(
+        [
+          { id: 'alohoid', title: 'Aloho', is_editable: true },
+          { id: 'moraid', title: 'Mora', is_editable: true },
+        ],
+      ));
 
-    renderWizard();
+      renderWizard();
 
-    const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
 
-    await selectEvent.openMenu(streamSelect);
+      fireEvent.click(selectStreamButton);
 
-    await selectEvent.select(streamSelect, 'Aloho');
+      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
-    const warning = await screen.findByText(/The selected stream has existing pipelines/i);
-    const warningPipeline1 = await screen.findByText(/Pipeline1/i);
-    const warningPipeline2 = await screen.findByText(/Pipeline2/i);
+      await selectEvent.openMenu(streamSelect);
 
-    expect(warning).toBeInTheDocument();
-    expect(warningPipeline1).toBeInTheDocument();
-    expect(warningPipeline2).toBeInTheDocument();
+      await selectEvent.select(streamSelect, 'Aloho');
+    });
+
+    it('should show a warning if the selected stream has connected pipelines', async () => {
+      asMock(useStreams).mockReturnValue(useStreamsResult(
+        [
+          { id: 'alohoid', title: 'Aloho', is_editable: true },
+          { id: 'moraid', title: 'Mora', is_editable: true },
+        ],
+      ));
+
+      asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock([
+        { id: 'pipeline1', title: 'Pipeline1' },
+        { id: 'pipeline2', title: 'Pipeline2' },
+      ]));
+
+      renderWizard();
+
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(selectStreamButton);
+
+      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+
+      await selectEvent.openMenu(streamSelect);
+
+      await selectEvent.select(streamSelect, 'Aloho');
+
+      const warning = await screen.findByText(/Pipelines connected to target Stream/i);
+      const warningPipeline1 = await screen.findByText(/Pipeline1/i);
+      const warningPipeline2 = await screen.findByText(/Pipeline2/i);
+
+      expect(warning).toBeInTheDocument();
+      expect(warningPipeline1).toBeInTheDocument();
+      expect(warningPipeline2).toBeInTheDocument();
+    });
   });
 
   describe('Stream creation', () => {
@@ -323,7 +364,7 @@ describe('InputSetupWizard Setup Routing', () => {
       });
 
       const nextStepButton = await screen.findByRole('button', {
-        name: /Finish & Start Input/i,
+        name: /Skip & Start Input/i,
         hidden: true,
       });
 

@@ -19,7 +19,7 @@ import React from 'react';
 
 import type { DropdownField as DropdownFieldType } from 'components/configurationforms/types';
 import { Input } from 'components/bootstrap';
-import { optionalMarker } from 'components/configurationforms/FieldHelpers';
+import { optionableLabel } from 'components/configurationforms/FieldHelpers';
 
 type Props = {
   autoFocus?: boolean,
@@ -46,12 +46,10 @@ const DropdownField = ({ autoFocus = false, field, onChange, title, typeName, va
     options.unshift(formatOption('', `Select ${field.human_name || title}`, true));
   }
 
-  const label = <>{field.human_name} {optionalMarker(field)}</>;
-
   return (
     <Input id={`${typeName}-${title}`}
            name={`configuration[${title}]`}
-           label={label}
+           label={optionableLabel(field)}
            type="select"
            value={value}
            help={field.description}

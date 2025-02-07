@@ -24,6 +24,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import jakarta.inject.Inject;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
@@ -49,8 +50,6 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 import java.util.Optional;
@@ -172,10 +171,12 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return eventDefinitionService.streamAll()
-                .filter(ed -> ed.config().isContentPackExportable())
-                .map(this::createExcerpt)
-                .collect(Collectors.toSet());
+        try (var stream = eventDefinitionService.streamAll()) {
+            return stream
+                    .filter(ed -> ed.config().isContentPackExportable())
+                    .map(this::createExcerpt)
+                    .collect(Collectors.toSet());
+        }
     }
 
     @Override

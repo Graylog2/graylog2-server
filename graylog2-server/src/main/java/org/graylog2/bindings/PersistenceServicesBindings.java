@@ -51,10 +51,12 @@ import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.MongoDBSessionServiceImpl;
+import org.graylog2.shared.tokenusage.TokenUsageService;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.system.activities.SystemMessageService;
 import org.graylog2.system.activities.SystemMessageServiceImpl;
+import org.graylog2.tokenusage.TokenUsageServiceImpl;
 import org.graylog2.users.UserManagementServiceImpl;
 import org.graylog2.users.UserServiceImpl;
 
@@ -75,6 +77,7 @@ public class PersistenceServicesBindings extends AbstractModule {
         OptionalBinder.newOptionalBinder(binder(), UserManagementService.class)
                 .setDefault().to(UserManagementServiceImpl.class);
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class).asEagerSingleton();
+        bind(TokenUsageService.class).to(TokenUsageServiceImpl.class).asEagerSingleton();
         bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class).asEagerSingleton();
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);

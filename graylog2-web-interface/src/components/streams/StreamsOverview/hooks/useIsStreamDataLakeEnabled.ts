@@ -14,8 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { formatNumber as _formatNumber } from 'util/NumberFormatting';
+import { useQuery } from '@tanstack/react-query';
 
-const formatNumber = (value: number): string => _formatNumber(value, { maximumFractionDigits: 7 });
+import usePluginEntities from 'hooks/usePluginEntities';
 
-export default formatNumber;
+const useIsStreamDataLakeEnabled = (streamId: string, enabled: boolean) => {
+  const { fetchStreamDataLakeStatus } = usePluginEntities('dataLake')[0] ?? {};
+  const { data: status, isError, isLoading } = useQuery(['data-lake-config', streamId, 'enabled'],
+    () => fetchStreamDataLakeStatus(streamId),
+    { enabled: fetchStreamDataLakeStatus && enabled },
+  );
+
+  return (isLoading || isError) ? undefined : status?.enabled;
+};
+
+export default useIsStreamDataLakeEnabled;

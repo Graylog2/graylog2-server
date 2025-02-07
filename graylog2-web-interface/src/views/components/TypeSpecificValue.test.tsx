@@ -24,7 +24,7 @@ import useFeature from 'hooks/useFeature';
 
 jest.mock('hooks/useFeature');
 
-describe('SearchResult', () => {
+describe('TypeSpecificValue', () => {
   beforeEach(() => {
     asMock(useFeature).mockReturnValue(true);
   });
