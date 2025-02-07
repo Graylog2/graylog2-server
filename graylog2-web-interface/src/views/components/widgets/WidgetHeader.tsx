@@ -82,7 +82,7 @@ type WidgetTitleProps = {
   titleIcon?: React.ReactNode,
 }
 
-const WidgetTitle = ({ onChange, editing, title, titleIcon }: WidgetTitleProps) => {
+const WidgetTitle = ({ onChange = undefined, editing, title, titleIcon = undefined }: WidgetTitleProps) => {
   if (typeof onChange !== 'function') {
     return <><Title>{title}</Title>{titleIcon}</>;
   }
@@ -93,7 +93,7 @@ const WidgetTitle = ({ onChange, editing, title, titleIcon }: WidgetTitleProps) 
         <TitleInput type="text"
                     id="widget-title"
                     onChange={(e) => onChange(e.target.value)}
-                    value={title}
+                    defaultValue={title}
                     required />
       </TitleInputWrapper>
     );
@@ -125,9 +125,9 @@ const WidgetHeader = ({
   editing,
   hideDragHandle = false,
   loading = false,
-  children,
-  titleIcon,
-  onRename,
+  children = undefined,
+  titleIcon = undefined,
+  onRename = undefined,
 }: Props) => (
   <Container>
     <Col>

@@ -18,6 +18,7 @@ import { type SyntheticEvent } from 'react';
 
 import type { StepsType } from 'components/common/Wizard';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
+import { SYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 
 type Provider = {
   type: string,
@@ -117,3 +118,9 @@ export type EventDefinitionFormControlsProps = {
   onSubmit: (event: SyntheticEvent) => void,
   steps: StepsType,
 }
+
+export const isSystemEventDefinition = (eventDefinition: EventDefinition) => eventDefinition?.config?.type === SYSTEM_EVENT_DEFINITION_TYPE;
+
+export const isAggregationEventDefinition = (eventDefinition: EventDefinition) => eventDefinition?.config?.type === 'aggregation-v1';
+
+export const isSigmaEventDefinition = (eventDefinition: EventDefinition) => eventDefinition?.config?.type === 'sigma-v1';

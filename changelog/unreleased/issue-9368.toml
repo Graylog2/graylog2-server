@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed query validation with parameter usage. Parameters representing field names do not cause 'unknown field' warnings anymore."
+
+issues = ["9368"]
+pulls = ["21469"]

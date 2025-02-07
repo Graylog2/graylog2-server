@@ -18,10 +18,10 @@ package org.graylog2.rest.resources;
 
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.rest.HistogramResponseWriter;
 import org.graylog.plugins.views.storage.migration.RemoteReindexResource;
-import org.graylog.security.rest.ClientCertResource;
 import org.graylog.security.rest.CAResource;
 import org.graylog.security.rest.CertificateRenewalResource;
 import org.graylog.security.rest.CertificatesResource;
+import org.graylog.security.rest.ClientCertResource;
 import org.graylog2.Configuration;
 import org.graylog2.contentstream.rest.ContentStreamResource;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -106,6 +106,7 @@ import org.graylog2.rest.resources.system.monitoring.MonitoringResource;
 import org.graylog2.rest.resources.system.outputs.OutputResource;
 import org.graylog2.rest.resources.system.processing.ClusterProcessingStatusResource;
 import org.graylog2.rest.resources.system.processing.SystemProcessingStatusResource;
+import org.graylog2.rest.resources.tokenusage.TokenUsageResource;
 import org.graylog2.rest.resources.tools.ContainsStringTesterResource;
 import org.graylog2.rest.resources.tools.GrokTesterResource;
 import org.graylog2.rest.resources.tools.JsonTesterResource;
@@ -171,6 +172,8 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(CAResource.class);
         addSystemRestResource(ClientCertResource.class);
         addSystemRestResource(CertificatesResource.class);
+
+        addSystemRestResource(TokenUsageResource.class);
     }
 
     private void addDebugResources() {

@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { Button, Input } from 'components/bootstrap';
-import { optionalMarker } from 'components/configurationforms/FieldHelpers';
+import { optionableLabel } from 'components/configurationforms/FieldHelpers';
 
 import type { EncryptedFieldValue, InlineBinaryField as InlineBinaryFieldType } from './types';
 
@@ -43,8 +43,6 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty = false, onC
   const isRequired = !field.is_optional;
   const showReadOnly = !dirty && isValuePresent;
   const fieldId = `${typeName}-${title}`;
-
-  const labelContent = <>{field.human_name} {optionalMarker(field)}</>;
 
   const handleFileRead = (fileReader: FileReader, file) => {
     const dataUrl = fileReader.result;
@@ -120,7 +118,7 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty = false, onC
     <Input id={fieldId}
            type="password"
            name={`configuration[${title}]`}
-           label={labelContent}
+           label={optionableLabel(field)}
            required={isRequired}
            readOnly
            help={field.description}
@@ -133,7 +131,7 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty = false, onC
     (fileName) ? (
       <Input id={fieldId}
              name={`configuration[${title}]`}
-             label={labelContent}
+             label={optionableLabel(field)}
              required={isRequired}
              help={field.description}
              autoFocus={autoFocus}
@@ -144,7 +142,7 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty = false, onC
       <Input id={fieldId}
              type="file"
              name={`configuration[${title}]`}
-             label={labelContent}
+             label={optionableLabel(field)}
              required={isRequired}
              help={field.description}
              buttonAfter={undoResetButton()}

@@ -53,6 +53,9 @@ const KeySeparator = styled.div`
 const keyMapper = (key: string, isMacOS: boolean) => {
   const keyMap = {
     mod: isMacOS ? '⌘' : 'Ctrl',
+    alt: isMacOS ? '⌥' : 'Alt',
+    ctrl: isMacOS ? '⌃' : 'Ctrl',
+    meta: isMacOS ? '⌘' : 'Win',
   };
 
   return keyMap[key] || key;
