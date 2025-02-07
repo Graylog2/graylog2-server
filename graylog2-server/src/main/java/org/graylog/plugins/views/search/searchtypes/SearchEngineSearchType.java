@@ -14,18 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+package org.graylog.plugins.views.search.searchtypes;
 
-import usePluginEntities from 'hooks/usePluginEntities';
+import org.graylog.plugins.views.search.SearchType;
 
-const useIsStreamDataWarehouseEnabled = (streamId: string, enabled: boolean) => {
-  const { fetchStreamDataWarehouseStatus } = usePluginEntities('dataWarehouse')[0] ?? {};
-  const { data: status, isError, isLoading } = useQuery(['data-warehouse-config', streamId, 'enabled'],
-    () => fetchStreamDataWarehouseStatus(streamId),
-    { enabled: fetchStreamDataWarehouseStatus && enabled },
-  );
-
-  return (isLoading || isError) ? undefined : status?.enabled;
-};
-
-export default useIsStreamDataWarehouseEnabled;
+/**
+ * Marker interface for search types that are search engine related.
+ */
+public interface SearchEngineSearchType extends SearchType {
+}

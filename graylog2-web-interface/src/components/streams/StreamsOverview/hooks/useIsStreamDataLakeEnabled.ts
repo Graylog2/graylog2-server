@@ -14,25 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.rest.resources.system;
+import { useQuery } from '@tanstack/react-query';
 
-import com.fasterxml.jackson.databind.JsonNode;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Streaming;
+import usePluginEntities from 'hooks/usePluginEntities';
 
-import java.util.List;
+const useIsStreamDataLakeEnabled = (streamId: string, enabled: boolean) => {
+  const { fetchStreamDataLakeStatus } = usePluginEntities('dataLake')[0] ?? {};
+  const { data: status, isError, isLoading } = useQuery(['data-lake-config', streamId, 'enabled'],
+    () => fetchStreamDataLakeStatus(streamId),
+    { enabled: fetchStreamDataLakeStatus && enabled },
+  );
 
-public interface RemoteDataNodeStatusResource {
+  return (isLoading || isError) ? undefined : status?.enabled;
+};
 
-    @GET("/")
-    Call<JsonNode> status();
-
-    @Streaming
-    @Headers({"Accept: text/plain"})
-    @GET("/logs/internal")
-    Call<ResponseBody> datanodeInternalLogs();
-
-}
+export default useIsStreamDataLakeEnabled;
