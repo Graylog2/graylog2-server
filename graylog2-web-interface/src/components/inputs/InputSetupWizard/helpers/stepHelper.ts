@@ -55,22 +55,6 @@ export const checkHasPreviousStep = (orderedSteps: Array<InputSetupWizardStep>, 
   return true;
 };
 
-export const addStepAfter = (orderedSteps: Array<InputSetupWizardStep>, step: InputSetupWizardStep, setAfterStep?: InputSetupWizardStep) : Array<InputSetupWizardStep> => {
-  if (!setAfterStep) return [...orderedSteps, step];
-
-  const setAfterStepIndex = orderedSteps.indexOf(setAfterStep);
-
-  if (setAfterStepIndex === -1) return orderedSteps;
-
-  const newOrderedSteps = [
-    ...orderedSteps.slice(0, setAfterStepIndex + 1),
-    step,
-    ...orderedSteps.slice(setAfterStepIndex + 1),
-  ];
-
-  return newOrderedSteps;
-};
-
 export const updateStepConfigOrData = (configOrData: StepsConfig | StepsData, stepName: InputSetupWizardStep, data: object = {}, override: boolean = false) : StepsConfig | StepsData => {
   if (!stepName) return {};
 

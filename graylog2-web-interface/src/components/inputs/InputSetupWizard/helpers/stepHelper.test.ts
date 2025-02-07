@@ -24,7 +24,6 @@ import {
   checkHasNextStep,
   checkHasPreviousStep,
   checkIsNextStepDisabled,
-  addStepAfter,
   updateStepConfigOrData,
   enableNextStep,
 } from './stepHelper';
@@ -334,40 +333,6 @@ describe('stepHelper', () => {
 
     it('returns empty object when no step name is given', () => {
       expect(updateStepConfigOrData(undefined, undefined, { foo: 'bar' })).toEqual({});
-    });
-  });
-
-  describe('addStepAfter', () => {
-    it('returns ordered steps with added step in the middle', () => {
-      const testOrderedSteps = [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
-
-      expect(addStepAfter(testOrderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.SELECT_CATEGORY)).toEqual(
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS],
-      );
-    });
-
-    it('returns ordered steps with added step at the end', () => {
-      const testOrderedSteps = [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
-
-      expect(addStepAfter(testOrderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS)).toEqual(
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, INPUT_WIZARD_STEPS.SETUP_ROUTING],
-      );
-    });
-
-    it('returns ordered steps with added step at the end when no step to set after given', () => {
-      const testOrderedSteps = [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
-
-      expect(addStepAfter(testOrderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, INPUT_WIZARD_STEPS.SETUP_ROUTING],
-      );
-    });
-
-    it('returns original ordered steps when step to set after is not in the array', () => {
-      const testOrderedSteps = [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
-
-      expect(addStepAfter(testOrderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.START_INPUT)).toEqual(
-        testOrderedSteps,
-      );
     });
   });
 });
