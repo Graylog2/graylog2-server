@@ -35,7 +35,6 @@ import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.InlineBinaryField;
 import org.graylog2.plugin.configuration.fields.NumberField;
-import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
@@ -184,35 +183,37 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
             );
 
             request.addField(
-                    new TextField(
+                    new InlineBinaryField(
                             CK_TLS_CERT,
                             "TLS Server Certificate Chain",
-                            "",
                             "PEM-encoded certificate chain used by the input to authenticate itself to " +
                                     "clients.",
                             ConfigurationField.Optional.OPTIONAL,
-                            TextField.Attribute.TEXTAREA
+                            true, // TODO: no need to encrypt, but our UI doesn't support unencrypted yet
+                            ""
                     )
             );
 
-            final var privateKeyField = new InlineBinaryField(
-                    CK_TLS_KEY,
-                    "TLS Server Private Key",
-                    "PEM-encoded PKCS8 private key used by the server for TLS encryption",
-                    ConfigurationField.Optional.OPTIONAL,
-                    true);
-            privateKeyField.setDefaultValue("");
-            request.addField(privateKeyField);
-
             request.addField(
-                    new TextField(
+                    new InlineBinaryField(
+                            CK_TLS_KEY,
+                            "TLS Server Private Key",
+                            "PEM-encoded PKCS8 private key used by the server for TLS encryption. " +
+                                    "Please note, that if you run this input on a Forwarder, the key will also be " +
+                                    "stored in the local filesystem of the Forwarder.",
+                            ConfigurationField.Optional.OPTIONAL,
+                            true,
+                            "")
+            );
+
+            request.addField(new InlineBinaryField(
                             CK_TLS_CLIENT_CA,
                             "TLS Client Certificate Chain",
-                            "",
                             "PEM-encoded certificate chain used to authenticate client certificates in " +
                                     "mutual TLS.",
                             ConfigurationField.Optional.OPTIONAL,
-                            TextField.Attribute.TEXTAREA
+                    true, // TODO: no need to encrypt, but our UI doesn't support unencrypted yet
+                    ""
                     )
             );
 
