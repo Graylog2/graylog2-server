@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
@@ -30,25 +31,47 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 type Processor = {
   name: string,
   class_name: string
-}
-
-type Config = {
+};
+type ProcessorConfig = {
   disabled_processors: Array<string>,
   processor_order: Array<Processor>,
-}
+};
+type GlobalProcessingConfig = {
+  grace_period?: string,
+};
+type FormConfig = ProcessorConfig & GlobalProcessingConfig;
 
+const Wrapper = styled.div(({ theme }) => css`
+  margin-bottom: ${theme.spacings.md};
+  overflow: auto;
+`);
+const StyledDefList = styled.dl.attrs({ className: 'deflist' })(({ theme }) => css`
+  &&.deflist {
+    dd {
+      padding-left: ${theme.spacings.md};
+      display: table-cell;
+    }
+  }
+`);
 const MessageProcessorsConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
-  const [viewConfig, setViewConfig] = useState<Config | undefined>(undefined);
-  const [formConfig, setFormConfig] = useState<Config | undefined>(undefined);
+  const [viewConfig, setViewConfig] = useState<ProcessorConfig | undefined>(undefined);
+  const [formConfig, setFormConfig] = useState<FormConfig | undefined>(undefined);
+  const [globalProcessingConfig, setGlobalProcessingConfig] = useState<GlobalProcessingConfig | undefined>(undefined);
 
   useEffect(() => {
-    ConfigurationsActions.listMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG).then(() => {
-      const config = getConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG, configuration);
-      setViewConfig(config);
-      setFormConfig(config);
+    Promise.all([
+      ConfigurationsActions.listMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG),
+      ConfigurationsActions.list(ConfigurationType.GLOBAL_PROCESSING_RULE_CONFIG)
+    ]).then(() => {
+      const processorConfig = getConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG, configuration);
+      const globalConfig = getConfig(ConfigurationType.GLOBAL_PROCESSING_RULE_CONFIG, configuration);
+      setViewConfig(processorConfig);
+      setGlobalProcessingConfig(globalConfig);
+      setFormConfig(processorConfig);
     });
+
   }, [configuration]);
 
   const openModal = () => {
@@ -86,7 +109,7 @@ const MessageProcessorsConfig = () => {
     }
   };
 
-  const isProcessorEnabled = (processor: Processor, config: Config) => (
+  const isProcessorEnabled = (processor: Processor, config: ProcessorConfig) => (
     config.disabled_processors.filter((p) => p === processor.class_name).length < 1
   );
 
@@ -101,6 +124,18 @@ const MessageProcessorsConfig = () => {
       </tr>
     );
   });
+  const GlobalProcessing = () => (
+    <Wrapper>
+      <h2>Global Processing Rules Configuration</h2>
+      <p>Global Processing Rules are applied after receipt by an Input, and before processing rules applied by Message Processors.</p>
+      <StyledDefList>
+        <dt>Future Timestamp Normalization:</dt>
+        <dd>{globalProcessingConfig?.grace_period ? 'Enabled': 'Disabled'}</dd>
+        <dt>Grace Period:</dt>
+        <dd>{globalProcessingConfig?.grace_period}</dd>
+      </StyledDefList>
+    </Wrapper>
+  );
 
   const sortableItems = () => formConfig.processor_order.map((processor) => ({ id: processor.class_name, title: processor.name }));
 
@@ -127,6 +162,7 @@ const MessageProcessorsConfig = () => {
 
   return (
     <div>
+      <GlobalProcessing />
       <h2>Message Processors Configuration</h2>
       <p>The following message processors are executed in order. Disabled processors will be skipped.</p>
 
