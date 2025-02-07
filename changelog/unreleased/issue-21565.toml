@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix issue preventing quoted entity search values from finding exact matches on various pages throughout Graylog."
+
+issues = ["21565"]
+pulls = ["21567"]
