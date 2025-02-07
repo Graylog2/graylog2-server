@@ -142,9 +142,9 @@ const useInputDiagnosis = (inputId: string): {
       read_bytes_total: (nodeMetrics[metricWithPrefix(input, 'read_bytes_total')] as GaugeMetric)?.metric?.value,
       write_bytes_1sec: (nodeMetrics[metricWithPrefix(input, 'write_bytes_1sec')] as GaugeMetric)?.metric?.value,
       write_bytes_total: (nodeMetrics[metricWithPrefix(input, 'write_bytes_total')] as GaugeMetric)?.metric?.value,
-      failures_indexing: (nodeMetrics[failures_indexing]?.metric as Rate)?.rate?.fifteen_minute || 0,
-      failures_processing: (nodeMetrics[failures_processing]?.metric as Rate)?.rate?.fifteen_minute || 0,
-      failures_inputs_codecs: (nodeMetrics[failures_inputs_codecs]?.metric as Rate)?.rate?.fifteen_minute || 0,
+      failures_indexing: (nodeMetrics[failures_indexing] as GaugeMetric)?.metric?.value || 0,
+      failures_processing: (nodeMetrics[failures_processing] as GaugeMetric)?.metric?.value || 0,
+      failures_inputs_codecs: (nodeMetrics[failures_inputs_codecs] as GaugeMetric)?.metric?.value || 0,
       stream_message_count: Object.entries(messageCountByStream?.stream_message_count || {}),
     },
   };
