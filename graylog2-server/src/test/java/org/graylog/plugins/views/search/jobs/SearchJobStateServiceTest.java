@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.jobs;
 
 import org.graylog.plugins.views.search.SearchJobIdentifier;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
@@ -28,7 +29,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -54,7 +54,7 @@ public class SearchJobStateServiceTest {
     public void testSaveAndGet() {
         final SearchJobState toBeSaved = SearchJobState.builder()
                 .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .messages(List.of())
+                .result(noResult())
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -72,7 +72,7 @@ public class SearchJobStateServiceTest {
     public void testSaveAndDelete() {
         final SearchJobState toBeSaved = SearchJobState.builder()
                 .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .messages(List.of())
+                .result(noResult())
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -89,7 +89,7 @@ public class SearchJobStateServiceTest {
     public void testSaveAndUpdate() {
         final SearchJobState toBeSaved = SearchJobState.builder()
                 .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .messages(List.of())
+                .result(noResult())
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -111,7 +111,7 @@ public class SearchJobStateServiceTest {
     public void testChangeStatus() {
         final SearchJobState toBeSaved = SearchJobState.builder()
                 .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .messages(List.of())
+                .result(noResult())
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -137,7 +137,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10001",
                         "john",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .messages(List.of())
+                .result(noResult())
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.parse("1999-01-01T11:11:11"))
@@ -149,7 +149,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10002",
                         "john",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .messages(List.of())
+                .result(noResult())
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.parse("2000-01-01T11:11:11"))
@@ -161,7 +161,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10003",
                         "bob",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .messages(List.of())
+                .result(noResult())
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.parse("2020-01-01T11:11:11"))
@@ -181,7 +181,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10001",
                         "john",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .messages(List.of())
+                .result(noResult())
                 .status(SearchJobStatus.DONE)
                 .progress(42)
                 .createdAt(DateTime.parse("1999-01-01T11:11:11"))
@@ -192,7 +192,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10002",
                         "john",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .messages(List.of())
+                .result(noResult())
                 .status(SearchJobStatus.DONE)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC).minusDays(1))
@@ -203,7 +203,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10003",
                         "john",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .messages(List.of())
+                .result(noResult())
                 .status(SearchJobStatus.DONE)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -224,5 +224,9 @@ public class SearchJobStateServiceTest {
         numRemoved = toTest.deleteOlderThan(DateTime.now(DateTimeZone.UTC).minusDays(2));
         assertEquals(0, numRemoved);
 
+    }
+
+    private SearchType.Result noResult() {
+        return null;
     }
 }

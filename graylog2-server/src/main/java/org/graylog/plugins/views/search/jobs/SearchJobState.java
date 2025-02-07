@@ -23,14 +23,14 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nullable;
 
 @AutoValue
 @JsonDeserialize(builder = SearchJobState.Builder.class)
@@ -40,7 +40,7 @@ public abstract class SearchJobState implements MongoEntity {
     public static final String UPDATED_AT_FIELD = "updated_at";
     public static final String STATUS_FIELD = "status";
     public static final String TYPE_FIELD = "type";
-    public static final String MESSAGES_FIELD = "messages";
+    public static final String RESULT_FIELD = "result";
 
     @JsonUnwrapped
     public abstract SearchJobIdentifier identifier();
@@ -57,8 +57,9 @@ public abstract class SearchJobState implements MongoEntity {
     @JsonProperty("progress")
     public abstract int progress();
 
-    @JsonProperty(MESSAGES_FIELD)
-    public abstract List<Map<String, Object>> messages(); //TODO: if we decide to store search engine results as well (not only Data Lake), we would need to keep a more general SearchType.Result object here
+    @JsonProperty(RESULT_FIELD)
+    @Nullable
+    public abstract SearchType.Result result();
 
     @JsonProperty(CREATED_AT_FIELD)
     public abstract DateTime createdAt();
@@ -90,8 +91,8 @@ public abstract class SearchJobState implements MongoEntity {
         @JsonProperty("progress")
         public abstract Builder progress(final int progress);
 
-        @JsonProperty(MESSAGES_FIELD)
-        public abstract Builder messages(final List<Map<String, Object>> messages);
+        @JsonProperty(RESULT_FIELD)
+        public abstract Builder result(final SearchType.Result result);
 
         @JsonProperty(CREATED_AT_FIELD)
         public abstract Builder createdAt(final DateTime createdAt);
@@ -113,7 +114,7 @@ public abstract class SearchJobState implements MongoEntity {
     public static SearchJobState createNewJob(final SearchJobIdentifier searchJobIdentifier) {
         return SearchJobState.builder()
                 .identifier(searchJobIdentifier)
-                .messages(List.of())
+                .result(null)
                 .status(SearchJobStatus.RUNNING)
                 .progress(0)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -122,9 +123,9 @@ public abstract class SearchJobState implements MongoEntity {
     }
 
     public static SearchJobState createDoneJobFrom(final SearchJobState existingSearchJob,
-                                                   final List<Map<String, Object>> result) {
+                                                   final SearchType.Result result) {
         return existingSearchJob.toBuilder()
-                .messages(result)
+                .result(result)
                 .status(SearchJobStatus.DONE)
                 .progress(100)
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
