@@ -39,7 +39,6 @@ import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -87,30 +86,30 @@ public class InputEventListener {
     // TODO: add graceful shutdown behavior
     // TODO: fix tests
     private void initializeEventQueueTask() {
-        final var interval = Duration.ofMillis(100);
         daemonScheduler.scheduleAtFixedRate(() -> {
             try {
                 final var queuedEvent = eventQueue.poll();
                 if (queuedEvent != null) {
-                    LOG.debug("Processing queued event: {}", queuedEvent.receivedEvent);
-                    if (queuedEvent.receivedEvent instanceof InputCreated) {
-                        doInputCreated(((InputCreated) queuedEvent.receivedEvent).id());
-                    } else if (queuedEvent.receivedEvent instanceof InputDeleted) {
-                        doInputDeleted(((InputDeleted) queuedEvent.receivedEvent).id());
-                    } else if (queuedEvent.receivedEvent instanceof InputSetup) {
-                        doInputSetup(((InputSetup) queuedEvent.receivedEvent).id());
-                    } else if (queuedEvent.receivedEvent instanceof InputUpdated) {
-                        doInputUpdated(((InputUpdated) queuedEvent.receivedEvent).id());
-                    } else if (queuedEvent.receivedEvent instanceof LeaderChangedEvent) {
+                    final Object receivedEvent = queuedEvent.receivedEvent;
+                    LOG.debug("Processing event: {}", receivedEvent);
+                    if (receivedEvent instanceof InputCreated) {
+                        doInputCreated(((InputCreated) receivedEvent).id());
+                    } else if (receivedEvent instanceof InputDeleted) {
+                        doInputDeleted(((InputDeleted) receivedEvent).id());
+                    } else if (receivedEvent instanceof InputSetup) {
+                        doInputSetup(((InputSetup) receivedEvent).id());
+                    } else if (receivedEvent instanceof InputUpdated) {
+                        doInputUpdated(((InputUpdated) receivedEvent).id());
+                    } else if (receivedEvent instanceof LeaderChangedEvent) {
                         doLeaderChanged();
                     } else {
-                        throw new IllegalArgumentException("Unexpected queued event: " + queuedEvent.receivedEvent);
+                        throw new IllegalArgumentException("Unexpected event: " + queuedEvent.receivedEvent);
                     }
                 }
             } catch (Exception e) {
-                LOG.error("Caught exception while trying to execute queued event", e);
+                LOG.error("Caught exception while trying to process queued event", e);
             }
-        }, 0, interval.toMillis(), TimeUnit.MILLISECONDS);
+        }, 0, 100, TimeUnit.MILLISECONDS);
     }
 
     @Subscribe
