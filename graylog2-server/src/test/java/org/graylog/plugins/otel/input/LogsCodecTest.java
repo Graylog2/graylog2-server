@@ -50,7 +50,7 @@ class LogsCodecTest {
 
     // Uses a modified official example that was copied from
     // https://github.com/open-telemetry/opentelemetry-proto/blob/7312bdf63218acf27fe96430b7231de37fd091f2/examples/logs.json
-    // The only difference to the original is that the values trace_id and span_id have been converted from a hex
+    // The only difference to the original is that the values of trace_id and span_id have been converted from a hex
     // encoded string to a base64 encoded string in order to correctly parse the file with the generic protobuf utils
     @Test
     void decodeOfficialExample() throws IOException {
