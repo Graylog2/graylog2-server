@@ -18,5 +18,5 @@ package org.graylog.plugins.views.search.jobs;
 
 public enum SearchJobType {
     DATA_LAKE,
-    //SEARCH_ENGINE - TBD in future
+    //SEARCH_ENGINE or INDEXER - TBD in future
 }
