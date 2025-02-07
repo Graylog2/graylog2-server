@@ -79,10 +79,10 @@ public class SearchQueryParser {
 
     // Pattern to split a search query into individual parsable elements terms.
     private static final String TERM_SPLIT_PATTERN =
-            "(\\S+:(=|=~|<|<=|>|>=)?'(?:[^'\\\\]|\\\\.)*')|" + // Field-specific terms with single-quotes: title:'value'
-                    "(\\S+:(=|=~|<|<=|>|>=)?\"(?:[^\"\\\\]|\\\\.)*\")|" + // Field-specific terms with double-quotes title:"value"
-                    "['\"][^\\\\]*?(?:\\\\.[^\\\\]*)*?['\"]|" + // Single quoted value: "value one"
-                    "\\S+:(=|=~|<|<=|>|>=)?\\S+|" + // Field-specific terms without quotes title:value
+            "(\\S+:(=|=~|<|<=|>|>=)?'(?:[^'\\\\]|\\\\.)*')|" + // Split field-specific terms with single-quotes: title:'value'
+                    "(\\S+:(=|=~|<|<=|>|>=)?\"(?:[^\"\\\\]|\\\\.)*\")|" + // Split field-specific terms with double-quotes title:"value"
+                    "['\"][^\\\\]*?(?:\\\\.[^\\\\]*)*?['\"]|" + // Split single quoted value: "value one"
+                    "\\S+:(=|=~|<|<=|>|>=)?\\S+|" + // Split field-specific terms without quotes title:value
                     "\\S+"; // Split the words of any other string value
 
     // This needs to be updated if more operators are added
