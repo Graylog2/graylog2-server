@@ -37,12 +37,7 @@ public abstract class AbstractCodec implements Codec {
 
     protected AbstractCodec(Configuration configuration) {
         this.configuration = configuration;
-        if (configuration.stringIsSet(Codec.Config.CK_CHARSET_NAME)) {
-            this.charset = Charset.forName(configuration.getString(Codec.Config.CK_CHARSET_NAME));
-        }
-        else {
-            this.charset = StandardCharsets.UTF_8;
-        }
+        this.charset = getCharsetOrDefault(configuration);
     }
 
     @Override
@@ -59,10 +54,14 @@ public abstract class AbstractCodec implements Codec {
                 name = this.getClass().getAnnotation(org.graylog2.plugin.inputs.annotations.Codec.class).name();
             } else {
                 log.error("Annotation {} missing on codec {}. This is a bug and this codec will not be available.",
-                          org.graylog2.plugin.inputs.annotations.Codec.class, this.getClass());
+                        org.graylog2.plugin.inputs.annotations.Codec.class, this.getClass());
             }
         }
         return name;
+    }
+
+    protected static Charset getCharsetOrDefault(Configuration configuration) {
+        return Charset.forName(configuration.getString(Codec.Config.CK_CHARSET_NAME, StandardCharsets.UTF_8.name()));
     }
 
     @Nullable
