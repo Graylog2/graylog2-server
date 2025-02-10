@@ -77,7 +77,7 @@ public class PasswordSecretPreflightCheck implements PreflightCheck {
         throw new PreflightCheckException("""
                 Invalid password_secret!
                 Failed to decrypt values from MongoDB. This means that your password_secret has been changed or there
-                are some nodes in your cluster that are using different password_secret. Secrets have to be configured
+                are some nodes in your cluster that are using a different password_secret to the one configured on this node. Secrets have to be configured
                 to the same value on every node and can't be changed afterwards.""");
     }
 }
