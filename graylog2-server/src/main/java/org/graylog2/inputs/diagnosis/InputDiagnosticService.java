@@ -44,15 +44,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 import static org.graylog2.rest.models.system.inputs.responses.InputDiagnostics.EMPTY_DIAGNOSTICS;
+import static org.graylog2.rest.models.system.inputs.responses.InputDiagnostics.StreamMessageCount;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class InputDiagnosticService {
@@ -92,18 +92,18 @@ public class InputDiagnosticService {
                     .filter(row -> row.source().equals("leaf"))
                     .map(InputDiagnosticService::extractValues)
                     .toList();
-            Map<String, Long> resultMap = new HashMap<>();
+            List<StreamMessageCount> streamMessageCounts = new ArrayList<>();
             resultList.forEach(
                     entry -> {
                         try {
                             final org.graylog2.plugin.streams.Stream stream = streamService.load(entry.getKey());
-                            resultMap.put(stream.getTitle(), entry.getValue());
+                            streamMessageCounts.add(new StreamMessageCount(stream.getTitle(), stream.getId(), entry.getValue()));
                         } catch (NotFoundException e) {
                             LOG.warn("Unable to load stream {}", entry.getKey(), e);
                         }
                     }
             );
-            return new InputDiagnostics(resultMap);
+            return new InputDiagnostics(streamMessageCounts);
         }
 
         return EMPTY_DIAGNOSTICS;
