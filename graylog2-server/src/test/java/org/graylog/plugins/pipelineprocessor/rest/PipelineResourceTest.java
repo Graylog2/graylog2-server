@@ -24,18 +24,16 @@ import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.inputs.InputRoutingService;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.List;
@@ -49,15 +47,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class PipelineResourceTest {
-    static {
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
-    }
-
     @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Mock
-    private PipelineRuleParser pipelineRuleParser;
+    public final MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     private PipelineService pipelineService;
@@ -66,13 +57,10 @@ public class PipelineResourceTest {
     private PaginatedPipelineService paginatedPipelineService;
 
     @Mock
+    private PipelineRuleParser pipelineRuleParser;
+
+    @Mock
     private PipelineStreamConnectionsService connectionsService;
-
-    @Mock
-    private RuleService ruleService;
-
-    @Mock
-    private StreamService streamService;
 
     @Mock
     private InputRoutingService inputRoutingService;
