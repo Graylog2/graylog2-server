@@ -30,7 +30,8 @@ import java.util.Map;
  * replace the in-use copy if needed.
  */
 public class CIDRPatriciaTrie {
-    private record Node(
+    @VisibleForTesting
+    record Node(
             // The lookup value of the range
             String rangeName,
             // Whether the range is an IPv4 or IPv6 CIDR range
@@ -231,5 +232,11 @@ public class CIDRPatriciaTrie {
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid IP address format: " + ip);
         }
+    }
+
+    // Used only for testing purposes.
+    @VisibleForTesting
+    Node getNode(String key) {
+        return trie.get(key);
     }
 }

@@ -17,6 +17,7 @@
 package org.graylog2.utilities;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
@@ -73,15 +74,58 @@ public class CIDRPatriciaTrieTest {
     }
 
     @Test
-    public void testCleanCopy() throws InterruptedException {
-        final CIDRPatriciaTrie trie = new CIDRPatriciaTrie();
-        final long expireAt = DateTime.now(DateTimeZone.UTC).getMillis() + 500L;
-        trie.insertCIDR("192.168.1.0/24", "IPv4 Range 1", expireAt);
-        trie.insertCIDR("10.0.0.0/8", "IPv4 Range 2", expireAt);
-        trie.insertCIDR("35.138.0.0/15", "IPv4 Range 3", expireAt);
-        Thread.sleep(1000L);
-        final CIDRPatriciaTrie copy = trie.cleanCopy();
-        assertThat(copy.isEmpty()).isTrue();
+    public void testCleanCopy() {
+        try {
+            final CIDRPatriciaTrie trie = new CIDRPatriciaTrie();
+            final long expireAt = DateTime.now(DateTimeZone.UTC).getMillis() + 500L;
+            trie.insertCIDR("192.168.1.0/24", "IPv4 Range 1", expireAt);
+            trie.insertCIDR("10.0.0.0/8", "IPv4 Range 2", expireAt);
+            trie.insertCIDR("35.138.0.0/15", "IPv4 Range 3");
+
+            DateTimeUtils.setCurrentMillisOffset(501);
+            final CIDRPatriciaTrie copy = trie.cleanCopy();
+            // Copy should be a deep copy.
+            assertThat(copy).isNotSameAs(trie);
+            // No operations performed on the original trie, so all nodes should still exist in the trie.
+            assertThat(trie).satisfies(t -> {
+                assertThat(t.longestPrefixRangeLookup("192.168.1.100")).isEqualTo("IPv4 Range 1");
+                assertThat(t.longestPrefixRangeLookup("10.0.5.1")).isEqualTo("IPv4 Range 2");
+                assertThat(t.longestPrefixRangeLookup("35.139.253.123")).isEqualTo("IPv4 Range 3");
+            });
+            // Confirm two nodes with TTLs have been cleaned out of the copy and the one without a TTL has not.
+            assertThat(copy).satisfies(t -> {
+                assertThat(t.longestPrefixRangeLookup("192.168.1.100")).isNull();
+                assertThat(t.longestPrefixRangeLookup("10.0.5.1")).isNull();
+                assertThat(t.longestPrefixRangeLookup("35.139.253.123")).isEqualTo("IPv4 Range 3");
+            });
+
+            // Ensure individual trie nodes have also been deep copied
+            final CIDRPatriciaTrie.Node originalTrieNode = trie.getNode("001000111000101");
+            final CIDRPatriciaTrie.Node copyTrie = copy.getNode("001000111000101");
+            assertThat(originalTrieNode).isNotSameAs(copyTrie);
+
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
+    }
+
+    @Test
+    public void testCleanCopyExpiredNodes() {
+        try {
+            final CIDRPatriciaTrie trie = new CIDRPatriciaTrie();
+            final long expireAt = DateTime.now(DateTimeZone.UTC).getMillis() + 500L;
+            trie.insertCIDR("192.168.1.0/24", "IPv4 Range 1", expireAt);
+            trie.insertCIDR("10.0.0.0/8", "IPv4 Range 2", expireAt);
+            trie.insertCIDR("35.138.0.0/15", "IPv4 Range 3", expireAt);
+
+            DateTimeUtils.setCurrentMillisOffset(501);
+            final CIDRPatriciaTrie copy = trie.cleanCopy();
+            assertThat(copy).isNotSameAs(trie);
+            assertThat(trie.isEmpty()).isFalse();
+            assertThat(copy.isEmpty()).isTrue();
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
     }
 
     @Test
