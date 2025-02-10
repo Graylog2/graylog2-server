@@ -35,7 +35,7 @@ import jakarta.inject.Inject;
 public class PaloAlto9xInput extends MessageInput {
     private static final Logger LOG = LoggerFactory.getLogger(PaloAlto9xInput.class);
 
-    public static final String NAME = "Palo Alto Networks TCP v9+ (deprecated)";
+    public static final String NAME = "Palo Alto Networks TCP v9.x (deprecated)";
 
     @Inject
     public PaloAlto9xInput(@Assisted Configuration configuration,
