@@ -34,7 +34,6 @@ import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.cluster.certificates.CertificateExchange;
 import org.graylog2.cluster.certificates.CertificateExchangeImpl;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 
@@ -42,11 +41,9 @@ public class PreflightChecksBindings extends AbstractModule {
 
 
     private final ChainingClassLoader chainingClassLoader;
-    private final FeatureFlags featureFlags;
 
-    public PreflightChecksBindings(ChainingClassLoader chainingClassLoader, FeatureFlags featureFlags) {
+    public PreflightChecksBindings(ChainingClassLoader chainingClassLoader) {
         this.chainingClassLoader = chainingClassLoader;
-        this.featureFlags = featureFlags;
     }
 
     @Override
@@ -61,18 +58,10 @@ public class PreflightChecksBindings extends AbstractModule {
         addPreflightCheck(OpenSearchPreconditionsCheck.class);
         addPreflightCheck(OpensearchDataDirCompatibilityCheck.class);
         addPreflightCheck(PasswordSecretPreflightCheck.class);
-
-        bindLimittedObjectMapper();
-
         // Mongodb is needed for legacy datanode storage, where we want to extract the certificate chain from
         // mongodb and store it in local keystore
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         addPreflightCheck(DatanodeKeystoreCheck.class);
-    }
-
-    private void bindLimittedObjectMapper() {
-        bind(ClassLoader.class).annotatedWith(GraylogClassLoader.class).toInstance(chainingClassLoader);
-        bind(ObjectMapper.class).toProvider(PreflightObjectMapperProvider.class).asEagerSingleton();
     }
 
     protected void addPreflightCheck(Class<? extends PreflightCheck> preflightCheck) {
