@@ -50,6 +50,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -373,6 +374,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                         + ");\nend\n";
 
         RuleDao ruleDao = RuleDao.builder()
+                .scope(SystemPipelineRuleScope.NAME)
                 .title(ruleName)
                 .description("Input setup wizard routing rule")
                 .source(ruleSource)
