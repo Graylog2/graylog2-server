@@ -85,6 +85,7 @@ import org.graylog.plugins.views.search.rest.remote.SearchJobsStatusResource;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
@@ -190,6 +191,11 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(MessageList.class);
         registerJacksonSubtype(Pivot.class);
         registerJacksonSubtype(EventList.class);
+
+        //search type results
+        registerJacksonSubtype(PivotResult.class, Pivot.NAME);
+        registerJacksonSubtype(MessageList.Result.class, MessageList.NAME);
+        registerJacksonSubtype(EventList.Result.class, EventList.NAME);
 
         // pivot specs
         registerJacksonSubtype(Values.class);
