@@ -193,9 +193,9 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(EventList.class);
 
         //search type results
-        registerJacksonSubtype(PivotResult.class, Pivot.NAME);
-        registerJacksonSubtype(MessageList.Result.class, MessageList.NAME);
-        registerJacksonSubtype(EventList.Result.class, EventList.NAME);
+        registerJacksonSubtype(PivotResult.class);
+        registerJacksonSubtype(MessageList.Result.class);
+        registerJacksonSubtype(EventList.Result.class);
 
         // pivot specs
         registerJacksonSubtype(Values.class);
