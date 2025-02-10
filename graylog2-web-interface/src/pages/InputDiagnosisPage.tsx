@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { DocumentTitle, LinkToNode, PageHeader } from 'components/common';
 import useParams from 'routing/useParams';
 import { Row, Col, DropdownButton, MenuItem } from 'components/bootstrap';
+import type { StreamMessageCount } from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 import ShowReceivedMessagesButton from 'components/inputs/InputDiagnosis/ShowReceivedMessagesButton';
 import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
@@ -173,10 +174,10 @@ const InputDiagnosisPage = () => {
                 <h3>Received Message count by Stream</h3>
                 {inputMetrics.stream_message_count?.length && (
                   <StyledDl>
-                    {inputMetrics.stream_message_count.map(([key, value]) => (
-                      <span key={key}>
-                        <dt>{key}</dt>
-                        <dd>{value}</dd>
+                    {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
+                      <span key={stream.stream_id}>
+                        <dt>{stream.stream_name}</dt>
+                        <dd>{stream.count}</dd>
                       </span>
                     ))}
                   </StyledDl>

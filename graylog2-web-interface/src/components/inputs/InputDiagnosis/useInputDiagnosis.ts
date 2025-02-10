@@ -40,7 +40,7 @@ export type InputDiagnosisMetrics = {
   failures_indexing: any;
   failures_processing: any;
   failures_inputs_codecs: any;
-  stream_message_count: [string, number][];
+  stream_message_count: StreamMessageCount[];
 }
 
 export type InputNodeStateInfo = {
@@ -60,10 +60,14 @@ export type InputNodeStates = {
   total: number;
 }
 
+export type StreamMessageCount = {
+  stream_name : string,
+  stream_id : string,
+  count : number
+}
+
 export type InputDiagnostics = {
-  stream_message_count: {
-    [streamName: string]: number,
-  },
+  stream_message_count: StreamMessageCount[],
 }
 
 export const metricWithPrefix = (input: Input, metric: string) => `${input?.type}.${input?.id}.${metric}`;
@@ -145,7 +149,7 @@ const useInputDiagnosis = (inputId: string): {
       failures_indexing: (nodeMetrics[failures_indexing] as GaugeMetric)?.metric?.value || 0,
       failures_processing: (nodeMetrics[failures_processing] as GaugeMetric)?.metric?.value || 0,
       failures_inputs_codecs: (nodeMetrics[failures_inputs_codecs] as GaugeMetric)?.metric?.value || 0,
-      stream_message_count: Object.entries(messageCountByStream?.stream_message_count || {}),
+      stream_message_count: messageCountByStream?.stream_message_count || [],
     },
   };
 };

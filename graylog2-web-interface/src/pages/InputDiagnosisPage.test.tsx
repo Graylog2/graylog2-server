@@ -61,9 +61,9 @@ const inputMetrics = {
   failures_processing: 20,
   failures_inputs_codecs: 21,
   stream_message_count: [
-    ['Test Stream 1', 22],
-    ['Test Stream 2', 23],
-  ] as [string, number][],
+    { stream_name: 'Test Stream 1', stream_id: '1', count: 22 },
+    { stream_name: 'Test Stream 2', stream_id: '2', count: 23 },
+  ],
 };
 
 const useInputDiagnosisMock = { input, inputNodeStates, inputMetrics };
