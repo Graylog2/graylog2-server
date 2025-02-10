@@ -18,6 +18,7 @@ package org.graylog.plugins.otel.input.grpc;
 
 import com.codahale.metrics.MetricSet;
 import com.google.common.eventbus.EventBus;
+import io.grpc.Metadata;
 import io.grpc.Server;
 import io.grpc.ServerServiceDefinition;
 import io.grpc.internal.GrpcUtil;
@@ -27,6 +28,8 @@ import io.grpc.protobuf.services.ProtoReflectionServiceV1;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.grpc.auth.AuthorizationServerInterceptor;
+import org.graylog.grpc.auth.TokenExtractor;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -45,11 +48,12 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLException;
 import java.io.ByteArrayInputStream;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -70,17 +74,33 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
     protected final LocalMetricRegistry localMetricRegistry;
     private final Configuration configuration;
     private final EncryptedValueService encryptedValueService;
+    private final AuthorizationServerInterceptor.Factory authorizationServerInterceptorFactory;
+
+    private final TokenExtractor bearerTokenExtractor = metadata -> {
+        final var authHeader = StringUtils.strip(
+                metadata.get(Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER)));
+        if (StringUtils.isEmpty(authHeader)) {
+            return Optional.empty();
+        }
+        final var token = StringUtils.removeStart(authHeader, "Bearer ");
+        if (token.length() == authHeader.length() || token.isEmpty()) {
+            throw new IllegalArgumentException("Authorization header doesn't contain a bearer token.");
+        }
+        return Optional.of(token);
+    };
 
     private Server server;
 
     public AbstractGrpcTransport(EventBus eventBus,
                                  Configuration configuration,
                                  LocalMetricRegistry localMetricRegistry,
-                                 EncryptedValueService encryptedValueService) {
+                                 EncryptedValueService encryptedValueService,
+                                 AuthorizationServerInterceptor.Factory authorizationServerInterceptorFactory) {
         super(eventBus, configuration);
         this.localMetricRegistry = localMetricRegistry;
         this.configuration = configuration;
         this.encryptedValueService = encryptedValueService;
+        this.authorizationServerInterceptorFactory = authorizationServerInterceptorFactory;
     }
 
     abstract List<ServerServiceDefinition> grpcServices(MessageInput input);
@@ -95,6 +115,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
 
         final NettyServerBuilder serverBuilder = NettyServerBuilder
                 .forAddress(new InetSocketAddress(bindAddress, port))
+                .intercept(authorizationServerInterceptorFactory.create(Collections.emptySet(), bearerTokenExtractor))
                 .addServices(grpcServices(input))
                 .addService(ProtoReflectionServiceV1.newInstance())
                 .permitKeepAliveWithoutCalls(true)
@@ -116,7 +137,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
         final var fields = new Config().getRequestedConfiguration();
 
         final List<String> missingFieldNames = new ArrayList<>();
-        if (!configuration.stringIsSet(CK_TLS_CERT)) {
+        if (!configuration.encryptedValueIsSet(CK_TLS_CERT)) {
             missingFieldNames.add(fields.getField(CK_TLS_CERT).getHumanName());
         }
         if (!configuration.encryptedValueIsSet(CK_TLS_KEY)) {
@@ -129,17 +150,21 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
                             .collect(Collectors.joining(", "))));
         }
 
-        final var certChain = configuration.getString(CK_TLS_CERT, "")
-                .getBytes(StandardCharsets.UTF_8);
-        final var privateKey =
-                Base64.getDecoder().decode(encryptedValueService.decrypt(configuration.getEncryptedValue(CK_TLS_KEY)));
-        final var clientCaCert = configuration.getString(CK_TLS_CLIENT_CA, "")
-                .getBytes(StandardCharsets.UTF_8);
+        final Base64.Decoder base64Decoder = Base64.getDecoder();
+
+        final var certChain = base64Decoder.decode(
+                encryptedValueService.decrypt(configuration.getEncryptedValue(CK_TLS_CERT)));
+        final var privateKey = base64Decoder.decode(
+                encryptedValueService.decrypt(configuration.getEncryptedValue(CK_TLS_KEY)));
+
+        final var clientCaCert = configuration.encryptedValueIsSet(CK_TLS_CLIENT_CA) ?
+                base64Decoder.decode(encryptedValueService.decrypt(configuration.getEncryptedValue(CK_TLS_CLIENT_CA))) :
+                null;
 
         try {
             final var contextBuilder = GrpcSslContexts
                     .forServer(new ByteArrayInputStream(certChain), new ByteArrayInputStream(privateKey));
-            if (clientCaCert.length > 0) {
+            if (clientCaCert != null) {
                 contextBuilder.clientAuth(ClientAuth.REQUIRE).trustManager(new ByteArrayInputStream(clientCaCert));
             }
             return contextBuilder.build();

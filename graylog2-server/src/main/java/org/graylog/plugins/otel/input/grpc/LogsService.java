@@ -17,15 +17,19 @@
 package org.graylog.plugins.otel.input.grpc;
 
 import com.google.inject.assistedinject.Assisted;
+import io.grpc.Context;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import jakarta.inject.Inject;
+import org.graylog.grpc.auth.CallAuthorizer;
 import org.graylog.plugins.otel.input.JournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.security.RestPermissions;
 
 import static org.graylog.plugins.otel.input.grpc.Utils.createThrottledStatusRuntimeException;
 
@@ -33,13 +37,15 @@ public class LogsService extends LogsServiceGrpc.LogsServiceImplBase {
     private final JournalRecordFactory journalRecordFactory;
     private final ThrottleableTransport2 transport;
     private final MessageInput input;
+    private final CallAuthorizer callAuthorizer;
 
     @Inject
     public LogsService(@Assisted ThrottleableTransport2 transport, @Assisted MessageInput input,
-                       JournalRecordFactory journalRecordFactory) {
+                       JournalRecordFactory journalRecordFactory, CallAuthorizer callAuthorizer) {
         this.transport = transport;
         this.input = input;
         this.journalRecordFactory = journalRecordFactory;
+        this.callAuthorizer = callAuthorizer;
     }
 
     public interface Factory {
@@ -49,6 +55,16 @@ public class LogsService extends LogsServiceGrpc.LogsServiceImplBase {
     @Override
     public void export(ExportLogsServiceRequest request,
                        StreamObserver<ExportLogsServiceResponse> responseObserver) {
+
+        if (Context.current().isCancelled()) {
+            responseObserver.onError(Status.CANCELLED.withDescription("Cancelled by client").asRuntimeException());
+            return;
+        }
+
+        // TODO: we can't use messages:read permission. add dedicated permission like e.g. messages:ingest
+        if (!callAuthorizer.verifyPermitted(responseObserver, RestPermissions.MESSAGES_READ)) {
+            return;
+        }
 
         if (transport.isThrottled()) {
             responseObserver.onError(createThrottledStatusRuntimeException());

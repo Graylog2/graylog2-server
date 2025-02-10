@@ -24,11 +24,13 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.KeyValue;
+import org.graylog.grpc.auth.CallAuthorizer;
 import org.graylog.plugins.otel.input.Journal;
 import org.graylog.plugins.otel.input.JournalRecordFactory;
 import org.graylog.plugins.otel.input.OpenTelemetryGrpcInput;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
+import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,9 +41,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LogsServiceTest {
@@ -52,12 +56,16 @@ class LogsServiceTest {
     private MessageInput input;
     @Mock
     private StreamObserver<ExportLogsServiceResponse> responseObserver;
+    @Mock
+    private CallAuthorizer callAuthorizer;
 
     private LogsService logsService;
 
     @BeforeEach
     void setUp() {
-        logsService = new LogsService(transport, input, new JournalRecordFactory());
+        when(callAuthorizer.verifyPermitted(any(StreamObserver.class), eq(RestPermissions.MESSAGES_READ)))
+                .thenReturn(true);
+        logsService = new LogsService(transport, input, new JournalRecordFactory(), callAuthorizer);
     }
 
     // Test processing a request using the official example from
