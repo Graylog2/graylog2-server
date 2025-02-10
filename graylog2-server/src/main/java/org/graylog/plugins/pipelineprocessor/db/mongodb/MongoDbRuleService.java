@@ -111,7 +111,7 @@ public class MongoDbRuleService implements RuleService {
 
     @Override
     public void delete(String id) {
-        if (!scopedEntityMongoUtils.deleteById(id)) {
+        if (!scopedEntityMongoUtils.deleteById(id, false)) {
             log.error("Unable to delete rule {}", id);
         }
         clusterBus.post(RulesChangedEvent.deletedRuleId(id));

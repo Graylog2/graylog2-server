@@ -34,7 +34,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MongoDBExtension.class)
@@ -61,11 +64,28 @@ class MongoDbRuleServiceTest {
     }
 
     @Test
+    void createSystemRule() throws Exception {
+        final var rule = systemRule();
+        final var savedRule = ruleService.save(rule);
+        assertThat(ruleService.load(savedRule.id())).isEqualTo(rule.toBuilder().id(savedRule.id()).build());
+        verify(clusterEventBus).post(eq(RulesChangedEvent.updatedRuleId(savedRule.id())));
+    }
+
+    @Test
     void update() throws Exception {
         final var rule = dummyRule().toBuilder().id(new ObjectId().toHexString()).build();
         final var savedRule = ruleService.save(rule);
         assertThat(ruleService.load(savedRule.id())).isEqualTo(rule);
         verify(clusterEventBus).post(eq(RulesChangedEvent.updatedRuleId(savedRule.id())));
+    }
+
+    @Test
+    void updateSystemRuleThrows() throws Exception {
+        final var rule = systemRule().toBuilder().id(new ObjectId().toHexString()).build();
+        assertThatThrownBy(() -> ruleService.save(rule))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Immutable entity cannot be modified");
+        verify(clusterEventBus, times(0)).post(any());
     }
 
     @Test
@@ -94,6 +114,15 @@ class MongoDbRuleServiceTest {
     }
 
     @Test
+    void deleteSystemRule() {
+        final var rule = ruleService.save(systemRule().toBuilder().title("title 2").build());
+        assertThat(ruleService.loadAll()).hasSize(1);
+        ruleService.delete(rule.id());
+        assertThat(ruleService.loadAll()).hasSize(0);
+        verify(clusterEventBus).post(eq(RulesChangedEvent.deletedRuleId(rule.id())));
+    }
+
+    @Test
     void loadNamed() {
         final var rule1 = ruleService.save(dummyRule().toBuilder().title("title 1").build());
         final var ignored = ruleService.save(dummyRule().toBuilder().title("title 2").build());
@@ -105,6 +134,10 @@ class MongoDbRuleServiceTest {
 
     private static RuleDao dummyRule() {
         return RuleDao.builder().title("a title").source("a source").build();
+    }
+
+    private static RuleDao systemRule() {
+        return RuleDao.builder().scope(SystemPipelineRuleScope.NAME).title("a sysytem rule").source("a source").build();
     }
 
 }
