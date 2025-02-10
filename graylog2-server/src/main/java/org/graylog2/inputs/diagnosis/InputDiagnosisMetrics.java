@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Singleton
 public class InputDiagnosisMetrics {
 
-    private static final int SIZE_FOR_15_MINUTES = 15;
+    private static final int SIZE_FOR_15_MINUTES = (15 * 60) / InputDiagnosisMetricsPeriodical.UPDATE_FREQUENCY;
     private final Map<String, CircularFifoQueue<Long>> metrics = new HashMap<>();
     private final AtomicReference<MetricRegistry> localMetricRegistry = new AtomicReference<>(new MetricRegistry());
     private final MetricRegistry metricRegistry;
@@ -56,6 +56,10 @@ public class InputDiagnosisMetrics {
                             .sum());
                     return queue;
                 }));
+
+        metrics.entrySet().stream()
+                .filter(e -> !registry.getCounters().containsKey(e.getKey()))
+                .forEach(e -> e.getValue().add(0L));
     }
 
 }

@@ -26,6 +26,7 @@ import javax.annotation.Nonnull;
 public class InputDiagnosisMetricsPeriodical extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputDiagnosisMetricsPeriodical.class);
+    public static final int UPDATE_FREQUENCY = 5;
 
     private final InputDiagnosisMetrics inputDiagnosisMetrics;
 
@@ -61,7 +62,7 @@ public class InputDiagnosisMetricsPeriodical extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return 60;
+        return UPDATE_FREQUENCY;
     }
 
     @Override
