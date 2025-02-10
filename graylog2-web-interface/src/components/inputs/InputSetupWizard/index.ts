@@ -17,4 +17,4 @@
 
 export { default as InputSetupWizard } from './InputSetupWizard';
 export * from './types';
-export { INPUT_SETUP_MODE_FEATURE_FLAG } from './constants';
+export { INPUT_SETUP_MODE_FEATURE_FLAG, DEFAULT_ORDERED_STEPS } from './constants';

@@ -18,24 +18,18 @@
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
-import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import InputSetupWizardContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardContext';
 import type { InputSetupWizardStep, WizardData, StepsConfig } from 'components/inputs/InputSetupWizard/types';
 import { getNextStep, checkHasPreviousStep, checkIsNextStepDisabled } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 
 const DEFAULT_ACTIVE_STEP = undefined;
 const DEFAULT_WIZARD_DATA = {};
-const DEFAULT_ORDERED_STEPS = [INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.START_INPUT, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
 
 const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{}>) => {
   const [activeStep, setActiveStep] = useState<InputSetupWizardStep>(DEFAULT_ACTIVE_STEP);
   const [wizardData, setWizardData] = useState<WizardData>(DEFAULT_WIZARD_DATA);
-  const [orderedSteps, setOrderedStepsState] = useState<Array<InputSetupWizardStep>>(DEFAULT_ORDERED_STEPS);
+  const [orderedSteps, setOrderedSteps] = useState<Array<InputSetupWizardStep>>([]);
   const [stepsConfig, setStepsConfig] = useState<StepsConfig>({});
-
-  const setOrderedSteps = useCallback((steps: Array<InputSetupWizardStep>) => {
-    setOrderedStepsState([...steps, ...DEFAULT_ORDERED_STEPS]);
-  }, [setOrderedStepsState])
 
   const goToNextStep = useCallback(() => {
     const nextStep = getNextStep(orderedSteps, activeStep);
@@ -73,7 +67,6 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
     activeStep,
     wizardData,
     orderedSteps,
-    setOrderedSteps,
     stepsConfig,
     goToPreviousStep,
     goToNextStep,
