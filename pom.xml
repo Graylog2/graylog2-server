@@ -89,7 +89,7 @@
         <!-- Dependencies -->
         <opensearch.shaded.version>2.15.0-1</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
-        <amqp-client.version>5.24.0</amqp-client.version>
+        <amqp-client.version>5.25.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -179,7 +179,7 @@
         <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.6-9</zstd.version>
+        <zstd.version>1.5.6-10</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.6</jjwt.version>
@@ -191,7 +191,7 @@
         <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.2</awaitility.version>
-        <equalsverifier.version>3.18.2</equalsverifier.version>
+        <equalsverifier.version>3.19</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.11.4</junit-jupiter.version>

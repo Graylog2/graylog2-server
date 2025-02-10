@@ -14,27 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine;
+package org.graylog.plugins.views.search.searchtypes;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 
-import java.util.Set;
+/**
+ * Marker interface for search types that are not search engine related, but Data Warehouse/Iceberg related
+ */
+public interface DataWarehouseSearchType extends SearchType {
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        property = BackendQuery.TYPE_FIELD,
-        visible = true,
-        defaultImpl = ElasticsearchQueryString.class)
-public interface BackendQuery {
-    String TYPE_FIELD = "type";
-
-    String type();
-
-    String queryString();
-
-    @JsonIgnore
-    Set<Class<? extends SearchType>> supportedSearchTypes();
+    String PREFIX = "data_warehouse_";
 }
