@@ -22,7 +22,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -39,10 +38,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 
 public class BeatsCodecTest {
     @Rule
@@ -57,7 +54,6 @@ public class BeatsCodecTest {
     @Before
     public void setUp() throws Exception {
         objectMapper = new ObjectMapperProvider().get();
-        when(configuration.getString(Codec.Config.CK_CHARSET_NAME, UTF_8.name())).thenReturn(UTF_8.name());
         codec = new BeatsCodec(configuration, objectMapper, messageFactory);
     }
 

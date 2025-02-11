@@ -28,8 +28,11 @@ import javax.annotation.Nullable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import static org.graylog2.plugin.inputs.codecs.Codec.Config.CK_CHARSET_NAME;
+
 public abstract class AbstractCodec implements Codec {
     private static final Logger log = LoggerFactory.getLogger(AbstractCodec.class);
+    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     protected final Configuration configuration;
     protected final Charset charset;
@@ -61,7 +64,10 @@ public abstract class AbstractCodec implements Codec {
     }
 
     protected static Charset getCharsetOrDefault(Configuration configuration) {
-        return Charset.forName(configuration.getString(Codec.Config.CK_CHARSET_NAME, StandardCharsets.UTF_8.name()));
+        if (configuration == null || !configuration.stringIsSet(CK_CHARSET_NAME)) {
+            return DEFAULT_CHARSET;
+        }
+        return Charset.forName(configuration.getString(CK_CHARSET_NAME, DEFAULT_CHARSET.name()));
     }
 
     @Nullable
@@ -88,7 +94,7 @@ public abstract class AbstractCodec implements Codec {
             configurationRequest.addField(new TextField(
                     CK_CHARSET_NAME,
                     "Encoding",
-                    StandardCharsets.UTF_8.name(),
+                    DEFAULT_CHARSET.name(),
                     "Default encoding is UTF-8. Set this to a standard charset name if you want override the default.",
                     ConfigurationField.Optional.OPTIONAL
             ));

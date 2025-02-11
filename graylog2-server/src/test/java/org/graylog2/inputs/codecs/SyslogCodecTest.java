@@ -25,7 +25,6 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.fields.DropdownField;
-import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
@@ -38,7 +37,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
@@ -48,7 +46,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -79,7 +76,7 @@ public class SyslogCodecTest {
     public void setUp() throws Exception {
         when(metricRegistry.timer(any(String.class))).thenReturn(mockedTimer);
         when(mockedTimer.time()).thenReturn(mock(Timer.Context.class));
-        when(configuration.getString(Codec.Config.CK_CHARSET_NAME, UTF_8.name())).thenReturn(UTF_8.name());
+
         codec = new SyslogCodec(configuration, metricRegistry, messageFactory);
     }
 
