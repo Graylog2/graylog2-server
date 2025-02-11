@@ -126,6 +126,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
      * <p>
      * The frontend components then make use of the structured data to display it.
      */
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.EXISTING_PROPERTY,
+            property = "type",
+            visible = true)
     interface Result {
         @JsonProperty("id")
         String id();
