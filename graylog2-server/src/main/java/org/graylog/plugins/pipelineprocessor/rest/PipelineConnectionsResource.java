@@ -21,23 +21,8 @@ import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamService;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -46,6 +31,20 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.SystemPipelineScope;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamService;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -90,7 +89,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         // verify the pipelines exist
         for (String s : connection.pipelineIds()) {
             checkPermission(PipelineRestPermissions.PIPELINE_READ, s);
-            pipelineService.load(s);
+            checkScope(pipelineService.load(s));
         }
         return connectionsService.save(connection);
     }
@@ -104,9 +103,9 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         final String pipelineId = connection.pipelineId();
         final Set<PipelineConnections> updatedConnections = Sets.newHashSet();
 
-        // verify the pipeline exists
+        // verify the pipeline exists and is editable
         checkPermission(PipelineRestPermissions.PIPELINE_READ, pipelineId);
-        pipelineService.load(pipelineId);
+        checkScope(pipelineService.load(pipelineId));
 
         // get all connections where the pipeline was present
         final Set<PipelineConnections> pipelineConnections = connectionsService.loadAll().stream()
@@ -203,4 +202,9 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         }
     }
 
+    private void checkScope(PipelineDao pipelineDao) {
+        if (pipelineDao.scope().equalsIgnoreCase(SystemPipelineScope.NAME)) {
+            throw new BadRequestException("Cannot modify system pipeline connections");
+        }
+    }
 }

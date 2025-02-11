@@ -54,7 +54,7 @@ public class MongoDbPipelineService implements PipelineService {
     private final MongoCollection<PipelineDao> collection;
     private final ClusterEventBus clusterBus;
     private final MongoUtils<PipelineDao> mongoUtils;
-    ScopedEntityMongoUtils<PipelineDao> scopedEntityMongoUtils;
+    private final ScopedEntityMongoUtils<PipelineDao> scopedEntityMongoUtils;
 
     @Inject
     public MongoDbPipelineService(MongoCollections mongoCollections,
