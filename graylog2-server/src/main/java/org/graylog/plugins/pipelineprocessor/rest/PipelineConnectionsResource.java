@@ -37,9 +37,9 @@ import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTy
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.db.SystemPipelineScope;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -63,14 +63,17 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     private final PipelineStreamConnectionsService connectionsService;
     private final PipelineService pipelineService;
     private final StreamService streamService;
+    private final EntityScopeService entityScopeService;
 
     @Inject
     public PipelineConnectionsResource(PipelineStreamConnectionsService connectionsService,
                                        PipelineService pipelineService,
-                                       StreamService streamService) {
+                                       StreamService streamService,
+                                       EntityScopeService entityScopeService) {
         this.connectionsService = connectionsService;
         this.pipelineService = pipelineService;
         this.streamService = streamService;
+        this.entityScopeService = entityScopeService;
     }
 
     @ApiOperation(value = "Connect processing pipelines to a stream", notes = "")
@@ -203,8 +206,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     }
 
     private void checkScope(PipelineDao pipelineDao) {
-        if (pipelineDao.scope().equalsIgnoreCase(SystemPipelineScope.NAME)) {
-            throw new BadRequestException("Cannot modify system pipeline connections");
+        if (!entityScopeService.isMutable(pipelineDao)) {
+            throw new BadRequestException("Cannot modify connections for immutable pipeline");
         }
     }
 }
