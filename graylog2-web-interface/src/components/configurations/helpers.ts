@@ -14,7 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { Processor, ProcessorConfig } from "components/configurations/message-processors/Types";
+
 const getConfig = (configType, configuration) => configuration?.[configType] ?? null;
 
-export { getConfig };
+const isProcessorEnabled = (processor: Processor, config: ProcessorConfig) => (
+  config.disabled_processors.filter((p) => p === processor.class_name).length < 1
+);
+
+export { getConfig, isProcessorEnabled };
 export default getConfig;
