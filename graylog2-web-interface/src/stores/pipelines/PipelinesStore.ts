@@ -66,7 +66,7 @@ export type PipelineType = {
 
 export type StageType = {
   stage: number,
-  match: string,
+  match: 'ALL' | 'EITHER' | 'PASS',
   rules: Array<string>,
 };
 

@@ -17,6 +17,9 @@
 package org.graylog.events.notifications;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.DBJobDefinitionService;
@@ -25,13 +28,9 @@ import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
-
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class NotificationResourceHandler {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationResourceHandler.class);
@@ -168,20 +167,21 @@ public class NotificationResourceHandler {
                 });
 
         // Delete notification from existing events
-        eventDefinitionService.getByNotificationId(dtoId)
-                .forEach(eventDefinition -> {
-                    LOG.debug("Removing notification <{}/{}> from event definition <{}/{}>",
-                            dto.get().id(), dto.get().title(),
-                            eventDefinition.id(), eventDefinition.title());
-                    final ImmutableList<EventNotificationHandler.Config> notifications = eventDefinition.notifications().stream()
-                            .filter(entry -> !entry.notificationId().equals(dtoId))
-                            .collect(ImmutableList.toImmutableList());
-                    EventDefinitionDto updatedEventDto = eventDefinition.toBuilder()
-                            .notifications(notifications)
-                            .build();
-                    eventDefinitionService.save(updatedEventDto);
-
-                });
+        try (Stream<EventDefinitionDto> eventDefinitionStream = eventDefinitionService.streamByNotificationId(dtoId)) {
+            eventDefinitionStream
+                    .forEach(eventDefinition -> {
+                        LOG.debug("Removing notification <{}/{}> from event definition <{}/{}>",
+                                dto.get().id(), dto.get().title(),
+                                eventDefinition.id(), eventDefinition.title());
+                        final ImmutableList<EventNotificationHandler.Config> notifications = eventDefinition.notifications().stream()
+                                .filter(entry -> !entry.notificationId().equals(dtoId))
+                                .collect(ImmutableList.toImmutableList());
+                        EventDefinitionDto updatedEventDto = eventDefinition.toBuilder()
+                                .notifications(notifications)
+                                .build();
+                        eventDefinitionService.save(updatedEventDto);
+                    });
+        }
         LOG.debug("Deleting notification definition <{}/{}>", dto.get().id(), dto.get().title());
         return notificationService.delete(dtoId) > 0;
     }
