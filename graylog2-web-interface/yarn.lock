@@ -5876,10 +5876,10 @@ crypt@0.0.2:
   resolved "https://registry.yarnpkg.com/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
   integrity sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=
 
-csp-header@^5.2.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/csp-header/-/csp-header-5.2.1.tgz#4152b83af88febc7737640ce11e266d59f353d23"
-  integrity sha512-qOJNu39JZkPrbrAM40a1tQCePEPYVIoI6nMDhX4RA07QjU8efS+zyd/zE83XJu85KKazH9NjKlvvlswFMteMgg==
+csp-header@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/csp-header/-/csp-header-6.0.0.tgz#636a7a5ac80278c031600aaa931b9e50fc639383"
+  integrity sha512-36QEB4YiqByFRvpbBJ1sUqdkWZ21vG3pJavt318X9a1jJOBxS2hgtKOM8K5fBZEf8V6yZPbOspvfXdFshM5TuQ==
 
 css-box-model@^1.2.0:
   version "1.2.1"
@@ -8002,12 +8002,12 @@ expect@^29.0.0, expect@^29.7.0:
     jest-message-util "^29.7.0"
     jest-util "^29.7.0"
 
-express-csp-header@^5.1.0:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/express-csp-header/-/express-csp-header-5.2.1.tgz#015361becc72013c439e9366ca48cbec609891d4"
-  integrity sha512-HvVCUa3GwqH9m4rG0y+s6bHENNxtPzLccM1bSmZNiMIWwMc38Q2Gkz6byiDkrqmnqaCJ9+9cc/p2Pd4QqOmx9Q==
+express-csp-header@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/express-csp-header/-/express-csp-header-6.0.0.tgz#0068e7cc79dd33ff4537d2b74f424e4ba2fa985f"
+  integrity sha512-ZyaOpgnki8/1RnYDfd+7sryewA9Mo3fA2ZrcxjKfar/gUWYoDUtu5v2VXGju9dEPUjUAiOycpz7BfpU0b/8KGA==
   dependencies:
-    csp-header "^5.2.1"
+    csp-header "^6.0.0"
     psl "1.8.0"
 
 express-formidable@^1.2.0:
