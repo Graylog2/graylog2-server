@@ -20,7 +20,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import io.grpc.ServerServiceDefinition;
 import jakarta.inject.Inject;
-import org.graylog.grpc.auth.AuthorizationServerInterceptor;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -43,9 +42,8 @@ public class OpenTelemetryGrpcTransport extends AbstractGrpcTransport {
                                       @Assisted Configuration configuration,
                                       LocalMetricRegistry localMetricRegistry,
                                       LogsService.Factory logsServiceFactory,
-                                      EncryptedValueService encryptedValueService,
-                                      AuthorizationServerInterceptor.Factory authorizationServerInterceptorFactory) {
-        super(eventBus, configuration, localMetricRegistry, encryptedValueService, authorizationServerInterceptorFactory);
+                                      EncryptedValueService encryptedValueService) {
+        super(eventBus, configuration, localMetricRegistry, encryptedValueService);
         this.logsServiceFactory = logsServiceFactory;
     }
 

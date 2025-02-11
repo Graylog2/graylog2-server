@@ -18,7 +18,6 @@ package org.graylog.plugins.otel.input.grpc;
 
 import com.codahale.metrics.MetricSet;
 import com.google.common.eventbus.EventBus;
-import io.grpc.Metadata;
 import io.grpc.Server;
 import io.grpc.ServerServiceDefinition;
 import io.grpc.internal.GrpcUtil;
@@ -28,8 +27,6 @@ import io.grpc.protobuf.services.ProtoReflectionServiceV1;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog.grpc.auth.AuthorizationServerInterceptor;
-import org.graylog.grpc.auth.TokenExtractor;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -38,6 +35,7 @@ import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.InlineBinaryField;
 import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
@@ -51,9 +49,7 @@ import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -65,6 +61,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
 
     private static final String CK_BIND_ADDRESS = "bind_address";
     private static final String CK_PORT = "port";
+    private static final String CK_BEARER_TOKEN = "bearer_token";
     private static final String CK_INSECURE = "insecure";
     private static final String CK_TLS_CERT = "tls_cert";
     private static final String CK_TLS_KEY = "tls_key";
@@ -74,33 +71,17 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
     protected final LocalMetricRegistry localMetricRegistry;
     private final Configuration configuration;
     private final EncryptedValueService encryptedValueService;
-    private final AuthorizationServerInterceptor.Factory authorizationServerInterceptorFactory;
-
-    private final TokenExtractor bearerTokenExtractor = metadata -> {
-        final var authHeader = StringUtils.strip(
-                metadata.get(Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER)));
-        if (StringUtils.isEmpty(authHeader)) {
-            return Optional.empty();
-        }
-        final var token = StringUtils.removeStart(authHeader, "Bearer ");
-        if (token.length() == authHeader.length() || token.isEmpty()) {
-            throw new IllegalArgumentException("Authorization header doesn't contain a bearer token.");
-        }
-        return Optional.of(token);
-    };
 
     private Server server;
 
     public AbstractGrpcTransport(EventBus eventBus,
                                  Configuration configuration,
                                  LocalMetricRegistry localMetricRegistry,
-                                 EncryptedValueService encryptedValueService,
-                                 AuthorizationServerInterceptor.Factory authorizationServerInterceptorFactory) {
+                                 EncryptedValueService encryptedValueService) {
         super(eventBus, configuration);
         this.localMetricRegistry = localMetricRegistry;
         this.configuration = configuration;
         this.encryptedValueService = encryptedValueService;
-        this.authorizationServerInterceptorFactory = authorizationServerInterceptorFactory;
     }
 
     abstract List<ServerServiceDefinition> grpcServices(MessageInput input);
@@ -112,15 +93,21 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
         final var port = configuration.getInt(CK_PORT, 4317);
         final var insecure = configuration.getBoolean(CK_INSECURE, false);
         final var maxInboundMsgSize = configuration.getInt(CK_MAX_INBOUND_MSG_SIZE, GrpcUtil.DEFAULT_MAX_MESSAGE_SIZE);
+        final var requireBearerToken = configuration.encryptedValueIsSet(CK_BEARER_TOKEN);
 
         final NettyServerBuilder serverBuilder = NettyServerBuilder
                 .forAddress(new InetSocketAddress(bindAddress, port))
-                .intercept(authorizationServerInterceptorFactory.create(Collections.emptySet(), bearerTokenExtractor))
+                .intercept(new RemoteAddressProviderInterceptor())
                 .addServices(grpcServices(input))
                 .addService(ProtoReflectionServiceV1.newInstance())
                 .permitKeepAliveWithoutCalls(true)
                 .permitKeepAliveTime(10, TimeUnit.SECONDS)
                 .maxInboundMessageSize(maxInboundMsgSize);
+
+        if (requireBearerToken) {
+            final var token = encryptedValueService.decrypt(configuration.getEncryptedValue(CK_BEARER_TOKEN));
+            serverBuilder.intercept(new BearerTokenAuthInterceptor(token));
+        }
 
         if (!insecure) {
             serverBuilder.sslContext(getSslContext());
@@ -197,6 +184,18 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
 
             request.addField(ConfigurationRequest.Templates.bindAddress(CK_BIND_ADDRESS));
             request.addField(ConfigurationRequest.Templates.portNumber(CK_PORT, 4317));
+
+            request.addField(new TextField(
+                    CK_BEARER_TOKEN,
+                    "Required bearer token",
+                    "",
+                    "A static bearer token that the server will enforce for all clients. If set, clients, " +
+                            "such as the OpenTelemetry Collector, must include this token in the Authorization " +
+                            "header of their requests. To configure this in the OpenTelemetry Collector, the Bearer " +
+                            "Token Extension (bearertokenauth) can be used.",
+                    ConfigurationField.Optional.OPTIONAL,
+                    true
+            ));
 
             request.addField(
                     new BooleanField(
