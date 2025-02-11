@@ -25,7 +25,7 @@ import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosi
 import ShowReceivedMessagesButton from 'components/inputs/InputDiagnosis/ShowReceivedMessagesButton';
 import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, Link } from 'components/common/router';
 
 const StyledDl = styled.dl`
   margin: 0;
@@ -176,7 +176,7 @@ const InputDiagnosisPage = () => {
                   <StyledDl>
                     {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
                       <span key={stream.stream_id}>
-                        <dt>{stream.stream_name}</dt>
+                        <dt><Link to={Routes.stream_view(stream.stream_id)}>{stream.stream_name}</Link></dt>
                         <dd>{stream.count}</dd>
                       </span>
                     ))}
