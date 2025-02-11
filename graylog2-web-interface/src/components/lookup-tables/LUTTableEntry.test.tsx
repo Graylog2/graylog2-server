@@ -48,7 +48,7 @@ describe('LUTTableEntry', () => {
         };
 
         return {
-          loadingScopePermissions: false,
+          loadingScopePermissions: !entity._scope,
           scopePermissions: scopes[entity?._scope || 'DEFAULT'],
           checkPermissions: (inEntity: Partial<GenericEntityType>) => {
             const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';

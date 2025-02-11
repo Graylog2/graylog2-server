@@ -35,6 +35,12 @@ type EntityScopeType = {
   entity_scopes: EntityScopeRecord,
 };
 
+export type PermissionsByScopeReturnType = {
+  loadingScopePermissions: boolean;
+  scopePermissions: ScopeParams;
+  checkPermissions: (inEntity: Partial<GenericEntityType>) => boolean;
+};
+
 function fetchScopePermissions() {
   return fetch('GET', qualifyUrl(ApiRoutes.EntityScopeController.getScope().url));
 }
