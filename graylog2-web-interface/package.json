@@ -72,7 +72,7 @@
     "interactjs": "^1.4.0-rc.13",
     "leaflet": "^1.5.1",
     "lodash": "^4.17.4",
-    "marked": "^14.0.0",
+    "marked": "^15.0.7",
     "material-symbols": "^0.28.1",
     "md5": "^2.2.1",
     "moment-duration-format": "2.3.2",
