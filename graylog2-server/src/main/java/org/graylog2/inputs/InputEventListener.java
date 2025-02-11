@@ -19,7 +19,6 @@ package org.graylog2.inputs;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.graylog2.cluster.leader.LeaderChangedEvent;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
@@ -39,12 +38,14 @@ import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class InputEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(InputEventListener.class);
+    protected static final int EVENT_QUEUE_POLL_PERIOD_MS = 100;
     private final InputLauncher inputLauncher;
     private final InputRegistry inputRegistry;
     private final InputService inputService;
@@ -52,8 +53,8 @@ public class InputEventListener {
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
-    private final ScheduledExecutorService daemonScheduler;
-    private final LinkedBlockingQueue<QueuedEvent> eventQueue = new LinkedBlockingQueue<>(100);
+    private final ScheduledExecutorService daemonScheduler = Executors.newSingleThreadScheduledExecutor();
+    private final LinkedBlockingQueue<QueuedEvent> eventQueue = new LinkedBlockingQueue<>(EVENT_QUEUE_POLL_PERIOD_MS);
 
     private record QueuedEvent(Object receivedEvent) {}
 
@@ -65,8 +66,7 @@ public class InputEventListener {
                               NodeId nodeId,
                               LeaderElectionService leaderElectionService,
                               PersistedInputs persistedInputs,
-                              ServerStatus serverStatus,
-                              @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
+                              ServerStatus serverStatus) {
         this.inputLauncher = inputLauncher;
         this.inputRegistry = inputRegistry;
         this.inputService = inputService;
@@ -74,17 +74,11 @@ public class InputEventListener {
         this.leaderElectionService = leaderElectionService;
         this.persistedInputs = persistedInputs;
         this.serverStatus = serverStatus;
-        this.daemonScheduler = daemonScheduler;
         initializeEventQueueTask();
         eventBus.register(this);
     }
 
-    // TODO: create a queue per input?
-    // TODO: make processing interval configurable?
-    // TODO: replace daemonScheduler with a separate thread, and use eventQueue.take()?
-    // TODO: replace instanceof checks with dedicated type?
-    // TODO: add graceful shutdown behavior
-    // TODO: fix tests
+    // TODO: add shutdown behavior
     private void initializeEventQueueTask() {
         daemonScheduler.scheduleAtFixedRate(() -> {
             try {
@@ -109,7 +103,7 @@ public class InputEventListener {
             } catch (Exception e) {
                 LOG.error("Caught exception while trying to process queued event", e);
             }
-        }, 0, 100, TimeUnit.MILLISECONDS);
+        }, 0, EVENT_QUEUE_POLL_PERIOD_MS, TimeUnit.MILLISECONDS);
     }
 
     @Subscribe

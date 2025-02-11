@@ -38,20 +38,20 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.concurrent.Executors;
-
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class InputEventListenerTest {
     private static final String INPUT_ID = "input-id";
     private static final String THIS_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
     private static final String OTHER_NODE_ID = "c0c0a000-0000-4000-a000-000000000000";
+
+    // Input events will be processed by an asynchronous queue
+    private static final int EVENT_QUEUE_WAIT_TIME_MS = InputEventListener.EVENT_QUEUE_POLL_PERIOD_MS + 100;
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -79,7 +79,7 @@ public class InputEventListenerTest {
     @Before
     public void setUp() throws Exception {
         final EventBus eventBus = new EventBus(this.getClass().getSimpleName());
-        listener = new InputEventListener(eventBus, inputLauncher, inputRegistry, inputService, nodeId, leaderElectionService, persistedInputs, serverStatus, Executors.newSingleThreadScheduledExecutor());
+        listener = new InputEventListener(eventBus, inputLauncher, inputRegistry, inputService, nodeId, leaderElectionService, persistedInputs, serverStatus);
     }
 
     @Test
@@ -88,7 +88,9 @@ public class InputEventListenerTest {
 
         listener.inputCreated(InputCreated.create(INPUT_ID));
 
-        verifyNoMoreInteractions(inputLauncher, inputRegistry);
+        verify(inputLauncher, after(EVENT_QUEUE_WAIT_TIME_MS).never()).launch(any(MessageInput.class));
+        verify(inputRegistry, after(EVENT_QUEUE_WAIT_TIME_MS).never()).remove(any(MessageInput.class));
+        verify(inputRegistry, after(EVENT_QUEUE_WAIT_TIME_MS).never()).add(any());
     }
 
     @Test
@@ -98,7 +100,7 @@ public class InputEventListenerTest {
 
         listener.inputCreated(InputCreated.create(INPUT_ID));
 
-        verify(inputRegistry, times(1)).remove(inputState);
+        verify(inputRegistry, timeout(EVENT_QUEUE_WAIT_TIME_MS).times(1)).remove(inputState);
     }
 
     @Test
@@ -108,7 +110,7 @@ public class InputEventListenerTest {
 
         listener.inputCreated(InputCreated.create(INPUT_ID));
 
-        verify(inputRegistry, never()).remove(Mockito.<IOState<MessageInput>>any());
+        verify(inputRegistry, after(EVENT_QUEUE_WAIT_TIME_MS).never()).remove(Mockito.<IOState<MessageInput>>any());
     }
 
     @Test
@@ -122,7 +124,7 @@ public class InputEventListenerTest {
 
         listener.inputCreated(InputCreated.create(INPUT_ID));
 
-        verify(inputLauncher, times(1)).launch(messageInput);
+        verify(inputLauncher, timeout(EVENT_QUEUE_WAIT_TIME_MS).times(1)).launch(messageInput);
     }
 
     @Test
@@ -136,7 +138,7 @@ public class InputEventListenerTest {
 
         listener.inputCreated(InputCreated.create(INPUT_ID));
 
-        verify(inputLauncher, never()).launch(messageInput);
+        verify(inputLauncher, after(EVENT_QUEUE_WAIT_TIME_MS).never()).launch(messageInput);
     }
 
     @Test
@@ -150,7 +152,7 @@ public class InputEventListenerTest {
 
         listener.inputCreated(InputCreated.create(INPUT_ID));
 
-        verify(inputLauncher, times(1)).launch(messageInput);
+        verify(inputLauncher, timeout(EVENT_QUEUE_WAIT_TIME_MS).times(1)).launch(messageInput);
     }
 
     @Test
@@ -159,7 +161,9 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
-        verifyNoMoreInteractions(inputLauncher, inputRegistry);
+        verify(inputLauncher, after(EVENT_QUEUE_WAIT_TIME_MS).never()).launch(any(MessageInput.class));
+        verify(inputRegistry, after(EVENT_QUEUE_WAIT_TIME_MS).never()).remove(any(MessageInput.class));
+        verify(inputRegistry, after(EVENT_QUEUE_WAIT_TIME_MS).never()).add(any());
     }
 
     @Test
@@ -169,7 +173,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
-        verify(inputRegistry, times(1)).remove(inputState);
+        verify(inputRegistry, timeout(EVENT_QUEUE_WAIT_TIME_MS).times(1)).remove(inputState);
     }
 
     @Test
@@ -179,7 +183,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
-        verify(inputRegistry, never()).remove(Mockito.<IOState<MessageInput>>any());
+        verify(inputRegistry, after(EVENT_QUEUE_WAIT_TIME_MS).never()).remove(Mockito.<IOState<MessageInput>>any());
     }
 
     @Test
@@ -195,7 +199,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
-        verify(inputLauncher, times(1)).launch(messageInput);
+        verify(inputLauncher, timeout(EVENT_QUEUE_WAIT_TIME_MS).times(1)).launch(messageInput);
     }
 
     @Test
@@ -210,8 +214,7 @@ public class InputEventListenerTest {
         when(inputService.getMessageInput(input)).thenReturn(messageInput);
 
         listener.inputUpdated(InputUpdated.create(INPUT_ID));
-
-        verify(inputLauncher, times(1)).launch(messageInput);
+        verify(inputLauncher, timeout(EVENT_QUEUE_WAIT_TIME_MS).times(1)).launch(messageInput);
     }
 
     @Test
@@ -226,7 +229,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
-        verify(inputLauncher, never()).launch(messageInput);
+        verify(inputLauncher, after(EVENT_QUEUE_WAIT_TIME_MS).never()).launch(messageInput);
     }
 
     @Test
@@ -242,7 +245,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
-        verify(inputLauncher, times(1)).launch(messageInput);
+        verify(inputLauncher, timeout(EVENT_QUEUE_WAIT_TIME_MS).times(1)).launch(messageInput);
     }
 
     @Test
@@ -258,7 +261,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(INPUT_ID));
 
-        verify(inputLauncher, never()).launch(messageInput);
+        verify(inputLauncher, after(EVENT_QUEUE_WAIT_TIME_MS).never()).launch(messageInput);
     }
 
     @Test
@@ -268,7 +271,7 @@ public class InputEventListenerTest {
 
         listener.inputDeleted(InputDeleted.create(INPUT_ID));
 
-        verify(inputRegistry, never()).remove(any(MessageInput.class));
+        verify(inputRegistry, after(EVENT_QUEUE_WAIT_TIME_MS).never()).remove(any(MessageInput.class));
     }
 
     @Test
@@ -278,6 +281,6 @@ public class InputEventListenerTest {
 
         listener.inputDeleted(InputDeleted.create(INPUT_ID));
 
-        verify(inputRegistry, never()).remove(any(MessageInput.class));
+        verify(inputRegistry, after(EVENT_QUEUE_WAIT_TIME_MS).never()).remove(any(MessageInput.class));
     }
 }
