@@ -37,10 +37,10 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -481,6 +481,6 @@ public class SyslogCodecTest {
     }
 
     private RawMessage buildRawMessage(String message) {
-        return new RawMessage(message.getBytes(UTF_8), new InetSocketAddress("127.0.0.1", 5140));
+        return new RawMessage(message.getBytes(StandardCharsets.UTF_8), new InetSocketAddress("127.0.0.1", 5140));
     }
 }
