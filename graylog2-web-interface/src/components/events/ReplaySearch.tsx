@@ -81,15 +81,11 @@ type Props = {
   forceSidebarPinned?: boolean,
 }
 
-const canReplayEvent = (event: Event, eventDefinition: EventDefinition) => {
+const canReplayEvent = (eventDefinition: EventDefinition) => {
   const systemEvent = isSystemEventDefinition(eventDefinition);
 
   if (systemEvent) {
     return 'Event is a system event, these have no query/stream/time range attached.';
-  }
-
-  if (!event?.replay_info) {
-    return 'Event is missing replay information.';
   }
 
   return true;
@@ -104,7 +100,7 @@ const LoadingBarrier = ({
     return <Spinner />;
   }
 
-  const canReplay = canReplayEvent(eventData, eventDefinition);
+  const canReplay = canReplayEvent(eventDefinition);
 
   return canReplay === true
     ? (
