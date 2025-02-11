@@ -22,6 +22,7 @@ import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import org.graylog.plugins.otel.input.codec.LogsCodec;
+import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -30,6 +31,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +46,10 @@ class LogsCodecTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private LogsCodec codec;
 
+    private final ResolvableInetSocketAddress remoteAddress = ResolvableInetSocketAddress.wrap(
+            new InetSocketAddress(Inet4Address.getLoopbackAddress(), 12345)
+    );
+
     @BeforeEach
     void setUp() {
         codec = new LogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get());
@@ -54,7 +61,7 @@ class LogsCodecTest {
     // encoded string to a base64 encoded string in order to correctly parse the file with the generic protobuf utils
     @Test
     void decodeOfficialExample() throws IOException {
-        final var decoded = codec.decode(parseFixture("logs.json"), new DateTime(DateTimeZone.UTC));
+        final var decoded = codec.decode(parseFixture("logs.json"), new DateTime(DateTimeZone.UTC), remoteAddress);
         assertThat(decoded).isNotEmpty();
 
         final var message = decoded.get();
@@ -80,12 +87,12 @@ class LogsCodecTest {
         expected.put("resource_attributes_service_name", "my.service");
 
         assertThat(message.getFields()).containsAllEntriesOf(expected);
-        assertThat(message.getSource()).isNull();
+        assertThat(message.getSource()).isEqualTo("127.0.0.1:12345");
     }
 
     @Test
     void decodeDeeplyNested() throws IOException {
-        final var decoded = codec.decode(parseFixture("deeply_nested_log_record.json"), new DateTime(DateTimeZone.UTC));
+        final var decoded = codec.decode(parseFixture("deeply_nested_log_record.json"), new DateTime(DateTimeZone.UTC), remoteAddress);
         assertThat(decoded).isNotEmpty();
         final var message = decoded.get();
 
@@ -98,7 +105,7 @@ class LogsCodecTest {
 
     @Test
     void decodeComplexResourceAndBody() throws IOException {
-        final var decoded = codec.decode(parseFixture("complex_source_and_body.json"), new DateTime(DateTimeZone.UTC));
+        final var decoded = codec.decode(parseFixture("complex_source_and_body.json"), new DateTime(DateTimeZone.UTC), remoteAddress);
         assertThat(decoded).isNotEmpty();
         final var message = decoded.get();
 
@@ -116,7 +123,7 @@ class LogsCodecTest {
 
     @Test
     void decodeArrayFlavors() throws IOException {
-        final var decoded = codec.decode(parseFixture("log_record_array_flavors.json"), new DateTime(DateTimeZone.UTC));
+        final var decoded = codec.decode(parseFixture("log_record_array_flavors.json"), new DateTime(DateTimeZone.UTC), remoteAddress);
         assertThat(decoded).isNotEmpty();
         final var message = decoded.get();
 
@@ -156,11 +163,21 @@ class LogsCodecTest {
     @Test
     void fallbackToReceiveTimestamp() throws IOException {
         final DateTime receiveTimestamp = new DateTime(2025, 2, 7, 14, 0, 0, DateTimeZone.UTC);
-        final var decoded = codec.decode(parseFixture("empty_record.json"), receiveTimestamp);
+        final var decoded = codec.decode(parseFixture("empty_record.json"), receiveTimestamp, remoteAddress);
         assertThat(decoded).isNotEmpty();
         final var message = decoded.get();
 
         assertThat(message.getTimestamp()).isEqualTo(receiveTimestamp);
+    }
+
+    @Test
+    void fallbackToClientRemoteAddress() throws IOException {
+        final var decoded = codec.decode(parseFixture("empty_record.json"), DateTime.now(DateTimeZone.UTC),
+                remoteAddress);
+        assertThat(decoded).isNotEmpty();
+        final var message = decoded.get();
+
+        assertThat(message.getSource()).isEqualTo("127.0.0.1:12345");
     }
 
     private Journal.Log parseFixture(String filename) throws IOException {

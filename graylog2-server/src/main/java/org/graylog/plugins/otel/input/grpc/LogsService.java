@@ -17,6 +17,7 @@
 package org.graylog.plugins.otel.input.grpc;
 
 import com.google.inject.assistedinject.Assisted;
+import com.google.protobuf.AbstractMessageLite;
 import io.grpc.Context;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -29,6 +30,10 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
 
+import java.net.InetSocketAddress;
+import java.util.function.Function;
+
+import static org.graylog.plugins.otel.input.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
 import static org.graylog.plugins.otel.input.grpc.Utils.createThrottledStatusRuntimeException;
 
 public class LogsService extends LogsServiceGrpc.LogsServiceImplBase {
@@ -62,12 +67,19 @@ public class LogsService extends LogsServiceGrpc.LogsServiceImplBase {
             return;
         }
 
-        // TODO: get client IP and use RawMessage(byte[], java.net.InetSocketAddress) constructor
-        journalRecordFactory.createFromRequest(request).forEach(record ->
-                input.processRawMessage(new RawMessage(record.toByteArray())));
+        final Function<byte[], RawMessage> createRawMessage;
+        if (REMOTE_ADDRESS.get() instanceof InetSocketAddress address) {
+            createRawMessage = bytes -> new RawMessage(bytes, address);
+        } else {
+            createRawMessage = RawMessage::new;
+        }
+
+        journalRecordFactory.createFromRequest(request).stream()
+                .map(AbstractMessageLite::toByteArray)
+                .map(createRawMessage)
+                .forEach(input::processRawMessage);
 
         responseObserver.onNext(ExportLogsServiceResponse.newBuilder().build());
         responseObserver.onCompleted();
     }
-
 }

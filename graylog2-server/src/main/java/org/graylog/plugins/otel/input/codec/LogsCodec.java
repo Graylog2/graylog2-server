@@ -32,6 +32,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.graylog.plugins.otel.input.Journal;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -61,11 +62,11 @@ public class LogsCodec {
         this.objectMapper = objectMapper;
     }
 
-    public Optional<Message> decode(@Nonnull Journal.Log log, DateTime receiveTimestamp) {
+    public Optional<Message> decode(@Nonnull Journal.Log log, DateTime receiveTimestamp, ResolvableInetSocketAddress remoteAddress) {
         final var logRecord = log.getLogRecord();
 
         final String body = asString("body", logRecord.getBody()).orElse("");
-        final Message message = messageFactory.createMessage(body, source(log), timestamp(logRecord).orElse(receiveTimestamp));
+        final Message message = messageFactory.createMessage(body, source(log, remoteAddress), timestamp(logRecord).orElse(receiveTimestamp));
 
         message.addField("trace_id", Hex.encodeHexString(logRecord.getTraceId().toByteArray()));
         message.addField("span_id", Hex.encodeHexString(logRecord.getSpanId().toByteArray()));
@@ -103,11 +104,12 @@ public class LogsCodec {
         return new DateTime(timeUnixNano / 1_000_000L, DateTimeZone.UTC);
     }
 
-    private @Nullable String source(Journal.Log log) {
+    private @Nullable String source(Journal.Log log, ResolvableInetSocketAddress remoteAddress) {
         return log.getResource().getAttributesList().stream()
                 .filter(kv -> kv.getKey().equals(HostIncubatingAttributes.HOST_NAME.getKey()))
                 .flatMap(kv -> asString(kv.getKey(), kv.getValue()).stream())
                 .findFirst()
+                .or(() -> Optional.ofNullable(remoteAddress).map(ResolvableInetSocketAddress::toString))
                 .orElse(null);
     }
 

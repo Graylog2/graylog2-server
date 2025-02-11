@@ -81,7 +81,8 @@ public class OpenTelemetryCodec implements Codec {
         }
 
         return switch (journalRecord.getPayloadCase()) {
-            case LOG -> logsCodec.decode(journalRecord.getLog(), rawMessage.getTimestamp());
+            case LOG ->
+                    logsCodec.decode(journalRecord.getLog(), rawMessage.getTimestamp(), rawMessage.getRemoteAddress());
             case PAYLOAD_NOT_SET -> throw InputProcessingException.create(
                     "Error handling OpenTelemetry message. No payload set.", rawMessage);
         };
