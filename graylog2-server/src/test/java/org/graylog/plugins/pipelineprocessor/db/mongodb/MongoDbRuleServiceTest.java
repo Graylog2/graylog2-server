@@ -36,7 +36,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -60,15 +59,15 @@ class MongoDbRuleServiceTest {
         final var rule = dummyRule();
         final var savedRule = ruleService.save(rule);
         assertThat(ruleService.load(savedRule.id())).isEqualTo(rule.toBuilder().id(savedRule.id()).build());
-        verify(clusterEventBus).post(eq(RulesChangedEvent.updatedRuleId(savedRule.id())));
+        verify(clusterEventBus).post(RulesChangedEvent.updatedRuleId(savedRule.id()));
     }
 
     @Test
-    void createSystemRule() throws Exception {
+    void createSystemRuleSucceeds() throws Exception {
         final var rule = systemRule();
         final var savedRule = ruleService.save(rule);
         assertThat(ruleService.load(savedRule.id())).isEqualTo(rule.toBuilder().id(savedRule.id()).build());
-        verify(clusterEventBus).post(eq(RulesChangedEvent.updatedRuleId(savedRule.id())));
+        verify(clusterEventBus).post(RulesChangedEvent.updatedRuleId(savedRule.id()));
     }
 
     @Test
@@ -76,11 +75,11 @@ class MongoDbRuleServiceTest {
         final var rule = dummyRule().toBuilder().id(new ObjectId().toHexString()).build();
         final var savedRule = ruleService.save(rule);
         assertThat(ruleService.load(savedRule.id())).isEqualTo(rule);
-        verify(clusterEventBus).post(eq(RulesChangedEvent.updatedRuleId(savedRule.id())));
+        verify(clusterEventBus).post(RulesChangedEvent.updatedRuleId(savedRule.id()));
     }
 
     @Test
-    void updateSystemRuleThrows() throws Exception {
+    void updateSystemRuleThrows() {
         final var rule = systemRule().toBuilder().id(new ObjectId().toHexString()).build();
         assertThatThrownBy(() -> ruleService.save(rule))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -110,16 +109,16 @@ class MongoDbRuleServiceTest {
         assertThat(ruleService.loadAll()).hasSize(1);
         ruleService.delete(rule.id());
         assertThat(ruleService.loadAll()).hasSize(0);
-        verify(clusterEventBus).post(eq(RulesChangedEvent.deletedRuleId(rule.id())));
+        verify(clusterEventBus).post(RulesChangedEvent.deletedRuleId(rule.id()));
     }
 
     @Test
-    void deleteSystemRule() {
+    void deleteSystemRuleSucceeds() {
         final var rule = ruleService.save(systemRule().toBuilder().title("title 2").build());
         assertThat(ruleService.loadAll()).hasSize(1);
         ruleService.delete(rule.id());
         assertThat(ruleService.loadAll()).hasSize(0);
-        verify(clusterEventBus).post(eq(RulesChangedEvent.deletedRuleId(rule.id())));
+        verify(clusterEventBus).post(RulesChangedEvent.deletedRuleId(rule.id()));
     }
 
     @Test

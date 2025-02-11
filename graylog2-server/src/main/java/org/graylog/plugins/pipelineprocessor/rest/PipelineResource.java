@@ -48,8 +48,6 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
-import org.graylog.plugins.pipelineprocessor.db.RuleService;
-import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -313,47 +311,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
         }
         pipelineConnections.pipelineIds().add(pipelineId);
         connectionsService.save(pipelineConnections);
-    }
-
-    private RuleDao createRoutingRule(RoutingRequest request, boolean removeFromDefault, String streamName) {
-        String ruleName = "route_" + request.inputId() + "_to_" + streamName;
-        final Optional<RuleDao> ruleDaoOpt = ruleService.findByName(ruleName);
-        if (ruleDaoOpt.isPresent()) {
-            log.info(f("Routing rule %s already exists - skipping", ruleName));
-            return ruleDaoOpt.get();
-        }
-
-        String ruleSource =
-                "rule \"" + ruleName + "\"\n"
-                        + "when has_field(\"gl2_source_input\") AND to_string($message.gl2_source_input)==\"" + request.inputId() + "\"\n"
-                        + "then\n"
-                        + "route_to_stream(id:\"" + request.streamId() + "\""
-                        + ", remove_from_default: " + removeFromDefault
-                        + ");\nend\n";
-
-        RuleDao ruleDao = RuleDao.builder()
-                .scope(SystemPipelineRuleScope.NAME)
-                .title(ruleName)
-                .description("Input setup wizard routing rule")
-                .source(ruleSource)
-                .createdAt(DateTime.now(DateTimeZone.UTC))
-                .build();
-        return ruleService.save(ruleDao);
-    }
-
-    @VisibleForTesting
-    public static String createPipelineString(PipelineSource pipelineSource) {
-        StringBuilder result = new StringBuilder("pipeline \"" + pipelineSource.title() + "\"\n");
-        for (int stageNr = 0; stageNr < pipelineSource.stages().size(); stageNr++) {
-            StageSource currStage = pipelineSource.stages().get(stageNr);
-            result.append("stage ").append(stageNr).append(" match ").append(currStage.match()).append('\n');
-            for (String rule : currStage.rules()) {
-                result.append("rule \"").append(rule).append("\"\n");
-            }
-        }
-        result.append("end");
-
-        return result.toString();
     }
 
     @ApiOperation(value = "Delete a processing pipeline", notes = "It can take up to a second until the change is applied")
