@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -41,6 +42,9 @@ public abstract class RuleSource {
     @Id
     @ObjectId
     public abstract String id();
+
+    @JsonProperty("_scope")
+    public abstract String scope();
 
     @JsonProperty
     @Nullable
@@ -79,8 +83,19 @@ public abstract class RuleSource {
 
     public abstract Builder toBuilder();
 
+    public static RuleSource create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
+                                    @JsonProperty("title") String title,
+                                    @JsonProperty("description") @Nullable String description,
+                                    @JsonProperty("source") String source,
+                                    @JsonProperty("simulator_message") @Nullable String simulatorMessage,
+                                    @JsonProperty("created_at") @Nullable DateTime createdAt,
+                                    @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
+        return create(id, null, title, description, source, simulatorMessage, createdAt, modifiedAt);
+    }
+
     @JsonCreator
     public static RuleSource create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
+                                    @JsonProperty("_scope") @Nullable String scope,
                                     @JsonProperty("title") String title,
                                     @JsonProperty("description") @Nullable String description,
                                     @JsonProperty("source") String source,
@@ -89,6 +104,7 @@ public abstract class RuleSource {
                                     @JsonProperty("modified_at") @Nullable DateTime modifiedAt) {
         return builder()
                 .id(id)
+                .scope(scope == null ? DefaultEntityScope.NAME : scope)
                 .source(source)
                 .title(title)
                 .description(description)
@@ -109,6 +125,7 @@ public abstract class RuleSource {
 
         return builder()
                 .id(dao.id())
+                .scope(dao.scope())
                 .source(dao.source())
                 .title(dao.title())
                 .description(dao.description())
@@ -125,6 +142,8 @@ public abstract class RuleSource {
         public abstract RuleSource build();
 
         public abstract Builder id(String id);
+
+        public abstract Builder scope(String scope);
 
         public abstract Builder title(String title);
 

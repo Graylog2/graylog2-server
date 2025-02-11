@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
@@ -111,6 +112,7 @@ public class InputRoutingService {
                         + ");\nend\n";
 
         RuleDao ruleDao = RuleDao.builder()
+                .scope(SystemPipelineRuleScope.NAME)
                 .title(ruleName)
                 .description("Input setup wizard routing rule")
                 .source(ruleSource)
