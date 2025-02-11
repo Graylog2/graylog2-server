@@ -194,7 +194,8 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
                             "header of their requests. To configure this in the OpenTelemetry Collector, the Bearer " +
                             "Token Extension (bearertokenauth) can be used.",
                     ConfigurationField.Optional.OPTIONAL,
-                    true
+                    true,
+                    TextField.Attribute.IS_PASSWORD
             ));
 
             request.addField(
