@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
@@ -49,22 +48,20 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
-import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.inputs.InputRoutingService;
 import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -73,7 +70,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -99,27 +95,23 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
     private final SearchQueryParser searchQueryParser;
     private final PaginatedPipelineService paginatedPipelineService;
-
     private final PipelineService pipelineService;
     private final PipelineRuleParser pipelineRuleParser;
     private final PipelineStreamConnectionsService connectionsService;
-    private final RuleService ruleService;
-    private final StreamService streamService;
+    private final InputRoutingService inputRoutingService;
 
     @Inject
     public PipelineResource(PipelineService pipelineService,
                             PaginatedPipelineService paginatedPipelineService,
                             PipelineRuleParser pipelineRuleParser,
                             PipelineStreamConnectionsService connectionsService,
-                            RuleService ruleService,
-                            StreamService streamService) {
+                            InputRoutingService inputRoutingService) {
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.paginatedPipelineService = paginatedPipelineService;
         this.searchQueryParser = new SearchQueryParser(PipelineDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.connectionsService = connectionsService;
-        this.ruleService = ruleService;
-        this.streamService = streamService;
+        this.inputRoutingService = inputRoutingService;
     }
 
     @ApiOperation(value = "Create a processing pipeline from source")
@@ -245,30 +237,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     public PipelineSource update(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
-
-        final PipelineDao dao = pipelineService.load(id);
-        final Pipeline pipeline;
-        try {
-            pipeline = pipelineRuleParser.parsePipeline(update.id(), update.source());
-        } catch (ParseException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
-        }
-        final PipelineDao toSave = dao.toBuilder()
-                .title(pipeline.name())
-                .description(update.description())
-                .source(update.source())
-                .modifiedAt(DateTime.now(DateTimeZone.UTC))
-                .build();
-
-        final PipelineDao savedPipeline;
-        try {
-            savedPipeline = pipelineService.save(toSave);
-        } catch (IllegalArgumentException e) {
-            log.error(e.getMessage(), e);
-            throw new BadRequestException(e.getMessage());
-        }
-
-        return PipelineSource.fromDao(pipelineRuleParser, savedPipeline);
+        return PipelineUtils.update(pipelineService, pipelineRuleParser, id, update);
     }
 
     public record RoutingRequest(
@@ -288,19 +257,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
         checkPermission(RestPermissions.STREAMS_EDIT, request.streamId());
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_CREATE);
 
-        Stream stream;
-        try {
-            stream = streamService.load(request.streamId());
-        } catch (NotFoundException e) {
-            throw new NotFoundException(f("Unable to load stream %s", request.streamId()), e);
-        }
-
-        boolean removeFromDefault = true;
-        if (request.removeFromDefault() == null) {
-            removeFromDefault = stream.getRemoveMatchesFromDefaultStream();
-        }
-
-        RuleDao ruleDao = createRoutingRule(request, removeFromDefault, stream.getTitle());
+        RuleDao ruleDao = inputRoutingService.createRoutingRule(request);
         PipelineDao pipelineDao;
         try {
             pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
@@ -317,7 +274,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
         if (rules0.stream().filter(ruleRef -> ruleRef.equals(ruleDao.title())).findFirst().isEmpty()) {
             rules0.add(ruleDao.title());
             pipelineSource = pipelineSource.toBuilder()
-                    .source(createPipelineString(pipelineSource))
+                    .source(PipelineUtils.createPipelineString(pipelineSource))
                     .build();
             update(pipelineDao.id(), pipelineSource);
         } else {
@@ -354,46 +311,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
         }
         pipelineConnections.pipelineIds().add(pipelineId);
         connectionsService.save(pipelineConnections);
-    }
-
-    private RuleDao createRoutingRule(RoutingRequest request, boolean removeFromDefault, String streamName) {
-        String ruleName = "route_" + request.inputId() + "_to_" + streamName;
-        final Optional<RuleDao> ruleDaoOpt = ruleService.findByName(ruleName);
-        if (ruleDaoOpt.isPresent()) {
-            log.info(f("Routing rule %s already exists - skipping", ruleName));
-            return ruleDaoOpt.get();
-        }
-
-        String ruleSource =
-                "rule \"" + ruleName + "\"\n"
-                        + "when has_field(\"gl2_source_input\") AND to_string($message.gl2_source_input)==\"" + request.inputId() + "\"\n"
-                        + "then\n"
-                        + "route_to_stream(id:\"" + request.streamId() + "\""
-                        + ", remove_from_default: " + removeFromDefault
-                        + ");\nend\n";
-
-        RuleDao ruleDao = RuleDao.builder()
-                .title(ruleName)
-                .description("Input setup wizard routing rule")
-                .source(ruleSource)
-                .createdAt(DateTime.now(DateTimeZone.UTC))
-                .build();
-        return ruleService.save(ruleDao);
-    }
-
-    @VisibleForTesting
-    public static String createPipelineString(PipelineSource pipelineSource) {
-        StringBuilder result = new StringBuilder("pipeline \"" + pipelineSource.title() + "\"\n");
-        for (int stageNr = 0; stageNr < pipelineSource.stages().size(); stageNr++) {
-            StageSource currStage = pipelineSource.stages().get(stageNr);
-            result.append("stage ").append(stageNr).append(" match ").append(currStage.match()).append('\n');
-            for (String rule : currStage.rules()) {
-                result.append("rule \"").append(rule).append("\"\n");
-            }
-        }
-        result.append("end");
-
-        return result.toString();
     }
 
     @ApiOperation(value = "Delete a processing pipeline", notes = "It can take up to a second until the change is applied")

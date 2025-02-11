@@ -154,8 +154,8 @@
         <mongodb-driver.version>5.3.1</mongodb-driver.version>
         <mongojack.version>5.0.2</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.117.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.69.Final</netty-tcnative-boringssl-static.version>
+        <netty.version>4.1.118.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.70.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.32.0</opentelemetry.version>
@@ -179,7 +179,7 @@
         <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.6-9</zstd.version>
+        <zstd.version>1.5.6-10</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.6</jjwt.version>
