@@ -18,31 +18,42 @@ package org.graylog.plugins.views.search.db;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.Uninterruptibles;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.ForbiddenException;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchValidator;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.StringUtils;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 // TODO dummy that only holds everything in memory for now
 @Singleton
 public class InMemorySearchJobService implements SearchJobService {
 
-    private final Cache<String, SearchJob> cache;
+    private final Cache<String, SearchJob> indexerSearchJobsCache;
+    private final Cache<String, SearchJob> dataLakeSearchJobsCache;
     private final NodeId nodeId;
 
     @Inject
     public InMemorySearchJobService(final NodeId nodeId) {
         this.nodeId = nodeId;
-        cache = CacheBuilder.newBuilder()
+        indexerSearchJobsCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)
+                .maximumSize(1000)
+                .recordStats()
+                .build();
+        dataLakeSearchJobsCache = CacheBuilder.newBuilder()
+                .expireAfterAccess(4, TimeUnit.HOURS)
                 .maximumSize(1000)
                 .recordStats()
                 .build();
@@ -54,20 +65,52 @@ public class InMemorySearchJobService implements SearchJobService {
                             final Integer cancelAfterSeconds) {
         final String id = new ObjectId().toHexString();
         final SearchJob searchJob = new SearchJob(id, search, owner, nodeId.getNodeId(), cancelAfterSeconds);
-        cache.put(id, searchJob);
+        if (DataWarehouseSearchValidator.containsDataWarehouseSearchElements(search)) {
+            dataLakeSearchJobsCache.put(id, searchJob);
+        } else {
+            indexerSearchJobsCache.put(id, searchJob);
+        }
         return searchJob;
     }
 
     @Override
-    public Optional<SearchJob> load(final String id,
-                                    final SearchUser searchUser) throws ForbiddenException {
-        final SearchJob searchJob = cache.getIfPresent(id);
+    public Optional<SearchJobDTO> load(final String id,
+                                       final SearchUser searchUser) throws ForbiddenException {
+        final SearchJob searchJob = getFromCache(id);
         if (searchJob == null) {
             return Optional.empty();
         } else if (searchJob.getOwner().equals(searchUser.username()) || searchUser.isAdmin()) {
-            return Optional.of(searchJob);
+            if (searchJob.getResultFuture() != null) {
+                try {
+                    // force a "conditional join", to catch fast responses without having to poll
+                    Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
+                } catch (ExecutionException | TimeoutException ignore) {
+                }
+            }
+            return Optional.of(SearchJobDTO.fromSearchJob(searchJob));
         } else {
             throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
         }
+    }
+
+    @Override
+    public boolean cancel(String id, SearchUser searchUser) throws ForbiddenException {
+        final SearchJob searchJob = getFromCache(id);
+        if (searchJob == null) {
+            return false;
+        } else if (searchJob.getOwner().equals(searchUser.username()) || searchUser.isAdmin()) {
+            searchJob.cancel();
+            return true;
+        } else {
+            throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
+        }
+    }
+
+    private SearchJob getFromCache(final String id) {
+        SearchJob searchJob = indexerSearchJobsCache.getIfPresent(id);
+        if (searchJob == null) {
+            searchJob = dataLakeSearchJobsCache.getIfPresent(id);
+        }
+        return searchJob;
     }
 }

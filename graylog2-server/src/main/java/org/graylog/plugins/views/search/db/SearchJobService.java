@@ -20,11 +20,15 @@ import jakarta.ws.rs.ForbiddenException;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.SearchJobDTO;
 
 import java.util.Optional;
 
 public interface SearchJobService {
 
     SearchJob create(Search search, String owner, Integer cancelAfterSeconds);
-    Optional<SearchJob> load(String id, SearchUser searchUser) throws ForbiddenException;
+
+    Optional<SearchJobDTO> load(String id, SearchUser searchUser) throws ForbiddenException;
+
+    boolean cancel(String id, SearchUser searchUser) throws ForbiddenException;
 }
