@@ -17,7 +17,6 @@
 package org.graylog2.shared.bindings;
 
 import com.google.inject.multibindings.MapBinder;
-import org.graylog.grpc.GrpcModule;
 import org.graylog.plugins.beats.BeatsInputPluginModule;
 import org.graylog.plugins.otel.bindings.OpenTelemetryModule;
 import org.graylog2.inputs.beats.kafka.BeatsKafkaInput;
@@ -69,8 +68,6 @@ public class MessageInputBindings extends Graylog2Module {
         installInput(inputMapBinder, BeatsKafkaInput.class, BeatsKafkaInput.Factory.class);
 
         install(new BeatsInputPluginModule());
-
-        install(new GrpcModule());
         install(new OpenTelemetryModule());
     }
 }
