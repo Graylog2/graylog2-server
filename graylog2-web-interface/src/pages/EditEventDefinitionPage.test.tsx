@@ -28,6 +28,7 @@ import { adminUser } from 'fixtures/users';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import EditEventDefinitionPage from 'pages/EditEventDefinitionPage';
 import useCurrentUser from 'hooks/useCurrentUser';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
 
 type entityScope = {
   is_mutable: boolean;
@@ -36,11 +37,13 @@ type entityScope = {
 type getPermissionsByScopeReturnType = {
   loadingScopePermissions: boolean;
   scopePermissions: entityScope;
+  checkPermissions: (inEntity: Partial<GenericEntityType>) => boolean;
 };
 
 const exampleEntityScopeMutable: getPermissionsByScopeReturnType = {
   loadingScopePermissions: false,
   scopePermissions: { is_mutable: true },
+  checkPermissions: (_inEntity: Partial<GenericEntityType>) => true,
 };
 
 jest.mock('react-router-dom', () => ({

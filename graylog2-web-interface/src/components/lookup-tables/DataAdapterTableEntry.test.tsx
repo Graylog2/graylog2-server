@@ -36,13 +36,6 @@ describe('DataAdapterTableEntry', () => {
   beforeAll(() => {
     asMock(useScopePermissions).mockImplementation(
       (entity: GenericEntityType) => {
-        if (!entity._scope) {
-          return {
-            loadingScopePermissions: true,
-            scopePermissions: null,
-          };
-        }
-
         const scopes = {
           ILLUMINATE: { is_mutable: false },
           DEFAULT: { is_mutable: true },
@@ -50,7 +43,12 @@ describe('DataAdapterTableEntry', () => {
 
         return {
           loadingScopePermissions: false,
-          scopePermissions: scopes[entity._scope],
+          scopePermissions: scopes[entity?._scope || 'DEFAULT'],
+          checkPermissions: (inEntity: Partial<GenericEntityType>) => {
+            const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
+
+            return scopes[entityScope].is_mutable;
+          },
         };
       },
     );
