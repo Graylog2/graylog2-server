@@ -116,9 +116,24 @@ public class MongoIndexRangeServiceTest {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
 
         assertThat(indexRanges).containsExactly(
+                MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000008"), "graylog_deflect", new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 6, 0, 0, DateTimeZone.UTC), 42),
                 MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000002"), "graylog_2", new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), 42),
                 MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000003"), "graylog_3", new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), 42),
-                MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000004"), "graylog_4", new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), 42)
+                MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000004"), "graylog_4", new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), 42),
+                MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000006"), "graylog_6", new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 6, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 6, 0, 0, DateTimeZone.UTC), 42)
+        );
+    }
+
+    @Test
+    @MongoDBFixtures("MongoIndexRangeServiceTest-distinct.json")
+    public void findReturnsOnlyDeflectorIndex() throws Exception {
+        // looking at a timerange that contains no other indices so only the deflector is returned
+        final DateTime begin = new DateTime(2017, 1, 1, 0, 0, DateTimeZone.UTC);
+        final DateTime end = new DateTime(2017, 11, 1, 0, 0, DateTimeZone.UTC);
+        final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
+
+        assertThat(indexRanges).containsExactly(
+                MongoIndexRange.create(new ObjectId("55e0261a0cc6980000000008"), "graylog_deflect", new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 6, 0, 0, DateTimeZone.UTC), 42)
         );
     }
 

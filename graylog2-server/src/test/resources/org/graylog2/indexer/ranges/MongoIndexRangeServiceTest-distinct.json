@@ -49,6 +49,36 @@
       "begin": 1420416000000,
       "end": 1420502400000,
       "took_ms": 42
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000006"
+      },
+      "index_name": "graylog_6",
+      "calculated_at": 1420502400000,
+      "begin": 0,
+      "end": 1420502400000,
+      "took_ms": 42
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000007"
+      },
+      "index_name": "graylog_7",
+      "calculated_at": 1420502400000,
+      "begin": 2120502400000,
+      "end": 2420502400000,
+      "took_ms": 42
+    },
+    {
+      "_id": {
+        "$oid": "55e0261a0cc6980000000008"
+      },
+      "index_name": "graylog_deflect",
+      "calculated_at": 1420502400000,
+      "begin": 0,
+      "end": 0,
+      "took_ms": 42
     }
   ]
 }
