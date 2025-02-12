@@ -154,10 +154,7 @@ type DataTiering = {
 
 type InputSetupWizard = {
   EnterpriseInputSetupWizard: React.ComponentType<{
-    onStepChange: (InputSetupWizardStep) => void,
-    activeStep: InputSetupWizardStep,
     openSteps: {[key in InputSetupWizardStep]?: StepType},
-    inputCategory?: InputSetupWizardCategory,
   }>
 }
 

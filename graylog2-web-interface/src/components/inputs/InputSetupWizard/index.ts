@@ -19,3 +19,5 @@ export { default as InputSetupWizard } from './InputSetupWizard';
 export * from './steps/components/StepWrapper';
 export * from './types';
 export { INPUT_SETUP_MODE_FEATURE_FLAG, DEFAULT_ORDERED_STEPS } from './constants';
+export * from './helpers/stepHelper';
+export { default as useInputSetupWizard } from './hooks/useInputSetupWizard';

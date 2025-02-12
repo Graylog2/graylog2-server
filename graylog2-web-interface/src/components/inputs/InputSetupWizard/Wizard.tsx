@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Modal } from 'components/bootstrap';
@@ -35,9 +35,8 @@ type Props = {
 }
 
 const Wizard = ({ show, input, onClose }: Props) => {
-  const { activeStep, setActiveStep, stepsConfig, setStepsConfig, setWizardData, wizardData } = useInputSetupWizard();
-
-  const EnterpriseWizard = PluginStore.exports('inputSetupWizard').find(plugin => !!plugin.EnterpriseInputSetupWizard).EnterpriseInputSetupWizard;
+  const { activeStep, setActiveStep, orderedSteps, setOrderedSteps, stepsConfig, setStepsConfig, setWizardData, wizardData } = useInputSetupWizard();
+  const EnterpriseWizard = PluginStore.exports('inputSetupWizard').find(plugin => !!plugin.EnterpriseInputSetupWizard)?.EnterpriseInputSetupWizard;
 
   const initialStepsConfig = {
     [INPUT_WIZARD_STEPS.SETUP_ROUTING]: {
@@ -96,7 +95,17 @@ const Wizard = ({ show, input, onClose }: Props) => {
     }
   ), [onClose, stepsConfig]);
 
-  const orderedSteps = [INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.START_INPUT, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
+  const setInitialSteps = useCallback(() => {
+    setOrderedSteps([INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.START_INPUT, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]);
+    setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);
+  }, [setOrderedSteps, setActiveStep])
+
+  useEffect(() => {
+    if (EnterpriseWizard) return;
+    if (!activeStep) {
+      setInitialSteps()
+    }
+  }, [EnterpriseWizard, activeStep, setInitialSteps])
 
   if (!show) return null;
 
@@ -109,17 +118,17 @@ const Wizard = ({ show, input, onClose }: Props) => {
         <InputSetupWizardStepsProvider>
         {EnterpriseWizard ? (
           <EnterpriseWizard
-            onStepChange={setActiveStep}
-            activeStep={activeStep}
             openSteps={steps}
           />
         ) : (
-          <CommonWizard activeStep={activeStep ?? orderedSteps[0]}
-                        hidePreviousNextButtons
-                        horizontal
-                        justified
-                        onStepChange={setActiveStep}
-                        steps={orderedStepsConfig} />
+          orderedSteps.length > 0 && (
+            <CommonWizard activeStep={activeStep}
+                hidePreviousNextButtons
+                horizontal
+                justified
+                onStepChange={setActiveStep}
+                steps={orderedStepsConfig} />
+          )
         )}
         </InputSetupWizardStepsProvider>
       </Modal.Body>
