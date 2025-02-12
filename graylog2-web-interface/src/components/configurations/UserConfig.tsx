@@ -99,6 +99,8 @@ const UserConfig = () => {
             <dd>{viewConfig.enable_global_session_timeout ? 'Enabled' : 'Disabled'}</dd>
             <dt>Timeout interval:</dt>
             <dd>{viewConfig.enable_global_session_timeout ? viewConfig.global_session_timeout_interval : '-'}</dd>
+            <dt>Allow access token for external users:</dt>
+            <dd>{viewConfig.allow_access_token_for_external_user ? 'Enabled' : 'Disabled'}</dd>
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">
@@ -149,6 +151,15 @@ const UserConfig = () => {
                                               disabled={!values.enable_global_session_timeout}
                                               required />
                           </fieldset>
+                        </Col>
+                        <Col sm={12}>
+                          <FormikInput type="checkbox"
+                                       name="allow_access_token_for_external_user"
+                                       id="allow_access_token_for_external_user"
+                                       label={(
+                                         <LabelSpan>Allow access token for external users</LabelSpan>
+                                       )} />
+                          <InputDescription help="If enabled, it will allow external users to use access tokens." />
                         </Col>
                       </Row>
                     </div>
