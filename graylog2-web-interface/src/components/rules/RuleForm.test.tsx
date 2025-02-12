@@ -124,7 +124,7 @@ describe('RuleForm', () => {
 
     expect(rawMessageInput).toHaveValue('');
 
-    await userEvent.paste(rawMessageInput, ruleInput);
+    await userEvent.type(rawMessageInput, ruleInput);
     const runSimulationButton = await screen.findByRole('button', { name: 'Run rule simulation' });
 
     await waitFor(() => {

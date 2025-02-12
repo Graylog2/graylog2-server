@@ -103,8 +103,8 @@ describe('<TimeUnitInput />', () => {
 
     const timeInput = await findTimeInput();
 
-    userEvent.clear(timeInput);
-    userEvent.paste(timeInput, '42');
+    await userEvent.clear(timeInput);
+    await userEvent.type(timeInput, '42');
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));
   });
