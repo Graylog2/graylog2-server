@@ -203,6 +203,7 @@ public class EventsSearchService {
 
     private long mapPriority(String priorityFilter) {
         return switch (priorityFilter) {
+            case "critical", "4" -> 4;
             case "high", "3" -> 3;
             case "normal", "2" -> 2;
             case "low", "1" -> 1;
