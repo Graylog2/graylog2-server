@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
-import { useQueryParam } from 'use-query-params';
 
+import { useQueryParam } from 'routing/QueryParams';
 import { MockStore } from 'helpers/mocking';
 import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
@@ -80,8 +80,8 @@ jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfile');
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField');
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions');
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 

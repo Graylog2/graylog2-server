@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestJobTriggerData;
@@ -44,7 +45,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mongojack.DBQuery;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,6 +53,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
@@ -105,10 +106,12 @@ public class DBJobTriggerServiceTest {
     @MongoDBFixtures("job-triggers.json")
     public void loadPersistedTriggers() {
         // Sort by ID to make sure we have a defined order
-        final List<JobTriggerDto> all = dbJobTriggerService.all()
-                .stream()
-                .sorted(comparing(jobTriggerDto -> requireNonNull(jobTriggerDto.id())))
-                .collect(ImmutableList.toImmutableList());
+        final List<JobTriggerDto> all;
+        try (Stream<JobTriggerDto> triggerStream = dbJobTriggerService.streamAll()) {
+            all = triggerStream
+                    .sorted(comparing(jobTriggerDto -> requireNonNull(jobTriggerDto.id())))
+                    .collect(ImmutableList.toImmutableList());
+        }
 
         assertThat(all).hasSize(4);
 
@@ -241,9 +244,11 @@ public class DBJobTriggerServiceTest {
                 .hasMessageContaining("54e3deadbeefdeadbeefaff3");
 
         // But we can also obtain all by calling following method:
-        assertThat(dbJobTriggerService.getAllForJob("54e3deadbeefdeadbeefaff3"))
-                .hasSize(2)
-                .allSatisfy(trigger -> assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff3"));
+        try (var stream = dbJobTriggerService.streamAllForJob("54e3deadbeefdeadbeefaff3")) {
+            assertThat(stream)
+                    .hasSize(2)
+                    .allSatisfy(trigger -> assertThat(trigger.jobDefinitionId()).isEqualTo("54e3deadbeefdeadbeefaff3"));
+        }
     }
 
 
@@ -879,19 +884,25 @@ public class DBJobTriggerServiceTest {
     @Test
     @MongoDBFixtures("stale-job-triggers.json")
     public void forceReleaseOwnedTriggers() {
-        final Set<String> triggerIds = dbJobTriggerService.all().stream()
-                .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))
-                .map(JobTriggerDto::id)
-                .collect(Collectors.toSet());
+        final Set<String> triggerIds;
+        try (Stream<JobTriggerDto> triggerStream = dbJobTriggerService.streamAll()) {
+            triggerIds = triggerStream
+                    .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))
+                    .map(JobTriggerDto::id)
+                    .collect(Collectors.toSet());
+        }
 
         assertThat(triggerIds).containsOnly("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002", "54e3deadbeefdeadbeef0004");
 
         assertThat(dbJobTriggerService.forceReleaseOwnedTriggers()).isEqualTo(2);
 
-        final Set<String> newTriggerIds = dbJobTriggerService.all().stream()
-                .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))
-                .map(JobTriggerDto::id)
-                .collect(Collectors.toSet());
+        final Set<String> newTriggerIds;
+        try (Stream<JobTriggerDto> triggerStream = dbJobTriggerService.streamAll()) {
+            newTriggerIds = triggerStream
+                    .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))
+                    .map(JobTriggerDto::id)
+                    .collect(Collectors.toSet());
+        }
 
         // Running triggers not owned by this node should not be released
         assertThat(newTriggerIds).containsOnly("54e3deadbeefdeadbeef0002");
@@ -900,19 +911,25 @@ public class DBJobTriggerServiceTest {
     @Test
     @MongoDBFixtures("stale-job-triggers.json")
     public void forceReleaseOwnedCancelledTriggers() {
-        final Set<String> cancelledTriggerIds = dbJobTriggerService.all().stream()
-                .filter(JobTriggerDto::isCancelled)
-                .map(JobTriggerDto::id)
-                .collect(Collectors.toSet());
+        final Set<String> cancelledTriggerIds;
+        try (Stream<JobTriggerDto> triggerStream = dbJobTriggerService.streamAll()) {
+            cancelledTriggerIds = triggerStream
+                    .filter(JobTriggerDto::isCancelled)
+                    .map(JobTriggerDto::id)
+                    .collect(Collectors.toSet());
+        }
 
         assertThat(cancelledTriggerIds).containsOnly("54e3deadbeefdeadbeef0001");
 
         assertThat(dbJobTriggerService.forceReleaseOwnedTriggers()).isEqualTo(2);
 
-        final Set<String> newCancelledTriggerIds = dbJobTriggerService.all().stream()
-                .filter(JobTriggerDto::isCancelled)
-                .map(JobTriggerDto::id)
-                .collect(Collectors.toSet());
+        final Set<String> newCancelledTriggerIds;
+        try (Stream<JobTriggerDto> triggerStream = dbJobTriggerService.streamAll()) {
+            newCancelledTriggerIds = triggerStream
+                    .filter(JobTriggerDto::isCancelled)
+                    .map(JobTriggerDto::id)
+                    .collect(Collectors.toSet());
+        }
 
         // Force releasing triggers should reset the "is_cancelled" flag to false
         assertThat(newCancelledTriggerIds).isEmpty();
@@ -939,10 +956,13 @@ public class DBJobTriggerServiceTest {
 
         service.updateLockedJobTriggers();
 
-        List<String> updatedJobTriggerIds = service.all().stream()
-                .filter(jobTriggerDto -> newLockTime.equals(jobTriggerDto.lock().lastLockTime()))
-                .map(JobTriggerDto::id)
-                .collect(Collectors.toList());
+        final List<String> updatedJobTriggerIds;
+        try (Stream<JobTriggerDto> triggerStream = service.streamAll()) {
+            updatedJobTriggerIds = triggerStream
+                    .filter(jobTriggerDto -> newLockTime.equals(jobTriggerDto.lock().lastLockTime()))
+                    .map(JobTriggerDto::id)
+                    .collect(Collectors.toList());
+        }
         assertThat(updatedJobTriggerIds).containsOnly("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002");
     }
 
@@ -961,14 +981,14 @@ public class DBJobTriggerServiceTest {
         dbJobTriggerService.create(triggerBuilder
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
-        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+        dbJobTriggerService.deleteByQuery(Filters.empty());
 
         // two unfulfilled constraints
         dbJobTriggerService.create(triggerBuilder
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
-        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+        dbJobTriggerService.deleteByQuery(Filters.empty());
 
         // two fulfilled constraints
         when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER"));
@@ -976,7 +996,7 @@ public class DBJobTriggerServiceTest {
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
-        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+        dbJobTriggerService.deleteByQuery(Filters.empty());
 
         // more capabilities than constraints
         when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER", "ANOTHER_CAPABITILITY"));
@@ -984,7 +1004,7 @@ public class DBJobTriggerServiceTest {
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE"))
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
-        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+        dbJobTriggerService.deleteByQuery(Filters.empty());
 
         // more constraints than capabilities
         when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of("HAS_ARCHIVE", "IS_LEADER"));
@@ -992,7 +1012,7 @@ public class DBJobTriggerServiceTest {
                 .constraints(ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE", "ANOTHER_CONSTRAINT"))
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
-        dbJobTriggerService.deleteByQuery(DBQuery.empty());
+        dbJobTriggerService.deleteByQuery(Filters.empty());
     }
 
     @Test
@@ -1013,13 +1033,13 @@ public class DBJobTriggerServiceTest {
     @MongoDBFixtures("locked-job-triggers.json")
     public void cancelTriggerByQuery() {
         // Must return an empty Optional if the query didn't match any trigger
-        assertThat(dbJobTriggerService.cancelTriggerByQuery(DBQuery.is("foo", "bar"))).isEmpty();
+        assertThat(dbJobTriggerService.cancelTriggerByQuery(Filters.eq("foo", "bar"))).isEmpty();
 
         final JobTriggerDto lockedTrigger = dbJobTriggerService.get("54e3deadbeefdeadbeef0001").orElseThrow(AssertionError::new);
 
         assertThat(lockedTrigger.isCancelled()).isFalse();
 
-        assertThat(dbJobTriggerService.cancelTriggerByQuery(DBQuery.is("_id", "54e3deadbeefdeadbeef0001"))).isPresent();
+        assertThat(dbJobTriggerService.cancelTriggerByQuery(MongoUtils.idEq("54e3deadbeefdeadbeef0001"))).isPresent();
 
         final JobTriggerDto cancelledTrigger = dbJobTriggerService.get(lockedTrigger.id()).orElseThrow(AssertionError::new);
 
