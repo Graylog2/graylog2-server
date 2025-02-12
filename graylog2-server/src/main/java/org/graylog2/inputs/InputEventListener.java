@@ -18,6 +18,7 @@ package org.graylog2.inputs;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import org.graylog2.cluster.leader.LeaderChangedEvent;
 import org.graylog2.cluster.leader.LeaderElectionService;
@@ -41,11 +42,13 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 public class InputEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(InputEventListener.class);
     protected static final int EVENT_QUEUE_POLL_PERIOD_MS = 100;
+    private static final int EVENT_QUEUE_CAPACITY = 100;
     private final InputLauncher inputLauncher;
     private final InputRegistry inputRegistry;
     private final InputService inputService;
@@ -53,8 +56,8 @@ public class InputEventListener {
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
-    private final ScheduledExecutorService daemonScheduler = Executors.newSingleThreadScheduledExecutor();
-    private final LinkedBlockingQueue<QueuedEvent> eventQueue = new LinkedBlockingQueue<>(EVENT_QUEUE_POLL_PERIOD_MS);
+    private final ScheduledExecutorService daemonScheduler;
+    private final LinkedBlockingQueue<QueuedEvent> eventQueue = new LinkedBlockingQueue<>(EVENT_QUEUE_CAPACITY);
 
     private record QueuedEvent(Object receivedEvent) {}
 
@@ -74,11 +77,14 @@ public class InputEventListener {
         this.leaderElectionService = leaderElectionService;
         this.persistedInputs = persistedInputs;
         this.serverStatus = serverStatus;
+
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("input-event-listener-%d").build();
+        this.daemonScheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
+
         initializeEventQueueTask();
         eventBus.register(this);
     }
 
-    // TODO: add shutdown behavior
     private void initializeEventQueueTask() {
         daemonScheduler.scheduleAtFixedRate(() -> {
             try {
