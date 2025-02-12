@@ -78,7 +78,7 @@ public abstract class RuleSource {
     public abstract String simulatorMessage();
 
     public static Builder builder() {
-        return new AutoValue_RuleSource.Builder();
+        return new AutoValue_RuleSource.Builder().scope(DefaultEntityScope.NAME);
     }
 
     public abstract Builder toBuilder();

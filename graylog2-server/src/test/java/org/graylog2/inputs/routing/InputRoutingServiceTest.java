@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.inputs;
+package org.graylog2.inputs.routing;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
@@ -29,6 +29,9 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineUtils;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.inputs.Input;
+import org.graylog2.inputs.InputRoutingService;
+import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
