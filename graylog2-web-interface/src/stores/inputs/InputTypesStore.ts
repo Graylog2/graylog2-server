@@ -20,6 +20,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type { ConfigurationField } from 'components/configurationforms';
 
 type InputTypesActionsType = {
   list: () => Promise<unknown>,
@@ -35,19 +36,6 @@ export const InputTypesActions = singletonActions(
 
 export type InputTypes = {
   [type: string]: string,
-};
-
-export type ConfigurationField = {
-  field_type: 'boolean' | 'text' | 'dropdown' | 'list' | 'number',
-  name: string,
-  human_name: string,
-  description: string,
-  default_value: any,
-  is_optional: boolean,
-  attributes: Array<string>,
-  additional_info: any,
-  position: number,
-  is_encrypted: boolean,
 };
 
 export type InputDescription = {

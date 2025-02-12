@@ -14,20 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useMemo } from 'react';
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
+package org.graylog.plugins.views.search.jobs;
 
-type Props = {
-  text: string,
+public enum SearchJobStatus {
+    RUNNING,
+    DONE,
+    CANCELLATION_REQUESTED,
+    CANCELLED,
+    TIMEOUT,
+    EXPIRED,
+    ERROR,
+    RESET
 }
-
-const Markdown = ({ text }: Props) => {
-  const markdown = useMemo(() => DOMPurify.sanitize(marked(text ?? '', { async: false })), [text]);
-
-  // eslint-disable-next-line react/no-danger
-  return <div dangerouslySetInnerHTML={{ __html: markdown }} />;
-};
-
-export default Markdown;

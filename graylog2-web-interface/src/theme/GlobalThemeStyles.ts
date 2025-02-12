@@ -414,49 +414,6 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     overflow: auto;
   }
 
-  .well.configuration-well {
-    margin-top: 5px;
-    margin-bottom: 0;
-    padding: 9px;
-    font-family: ${theme.fonts.family.monospace};
-    word-wrap: break-word;
-  }
-
-  .well.configuration-well > ul {
-    padding: 0;
-    margin: 0;
-  }
-
-  .well.react-configuration-well {
-    white-space: pre-line;
-  }
-
-  .well.configuration-well .configuration-section {
-    margin-bottom: 10px;
-  }
-
-  .well.configuration-well li:not(:last-child) {
-    margin-bottom: 5px;
-  }
-
-  .well.configuration-well .key {
-    display: inline;
-  }
-
-  .alert-callback .well.configuration-well .key {
-    display: inline-block;
-    min-width: 140px;
-    vertical-align: top;
-  }
-
-  .well.configuration-well .value {
-    display: inline;
-  }
-
-  .alert-callback .well.configuration-well .value {
-    display: inline-block;
-  }
-
   .form-inline label {
     margin-right: 10px;
   }
