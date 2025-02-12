@@ -44,6 +44,9 @@ import java.util.regex.Pattern;
  * It configures the search role for the node if snapshots are enabled and also validates the node search cache size.
  * If there is neither S3 nor local filesystem snapshot configuration, both search role and cache are disabled,
  * preventing unnecessary disk space consumption on the node.
+ *
+ * The search role and cache configuration will be skipped if explicit list of {@code node_roles} is provided in the
+ * configuration, and it doesn't contain the {@code search} role.
  */
 public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
@@ -64,16 +67,26 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     @Override
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
         if (snapshotsAreEnabled()) {
-            validateUsableSpace();
-            return DatanodeConfigurationPart.builder()
-                    .properties(properties())
+            final DatanodeConfigurationPart.Builder builder = DatanodeConfigurationPart.builder();
+
+            final boolean searchRoleEnabled = searchRoleEnabled();
+            if(searchRoleEnabled) {
+                validateUsableSpace();
+                builder.addNodeRole(SEARCH_NODE_ROLE);
+            }
+            return builder
+                    .properties(properties(searchRoleEnabled))
                     .keystoreItems(keystoreItems())
-                    .addNodeRole(SEARCH_NODE_ROLE)
                     .build();
         } else {
             LOG.info("Opensearch snapshots not configured, skipping search role and cache configuration.");
             return DatanodeConfigurationPart.builder().build();
         }
+    }
+
+    private boolean searchRoleEnabled() {
+        final boolean rolesNotConfigured = localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty();
+        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(SEARCH_NODE_ROLE);
     }
 
     private void validateUsableSpace() throws OpensearchConfigurationException {
@@ -126,9 +139,12 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
         return returnValue;
     }
 
-    private Map<String, String> properties() {
+    private Map<String, String> properties(boolean searchRoleEnabled) {
         final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        builder.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
+
+        if(searchRoleEnabled) { // configure cache only if we also have the search role
+            builder.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
+        }
 
         if (isSharedFileSystemRepo()) {
             // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system

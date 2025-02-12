@@ -279,7 +279,7 @@ public class Configuration implements CommonNodeConfiguration {
 
     @Documentation("The list of the opensearch node’s roles.")
     @Parameter(value = "node_roles", converter = StringListConverter.class)
-    private List<String> nodeRoles = List.of("cluster_manager", "data", "ingest", "remote_cluster_client");
+    private List<String> nodeRoles;
 
     @Documentation(visible = false)
     @Parameter(value = "async_eventbus_processors")
