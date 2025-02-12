@@ -58,9 +58,11 @@ const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);
 
 root.render((
-  <TelemetryInit>
-    <LoginQueryClientProvider>
-      <AppFacade />
-    </LoginQueryClientProvider>
-  </TelemetryInit>
+  <React.StrictMode>
+    <TelemetryInit>
+      <LoginQueryClientProvider>
+        <AppFacade />
+      </LoginQueryClientProvider>
+    </TelemetryInit>
+  </React.StrictMode>
 ));
