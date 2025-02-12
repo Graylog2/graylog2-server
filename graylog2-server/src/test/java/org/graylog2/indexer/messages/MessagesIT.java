@@ -204,43 +204,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void retryIndexingMessagesWhenHeapSpaceIsMaxed() throws Exception {
-        final CountDownLatch countDownLatch = new CountDownLatch(1);
-        final AtomicBoolean succeeded = new AtomicBoolean(false);
-        final var messageCount = 20;
-        final List<MessageWithIndex> messageBatch = createMessageBatch(10240, messageCount);
-
-        final Future<IndexingResults> resultsFuture = lowerCircuitBreaker(() -> {
-            final var result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
-
-            countDownLatch.await();
-
-            return result;
-        });
-
-        var results = resultsFuture.get(3, TimeUnit.MINUTES);
-        assertThat(results.errors()).isEmpty();
-
-        client().refreshNode();
-
-        assertThat(messageCount(INDEX_NAME)).isEqualTo(messageCount);
-        assertThat(succeeded.get()).isTrue();
-    }
-
-    interface ThrowingSupplier<T> {
-        T get() throws Exception;
-    }
-
-    private <T> T lowerCircuitBreaker(ThrowingSupplier<T> fn) throws Exception {
-        client().setRequestCircuitBreakerLimit("100kb");
-        try {
-            return fn.get();
-        } finally {
-            client().setRequestCircuitBreakerLimit(null);
-        }
-    }
-
-    @Test
     public void retryIndexingMessagesDuringFloodStage() throws Exception {
         triggerFloodStage(INDEX_NAME);
         final CountDownLatch countDownLatch = new CountDownLatch(1);

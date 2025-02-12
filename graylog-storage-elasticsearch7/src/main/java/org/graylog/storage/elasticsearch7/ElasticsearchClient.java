@@ -40,7 +40,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.ResponseExcept
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.errors.ResponseError;
 import org.graylog2.indexer.BatchSizeTooLargeException;
-import org.graylog2.indexer.CircuitBreakerException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MapperParsingException;
@@ -206,33 +205,10 @@ public class ElasticsearchClient {
             if (isMapperParsingExceptionException(elasticsearchException)) {
                 throw new MapperParsingException(elasticsearchException.getMessage());
             }
-            if (isCircuitBreakerException(elasticsearchException)) {
-                throw new CircuitBreakerException(elasticsearchException.getMessage(), durabilityFrom(elasticsearchException));
-            }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
             throw new BatchSizeTooLargeException(e.getMessage());
         }
         return new ElasticsearchException(errorMessage, e);
-    }
-
-    private CircuitBreakerException.Durability durabilityFrom(ElasticsearchException elasticsearchException) {
-        return Optional.ofNullable(elasticsearchException.getMetadata("es.durability"))
-                .map(durabilities -> durabilities.get(0))
-                .map(durability -> switch (durability) {
-                    case "TRANSIENT" -> CircuitBreakerException.Durability.Transient;
-                    case "PERMANENT" -> CircuitBreakerException.Durability.Permanent;
-                    default -> throw new IllegalStateException("Invalid durability: " + durability);
-                })
-                .orElse(CircuitBreakerException.Durability.Permanent);
-    }
-
-    private boolean isCircuitBreakerException(ElasticsearchException elasticsearchException) {
-        try {
-            final var parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
-            return parsedException.type().equals("circuit_breaking_exception");
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private boolean isInvalidWriteTargetException(ElasticsearchException elasticsearchException) {

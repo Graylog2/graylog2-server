@@ -25,6 +25,7 @@ import java.util.List;
 
 public class ChunkedBulkIndexer {
     private static final Logger LOG = LoggerFactory.getLogger(ChunkedBulkIndexer.class);
+    private static final RetryWait retryWait = new RetryWait(100);
 
     public interface BulkIndex {
         IndexingResults apply(Chunk chunk) throws ChunkedBulkIndexer.EntityTooLargeException, IOException;
@@ -38,23 +39,25 @@ public class ChunkedBulkIndexer {
         int chunkSize = messageList.size();
         int offset = 0;
         IndexingResults.Builder accumulatedResults = IndexingResults.Builder.create();
+        int attempt = 0;
         for (; ; ) {
             try {
                 var results = bulkIndex.apply(new Chunk(messageList, offset, chunkSize));
                 accumulatedResults.addResults(results);
                 return accumulatedResults.build();
             } catch (EntityTooLargeException e) {
-                if (e instanceof TooManyRequestsException) {
-                    LOG.warn("Bulk index failed with 'Too many requests' error. Retrying by splitting up batch size <{}>.", chunkSize);
-                } else {
-                    LOG.warn("Bulk index failed with 'Request Entity Too Large' error. Retrying by splitting up batch size <{}>.", chunkSize);
-                }
+                final var retryForever = e instanceof CircuitBreakerException;
+                LOG.warn("Bulk index failed with '{}' error. Retrying by splitting up batch size <{}>.", e.description(), chunkSize);
                 if (chunkSize == messageList.size()) {
                     LOG.warn("Consider lowering the \"output_batch_size\" setting. Or resizing your Search cluster");
                 }
                 offset += e.indexedSuccessfully;
-                chunkSize /= 2;
+                chunkSize = Math.max(chunkSize / 2, retryForever ? 1 : 0);
                 accumulatedResults.addResults(e.previousResults);
+
+                if (retryForever && chunkSize == 1) {
+                    retryWait.waitBeforeRetrying(attempt++);
+                }
             }
             if (chunkSize == 0) {
                 throw new ElasticsearchException("Bulk index cannot split output batch any further.");
@@ -78,6 +81,10 @@ public class ChunkedBulkIndexer {
         public final int indexedSuccessfully;
         public final IndexingResults previousResults;
 
+        String description() {
+            return "Request Entity Too Large";
+        }
+
         public EntityTooLargeException(int indexedSuccessfully, IndexingResults previousResults) {
             this.indexedSuccessfully = indexedSuccessfully;
             this.previousResults = previousResults;
@@ -85,7 +92,21 @@ public class ChunkedBulkIndexer {
     }
 
     public static class TooManyRequestsException extends EntityTooLargeException {
+        String description() {
+            return "Too many requests";
+        }
+
         public TooManyRequestsException(int indexedSuccessfully, IndexingResults previousResults) {
+            super(indexedSuccessfully, previousResults);
+        }
+    }
+
+    public static class CircuitBreakerException extends EntityTooLargeException {
+        String description() {
+            return "Data too large";
+        }
+
+        public CircuitBreakerException(int indexedSuccessfully, IndexingResults previousResults) {
             super(indexedSuccessfully, previousResults);
         }
     }

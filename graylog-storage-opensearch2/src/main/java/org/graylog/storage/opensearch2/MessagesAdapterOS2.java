@@ -176,6 +176,9 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
                 if (cause.status().equals(RestStatus.REQUEST_ENTITY_TOO_LARGE)) {
                     throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, previousResults);
                 } else if (cause.status().equals(RestStatus.TOO_MANY_REQUESTS)) {
+                    if (cause.getDetailedMessage().contains(CIRCUIT_BREAKING_EXCEPTION)) {
+                        throw new ChunkedBulkIndexer.CircuitBreakerException(indexedSuccessfully, previousResults);
+                    }
                     throw new ChunkedBulkIndexer.TooManyRequestsException(indexedSuccessfully, previousResults);
                 }
             }

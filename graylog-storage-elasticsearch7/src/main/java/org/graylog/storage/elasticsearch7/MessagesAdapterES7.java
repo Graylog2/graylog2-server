@@ -177,6 +177,9 @@ public class MessagesAdapterES7 implements MessagesAdapter {
                     throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, previousResults);
                 }
                 if (cause.status().equals(RestStatus.TOO_MANY_REQUESTS)) {
+                    if (cause.getDetailedMessage().contains(CIRCUIT_BREAKING_EXCEPTION)) {
+                        throw new ChunkedBulkIndexer.CircuitBreakerException(indexedSuccessfully, previousResults);
+                    }
                     throw new ChunkedBulkIndexer.TooManyRequestsException(indexedSuccessfully, previousResults);
                 }
             }
