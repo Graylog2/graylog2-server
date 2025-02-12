@@ -1,0 +1,4 @@
+type = "security"
+message = "Update netty to 4.1.118 to address CVE-2025-24970."
+
+pulls = ["21589"]
