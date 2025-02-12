@@ -22,6 +22,7 @@ import { asMock } from 'helpers/mocking';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import useStreams from 'components/streams/hooks/useStreams';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
+import useStreamsByIndexSet from 'components/inputs/InputSetupWizard/hooks/useStreamsByIndexSet';
 
 import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
 import InputSetupWizard from './Wizard';
@@ -51,6 +52,7 @@ const renderWizard = () => (
 jest.mock('components/streams/hooks/useStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
 jest.mock('components/indices/hooks/useIndexSetsList');
+jest.mock('components/inputs/InputSetupWizard/hooks/useStreamsByIndexSet');
 
 const useStreamsResult = (list = []) => ({
   data: { list: list, pagination: { total: 1 }, attributes: [] },
@@ -58,6 +60,11 @@ const useStreamsResult = (list = []) => ({
   isFetching: false,
   error: undefined,
   refetch: () => {},
+});
+
+const useStreamByIndexSetResult = (data = { total: 0, streams: [] }) => ({
+  data,
+  isLoading: false,
 });
 
 const pipelinesConnectedMock = (response = []) => ({
@@ -143,7 +150,7 @@ const getStreamCreateFormFields = async () => {
     hidden: true,
   });
 
-  const indexSetSelect = await screen.findByLabelText(/Index Set/i);
+  const indexSetSelect = await screen.findByLabelText('Index Set');
 
   const removeMatchesCheckbox = await screen.findByRole('checkbox', {
     name: /Remove matches from/i,
@@ -177,14 +184,19 @@ beforeEach(() => {
 });
 
 describe('InputSetupWizard Setup Routing', () => {
-  it('should render the Setup Routing step', async () => {
-    renderWizard();
+  describe('with existing stream', () => {
+    beforeEach(() => {
+      asMock(useStreamsByIndexSet).mockReturnValue(useStreamByIndexSetResult());
+    });
 
+    it('should render the Setup Routing step', async () => {
+      renderWizard();
     const routingStepText = await screen.findByText(/Select a destination Stream to route messages from this input to./i);
 
-    expect(routingStepText).toBeInTheDocument();
-  });
 
+      expect(routingStepText).toBeInTheDocument();
+    });
+   
   describe('Stream Selection', () => {
     it('should show the stream select when clicking on choose stream', async () => {
       renderWizard();
@@ -273,9 +285,9 @@ describe('InputSetupWizard Setup Routing', () => {
       const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
       await selectEvent.openMenu(streamSelect);
-
       await selectEvent.select(streamSelect, 'Aloho');
     });
+
 
     it('should show a warning if the selected stream has connected pipelines', async () => {
       asMock(useStreams).mockReturnValue(useStreamsResult(
@@ -314,11 +326,21 @@ describe('InputSetupWizard Setup Routing', () => {
       expect(warningPipeline2).toBeInTheDocument();
     });
   });
+});
 
   describe('Stream creation', () => {
-    it('should allow the user to create a new stream', async () => {
-      asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
+    beforeEach(() => {
+      asMock(useStreamsByIndexSet).mockReturnValue(useStreamByIndexSetResult(
+        {
+          total: 2,
+          streams: [
+            { id: 'alohoid', title: 'Aloho', is_editable: true },
+            { id: 'moraid', title: 'Mora', is_editable: true },
+          ],
+        }));
+    });
 
+    it('should allow the user to create a new stream', async () => {
       renderWizard();
 
       const createStreamButton = await screen.findByRole('button', {
@@ -353,9 +375,51 @@ describe('InputSetupWizard Setup Routing', () => {
       ).toBeInTheDocument();
     });
 
-    it('should disable and enable the next step button', async () => {
-      asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
+    it('should show a warning when the user selects the default index set', async () => {
+      renderWizard();
 
+      const createStreamButton = await screen.findByRole('button', {
+        name: /Create Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(createStreamButton);
+
+      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+
+      const { titleInput, descriptionInput, indexSetSelect } = await getStreamCreateFormFields();
+
+      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await selectEvent.openMenu(indexSetSelect);
+      await selectEvent.select(indexSetSelect, 'Default');
+
+      expect(await screen.findByText(/You have selected the Default Index Set./i)).toBeInTheDocument();
+    });
+
+    it('should show a warning when the user selects an index set already associated with other streams', async () => {
+      renderWizard();
+
+      const createStreamButton = await screen.findByRole('button', {
+        name: /Create Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(createStreamButton);
+
+      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+
+      const { titleInput, descriptionInput, indexSetSelect } = await getStreamCreateFormFields();
+
+      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await selectEvent.openMenu(indexSetSelect);
+      await selectEvent.select(indexSetSelect, 'Nox');
+
+      await screen.findByText(/Selected index set already associated with another stream/i);
+    });
+
+    it('should disable and enable the next step button', async () => {
       renderWizard();
 
       const createStreamButton = await screen.findByRole('button', {
@@ -394,8 +458,6 @@ describe('InputSetupWizard Setup Routing', () => {
     });
 
     it('should allow the user to reset the new stream', async () => {
-      asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
-
       renderWizard();
 
       const createStreamButton = await screen.findByRole('button', {
