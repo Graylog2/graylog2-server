@@ -78,9 +78,9 @@ public class InMemorySearchJobService implements SearchJobService {
         final String id = new ObjectId().toHexString();
         final SearchJob searchJob = new SearchJob(id, search, owner, nodeId.getNodeId(), cancelAfterSeconds);
         if (DataWarehouseSearchValidator.containsDataWarehouseSearchElements(search)) {
+            //proper Mongo entry is created in DataWarehouseNativeIcebergTableScanQueryService
             dataLakeSearchJobsCache.put(id, searchJob);
         } else {
-            //proper Mongo entry is created in DataWarehouseNativeIcebergTableScanQueryService
             indexerSearchJobsCache.put(id, searchJob);
         }
         return searchJob;
