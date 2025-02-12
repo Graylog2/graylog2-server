@@ -213,7 +213,7 @@ public class InputRoutingService {
             pipelineSource = pipelineSource.toBuilder()
                     .source(PipelineUtils.createPipelineString(pipelineSource))
                     .build();
-            PipelineUtils.update(pipelineService, pipelineRuleParser, pipelineDao.id(), pipelineSource);
+            PipelineUtils.forceUpdate(pipelineService, pipelineRuleParser, ruleService, pipelineDao.id(), pipelineSource);
         } catch (NotFoundException e) {
             log.warn("Unable to load pipeline {}", GL_INPUT_ROUTING_PIPELINE, e);
         }

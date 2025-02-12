@@ -22,6 +22,9 @@ import jakarta.ws.rs.core.Response;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.database.NotFoundException;
@@ -39,10 +42,28 @@ public class PipelineUtils {
     private PipelineUtils() {
     }
 
+    public static PipelineSource forceUpdate(PipelineService pipelineService,
+                                             PipelineRuleParser pipelineRuleParser,
+                                             RuleService ruleService,
+                                             String id,
+                                             PipelineSource update) throws NotFoundException {
+        return update(pipelineService, pipelineRuleParser, ruleService, id, update, true);
+    }
+
     public static PipelineSource update(PipelineService pipelineService,
                                         PipelineRuleParser pipelineRuleParser,
+                                        RuleService ruleService,
                                         String id,
                                         PipelineSource update) throws NotFoundException {
+        return update(pipelineService, pipelineRuleParser, ruleService, id, update, false);
+    }
+
+    private static PipelineSource update(PipelineService pipelineService,
+                                         PipelineRuleParser pipelineRuleParser,
+                                         RuleService ruleService,
+                                         String id,
+                                         PipelineSource update,
+                                         boolean allowSystemRules) throws NotFoundException {
         final PipelineDao dao = pipelineService.load(id);
         final Pipeline pipeline;
         try {
@@ -50,6 +71,10 @@ public class PipelineUtils {
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
+        if (!allowSystemRules) {
+            checkSystemRules(ruleService, pipeline);
+        }
+
         final PipelineDao toSave = dao.toBuilder()
                 .title(pipeline.name())
                 .description(update.description())
@@ -66,6 +91,25 @@ public class PipelineUtils {
         }
 
         return PipelineSource.fromDao(pipelineRuleParser, savedPipeline);
+    }
+
+    private static void checkSystemRules(RuleService ruleService, Pipeline pipeline) {
+        pipeline.stages().stream()
+                .flatMap(stage -> stage.ruleReferences().stream())
+                .filter(ruleRef -> isSystemRule(ruleService, ruleRef))
+                .findAny()
+                .ifPresent(rule -> {
+                    throw new BadRequestException("System rules cannot be assigned to other pipelines.");
+                });
+    }
+
+    private static boolean isSystemRule(RuleService ruleService, String ruleRef) {
+        try {
+            final RuleDao ruleDao = ruleService.loadByName(ruleRef);
+            return ruleDao.scope().equalsIgnoreCase(SystemPipelineRuleScope.NAME);
+        } catch (NotFoundException e) {
+            return false;
+        }
     }
 
     public static String createPipelineString(PipelineSource pipelineSource) {
