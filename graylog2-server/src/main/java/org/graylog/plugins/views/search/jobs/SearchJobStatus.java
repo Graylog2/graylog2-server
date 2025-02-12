@@ -14,18 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+package org.graylog.plugins.views.search.jobs;
 
-import usePluginEntities from 'hooks/usePluginEntities';
-
-const useIsStreamDataWarehouseEnabled = (streamId: string, enabled: boolean) => {
-  const { fetchStreamDataWarehouseStatus } = usePluginEntities('dataWarehouse')[0] ?? {};
-  const { data: status, isError, isLoading } = useQuery(['data-warehouse-config', streamId, 'enabled'],
-    () => fetchStreamDataWarehouseStatus(streamId),
-    { enabled: fetchStreamDataWarehouseStatus && enabled },
-  );
-
-  return (isLoading || isError) ? undefined : status?.enabled;
-};
-
-export default useIsStreamDataWarehouseEnabled;
+public enum SearchJobStatus {
+    RUNNING,
+    DONE,
+    CANCELLATION_REQUESTED,
+    CANCELLED,
+    TIMEOUT,
+    EXPIRED,
+    ERROR,
+    RESET
+}

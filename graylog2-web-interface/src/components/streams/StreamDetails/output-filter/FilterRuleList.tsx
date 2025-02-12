@@ -102,7 +102,7 @@ const FilterRulesList = ({ streamId, destinationType, paginatedFilters, onPagina
                               </IfPermitted>
              )}>
       <Alert bsStyle="default">
-        Messages which meet the criteria of the following filter rule(s) will not be routed to the  {destinationType === 'indexer' ? 'Index Set' : 'Data Warehouse'}.
+        Messages which meet the criteria of the following filter rule(s) will not be routed to the  {destinationType === 'indexer' ? 'Index Set' : 'Data Lake'}.
       </Alert>
       <PaginatedList totalItems={total}
                      pageSize={DEFAULT_PAGE_SIZES[0]}
