@@ -14,20 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useMemo } from 'react';
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
+package org.graylog2.rest.resources.system.inputs;
 
-type Props = {
-  text: string,
+public record InputRenamedEvent(String inputId, String oldInputTitle, String newInputTitle) {
 }
-
-const Markdown = ({ text }: Props) => {
-  const markdown = useMemo(() => DOMPurify.sanitize(marked(text ?? '', { async: false })), [text]);
-
-  // eslint-disable-next-line react/no-danger
-  return <div dangerouslySetInnerHTML={{ __html: markdown }} />;
-};
-
-export default Markdown;

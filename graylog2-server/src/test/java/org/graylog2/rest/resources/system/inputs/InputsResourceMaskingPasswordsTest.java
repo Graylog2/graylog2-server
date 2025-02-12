@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
@@ -68,7 +69,7 @@ public class InputsResourceMaskingPasswordsTest {
 
     class InputsTestResource extends InputsResource {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
-            super(inputService, mock(InputDiagnosticService.class), messageInputFactory, new Configuration());
+            super(inputService, mock(InputDiagnosticService.class), messageInputFactory, new Configuration(), mock(ClusterEventBus.class));
         }
 
         @Override
