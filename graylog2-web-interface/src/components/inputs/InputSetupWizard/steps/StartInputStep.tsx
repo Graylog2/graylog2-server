@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState, useMemo } from 'react';
-import styled, { css } from 'styled-components';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,26 +31,7 @@ import type { RoutingStepData } from 'components/inputs/InputSetupWizard/steps/S
 import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import ProgressMessage from 'components/inputs/InputSetupWizard/steps/components/ProgressMessage';
 
-const StepCol = styled(Col)(({ theme }) => css`
-  padding-left: ${theme.spacings.lg};
-  padding-right: ${theme.spacings.lg};
-  padding-top: ${theme.spacings.sm};
-`);
-
-const DescriptionCol = styled(Col)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
-`);
-
-const StyledHeading = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
-`);
-
-const ButtonCol = styled(Col)(({ theme }) => css`
-  display: flex;
-  justify-content: flex-end;
-  gap: ${theme.spacings.xs};
-  margin-top: ${theme.spacings.lg};
-`);
+import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading } from './components/StepWrapper'
 
 export type ProcessingSteps = 'createStream' | 'startStream' | 'createPipeline' | 'setupRouting' | 'deleteStream' | 'deletePipeline' | 'deleteRouting' | 'result';
 
@@ -326,52 +306,50 @@ const StartInputStep = () => {
   };
 
   return (
-    <Row>
-      <StepCol md={12}>
-        <Row>
-          <DescriptionCol md={12}>
-            <p>
-              Set up and start the Input according to the configuration made.
-            </p>
-          </DescriptionCol>
-        </Row>
-        <Row>
-          <Col md={12}>
-            {hasBeenStarted && (
-              isRollback ? (
-                <>
-                  <StyledHeading>Rolling back Input...</StyledHeading>
-                  {renderProgressMessages(rollBackMutations)}
-                </>
-              ) : (
-                <>
-                  <StyledHeading>Setting up Input...</StyledHeading>
-                  {renderProgressMessages(stepMutations)}
-                  {startInputStatus && (
-                  <ProgressMessage stepName="result"
-                                   isLoading={false}
-                                   isSuccess={startInputStatus === 'SUCCESS'}
-                                   isError={startInputStatus === 'FAILED'} />
-                  )}
-                </>
-              )
+    <StepWrapper>
+      <Row>
+        <DescriptionCol md={12}>
+          <p>
+            Set up and start the Input according to the configuration made.
+          </p>
+        </DescriptionCol>
+      </Row>
+      <Row>
+        <Col md={12}>
+          {hasBeenStarted && (
+            isRollback ? (
+              <>
+                <StyledHeading>Rolling back Input...</StyledHeading>
+                {renderProgressMessages(rollBackMutations)}
+              </>
+            ) : (
+              <>
+                <StyledHeading>Setting up Input...</StyledHeading>
+                {renderProgressMessages(stepMutations)}
+                {startInputStatus && (
+                <ProgressMessage stepName="result"
+                                  isLoading={false}
+                                  isSuccess={startInputStatus === 'SUCCESS'}
+                                  isError={startInputStatus === 'FAILED'} />
+                )}
+              </>
+            )
 
-            )}
+          )}
 
-            {!hasBeenStarted && !isInputStartable() && (<p>Your Input is not ready to be setup yet. Please complete the previous steps.</p>)}
-          </Col>
-        </Row>
+          {!hasBeenStarted && !isInputStartable() && (<p>Your Input is not ready to be setup yet. Please complete the previous steps.</p>)}
+        </Col>
+      </Row>
 
-        {(hasPreviousStep || hasNextStep) && (
-        <Row>
-          <ButtonCol md={12}>
-            {(hasPreviousStep) && (<Button disabled={isRunning} onClick={handleBackClick}>Back</Button>)}
-            {renderNextButton()}
-          </ButtonCol>
-        </Row>
-        )}
-      </StepCol>
-    </Row>
+      {(hasPreviousStep || hasNextStep) && (
+      <Row>
+        <ButtonCol md={12}>
+          {(hasPreviousStep) && (<Button disabled={isRunning} onClick={handleBackClick}>Back</Button>)}
+          {renderNextButton()}
+        </ButtonCol>
+      </Row>
+      )}
+    </StepWrapper>
   );
 };
 
