@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -206,17 +205,18 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     @Test
     public void retryIndexingMessagesWhenHeapSpaceIsMaxed() throws Exception {
-        lowerCircuitBreaker();
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         final AtomicBoolean succeeded = new AtomicBoolean(false);
         final var messageCount = 20;
         final List<MessageWithIndex> messageBatch = createMessageBatch(10240, messageCount);
 
-        final Future<IndexingResults> resultsFuture = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
+        final Future<IndexingResults> resultsFuture = lowerCircuitBreaker(() -> {
+            final var result = background(() -> this.messages.bulkIndex(messageBatch, createIndexingListener(countDownLatch, succeeded)));
 
-        countDownLatch.await();
+            countDownLatch.await();
 
-        relaxCircuitBreaker();
+            return result;
+        });
 
         var results = resultsFuture.get(3, TimeUnit.MINUTES);
         assertThat(results.errors()).isEmpty();
@@ -227,12 +227,17 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(succeeded.get()).isTrue();
     }
 
-    private void lowerCircuitBreaker() {
-        client().setRequestCircuitBreakerLimit("100kb");
+    interface ThrowingSupplier<T> {
+        T get() throws Exception;
     }
 
-    private void relaxCircuitBreaker() {
-        client().setRequestCircuitBreakerLimit(null);
+    private <T> T lowerCircuitBreaker(ThrowingSupplier<T> fn) throws Exception {
+        client().setRequestCircuitBreakerLimit("100kb");
+        try {
+            return fn.get();
+        } finally {
+            client().setRequestCircuitBreakerLimit(null);
+        }
     }
 
     @Test
@@ -358,10 +363,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().putSetting("cluster.routing.allocation.disk.watermark.low", "85%");
 
         client().resetIndexBlock(index);
-    }
-
-    private Map.Entry<IndexSet, Message> entry(IndexSet indexSet, Message message) {
-        return new AbstractMap.SimpleEntry<>(indexSet, message);
     }
 
     private DateTime now() {
