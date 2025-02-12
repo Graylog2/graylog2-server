@@ -3526,12 +3526,12 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-sticky-el@^1.0.3":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@types/react-sticky-el/-/react-sticky-el-1.0.7.tgz#b3cad755c1aaa319dc13ecf5b2a901d8fc598ff6"
-  integrity sha512-JLWVi2WvSJQ7T3USa18ywQjAnVfPDixwdJx4NhxEXcAnEaiwmCg6TV1uyABTB6hdlxoXUiPTo7sA7DxBSWEfzA==
+"@types/react-sticky-el@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@types/react-sticky-el/-/react-sticky-el-2.1.0.tgz#9f39e57e221983bac5c40255852512c5d25d3f04"
+  integrity sha512-iSZWeRAxWn4kh+X0OhXk2jcwHVbJ39PI7SdPJN7IXf9nXwMuV8nSEZd+8D+I8dDF3Zr3vKmMMJgQPXiNtb7GwA==
   dependencies:
-    "@types/react" "*"
+    react-sticky-el "*"
 
 "@types/react-transition-group@^4.4.0":
   version "4.4.4"
@@ -14172,7 +14172,7 @@ react-sortable-hoc@^1.7.1:
     invariant "^2.2.4"
     prop-types "^15.5.7"
 
-react-sticky-el@^2.0.9:
+react-sticky-el@*, react-sticky-el@^2.0.9:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/react-sticky-el/-/react-sticky-el-2.1.1.tgz#6a142a3f766b2a4b71d0014743142696d80bf01e"
   integrity sha512-likcCH5HN86qQGdOMbvMMJQXJQzelvxuGovFglnBlu8qqgPaee90hO4sws9oSwnsnRPows6Ry7RAd+tazVCS+w==
