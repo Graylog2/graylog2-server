@@ -14,15 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Well as BootstrapWell } from 'react-bootstrap';
+import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-const Well = styled(BootstrapWell)(({ theme }) => css`
+import Alert from './Alert';
+
+type Padding = 'small';
+
+const StyledAlert = styled(Alert)<{ $padding: Padding }>(({ theme, $padding }) => css`
   background-color: ${theme.colors.variant.lightest.default};
   border-color: ${theme.colors.variant.light.default};
-  color: ${theme.colors.variant.darker.default};
+  margin-top: 0;
+  padding: ${$padding === 'small' ? theme.spacings.sm : theme.spacings.md};
+
+  .mantine-Alert-message {
+    color: ${theme.colors.variant.darker.default};
+  }
 `);
+
+type Props = Pick<React.ComponentProps<typeof StyledAlert>, 'children' | 'className' | 'style'> & {
+  bsSize?: Padding,
+};
+// eslint-disable-next-line react/require-default-props
+const Well = (props: Props) => <StyledAlert noIcon $padding={props.bsSize} {...props} />;
 
 /** @component */
 export default Well;

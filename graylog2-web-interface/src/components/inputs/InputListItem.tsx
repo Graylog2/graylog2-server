@@ -287,7 +287,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       <Col md={8}>
         <ConfigurationWell id={input.id}
                            configuration={input.attributes}
-                           typeDefinition={definition || {}} />
+                           typeDefinition={definition} />
         {showStaticFieldForm && (
         <StaticFieldForm input={input}
                          setShowModal={setShowStaticFieldForm} />
