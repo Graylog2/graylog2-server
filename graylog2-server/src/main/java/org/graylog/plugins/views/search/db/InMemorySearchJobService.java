@@ -130,9 +130,9 @@ public class InMemorySearchJobService implements SearchJobService {
             final Optional<Search> search = searchDbService.get(state.identifier().searchId());
             if (hasPermissionToAccessJob(searchUser, state.identifier().owner())) {
                 return Optional.of(SearchJobDTO.fromSearchJobState(state, search));
-            } else {
-                throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
             }
+            throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
+
         }
     }
 
