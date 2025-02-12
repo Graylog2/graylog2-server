@@ -26,6 +26,8 @@ import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchValidator;
+import org.graylog.plugins.views.search.jobs.SearchJobState;
+import org.graylog.plugins.views.search.jobs.SearchJobStateService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog2.plugin.system.NodeId;
@@ -42,16 +44,26 @@ public class InMemorySearchJobService implements SearchJobService {
 
     private final Cache<String, SearchJob> indexerSearchJobsCache;
     private final Cache<String, SearchJob> dataLakeSearchJobsCache;
+    private final SearchJobStateService searchJobStateService;
+
+    private final SearchDbService searchDbService;
     private final NodeId nodeId;
 
     @Inject
-    public InMemorySearchJobService(final NodeId nodeId) {
+    public InMemorySearchJobService(final NodeId nodeId,
+                                    final SearchJobStateService searchJobStateService,
+                                    final SearchDbService searchDbService) {
         this.nodeId = nodeId;
+        this.searchJobStateService = searchJobStateService;
+        this.searchDbService = searchDbService;
         indexerSearchJobsCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .maximumSize(1000)
                 .recordStats()
                 .build();
+        //TODO: for now using existing approach, just with different expiration
+        //There is a potential to avoid this cache at all in Data Lake scenario - status can be loaded from Mongo, cancellation may be reimplemented with SearchJobStatus.CANCELLATION_REQUESTED idea...
+        //That approach could make it possible to even split this service in two separate pieces
         dataLakeSearchJobsCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(4, TimeUnit.HOURS)
                 .maximumSize(1000)
@@ -68,6 +80,7 @@ public class InMemorySearchJobService implements SearchJobService {
         if (DataWarehouseSearchValidator.containsDataWarehouseSearchElements(search)) {
             dataLakeSearchJobsCache.put(id, searchJob);
         } else {
+            //proper Mongo entry is created in DataWarehouseNativeIcebergTableScanQueryService
             indexerSearchJobsCache.put(id, searchJob);
         }
         return searchJob;
@@ -78,8 +91,9 @@ public class InMemorySearchJobService implements SearchJobService {
                                        final SearchUser searchUser) throws ForbiddenException {
         final SearchJob searchJob = getFromCache(id);
         if (searchJob == null) {
-            return Optional.empty();
-        } else if (searchJob.getOwner().equals(searchUser.username()) || searchUser.isAdmin()) {
+            //Data Lake search jobs data are not stored only in memory, they can survive server restart
+            return getFromDB(id, searchUser);
+        } else if (hasPermissionToAccessJob(searchUser, searchJob.getOwner())) {
             if (searchJob.getResultFuture() != null) {
                 try {
                     // force a "conditional join", to catch fast responses without having to poll
@@ -98,12 +112,32 @@ public class InMemorySearchJobService implements SearchJobService {
         final SearchJob searchJob = getFromCache(id);
         if (searchJob == null) {
             return false;
-        } else if (searchJob.getOwner().equals(searchUser.username()) || searchUser.isAdmin()) {
+        } else if (hasPermissionToAccessJob(searchUser, searchJob.getOwner())) {
             searchJob.cancel();
             return true;
         } else {
             throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
         }
+    }
+
+    private Optional<SearchJobDTO> getFromDB(final String id,
+                                             final SearchUser searchUser) {
+        final Optional<SearchJobState> searchJobState = searchJobStateService.get(id);
+        if (searchJobState.isEmpty()) {
+            return Optional.empty();
+        } else {
+            final SearchJobState state = searchJobState.get();
+            final Optional<Search> search = searchDbService.get(state.identifier().searchId());
+            if (hasPermissionToAccessJob(searchUser, state.identifier().owner())) {
+                return Optional.of(SearchJobDTO.fromSearchJobState(state, search));
+            } else {
+                throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
+            }
+        }
+    }
+
+    private boolean hasPermissionToAccessJob(final SearchUser searchUser, final String jobOwner) {
+        return jobOwner.equals(searchUser.username()) || searchUser.isAdmin();
     }
 
     private SearchJob getFromCache(final String id) {

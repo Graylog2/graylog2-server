@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -31,6 +32,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = SearchJobState.Builder.class)
@@ -41,6 +43,7 @@ public abstract class SearchJobState implements MongoEntity {
     public static final String STATUS_FIELD = "status";
     public static final String TYPE_FIELD = "type";
     public static final String RESULT_FIELD = "result";
+    public static final String ERRORS_FIELD = "error_message";
 
     @JsonUnwrapped
     public abstract SearchJobIdentifier identifier();
@@ -51,8 +54,8 @@ public abstract class SearchJobState implements MongoEntity {
     @JsonProperty(TYPE_FIELD)
     public abstract SearchJobType type();
 
-    @JsonProperty("error_message")
-    public abstract String errorMessage();
+    @JsonProperty(ERRORS_FIELD)
+    public abstract Set<SearchError> errors();
 
     @JsonProperty("progress")
     public abstract int progress();
@@ -85,8 +88,8 @@ public abstract class SearchJobState implements MongoEntity {
         @JsonProperty(TYPE_FIELD)
         public abstract Builder type(final SearchJobType type);
 
-        @JsonProperty("error_message")
-        public abstract Builder errorMessage(final String errorMessage);
+        @JsonProperty(ERRORS_FIELD)
+        public abstract Builder errors(final Set<SearchError> errors);
 
         @JsonProperty("progress")
         public abstract Builder progress(final int progress);
@@ -107,7 +110,7 @@ public abstract class SearchJobState implements MongoEntity {
             return new AutoValue_SearchJobState.Builder()
                     .progress(0)
                     .type(SearchJobType.DATA_LAKE)
-                    .errorMessage("");
+                    .errors(Set.of());
         }
     }
 

@@ -20,13 +20,25 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
+import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.errors.SearchError;
+import org.graylog.plugins.views.search.jobs.SearchJobState;
+import org.graylog.plugins.views.search.jobs.SearchJobStatus;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+
+import static org.graylog.plugins.views.search.jobs.SearchJobStatus.CANCELLED;
+import static org.graylog.plugins.views.search.jobs.SearchJobStatus.ERROR;
+import static org.graylog.plugins.views.search.jobs.SearchJobStatus.RUNNING;
+import static org.graylog.plugins.views.search.jobs.SearchJobStatus.TIMEOUT;
 
 @JsonPropertyOrder({"execution", "results"})
 public record SearchJobDTO(
@@ -42,6 +54,36 @@ public record SearchJobDTO(
                 searchJob.getSearchJobIdentifier(),
                 searchJob.getErrors(),
                 searchJob.results(),
+                executionInfo);
+    }
+
+    public static SearchJobDTO fromSearchJobState(final SearchJobState searchJob, final Optional<Search> loadedSearch) {
+        //TODO: bring back when deprecated method in DataWarehouseQueryResource is gone
+//        if (loadedSearch.isEmpty()) {
+//            //TODO: less hardcore error handling?
+//            throw new IllegalStateException("Search Job stored in the database references missing Search");
+//        }
+        final SearchJobStatus status = searchJob.status();
+        final ExecutionInfo executionInfo = new ExecutionInfo(
+                status != RUNNING,
+                status == CANCELLED || status == TIMEOUT,
+                status == ERROR
+        );
+        return new SearchJobDTO(
+                searchJob.identifier(),
+                searchJob.errors(),
+                //TODO: replace hardcoded stuff or ... consider storing top-level element in Mongo
+                Map.of("TBD",
+                        QueryResult.builder()
+                                .query(Query.builder()
+                                        .id("")
+                                        .timerange(EmptyTimeRange.emptyTimeRange())
+                                        .query(ElasticsearchQueryString.empty())
+                                        .filter(null)
+                                        .build())
+                                .searchTypes(Map.of("TBD", searchJob.result()))
+
+                                .build()),
                 executionInfo);
     }
 
