@@ -75,7 +75,7 @@ public class Messages {
                 .retryIfException(t -> ExceptionUtils.hasCauseOf(t, IOException.class)
                         || t instanceof InvalidWriteTargetException
                         || t instanceof MasterNotDiscoveredException
-                        || (t instanceof CircuitBreakerException circuitBreaker && circuitBreaker.getDurability().equals(CircuitBreakerException.Durability.Transient)))
+                        || (t instanceof CircuitBreakerException circuitBreaker && circuitBreaker.isTransient()))
                 .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
                 .withRetryListener(new RetryListener() {
                     @Override

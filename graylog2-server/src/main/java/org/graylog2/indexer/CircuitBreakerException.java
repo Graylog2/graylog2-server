@@ -28,6 +28,10 @@ public class CircuitBreakerException extends ElasticsearchException {
         return durability;
     }
 
+    public boolean isTransient() {
+        return durability == Durability.Transient;
+    }
+
     public CircuitBreakerException(String message, Durability durability) {
         super(message);
         this.durability = durability;
