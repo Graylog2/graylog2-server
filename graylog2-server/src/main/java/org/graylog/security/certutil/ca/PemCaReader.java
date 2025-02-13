@@ -19,9 +19,13 @@ package org.graylog.security.certutil.ca;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.openssl.PEMDecryptorProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.PKCSException;
@@ -77,6 +81,15 @@ public class PemCaReader {
                     var privateKeyInfo = encryptedPrivateKey.decryptPrivateKeyInfo(keyDecryptorBuilder);
                     privateKey = converter.getPrivateKey(privateKeyInfo);
                 } else if (pemObject instanceof PrivateKeyInfo privateKeyInfo) {
+                    privateKey = converter.getPrivateKey(privateKeyInfo);
+                } else if (pemObject instanceof PEMKeyPair pemKeyPair) {
+                    privateKey = converter.getPrivateKey(pemKeyPair.getPrivateKeyInfo());
+                } else if (pemObject instanceof PEMEncryptedKeyPair pemEncryptedKeyPair) {
+                    if (keyPassword == null || keyPassword.isBlank()) {
+                        throw new CACreationException("Private key is encrypted, but no password was supplied!");
+                    }
+                    PEMDecryptorProvider decryptorProvider = new JcePEMDecryptorProviderBuilder().setProvider("BC").build(keyPassword.toCharArray());
+                    final PrivateKeyInfo privateKeyInfo = pemEncryptedKeyPair.decryptKeyPair(decryptorProvider).getPrivateKeyInfo();
                     privateKey = converter.getPrivateKey(privateKeyInfo);
                 }
             }
