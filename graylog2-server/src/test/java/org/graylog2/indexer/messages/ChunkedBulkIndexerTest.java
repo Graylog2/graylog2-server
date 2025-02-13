@@ -17,6 +17,7 @@
 package org.graylog2.indexer.messages;
 
 import com.google.common.base.Strings;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ChunkedBulkIndexerTest {
     private final ChunkedBulkIndexer indexer = new ChunkedBulkIndexer();
@@ -71,6 +73,16 @@ class ChunkedBulkIndexerTest {
         assertThat(result.successes()).hasSize(indexingRequests.size());
     }
 
+    @Test
+    void doesNotRetryPermanentCircuitBreakerExceptions() {
+        final ChunkedBulkIndexer.BulkIndex bulkIndex = chunk -> {
+            throw circuitBreakerException(ChunkedBulkIndexer.CircuitBreakerException.Durability.Permanent);
+        };
+        assertThatThrownBy(() -> indexer.index(indexingRequests, bulkIndex))
+                .isInstanceOf(ElasticsearchException.class)
+                .hasMessageContaining("Bulk index cannot split output batch any further.");
+    }
+
     private IndexingResults success(ChunkedBulkIndexer.Chunk chunk) {
         final var results = chunk.requests.stream()
                 .map(request -> IndexingSuccess.create(request.message(), request.indexSet().getNewestIndex()))
@@ -79,7 +91,11 @@ class ChunkedBulkIndexerTest {
     }
 
     private ChunkedBulkIndexer.CircuitBreakerException circuitBreakerException() {
-        return new ChunkedBulkIndexer.CircuitBreakerException(0, IndexingResults.empty());
+        return circuitBreakerException(ChunkedBulkIndexer.CircuitBreakerException.Durability.Transient);
+    }
+
+    private ChunkedBulkIndexer.CircuitBreakerException circuitBreakerException(ChunkedBulkIndexer.CircuitBreakerException.Durability durability) {
+        return new ChunkedBulkIndexer.CircuitBreakerException(0, IndexingResults.empty(), durability);
     }
 
     private List<IndexingRequest> createMessageBatch(int size, int count) {

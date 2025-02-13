@@ -53,6 +53,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -177,7 +178,7 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
                     throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, previousResults);
                 } else if (cause.status().equals(RestStatus.TOO_MANY_REQUESTS)) {
                     if (cause.getDetailedMessage().contains(CIRCUIT_BREAKING_EXCEPTION)) {
-                        throw new ChunkedBulkIndexer.CircuitBreakerException(indexedSuccessfully, previousResults);
+                        throw new ChunkedBulkIndexer.CircuitBreakerException(indexedSuccessfully, previousResults, durabilityFrom(cause));
                     }
                     throw new ChunkedBulkIndexer.TooManyRequestsException(indexedSuccessfully, previousResults);
                 }
@@ -185,6 +186,17 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
             throw new org.graylog2.indexer.ElasticsearchException(e);
         }
         return result;
+    }
+
+    private ChunkedBulkIndexer.CircuitBreakerException.Durability durabilityFrom(OpenSearchException openSearchException) {
+        return Optional.ofNullable(openSearchException.getMetadata("opensearch.durability"))
+                .map(durabilities -> durabilities.get(0))
+                .map(durability -> switch (durability) {
+                    case "TRANSIENT" -> ChunkedBulkIndexer.CircuitBreakerException.Durability.Transient;
+                    case "PERMANENT" -> ChunkedBulkIndexer.CircuitBreakerException.Durability.Permanent;
+                    default -> throw new IllegalStateException("Invalid durability: " + durability);
+                })
+                .orElse(ChunkedBulkIndexer.CircuitBreakerException.Durability.Permanent);
     }
 
     private BulkRequest createBulkRequest(List<IndexingRequest> chunk) {

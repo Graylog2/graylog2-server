@@ -46,7 +46,7 @@ public class ChunkedBulkIndexer {
                 accumulatedResults.addResults(results);
                 return accumulatedResults.build();
             } catch (EntityTooLargeException e) {
-                final var retryForever = e instanceof CircuitBreakerException;
+                final var retryForever = e instanceof CircuitBreakerException cbe && cbe.isTransient();
                 LOG.warn("Bulk index failed with '{}' error. Retrying by splitting up batch size <{}>.", e.description(), chunkSize);
                 if (chunkSize == messageList.size()) {
                     LOG.warn("Consider lowering the \"output_batch_size\" setting. Or resizing your Search cluster");
@@ -102,12 +102,24 @@ public class ChunkedBulkIndexer {
     }
 
     public static class CircuitBreakerException extends EntityTooLargeException {
+        public enum Durability {
+            Transient,
+            Permanent
+        }
+
+        private final Durability durability;
+
+        private boolean isTransient() {
+            return durability == Durability.Transient;
+        }
+
         String description() {
             return "Data too large";
         }
 
-        public CircuitBreakerException(int indexedSuccessfully, IndexingResults previousResults) {
+        public CircuitBreakerException(int indexedSuccessfully, IndexingResults previousResults, Durability durability) {
             super(indexedSuccessfully, previousResults);
+            this.durability = durability;
         }
     }
 }
