@@ -16,12 +16,15 @@
  */
 package org.graylog.plugins.views.search.jobs;
 
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -29,6 +32,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -227,6 +231,12 @@ public class SearchJobStateServiceTest {
     }
 
     private QueryResult noResult() {
-        return QueryResult.emptyResult();
+        return QueryResult.builder()
+                .searchTypes(Collections.emptyMap())
+                .query(Query.builder()
+                        .id("0000000000000042")
+                        .timerange(KeywordRange.create("last year", "UTC"))
+                        .query(ElasticsearchQueryString.empty())
+                        .build()).build();
     }
 }
