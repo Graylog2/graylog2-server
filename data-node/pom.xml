@@ -548,10 +548,10 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.19.0/10783/linux/x64/tar/dist/opensearch/opensearch-2.19.0-linux-x64.tar.gz
+                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
                             <sha512>
-                                4cd9a597d6e43c0f921c38cbbbcfaf04e9666a28f55b96b79280a0255438b31e1b77041a60589f424604d2b069aa742691c66317409b790ae748b2f8d2996fb6
+                                57af39ad4476441c8c3f5084bab20914b2da8c7161c4286439aac2628361f009aa02c5e1116cc219ca9a7bcbcb86da0676fe864ab1813d0ea2bee05f762eb944
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -572,10 +572,10 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.19.0/10783/linux/arm64/tar/dist/opensearch/opensearch-2.19.0-linux-arm64.tar.gz
+                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
                             <sha512>
-                                d10d7e786c437729130d8a13f62cc9653899ec358ce04e9c6415bd6e5c617e283d286cdfe029aaec0797501117bf2bd53dde2beebf0799e669d484c8bfce4188
+                                17f76b11d41cd495de8d4ddc9bbdf258daaae1a430e46013395cfd62afba9016427b3977275981b7f0c2834bc3ea6dca28d916db6f26ef40d51ff80f7504092a
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -596,12 +596,12 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://ci.opensearch.org/ci/dbc/distribution-build-opensearch/2.19.0/10783/linux/x64/tar/builds/opensearch/core-plugins/repository-s3-2.19.0.zip
+                                https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.version}/repository-s3-${opensearch.version}.zip
                             </url>
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                0e751662037b32653b0c91f5ff3300ebd831178c2f5bbecc8ee562ec5c0ec8b916351e21f7ded714125efdc63be6f8ff414202ed7f7a6d43adc8fa39695fa57c
+                                0da51e6d9eb170ffb21fd643dd50b6534d88c3c79cb20f5f4133c6edee3c5f5ad609aa20d5a771e4a67f8c76db771e5116aa3d18477274a2f2902dbfe5b8fe3e
                             </sha512>
                         </configuration>
                     </execution>
