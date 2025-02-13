@@ -14,19 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.entities;
+package org.graylog.plugins.pipelineprocessor.db;
 
-import org.graylog.plugins.pipelineprocessor.db.SystemPipelineScope;
-import org.graylog2.plugin.PluginModule;
+import org.graylog2.database.entities.EntityScope;
 
-public class ScopedEntitiesModule extends PluginModule {
+public class SystemPipelineScope extends EntityScope {
+    public static final String NAME = "GRAYLOG_SYSTEM_PIPELINE_SCOPE";
+
     @Override
-    protected void configure() {
-
-        addEntityScope(DefaultEntityScope.class);
-        addEntityScope(SystemPipelineScope.class);
-
-        addSystemRestResource(EntityScopeResource.class);
+    public String getName() {
+        return NAME;
     }
 
+    @Override
+    public boolean isMutable() {
+        return false;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return false;
+    }
 }
