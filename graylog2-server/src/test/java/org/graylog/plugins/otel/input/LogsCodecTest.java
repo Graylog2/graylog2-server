@@ -89,7 +89,7 @@ class LogsCodecTest {
         expected.put("resource_attributes_service_name", "my.service");
 
         assertThat(message.getFields()).containsAllEntriesOf(expected);
-        assertThat(message.getSource()).isEqualTo("127.0.0.1:12345");
+        assertThat(message.getSource()).isEqualTo("127.0.0.1");
     }
 
     @Test
@@ -129,7 +129,6 @@ class LogsCodecTest {
                 .containsEntry("resource_attributes_host_name", "example.com")
                 .containsEntry("resource_attributes_service_name", "my.service")
                 .containsEntry("resource_attributes_map_attribute_some_map_key", "some value");
-        assertThat(message.getField("source")).isEqualTo("example.com");
         assertThat(message.getFieldAs(String.class, "message")).isEqualTo(message.getMessage()).isNotNull()
                 .satisfies(value -> {
                     final var parsed = objectMapper.readValue(value, List.class);
@@ -187,13 +186,23 @@ class LogsCodecTest {
     }
 
     @Test
-    void fallbackToClientRemoteAddress() throws IOException {
-        final var decoded = codec.decode(parseFixture("empty_record.json"), DateTime.now(DateTimeZone.UTC),
-                remoteAddress);
-        assertThat(decoded).isNotEmpty();
-        final var message = decoded.get();
+    void testSource() throws IOException {
+        final var address = ResolvableInetSocketAddress.wrap(
+                new InetSocketAddress(Inet4Address.getLoopbackAddress(), 12345));
 
-        assertThat(message.getSource()).isEqualTo("127.0.0.1:12345");
+        var decoded = codec.decode(parseFixture("empty_record.json"), DateTime.now(DateTimeZone.UTC), null);
+        assertThat(decoded).isNotEmpty();
+        assertThat(decoded.get().getSource()).isEqualTo("unknown");
+
+        decoded = codec.decode(parseFixture("empty_record.json"), DateTime.now(DateTimeZone.UTC), address);
+        assertThat(decoded).isNotEmpty();
+        assertThat(decoded.get().getSource()).isEqualTo("127.0.0.1");
+
+        address.reverseLookup();
+
+        decoded = codec.decode(parseFixture("empty_record.json"), DateTime.now(DateTimeZone.UTC), address);
+        assertThat(decoded).isNotEmpty();
+        assertThat(decoded.get().getSource()).isEqualTo("localhost");
     }
 
     private Journal.Log parseFixture(String filename) throws IOException {

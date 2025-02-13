@@ -778,10 +778,6 @@
             <groupId>io.opentelemetry.proto</groupId>
             <artifactId>opentelemetry-proto</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.opentelemetry.semconv</groupId>
-            <artifactId>opentelemetry-semconv-incubating</artifactId>
-        </dependency>
 
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>

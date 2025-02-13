@@ -18,6 +18,7 @@ package org.graylog.plugins.otel.input.codec;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import io.opentelemetry.proto.common.v1.AnyValue;
@@ -26,9 +27,7 @@ import io.opentelemetry.proto.common.v1.InstrumentationScope;
 import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.common.v1.KeyValueList;
 import io.opentelemetry.proto.logs.v1.LogRecord;
-import io.opentelemetry.semconv.incubating.HostIncubatingAttributes;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import org.apache.commons.codec.binary.Hex;
 import org.graylog.plugins.otel.input.Journal;
 import org.graylog2.plugin.Message;
@@ -73,7 +72,7 @@ public class LogsCodec {
         final var logRecord = log.getLogRecord();
 
         final String body = asString("body", logRecord.getBody()).orElse("");
-        final String source = source(log, remoteAddress);
+        final String source = remoteAddress == null ? "unknown" : source(remoteAddress);
         final DateTime timestamp = timestamp(logRecord).orElse(receiveTimestamp);
 
         final Message message = messageFactory.createMessage(body, source, timestamp);
@@ -121,13 +120,11 @@ public class LogsCodec {
         return new DateTime(timeUnixNano / 1_000_000L, DateTimeZone.UTC);
     }
 
-    private @Nullable String source(Journal.Log log, ResolvableInetSocketAddress remoteAddress) {
-        return log.getResource().getAttributesList().stream()
-                .filter(kv -> kv.getKey().equals(HostIncubatingAttributes.HOST_NAME.getKey()))
-                .flatMap(kv -> asString(kv.getKey(), kv.getValue()).stream())
-                .findFirst()
-                .or(() -> Optional.ofNullable(remoteAddress).map(ResolvableInetSocketAddress::toString))
-                .orElse(null);
+    private String source(ResolvableInetSocketAddress remoteAddress) {
+        if (remoteAddress.getHostName() != null) {
+            return remoteAddress.getHostName();
+        }
+        return InetAddresses.toAddrString(remoteAddress.getAddress());
     }
 
     private Stream<Map.Entry<String, ?>> scope(InstrumentationScope scope) {
