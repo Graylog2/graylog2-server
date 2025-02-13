@@ -117,7 +117,11 @@ describe('Unit converter functions', () => {
 
   describe('convertValueToUnit converts value to needed unit', () => {
     it('for time should convert smaller unit (ms) to bigger (d)', () => {
-      const result = convertValueToUnit(86400000, { abbrev: 'ms', unitType: 'time' }, { abbrev: 'd', unitType: 'time' });
+      const result = convertValueToUnit(
+        86400000,
+        { abbrev: 'ms', unitType: 'time' },
+        { abbrev: 'd', unitType: 'time' },
+      );
 
       expect(result).toEqual({
         value: 1,
@@ -155,7 +159,11 @@ describe('Unit converter functions', () => {
     });
 
     it('for size should convert smaller unit (kb) to bigger (Gb)', () => {
-      const result = convertValueToUnit(1000000, { abbrev: 'kb', unitType: 'size' }, { abbrev: 'Gb', unitType: 'size' });
+      const result = convertValueToUnit(
+        1000000,
+        { abbrev: 'kb', unitType: 'size' },
+        { abbrev: 'Gb', unitType: 'size' },
+      );
 
       expect(result).toEqual({
         value: 1,
@@ -196,8 +204,16 @@ describe('Unit converter functions', () => {
       const result1 = convertValueToUnit(50, { abbrev: 'Gb', unitType: 'size' }, undefined);
       const result2 = convertValueToUnit(50, undefined, { abbrev: 'Gb', unitType: 'size' });
       const result3 = convertValueToUnit(null, { abbrev: 'Gb', unitType: 'size' }, { abbrev: 'kb', unitType: 'size' });
-      const result4 = convertValueToUnit(50, { abbrev: 'Gb', unitType: 'size' }, { abbrev: undefined, unitType: 'size' });
-      const result5 = convertValueToUnit(50, { abbrev: undefined, unitType: 'size' }, { abbrev: undefined, unitType: 'size' });
+      const result4 = convertValueToUnit(
+        50,
+        { abbrev: 'Gb', unitType: 'size' },
+        { abbrev: undefined, unitType: 'size' },
+      );
+      const result5 = convertValueToUnit(
+        50,
+        { abbrev: undefined, unitType: 'size' },
+        { abbrev: undefined, unitType: 'size' },
+      );
 
       expect(result1).toEqual({ value: null, unit: null });
       expect(result2).toEqual({ value: null, unit: null });

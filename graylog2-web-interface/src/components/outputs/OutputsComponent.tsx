@@ -35,9 +35,9 @@ import CreateOutputDropdown from './CreateOutputDropdown';
 import AssignOutputDropdown from './AssignOutputDropdown';
 
 type Props = {
-  streamId?: string,
-  permissions: Immutable.List<string>,
-}
+  streamId?: string;
+  permissions: Immutable.List<string>;
+};
 
 const OutputsComponent = ({ streamId, permissions }: Props) => {
   const location = useLocation();
@@ -162,36 +162,33 @@ const OutputsComponent = ({ streamId, permissions }: Props) => {
   };
 
   if (outputs && types && (!streamId || assignableOutputs)) {
-    const createOutputDropdown = (isPermitted(permissions, ['outputs:create'])
-      ? (
-        <CreateOutputDropdown types={types}
-                              onSubmit={_handleCreateOutput}
-                              getTypeDefinition={OutputsStore.loadAvailable} />
-      ) : null);
-    const assignOutputDropdown = (streamId
-      ? (
-        <AssignOutputDropdown outputs={assignableOutputs}
-                              onSubmit={_handleAssignOutput} />
-      ) : null);
+    const createOutputDropdown = isPermitted(permissions, ['outputs:create']) ? (
+      <CreateOutputDropdown
+        types={types}
+        onSubmit={_handleCreateOutput}
+        getTypeDefinition={OutputsStore.loadAvailable}
+      />
+    ) : null;
+    const assignOutputDropdown = streamId ? (
+      <AssignOutputDropdown outputs={assignableOutputs} onSubmit={_handleAssignOutput} />
+    ) : null;
 
     return (
       <div className="outputs">
         <Row className="content">
-          <Col md={4}>
-            {createOutputDropdown}
-          </Col>
-          <Col md={8}>
-            {assignOutputDropdown}
-          </Col>
+          <Col md={4}>{createOutputDropdown}</Col>
+          <Col md={8}>{assignOutputDropdown}</Col>
         </Row>
 
-        <OutputList streamId={streamId}
-                    outputs={outputs}
-                    getTypeDefinition={OutputsStore.loadAvailable}
-                    types={types}
-                    onRemove={_removeOutputFromStream}
-                    onTerminate={_removeOutputGlobally}
-                    onUpdate={_handleOutputUpdate} />
+        <OutputList
+          streamId={streamId}
+          outputs={outputs}
+          getTypeDefinition={OutputsStore.loadAvailable}
+          types={types}
+          onRemove={_removeOutputFromStream}
+          onTerminate={_removeOutputGlobally}
+          onUpdate={_handleOutputUpdate}
+        />
       </div>
     );
   }

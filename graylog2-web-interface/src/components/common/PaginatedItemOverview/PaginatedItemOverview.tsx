@@ -33,28 +33,28 @@ export type DescriptiveItem = {
 };
 
 export type PaginatedListType = {
-  list: Immutable.List<DescriptiveItem>,
-  pagination: ListPagination,
+  list: Immutable.List<DescriptiveItem>;
+  pagination: ListPagination;
 };
 
 export type ResultsWrapperComponentProps = {
-  isEmptyResult: boolean,
-  children: React.ReactNode,
+  isEmptyResult: boolean;
+  children: React.ReactNode;
 };
 
 export type OverrideItemComponentProps = {
-  item: DescriptiveItem,
-  onDeleteItem: (item: DescriptiveItem) => void,
+  item: DescriptiveItem;
+  onDeleteItem: (item: DescriptiveItem) => void;
 };
 
 type Props = {
-  noDataText?: string,
-  onLoad: (pagination: Pagination, isSubscribed: boolean) => Promise<PaginatedListType>,
-  overrideList?: PaginatedListType,
-  onDeleteItem?: (descriptiveItem: DescriptiveItem) => void,
-  queryHelper?: React.ReactNode,
-  resultsWrapperComponent?: React.ComponentType<ResultsWrapperComponentProps>,
-  overrideItemComponent?: React.ComponentType<OverrideItemComponentProps>,
+  noDataText?: string;
+  onLoad: (pagination: Pagination, isSubscribed: boolean) => Promise<PaginatedListType>;
+  overrideList?: PaginatedListType;
+  onDeleteItem?: (descriptiveItem: DescriptiveItem) => void;
+  queryHelper?: React.ReactNode;
+  resultsWrapperComponent?: React.ComponentType<ResultsWrapperComponentProps>;
+  overrideItemComponent?: React.ComponentType<OverrideItemComponentProps>;
 };
 
 const pageSizes = [5, 10, 30];
@@ -82,7 +82,9 @@ const PaginatedItemOverview = ({
       }
     });
 
-    return () => { isSubscribed = false; };
+    return () => {
+      isSubscribed = false;
+    };
   }, [pagination, onLoad]);
 
   if (!paginatedList) {
@@ -103,21 +105,23 @@ const PaginatedItemOverview = ({
   }
 
   return (
-    <PaginatedList onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
-                   pageSize={pagination.perPage}
-                   totalItems={paginatedList?.pagination?.total ?? 0}
-                   pageSizes={pageSizes}
-                   activePage={pagination.page}
-                   useQueryParameter={false}>
-      <SearchForm onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
-                  label="Filter"
-                  queryWidth={300}
-                  wrapperClass="has-bm"
-                  placeholder="Enter query to filter"
-                  queryHelpComponent={queryHelper} />
-      <ResultsWrapperComponent isEmptyResult={!itemList}>
-        {itemList ?? emptyResult}
-      </ResultsWrapperComponent>
+    <PaginatedList
+      onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
+      pageSize={pagination.perPage}
+      totalItems={paginatedList?.pagination?.total ?? 0}
+      pageSizes={pageSizes}
+      activePage={pagination.page}
+      useQueryParameter={false}
+    >
+      <SearchForm
+        onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
+        label="Filter"
+        queryWidth={300}
+        wrapperClass="has-bm"
+        placeholder="Enter query to filter"
+        queryHelpComponent={queryHelper}
+      />
+      <ResultsWrapperComponent isEmptyResult={!itemList}>{itemList ?? emptyResult}</ResultsWrapperComponent>
     </PaginatedList>
   );
 };

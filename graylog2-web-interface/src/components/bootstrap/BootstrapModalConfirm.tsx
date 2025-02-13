@@ -22,14 +22,14 @@ import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  showModal: boolean,
-  title: string | React.ReactNode,
-  confirmButtonText?: string
-  cancelButtonDisabled?: boolean
-  confirmButtonDisabled?: boolean
-  onConfirm: (e: React.BaseSyntheticEvent) => void,
-  onCancel: () => void,
-  children: React.ReactNode,
+  showModal: boolean;
+  title: string | React.ReactNode;
+  confirmButtonText?: string;
+  cancelButtonDisabled?: boolean;
+  confirmButtonDisabled?: boolean;
+  onConfirm: (e: React.BaseSyntheticEvent) => void;
+  onCancel: () => void;
+  children: React.ReactNode;
 };
 
 /**
@@ -47,25 +47,22 @@ const BootstrapModalConfirm = ({
   onConfirm,
   ...restProps
 }: Props) => (
-  <BootstrapModalWrapper showModal={showModal}
-                         onHide={onCancel}
-                         role="alertdialog"
-                         {...restProps}>
+  <BootstrapModalWrapper showModal={showModal} onHide={onCancel} role="alertdialog" {...restProps}>
     <Modal.Header closeButton>
       <Modal.Title>{title}</Modal.Title>
     </Modal.Header>
 
-    <Modal.Body>
-      {children}
-    </Modal.Body>
+    <Modal.Body>{children}</Modal.Body>
 
     <Modal.Footer>
-      <ModalSubmit disabledCancel={cancelButtonDisabled}
-                   disabledSubmit={confirmButtonDisabled}
-                   onCancel={onCancel}
-                   onSubmit={onConfirm}
-                   submitButtonText={confirmButtonText}
-                   submitButtonType="button" />
+      <ModalSubmit
+        disabledCancel={cancelButtonDisabled}
+        disabledSubmit={confirmButtonDisabled}
+        onCancel={onCancel}
+        onSubmit={onConfirm}
+        submitButtonText={confirmButtonText}
+        submitButtonType="button"
+      />
     </Modal.Footer>
   </BootstrapModalWrapper>
 );

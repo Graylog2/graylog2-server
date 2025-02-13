@@ -67,7 +67,9 @@ const CreateInputControl = () => {
 
       options = inputTypesIds.map((id) => ({ value: id, label: inputTypes[id] }));
 
-      options.sort((inputTypeA, inputTypeB) => inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()));
+      options.sort((inputTypeA, inputTypeB) =>
+        inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()),
+      );
     } else {
       options.push({ value: 'none', label: 'No inputs available', disabled: true });
     }
@@ -88,7 +90,9 @@ const CreateInputControl = () => {
       event_details: { value: selected },
     });
 
-    InputTypesActions.get.triggerPromise(selected).then((inputDefinition: InputDescription) => setSelectedInputDefinition(inputDefinition));
+    InputTypesActions.get
+      .triggerPromise(selected)
+      .then((inputDefinition: InputDescription) => setSelectedInputDefinition(inputDefinition));
   };
 
   const onCustomInputClose = () => {
@@ -98,8 +102,9 @@ const CreateInputControl = () => {
   const handleInputTypeSubmit = (event) => {
     event.preventDefault();
 
-    const customConfiguration = PluginStore.exports('inputConfiguration')
-      .find((inputConfig) => inputConfig.type === selectedInput);
+    const customConfiguration = PluginStore.exports('inputConfiguration').find(
+      (inputConfig) => inputConfig.type === selectedInput,
+    );
 
     setCustomInputConfiguration(customConfiguration);
 
@@ -131,36 +136,43 @@ const CreateInputControl = () => {
       <Col md={12}>
         <StyledForm className="form-inline" onSubmit={handleInputTypeSubmit}>
           <FormGroup>
-            <Select placeholder="Select input"
-                    options={formatSelectOptions()}
-                    matchProp="label"
-                    onChange={onInputSelect}
-                    value={selectedInput} />
+            <Select
+              placeholder="Select input"
+              options={formatSelectOptions()}
+              matchProp="label"
+              onChange={onInputSelect}
+              value={selectedInput}
+            />
           </FormGroup>
-            &nbsp;
-          <Button bsStyle="success" type="submit" disabled={!selectedInput}>Launch new input</Button>
-          <ExternalLinkButton href="https://marketplace.graylog.org/"
-                              bsStyle="info"
-                              onClick={handleMarketplaceClick}>
+          &nbsp;
+          <Button bsStyle="success" type="submit" disabled={!selectedInput}>
+            Launch new input
+          </Button>
+          <ExternalLinkButton href="https://marketplace.graylog.org/" bsStyle="info" onClick={handleMarketplaceClick}>
             Find more inputs
           </ExternalLinkButton>
         </StyledForm>
-        {selectedInputDefinition && (
-          customInputConfiguration ? (
+        {selectedInputDefinition &&
+          (customInputConfiguration ? (
             <CustomInputsConfiguration onClose={onCustomInputClose} />
           ) : (
             showConfigurationForm && (
-            <InputForm key="configuration-form-input"
-                       setShowModal={setShowConfigurationForm}
-                       configFields={selectedInputDefinition.requested_configuration}
-                       title={<span>Launch new <em>{inputTypes[selectedInput] ?? ''}</em> input</span>}
-                       submitButtonText="Launch Input"
-                       helpBlock="Select a name of your new input that describes it."
-                       typeName={selectedInput}
-                       handleSubmit={createInput} />
+              <InputForm
+                key="configuration-form-input"
+                setShowModal={setShowConfigurationForm}
+                configFields={selectedInputDefinition.requested_configuration}
+                title={
+                  <span>
+                    Launch new <em>{inputTypes[selectedInput] ?? ''}</em> input
+                  </span>
+                }
+                submitButtonText="Launch Input"
+                helpBlock="Select a name of your new input that describes it."
+                typeName={selectedInput}
+                handleSubmit={createInput}
+              />
             )
-          )
-        )}
+          ))}
       </Col>
     </Row>
   );

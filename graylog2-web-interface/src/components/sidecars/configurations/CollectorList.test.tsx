@@ -74,16 +74,18 @@ const collectors: Array<Collector> = [
 ];
 
 const SUT = (props: Partial<React.ComponentProps<typeof CollectorList>>) => (
-  <CollectorList collectors={collectors}
-                 onClone={jest.fn()}
-                 onDelete={jest.fn()}
-                 onPageChange={jest.fn()}
-                 onQueryChange={jest.fn()}
-                 validateCollector={jest.fn()}
-                 pagination={{ page: 1, pageSize: 10, total: 1 }}
-                 query=""
-                 total={collectors.length}
-                 {...props} />
+  <CollectorList
+    collectors={collectors}
+    onClone={jest.fn()}
+    onDelete={jest.fn()}
+    onPageChange={jest.fn()}
+    onQueryChange={jest.fn()}
+    validateCollector={jest.fn()}
+    pagination={{ page: 1, pageSize: 10, total: 1 }}
+    query=""
+    total={collectors.length}
+    {...props}
+  />
 );
 
 describe('CollectorList', () => {

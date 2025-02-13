@@ -42,7 +42,8 @@ const hotspots = [
   {
     positionX: '70%',
     positionY: '1450px',
-    description: 'Determine if there is an unusual pattern in DNS query results like a particular error code suddenly showing up in the Top 15 list. ',
+    description:
+      'Determine if there is an unusual pattern in DNS query results like a particular error code suddenly showing up in the Top 15 list. ',
   },
   {
     positionX: '40%',

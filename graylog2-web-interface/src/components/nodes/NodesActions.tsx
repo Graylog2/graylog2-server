@@ -31,14 +31,21 @@ type NodesActionsProps = {
   systemOverview: any;
 };
 
-class NodesActions extends React.Component<NodesActionsProps, {
-  [key: string]: any;
-}> {
+class NodesActions extends React.Component<
+  NodesActionsProps,
+  {
+    [key: string]: any;
+  }
+> {
   _toggleMessageProcessing = () => {
     const { systemOverview, node } = this.props;
 
     // eslint-disable-next-line no-alert
-    if (window.confirm(`You are about to ${systemOverview.is_processing ? 'pause' : 'resume'} message processing in this node. Are you sure?`)) {
+    if (
+      window.confirm(
+        `You are about to ${systemOverview.is_processing ? 'pause' : 'resume'} message processing in this node. Are you sure?`,
+      )
+    ) {
       if (systemOverview.is_processing) {
         SystemProcessingStore.pause(node.node_id);
       } else {
@@ -69,9 +76,7 @@ class NodesActions extends React.Component<NodesActionsProps, {
           <Button>Metrics</Button>
         </LinkContainer>
 
-        <ExternalLinkButton href={apiBrowserURI}>
-          API browser
-        </ExternalLinkButton>
+        <ExternalLinkButton href={apiBrowserURI}>API browser</ExternalLinkButton>
 
         <DropdownButton title="More actions" id={`more-actions-dropdown-${node.node_id}`} pullRight>
           <IfPermitted permissions="processing:changestate">

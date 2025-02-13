@@ -24,39 +24,43 @@ import ExpandedSection from 'components/events/ExpandedSection';
 import BulkActions from 'components/events/events/BulkActions';
 import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
-const useTableElements = ({ defaultLayout }: {
-  defaultLayout: DefaultLayout,
-}) => {
-  const entityActions = useCallback((event: Event) => (
-    <EventActions event={event} />
-  ), []);
+const useTableElements = ({ defaultLayout }: { defaultLayout: DefaultLayout }) => {
+  const entityActions = useCallback((event: Event) => <EventActions event={event} />, []);
 
-  const renderExpandedRules = useCallback((event: Event) => (
-    <ExpandedSection defaultLayout={defaultLayout} event={event} />
-  ), [defaultLayout]);
+  const renderExpandedRules = useCallback(
+    (event: Event) => <ExpandedSection defaultLayout={defaultLayout} event={event} />,
+    [defaultLayout],
+  );
 
-  const expandedSections = useMemo(() => ({
-    restFieldsExpandedSection: {
-      title: 'Details',
-      content: renderExpandedRules,
-    },
-  }), [renderExpandedRules]);
+  const expandedSections = useMemo(
+    () => ({
+      restFieldsExpandedSection: {
+        title: 'Details',
+        content: renderExpandedRules,
+      },
+    }),
+    [renderExpandedRules],
+  );
 
-  const [selectedEntitiesData, setSelectedEntitiesData] = useState<{[eventId: string]: Event}>({});
-  const bulkSelection = useMemo(() => ({
-    onChangeSelection: (selectedItemsIds: Array<string>, list: Array<Event>) => {
-      setSelectedEntitiesData((cur) => {
-        const selectedItemsIdsSet = new Set(selectedItemsIds);
-        const filtratedCurrentItems: {[eventId: string]: Event} = pickBy(cur, (_, eventId) => selectedItemsIdsSet.has(eventId));
-        const filtratedCurrentEntries = list.filter(({ id }) => selectedItemsIdsSet.has(id));
-        const listOfCurrentEntries: {[eventId: string]: Event} = keyBy(filtratedCurrentEntries, 'id');
+  const [selectedEntitiesData, setSelectedEntitiesData] = useState<{ [eventId: string]: Event }>({});
+  const bulkSelection = useMemo(
+    () => ({
+      onChangeSelection: (selectedItemsIds: Array<string>, list: Array<Event>) => {
+        setSelectedEntitiesData((cur) => {
+          const selectedItemsIdsSet = new Set(selectedItemsIds);
+          const filtratedCurrentItems: { [eventId: string]: Event } = pickBy(cur, (_, eventId) =>
+            selectedItemsIdsSet.has(eventId),
+          );
+          const filtratedCurrentEntries = list.filter(({ id }) => selectedItemsIdsSet.has(id));
+          const listOfCurrentEntries: { [eventId: string]: Event } = keyBy(filtratedCurrentEntries, 'id');
 
-        return ({ ...filtratedCurrentItems, ...listOfCurrentEntries });
-      });
-    },
-    actions: <BulkActions selectedEntitiesData={selectedEntitiesData} />,
-
-  }), [selectedEntitiesData]);
+          return { ...filtratedCurrentItems, ...listOfCurrentEntries };
+        });
+      },
+      actions: <BulkActions selectedEntitiesData={selectedEntitiesData} />,
+    }),
+    [selectedEntitiesData],
+  );
 
   return {
     entityActions,

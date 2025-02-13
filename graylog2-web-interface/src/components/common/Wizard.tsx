@@ -23,16 +23,20 @@ import type { SelectCallback } from 'components/bootstrap/types';
 
 import Icon from './Icon';
 
-const SubnavigationCol = styled(Col)(({ theme }) => css`
-  border-right: ${theme.colors.gray[80]} solid 1px;
-`);
+const SubnavigationCol = styled(Col)(
+  ({ theme }) => css`
+    border-right: ${theme.colors.gray[80]} solid 1px;
+  `,
+);
 
 const HorizontalCol = styled(Col)`
   margin-bottom: 15px;
 `;
 
-const StyledNav: React.ComponentType<any> = styled(Nav)<{$style?: 'stepper'}>(({ $style, theme }) => css`
-  ${$style === 'stepper' ? `
+const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
+  ({ $style, theme }) => css`
+    ${$style === 'stepper'
+      ? `
   &.nav {
    counter-reset: line-number;
     > li {
@@ -138,7 +142,8 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{$style?: 'stepper'}>(({
       }
     } 
   }
-  ` : `&.nav {
+  `
+      : `&.nav {
     > li {
       border: 1px solid ${theme.colors.variant.lighter.default};
       border-left: 0;
@@ -230,7 +235,8 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{$style?: 'stepper'}>(({
       }
     }
   }`}
-`);
+  `,
+);
 
 const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
@@ -258,27 +264,27 @@ const warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: 
 export type StepKey = number | string;
 
 export type StepType = {
-  key: StepKey,
-  title: React.ReactNode,
-  component: React.ReactElement,
-  disabled?: boolean,
+  key: StepKey;
+  title: React.ReactNode;
+  component: React.ReactElement;
+  disabled?: boolean;
 };
 
 export type StepsType = Array<StepType>;
 type Props = {
-  steps: StepsType,
-  activeStep: StepKey | null | undefined,
-  onStepChange: (StepKey) => void,
-  children: React.ReactNode,
-  horizontal: boolean,
-  justified: boolean,
-  containerClassName: string,
-  hidePreviousNextButtons: boolean,
-  style: 'stepper' | undefined,
+  steps: StepsType;
+  activeStep: StepKey | null | undefined;
+  onStepChange: (StepKey) => void;
+  children: React.ReactNode;
+  horizontal: boolean;
+  justified: boolean;
+  containerClassName: string;
+  hidePreviousNextButtons: boolean;
+  style: 'stepper' | undefined;
 };
 
 type State = {
-  selectedStep: StepKey,
+  selectedStep: StepKey;
 };
 
 /**
@@ -319,7 +325,7 @@ class Wizard extends React.Component<Props, State> {
     const { activeStep, steps } = this.props;
     const { selectedStep } = this.state;
 
-    return (isValidActiveStep(activeStep, steps) ? activeStep : selectedStep);
+    return isValidActiveStep(activeStep, steps) ? activeStep : selectedStep;
   };
 
   _wizardChanged = (eventKey: StepKey) => {
@@ -337,10 +343,10 @@ class Wizard extends React.Component<Props, State> {
     const { steps } = this.props;
     const selectedStep = this._getSelectedStep();
     const len = steps.length;
-    const disabledPosition = direction === 'next' ? (len - 1) : 0;
+    const disabledPosition = direction === 'next' ? len - 1 : 0;
     const currentPosition = steps.findIndex((step) => step.key === this._getSelectedStep());
-    const otherPosition = direction === 'next' ? (currentPosition + 1) : (currentPosition - 1);
-    const otherStep = (steps[otherPosition]);
+    const otherPosition = direction === 'next' ? currentPosition + 1 : currentPosition - 1;
+    const otherStep = steps[otherPosition];
 
     return steps[disabledPosition].key === selectedStep || otherStep?.disabled;
   };
@@ -370,14 +376,18 @@ class Wizard extends React.Component<Props, State> {
 
     return (
       <SubnavigationCol md={2}>
-        <StyledNav stacked
-                   bsStyle="pills"
-                   $style={style}
-                   activeKey={selectedStep}
-                   onSelect={this._wizardChanged as SelectCallback}
-                   justified={justified}>
+        <StyledNav
+          stacked
+          bsStyle="pills"
+          $style={style}
+          activeKey={selectedStep}
+          onSelect={this._wizardChanged as SelectCallback}
+          justified={justified}
+        >
           {steps.map((navItem) => (
-            <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
+            <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>
+              {navItem.title}
+            </NavItem>
           ))}
         </StyledNav>
         {!hidePreviousNextButtons && (
@@ -385,17 +395,18 @@ class Wizard extends React.Component<Props, State> {
             <br />
             <Row>
               <Col xs={6}>
-                <Button onClick={this._onPrevious}
-                        bsSize="small"
-                        bsStyle="info"
-                        disabled={this._disableButton('previous')}>Previous
+                <Button
+                  onClick={this._onPrevious}
+                  bsSize="small"
+                  bsStyle="info"
+                  disabled={this._disableButton('previous')}
+                >
+                  Previous
                 </Button>
               </Col>
               <Col className="text-right" xs={6}>
-                <Button onClick={this._onNext}
-                        bsSize="small"
-                        bsStyle="info"
-                        disabled={this._disableButton('next')}>Next
+                <Button onClick={this._onNext} bsSize="small" bsStyle="info" disabled={this._disableButton('next')}>
+                  Next
                 </Button>
               </Col>
             </Row>
@@ -414,30 +425,39 @@ class Wizard extends React.Component<Props, State> {
         {!hidePreviousNextButtons && (
           <div className="pull-right">
             <HorizontalButtonToolbar>
-              <Button onClick={this._onPrevious}
-                      aria-label="Previous"
-                      bsSize="xsmall"
-                      bsStyle="info"
-                      disabled={this._disableButton('previous')}>
+              <Button
+                onClick={this._onPrevious}
+                aria-label="Previous"
+                bsSize="xsmall"
+                bsStyle="info"
+                disabled={this._disableButton('previous')}
+              >
                 <Icon name="arrow_left" />
               </Button>
-              <Button onClick={this._onNext}
-                      aria-label="Next"
-                      bsSize="xsmall"
-                      bsStyle="info"
-                      disabled={this._disableButton('next')}>
+              <Button
+                onClick={this._onNext}
+                aria-label="Next"
+                bsSize="xsmall"
+                bsStyle="info"
+                disabled={this._disableButton('next')}
+              >
                 <Icon name="arrow_right" />
               </Button>
             </HorizontalButtonToolbar>
           </div>
         )}
-        <StyledNav bsStyle="pills"
-                   activeKey={selectedStep}
-                   $style={style}
-                   onSelect={this._wizardChanged as SelectCallback}
-                   justified={justified}>
+        <StyledNav
+          bsStyle="pills"
+          activeKey={selectedStep}
+          $style={style}
+          onSelect={this._wizardChanged as SelectCallback}
+          justified={justified}
+        >
           {steps.map((navItem) => (
-            <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>))}
+            <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>
+              {navItem.title}
+            </NavItem>
+          ))}
         </StyledNav>
       </HorizontalCol>
     );
@@ -458,14 +478,8 @@ class Wizard extends React.Component<Props, State> {
     return (
       <Row className={containerClassName}>
         {horizontal ? this._renderHorizontalStepNav() : this._renderVerticalStepNav()}
-        <Col md={leftComponentCols}>
-          {steps[this._getSelectedIndex()].component}
-        </Col>
-        {children && (
-          <Col md={rightComponentCols}>
-            {children}
-          </Col>
-        )}
+        <Col md={leftComponentCols}>{steps[this._getSelectedIndex()].component}</Col>
+        {children && <Col md={rightComponentCols}>{children}</Col>}
       </Row>
     );
   }

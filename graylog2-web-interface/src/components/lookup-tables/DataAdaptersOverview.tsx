@@ -18,13 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Row, Col, Table } from 'components/bootstrap';
-import {
-  PaginatedList,
-  SearchForm,
-  Spinner,
-  NoSearchResult,
-  NoEntitiesExist,
-} from 'components/common';
+import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
@@ -41,31 +35,40 @@ const ScrollContainer = styled.div`
 const queryExamples = (
   <>
     <p>
-      Find data adapters by parts of their names:<br />
-      <kbd>name:geoip</kbd><br />
+      Find data adapters by parts of their names:
+      <br />
+      <kbd>name:geoip</kbd>
+      <br />
       <kbd>name:geo</kbd>
     </p>
     <p>
-      Searching without a field name matches against the <code>title</code> field:<br />
-      <kbd>geoip</kbd> <br />is the same as<br />
+      Searching without a field name matches against the <code>title</code> field:
+      <br />
+      <kbd>geoip</kbd> <br />
+      is the same as
+      <br />
       <kbd>title:geoip</kbd>
     </p>
   </>
 );
 
 const queryHelpComponent = (
-  <QueryHelper entityName="data adapter"
-               commonFields={['id', 'title', 'name', 'description']}
-               example={queryExamples} />
+  <QueryHelper
+    entityName="data adapter"
+    commonFields={['id', 'title', 'name', 'description']}
+    example={queryExamples}
+  />
 );
 
 const NoResults = ({ query }: { query: string }) => (
   <tbody>
     <tr>
       <td colSpan={5}>
-        {query
-          ? <NoSearchResult>No data adapters found with title &quot;{query}&quot;</NoSearchResult>
-          : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
+        {query ? (
+          <NoSearchResult>No data adapters found with title &quot;{query}&quot;</NoSearchResult>
+        ) : (
+          <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>
+        )}
       </td>
     </tr>
   </tbody>
@@ -76,27 +79,25 @@ const DataRow = ({
   query,
   errors,
 }: {
-  dataAdapters: LookupTableAdapter[],
-  query: string,
-  errors: { [key: string]: string },
-}) => (dataAdapters.length > 0
-  ? (
+  dataAdapters: LookupTableAdapter[];
+  query: string;
+  errors: { [key: string]: string };
+}) =>
+  dataAdapters.length > 0 ? (
     <>
       {dataAdapters.map((dataAdapter: LookupTableAdapter) => (
-        <DataAdapterTableEntry key={dataAdapter.id}
-                               adapter={dataAdapter}
-                               error={errors[dataAdapter.name]} />
+        <DataAdapterTableEntry key={dataAdapter.id} adapter={dataAdapter} error={errors[dataAdapter.name]} />
       ))}
     </>
   ) : (
     <NoResults query={query} />
-  ));
+  );
 
 type Props = {
-  dataAdapters: LookupTableAdapter[],
-  pagination: PaginationType,
-  errorStates: { [key: string]: { [key: string]: string } },
-  paginationQueryParameter: PaginationQueryParameterResult,
+  dataAdapters: LookupTableAdapter[];
+  pagination: PaginationType;
+  errorStates: { [key: string]: { [key: string]: string } };
+  paginationQueryParameter: PaginationQueryParameterResult;
 };
 
 const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginationQueryParameter }: Props) => {
@@ -112,19 +113,26 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
   React.useEffect(() => {
     const { currentPage, currentPageSize, currentQuery } = localPagination;
 
-    LookupTableDataAdaptersActions.searchPaginated(currentPage, currentPageSize, currentQuery)
-      .then(() => setLoading(false));
+    LookupTableDataAdaptersActions.searchPaginated(currentPage, currentPageSize, currentQuery).then(() =>
+      setLoading(false),
+    );
   }, [localPagination]);
 
-  const onPageChange = React.useCallback((newPage: number, newPerPage: number) => {
-    setLocalPagination({ ...localPagination, currentPage: newPage, currentPageSize: newPerPage });
-  }, [localPagination]);
+  const onPageChange = React.useCallback(
+    (newPage: number, newPerPage: number) => {
+      setLocalPagination({ ...localPagination, currentPage: newPage, currentPageSize: newPerPage });
+    },
+    [localPagination],
+  );
 
-  const onSearch = React.useCallback((query: string) => {
-    localPagination.resetPage();
-    localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
-    setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: query });
-  }, [localPagination]);
+  const onSearch = React.useCallback(
+    (query: string) => {
+      localPagination.resetPage();
+      localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
+      setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: query });
+    },
+    [localPagination],
+  );
 
   const onReset = React.useCallback(() => {
     localPagination.resetPage();
@@ -138,10 +146,12 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
         <h2 style={{ marginBottom: 16 }}>
           Configured lookup Data Adapters <small>{pagination.total} total</small>
         </h2>
-        <PaginatedList activePage={localPagination.currentPage}
-                       pageSize={localPagination.currentPageSize}
-                       onChange={onPageChange}
-                       totalItems={pagination.total}>
+        <PaginatedList
+          activePage={localPagination.currentPage}
+          pageSize={localPagination.currentPageSize}
+          onChange={onPageChange}
+          totalItems={pagination.total}
+        >
           <SearchForm onSearch={onSearch} onReset={onReset} queryHelpComponent={queryHelpComponent} />
           <ScrollContainer>
             <Table condensed hover className={Styles.overviewTable}>
@@ -154,10 +164,14 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
                   <th className={Styles.rowActions}>Actions</th>
                 </tr>
               </thead>
-              {loading ? <Spinner text="Loading data adapters" /> : (
-                <DataRow dataAdapters={dataAdapters}
-                         query={localPagination.currentQuery}
-                         errors={errorStates.dataAdapters} />
+              {loading ? (
+                <Spinner text="Loading data adapters" />
+              ) : (
+                <DataRow
+                  dataAdapters={dataAdapters}
+                  query={localPagination.currentQuery}
+                  errors={errorStates.dataAdapters}
+                />
               )}
             </Table>
           </ScrollContainer>

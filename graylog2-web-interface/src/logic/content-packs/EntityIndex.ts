@@ -18,9 +18,9 @@ import Immutable from 'immutable';
 
 export default class EntityIndex {
   private _value: {
-    id: string,
-    title: string,
-    type: string,
+    id: string;
+    title: string;
+    type: string;
   };
 
   constructor(id, title, type) {

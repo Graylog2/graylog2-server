@@ -23,12 +23,13 @@ import SearchLink from 'views/logic/search/SearchLink';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
-const buildSearchLink = (streamIds: Array<string>) => SearchLink.builder()
-  .timerange(DEFAULT_TIMERANGE)
-  .query(createElasticsearchQueryString())
-  .streams(streamIds)
-  .build()
-  .toURL();
+const buildSearchLink = (streamIds: Array<string>) =>
+  SearchLink.builder()
+    .timerange(DEFAULT_TIMERANGE)
+    .query(createElasticsearchQueryString())
+    .streams(streamIds)
+    .build()
+    .toURL();
 
 const SearchStreamsAction = () => {
   const { selectedEntities } = useSelectedEntities();

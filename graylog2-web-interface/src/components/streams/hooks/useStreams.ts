@@ -31,46 +31,50 @@ const INITIAL_DATA = {
 export const KEY_PREFIX = ['streams', 'overview'];
 export const keyFn = (searchParams: SearchParams) => [...KEY_PREFIX, searchParams];
 
-export const fetchStreams = (searchParams: SearchParams) => StreamsStore.searchPaginated(
-  searchParams.page,
-  searchParams.pageSize,
-  searchParams.query,
-  {
+export const fetchStreams = (searchParams: SearchParams) =>
+  StreamsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
     filters: FiltersForQueryParams(searchParams.filters),
-  },
-);
+  });
 
 type Options = {
-  enabled: boolean,
-}
-
-type StreamsResponse = {
-  list: Array<Stream>,
-  pagination: { total: number }
-  attributes: Array<Attribute>
+  enabled: boolean;
 };
 
-const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
-  data: StreamsResponse,
-  refetch: () => void,
-  isInitialLoading: boolean,
+type StreamsResponse = {
+  list: Array<Stream>;
+  pagination: { total: number };
+  attributes: Array<Attribute>;
+};
+
+const useStreams = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
+  data: StreamsResponse;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     keyFn(searchParams),
-    () => defaultOnError<StreamsResponse>(fetchStreams(searchParams), 'Loading streams failed with status', 'Could not load streams'),
+    () =>
+      defaultOnError<StreamsResponse>(
+        fetchStreams(searchParams),
+        'Loading streams failed with status',
+        'Could not load streams',
+      ),
     {
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useStreams;

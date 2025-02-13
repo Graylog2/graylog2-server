@@ -21,18 +21,16 @@ import Menu from 'components/bootstrap/Menu';
 import StopPropagation from 'views/components/common/StopPropagation';
 
 type Props = {
-  children: React.ReactNode,
-  element: React.ReactNode,
-  'data-testid'?: string,
-  header?: string,
+  children: React.ReactNode;
+  element: React.ReactNode;
+  'data-testid'?: string;
+  header?: string;
 };
 
 const ActionDropdown = ({ children, element, 'data-testid': dataTestid, header = 'Actions' }: Props) => (
   <StopPropagation data-testid={dataTestid}>
     <Menu position="bottom" withinPortal zIndex={1051}>
-      <Menu.Target>
-        {element}
-      </Menu.Target>
+      <Menu.Target>{element}</Menu.Target>
       <Menu.Dropdown>
         <MenuItem header>{header}</MenuItem>
         {children}

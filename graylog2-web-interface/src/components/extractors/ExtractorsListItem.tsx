@@ -28,9 +28,7 @@ type TimingMetricsProps = {
   timing: any;
 };
 
-const TimingMetrics = ({
-  timing,
-}: TimingMetricsProps) => (
+const TimingMetrics = ({ timing }: TimingMetricsProps) => (
   <dl className="metric-def metric-timer">
     <dt>95th percentile:</dt>
     <dd>{numeral(timing['95th_percentile']).format('0,0.[00]')}&#956;s</dd>
@@ -59,16 +57,13 @@ type MetricsProps = {
   metrics: any;
 };
 
-const Metrics = ({
-  metrics,
-}: MetricsProps) => {
+const Metrics = ({ metrics }: MetricsProps) => {
   let totalRate;
 
   if (metrics.total.rate) {
     totalRate = (
       <div className="meter" style={{ marginBottom: 10 }}>
-        {numeral(metrics.total.rate.total).format('0,0')} total invocations since boot,{' '}
-        averages:{' '}
+        {numeral(metrics.total.rate.total).format('0,0')} total invocations since boot, averages:{' '}
         {numeral(metrics.total.rate.one_minute).format('0,0.[00]')},{' '}
         {numeral(metrics.total.rate.five_minute).format('0,0.[00]')},{' '}
         {numeral(metrics.total.rate.fifteen_minute).format('0,0.[00]')}.
@@ -78,8 +73,7 @@ const Metrics = ({
 
   const conditionCounts = (
     <div className="meter" style={{ marginBottom: 10 }}>
-      {metrics.condition_hits} hits,{' '}
-      {metrics.condition_misses} misses
+      {metrics.condition_hits} hits, {metrics.condition_misses} misses
     </div>
   );
 
@@ -121,19 +115,23 @@ const Metrics = ({
       {conditionCounts}
       <Row>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Total time</h4><br />
+          <h4 style={{ display: 'inline' }}>Total time</h4>
+          <br />
           {totalTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Condition time</h4><br />
+          <h4 style={{ display: 'inline' }}>Condition time</h4>
+          <br />
           {conditionTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Execution time</h4><br />
+          <h4 style={{ display: 'inline' }}>Execution time</h4>
+          <br />
           {executionTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Converter time</h4><br />
+          <h4 style={{ display: 'inline' }}>Converter time</h4>
+          <br />
           {convertersTime}
         </Col>
       </Row>
@@ -147,9 +145,12 @@ type ExtractorsListItemProps = {
   nodeId: string;
 };
 
-class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
-  [key: string]: any;
-}> {
+class ExtractorsListItem extends React.Component<
+  ExtractorsListItemProps,
+  {
+    [key: string]: any;
+  }
+> {
   constructor(props) {
     super(props);
 
@@ -178,10 +179,8 @@ class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
 
     return (
       <span>
-        Trying to extract data from <em>{extractor.source_field}</em> into{' '}
-        <em>{extractor.target_field}</em>,{' '}
-        {extractor.cursor_strategy === 'cut' && 'not'}{' '}
-        leaving the original intact.
+        Trying to extract data from <em>{extractor.source_field}</em> into <em>{extractor.target_field}</em>,{' '}
+        {extractor.cursor_strategy === 'cut' && 'not'} leaving the original intact.
       </span>
     );
   };
@@ -218,13 +217,19 @@ class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
     );
 
     actions.push(
-      <LinkContainer key={`edit-extractor-${extractor.id}`}
-                     to={Routes.edit_input_extractor(nodeId, inputId, extractor.id)}>
+      <LinkContainer
+        key={`edit-extractor-${extractor.id}`}
+        to={Routes.edit_input_extractor(nodeId, inputId, extractor.id)}
+      >
         <Button>Edit</Button>
       </LinkContainer>,
     );
 
-    actions.push(<Button key="delete-extractor-" bsStyle="danger" onClick={this._deleteExtractor}>Delete</Button>);
+    actions.push(
+      <Button key="delete-extractor-" bsStyle="danger" onClick={this._deleteExtractor}>
+        Delete
+      </Button>,
+    );
 
     return actions;
   };
@@ -234,7 +239,11 @@ class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
 
     const attributes = Object.keys(options);
 
-    return attributes.map((attribute) => <li key={`${attribute}-${extractor.id}`}>{attribute}: {options[attribute]}</li>);
+    return attributes.map((attribute) => (
+      <li key={`${attribute}-${extractor.id}`}>
+        {attribute}: {options[attribute]}
+      </li>
+    ));
   };
 
   _formatConfiguration = (extractorConfig) => {
@@ -247,9 +256,7 @@ class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
     return (
       <div className="configuration-section">
         <h4>Configuration</h4>
-        <ul>
-          {formattedOptions}
-        </ul>
+        <ul>{formattedOptions}</ul>
       </div>
     );
   };
@@ -263,7 +270,9 @@ class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
 
   _formatConverters = (converters) => {
     const converterKeys = Object.keys(converters);
-    const formattedConverters = converterKeys.map((converterKey) => this._formatConverter(converterKey, converters[converterKey]));
+    const formattedConverters = converterKeys.map((converterKey) =>
+      this._formatConverter(converterKey, converters[converterKey]),
+    );
 
     if (formattedConverters.length === 0) {
       return <div />;
@@ -272,9 +281,7 @@ class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
     return (
       <div className="configuration-section">
         <h4>Converters</h4>
-        <ul>
-          {formattedConverters}
-        </ul>
+        <ul>{formattedConverters}</ul>
       </div>
     );
   };
@@ -306,12 +313,14 @@ class ExtractorsListItem extends React.Component<ExtractorsListItemProps, {
     const { showDetails } = this.state;
 
     return (
-      <EntityListItem key={`entry-list-${extractor.id}`}
-                      title={extractor.title}
-                      titleSuffix={ExtractorUtils.getReadableExtractorTypeName(extractor.type)}
-                      description={this._formatExtractorSubtitle()}
-                      actions={this._formatActions()}
-                      contentRow={showDetails ? this._formatDetails() : null} />
+      <EntityListItem
+        key={`entry-list-${extractor.id}`}
+        title={extractor.title}
+        titleSuffix={ExtractorUtils.getReadableExtractorTypeName(extractor.type)}
+        description={this._formatExtractorSubtitle()}
+        actions={this._formatActions()}
+        contentRow={showDetails ? this._formatDetails() : null}
+      />
     );
   }
 }

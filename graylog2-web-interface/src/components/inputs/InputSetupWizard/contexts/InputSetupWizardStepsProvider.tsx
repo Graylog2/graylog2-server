@@ -26,18 +26,15 @@ const DEFAULT_STEPS_DATA = {};
 const InputSetupWizardStepsProvider = ({ children = null }: React.PropsWithChildren<{}>) => {
   const [stepsData, setStepsData] = useState<StepsData>(DEFAULT_STEPS_DATA);
 
-  const value = useMemo(() => ({
-    stepsData,
-    setStepsData,
-  }), [
-    stepsData,
-  ]);
-
-  return (
-    <InputSetupWizardStepsContext.Provider value={value}>
-      {children}
-    </InputSetupWizardStepsContext.Provider>
+  const value = useMemo(
+    () => ({
+      stepsData,
+      setStepsData,
+    }),
+    [stepsData],
   );
+
+  return <InputSetupWizardStepsContext.Provider value={value}>{children}</InputSetupWizardStepsContext.Provider>;
 };
 
 export default InputSetupWizardStepsProvider;

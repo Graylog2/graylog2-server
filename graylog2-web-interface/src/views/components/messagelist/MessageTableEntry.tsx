@@ -43,23 +43,29 @@ import CustomHighlighting from '../highlighting/CustomHighlighting';
 import TypeSpecificValue from '../TypeSpecificValue';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
-export const TableBody = styled.tbody<{ $expanded?: boolean, $highlighted?: boolean }>(({
-  $expanded,
-  $highlighted,
-  theme,
-}) => `
+export const TableBody = styled.tbody<{ $expanded?: boolean; $highlighted?: boolean }>(
+  ({ $expanded, $highlighted, theme }) => `
   && {
     border-top: 0;
 
-    ${$expanded ? `
+    ${
+      $expanded
+        ? `
   border-left: 7px solid ${theme.colors.variant.light.info};
-` : ''}
+`
+        : ''
+    }
 
-    ${$highlighted ? `
+    ${
+      $highlighted
+        ? `
   border-left: 7px solid ${theme.colors.variant.light.success};
-` : ''}
+`
+        : ''
+    }
   }
-`);
+`,
+);
 
 const FieldsRow = styled.tr`
   cursor: pointer;
@@ -91,30 +97,28 @@ const MessageDetailRow = styled.tr`
 `;
 
 type Props = {
-  config: MessagesWidgetConfig,
-  disableSurroundingSearch?: boolean,
-  expandAllRenderAsync: boolean,
-  expanded: boolean,
-  fields: FieldTypeMappingsList,
-  message: Message,
-  selectedFields?: Immutable.OrderedSet<string>,
-  showMessageRow?: boolean,
-  toggleDetail: (messageId: string) => void,
+  config: MessagesWidgetConfig;
+  disableSurroundingSearch?: boolean;
+  expandAllRenderAsync: boolean;
+  expanded: boolean;
+  fields: FieldTypeMappingsList;
+  message: Message;
+  selectedFields?: Immutable.OrderedSet<string>;
+  showMessageRow?: boolean;
+  toggleDetail: (messageId: string) => void;
 };
 
-const isDecoratedField = (field: string | number, decorationStats: Message['decoration_stats']) => decorationStats
-  && (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
+const isDecoratedField = (field: string | number, decorationStats: Message['decoration_stats']) =>
+  decorationStats &&
+  (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
 
-const fieldType = (fieldName: string, { decoration_stats: decorationStats }: Message, fields: FieldTypeMappingsList) => (
+const fieldType = (fieldName: string, { decoration_stats: decorationStats }: Message, fields: FieldTypeMappingsList) =>
   isDecoratedField(fieldName, decorationStats)
     ? FieldType.Decorated
-    : ((fields?.find((f) => f.name === fieldName)) ?? { type: FieldType.Unknown }).type
-);
+    : (fields?.find((f) => f.name === fieldName) ?? { type: FieldType.Unknown }).type;
 
-const Strong = ({ children = undefined, strong }: React.PropsWithChildren<{ strong: boolean }>) => (strong
-  ? <strong>{children}</strong>
-
-  : <>{children}</>);
+const Strong = ({ children = undefined, strong }: React.PropsWithChildren<{ strong: boolean }>) =>
+  strong ? <strong>{children}</strong> : <>{children}</>;
 
 const MessageTableEntry = ({
   config,
@@ -133,8 +137,14 @@ const MessageTableEntry = ({
   const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const allStreams = useMemo(() => Immutable.List<Stream>(streamsList), [streamsList]);
-  const streams = useMemo(() => Immutable.Map<string, Stream>(streamsList.map((stream) => [stream.id, stream])), [streamsList]);
-  const inputs = useMemo(() => Immutable.Map<string, Input>(inputsList.map((input) => [input.id, input])), [inputsList]);
+  const streams = useMemo(
+    () => Immutable.Map<string, Stream>(streamsList.map((stream) => [stream.id, stream])),
+    [streamsList],
+  );
+  const inputs = useMemo(
+    () => Immutable.Map<string, Input>(inputsList.map((input) => [input.id, input])),
+    [inputsList],
+  );
 
   const _toggleDetail = useCallback(() => {
     const isSelectingText = !!window.getSelection()?.toString();
@@ -152,22 +162,33 @@ const MessageTableEntry = ({
 
   const colSpanFixup = selectedFields.size + 1;
 
-  const selectedFieldsList = useMemo(() => selectedFields.toArray().map((selectedFieldName, idx) => {
-    const type = fieldType(selectedFieldName, message, fields);
+  const selectedFieldsList = useMemo(
+    () =>
+      selectedFields.toArray().map((selectedFieldName, idx) => {
+        const type = fieldType(selectedFieldName, message, fields);
 
-    return (
-      <TableDataCell className="table-data-cell" $isNumeric={type.isNumeric()} key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
-        <Strong strong={idx === 0}>
-          <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
-            <TypeSpecificValue value={message.fields[selectedFieldName]}
-                               field={selectedFieldName}
-                               type={type}
-                               render={DecoratedValue} />
-          </CustomHighlighting>
-        </Strong>
-      </TableDataCell>
-    );
-  }), [fields, message, selectedFields]);
+        return (
+          <TableDataCell
+            className="table-data-cell"
+            $isNumeric={type.isNumeric()}
+            key={selectedFieldName}
+            data-testid={`message-summary-field-${selectedFieldName}`}
+          >
+            <Strong strong={idx === 0}>
+              <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
+                <TypeSpecificValue
+                  value={message.fields[selectedFieldName]}
+                  field={selectedFieldName}
+                  type={type}
+                  render={DecoratedValue}
+                />
+              </CustomHighlighting>
+            </Strong>
+          </TableDataCell>
+        );
+      }),
+    [fields, message, selectedFields],
+  );
 
   const messageFieldType = useMemo(() => fieldType(MESSAGE_FIELD, message, fields), [fields, message]);
 
@@ -178,23 +199,27 @@ const MessageTableEntry = ({
           {selectedFieldsList}
         </FieldsRow>
 
-        <MessagePreview showMessageRow={showMessageRow}
-                        config={config}
-                        colSpanFixup={colSpanFixup}
-                        messageFieldType={messageFieldType}
-                        onRowClick={_toggleDetail}
-                        message={message} />
+        <MessagePreview
+          showMessageRow={showMessageRow}
+          config={config}
+          colSpanFixup={colSpanFixup}
+          messageFieldType={messageFieldType}
+          onRowClick={_toggleDetail}
+          message={message}
+        />
 
         {expanded && (
           <MessageDetailRow>
             <td colSpan={colSpanFixup}>
-              <MessageDetail message={message}
-                             fields={fields}
-                             streams={streams}
-                             allStreams={allStreams}
-                             inputs={inputs}
-                             disableSurroundingSearch={disableSurroundingSearch}
-                             expandAllRenderAsync={expandAllRenderAsync} />
+              <MessageDetail
+                message={message}
+                fields={fields}
+                streams={streams}
+                allStreams={allStreams}
+                inputs={inputs}
+                disableSurroundingSearch={disableSurroundingSearch}
+                expandAllRenderAsync={expandAllRenderAsync}
+              />
             </td>
           </MessageDetailRow>
         )}

@@ -17,13 +17,7 @@
 import * as Immutable from 'immutable';
 import type { $PropertyType } from 'utility-types';
 
-import type {
-  GranteeType,
-  CapabilityType,
-  SharedEntityType,
-  ActiveShareType,
-  GRN,
-} from 'logic/permissions/types';
+import type { GranteeType, CapabilityType, SharedEntityType, ActiveShareType, GRN } from 'logic/permissions/types';
 import { defaultCompare } from 'logic/DefaultCompare';
 
 import Capability from './Capability';
@@ -39,7 +33,10 @@ export type GranteesList = Immutable.List<Grantee>;
 export type CapabilitiesList = Immutable.List<Capability>;
 export type ActiveShares = Immutable.List<ActiveShare>;
 export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity>>;
-export type SelectedGranteeCapabilities = Immutable.Map<$PropertyType<GranteeType, 'id'>, $PropertyType<CapabilityType, 'id'>>;
+export type SelectedGranteeCapabilities = Immutable.Map<
+  $PropertyType<GranteeType, 'id'>,
+  $PropertyType<CapabilityType, 'id'>
+>;
 export type SelectedGrantees = Immutable.List<SelectedGrantee>;
 
 const _missingDependenciesFromJSON = (missingDependenciesJSON): Immutable.Map<string, Immutable.List<SharedEntity>> => {
@@ -47,50 +44,65 @@ const _missingDependenciesFromJSON = (missingDependenciesJSON): Immutable.Map<st
 
   Object.keys(missingDependenciesJSON).forEach((granteeGRN) => {
     const dependencyList = missingDependenciesJSON[granteeGRN];
-    missingDependencies = missingDependencies.set(granteeGRN, dependencyList.map((dependency) => SharedEntity.fromJSON(dependency)));
+    missingDependencies = missingDependencies.set(
+      granteeGRN,
+      dependencyList.map((dependency) => SharedEntity.fromJSON(dependency)),
+    );
   });
 
   return missingDependencies;
 };
 
-const _sortAndOrderGrantees = <T extends GranteeInterface>(grantees: Immutable.List<T>, activeShares?: ActiveShares | undefined | null): Immutable.List<T> => {
+const _sortAndOrderGrantees = <T extends GranteeInterface>(
+  grantees: Immutable.List<T>,
+  activeShares?: ActiveShares | undefined | null,
+): Immutable.List<T> => {
   const granteesByType = grantees
-    .filter((grantee) => !activeShares || activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) >= 0)
+    .filter(
+      (grantee) => !activeShares || activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) >= 0,
+    )
     .sort((granteeA, granteeB) => defaultCompare(granteeA.title, granteeB.title))
     .groupBy((grantee) => grantee.type);
   const newGrantees = grantees
-    .filter((grantee) => activeShares && activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) === -1)
+    .filter(
+      (grantee) => activeShares && activeShares.findIndex((activeShare) => activeShare.grantee === grantee.id) === -1,
+    )
     .reverse();
 
-  return Immutable.List<T>().concat(
-    newGrantees,
-    granteesByType.get('error'),
-    granteesByType.get('global'),
-    granteesByType.get('team'),
-    granteesByType.get('user'),
-  ).filter((grantee) => !!grantee).toList();
+  return Immutable.List<T>()
+    .concat(
+      newGrantees,
+      granteesByType.get('error'),
+      granteesByType.get('global'),
+      granteesByType.get('team'),
+      granteesByType.get('user'),
+    )
+    .filter((grantee) => !!grantee)
+    .toList();
 };
 
 type InternalState = {
-  entity: GRN,
-  availableGrantees: GranteesList,
-  availableCapabilities: CapabilitiesList,
-  activeShares: ActiveShares,
-  selectedGranteeCapabilities: SelectedGranteeCapabilities,
-  missingDependencies: MissingDependencies,
-  validationResults: ValidationResult,
+  entity: GRN;
+  availableGrantees: GranteesList;
+  availableCapabilities: CapabilitiesList;
+  activeShares: ActiveShares;
+  selectedGranteeCapabilities: SelectedGranteeCapabilities;
+  missingDependencies: MissingDependencies;
+  validationResults: ValidationResult;
 };
 
 export type EntityShareStateJson = {
-  entity: $PropertyType<InternalState, 'entity'>,
-  available_grantees: Array<GranteeType>,
-  available_capabilities: Array<CapabilityType>,
-  active_shares: Array<ActiveShareType>,
-  selected_grantee_capabilities: {
-    [grantee: string]: $PropertyType<Capability, 'id'>,
-  } | {},
-  missing_permissions_on_dependencies: {[key: string]: Array<SharedEntityType>},
-  validation_result: ValidationResultJSON,
+  entity: $PropertyType<InternalState, 'entity'>;
+  available_grantees: Array<GranteeType>;
+  available_capabilities: Array<CapabilityType>;
+  active_shares: Array<ActiveShareType>;
+  selected_grantee_capabilities:
+    | {
+        [grantee: string]: $PropertyType<Capability, 'id'>;
+      }
+    | {};
+  missing_permissions_on_dependencies: { [key: string]: Array<SharedEntityType> };
+  validation_result: ValidationResultJSON;
 };
 
 export default class EntityShareState {
@@ -147,15 +159,18 @@ export default class EntityShareState {
   get selectedGrantees() {
     const _userLookup = (userId: GRN) => this._value.availableGrantees.find((grantee) => grantee.id === userId);
 
-    const granteesWithCapabilities: Immutable.List<SelectedGrantee> = this._value.selectedGranteeCapabilities.entrySeq().map(([granteeId, roleId]) => {
-      const grantee = _userLookup(granteeId);
+    const granteesWithCapabilities: Immutable.List<SelectedGrantee> = this._value.selectedGranteeCapabilities
+      .entrySeq()
+      .map(([granteeId, roleId]) => {
+        const grantee = _userLookup(granteeId);
 
-      if (!grantee) {
-        return SelectedGrantee.create(granteeId, `not found ${granteeId} (error)`, 'error', roleId);
-      }
+        if (!grantee) {
+          return SelectedGrantee.create(granteeId, `not found ${granteeId} (error)`, 'error', roleId);
+        }
 
-      return SelectedGrantee.create(grantee.id, grantee.title, grantee.type, roleId);
-    }).toList();
+        return SelectedGrantee.create(grantee.id, grantee.title, grantee.type, roleId);
+      })
+      .toList();
 
     return _sortAndOrderGrantees<SelectedGrantee>(granteesWithCapabilities, this._value.activeShares);
   }
@@ -172,15 +187,17 @@ export default class EntityShareState {
     } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      entity,
-      availableGrantees,
-      availableCapabilities,
-      activeShares,
-      selectedGranteeCapabilities,
-      missingDependencies,
-      validationResults,
-    }));
+    return new Builder(
+      Immutable.Map({
+        entity,
+        availableGrantees,
+        availableCapabilities,
+        activeShares,
+        selectedGranteeCapabilities,
+        missingDependencies,
+        validationResults,
+      }),
+    );
   }
 
   toJSON() {

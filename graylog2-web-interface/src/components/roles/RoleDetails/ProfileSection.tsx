@@ -21,15 +21,10 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 import { ReadOnlyFormGroup } from 'components/common';
 
 type Props = {
-  role: Role,
+  role: Role;
 };
 
-const ProfileSection = ({
-  role: {
-    name,
-    description,
-  },
-}: Props) => (
+const ProfileSection = ({ role: { name, description } }: Props) => (
   <SectionComponent title="Profile">
     <ReadOnlyFormGroup label="Name" value={name} />
     <ReadOnlyFormGroup label="Description" value={description} />

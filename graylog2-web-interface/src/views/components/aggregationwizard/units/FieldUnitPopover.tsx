@@ -49,33 +49,40 @@ const ButtonContainer = styled.div`
   height: 25px;
 `;
 
-export const StyledButton = styled(Button)(({ theme }) => css`
-  background-color: ${theme.colors.gray[60]};
-  padding: 1px 2px;
-  min-width: 20px;
-  border-radius: 3px;
-  color: ${theme.colors.variant.lightest.default};
-
-  &:hover {
-    background-color: ${theme.colors.gray[80]};
+export const StyledButton = styled(Button)(
+  ({ theme }) => css`
+    background-color: ${theme.colors.gray[60]};
+    padding: 1px 2px;
+    min-width: 20px;
+    border-radius: 3px;
     color: ${theme.colors.variant.lightest.default};
-  }
-`);
 
-const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefinedUnit: FieldUnit }) => {
+    &:hover {
+      background-color: ${theme.colors.gray[80]};
+      color: ${theme.colors.variant.lightest.default};
+    }
+  `,
+);
+
+const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefinedUnit: FieldUnit }) => {
   const [show, setShow] = useState(false);
-  const { setFieldValue, values } = useFormikContext<{units: FieldUnitsFormValues }>();
+  const { setFieldValue, values } = useFormikContext<{ units: FieldUnitsFormValues }>();
   const currentUnitType = useMemo<string>(() => values?.units?.[field]?.unitType, [values, field]);
   const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: capitalize(key) })), []);
-  const unitOptions = useMemo(() => currentUnitType && units[currentUnitType]
-    .map(({ abbrev, name }: Unit) => ({ value: abbrev, label: capitalize(name) })), [currentUnitType]);
+  const unitOptions = useMemo(
+    () =>
+      currentUnitType &&
+      units[currentUnitType].map(({ abbrev, name }: Unit) => ({ value: abbrev, label: capitalize(name) })),
+    [currentUnitType],
+  );
   const toggleShow = () => setShow((cur) => !cur);
-  const onUnitTypeChange = useCallback((val: string) => {
-    const fieldUnitSettings = val
-      ? { unitType: val, abbrev: undefined }
-      : undefined;
-    setFieldValue(`units.${field}`, fieldUnitSettings);
-  }, [field, setFieldValue]);
+  const onUnitTypeChange = useCallback(
+    (val: string) => {
+      const fieldUnitSettings = val ? { unitType: val, abbrev: undefined } : undefined;
+      setFieldValue(`units.${field}`, fieldUnitSettings);
+    },
+    [field, setFieldValue],
+  );
 
   const badgeLabel = useMemo(() => {
     const curUnit = values?.units?.[field]?.abbrev;
@@ -88,7 +95,12 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
 
     const unitName = units[predefinedUnit.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
 
-    return <>Unit <b>{unitName}</b> was defined for field <b>{field}</b> by Graylog. Changing this unit might represent data incorrectly on the charts</>;
+    return (
+      <>
+        Unit <b>{unitName}</b> was defined for field <b>{field}</b> by Graylog. Changing this unit might represent data
+        incorrectly on the charts
+      </>
+    );
   }, [field, predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType]);
 
   const onClear = useCallback(() => {
@@ -100,51 +112,72 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string, predefined
     <Popover position="right" opened={show} withArrow>
       <Popover.Target>
         <ButtonContainer>
-          <StyledButton bsSize="xs" onClick={toggleShow} title={`${field} unit settings`}>{badgeLabel}</StyledButton>
+          <StyledButton bsSize="xs" onClick={toggleShow} title={`${field} unit settings`}>
+            {badgeLabel}
+          </StyledButton>
         </ButtonContainer>
       </Popover.Target>
       <Popover.Dropdown title={`${field} unit settings`}>
         <Container>
           <Field name={`units.${field}.unitType`}>
             {({ field: { name, value }, meta: { error } }) => (
-              <Input id="metric-unit-type-field"
-                     label="Type"
-                     error={error}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <Select id="metric-unit-type-select"
-                        onChange={onUnitTypeChange}
-                        name={name}
-                        value={value}
-                        aria-label="Select a unit type"
-                        options={unitTypesOptions}
-                        size="small" />
+              <Input
+                id="metric-unit-type-field"
+                label="Type"
+                error={error}
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9"
+              >
+                <Select
+                  id="metric-unit-type-select"
+                  onChange={onUnitTypeChange}
+                  name={name}
+                  value={value}
+                  aria-label="Select a unit type"
+                  options={unitTypesOptions}
+                  size="small"
+                />
               </Input>
             )}
           </Field>
           {currentUnitType && (
-          <Field name={`units.${field}.abbrev`}>
-            {({ field: { name, value, onChange }, meta: { error } }) => (
-              <Input id="metric-unit-field"
-                     label={<span>Unit <HoverForHelp displayLeftMargin>Unit used to calculate the displayed value on charts.</HoverForHelp></span>}
-                     error={error}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <Select id="metric-unit-select"
-                        onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
-                        name={name}
-                        value={value}
-                        aria-label="Select a unit"
-                        options={unitOptions}
-                        size="small" />
-              </Input>
-            )}
-          </Field>
+            <Field name={`units.${field}.abbrev`}>
+              {({ field: { name, value, onChange }, meta: { error } }) => (
+                <Input
+                  id="metric-unit-field"
+                  label={
+                    <span>
+                      Unit{' '}
+                      <HoverForHelp displayLeftMargin>
+                        Unit used to calculate the displayed value on charts.
+                      </HoverForHelp>
+                    </span>
+                  }
+                  error={error}
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9"
+                >
+                  <Select
+                    id="metric-unit-select"
+                    onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
+                    name={name}
+                    value={value}
+                    aria-label="Select a unit"
+                    options={unitOptions}
+                    size="small"
+                  />
+                </Input>
+              )}
+            </Field>
           )}
           {predefinedInfo && <Alert bsStyle="info">{predefinedInfo}</Alert>}
           <ModalButtonToolbar>
-            <Button bsSize="xs" onClick={onClear}>Clear</Button>
-            <Button bsSize="xs" bsStyle="success" onClick={toggleShow}>OK</Button>
+            <Button bsSize="xs" onClick={onClear}>
+              Clear
+            </Button>
+            <Button bsSize="xs" bsStyle="success" onClick={toggleShow}>
+              OK
+            </Button>
           </ModalButtonToolbar>
         </Container>
       </Popover.Dropdown>

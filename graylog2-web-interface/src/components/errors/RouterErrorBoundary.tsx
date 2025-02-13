@@ -22,9 +22,12 @@ type RouterErrorBoundaryProps = {
   children?: React.ReactNode;
 };
 
-class RouterErrorBoundary extends React.Component<RouterErrorBoundaryProps, {
-  [key: string]: any;
-}> {
+class RouterErrorBoundary extends React.Component<
+  RouterErrorBoundaryProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     children: null,
   };

@@ -43,19 +43,23 @@ const ActionsCol = styled(Col)`
   margin-top: 50px;
 `;
 
-const StyledPanel = styled(Panel)(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 0;
-  box-shadow: none;
-  margin-bottom: 0;
-`);
+const StyledPanel = styled(Panel)(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    border: 0;
+    box-shadow: none;
+    margin-bottom: 0;
+  `,
+);
 
-const StyledPanelHeading = styled(Panel.Heading)(({ theme }) => css`
-  display: flex;
-  justify-content: space-between;
-  background-color: ${theme.colors.table.row.backgroundStriped} !important;
-  border: 0;
-`);
+const StyledPanelHeading = styled(Panel.Heading)(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    background-color: ${theme.colors.table.row.backgroundStriped} !important;
+    border: 0;
+  `,
+);
 
 const WhenOperator = styled.div`
   display: flex;
@@ -71,7 +75,10 @@ const StyledPanelBody = styled(Panel.Body)`
 `;
 
 const getLastOutputIndexFromRule = (rule: RuleBuilderRule): number => {
-  const outputIndexes = rule.rule_builder?.actions?.map((block: RuleBlock) => Number(block?.outputvariable?.replace('output_', '') || 0))?.sort((a, b) => a - b) || [];
+  const outputIndexes =
+    rule.rule_builder?.actions
+      ?.map((block: RuleBlock) => Number(block?.outputvariable?.replace('output_', '') || 0))
+      ?.sort((a, b) => a - b) || [];
 
   return outputIndexes[outputIndexes.length - 1] || 0;
 };
@@ -91,7 +98,7 @@ const RuleBuilder = () => {
     title: '',
     rule_builder: { operator: 'AND', conditions: [], actions: [] },
   });
-  const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number, type: BlockType } | null>(null);
+  const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number; type: BlockType } | null>(null);
   const [ruleSourceCodeToShow, setRuleSourceCodeToShow] = useState<RuleBuilderRule | null>(null);
   const [conditionsExpanded] = useState<boolean>(true);
   const [actionsExpanded] = useState<boolean>(true);
@@ -112,10 +119,7 @@ const RuleBuilder = () => {
     const newBlock = block;
     const blockDict = getDictForFunction(actionsDict, block.function);
 
-    if (
-      blockDict?.return_type !== RuleBuilderTypes.Void
-      && !newBlock.outputvariable
-    ) {
+    if (blockDict?.return_type !== RuleBuilderTypes.Void && !newBlock.outputvariable) {
       newBlock.outputvariable = `output_${outputIndex}`;
       setLastOutputIndex(outputIndex);
     }
@@ -126,9 +130,12 @@ const RuleBuilder = () => {
   const newConditionBlockIndex = rule.rule_builder.conditions.length;
   const newActionBlockIndex = rule.rule_builder.actions.length;
 
-  const validateAndSaveRuleBuilder = (ruleToValidate: RuleBuilderRule) => fetchValidateRule(ruleToValidate).then((ruleValidated) => {
-    setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder, source: ruleValidated.source });
-  }).catch(() => setRule(ruleToValidate));
+  const validateAndSaveRuleBuilder = (ruleToValidate: RuleBuilderRule) =>
+    fetchValidateRule(ruleToValidate)
+      .then((ruleValidated) => {
+        setRule({ ...ruleToValidate, rule_builder: ruleValidated.rule_builder, source: ruleValidated.source });
+      })
+      .catch(() => setRule(ruleToValidate));
 
   const saveSimulatorMessage = async (simulator_message: string) => {
     const newOperatorRule: RuleBuilderRule = {
@@ -139,15 +146,17 @@ const RuleBuilder = () => {
     setRule(newOperatorRule);
   };
 
-  const updateWhenOperator = async (operator: 'AND'|'OR') => {
+  const updateWhenOperator = async (operator: 'AND' | 'OR') => {
     sendTelemetry(
       operator === 'AND'
         ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.OPERATOR_AND_CLICKED
-        : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.OPERATOR_OR_CLICKED, {
+        : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.OPERATOR_OR_CLICKED,
+      {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'pipeline-rules',
         app_action_value: 'cancel-button',
-      });
+      },
+    );
 
     const newOperatorRule: RuleBuilderRule = {
       ...rule,
@@ -178,7 +187,10 @@ const RuleBuilder = () => {
     } else {
       const blockToSet = setOutputVariable(block, lastOutputIndex + 1);
       const newActions = rule.rule_builder.actions;
-      newActions.splice(Number.isInteger(orderIndex) ? orderIndex : newActions.length, 0, { ...blockToSet, id: blockId });
+      newActions.splice(Number.isInteger(orderIndex) ? orderIndex : newActions.length, 0, {
+        ...blockToSet,
+        id: blockId,
+      });
 
       ruleToAdd = {
         ...rule,
@@ -203,7 +215,8 @@ const RuleBuilder = () => {
       ruleToUpdate = {
         ...rule,
         rule_builder: {
-          ...rule.rule_builder, conditions: currentConditions,
+          ...rule.rule_builder,
+          conditions: currentConditions,
         },
       };
     } else {
@@ -214,7 +227,8 @@ const RuleBuilder = () => {
       ruleToUpdate = {
         ...rule,
         rule_builder: {
-          ...rule.rule_builder, actions: currentActions,
+          ...rule.rule_builder,
+          actions: currentActions,
         },
       };
     }
@@ -232,7 +246,8 @@ const RuleBuilder = () => {
       ruleToDelete = {
         ...rule,
         rule_builder: {
-          ...rule.rule_builder, conditions: currentConditions,
+          ...rule.rule_builder,
+          conditions: currentConditions,
         },
       };
     } else {
@@ -242,7 +257,8 @@ const RuleBuilder = () => {
       ruleToDelete = {
         ...rule,
         rule_builder: {
-          ...rule.rule_builder, actions: currentActions,
+          ...rule.rule_builder,
+          actions: currentActions,
         },
       };
     }
@@ -267,11 +283,13 @@ const RuleBuilder = () => {
       sendTelemetry(
         closeAfter
           ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_RULE_AND_CLOSE_CLICKED
-          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_RULE_CLICKED, {
+          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_RULE_CLICKED,
+        {
           app_pathname: getPathnameWithoutId(pathname),
           app_section: 'pipeline-rules',
           app_action_value: closeAfter ? 'update-rule-and-close-button' : 'update-rule-button',
-        });
+        },
+      );
 
       await updateRule(rule);
       if (closeAfter) handleCancel();
@@ -287,154 +305,166 @@ const RuleBuilder = () => {
     }
   };
 
-  const outputVariableList = () : OutputVariables => (
-    rule.rule_builder.actions.map((block: RuleBlock, index) => ({
-      variableName: block.outputvariable ? `$${block.outputvariable}` : null,
-      variableType: getDictForFunction(actionsDict, block.function)?.return_type,
-      stepOrder: index,
-      blockId: block.id,
-    })).filter(({ variableName }) => (variableName !== null))
-  );
+  const outputVariableList = (): OutputVariables =>
+    rule.rule_builder.actions
+      .map((block: RuleBlock, index) => ({
+        variableName: block.outputvariable ? `$${block.outputvariable}` : null,
+        variableType: getDictForFunction(actionsDict, block.function)?.return_type,
+        stepOrder: index,
+        blockId: block.id,
+      }))
+      .filter(({ variableName }) => variableName !== null);
 
   return (
-    (
-      <RuleBuilderProvider>
-        <form onSubmit={(e) => handleSave(e, true)}>
-          <Row className="content">
-            <Col xs={12}>
-              <RuleBuilderForm rule={rule}
-                               onChange={setRule} />
-            </Col>
-            <Col xs={8}>
-              <label htmlFor="rule_builder">Rule Builder</label>
-              <StyledPanel expanded={conditionsExpanded}>
-                <StyledPanelHeading>
-                  <Panel.Title toggle>
-                    When
-                  </Panel.Title>
-                  <WhenOperator>
-                    <Radio checked={rule.rule_builder.operator === 'AND'}
-                           onChange={() => updateWhenOperator('AND')}>
-                      and
-                    </Radio>
-                    <Radio checked={rule.rule_builder.operator === 'OR'}
-                           onChange={() => updateWhenOperator('OR')}>
-                      or
-                    </Radio>
-                  </WhenOperator>
-                </StyledPanelHeading>
-                <Panel.Collapse>
-                  <StyledPanelBody>
-                    {rule.rule_builder.conditions.map((condition, index) => (
+    <RuleBuilderProvider>
+      <form onSubmit={(e) => handleSave(e, true)}>
+        <Row className="content">
+          <Col xs={12}>
+            <RuleBuilderForm rule={rule} onChange={setRule} />
+          </Col>
+          <Col xs={8}>
+            <label htmlFor="rule_builder">Rule Builder</label>
+            <StyledPanel expanded={conditionsExpanded}>
+              <StyledPanelHeading>
+                <Panel.Title toggle>When</Panel.Title>
+                <WhenOperator>
+                  <Radio checked={rule.rule_builder.operator === 'AND'} onChange={() => updateWhenOperator('AND')}>
+                    and
+                  </Radio>
+                  <Radio checked={rule.rule_builder.operator === 'OR'} onChange={() => updateWhenOperator('OR')}>
+                    or
+                  </Radio>
+                </WhenOperator>
+              </StyledPanelHeading>
+              <Panel.Collapse>
+                <StyledPanelBody>
+                  {rule.rule_builder.conditions.map((condition, index) => (
+                    <RuleBuilderBlock
+                      key={index}
+                      blockDict={conditionsDict || []}
+                      block={condition}
+                      order={index}
+                      type="condition"
+                      addBlock={addBlock}
+                      updateBlock={updateBlock}
+                      deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })}
+                    />
+                  ))}
+                  <RuleBuilderBlock
+                    blockDict={conditionsDict || []}
+                    order={newConditionBlockIndex}
+                    type="condition"
+                    addBlock={addBlock}
+                    updateBlock={updateBlock}
+                    deleteBlock={() =>
+                      setBlockToDelete({
+                        orderIndex: newConditionBlockIndex,
+                        type: 'condition',
+                      })
+                    }
+                  />
+                </StyledPanelBody>
+              </Panel.Collapse>
+            </StyledPanel>
+            <br />
+            <StyledPanel expanded={actionsExpanded}>
+              <StyledPanelHeading>
+                <Panel.Title toggle>Then</Panel.Title>
+              </StyledPanelHeading>
+              <Panel.Collapse>
+                <StyledPanelBody>
+                  {rule.rule_builder.actions.map((action, index) => (
+                    <RuleBuilderBlock
+                      key={index}
+                      blockDict={actionsDict || []}
+                      block={action}
+                      order={index}
+                      type="action"
+                      outputVariableList={outputVariableList()}
+                      addBlock={addBlock}
+                      updateBlock={updateBlock}
+                      deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })}
+                    />
+                  ))}
+                  <RuleBuilderBlock
+                    blockDict={actionsDict || []}
+                    order={newActionBlockIndex}
+                    type="action"
+                    outputVariableList={outputVariableList()}
+                    addBlock={addBlock}
+                    updateBlock={updateBlock}
+                    deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })}
+                  />
+                </StyledPanelBody>
+              </Panel.Collapse>
+            </StyledPanel>
+            <Errors objectWithErrors={rule.rule_builder} />
+          </Col>
+          <Col xs={4}>
+            <RuleSimulation rule={rule} onSaveMessage={saveSimulatorMessage} />
+          </Col>
+          <ActionsCol xs={12}>
+            <FormSubmit
+              disabledSubmit={hasRuleBuilderErrors(rule)}
+              submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
+              centerCol={
+                initialRule && (
+                  <>
+                    <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors(rule)}>
+                      Update rule
+                    </Button>
+                    <Button
+                      bsStyle="info"
+                      title="Convert Rule Builder to Source Code"
+                      disabled={hasRuleBuilderErrors(rule)}
+                      onClick={() => {
+                        sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CONVERT_TO_SOURCE_CODE_CLICKED, {
+                          app_pathname: getPathnameWithoutId(pathname),
+                          app_section: 'pipeline-rules',
+                          app_action_value: 'convert-rule-builder-to-source-code-button',
+                        });
 
-                      (
-                        <RuleBuilderBlock key={index}
-                                          blockDict={conditionsDict || []}
-                                          block={condition}
-                                          order={index}
-                                          type="condition"
-                                          addBlock={addBlock}
-                                          updateBlock={updateBlock}
-                                          deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'condition' })} />
-                      )
-                    ))}
-                    <RuleBuilderBlock blockDict={conditionsDict || []}
-                                      order={newConditionBlockIndex}
-                                      type="condition"
-                                      addBlock={addBlock}
-                                      updateBlock={updateBlock}
-                                      deleteBlock={() => setBlockToDelete({
-                                        orderIndex: newConditionBlockIndex,
-                                        type: 'condition',
-                                      })} />
-                  </StyledPanelBody>
-                </Panel.Collapse>
-              </StyledPanel>
-              <br />
-              <StyledPanel expanded={actionsExpanded}>
-                <StyledPanelHeading>
-                  <Panel.Title toggle>
-                    Then
-                  </Panel.Title>
-                </StyledPanelHeading>
-                <Panel.Collapse>
-                  <StyledPanelBody>
-                    {rule.rule_builder.actions.map((action, index) => (
-
-                      (
-                        <RuleBuilderBlock key={index}
-                                          blockDict={actionsDict || []}
-                                          block={action}
-                                          order={index}
-                                          type="action"
-                                          outputVariableList={outputVariableList()}
-                                          addBlock={addBlock}
-                                          updateBlock={updateBlock}
-                                          deleteBlock={() => setBlockToDelete({ orderIndex: index, type: 'action' })} />
-                      )
-                    ))}
-                    <RuleBuilderBlock blockDict={actionsDict || []}
-                                      order={newActionBlockIndex}
-                                      type="action"
-                                      outputVariableList={outputVariableList()}
-                                      addBlock={addBlock}
-                                      updateBlock={updateBlock}
-                                      deleteBlock={() => setBlockToDelete({ orderIndex: newActionBlockIndex, type: 'action' })} />
-                  </StyledPanelBody>
-                </Panel.Collapse>
-              </StyledPanel>
-              <Errors objectWithErrors={rule.rule_builder} />
-            </Col>
-            <Col xs={4}>
-              <RuleSimulation rule={rule} onSaveMessage={saveSimulatorMessage} />
-            </Col>
-            <ActionsCol xs={12}>
-              <FormSubmit disabledSubmit={hasRuleBuilderErrors(rule)}
-                          submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
-                          centerCol={initialRule && (
-                          <>
-                            <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors(rule)}>
-                              Update rule
-                            </Button>
-                            <Button bsStyle="info"
-                                    title="Convert Rule Builder to Source Code"
-                                    disabled={hasRuleBuilderErrors(rule)}
-                                    onClick={() => {
-                                      sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CONVERT_TO_SOURCE_CODE_CLICKED, {
-                                        app_pathname: getPathnameWithoutId(pathname),
-                                        app_section: 'pipeline-rules',
-                                        app_action_value: 'convert-rule-builder-to-source-code-button',
-                                      });
-
-                                      setRuleSourceCodeToShow(rule);
-                                    }}>
-                              Convert to Source Code
-                            </Button>
-                          </>
-                          )}
-                          onCancel={handleCancel} />
-            </ActionsCol>
-          </Row>
-          {blockToDelete && (
-          <ConfirmDialog title={`Delete ${blockToDelete.type}`}
-                         show
-                         onConfirm={() => {
-                           deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
-                           setBlockToDelete(null);
-                         }}
-                         onCancel={() => setBlockToDelete(null)}>
-            <>Are you sure you want to delete <strong>{blockToDelete.type} N° {blockToDelete.orderIndex + 1}</strong>?</>
+                        setRuleSourceCodeToShow(rule);
+                      }}
+                    >
+                      Convert to Source Code
+                    </Button>
+                  </>
+                )
+              }
+              onCancel={handleCancel}
+            />
+          </ActionsCol>
+        </Row>
+        {blockToDelete && (
+          <ConfirmDialog
+            title={`Delete ${blockToDelete.type}`}
+            show
+            onConfirm={() => {
+              deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
+              setBlockToDelete(null);
+            }}
+            onCancel={() => setBlockToDelete(null)}
+          >
+            <>
+              Are you sure you want to delete{' '}
+              <strong>
+                {blockToDelete.type} N° {blockToDelete.orderIndex + 1}
+              </strong>
+              ?
+            </>
           </ConfirmDialog>
-          )}
-          {ruleSourceCodeToShow && (
-          <ConvertToSourceCodeModal show
-                                    onNavigateAway={updateRule}
-                                    onHide={() => setRuleSourceCodeToShow(null)}
-                                    rule={ruleSourceCodeToShow} />
-          )}
-        </form>
-      </RuleBuilderProvider>
-    )
+        )}
+        {ruleSourceCodeToShow && (
+          <ConvertToSourceCodeModal
+            show
+            onNavigateAway={updateRule}
+            onHide={() => setRuleSourceCodeToShow(null)}
+            rule={ruleSourceCodeToShow}
+          />
+        )}
+      </form>
+    </RuleBuilderProvider>
   );
 };
 

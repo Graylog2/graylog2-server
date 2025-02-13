@@ -30,11 +30,13 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
 
   it('should render the field set', () => {
     const { container } = render(
-      <HTTPJSONPathAdapterFieldSet config={config}
-                                   updateConfig={() => {}}
-                                   handleFormEvent={() => {}}
-                                   validationState={() => 'success'}
-                                   validationMessage={() => ''} />,
+      <HTTPJSONPathAdapterFieldSet
+        config={config}
+        updateConfig={() => {}}
+        handleFormEvent={() => {}}
+        validationState={() => 'success'}
+        validationMessage={() => ''}
+      />,
     );
 
     expect(container).not.toBeNull();
@@ -43,11 +45,13 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
   it('should add a header', () => {
     const updateConfig = jest.fn();
     const { getByTestId, getByText } = render(
-      <HTTPJSONPathAdapterFieldSet config={config}
-                                   updateConfig={updateConfig}
-                                   handleFormEvent={() => {}}
-                                   validationState={() => 'success'}
-                                   validationMessage={() => ''} />,
+      <HTTPJSONPathAdapterFieldSet
+        config={config}
+        updateConfig={updateConfig}
+        handleFormEvent={() => {}}
+        validationState={() => 'success'}
+        validationMessage={() => ''}
+      />,
     );
     const newKeyInput = getByTestId('newKey');
     const newValueInput = getByTestId('newValue');

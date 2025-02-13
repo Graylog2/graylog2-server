@@ -36,11 +36,11 @@ import type { ContentPackInstallation } from 'components/content-packs/Types';
 import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 
 type Props = {
-  pack: ContentPackInstallation
-  contentPackRevisions: ContentPackRevisions,
-  onDeletePack?: (id: string, rev: number) => void
-  onChange?: (id: string) => void
-  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void
+  pack: ContentPackInstallation;
+  contentPackRevisions: ContentPackRevisions;
+  onDeletePack?: (id: string, rev: number) => void;
+  onChange?: (id: string) => void;
+  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void;
 };
 
 const ContentPackVersionItem = ({
@@ -79,40 +79,37 @@ const ContentPackVersionItem = ({
   return (
     <tr key={pack.id + pack.rev}>
       <td>
-        <input type="radio"
-               value={pack.rev}
-               onChange={onChange}
-               checked={selectedVersion === pack.rev} />
+        <input type="radio" value={pack.rev} onChange={onChange} checked={selectedVersion === pack.rev} />
       </td>
       <td>{pack.rev}</td>
       <td className="text-right">
         <ButtonToolbar className="pull-right">
-          <Button bsStyle="success"
-                  bsSize="small"
-                  onClick={() => handleDownload()}>
+          <Button bsStyle="success" bsSize="small" onClick={() => handleDownload()}>
             Download
           </Button>
           <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">
             <MenuItem onClick={() => handleInstall()}>Install</MenuItem>
-            <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
+            <LinkContainer
+              to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}
+            >
               <MenuItem>Create New From Revision</MenuItem>
             </LinkContainer>
             <MenuItem divider />
-            <DeleteMenuItem onClick={() => { onDeletePack(pack.id, pack.rev); }} />
+            <DeleteMenuItem
+              onClick={() => {
+                onDeletePack(pack.id, pack.rev);
+              }}
+            />
           </DropdownButton>
         </ButtonToolbar>
       </td>
       {showInstallModal && (
-        <BootstrapModalWrapper showModal={showInstallModal}
-                               onHide={onCloseInstallModal}
-                               bsSize="large">
+        <BootstrapModalWrapper showModal={showInstallModal} onHide={onCloseInstallModal} bsSize="large">
           <Modal.Header closeButton>
             <Modal.Title>Install Content Pack</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <ContentPackInstall ref={installRef}
-                                contentPack={pack}
-                                onInstall={onInstallProp} />
+            <ContentPackInstall ref={installRef} contentPack={pack} onInstall={onInstallProp} />
           </Modal.Body>
           <Modal.Footer>
             <ModalSubmit submitButtonText="Install" onSubmit={onInstall} onCancel={onCloseInstallModal} />
@@ -120,12 +117,13 @@ const ContentPackVersionItem = ({
         </BootstrapModalWrapper>
       )}
       {showDownloadModal && (
-        <ContentPackDownloadControl show={showDownloadModal}
-                                    onHide={() => setShowDownloadModal(false)}
-                                    contentPackId={pack.id}
-                                    revision={pack.rev} />
+        <ContentPackDownloadControl
+          show={showDownloadModal}
+          onHide={() => setShowDownloadModal(false)}
+          contentPackId={pack.id}
+          revision={pack.rev}
+        />
       )}
-
     </tr>
   );
 };

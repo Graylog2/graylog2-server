@@ -26,29 +26,36 @@ const ESClusterStatus = styled(Alert)`
   margin-bottom: 5px;
 `;
 
-const IndexerClusterHealthSummary = ({ health, name }: {
+const IndexerClusterHealthSummary = ({
+  health,
+  name,
+}: {
   health: {
-    status: string,
+    status: string;
     shards: {
-      active: string,
-      initializing: string,
-      relocating: string,
-      unassigned: string
-    }
-  },
+      active: string;
+      initializing: string;
+      relocating: string;
+      unassigned: string;
+    };
+  };
   name?: {
-    name: string,
-    distribution: string,
-  }
+    name: string;
+    distribution: string;
+  };
 }) => {
   const formattedHealthStatus = health.status.toLowerCase();
 
   const alertClassForHealth = () => {
     switch (formattedHealthStatus) {
-      case 'green': return 'success';
-      case 'yellow': return 'warning';
-      case 'red': return 'danger';
-      default: return 'success';
+      case 'green':
+        return 'success';
+      case 'yellow':
+        return 'warning';
+      case 'red':
+        return 'danger';
+      default:
+        return 'success';
     }
   };
 
@@ -56,21 +63,20 @@ const IndexerClusterHealthSummary = ({ health, name }: {
     const text = `${name?.distribution || 'Elasticsearch'} cluster ${name?.name || ''} is ${formattedHealthStatus}.`;
 
     switch (formattedHealthStatus) {
-      case 'green': return text;
+      case 'green':
+        return text;
       case 'yellow':
-      case 'red': return <strong>{text}</strong>;
-      default: return text;
+      case 'red':
+        return <strong>{text}</strong>;
+      default:
+        return text;
     }
   }, [formattedHealthStatus, name]);
 
   return (
     <ESClusterStatus bsStyle={alertClassForHealth()}>
-      {formattedTextForHealth}{' '}
-      Shards:{' '}
-      {health.shards.active} active,{' '}
-      {health.shards.initializing} initializing,{' '}
-      {health.shards.relocating} relocating,{' '}
-      {health.shards.unassigned} unassigned,{' '}
+      {formattedTextForHealth} Shards: {health.shards.active} active, {health.shards.initializing} initializing,{' '}
+      {health.shards.relocating} relocating, {health.shards.unassigned} unassigned,{' '}
       <DocumentationLink page={DocsHelper.PAGES.CLUSTER_STATUS_EXPLAINED} text="What does this mean?" />
     </ESClusterStatus>
   );

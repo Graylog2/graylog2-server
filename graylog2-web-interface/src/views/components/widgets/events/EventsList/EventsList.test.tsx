@@ -75,23 +75,30 @@ describe('EventsList', () => {
     userEvent.click(nextPageButton);
   };
 
-  const SimpleEventsList = ({ data: _data = data, config: _config = config, fields = Immutable.List([]), ...props }: Partial<React.ComponentProps<typeof EventsList>>) => (
+  const SimpleEventsList = ({
+    data: _data = data,
+    config: _config = config,
+    fields = Immutable.List([]),
+    ...props
+  }: Partial<React.ComponentProps<typeof EventsList>>) => (
     <TestStoreProvider>
-      <EventsList title="Events List"
-                  editing={false}
-                  filter=""
-                  onConfigChange={() => Promise.resolve()}
-                  type="events"
-                  id="events-list"
-                  queryId="deadbeef"
-                  toggleEdit={() => {}}
-                  setLoadingState={() => {}}
-                  data={_data}
-                  config={_config}
-                  fields={fields}
-                  height={480}
-                  width={640}
-                  {...props} />
+      <EventsList
+        title="Events List"
+        editing={false}
+        filter=""
+        onConfigChange={() => Promise.resolve()}
+        type="events"
+        id="events-list"
+        queryId="deadbeef"
+        toggleEdit={() => {}}
+        setLoadingState={() => {}}
+        data={_data}
+        config={_config}
+        fields={fields}
+        height={480}
+        width={640}
+        {...props}
+      />
     </TestStoreProvider>
   );
 
@@ -102,10 +109,12 @@ describe('EventsList', () => {
   });
 
   it('reexecute query for search type, when using pagination', async () => {
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult(dummySearchJobResults),
-      widgetMapping: Immutable.Map(),
-    }));
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult(dummySearchJobResults),
+        widgetMapping: Immutable.Map(),
+      }),
+    );
     asMock(useAppDispatch).mockReturnValue(dispatch);
     const searchTypePayload = { [data.id]: { page: 2, per_page: 10 } };
     const secondPageSize = 10;
@@ -128,10 +137,12 @@ describe('EventsList', () => {
       animationId: 'animation-id',
     });
 
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult(dummySearchJobResults),
-      widgetMapping: Immutable.Map(),
-    }));
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult(dummySearchJobResults),
+        widgetMapping: Immutable.Map(),
+      }),
+    );
     asMock(useAppDispatch).mockReturnValue(dispatch);
     const secondPageSize = 10;
 
@@ -143,15 +154,19 @@ describe('EventsList', () => {
   });
 
   it('displays error description, when using pagination throws an error', async () => {
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult({
-        ...dummySearchJobResults,
-        errors: [{
-          description: 'Error description',
-        } as SearchErrorResponse],
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult({
+          ...dummySearchJobResults,
+          errors: [
+            {
+              description: 'Error description',
+            } as SearchErrorResponse,
+          ],
+        }),
+        widgetMapping: Immutable.Map(),
       }),
-      widgetMapping: Immutable.Map(),
-    }));
+    );
     asMock(useAppDispatch).mockReturnValue(dispatch);
 
     const secondPageSize = 10;

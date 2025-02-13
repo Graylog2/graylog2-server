@@ -28,8 +28,10 @@ const fromConfig = (config: AggregationWidgetConfig) => ({
   units: config.units.toFormValues(),
 });
 
-const toConfig = (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
-  .units(new UnitsConfig(mapValues(formValues.units, (unit) => new FieldUnit(unit.unitType, unit.abbrev))));
+const toConfig = (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) =>
+  configBuilder.units(
+    new UnitsConfig(mapValues(formValues.units, (unit) => new FieldUnit(unit.unitType, unit.abbrev))),
+  );
 
 const validate = () => ({});
 

@@ -27,7 +27,10 @@ import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
-import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import {
+  LookupTableDataAdaptersActions,
+  LookupTableDataAdaptersStore,
+} from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
 import withHistory from 'routing/withHistory';
 import type { HistoryFunction } from 'routing/useHistory';
@@ -56,9 +59,12 @@ type LUTDataAdaptersPageProps = {
   history: HistoryFunction;
 } & ParamsContext;
 
-class LUTDataAdaptersPage extends React.Component<LUTDataAdaptersPageProps, {
-  [key: string]: any;
-}> {
+class LUTDataAdaptersPage extends React.Component<
+  LUTDataAdaptersPageProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     errorStates: null,
     validationErrors: {},
@@ -78,8 +84,12 @@ class LUTDataAdaptersPage extends React.Component<LUTDataAdaptersPageProps, {
   }
 
   componentDidUpdate(prevProps) {
-    const { location: { pathname } } = this.props;
-    const { location: { pathname: prevPathname } } = prevProps;
+    const {
+      location: { pathname },
+    } = this.props;
+    const {
+      location: { pathname: prevPathname },
+    } = prevProps;
 
     if (pathname !== prevPathname) {
       this._loadData(this.props);
@@ -134,16 +144,7 @@ class LUTDataAdaptersPage extends React.Component<LUTDataAdaptersPageProps, {
   };
 
   render() {
-    const {
-      action,
-      errorStates,
-      dataAdapter,
-      validationErrors,
-      types,
-      dataAdapters,
-      pagination,
-      history,
-    } = this.props;
+    const { action, errorStates, dataAdapter, validationErrors, types, dataAdapters, pagination, history } = this.props;
     let content;
     const isShowing = action === 'show';
     const isEditing = action === 'edit';
@@ -155,13 +156,15 @@ class LUTDataAdaptersPage extends React.Component<LUTDataAdaptersPageProps, {
         content = (
           <Row className="content">
             <Col lg={12}>
-              <DataAdapterForm dataAdapter={dataAdapter}
-                               type={dataAdapter.config.type}
-                               create={false}
-                               title="Data Adapter"
-                               saved={() => _saved(history)}
-                               validate={_validateAdapter}
-                               validationErrors={validationErrors} />
+              <DataAdapterForm
+                dataAdapter={dataAdapter}
+                type={dataAdapter.config.type}
+                create={false}
+                title="Data Adapter"
+                saved={() => _saved(history)}
+                validate={_validateAdapter}
+                validationErrors={validationErrors}
+              />
             </Col>
           </Row>
         );
@@ -173,31 +176,33 @@ class LUTDataAdaptersPage extends React.Component<LUTDataAdaptersPageProps, {
         content = <Spinner text="Loading data adapter types" />;
       } else {
         content = (
-          <DataAdapterCreate types={types}
-                             saved={() => _saved(history)}
-                             validate={_validateAdapter}
-                             validationErrors={validationErrors} />
+          <DataAdapterCreate
+            types={types}
+            saved={() => _saved(history)}
+            validate={_validateAdapter}
+            validationErrors={validationErrors}
+          />
         );
       }
     } else if (!dataAdapters) {
       content = <Spinner text="Loading data adapters" />;
     } else {
-      content = (
-        <DataAdaptersOverview dataAdapters={dataAdapters}
-                              pagination={pagination}
-                              errorStates={errorStates} />
-      );
+      content = <DataAdaptersOverview dataAdapters={dataAdapters} pagination={pagination} errorStates={errorStates} />;
     }
 
     return (
       <DocumentTitle title="Lookup Tables - Data Adapters">
         <LUTPageNavigation />
-        <PageHeader title="Data adapters for Lookup Tables"
-                    actions={(
-                      <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
-                        <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>
-                      </LinkContainer>
-                    )}>
+        <PageHeader
+          title="Data adapters for Lookup Tables"
+          actions={
+            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
+              <Button bsStyle="success" style={{ marginLeft: 5 }}>
+                Create data adapter
+              </Button>
+            </LinkContainer>
+          }
+        >
           <span>Data adapters provide the actual values for lookup tables</span>
         </PageHeader>
 
@@ -214,4 +219,5 @@ export default connect(
     ...otherProps,
     ...dataAdaptersStore,
     errorStates: lookupTableStore.errorStates,
-  }));
+  }),
+);

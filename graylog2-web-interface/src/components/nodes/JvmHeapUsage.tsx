@@ -33,28 +33,30 @@ const NodeHeap = styled.div`
   }
 `;
 
-const Blob = styled.span(({ theme }) => css`
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  margin-left: 2px;
-  border: 1px solid;
+const Blob = styled.span(
+  ({ theme }) => css`
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-left: 2px;
+    border: 1px solid;
 
-  &.used-memory {
-    background-color: ${theme.colors.variant.primary};
-    border-color: ${theme.colors.variant.dark.primary};
-  }
+    &.used-memory {
+      background-color: ${theme.colors.variant.primary};
+      border-color: ${theme.colors.variant.dark.primary};
+    }
 
-  &.committed-memory {
-    background-color: ${theme.colors.variant.warning};
-    border-color: ${theme.colors.variant.dark.warning};
-  }
+    &.committed-memory {
+      background-color: ${theme.colors.variant.warning};
+      border-color: ${theme.colors.variant.dark.warning};
+    }
 
-  &.max-memory {
-    background-color: ${theme.colors.global.background};
-    border-color: ${theme.colors.gray[80]};
-  }
-`);
+    &.max-memory {
+      background-color: ${theme.colors.global.background};
+      border-color: ${theme.colors.gray[80]};
+    }
+  `,
+);
 
 const StyledProgressBar = styled(ProgressBar)`
   height: 25px;
@@ -62,8 +64,8 @@ const StyledProgressBar = styled(ProgressBar)`
 `;
 
 type Props = {
-  nodeId: string,
-}
+  nodeId: string;
+};
 const metricNames = {
   usedMemory: 'jvm.memory.heap.used',
   committedMemory: 'jvm.memory.heap.committed',
@@ -77,7 +79,9 @@ const JvmHeapUsage = ({ nodeId }: Props) => {
     Object.keys(metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, metricNames[metricShortName]));
 
     return () => {
-      Object.keys(metricNames).forEach((metricShortName) => MetricsActions.remove(nodeId, metricNames[metricShortName]));
+      Object.keys(metricNames).forEach((metricShortName) =>
+        MetricsActions.remove(nodeId, metricNames[metricShortName]),
+      );
     };
   }, [nodeId]);
 
@@ -103,8 +107,12 @@ const JvmHeapUsage = ({ nodeId }: Props) => {
   }, [metrics, nodeId]);
 
   const { usedPercentage, committedPercentage, usedMemory, committedMemory, maxMemory } = extractedMetrics;
-  let progressBarConfig: Array<{ value: number, bsStyle?: 'primary' | 'warning' }> = [{ value: 0 }];
-  let detail = <p><Spinner text="Loading heap usage information..." /></p>;
+  let progressBarConfig: Array<{ value: number; bsStyle?: 'primary' | 'warning' }> = [{ value: 0 }];
+  let detail = (
+    <p>
+      <Spinner text="Loading heap usage information..." />
+    </p>
+  );
 
   if (usedPercentage || committedPercentage) {
     if (Object.keys(extractedMetrics).length === 0) {
@@ -117,13 +125,9 @@ const JvmHeapUsage = ({ nodeId }: Props) => {
 
       detail = (
         <p>
-          The JVM is using{' '}
-          <Blob className="used-memory" />
-          <strong> {NumberUtils.formatBytes(usedMemory)}</strong>
-          {' '}of{' '}
-          <Blob className="committed-memory" />
-          <strong> {NumberUtils.formatBytes(committedMemory)}</strong>
-          {' '}heap space and will not attempt to use more than{' '}
+          The JVM is using <Blob className="used-memory" />
+          <strong> {NumberUtils.formatBytes(usedMemory)}</strong> of <Blob className="committed-memory" />
+          <strong> {NumberUtils.formatBytes(committedMemory)}</strong> heap space and will not attempt to use more than{' '}
           <Blob className="max-memory" />
           <strong> {NumberUtils.formatBytes(maxMemory)}</strong>
         </p>
