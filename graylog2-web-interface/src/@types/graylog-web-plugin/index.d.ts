@@ -25,7 +25,7 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 import type { Stream } from 'logic/streams/types';
 import type { ColumnRenderer } from 'components/common/EntityDataTable/types';
 import type { StepType } from 'components/common/Wizard';
-import type { InputSetupWizardStep, InputSetupWizardCategory } from 'components/inputs/InputSetupWizard';
+import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 
 interface PluginRoute {
   path: string;
