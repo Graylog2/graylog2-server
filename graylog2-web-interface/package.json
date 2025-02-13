@@ -93,7 +93,7 @@
     "react-hotkeys-hook": "^4.4.1",
     "react-immutable-proptypes": "^2.1.0",
     "react-isolated-scroll": "^0.1.1",
-    "react-leaflet": "^4.0.2",
+    "react-leaflet": "^5.0.0",
     "react-mops": "v2.0.0-beta.0",
     "react-plotly.js": "2.6.0",
     "react-redux": "^9.1.0",
