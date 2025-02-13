@@ -32,10 +32,10 @@ type DefaultProps = {
   value: string;
 };
 
-const Default = ({
-  value,
-}: DefaultProps) => (
-  <>{value} <small>(default)</small></>
+const Default = ({ value }: DefaultProps) => (
+  <>
+    {value} <small>(default)</small>
+  </>
 );
 
 type StepReviewProps = {
@@ -44,11 +44,7 @@ type StepReviewProps = {
   externalInputSubmit?: boolean;
 };
 
-const StepReview = ({
-  onSubmit,
-  onEditClick,
-  externalInputSubmit = false,
-}: StepReviewProps) => {
+const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: StepReviewProps) => {
   const [formError, setFormError] = useState(null);
   const { formData } = useContext(FormDataContext);
   const { logData } = useContext(ApiContext);
@@ -109,15 +105,21 @@ const StepReview = ({
   };
 
   return (
-    <FormWrap onSubmit={handleSubmit}
-              buttonContent="Complete CloudWatch Setup"
-              loading={fetchSubmitStatus.loading}
-              error={formError}
-              title="Final Review"
-              description="Check out everything below to make sure it&apos;s correct, then click the button below to complete your CloudWatch setup!">
-
+    <FormWrap
+      onSubmit={handleSubmit}
+      buttonContent="Complete CloudWatch Setup"
+      loading={fetchSubmitStatus.loading}
+      error={formError}
+      title="Final Review"
+      description="Check out everything below to make sure it's correct, then click the button below to complete your CloudWatch setup!"
+    >
       <Container>
-        <Subheader>Setting up CloudWatch <small><EditAnchor onClick={onEditClick('authorize')}>Edit</EditAnchor></small></Subheader>
+        <Subheader>
+          Setting up CloudWatch{' '}
+          <small>
+            <EditAnchor onClick={onEditClick('authorize')}>Edit</EditAnchor>
+          </small>
+        </Subheader>
         <ReviewItems>
           <li>
             <strong>Name</strong>
@@ -177,7 +179,12 @@ const StepReview = ({
           </li>
         </ReviewItems>
 
-        <Subheader>Setting up Kinesis <small><EditAnchor onClick={onEditClick('kinesis-setup')}>Edit</EditAnchor></small></Subheader>
+        <Subheader>
+          Setting up Kinesis{' '}
+          <small>
+            <EditAnchor onClick={onEditClick('kinesis-setup')}>Edit</EditAnchor>
+          </small>
+        </Subheader>
         <ReviewItems>
           <li>
             <strong>Stream</strong>
@@ -185,25 +192,31 @@ const StepReview = ({
           </li>
           <li>
             <strong>Global Input</strong>
-            <span><Icon name="check" /></span>
+            <span>
+              <Icon name="check" />
+            </span>
           </li>
           <li>
             <strong>Record Batch Size</strong>
             <span>
-              {
+              {awsCloudWatchBatchSize.value ? (
                 awsCloudWatchBatchSize.value
-                  ? awsCloudWatchBatchSize.value
-                  : <Default value={awsCloudWatchBatchSize.defaultValue} />
-              }
+              ) : (
+                <Default value={awsCloudWatchBatchSize.defaultValue} />
+              )}
             </span>
           </li>
           <li>
             <strong>Enable Throttling</strong>
-            <span><Icon name={throttleEnabled ? 'check_circle' : 'cancel'} /></span>
+            <span>
+              <Icon name={throttleEnabled ? 'check_circle' : 'cancel'} />
+            </span>
           </li>
           <li>
             <strong>Add Flow Log prefix to field names</strong>
-            <span><Icon name={addPrefix ? 'check_circle' : 'cancel'} /></span>
+            <span>
+              <Icon name={addPrefix ? 'check_circle' : 'cancel'} />
+            </span>
           </li>
         </ReviewItems>
 
@@ -214,14 +227,19 @@ const StepReview = ({
             <span>{KINESIS_LOG_TYPES.find((type) => type.value === awsCloudWatchKinesisInputType.value).label}</span>
           </li>
         </ReviewItems>
-        <p>If you need your logs parsed differently check out our <Link to={Routes.SYSTEM.PIPELINES.RULES}>Pipeline Rule</Link> for additional details and instructions.</p>
+        <p>
+          If you need your logs parsed differently check out our{' '}
+          <Link to={Routes.SYSTEM.PIPELINES.RULES}>Pipeline Rule</Link> for additional details and instructions.
+        </p>
 
-        <Input id="awsCloudWatchLog"
-               type="textarea"
-               label=""
-               value={(logData && logData.message) || "We haven't received a response back from Amazon yet."}
-               rows={10}
-               disabled />
+        <Input
+          id="awsCloudWatchLog"
+          type="textarea"
+          label=""
+          value={(logData && logData.message) || "We haven't received a response back from Amazon yet."}
+          rows={10}
+          disabled
+        />
       </Container>
     </FormWrap>
   );

@@ -20,14 +20,15 @@ import usePluginEntities from 'hooks/usePluginEntities';
 
 const useStreamDataLakeHasData = (streamId: string, enabled: boolean) => {
   const { fetchStreamDataLake } = usePluginEntities('dataLake')[0] ?? {};
-  const { data: dataLake, isError, isLoading } = useQuery(['stream', 'data-lake', streamId],
-    () => fetchStreamDataLake(streamId),
-    { enabled: fetchStreamDataLake && enabled },
-  );
+  const {
+    data: dataLake,
+    isError,
+    isLoading,
+  } = useQuery(['stream', 'data-lake', streamId], () => fetchStreamDataLake(streamId), {
+    enabled: fetchStreamDataLake && enabled,
+  });
 
-  return (isLoading || isError) ? undefined : (
-    dataLake?.message_count > 1 || dataLake?.restore_history?.length > 0
-  );
+  return isLoading || isError ? undefined : dataLake?.message_count > 1 || dataLake?.restore_history?.length > 0;
 };
 
 export default useStreamDataLakeHasData;

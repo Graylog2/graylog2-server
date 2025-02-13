@@ -32,21 +32,26 @@ const EditExtractorsPage = () => {
   const history = useHistory();
   const { extractor } = useStore(ExtractorsStore);
   const { input } = useStore(InputsStore);
-  const { inputId, extractorId, nodeId } = useParams<{ inputId: string, extractorId: string, nodeId: string }>();
-  const [exampleMessage, setExampleMessage] = useState<{ fields?: { [key: string]: any }}>({});
+  const { inputId, extractorId, nodeId } = useParams<{ inputId: string; extractorId: string; nodeId: string }>();
+  const [exampleMessage, setExampleMessage] = useState<{ fields?: { [key: string]: any } }>({});
 
   useEffect(() => {
     InputsActions.get(inputId);
     ExtractorsActions.get(inputId, extractorId);
 
-    UniversalSearchStore.search('relative', `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`, { relative: 3600 }, undefined, 1)
-      .then((response) => {
-        if (response.total_results > 0) {
-          setExampleMessage(response.messages[0]);
-        } else {
-          setExampleMessage({});
-        }
-      });
+    UniversalSearchStore.search(
+      'relative',
+      `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
+      { relative: 3600 },
+      undefined,
+      1,
+    ).then((response) => {
+      if (response.total_results > 0) {
+        setExampleMessage(response.messages[0]);
+      } else {
+        setExampleMessage({});
+      }
+    });
   }, [extractorId, inputId]);
 
   const _isLoading = !(input && extractor && exampleMessage);
@@ -72,22 +77,29 @@ const EditExtractorsPage = () => {
 
   return (
     <DocumentTitle title={`Edit extractor ${extractor.title}`}>
-      <PageHeader title={<span>Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em></span>}
-                  documentationLink={{
-                    title: 'Extractors documentation',
-                    path: DocsHelper.PAGES.EXTRACTORS,
-                  }}>
+      <PageHeader
+        title={
+          <span>
+            Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em>
+          </span>
+        }
+        documentationLink={{
+          title: 'Extractors documentation',
+          path: DocsHelper.PAGES.EXTRACTORS,
+        }}
+      >
         <span>
-          Extractors are applied on every message that is received by an input. Use them to extract and transform{' '}
-          any text data into fields that allow you easy filtering and analysis later on.
+          Extractors are applied on every message that is received by an input. Use them to extract and transform any
+          text data into fields that allow you easy filtering and analysis later on.
         </span>
       </PageHeader>
-      <EditExtractor action="edit"
-                     extractor={extractor}
-                     inputId={input.id}
-                     exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
-                     onSave={_extractorSaved} />
-
+      <EditExtractor
+        action="edit"
+        extractor={extractor}
+        inputId={input.id}
+        exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
+        onSave={_extractorSaved}
+      />
     </DocumentTitle>
   );
 };

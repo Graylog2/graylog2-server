@@ -14,15 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Well as BootstrapWell } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+package org.graylog.plugins.views.search.jobs;
 
-const Well = styled(BootstrapWell)(({ theme }) => css`
-  background-color: ${theme.colors.variant.lightest.default};
-  border-color: ${theme.colors.variant.light.default};
-  color: ${theme.colors.variant.darker.default};
-`);
-
-/** @component */
-export default Well;
+public enum SearchJobType {
+    DATA_LAKE,
+    //SEARCH_ENGINE or INDEXER - TBD in future
+}

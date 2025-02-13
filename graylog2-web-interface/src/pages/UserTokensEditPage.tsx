@@ -32,17 +32,18 @@ import useCurrentUser from 'hooks/useCurrentUser';
 
 type Props = {
   params: {
-    userId: string,
-  },
+    userId: string;
+  };
 };
 
 const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
   <>
-    Edit Tokens Of User  {fullName && (
+    Edit Tokens Of User{' '}
+    {fullName && (
       <>
         - <i>{fullName}</i>
       </>
-  )}
+    )}
   </>
 );
 
@@ -90,38 +91,42 @@ const UserEditPage = ({ params }: Props) => {
   const userId = params?.userId;
 
   const loadTokens = useCallback(() => _loadTokens(loadedUser, currentUser, setTokens), [currentUser, loadedUser]);
-  const _handleTokenDelete = (tokenId, tokenName) => _deleteToken(tokenId, tokenName, userId, loadTokens, setDeletingTokenId);
+  const _handleTokenDelete = (tokenId, tokenName) =>
+    _deleteToken(tokenId, tokenName, userId, loadTokens, setDeletingTokenId);
   const _handleTokenCreate = (tokenName) => _createToken(tokenName, userId, loadTokens, setCreatingToken);
 
-  useEffect(() => { loadTokens(); }, [loadTokens, loadedUser]);
-  useEffect(() => { UsersDomain.load(userId).then(setLoadedUser); }, [userId]);
+  useEffect(() => {
+    loadTokens();
+  }, [loadTokens, loadedUser]);
+  useEffect(() => {
+    UsersDomain.load(userId).then(setLoadedUser);
+  }, [userId]);
 
   return (
     <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>
       <UsersPageNavigation />
-      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
-                  actions={(
-                    <UserActionLinks userId={userId}
-                                     userIsReadOnly={loadedUser?.readOnly ?? false} />
-                  )}
-                  documentationLink={{
-                    title: 'Permissions documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
-        <span>
-          You can create new tokens or delete old ones.
-        </span>
+      <PageHeader
+        title={<PageTitle fullName={loadedUser?.fullName} />}
+        actions={<UserActionLinks userId={userId} userIsReadOnly={loadedUser?.readOnly ?? false} />}
+        documentationLink={{
+          title: 'Permissions documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+      >
+        <span>You can create new tokens or delete old ones.</span>
       </PageHeader>
 
       <Row className="content">
         <Col lg={8}>
           <Headline>Create And Edit Tokens</Headline>
           {loadedUser ? (
-            <TokenList tokens={tokens}
-                       onDelete={_handleTokenDelete}
-                       onCreate={_handleTokenCreate}
-                       creatingToken={creatingToken}
-                       deletingToken={deletingTokenId} />
+            <TokenList
+              tokens={tokens}
+              onDelete={_handleTokenDelete}
+              onCreate={_handleTokenCreate}
+              creatingToken={creatingToken}
+              deletingToken={deletingTokenId}
+            />
           ) : (
             <Row>
               <Col xs={12}>

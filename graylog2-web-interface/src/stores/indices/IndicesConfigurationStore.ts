@@ -27,9 +27,8 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const IndicesConfigurationActions = singletonActions(
-  'core.IndicesConfiguration',
-  () => Reflux.createActions<IndicesConfigurationActionsType>({
+export const IndicesConfigurationActions = singletonActions('core.IndicesConfiguration', () =>
+  Reflux.createActions<IndicesConfigurationActionsType>({
     loadRotationStrategies: { asyncResult: true },
     loadRetentionStrategies: { asyncResult: true },
   }),
@@ -37,9 +36,8 @@ export const IndicesConfigurationActions = singletonActions(
 
 const urlPrefix = '/system/indices';
 
-export const IndicesConfigurationStore = singletonStore(
-  'core.IndicesConfiguration',
-  () => Reflux.createStore<IndicesConfigurationStoreState>({
+export const IndicesConfigurationStore = singletonStore('core.IndicesConfiguration', () =>
+  Reflux.createStore<IndicesConfigurationStoreState>({
     listenables: [IndicesConfigurationActions],
 
     rotationStrategies: undefined,
@@ -81,7 +79,10 @@ export const IndicesConfigurationStore = singletonStore(
           this.trigger(this.getState());
         },
         (error) => {
-          UserNotification.error(`Fetching rotation strategies failed: ${error}`, 'Could not retrieve rotation strategies');
+          UserNotification.error(
+            `Fetching rotation strategies failed: ${error}`,
+            'Could not retrieve rotation strategies',
+          );
         },
       );
 
@@ -98,7 +99,10 @@ export const IndicesConfigurationStore = singletonStore(
           this.trigger(this.getState());
         },
         (error) => {
-          UserNotification.error(`Fetching retention strategies failed: ${error}`, 'Could not retrieve retention strategies');
+          UserNotification.error(
+            `Fetching retention strategies failed: ${error}`,
+            'Could not retrieve retention strategies',
+          );
         },
       );
 

@@ -27,21 +27,24 @@ import EventsPageNavigation from 'components/events/EventsPageNavigation';
 const EventNotificationsPage = () => (
   <DocumentTitle title="Notifications">
     <EventsPageNavigation />
-    <PageHeader title="Notifications"
-                actions={(
-                  <IfPermitted permissions="eventnotifications:create">
-                    <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-                      <Button bsStyle="success">Create notification</Button>
-                    </LinkContainer>
-                  </IfPermitted>
-                  )}
-                documentationLink={{
-                  title: 'Alerts documentation',
-                  path: DocsHelper.PAGES.ALERTS,
-                }}>
+    <PageHeader
+      title="Notifications"
+      actions={
+        <IfPermitted permissions="eventnotifications:create">
+          <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+            <Button bsStyle="success">Create notification</Button>
+          </LinkContainer>
+        </IfPermitted>
+      }
+      documentationLink={{
+        title: 'Alerts documentation',
+        path: DocsHelper.PAGES.ALERTS,
+      }}
+    >
       <span>
-        Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-        to you or to other systems you use for that purpose. Remember to assign Notifications while creating or editing an Event Definition.
+        Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly to you
+        or to other systems you use for that purpose. Remember to assign Notifications while creating or editing an
+        Event Definition.
       </span>
     </PageHeader>
 

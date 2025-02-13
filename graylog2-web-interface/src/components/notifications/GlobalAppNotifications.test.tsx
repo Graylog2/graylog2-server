@@ -22,14 +22,19 @@ import GlobalAppNotifications from './GlobalAppNotifications';
 
 describe('GlobalAppNotifications', () => {
   it('displays global notifications', async () => {
-    PluginStore.register(new PluginManifest({}, {
-      globalNotifications: [
+    PluginStore.register(
+      new PluginManifest(
+        {},
         {
-          key: 'org.graylog.plugins.globalNotification.licenseWarning',
-          component: () => <>Your license is expiring.</>,
+          globalNotifications: [
+            {
+              key: 'org.graylog.plugins.globalNotification.licenseWarning',
+              component: () => <>Your license is expiring.</>,
+            },
+          ],
         },
-      ],
-    }));
+      ),
+    );
 
     render(<GlobalAppNotifications />);
 

@@ -29,9 +29,11 @@ import * as FormsUtils from 'util/FormsUtils';
 
 const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
-const Container = styled.div(({ theme }) => css`
-  padding-top: ${theme.spacings.lg};
-`);
+const Container = styled.div(
+  ({ theme }) => css`
+    padding-top: ${theme.spacings.lg};
+  `,
+);
 
 type NotificationSettingsFormProps = {
   eventDefinition: any;
@@ -39,9 +41,12 @@ type NotificationSettingsFormProps = {
   onSettingsChange: (...args: any[]) => void;
 };
 
-class NotificationSettingsForm extends React.Component<NotificationSettingsFormProps, {
-  [key: string]: any;
-}> {
+class NotificationSettingsForm extends React.Component<
+  NotificationSettingsFormProps,
+  {
+    [key: string]: any;
+  }
+> {
   constructor(props) {
     super(props);
 
@@ -54,7 +59,7 @@ class NotificationSettingsForm extends React.Component<NotificationSettingsFormP
     this.state = {
       gracePeriodDuration: gracePeriod.duration,
       gracePeriodUnit: gracePeriod.unit,
-      isBacklogSizeEnabled: (backlogSize === null ? false : (effectiveBacklogSize > 0)),
+      isBacklogSizeEnabled: backlogSize === null ? false : effectiveBacklogSize > 0,
       backlogSize: effectiveBacklogSize,
     };
   }
@@ -86,7 +91,7 @@ class NotificationSettingsForm extends React.Component<NotificationSettingsFormP
     const { isBacklogSizeEnabled, backlogSize } = this.state;
 
     this.setState({ isBacklogSizeEnabled: !isBacklogSizeEnabled });
-    this.propagateChanges('backlog_size', (isBacklogSizeEnabled ? 0 : backlogSize));
+    this.propagateChanges('backlog_size', isBacklogSizeEnabled ? 0 : backlogSize);
   };
 
   render() {
@@ -100,17 +105,19 @@ class NotificationSettingsForm extends React.Component<NotificationSettingsFormP
     return (
       <Container>
         <FormGroup controlId="grace-period">
-          <TimeUnitInput label="Grace Period"
-                         update={this.handleGracePeriodChange}
-                         defaultEnabled={gracePeriodDuration !== 0}
-                         value={gracePeriodDuration}
-                         unit={gracePeriodUnit}
-                         units={TIME_UNITS}
-                         clearable />
+          <TimeUnitInput
+            label="Grace Period"
+            update={this.handleGracePeriodChange}
+            defaultEnabled={gracePeriodDuration !== 0}
+            value={gracePeriodDuration}
+            unit={gracePeriodUnit}
+            units={TIME_UNITS}
+            clearable
+          />
           <p>
-            Graylog sends Notifications for Alerts every time they occur. Set a Grace Period to control how long
-            Graylog should wait before sending Notifications again. Note that Events with keys will have a Grace
-            Period for each different key value.
+            Graylog sends Notifications for Alerts every time they occur. Set a Grace Period to control how long Graylog
+            should wait before sending Notifications again. Note that Events with keys will have a Grace Period for each
+            different key value.
           </p>
         </FormGroup>
 
@@ -118,17 +125,21 @@ class NotificationSettingsForm extends React.Component<NotificationSettingsFormP
           <ControlLabel>Message Backlog</ControlLabel>
           <InputGroup>
             <InputGroup.Addon>
-              <input id="toggle_backlog_size"
-                     type="checkbox"
-                     checked={isBacklogSizeEnabled}
-                     onChange={this.toggleBacklogSize} />
+              <input
+                id="toggle_backlog_size"
+                type="checkbox"
+                checked={isBacklogSizeEnabled}
+                onChange={this.toggleBacklogSize}
+              />
             </InputGroup.Addon>
-            <FormControl type="number"
-                         id="backlog_size"
-                         name="backlog_size"
-                         onChange={this.handleBacklogSizeChange}
-                         value={backlogSize}
-                         disabled={!isBacklogSizeEnabled} />
+            <FormControl
+              type="number"
+              id="backlog_size"
+              name="backlog_size"
+              onChange={this.handleBacklogSizeChange}
+              value={backlogSize}
+              disabled={!isBacklogSizeEnabled}
+            />
           </InputGroup>
           <p>Number of messages to be included in Notifications.</p>
         </FormGroup>

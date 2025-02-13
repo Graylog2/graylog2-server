@@ -26,9 +26,12 @@ type CopyConfigurationModalProps = {
   showModal?: boolean;
 };
 
-class CopyConfigurationModal extends React.Component<CopyConfigurationModalProps, {
-  [key: string]: any;
-}> {
+class CopyConfigurationModal extends React.Component<
+  CopyConfigurationModalProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     showModal: false,
   };
@@ -82,13 +85,15 @@ class CopyConfigurationModal extends React.Component<CopyConfigurationModalProps
     const { onClose, showModal } = this.props;
 
     return (
-      <CloneMenuModal onClose={() => onClose()}
-                      onSave={this._save}
-                      id={this._getId('configuration-name')}
-                      onChange={this._changeName}
-                      error={errorMessage}
-                      name={name}
-                      showModal={showModal} />
+      <CloneMenuModal
+        onClose={() => onClose()}
+        onSave={this._save}
+        id={this._getId('configuration-name')}
+        onChange={this._changeName}
+        error={errorMessage}
+        name={name}
+        showModal={showModal}
+      />
     );
   }
 }

@@ -38,9 +38,9 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 type Props = {
   params: {
-    index: string | undefined | null,
-    messageId: string | undefined | null,
-  },
+    index: string | undefined | null;
+    messageId: string | undefined | null;
+  };
 };
 
 const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | undefined) => {
@@ -66,8 +66,8 @@ const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | un
 };
 
 type MessageFields = {
-  streams: Array<string>,
-  timestamp: string,
+  streams: Array<string>;
+  timestamp: string;
 };
 
 const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
@@ -81,10 +81,11 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   const { data: message } = useMessage(index, messageId);
   const inputs = useInputs(message?.source_input_id, message?.fields.gl2_source_node);
 
-  useEffect(() => { NodesActions.list(); }, []);
+  useEffect(() => {
+    NodesActions.list();
+  }, []);
 
-  const isLoaded = useMemo(() => (message !== undefined
-    && inputs !== undefined), [message, inputs]);
+  const isLoaded = useMemo(() => message !== undefined && inputs !== undefined, [message, inputs]);
 
   const view = useMemo(() => View.create(), []);
   const executionState = useMemo(() => SearchExecutionState.empty(), []);
@@ -103,12 +104,14 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
                   <FieldTypesContext.Consumer>
                     {({ all }) => (
                       <InteractiveContext.Provider value={false}>
-                        <MessageDetail fields={all}
-                                       streams={streamsMap}
-                                       allStreams={streamsList}
-                                       disableSurroundingSearch
-                                       inputs={inputs}
-                                       message={message} />
+                        <MessageDetail
+                          fields={all}
+                          streams={streamsMap}
+                          allStreams={streamsList}
+                          disableSurroundingSearch
+                          inputs={inputs}
+                          message={message}
+                        />
                       </InteractiveContext.Provider>
                     )}
                   </FieldTypesContext.Consumer>

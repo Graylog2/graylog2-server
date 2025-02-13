@@ -34,18 +34,30 @@ const DEFAULT_LAYOUT = {
   entityTableId: 'datanodes',
   defaultPageSize: 10,
   defaultSort: { attributeId: 'hostname', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['hostname', 'transport_address', 'data_node_status', 'is_leader', 'cert_valid_until', 'datanode_version'],
+  defaultDisplayedAttributes: [
+    'hostname',
+    'transport_address',
+    'data_node_status',
+    'is_leader',
+    'cert_valid_until',
+    'datanode_version',
+  ],
 };
 
-const COLUMNS_ORDER = ['hostname', 'transport_address', 'data_node_status', 'is_leader', 'cert_valid_until', 'datanode_version'];
+const COLUMNS_ORDER = [
+  'hostname',
+  'transport_address',
+  'data_node_status',
+  'is_leader',
+  'cert_valid_until',
+  'datanode_version',
+];
 
 const columnRenderers: ColumnRenderers<DataNode> = {
   attributes: {
     hostname: {
       renderCell: (_hostname: string, dataNode: DataNode) => (
-        <Link to={Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>
-          {dataNode.hostname}
-        </Link>
+        <Link to={Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>{dataNode.hostname}</Link>
       ),
     },
     data_node_status: {
@@ -55,37 +67,42 @@ const columnRenderers: ColumnRenderers<DataNode> = {
       renderCell: (_is_leader: string, dataNode: DataNode) => (dataNode.is_leader ? 'yes' : 'no'),
     },
     cert_valid_until: {
-      renderCell: (_cert_valid_until: string, dataNode: DataNode) => <RelativeTime dateTime={dataNode.cert_valid_until} />,
+      renderCell: (_cert_valid_until: string, dataNode: DataNode) => (
+        <RelativeTime dateTime={dataNode.cert_valid_until} />
+      ),
     },
   },
 };
 
-const entityActions = (dataNode: DataNode) => (
-  <DataNodeActions dataNode={dataNode} />
-);
+const entityActions = (dataNode: DataNode) => <DataNodeActions dataNode={dataNode} />;
 
 const DataNodeList = () => (
-  <PaginatedEntityTable<DataNode> humanName="data nodes"
-                                  columnsOrder={COLUMNS_ORDER}
-                                  queryHelpComponent={(
-                                    <QueryHelper entityName="datanode"
-                                                 commonFields={['name']}
-                                                 example={(
-                                                   <p>
-                                                     Find entities with a description containing node:<br />
-                                                     <code>name:node</code><br />
-                                                   </p>
-                                            )} />
-                             )}
-                                  bulkSelection={{ actions: <DataNodeBulkActions /> }}
-                                  entityActions={entityActions}
-                                  tableLayout={DEFAULT_LAYOUT}
-                                  fetchEntities={fetchDataNodes}
-                                  fetchOptions={{ refetchInterval: 5000 }}
-                                  keyFn={keyFn}
-                                  entityAttributesAreCamelCase={false}
-                                  columnRenderers={columnRenderers} />
-
+  <PaginatedEntityTable<DataNode>
+    humanName="data nodes"
+    columnsOrder={COLUMNS_ORDER}
+    queryHelpComponent={
+      <QueryHelper
+        entityName="datanode"
+        commonFields={['name']}
+        example={
+          <p>
+            Find entities with a description containing node:
+            <br />
+            <code>name:node</code>
+            <br />
+          </p>
+        }
+      />
+    }
+    bulkSelection={{ actions: <DataNodeBulkActions /> }}
+    entityActions={entityActions}
+    tableLayout={DEFAULT_LAYOUT}
+    fetchEntities={fetchDataNodes}
+    fetchOptions={{ refetchInterval: 5000 }}
+    keyFn={keyFn}
+    entityAttributesAreCamelCase={false}
+    columnRenderers={columnRenderers}
+  />
 );
 
 export default DataNodeList;

@@ -50,10 +50,7 @@ type KinesisSetupStepProps = {
   label: string;
 };
 
-const KinesisSetupStep = ({
-  label,
-  progress,
-}: KinesisSetupStepProps) => {
+const KinesisSetupStep = ({ label, progress }: KinesisSetupStepProps) => {
   const { data, error, loading } = progress;
 
   const waitingText = !data && !loading && !error && 'Waiting...';
@@ -73,9 +70,7 @@ const KinesisSetupStep = ({
       <Content>
         <StepHeader>Create {label}</StepHeader>
 
-        <StepDetails>
-          {defaultText}
-        </StepDetails>
+        <StepDetails>{defaultText}</StepDetails>
       </Content>
     </StepItem>
   );

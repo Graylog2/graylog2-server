@@ -32,74 +32,88 @@ jest.mock('routing/QueryParams', () => ({
 
 jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '' })));
 
-jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() => ({
-  data: {
-    opensearch_version: '2.10.0',
-    info: {
-      nodes: [{
-        indices: [{
-          index_id: 'prlnhUp_TvSof9U-K3FZ9A',
-          shards: [{ documents_count: 10, name: 'S0', primary: true, min_lucene_version: '9.7.0' }],
-          index_name: '.opendistro_security',
-          creation_date: '2023-11-17T09:57:36.511',
-          index_version_created: '2.10.0',
-        }],
-      }],
-      opensearch_data_location: '/home/tdvorak/bin/datanode/data',
+jest.mock('components/datanode/hooks/useCompatibilityCheck', () =>
+  jest.fn(() => ({
+    data: {
+      opensearch_version: '2.10.0',
+      info: {
+        nodes: [
+          {
+            indices: [
+              {
+                index_id: 'prlnhUp_TvSof9U-K3FZ9A',
+                shards: [{ documents_count: 10, name: 'S0', primary: true, min_lucene_version: '9.7.0' }],
+                index_name: '.opendistro_security',
+                creation_date: '2023-11-17T09:57:36.511',
+                index_version_created: '2.10.0',
+              },
+            ],
+          },
+        ],
+        opensearch_data_location: '/home/tdvorak/bin/datanode/data',
+      },
+      compatibility_errors: [],
     },
-    compatibility_errors: [],
-  },
-  isFetching: false,
-  isInitialLoading: false,
-  error: undefined,
-})));
+    isFetching: false,
+    isInitialLoading: false,
+    error: undefined,
+  })),
+);
 
-jest.mock('components/datanode/hooks/useDataNodes', () => jest.fn(() => ({
-  data: {
-    attributes: [],
-    list: [{
-      cert_valid_until: '2053-11-02T13:20:58',
-      error_msg: null,
-      hostname: 'datanode1',
-      node_id: '3af165ef-87a9-467f-b7db-435f4748eb75',
-      short_node_id: '3af165ef',
-      status: 'CONNECTED' as any,
-      transport_address: 'http://datanode1:9200',
-      type: 'DATANODE',
-      id: '1',
-      is_leader: true,
-      is_master: true,
-      last_seen: '2053-11-02T13:20:58',
-    }],
-    pagination: {
-      query: '',
-      page: 1,
-      per_page: 0,
-      total: 0,
-      count: 0,
+jest.mock('components/datanode/hooks/useDataNodes', () =>
+  jest.fn(() => ({
+    data: {
+      attributes: [],
+      list: [
+        {
+          cert_valid_until: '2053-11-02T13:20:58',
+          error_msg: null,
+          hostname: 'datanode1',
+          node_id: '3af165ef-87a9-467f-b7db-435f4748eb75',
+          short_node_id: '3af165ef',
+          status: 'CONNECTED' as any,
+          transport_address: 'http://datanode1:9200',
+          type: 'DATANODE',
+          id: '1',
+          is_leader: true,
+          is_master: true,
+          last_seen: '2053-11-02T13:20:58',
+        },
+      ],
+      pagination: {
+        query: '',
+        page: 1,
+        per_page: 0,
+        total: 0,
+        count: 0,
+      },
     },
-  },
-  refetch: () => {
-  },
-  isInitialLoading: false,
-  error: null,
-})));
+    refetch: () => {},
+    isInitialLoading: false,
+    error: null,
+  })),
+);
 
 const renderStep = (_state: MigrationStateItem) => {
-  const getCurrentStep = (state: MigrationStateItem) => ({
-    state,
-    next_steps: [],
-    error_message: null,
-    response: null,
-  } as MigrationState);
+  const getCurrentStep = (state: MigrationStateItem) =>
+    ({
+      state,
+      next_steps: [],
+      error_message: null,
+      response: null,
+    }) as MigrationState;
 
-  render(<RemoteReindexingMigration onTriggerStep={async () => ({} as MigrationState)}
-                                    currentStep={getCurrentStep(_state)} />);
+  render(
+    <RemoteReindexingMigration
+      onTriggerStep={async () => ({}) as MigrationState}
+      currentStep={getCurrentStep(_state)}
+    />,
+  );
 };
 
 describe('RemoteReindexingMigration', () => {
   beforeEach(() => {
-    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
+    asMock(useQueryParam).mockImplementation(() => [undefined, () => {}]);
   });
 
   it('should render Welcome step', async () => {

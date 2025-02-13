@@ -20,12 +20,15 @@ import usePluginEntities from 'hooks/usePluginEntities';
 
 const useIsStreamDataLakeEnabled = (streamId: string, enabled: boolean) => {
   const { fetchStreamDataLakeStatus } = usePluginEntities('dataLake')[0] ?? {};
-  const { data: status, isError, isLoading } = useQuery(['data-lake-config', streamId, 'enabled'],
-    () => fetchStreamDataLakeStatus(streamId),
-    { enabled: fetchStreamDataLakeStatus && enabled },
-  );
+  const {
+    data: status,
+    isError,
+    isLoading,
+  } = useQuery(['data-lake-config', streamId, 'enabled'], () => fetchStreamDataLakeStatus(streamId), {
+    enabled: fetchStreamDataLakeStatus && enabled,
+  });
 
-  return (isLoading || isError) ? undefined : status?.enabled;
+  return isLoading || isError ? undefined : status?.enabled;
 };
 
 export default useIsStreamDataLakeEnabled;

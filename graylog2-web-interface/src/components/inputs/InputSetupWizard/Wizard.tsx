@@ -29,15 +29,24 @@ import type { WizardData } from './types';
 import { InputDiagnosisStep, SetupRoutingStep, StartInputStep } from './steps';
 
 type Props = {
-  show: boolean,
-  input: WizardData['input'],
-  onClose: () => void,
-}
+  show: boolean;
+  input: WizardData['input'];
+  onClose: () => void;
+};
 
 const Wizard = ({ show, input, onClose }: Props) => {
-  const { activeStep, setActiveStep, orderedSteps, setOrderedSteps, stepsConfig, setStepsConfig, setWizardData, wizardData } = useInputSetupWizard();
+  const {
+    activeStep,
+    setActiveStep,
+    orderedSteps,
+    setOrderedSteps,
+    stepsConfig,
+    setStepsConfig,
+    setWizardData,
+    wizardData,
+  } = useInputSetupWizard();
 
-  const enterpriseSteps = PluginStore.exports('inputSetupWizard').find((plugin) => (!!plugin.steps))?.steps;
+  const enterpriseSteps = PluginStore.exports('inputSetupWizard').find((plugin) => !!plugin.steps)?.steps;
 
   const initialStepsConfig = {
     [INPUT_WIZARD_STEPS.SETUP_ROUTING]: {
@@ -60,38 +69,20 @@ const Wizard = ({ show, input, onClose }: Props) => {
     const defaultSteps = {
       [INPUT_WIZARD_STEPS.SETUP_ROUTING]: {
         key: INPUT_WIZARD_STEPS.SETUP_ROUTING,
-        title: (
-          <>
-            Routing
-          </>
-        ),
-        component: (
-          <SetupRoutingStep />
-        ),
+        title: <>Routing</>,
+        component: <SetupRoutingStep />,
         disabled: !getStepConfigOrData(stepsConfig, INPUT_WIZARD_STEPS.SETUP_ROUTING, 'enabled'),
       },
       [INPUT_WIZARD_STEPS.START_INPUT]: {
         key: INPUT_WIZARD_STEPS.START_INPUT,
-        title: (
-          <>
-            Launch
-          </>
-        ),
-        component: (
-          <StartInputStep />
-        ),
+        title: <>Launch</>,
+        component: <StartInputStep />,
         disabled: !getStepConfigOrData(stepsConfig, INPUT_WIZARD_STEPS.START_INPUT, 'enabled'),
       },
       [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
         key: INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
-        title: (
-          <>
-            Diagnosis
-          </>
-        ),
-        component: (
-          <InputDiagnosisStep onClose={() => onClose()} />
-        ),
+        title: <>Diagnosis</>,
+        component: <InputDiagnosisStep onClose={() => onClose()} />,
         disabled: !getStepConfigOrData(stepsConfig, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, 'enabled'),
       },
     };
@@ -102,7 +93,11 @@ const Wizard = ({ show, input, onClose }: Props) => {
 
   const determineFirstStep = useCallback(() => {
     setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);
-    setOrderedSteps([INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.START_INPUT, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]);
+    setOrderedSteps([
+      INPUT_WIZARD_STEPS.SETUP_ROUTING,
+      INPUT_WIZARD_STEPS.START_INPUT,
+      INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
+    ]);
   }, [setActiveStep, setOrderedSteps]);
 
   useEffect(() => {
@@ -122,12 +117,14 @@ const Wizard = ({ show, input, onClose }: Props) => {
       <Modal.Header closeButton>Input Setup Wizard</Modal.Header>
       <Modal.Body>
         <InputSetupWizardStepsProvider>
-          <CommonWizard activeStep={activeStep}
-                        hidePreviousNextButtons
-                        horizontal
-                        justified
-                        onStepChange={setActiveStep}
-                        steps={orderedSteps.map((step) => steps[step])} />
+          <CommonWizard
+            activeStep={activeStep}
+            hidePreviousNextButtons
+            horizontal
+            justified
+            onStepChange={setActiveStep}
+            steps={orderedSteps.map((step) => steps[step])}
+          />
         </InputSetupWizardStepsProvider>
       </Modal.Body>
     </Modal>

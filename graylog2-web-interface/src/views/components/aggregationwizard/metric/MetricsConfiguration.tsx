@@ -25,31 +25,37 @@ import ElementConfigurationContainer from '../ElementConfigurationContainer';
 import type { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const MetricsConfiguration = () => {
-  const { values: { metrics }, setValues, values } = useFormikContext<WidgetConfigFormValues>();
+  const {
+    values: { metrics },
+    setValues,
+    values,
+  } = useFormikContext<WidgetConfigFormValues>();
 
-  const removeMetric = useCallback((index) => () => {
-    setValues(MetricElement.onRemove(index, values));
-  }, [setValues, values]);
+  const removeMetric = useCallback(
+    (index) => () => {
+      setValues(MetricElement.onRemove(index, values));
+    },
+    [setValues, values],
+  );
 
   return (
-    (
-      <FieldArray name="metrics"
-                  validateOnChange={false}
-                  render={() => (
-                    <>
-                      {metrics.map((_metric, index) => (
-
-                        (
-                          <ElementConfigurationContainer key={`metrics-${index}`}
-                                                         onRemove={removeMetric(index)}
-                                                         elementTitle={MetricElement.title}>
-                            <MetricConfiguration index={index} />
-                          </ElementConfigurationContainer>
-                        )
-                      ))}
-                    </>
-                  )} />
-    )
+    <FieldArray
+      name="metrics"
+      validateOnChange={false}
+      render={() => (
+        <>
+          {metrics.map((_metric, index) => (
+            <ElementConfigurationContainer
+              key={`metrics-${index}`}
+              onRemove={removeMetric(index)}
+              elementTitle={MetricElement.title}
+            >
+              <MetricConfiguration index={index} />
+            </ElementConfigurationContainer>
+          ))}
+        </>
+      )}
+    />
   );
 };
 

@@ -67,7 +67,11 @@ describe('StreamSearchPage', () => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ streamId });
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
+    asMock(useProcessHooksForView).mockReturnValue({
+      status: 'loaded',
+      view: mockView,
+      executionState: SearchExecutionState.empty(),
+    });
     asMock(useCreateSearch).mockImplementation(async (view: Promise<View>) => view);
   });
 
@@ -82,32 +86,47 @@ describe('StreamSearchPage', () => {
   it('should create view with streamId passed from props', async () => {
     render(<SimpleStreamSearchPage />);
 
-    await waitFor(() => expect(useCreateSavedSearch).toHaveBeenCalledWith({
-      queryString: undefined,
-      streamId: 'stream-id-1',
-      timeRange: undefined,
-    }, [streamId]));
+    await waitFor(() =>
+      expect(useCreateSavedSearch).toHaveBeenCalledWith(
+        {
+          queryString: undefined,
+          streamId: 'stream-id-1',
+          timeRange: undefined,
+        },
+        [streamId],
+      ),
+    );
   });
 
   it('should rerender hook when streamId passed from props changes', async () => {
     const { rerender } = render(<SimpleStreamSearchPage />);
 
-    await waitFor(() => expect(useCreateSavedSearch).toHaveBeenCalledWith({
-      queryString: undefined,
-      streamId: 'stream-id-1',
-      timeRange: undefined,
-    }, [streamId]));
+    await waitFor(() =>
+      expect(useCreateSavedSearch).toHaveBeenCalledWith(
+        {
+          queryString: undefined,
+          streamId: 'stream-id-1',
+          timeRange: undefined,
+        },
+        [streamId],
+      ),
+    );
 
     const secondStream = 'stream-id-2';
     asMock(useParams).mockReturnValue({ streamId: secondStream });
 
     rerender(<SimpleStreamSearchPage />);
 
-    await waitFor(() => expect(useCreateSavedSearch).toHaveBeenLastCalledWith({
-      queryString: undefined,
-      streamId: 'stream-id-2',
-      timeRange: undefined,
-    }, [secondStream]));
+    await waitFor(() =>
+      expect(useCreateSavedSearch).toHaveBeenLastCalledWith(
+        {
+          queryString: undefined,
+          streamId: 'stream-id-2',
+          timeRange: undefined,
+        },
+        [secondStream],
+      ),
+    );
   });
 
   describe('loading another view', () => {
@@ -115,8 +134,8 @@ describe('StreamSearchPage', () => {
       asMock(SearchComponent as React.FunctionComponent).mockImplementation(() => (
         <ViewLoaderContext.Consumer>
           {(_loadView) => (
-            <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load
-              view
+            <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>
+              Load view
             </button>
           )}
         </ViewLoaderContext.Consumer>
@@ -136,7 +155,11 @@ describe('StreamSearchPage', () => {
     beforeEach(() => {
       asMock(SearchComponent as React.FunctionComponent).mockImplementation(() => (
         <NewViewLoaderContext.Consumer>
-          {(loadNewView) => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
+          {(loadNewView) => (
+            <button type="button" onClick={() => loadNewView()}>
+              Load new view
+            </button>
+          )}
         </NewViewLoaderContext.Consumer>
       ));
     });
