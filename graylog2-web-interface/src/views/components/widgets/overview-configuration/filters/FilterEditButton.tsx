@@ -86,8 +86,7 @@ const FilterEditButton = ({
       opened={open}
       width={containerWidth}
       offset={{ alignmentAxis: -25 }}
-      onClose={onClose}
-    >
+      onClose={onClose}>
       <Menu.Target>
         <IconButton name="edit" title={`Edit ${columnTitle(column)} filter`} onClick={() => setOpen(true)} />
       </Menu.Target>

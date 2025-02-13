@@ -108,8 +108,7 @@ const PermissionsConfig = () => {
                 bsStyle="info"
                 onClick={() => {
                   setShowModal(true);
-                }}
-              >
+                }}>
                 Edit configuration
               </Button>
             </p>

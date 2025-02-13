@@ -152,8 +152,7 @@ describe('<Widget />', () => {
       <SearchExplainContext.Provider value={searchExplainContext(searchedIndices)}>
         <FieldTypesContext.Provider value={fieldTypes}>
           <WidgetFocusContext.Provider
-            value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}
-          >
+            value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
             <WidgetContext.Provider value={propsWidget}>
               <Widget
                 widget={propsWidget}

@@ -54,8 +54,7 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields = {} }: 
   return (
     <SectionComponent
       title="User Synchronization"
-      headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={USER_SYNC_KEY} />}
-    >
+      headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={USER_SYNC_KEY} />}>
       <ReadOnlyFormGroup label="Search Base DN" value={userSearchBase} />
       <ReadOnlyFormGroup label="Search Pattern" value={userSearchPattern} />
       <ReadOnlyFormGroup label="Name Attribute" value={userNameAttribute} />

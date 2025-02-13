@@ -48,8 +48,7 @@ const IndexSetTemplatePage = () => {
               <Button>Overview</Button>
             </LinkContainer>
           </ButtonToolbar>
-        }
-      >
+        }>
         <span>{description}</span>
       </PageHeader>
       <Row className="content">

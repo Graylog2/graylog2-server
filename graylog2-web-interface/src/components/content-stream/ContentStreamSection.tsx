@@ -113,8 +113,7 @@ const ContentStreamSection = () => {
       <StyledNewsSectionComponent
         title="News"
         $enabled={contentStreamEnabled}
-        headerActions={<ToggleActionButton onClick={toggleNews} isOpen={contentStreamEnabled} />}
-      >
+        headerActions={<ToggleActionButton onClick={toggleNews} isOpen={contentStreamEnabled} />}>
         {contentStreamEnabled && (
           <CarouselProvider carouselId={CAROUSEL_ID}>
             <ContentStreamNews />
@@ -125,8 +124,7 @@ const ContentStreamSection = () => {
       <StyledReleaseSectionComponent
         title="Releases"
         $enabled={releasesSectionEnabled}
-        headerActions={<ToggleActionButton onClick={toggleRelease} isOpen={releasesSectionEnabled} />}
-      >
+        headerActions={<ToggleActionButton onClick={toggleRelease} isOpen={releasesSectionEnabled} />}>
         {releasesSectionEnabled && <ContentStreamReleasesSection />}
       </StyledReleaseSectionComponent>
     </SectionGrid>

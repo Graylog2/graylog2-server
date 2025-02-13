@@ -271,8 +271,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               isSystemEventDefinition(eventDefinition)
                 ? undefined
                 : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)
-            }
-          >
+            }>
             {isEnabled ? 'Disable' : 'Enable'}
           </MenuItem>
 
@@ -306,8 +305,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           title={DIALOG_TEXT[dialogType].dialogTitle}
           show
           onConfirm={handleConfirm}
-          onCancel={handleClearState}
-        >
+          onCancel={handleClearState}>
           {DIALOG_TEXT[dialogType].dialogBody(currentDefinition.title)}
         </ConfirmDialog>
       )}

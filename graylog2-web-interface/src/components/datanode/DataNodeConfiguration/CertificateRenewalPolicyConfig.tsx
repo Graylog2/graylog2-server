@@ -218,8 +218,7 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
                   });
 
                   setShowModal(true);
-                }}
-              >
+                }}>
                 Edit configuration
               </Button>
             </IfPermitted>

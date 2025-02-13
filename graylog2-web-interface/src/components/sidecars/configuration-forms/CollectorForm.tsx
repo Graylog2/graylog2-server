@@ -267,8 +267,7 @@ class CollectorForm extends React.Component<
 
             <FormGroup
               controlId="node_operating_system"
-              validationState={this._validationState('node_operating_system')}
-            >
+              validationState={this._validationState('node_operating_system')}>
               <ControlLabel>Operating System</ControlLabel>
               <Select
                 inputId="node_operating_system"

@@ -197,8 +197,7 @@ const ViewHeader = () => {
                     onClick={toggleMetadataEdit}
                     role="button"
                     title={`Edit ${typeText} ${view.title} metadata`}
-                    tabIndex={0}
-                  >
+                    tabIndex={0}>
                     <Icon name="edit_square" />
                   </EditButton>
                 </>

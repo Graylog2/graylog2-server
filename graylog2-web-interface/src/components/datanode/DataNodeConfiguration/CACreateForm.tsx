@@ -66,8 +66,7 @@ const CaCreateForm = () => {
       </p>
       <Formik
         initialValues={{ organization: 'Graylog CA' }}
-        onSubmit={(formValues: FormValues) => onSubmit(formValues)}
-      >
+        onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
         {({ isSubmitting, isValid }) => (
           <Form>
             <FormikInput

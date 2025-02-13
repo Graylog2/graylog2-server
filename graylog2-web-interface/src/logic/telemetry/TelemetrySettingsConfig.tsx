@@ -86,8 +86,7 @@ const TelemetrySettingsConfig = () => {
                     bsStyle="success"
                     disabled={isSubmitting || !isValid || !isTelemetryEnabled}
                     title="Update Preferences"
-                    type="submit"
-                  >
+                    type="submit">
                     Update telemetry
                   </Button>
                 </div>

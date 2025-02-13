@@ -102,8 +102,7 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
           indexSets={indexSets}
           stream={stream}
         />
-      }
-    >
+      }>
       <Alert bsStyle="default">
         Messages routed to the <b>Search Cluster</b> will be searchable in Graylog and count towards Graylog License
         usage.

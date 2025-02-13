@@ -54,8 +54,7 @@ const StaticFieldForm = ({ input, setShowModal }: Props) => {
       onCancel={() => {
         setShowModal(false);
       }}
-      onSubmitForm={addStaticField}
-    >
+      onSubmitForm={addStaticField}>
       <p>
         Define a static field that is added to every message that comes in via this input. The field is not overwritten
         If the message already has that key. Key must only contain alphanumeric characters or underscores and not be a

@@ -86,8 +86,7 @@ const SearchPage = ({
       executionState={executionState}
       isNew={isNew}
       initialQuery={initialQuery}
-      result={searchResult}
-    >
+      result={searchResult}>
       <SearchPageTitle>
         <DashboardPageContextProvider>
           <NewViewLoaderContext.Provider value={loadNewView}>

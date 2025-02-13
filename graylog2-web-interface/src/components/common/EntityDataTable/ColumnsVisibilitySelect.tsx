@@ -112,8 +112,7 @@ const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Prop
       aria-label="Configure visible columns"
       id="columns-visibility-select"
       bsStyle="default"
-      closeOnItemClick={false}
-    >
+      closeOnItemClick={false}>
       {sortedColumns.map((column) => (
         <ColumnListItem
           column={column}

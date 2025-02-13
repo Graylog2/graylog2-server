@@ -48,8 +48,7 @@ const EventDefinitionsPage = () => {
                     app_section: 'event-definitions',
                     app_action_value: 'create-event-definition-button',
                   });
-                }}
-              >
+                }}>
                 Create event definition
               </Button>
             </LinkContainer>
@@ -58,8 +57,7 @@ const EventDefinitionsPage = () => {
         documentationLink={{
           title: 'Alerts documentation',
           path: DocsHelper.PAGES.ALERTS,
-        }}
-      >
+        }}>
         <span>
           Create new Event Definitions that will allow you to search for different Conditions and alert on them.
         </span>

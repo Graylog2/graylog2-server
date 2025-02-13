@@ -259,8 +259,7 @@ class ContentPackEditParameter extends React.Component<
               onChange={this._bindValue}
               label="Value Type"
               help="Give the type of the parameter."
-              required
-            >
+              required>
               <option value="string">String</option>
               <option value="integer">Integer</option>
               <option value="double">Double</option>

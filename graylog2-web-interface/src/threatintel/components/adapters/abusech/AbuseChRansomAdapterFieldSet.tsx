@@ -71,8 +71,7 @@ class AbuseChRansomAdapterFieldSet extends React.Component<
           autoFocus
           help="Select the type of the abuse.ch ransomware blocklist"
           labelClassName="col-sm-3"
-          wrapperClassName="col-sm-9"
-        >
+          wrapperClassName="col-sm-9">
           <Select
             placeholder="Select the type of blocklist"
             clearable={false}

@@ -159,8 +159,7 @@ class SimulationResults extends React.Component<
               title="More results"
               bsStyle="default"
               bsSize="small"
-              pullRight
-            >
+              pullRight>
               {this._getViewOptionsMenuItems()}
             </DropdownButton>
           </div>

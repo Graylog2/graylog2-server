@@ -260,8 +260,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
       <SelectedEntitiesProvider<Entity>
         initialSelection={initialSelection}
         onChangeSelection={onChangeSelection}
-        entities={entities}
-      >
+        entities={entities}>
         <ExpandedSectionsProvider>
           <ActionsRow>
             <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>

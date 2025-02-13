@@ -38,8 +38,7 @@ const LoadViewError = ({ error }: { error: Error }) => {
           An unknown error has occurred. Please have a look at the following message and the graylog server log for more
           information.
         </p>
-      }
-    >
+      }>
       <pre>{error?.message}</pre>
     </ErrorPage>
   );

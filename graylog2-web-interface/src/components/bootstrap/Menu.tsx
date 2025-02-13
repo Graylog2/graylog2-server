@@ -61,8 +61,7 @@ const Menu = ({
     withinPortal={withinPortal}
     keepMounted={keepMounted}
     offset={offset}
-    zIndex={zIndex}
-  >
+    zIndex={zIndex}>
     {children}
   </MantineMenu>
 );

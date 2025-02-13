@@ -72,8 +72,7 @@ const SidecarEditConfigurationPage = ({ params }: SidecarEditConfigurationPagePr
         documentationLink={{
           title: 'Sidecar documentation',
           path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-        }}
-      >
+        }}>
         <span>Some words about collector configurations.</span>
       </PageHeader>
       <ConfigurationForm configuration={configuration} configurationSidecars={configurationSidecars} />

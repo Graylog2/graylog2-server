@@ -54,8 +54,7 @@ const ColorLabel = ({ color, size = 'normal', text = <span>&emsp;</span> }: Prop
           maxWidth: '128px',
           marginRight: '4px',
           marginBottom: '4px',
-        }}
-      >
+        }}>
         {text}
       </Label>
     </ColorLabelWrap>

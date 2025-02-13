@@ -101,8 +101,7 @@ const OverlayTrigger = React.forwardRef<OverlayType, Props>(
               onMouseEnter={hover ? open : undefined}
               onMouseLeave={hover ? close : undefined}
               onFocus={focus ? open : undefined}
-              onBlur={focus ? open : undefined}
-            >
+              onBlur={focus ? open : undefined}>
               {children}
             </TriggerWrap>
           </Popover.Target>

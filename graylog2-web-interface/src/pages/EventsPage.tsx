@@ -30,8 +30,7 @@ const EventsPage = () => (
       documentationLink={{
         title: 'Alerts documentation',
         path: DocsHelper.PAGES.ALERTS,
-      }}
-    >
+      }}>
       <span>
         Define Events through different conditions. Add Notifications to Events that require your attention to create
         Alerts.

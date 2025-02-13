@@ -156,8 +156,7 @@ class ContentPackEntitiesList extends React.Component<
       <BootstrapModalWrapper
         showModal={entity.id === this.state.showConfigModalId}
         onHide={closeShowModal}
-        bsSize="large"
-      >
+        bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Entity Config</Modal.Title>
         </Modal.Header>
@@ -191,8 +190,7 @@ class ContentPackEntitiesList extends React.Component<
                 disabled={disableBtn}
                 onClick={() => {
                   open();
-                }}
-              >
+                }}>
                 Edit
               </Button>
             )}
@@ -200,8 +198,7 @@ class ContentPackEntitiesList extends React.Component<
               bsSize="xs"
               onClick={() => {
                 openShowModal(entity.id);
-              }}
-            >
+              }}>
               Show
             </Button>
           </ButtonToolbar>

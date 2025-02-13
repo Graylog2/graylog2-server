@@ -137,8 +137,7 @@ class EditQueryParameterModal extends React.Component<Props, State> {
           data-telemetry-title="Declare Query Parameter from Lookup Table"
           onSubmitForm={this._saved}
           onCancel={this._cleanState}
-          submitButtonText="Save"
-        >
+          submitButtonText="Save">
           <LookupTableParameterEdit
             validationState={validationState}
             identifier={queryParameter.name}

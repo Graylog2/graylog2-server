@@ -182,20 +182,17 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage = () => {} }: Props) 
         <ButtonGroup>
           <Button
             active={simulationFieldType === SimulationFieldType.JSON}
-            onClick={() => handleFieldTypeChange(SimulationFieldType.JSON)}
-          >
+            onClick={() => handleFieldTypeChange(SimulationFieldType.JSON)}>
             JSON
           </Button>
           <Button
             active={simulationFieldType === SimulationFieldType.KeyValue}
-            onClick={() => handleFieldTypeChange(SimulationFieldType.KeyValue)}
-          >
+            onClick={() => handleFieldTypeChange(SimulationFieldType.KeyValue)}>
             Key Value
           </Button>
           <Button
             active={simulationFieldType === SimulationFieldType.Simple}
-            onClick={() => handleFieldTypeChange(SimulationFieldType.Simple)}
-          >
+            onClick={() => handleFieldTypeChange(SimulationFieldType.Simple)}>
             Simple Message
           </Button>
         </ButtonGroup>
@@ -214,8 +211,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage = () => {} }: Props) 
           bsStyle="info"
           bsSize="xsmall"
           disabled={!rawMessageToSimulate || Boolean(ruleErrorMessage)}
-          onClick={handleRunRuleSimulation}
-        >
+          onClick={handleRunRuleSimulation}>
           Run rule simulation
         </Button>
         <ResetButton bsStyle="default" bsSize="xsmall" onClick={handleResetRuleSimulation}>
@@ -249,8 +245,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage = () => {} }: Props) 
                         <OutputText
                           key={keyValue[0]}
                           $highlighted={highlightedOutput === keyValue[0]}
-                          title={JSON.stringify(keyValue[1])}
-                        >
+                          title={JSON.stringify(keyValue[1])}>
                           <ActionOutputIndex>${keyValue[0]}</ActionOutputIndex>: {JSON.stringify(keyValue[1])}
                         </OutputText>
                       );

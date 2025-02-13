@@ -47,8 +47,7 @@ const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisual
       value={{
         all: Immutable.List(),
         queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }),
-      }}
-    >
+      }}>
       <OriginalAreaVisualization {...props} />
     </FieldTypesContext.Provider>
   </TestStoreProvider>

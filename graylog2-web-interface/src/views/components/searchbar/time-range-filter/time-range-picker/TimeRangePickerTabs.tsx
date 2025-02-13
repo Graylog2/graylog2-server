@@ -184,8 +184,7 @@ const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
       defaultActiveKey={availableTimeRangeTypes[0].type}
       activeKey={activeTab ?? -1}
       onSelect={onSelect as SelectCallback}
-      animation={false}
-    >
+      animation={false}>
       {tabs}
       {!activeTab && <TabDisabledTimeRange />}
     </StyledTabs>

@@ -66,8 +66,7 @@ const RoleDetailsPage = ({ params }: Props) => {
           <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
             <Button bsStyle="info">Roles Overview</Button>
           </LinkContainer>
-        }
-      >
+        }>
         <span>Overview of details like name, description and assigned users.</span>
       </PageHeader>
       <RoleDetails role={roleId === loadedRole?.id ? loadedRole : undefined} />

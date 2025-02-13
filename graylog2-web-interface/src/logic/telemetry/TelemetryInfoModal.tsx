@@ -31,8 +31,7 @@ const TelemetryInfoModal = ({ show, onConfirm }: Props) => (
     hideCancelButton={false}
     onCancel={onConfirm}
     title="Help us improve Graylog"
-    btnConfirmText="Ok"
-  >
+    btnConfirmText="Ok">
     <TelemetryInfoText showProfile />
   </ConfirmDialog>
 );

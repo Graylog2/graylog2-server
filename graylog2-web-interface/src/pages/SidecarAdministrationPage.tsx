@@ -34,8 +34,7 @@ const SidecarAdministrationPage = () => {
         documentationLink={{
           title: 'Sidecar documentation',
           path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-        }}
-      >
+        }}>
         <span>
           The Graylog collectors can reliably forward contents of log files or Windows EventLog from your servers.
         </span>

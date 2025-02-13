@@ -127,8 +127,7 @@ const RulesPage = () => {
           });
 
           history.push(`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`);
-        }}
-      >
+        }}>
         Create Rule
       </Button>
       {renderDebugMetricsButton()}
@@ -164,8 +163,7 @@ const RulesPage = () => {
         documentationLink={{
           title: 'Pipeline rules documentation',
           path: DocsHelper.PAGES.PIPELINE_RULES,
-        }}
-      >
+        }}>
         <span>
           Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of
           actions. Graylog evaluates the condition against a message and executes the actions if the condition is

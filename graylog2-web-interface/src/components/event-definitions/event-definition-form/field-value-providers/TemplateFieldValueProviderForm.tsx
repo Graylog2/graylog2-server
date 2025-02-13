@@ -82,8 +82,7 @@ class TemplateFieldValueProviderForm extends React.Component<
               id="lookup-message-require-values"
               name="require_values"
               checked={provider.require_values}
-              onChange={this.handleChange}
-            >
+              onChange={this.handleChange}>
               Require all template values to be set
             </Checkbox>
             <HelpBlock>Check this option to validate that all variables used in the Template have values.</HelpBlock>

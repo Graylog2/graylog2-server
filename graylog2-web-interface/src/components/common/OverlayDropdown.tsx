@@ -72,8 +72,7 @@ const OverlayDropdown = ({
       closeOnItemClick={closeOnSelect}
       onClose={onToggle}
       portalProps={{ target: menuContainer }}
-      zIndex={dropdownZIndex}
-    >
+      zIndex={dropdownZIndex}>
       <Menu.Target>
         <ToggleDropdown $alwaysShowCaret={alwaysShowCaret} onClick={onToggle} ref={toggleTarget} role="presentation">
           {toggleChild}

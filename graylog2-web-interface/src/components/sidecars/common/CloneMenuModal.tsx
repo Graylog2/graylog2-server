@@ -46,8 +46,7 @@ const CloneMenuModal = ({
     onSubmitForm={onSave}
     onCancel={onClose}
     submitButtonDisabled={Boolean(error)}
-    submitButtonText="Done"
-  >
+    submitButtonText="Done">
     <fieldset>
       <Input
         type="text"

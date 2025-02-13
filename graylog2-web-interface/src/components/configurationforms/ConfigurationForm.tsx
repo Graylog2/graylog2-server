@@ -267,8 +267,7 @@ const ConfigurationForm = forwardRef(
         title={title}
         onCancel={handleCancel}
         onSubmitForm={save}
-        submitButtonText={submitButtonText}
-      >
+        submitButtonText={submitButtonText}>
         <fieldset>
           <input type="hidden" name="type" value={typeName} />
           {children}

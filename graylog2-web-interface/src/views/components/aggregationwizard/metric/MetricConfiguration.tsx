@@ -125,8 +125,7 @@ const Metric = ({ index }: Props) => {
               label="Function"
               error={error}
               labelClassName="col-sm-3"
-              wrapperClassName="col-sm-9"
-            >
+              wrapperClassName="col-sm-9">
               <Select
                 options={functionOptions}
                 clearable={false}
@@ -151,8 +150,7 @@ const Metric = ({ index }: Props) => {
                   label="Field"
                   error={error}
                   labelClassName="col-sm-3"
-                  wrapperClassName="col-sm-9"
-                >
+                  wrapperClassName="col-sm-9">
                   <FieldSelect
                     id="metric-field-select"
                     selectRef={metricFieldSelectRef}
@@ -186,8 +184,7 @@ const Metric = ({ index }: Props) => {
                 label="Percentile"
                 error={error}
                 labelClassName="col-sm-3"
-                wrapperClassName="col-sm-9"
-              >
+                wrapperClassName="col-sm-9">
                 <Select
                   options={percentileOptions}
                   clearable={false}
@@ -213,8 +210,7 @@ const Metric = ({ index }: Props) => {
                   label="Strategy"
                   error={error}
                   labelClassName="col-sm-3"
-                  wrapperClassName="col-sm-9"
-                >
+                  wrapperClassName="col-sm-9">
                   <Select
                     options={percentageStrategyOptions}
                     clearable={false}
@@ -237,8 +233,7 @@ const Metric = ({ index }: Props) => {
                   label="Field"
                   error={error}
                   labelClassName="col-sm-3"
-                  wrapperClassName="col-sm-9"
-                >
+                  wrapperClassName="col-sm-9">
                   <FieldSelect
                     id="metric-field-select"
                     selectRef={metricFieldSelectRef}

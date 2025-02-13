@@ -89,8 +89,7 @@ describe('<EventInfoBar />', () => {
           type,
           definitionId: '',
           alertId: '',
-        }}
-      >
+        }}>
         <EventInfoBar />
       </ReplaySearchContext.Provider>
     </TestStoreProvider>

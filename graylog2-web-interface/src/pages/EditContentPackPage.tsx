@@ -172,8 +172,7 @@ const EditContentPackPage = () => {
             <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
               <Button bsStyle="info">Content Packs</Button>
             </LinkContainer>
-          }
-        >
+          }>
           <span>
             Content packs accelerate the set up process for a specific data source. A content pack can include
             inputs/extractors, streams, and dashboards.

@@ -40,8 +40,7 @@ const FallbackErrorPage = ({ reportedError }: { reportedError: ReportedError }) 
         An unknown error has occurred. Please have a look at the following message and the graylog server log for more
         information.
       </p>
-    }
-  >
+    }>
     <pre>{JSON.stringify(reportedError)}</pre>
   </ErrorPage>
 );

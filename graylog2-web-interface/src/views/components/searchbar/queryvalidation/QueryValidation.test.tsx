@@ -48,12 +48,10 @@ describe('QueryValidation', () => {
       onSubmit={() => {}}
       initialValues={{}}
       initialErrors={error ? { queryString: error } : {}}
-      enableReinitialize
-    >
+      enableReinitialize>
       <Form>
         <FormWarningsContext.Provider
-          value={{ warnings: warning ? { queryString: warning } : {}, setFieldWarning: () => {} }}
-        >
+          value={{ warnings: warning ? { queryString: warning } : {}, setFieldWarning: () => {} }}>
           <QueryValidation />
         </FormWarningsContext.Provider>
       </Form>

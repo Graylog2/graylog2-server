@@ -64,8 +64,7 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
               streamId={stream.id}
             />
           </IfPermitted>
-        }
-      >
+        }>
         <MatchingTypeSwitcher stream={stream} onChange={handleMatchingTypeSwitched} />
         <Table condensed striped hover>
           <thead>

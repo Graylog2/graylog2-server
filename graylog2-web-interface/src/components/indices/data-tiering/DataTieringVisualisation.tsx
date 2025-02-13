@@ -183,8 +183,7 @@ const DataTieringVisualisation = ({
                 placement="bottom"
                 id="min-days-in-hot-and-storage"
                 arrowOffsetLeft={minDaysInHotPercentage <= PERCENTAGE_SPACING_THRESHOLD ? '10px' : '100%'}
-                value={minDaysInHotPercentage}
-              >
+                value={minDaysInHotPercentage}>
                 Min. # of days in Hot Tier and storage
               </StyledTooltip>
             ) : (
@@ -192,8 +191,7 @@ const DataTieringVisualisation = ({
                 placement="bottom"
                 id="min-days-in-hot"
                 arrowOffsetLeft={minDaysInHotPercentage <= PERCENTAGE_SPACING_THRESHOLD ? '10px' : '100%'}
-                value={minDaysInHotPercentage}
-              >
+                value={minDaysInHotPercentage}>
                 Min. # of days in Hot Tier
               </StyledTooltip>
             ))}
@@ -202,8 +200,7 @@ const DataTieringVisualisation = ({
               placement="bottom"
               id="min-days-in-storage"
               arrowOffsetLeft={minDaysPercentage <= PERCENTAGE_SPACING_THRESHOLD ? '10px' : '100%'}
-              value={minDaysPercentage}
-            >
+              value={minDaysPercentage}>
               Min. # of days in storage
             </StyledTooltip>
           )}

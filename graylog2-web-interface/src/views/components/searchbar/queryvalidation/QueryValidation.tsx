@@ -229,8 +229,7 @@ const QueryValidation = () => {
               onClick={toggleShow}
               $clickable
               tabIndex={0}
-              type="button"
-            >
+              type="button">
               <ErrorIcon $status={status} name={isInfo ? 'database' : 'error'} />
             </ExplanationTrigger>
           ) : (
@@ -246,8 +245,7 @@ const QueryValidation = () => {
         <StyledPopoverDropdown
           id="query-validation-error-explanation"
           title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
-          $shaking={shakingPopover}
-        >
+          $shaking={shakingPopover}>
           <div role="alert">
             {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (
               <Explanation key={id}>

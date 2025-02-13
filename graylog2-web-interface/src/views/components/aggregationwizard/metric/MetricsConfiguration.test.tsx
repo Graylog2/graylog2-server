@@ -98,8 +98,7 @@ const SUT = ({ initialValues = {} }: { initialValues: WidgetConfigFormValues }) 
         queryFields: Immutable.Map({
           queryId: Immutable.List(fieldTypes),
         }),
-      }}
-    >
+      }}>
       <Formik initialValues={initialValues} onSubmit={() => {}}>
         <Form>
           <MetricsConfiguration />

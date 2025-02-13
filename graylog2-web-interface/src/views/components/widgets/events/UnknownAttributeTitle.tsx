@@ -36,8 +36,7 @@ const UnknownAttributeTitle = () => (
     Unknown
     <OverlayTrigger
       overlay="This attribute is currently not available, because it requires a valid license."
-      placement="bottom"
-    >
+      placement="bottom">
       <ErrorIcon name="error" />
     </OverlayTrigger>
   </UnknownFieldTitleContainer>

@@ -130,8 +130,7 @@ const SidecarConfig = () => {
           title="Update Sidecars System Configuration"
           onSubmitForm={saveConfig}
           onCancel={closeModal}
-          submitButtonText="Update configuration"
-        >
+          submitButtonText="Update configuration">
           <fieldset>
             <ISODurationInput
               id="inactive-threshold-field"

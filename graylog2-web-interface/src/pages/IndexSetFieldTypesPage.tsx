@@ -56,8 +56,7 @@ const IndexSetFieldTypesPage = () => {
           title: 'Index model documentation',
           path: DocsHelper.PAGES.INDEX_MODEL,
         }}
-        actions={indexFieldTypeChangeAllowed && <ChangeFieldTypeButton indexSetId={indexSetId} />}
-      >
+        actions={indexFieldTypeChangeAllowed && <ChangeFieldTypeButton indexSetId={indexSetId} />}>
         <span>
           The data represents field types from 2 last indices and the fields with custom field type. You can modify the
           current field types configuration for this index set.

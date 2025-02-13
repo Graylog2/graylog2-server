@@ -95,8 +95,7 @@ const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
         onSelect={handleSelect}
         id="absolute-time-ranges"
         data-testid="absolute-time-ranges"
-        activeKey={activeAccordion}
-      >
+        activeKey={activeAccordion}>
         <AccordionItem name="Calendar">
           <RangeWrapper>
             <AbsoluteCalendar startDate={fromStartDate} timeRange={activeTabTimeRange} range="from" />

@@ -71,8 +71,7 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
       accordion
       activeKey={activeKey}
       id="sidebar-server-response"
-      onSelect={setActiveKey as SelectCallback}
-    >
+      onSelect={setActiveKey as SelectCallback}>
       <Panel eventKey={SERVER_CONFIG_KEY}>
         <Panel.Heading>
           <Panel.Title toggle>Server Connection Check</Panel.Title>

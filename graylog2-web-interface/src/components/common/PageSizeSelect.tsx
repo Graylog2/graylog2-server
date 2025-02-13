@@ -55,8 +55,7 @@ const PageSizeSelect = ({
       aria-label="Configure page size"
       pullRight
       bsSize="small"
-      bsStyle="default"
-    >
+      bsStyle="default">
       {pageSizes.map((size) => (
         <MenuItem key={`option-${size}`} onSelect={() => onChange(size)}>
           {size}

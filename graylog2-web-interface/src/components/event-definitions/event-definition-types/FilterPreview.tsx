@@ -87,8 +87,7 @@ const FilterPreview = ({
       <HelpPanel
         collapsible
         defaultExpanded={!displayPreview}
-        title="How many Events will Filter & Aggregation create?"
-      >
+        title="How many Events will Filter & Aggregation create?">
         <p>
           The Filter & Aggregation Condition will generate different number of Events, depending on how it is
           configured:

@@ -250,8 +250,7 @@ class EmailNotificationForm extends React.Component<
     return (
       <FormGroup
         controlId="notification-email-recipients"
-        validationState={validation.errors.recipients ? 'error' : null}
-      >
+        validationState={validation.errors.recipients ? 'error' : null}>
         <ControlLabel>
           Email recipient(s) <small className="text-muted">(Optional)</small>
         </ControlLabel>
@@ -603,8 +602,7 @@ class EmailNotificationForm extends React.Component<
         <IfPermitted permissions="users:list">
           <FormGroup
             controlId="notification-user-recipients"
-            validationState={validation.errors.recipients ? 'error' : null}
-          >
+            validationState={validation.errors.recipients ? 'error' : null}>
             <ControlLabel>
               User recipient(s) <small className="text-muted">(Optional)</small>
             </ControlLabel>
@@ -696,8 +694,7 @@ class EmailNotificationForm extends React.Component<
             <>
               Time zone for date/time values <small className="text-muted">(Optional)</small>
             </>
-          }
-        >
+          }>
           <TimezoneSelect
             className="timezone-select"
             name="time_zone"

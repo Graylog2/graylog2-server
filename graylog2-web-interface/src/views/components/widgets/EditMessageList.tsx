@@ -106,8 +106,7 @@ const EditMessageList = ({
                 key={option.title}
                 checked={option.isChecked(config)}
                 onChange={() => option.onChange(config, onChange)}
-                disabled={option.isDisabled(config)}
-              >
+                disabled={option.isDisabled(config)}>
                 {option.title}
                 {option.help && <HoverForHelp title={option.title}>{option.help}</HoverForHelp>}
               </PreviewOptionCheckbox>

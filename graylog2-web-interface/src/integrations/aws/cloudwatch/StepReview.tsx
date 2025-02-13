@@ -111,8 +111,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       loading={fetchSubmitStatus.loading}
       error={formError}
       title="Final Review"
-      description="Check out everything below to make sure it's correct, then click the button below to complete your CloudWatch setup!"
-    >
+      description="Check out everything below to make sure it's correct, then click the button below to complete your CloudWatch setup!">
       <Container>
         <Subheader>
           Setting up CloudWatch{' '}

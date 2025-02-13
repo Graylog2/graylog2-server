@@ -85,8 +85,7 @@ const ListItem = forwardRef(
         $alignItemContent={alignItemContent}
         ref={ref}
         className={className}
-        containerProps={{ ...draggableProps }}
-      >
+        containerProps={{ ...draggableProps }}>
         {!disableDragging && (
           <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
             <Icon name="drag_indicator" />

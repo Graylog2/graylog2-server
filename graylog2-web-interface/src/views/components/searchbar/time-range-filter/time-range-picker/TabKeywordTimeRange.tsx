@@ -117,8 +117,7 @@ const TabKeywordTimeRange = ({ disabled = false }: Props) => (
           <FormGroup
             controlId="form-inline-keyword"
             style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
-            validationState={error ? 'error' : null}
-          >
+            validationState={error ? 'error' : null}>
             <KeywordInput
               type="text"
               className="input-sm mousetrap"

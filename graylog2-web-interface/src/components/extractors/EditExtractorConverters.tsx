@@ -277,8 +277,7 @@ class EditExtractorConverters extends React.Component<
           label="Add converter"
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
-          help="Add converters to transform the extracted value."
-        >
+          help="Add converters to transform the extracted value.">
           <Row className="row-sm">
             <Col md={11}>
               <Select

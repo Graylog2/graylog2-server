@@ -74,8 +74,7 @@ class AddExtractorWizard extends React.Component<
               bsStyle="success"
               bsSize="small"
               onClick={this._showAddExtractorForm}
-              disabled={this.state.showExtractorForm}
-            >
+              disabled={this.state.showExtractorForm}>
               Create extractor
             </Button>
           </p>

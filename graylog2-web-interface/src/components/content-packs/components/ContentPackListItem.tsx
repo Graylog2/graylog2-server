@@ -90,8 +90,7 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
                 <MenuItem>Show</MenuItem>
               </LinkContainer>
               <LinkContainer
-                to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}
-              >
+                to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
                 <MenuItem>Create New Version</MenuItem>
               </LinkContainer>
               <MenuItem onSelect={handleDownload}>Download</MenuItem>

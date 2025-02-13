@@ -144,8 +144,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
         pageSize={layoutConfig.pageSize}
         activePage={activePage}
         showPageSizeSelect={false}
-        useQueryParameter={false}
-      >
+        useQueryParameter={false}>
         {!list?.length && <NoEntitiesExist>No index sets have been found.</NoEntitiesExist>}
         {list.length && (
           <EntityDataTable<FieldTypeUsage>

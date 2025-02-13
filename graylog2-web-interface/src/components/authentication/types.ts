@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
+import type * as Immutable from 'immutable';
+import type { FormikProps } from 'formik';
 
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type {
@@ -32,11 +34,11 @@ export interface DirectoryServiceAuthenticationService {
   displayName: string;
   createComponent: React.ComponentType<{}>;
   editComponent: React.ComponentType<{
-    authenticationBackend: typeof DirectoryServiceBackend | typeof OktaBackendConfig;
+    authenticationBackend: AuthenticationBackend | DirectoryServiceBackend | OktaBackendConfig;
     initialStepKey: string | null | undefined;
   }>;
   configDetailsComponent: React.ComponentType<{
-    authenticationBackend: typeof AuthenticationBackend | typeof OktaBackend;
+    authenticationBackend: DirectoryServiceBackend | AuthenticationBackend | OktaBackend;
     roles?: Immutable.List<Role>;
   }>;
   configToJson: (config: {}) => DirectoryServiceBackendConfigJson;
@@ -81,7 +83,7 @@ interface Backend {
   excludedFields: { [field: string]: boolean };
 }
 
-interface DirectoryServicesGroupSync {
+export interface DirectoryServicesGroupSync {
   actions: {
     onDirectoryServiceBackendUpdate: (
       backendGroupSyncIsActive: boolean,

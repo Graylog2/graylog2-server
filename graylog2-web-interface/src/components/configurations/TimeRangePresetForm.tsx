@@ -203,8 +203,7 @@ const TimeRangePresetForm = ({
         bsSize="xs"
         onClick={addTimeRange}
         title="Add new search time range preset"
-        aria-label="Add new search time range preset"
-      >
+        aria-label="Add new search time range preset">
         Add option
       </Button>
     </div>

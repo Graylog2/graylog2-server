@@ -33,8 +33,7 @@ const renderWithForm = (element) =>
   render(
     <Formik
       initialValues={{ timeRangeTabs: { absolute: defaultProps.timeRange }, activeTab: 'absolute' }}
-      onSubmit={() => {}}
-    >
+      onSubmit={() => {}}>
       <Form>{element}</Form>
     </Formik>,
   );

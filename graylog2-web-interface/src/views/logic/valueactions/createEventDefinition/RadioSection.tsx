@@ -50,8 +50,7 @@ const RadioSection = ({ strategy, onChange, strategyAvailabilities }: Props) => 
               name="strategy"
               value={curStrategy}
               checked={curStrategy === strategy}
-              onChange={onChange}
-            >
+              onChange={onChange}>
               {label}
             </Radio>
           );

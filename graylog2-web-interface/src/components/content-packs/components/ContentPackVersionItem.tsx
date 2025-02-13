@@ -90,8 +90,7 @@ const ContentPackVersionItem = ({
           <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">
             <MenuItem onClick={() => handleInstall()}>Install</MenuItem>
             <LinkContainer
-              to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}
-            >
+              to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
               <MenuItem>Create New From Revision</MenuItem>
             </LinkContainer>
             <MenuItem divider />
