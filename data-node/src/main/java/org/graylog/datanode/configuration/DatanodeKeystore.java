@@ -106,6 +106,7 @@ public class DatanodeKeystore {
                 return true;
             } catch (CertificateException | NoSuchAlgorithmException | InvalidKeyException |
                      NoSuchProviderException | SignatureException e) {
+                LOG.warn("Failed to verify datanode certificate validity", e);
                 return false;
             }
 
