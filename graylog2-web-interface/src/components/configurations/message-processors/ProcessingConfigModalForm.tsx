@@ -147,8 +147,8 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
         </Formik>
       </Modal>
   )
-}
+};
 
-export default ProcessingConfigModalForm
+export default ProcessingConfigModalForm;
 
 
