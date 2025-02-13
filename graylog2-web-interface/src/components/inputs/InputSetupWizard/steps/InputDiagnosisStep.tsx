@@ -23,11 +23,13 @@ import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInp
 import { StepWrapper, DescriptionCol, ButtonCol } from './components/StepWrapper'
 
 type Props = {
-  onClose: () => void,
-}
+  onClose: () => void;
+};
 
 const InputDiagnosisStep = ({ onClose }: Props) => {
-  const { wizardData: { input } } = useInputSetupWizard();
+  const {
+    wizardData: { input },
+  } = useInputSetupWizard();
 
   return (
     <StepWrapper>

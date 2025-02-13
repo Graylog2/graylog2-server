@@ -32,16 +32,20 @@ import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
 import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading } from './components/StepWrapper'
 
-const ExistingStreamCol = styled(Col)(({ theme }) => css`
-  padding-top: ${theme.spacings.sm};
-  padding-bottom: ${theme.spacings.md};
-`);
+const ExistingStreamCol = styled(Col)(
+  ({ theme }) => css`
+    padding-top: ${theme.spacings.sm};
+    padding-bottom: ${theme.spacings.md};
+  `,
+);
 
-const CreateStreamCol = styled(Col)(({ theme }) => css`
-  padding-top: ${theme.spacings.sm};
-  padding-bottom: ${theme.spacings.md};
-  border-right: 1px solid ${theme.colors.cards.border};
-`);
+const CreateStreamCol = styled(Col)(
+  ({ theme }) => css`
+    padding-top: ${theme.spacings.sm};
+    padding-bottom: ${theme.spacings.md};
+    border-right: 1px solid ${theme.colors.cards.border};
+  `,
+);
 
 const StyledTooltip = styled(Tooltip)(({ theme }) => css`
   &.mantine-Tooltip-tooltip {
@@ -55,21 +59,23 @@ const StyledList = styled.ul`
   padding-left: 20px;
 `;
 
-const StyledLabel = styled.label(({ theme }) => css`
-  font-weight: normal;
-  line-height: 1.1;
-  margin-bottom: ${theme.spacings.sm};
-  display: inline-block;
-  font-size: ${theme.fonts.size.h3};
-  background: none;
-`);
+const StyledLabel = styled.label(
+  ({ theme }) => css`
+    font-weight: normal;
+    line-height: 1.1;
+    margin-bottom: ${theme.spacings.sm};
+    display: inline-block;
+    font-size: ${theme.fonts.size.h3};
+    background: none;
+  `,
+);
 
 export type RoutingStepData = {
-  streamId?: string,
-  newStream?: StreamFormValues,
-  shouldCreateNewPipeline?: boolean,
-  streamType: 'NEW' | 'EXISTING' | 'DEFAULT'
-}
+  streamId?: string;
+  newStream?: StreamFormValues;
+  shouldCreateNewPipeline?: boolean;
+  streamType: 'NEW' | 'EXISTING' | 'DEFAULT';
+};
 
 const SetupRoutingStep = () => {
   const currentStepName = useMemo(() => INPUT_WIZARD_STEPS.SETUP_ROUTING, []);
@@ -172,7 +178,10 @@ const SetupRoutingStep = () => {
 
   const streamHasConnectedPipelines = streamPipelinesData && streamPipelinesData?.length > 0;
 
-  const submitStreamCreation = ({ create_new_pipeline, ...stream }: StreamFormValues & { create_new_pipeline?: boolean }) => {
+  const submitStreamCreation = ({
+    create_new_pipeline,
+    ...stream
+  }: StreamFormValues & { create_new_pipeline?: boolean }) => {
     setStepsData(
       updateStepData(stepsData, currentStepName, {
         newStream: stream,

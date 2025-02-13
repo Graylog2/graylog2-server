@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 type Props = {
-  children: Array<React.ReactElement | string> | React.ReactElement,
-  delay: number,
+  children: Array<React.ReactElement | string> | React.ReactElement;
+  delay: number;
 };
 
 const Delayed = ({ children, delay }: Props) => {

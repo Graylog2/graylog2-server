@@ -17,11 +17,9 @@
 import React from 'react';
 
 type PopoverProps = {
- children: any;
+  children: any;
 };
 
-const Popover = ({
-  children,
-}: PopoverProps) => <>{children}</>;
+const Popover = ({ children }: PopoverProps) => <>{children}</>;
 
 export default Popover;

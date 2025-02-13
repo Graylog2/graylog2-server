@@ -28,21 +28,21 @@ import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import type { Collector } from 'components/sidecars/types';
 
 type Configuration = {
-  id: string,
-  name: string,
-  color: string,
-}
+  id: string;
+  name: string;
+  color: string;
+};
 type Props = {
-  collectors: Collector[],
-  configurations: Configuration[],
+  collectors: Collector[];
+  configurations: Configuration[];
   filters: {
-    collector?: string,
-    configuration?: string,
-    os?: string,
-    status?: string,
-  },
-  filter: (name?: string, value?: string) => void,
-}
+    collector?: string;
+    configuration?: string;
+    os?: string;
+    status?: string;
+  };
+  filter: (name?: string, value?: string) => void;
+};
 
 const CollectorsAdministrationFilters = (props: Props) => {
   const onFilterChange = (name: string, value: string, callback: () => void) => {
@@ -83,14 +83,20 @@ const CollectorsAdministrationFilters = (props: Props) => {
     }
 
     return (
-      <SelectPopover id="collector-filter"
-                     title="Filter by collector"
-                     triggerNode={<Button bsSize="small" bsStyle="link">Collector <span className="caret" /></Button>}
-                     items={collectorItems}
-                     itemFormatter={collectorFormatter}
-                     onItemSelect={filter}
-                     selectedItems={collectorFilter ? [collectorFilter] : []}
-                     filterPlaceholder="Filter by collector" />
+      <SelectPopover
+        id="collector-filter"
+        title="Filter by collector"
+        triggerNode={
+          <Button bsSize="small" bsStyle="link">
+            Collector <span className="caret" />
+          </Button>
+        }
+        items={collectorItems}
+        itemFormatter={collectorFormatter}
+        onItemSelect={filter}
+        selectedItems={collectorFilter ? [collectorFilter] : []}
+        filterPlaceholder="Filter by collector"
+      />
     );
   };
 
@@ -107,7 +113,11 @@ const CollectorsAdministrationFilters = (props: Props) => {
       const [id] = configurationId.split(';');
       const configuration = find(configurations, { id: id });
 
-      return <span><ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}</span>;
+      return (
+        <span>
+          <ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}
+        </span>
+      );
     };
 
     const filter = ([configurationId]: Array<string>, callback: () => void) => {
@@ -125,55 +135,75 @@ const CollectorsAdministrationFilters = (props: Props) => {
     }
 
     return (
-      <SelectPopover id="configuration-filter"
-                     title="Filter by configuration"
-                     triggerNode={<Button bsSize="small" bsStyle="link">Configuration <span className="caret" /></Button>}
-                     items={configurationItems}
-                     itemFormatter={configurationFormatter}
-                     onItemSelect={filter}
-                     selectedItems={configurationFilter ? [configurationFilter] : []}
-                     filterPlaceholder="Filter by configuration" />
+      <SelectPopover
+        id="configuration-filter"
+        title="Filter by configuration"
+        triggerNode={
+          <Button bsSize="small" bsStyle="link">
+            Configuration <span className="caret" />
+          </Button>
+        }
+        items={configurationItems}
+        itemFormatter={configurationFormatter}
+        onItemSelect={filter}
+        selectedItems={configurationFilter ? [configurationFilter] : []}
+        filterPlaceholder="Filter by configuration"
+      />
     );
   };
 
   const getOSFilter = () => {
     const { collectors, filters } = props;
 
-    const operatingSystems = uniq(collectors.map((collector) => upperFirst(collector.node_operating_system)))
-      .sort(naturalSortIgnoreCase);
+    const operatingSystems = uniq(collectors.map((collector) => upperFirst(collector.node_operating_system))).sort(
+      naturalSortIgnoreCase,
+    );
 
     const filter = ([os]: Array<string>, callback: () => void) => onFilterChange('os', os, callback);
 
     const osFilter = filters.os;
 
     return (
-      <SelectPopover id="os-filter"
-                     title="Filter by OS"
-                     triggerNode={<Button bsSize="small" bsStyle="link">OS <span className="caret" /></Button>}
-                     items={operatingSystems}
-                     onItemSelect={filter}
-                     selectedItems={osFilter ? [osFilter] : []}
-                     filterPlaceholder="Filter by OS" />
+      <SelectPopover
+        id="os-filter"
+        title="Filter by OS"
+        triggerNode={
+          <Button bsSize="small" bsStyle="link">
+            OS <span className="caret" />
+          </Button>
+        }
+        items={operatingSystems}
+        onItemSelect={filter}
+        selectedItems={osFilter ? [osFilter] : []}
+        filterPlaceholder="Filter by OS"
+      />
     );
   };
 
   const getStatusFilter = () => {
     const { filters } = props;
     const status = Object.keys(SidecarStatusEnum.properties).map((key) => String(key));
-    const filter = ([statusCode]: Array<string>, callback: () => void) => onFilterChange('status', statusCode, callback);
+    const filter = ([statusCode]: Array<string>, callback: () => void) =>
+      onFilterChange('status', statusCode, callback);
 
     const statusFilter = filters.status;
     const statusFormatter = (statusCode: string) => upperFirst(SidecarStatusEnum.toString(statusCode));
 
     return (
-      <SelectPopover id="status-filter"
-                     title="Filter by collector status"
-                     triggerNode={<Button bsSize="small" bsStyle="link">Collector Status <span className="caret" /></Button>}
-                     items={status}
-                     itemFormatter={statusFormatter}
-                     onItemSelect={filter}
-                     selectedItems={statusFilter ? [statusFilter] : []}
-                     filterPlaceholder="Filter by collector status" />
+      <SelectPopover
+        id="status-filter"
+        title="Filter by collector status"
+        triggerNode={
+          <Button bsSize="small" bsStyle="link">
+            Collector Status <span className="caret" />
+          </Button>
+        }
+        items={status}
+        itemFormatter={statusFormatter}
+        onItemSelect={filter}
+        selectedItems={statusFilter ? [statusFilter] : []}
+        filterPlaceholder="Filter by collector status"
+      />
     );
   };
 

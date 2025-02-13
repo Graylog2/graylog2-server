@@ -28,13 +28,9 @@ import useCurrentUser from 'hooks/useCurrentUser';
 export const usePluggableEventDetails = (eventId: string) => {
   const pluggableEventDetails = usePluginEntities('views.components.widgets.events.detailsComponent');
 
-  return pluggableEventDetails.filter(
-    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
-  ).map(
-    ({ component: PluggableEventAction, key }) => (
-      <PluggableEventAction key={key} eventId={eventId} />
-    ),
-  );
+  return pluggableEventDetails
+    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .map(({ component: PluggableEventAction, key }) => <PluggableEventAction key={key} eventId={eventId} />);
 };
 
 export const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {

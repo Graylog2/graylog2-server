@@ -28,10 +28,10 @@ import type { WizardData } from './types';
 import { InputDiagnosisStep, SetupRoutingStep, StartInputStep } from './steps';
 
 type Props = {
-  show: boolean,
-  input: WizardData['input'],
-  onClose: () => void,
-}
+  show: boolean;
+  input: WizardData['input'];
+  onClose: () => void;
+};
 
 const Wizard = ({ show, input, onClose }: Props) => {
   const { activeStep, setActiveStep, orderedSteps, setOrderedSteps, setWizardData, wizardData } = useInputSetupWizard();

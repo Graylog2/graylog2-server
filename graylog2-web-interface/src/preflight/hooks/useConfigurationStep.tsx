@@ -39,7 +39,8 @@ const configurationStep = (
     return CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key;
   }
 
-  const finishedProvisioning = !!dataNodes?.length && !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.CONNECTED);
+  const finishedProvisioning =
+    !!dataNodes?.length && !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.CONNECTED);
 
   if (!finishedProvisioning && !isSkippingProvisioning) {
     return CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key;
@@ -49,19 +50,23 @@ const configurationStep = (
 };
 
 type Props = {
-  isSkippingProvisioning: boolean
-}
+  isSkippingProvisioning: boolean;
+};
 
 type Result = {
-  step: ConfigurationStep | null,
-  isLoading: boolean,
-  errors: Array<{ entityName: string, error: FetchError}> | null
-}
+  step: ConfigurationStep | null;
+  isLoading: boolean;
+  errors: Array<{ entityName: string; error: FetchError }> | null;
+};
 
 const useConfigurationStep = ({ isSkippingProvisioning }: Props): Result => {
   const { data: dataNodes, isInitialLoading: isLoadingDataNodes, error: dataNodesError } = useDataNodes();
   const { data: dataNodesCA, isInitialLoading: isLoadingCAStatus, error: caError } = useDataNodesCA();
-  const { data: renewalPolicy, isInitialLoading: isLoadingRenewalPolicy, error: renewalPolicyError } = useRenewalPolicy();
+  const {
+    data: renewalPolicy,
+    isInitialLoading: isLoadingRenewalPolicy,
+    error: renewalPolicyError,
+  } = useRenewalPolicy();
   const step = configurationStep(dataNodes, dataNodesCA, renewalPolicy, isSkippingProvisioning);
 
   return useMemo(() => {
@@ -72,18 +77,18 @@ const useConfigurationStep = ({ isSkippingProvisioning }: Props): Result => {
         { entityName: 'renewal policy', error: renewalPolicyError },
       ].filter(({ error }) => !!error);
 
-      return ({ isLoading: false, step: null, errors });
+      return { isLoading: false, step: null, errors };
     }
 
     if (isLoadingDataNodes || isLoadingCAStatus || isLoadingRenewalPolicy) {
-      return ({ isLoading: true, step: null, errors: null });
+      return { isLoading: true, step: null, errors: null };
     }
 
-    return ({
+    return {
       isLoading: false,
       step,
       errors: null,
-    });
+    };
   }, [
     caError,
     dataNodesError,

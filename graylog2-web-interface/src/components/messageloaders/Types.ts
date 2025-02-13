@@ -16,40 +16,40 @@
  */
 
 interface InputBase {
-  title: string,
-  type: string,
-  global: boolean,
-  node?: string,
+  title: string;
+  type: string;
+  global: boolean;
+  node?: string;
 }
 
 export interface Input extends InputBase {
-  id: string,
-  name: string,
-  created_at: string,
-  creator_user_id: string,
-  content_pack?: boolean,
-  static_fields: { [field: string]: any },
+  id: string;
+  name: string;
+  created_at: string;
+  creator_user_id: string;
+  content_pack?: boolean;
+  static_fields: { [field: string]: any };
   attributes: {
-    [type: string]: any,
-  },
+    [type: string]: any;
+  };
 }
 
 export interface ConfiguredInput extends InputBase {
   configuration: {
-    [type: string]: any,
-  },
+    [type: string]: any;
+  };
 }
 
-export type Codec ={
-  type: string,
-  name: string,
+export type Codec = {
+  type: string;
+  name: string;
   requested_configuration: {
     [key: string]: {
-      [key: string]: any,
-    },
-  },
+      [key: string]: any;
+    };
+  };
 };
 
 export type CodecTypes = {
-  [key: string]: Codec,
+  [key: string]: Codec;
 };

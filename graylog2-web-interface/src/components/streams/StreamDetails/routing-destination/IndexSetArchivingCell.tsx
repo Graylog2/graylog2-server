@@ -21,12 +21,14 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Icon, Tooltip } from 'components/common';
 
 type Props = {
-  isArchivingEnabled: boolean,
-  streamId: string,
-}
-const Wrapper = styled.div<{ $enabled: boolean }>(({ theme, $enabled }) => css`
-  color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.darker.default};
-`);
+  isArchivingEnabled: boolean;
+  streamId: string;
+};
+const Wrapper = styled.div<{ $enabled: boolean }>(
+  ({ theme, $enabled }) => css`
+    color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.darker.default};
+  `,
+);
 const StyledDiv = styled.div`
   display: flex;
 `;
@@ -41,7 +43,9 @@ const IndexSetArchivingCell = ({ isArchivingEnabled, streamId }: Props) => {
           <Icon name={isArchivingEnabled ? 'check_circle' : 'cancel'} />
         </Wrapper>
       </Tooltip>
-      {StreamIndexSetDataLakeWarning && (<StreamIndexSetDataLakeWarning streamId={streamId} isArchivingEnabled={isArchivingEnabled} />)}
+      {StreamIndexSetDataLakeWarning && (
+        <StreamIndexSetDataLakeWarning streamId={streamId} isArchivingEnabled={isArchivingEnabled} />
+      )}
     </StyledDiv>
   );
 };

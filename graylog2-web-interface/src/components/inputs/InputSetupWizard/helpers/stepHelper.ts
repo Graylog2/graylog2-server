@@ -23,7 +23,10 @@ export const getStepData = (stepsData: StepsData, stepName: InputSetupWizardStep
   return stepsData[stepName];
 };
 
-export const getNextStep = (orderedSteps: Array<InputSetupWizardStep>, activeStep: InputSetupWizardStep) : InputSetupWizardStep | undefined => {
+export const getNextStep = (
+  orderedSteps: Array<InputSetupWizardStep>,
+  activeStep: InputSetupWizardStep,
+): InputSetupWizardStep | undefined => {
   const activeStepIndex = orderedSteps.indexOf(activeStep);
 
   if (activeStepIndex < 0) return undefined;

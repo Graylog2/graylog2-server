@@ -26,7 +26,7 @@ describe('SearchButton', () => {
     jest.clearAllMocks();
   });
 
-  const SUT = ({ disabled = false, dirty = false }: { dirty?: boolean, disabled?: boolean}) => (
+  const SUT = ({ disabled = false, dirty = false }: { dirty?: boolean; disabled?: boolean }) => (
     <form onSubmit={onFormSubmit}>
       <SearchButton disabled={disabled} dirty={dirty} />
     </form>
@@ -35,7 +35,9 @@ describe('SearchButton', () => {
   it('should trigger form submit refresh when dirty', () => {
     render(<SUT dirty />);
 
-    const button = screen.getByRole('button', { name: /perform search \(changes were made after last search execution\)/i });
+    const button = screen.getByRole('button', {
+      name: /perform search \(changes were made after last search execution\)/i,
+    });
 
     fireEvent.click(button);
 

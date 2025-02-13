@@ -23,18 +23,17 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
 type Actions = {
-  searchPaginated: (page: number, perPage: number, query?: string) => Promise<StoreState>,
-  reloadPage: () => Promise<void>,
-  get: (idOrName: string) => Promise<void>,
-  create: (cache: LookupTableCache) => Promise<void>,
-  update: (cache: LookupTableCache) => Promise<void>,
-  getTypes: () => Promise<unknown>,
-  delete: (idOrName: string) => Promise<void>,
-  validate: (cache: LookupTableCache) => Promise<void>,
-}
-export const LookupTableCachesActions = singletonActions(
-  'core.LookupTableCaches',
-  () => Reflux.createActions<Actions>({
+  searchPaginated: (page: number, perPage: number, query?: string) => Promise<StoreState>;
+  reloadPage: () => Promise<void>;
+  get: (idOrName: string) => Promise<void>;
+  create: (cache: LookupTableCache) => Promise<void>;
+  update: (cache: LookupTableCache) => Promise<void>;
+  getTypes: () => Promise<unknown>;
+  delete: (idOrName: string) => Promise<void>;
+  validate: (cache: LookupTableCache) => Promise<void>;
+};
+export const LookupTableCachesActions = singletonActions('core.LookupTableCaches', () =>
+  Reflux.createActions<Actions>({
     searchPaginated: { asyncResult: true },
     reloadPage: { asyncResult: true },
     get: { asyncResult: true },
@@ -47,18 +46,17 @@ export const LookupTableCachesActions = singletonActions(
 );
 
 type StoreState = {
-  caches: LookupTableCache[],
+  caches: LookupTableCache[];
   pagination: {
-    page: number,
-    per_page: number,
-    total: number,
-    count: number,
-    query: string | null
-  }
-}
-export const LookupTableCachesStore = singletonStore(
-  'core.LookupTableCaches',
-  () => Reflux.createStore<StoreState>({
+    page: number;
+    per_page: number;
+    total: number;
+    count: number;
+    query: string | null;
+  };
+};
+export const LookupTableCachesStore = singletonStore('core.LookupTableCaches', () =>
+  Reflux.createStore<StoreState>({
     listenables: [LookupTableCachesActions],
     cache: null,
     caches: null,
@@ -109,18 +107,21 @@ export const LookupTableCachesStore = singletonStore(
 
       const promise = fetch('GET', url);
 
-      promise.then((response) => {
-        this.pagination = {
-          count: response.count,
-          total: response.total,
-          page: response.page,
-          per_page: response.per_page,
-          query: response.query,
-        };
+      promise.then(
+        (response) => {
+          this.pagination = {
+            count: response.count,
+            total: response.total,
+            page: response.page,
+            per_page: response.per_page,
+            query: response.query,
+          };
 
-        this.caches = response.caches;
-        this.propagateChanges();
-      }, this._errorHandler('Fetching lookup table caches failed', 'Could not retrieve the lookup caches'));
+          this.caches = response.caches;
+          this.propagateChanges();
+        },
+        this._errorHandler('Fetching lookup table caches failed', 'Could not retrieve the lookup caches'),
+      );
 
       LookupTableCachesActions.searchPaginated.promise(promise);
 
@@ -131,10 +132,13 @@ export const LookupTableCachesStore = singletonStore(
       const url = this._url(`caches/${idOrName}`);
       const promise = fetch('GET', url);
 
-      promise.then((response) => {
-        this.cache = response;
-        this.propagateChanges();
-      }, this._errorHandler(`Fetching lookup table cache ${idOrName} failed`, 'Could not retrieve lookup table cache'));
+      promise.then(
+        (response) => {
+          this.cache = response;
+          this.propagateChanges();
+        },
+        this._errorHandler(`Fetching lookup table cache ${idOrName} failed`, 'Could not retrieve lookup table cache'),
+      );
 
       LookupTableCachesActions.get.promise(promise);
 
@@ -145,10 +149,13 @@ export const LookupTableCachesStore = singletonStore(
       const url = this._url('caches');
       const promise = fetch('POST', url, cache);
 
-      promise.then((response) => {
-        this.cache = response;
-        this.propagateChanges();
-      }, this._errorHandler('Creating lookup table cache failed', `Could not create lookup table cache "${cache.name}"`));
+      promise.then(
+        (response) => {
+          this.cache = response;
+          this.propagateChanges();
+        },
+        this._errorHandler('Creating lookup table cache failed', `Could not create lookup table cache "${cache.name}"`),
+      );
 
       LookupTableCachesActions.create.promise(promise);
 
@@ -159,10 +166,13 @@ export const LookupTableCachesStore = singletonStore(
       const url = this._url(`caches/${cache.id}`);
       const promise = fetch('PUT', url, cache);
 
-      promise.then((response) => {
-        this.cache = response;
-        this.propagateChanges();
-      }, this._errorHandler('Updating lookup table cache failed', `Could not update lookup table cache "${cache.name}"`));
+      promise.then(
+        (response) => {
+          this.cache = response;
+          this.propagateChanges();
+        },
+        this._errorHandler('Updating lookup table cache failed', `Could not update lookup table cache "${cache.name}"`),
+      );
 
       LookupTableCachesActions.update.promise(promise);
 
@@ -173,10 +183,13 @@ export const LookupTableCachesStore = singletonStore(
       const url = this._url('types/caches');
       const promise = fetch('GET', url);
 
-      promise.then((response) => {
-        this.types = response;
-        this.propagateChanges();
-      }, this._errorHandler('Fetching available types failed', 'Could not fetch the available lookup table cache types'));
+      promise.then(
+        (response) => {
+          this.types = response;
+          this.propagateChanges();
+        },
+        this._errorHandler('Fetching available types failed', 'Could not fetch the available lookup table cache types'),
+      );
 
       LookupTableCachesActions.getTypes.promise(promise);
 
@@ -187,7 +200,9 @@ export const LookupTableCachesStore = singletonStore(
       const url = this._url(`caches/${idOrName}`);
       const promise = fetch('DELETE', url);
 
-      promise.catch(this._errorHandler('Deleting lookup table cache failed', `Could not delete lookup table cache "${idOrName}"`));
+      promise.catch(
+        this._errorHandler('Deleting lookup table cache failed', `Could not delete lookup table cache "${idOrName}"`),
+      );
 
       LookupTableCachesActions.delete.promise(promise);
 
@@ -198,13 +213,16 @@ export const LookupTableCachesStore = singletonStore(
       const url = this._url('caches/validate');
       const promise = fetch('POST', url, cache);
 
-      promise.then((response) => {
-        this.validationErrors = response.errors;
-        this.propagateChanges();
-      }, this._errorHandler(
-        'Lookup table cache validation failed',
-        `Could not validate lookup table cache "${cache.name}"`,
-      ));
+      promise.then(
+        (response) => {
+          this.validationErrors = response.errors;
+          this.propagateChanges();
+        },
+        this._errorHandler(
+          'Lookup table cache validation failed',
+          `Could not validate lookup table cache "${cache.name}"`,
+        ),
+      );
 
       LookupTableCachesActions.validate.promise(promise);
 

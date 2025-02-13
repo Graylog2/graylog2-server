@@ -27,10 +27,7 @@ describe('BootstrapModalForm', () => {
     onSubmitForm: () => void = () => {},
     onCancel: () => void = () => {},
   ) => (
-    <BootstrapModalForm title="Sample Form"
-                        show={show}
-                        onSubmitForm={onSubmitForm}
-                        onCancel={onCancel}>
+    <BootstrapModalForm title="Sample Form" show={show} onSubmitForm={onSubmitForm} onCancel={onCancel}>
       {children}
     </BootstrapModalForm>
   );

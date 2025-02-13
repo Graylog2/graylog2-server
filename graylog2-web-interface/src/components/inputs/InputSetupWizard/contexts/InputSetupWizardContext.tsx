@@ -25,10 +25,10 @@ type InputSetupWizardContextType = {
   setActiveStep: (step: InputSetupWizardStep) => void,
   wizardData: WizardData,
   setWizardData: (wizardData: WizardData) => void;
-  orderedSteps: Array<InputSetupWizardStep>,
-  setOrderedSteps: (steps: Array<InputSetupWizardStep>) => void,
-  goToPreviousStep: () => void,
-  goToNextStep: (step?: InputSetupWizardStep) => void,
+  orderedSteps: Array<InputSetupWizardStep>;
+  setOrderedSteps: (steps: Array<InputSetupWizardStep>) => void;
+  goToPreviousStep: () => void;
+  goToNextStep: (step?: InputSetupWizardStep) => void;
 };
 
 const InputSetupWizardContext = React.createContext<InputSetupWizardContextType | undefined>(undefined);

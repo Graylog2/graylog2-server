@@ -56,21 +56,15 @@ describe('stepHelper', () => {
 
   describe('getNextStep', () => {
     it('returns the next step', () => {
-      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY)).toEqual(
-        INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
-      );
+      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY)).toEqual(INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS);
     });
 
     it('returns undefined if there is no next step', () => {
-      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS)).toEqual(
-        undefined,
-      );
+      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS)).toEqual(undefined);
     });
 
     it('returns undefined if active step is not in ordered steps', () => {
-      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(
-        undefined,
-      );
+      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(undefined);
     });
   });
 

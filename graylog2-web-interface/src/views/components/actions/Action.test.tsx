@@ -63,7 +63,7 @@ describe('Action', () => {
 
   type Props = Partial<React.ComponentProps<typeof Action>>;
 
-  const OpenActionsMenu = () => (<div>Open Actions Menu</div>);
+  const OpenActionsMenu = () => <div>Open Actions Menu</div>;
 
   const SimpleAction = ({
     children = 'The dropdown header',
@@ -71,10 +71,7 @@ describe('Action', () => {
     menuContainer = undefined,
     type = 'field',
   }: Props) => (
-    <Action element={OpenActionsMenu}
-            handlerArgs={handlerArgs}
-            menuContainer={menuContainer}
-            type={type}>
+    <Action element={OpenActionsMenu} handlerArgs={handlerArgs} menuContainer={menuContainer} type={type}>
       {children}
     </Action>
   );
@@ -104,7 +101,7 @@ describe('Action', () => {
       },
     ];
 
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ fieldActions }[entityKey]));
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({ fieldActions })[entityKey]);
 
     render(<SimpleAction type="field" />);
 
@@ -117,7 +114,7 @@ describe('Action', () => {
   });
 
   it('does not fail when plugin is not present for external actions', async () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ wrongKey: noop }[entityKey]));
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({ wrongKey: noop })[entityKey]);
 
     render(<SimpleAction>The dropdown header</SimpleAction>);
     await openDropdown('The dropdown header');
@@ -136,13 +133,13 @@ describe('Action', () => {
       isError: false,
     });
 
-    render(
-      <SimpleAction type="value" />,
-    );
+    render(<SimpleAction type="value" />);
 
     await openDropdown();
 
-    const actionMenuItem = await screen.findByRole('menuitem', { name: /external value action/i }) as HTMLAnchorElement;
+    const actionMenuItem = (await screen.findByRole('menuitem', {
+      name: /external value action/i,
+    })) as HTMLAnchorElement;
 
     expect(actionMenuItem.href).toContain('the-link-to-field1');
   });

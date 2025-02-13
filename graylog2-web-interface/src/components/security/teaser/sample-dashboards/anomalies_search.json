@@ -68,9 +68,7 @@
           "row_groups": [
             {
               "type": "time",
-              "fields": [
-                "timestamp"
-              ],
+              "fields": ["timestamp"],
               "interval": {
                 "type": "auto",
                 "scaling": 1
@@ -80,9 +78,7 @@
           "column_groups": [
             {
               "type": "values",
-              "fields": [
-                "anomaly_detector_name"
-              ],
+              "fields": ["anomaly_detector_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -115,9 +111,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "anomaly_detector_name"
-              ],
+              "fields": ["anomaly_detector_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -207,9 +201,7 @@
           "row_groups": [
             {
               "type": "time",
-              "fields": [
-                "timestamp"
-              ],
+              "fields": ["timestamp"],
               "interval": {
                 "type": "auto",
                 "scaling": 1
@@ -219,9 +211,7 @@
           "column_groups": [
             {
               "type": "values",
-              "fields": [
-                "user_name"
-              ],
+              "fields": ["user_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -281,9 +271,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "user_name"
-              ],
+              "fields": ["user_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -346,9 +334,7 @@
           "row_groups": [
             {
               "type": "time",
-              "fields": [
-                "timestamp"
-              ],
+              "fields": ["timestamp"],
               "interval": {
                 "type": "auto",
                 "scaling": 1
@@ -467,9 +453,7 @@
           "row_groups": [
             {
               "type": "time",
-              "fields": [
-                "timestamp"
-              ],
+              "fields": ["timestamp"],
               "interval": {
                 "type": "auto",
                 "scaling": 1
@@ -479,9 +463,7 @@
           "column_groups": [
             {
               "type": "values",
-              "fields": [
-                "anomaly_detector_name"
-              ],
+              "fields": ["anomaly_detector_name"],
               "limit": 15,
               "skip_empty_values": false
             }

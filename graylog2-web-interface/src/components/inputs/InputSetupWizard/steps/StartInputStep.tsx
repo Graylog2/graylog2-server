@@ -33,7 +33,15 @@ import ProgressMessage from 'components/inputs/InputSetupWizard/steps/components
 
 import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading } from './components/StepWrapper'
 
-export type ProcessingSteps = 'createStream' | 'startStream' | 'createPipeline' | 'setupRouting' | 'deleteStream' | 'deletePipeline' | 'deleteRouting' | 'result';
+export type ProcessingSteps =
+  | 'createStream'
+  | 'startStream'
+  | 'createPipeline'
+  | 'setupRouting'
+  | 'deleteStream'
+  | 'deletePipeline'
+  | 'deleteRouting'
+  | 'result';
 
 const StartInputStep = () => {
   const navigateTo = useNavigate();
@@ -56,18 +64,24 @@ const StartInputStep = () => {
     deleteRoutingRuleMutation,
   } = useSetupInputMutations();
 
-  const stepMutations = useMemo<{[key in ProcessingSteps]?: UseMutationResult}>(() => ({
-    createStream: createStreamMutation,
-    startStream: startStreamMutation,
-    createPipeline: createPipelineMutation,
-    setupRouting: updateRoutingMutation,
-  }), [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation]);
+  const stepMutations = useMemo<{ [key in ProcessingSteps]?: UseMutationResult }>(
+    () => ({
+      createStream: createStreamMutation,
+      startStream: startStreamMutation,
+      createPipeline: createPipelineMutation,
+      setupRouting: updateRoutingMutation,
+    }),
+    [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation],
+  );
 
-  const rollBackMutations = useMemo<{[key in ProcessingSteps]?: UseMutationResult}>(() => ({
-    deleteStream: deleteStreamMutation,
-    deletePipeline: deletePipelineMutation,
-    deleteRouting: deleteRoutingRuleMutation,
-  }), [deleteStreamMutation, deletePipelineMutation, deleteRoutingRuleMutation]);
+  const rollBackMutations = useMemo<{ [key in ProcessingSteps]?: UseMutationResult }>(
+    () => ({
+      deleteStream: deleteStreamMutation,
+      deletePipeline: deletePipelineMutation,
+      deleteRouting: deleteRoutingRuleMutation,
+    }),
+    [deleteStreamMutation, deletePipelineMutation, deleteRoutingRuleMutation],
+  );
 
   useEffect(() => {
     if (!isRollback) {
@@ -99,10 +113,9 @@ const StartInputStep = () => {
 
     if (!input) return;
 
-    InputStatesStore.start(input)
-      .finally(() => {
-        setStartInputStatus('SUCCESS');
-      });
+    InputStatesStore.start(input).finally(() => {
+      setStartInputStatus('SUCCESS');
+    });
   };
 
   const stopInput = async () => {
@@ -122,7 +135,6 @@ const StartInputStep = () => {
 
     switch (routingStepData.streamType) {
       case 'NEW':
-
         if (routingStepData.shouldCreateNewPipeline) {
           createPipeline(routingStepData.newStream);
         }
@@ -170,8 +182,7 @@ const StartInputStep = () => {
         if (!createdStreamId) return;
 
         if (routingRuleId) {
-          deleteRoutingRuleMutation.mutateAsync(routingRuleId, {
-          }).finally(() => {
+          deleteRoutingRuleMutation.mutateAsync(routingRuleId, {}).finally(() => {
             deleteStreamMutation.mutateAsync(createdStreamId).finally(() => {
               setStartInputStatus('ROLLED_BACK');
             });
@@ -188,10 +199,9 @@ const StartInputStep = () => {
 
         if (!routingRuleId) return;
 
-        deleteRoutingRuleMutation.mutateAsync(routingRuleId).finally(
-          () => {
-            setStartInputStatus('ROLLED_BACK');
-          });
+        deleteRoutingRuleMutation.mutateAsync(routingRuleId).finally(() => {
+          setStartInputStatus('ROLLED_BACK');
+        });
 
         break;
       case 'DEFAULT':
@@ -262,36 +272,46 @@ const StartInputStep = () => {
     }
   };
 
-  const renderProgressMessages = (mutations: {[key in ProcessingSteps]?: UseMutationResult}) => (Object.keys(mutations).map((stepName) => {
-    const mutation = mutations[stepName];
+  const renderProgressMessages = (mutations: { [key in ProcessingSteps]?: UseMutationResult }) =>
+    Object.keys(mutations).map((stepName) => {
+      const mutation = mutations[stepName];
 
-    if (!mutation) return null;
-    if (mutation.isIdle) return null;
+      if (!mutation) return null;
+      if (mutation.isIdle) return null;
 
-    const name = getProgressEntityName(stepName, mutations);
+      const name = getProgressEntityName(stepName, mutations);
 
-    return (
-      <ProgressMessage stepName={stepName as ProcessingSteps}
-                       isLoading={mutation.isLoading}
-                       key={stepName}
-                       isSuccess={mutation.isSuccess}
-                       name={name}
-                       isError={mutation.isError}
-                       errorMessage={mutation.error} />
-    );
-  })
-  );
+      return (
+        <ProgressMessage
+          stepName={stepName as ProcessingSteps}
+          isLoading={mutation.isLoading}
+          key={stepName}
+          isSuccess={mutation.isSuccess}
+          name={name}
+          isError={mutation.isError}
+          errorMessage={mutation.error}
+        />
+      );
+    });
 
   const renderNextButton = () => {
     if (startInputStatus === 'NOT_STARTED' || startInputStatus === 'ROLLED_BACK') {
       return (
-        <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary" data-testid="start-input-button">Start Input</Button>
+        <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary" data-testid="start-input-button">
+          Start Input
+        </Button>
       );
     }
 
     if (startInputStatus === 'FAILED' || startInputStatus === 'ROLLING_BACK') {
       return (
-        <Button disabled={startInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary" data-testid="rollback-input-button">Rollback Input</Button>
+        <Button
+          disabled={startInputStatus === 'ROLLING_BACK'}
+          onClick={handleRollback}
+          bsStyle="primary"
+          data-testid="rollback-input-button">
+          Rollback Input
+        </Button>
       );
     }
 

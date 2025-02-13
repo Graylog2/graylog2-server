@@ -25,32 +25,43 @@ import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/vis
 
 type AreaVisualizationConfigFormValues = {
   interpolation: InterpolationType;
-  axisType: AxisType,
+  axisType: AxisType;
 };
 
 const validate = hasAtLeastOneMetric('Area chart');
 
-const areaChart: VisualizationType<typeof AreaVisualization.type, AreaVisualizationConfig, AreaVisualizationConfigFormValues> = {
+const areaChart: VisualizationType<
+  typeof AreaVisualization.type,
+  AreaVisualizationConfig,
+  AreaVisualizationConfigFormValues
+> = {
   type: AreaVisualization.type,
   displayName: 'Area Chart',
   component: AreaVisualization,
   config: {
     createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION, axisType: DEFAULT_AXIS_TYPE }),
-    fromConfig: (config: AreaVisualizationConfig) => ({ interpolation: config?.interpolation, axisType: config?.axisType }),
-    toConfig: (formValues: AreaVisualizationConfigFormValues) => AreaVisualizationConfig.create(formValues.interpolation, formValues.axisType),
-    fields: [{
-      name: 'interpolation',
-      title: 'Interpolation',
-      type: 'select',
-      options: interpolationTypes,
-      required: true,
-    }, {
-      name: 'axisType',
-      title: 'Axis Type',
-      type: 'select',
-      options: axisTypes,
-      required: true,
-    }],
+    fromConfig: (config: AreaVisualizationConfig) => ({
+      interpolation: config?.interpolation,
+      axisType: config?.axisType,
+    }),
+    toConfig: (formValues: AreaVisualizationConfigFormValues) =>
+      AreaVisualizationConfig.create(formValues.interpolation, formValues.axisType),
+    fields: [
+      {
+        name: 'interpolation',
+        title: 'Interpolation',
+        type: 'select',
+        options: interpolationTypes,
+        required: true,
+      },
+      {
+        name: 'axisType',
+        title: 'Axis Type',
+        type: 'select',
+        options: axisTypes,
+        required: true,
+      },
+    ],
   },
   capabilities: ['event-annotations'],
   validate,
