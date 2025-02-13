@@ -24,10 +24,10 @@ import ContentPackInstallEntityList from './ContentPackInstallEntityList';
 
 type ContentPackInstallViewProps = {
   install: {
-    comment: string,
-    created_at: string,
-    created_by: string,
-    entities: any[],
+    comment: string;
+    created_at: string;
+    created_by: string;
+    entities: any[];
   };
 };
 
@@ -45,7 +45,9 @@ const ContentPackInstallView = ({ install }: ContentPackInstallViewProps) => {
             <dt>Installed by:</dt>
             <dd>{createdBy}&nbsp;</dd>
             <dt>Installed at:</dt>
-            <dd><Timestamp dateTime={createdAt} /></dd>
+            <dd>
+              <Timestamp dateTime={createdAt} />
+            </dd>
           </dl>
         </Col>
       </Row>

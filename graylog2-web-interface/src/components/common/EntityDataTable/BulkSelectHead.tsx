@@ -26,7 +26,10 @@ import { Th } from 'components/common/EntityDataTable/TableHead';
 
 type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
-const useCheckboxStatus = <Entity extends EntityBase>(data: Readonly<Array<Entity>>, selectedEntityIds: Array<string>) => {
+const useCheckboxStatus = <Entity extends EntityBase>(
+  data: Readonly<Array<Entity>>,
+  selectedEntityIds: Array<string>,
+) => {
   const checkboxRef = useRef<HTMLInputElement>();
   const checkboxStatus: CheckboxStatus = useMemo(() => {
     const selectedEntities = data.filter(({ id }) => selectedEntityIds.includes(id));
@@ -61,12 +64,10 @@ const useCheckboxStatus = <Entity extends EntityBase>(data: Readonly<Array<Entit
 };
 
 type Props<Entity extends EntityBase> = {
-  data: Readonly<Array<Entity>>,
-}
+  data: Readonly<Array<Entity>>;
+};
 
-const BulkSelectHead = <Entity extends EntityBase>({
-  data,
-}: Props<Entity>) => {
+const BulkSelectHead = <Entity extends EntityBase>({ data }: Props<Entity>) => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
   const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'Select'} all visible entities`;
@@ -85,12 +86,16 @@ const BulkSelectHead = <Entity extends EntityBase>({
 
   return (
     <Th $width={BULK_SELECT_COLUMN_WIDTH}>
-      <RowCheckbox inputRef={(ref) => { checkboxRef.current = ref; }}
-                   onChange={onBulkSelect}
-                   checked={checkboxStatus === 'CHECKED'}
-                   title={title}
-                   disabled={!data?.length}
-                   aria-label={title} />
+      <RowCheckbox
+        inputRef={(ref) => {
+          checkboxRef.current = ref;
+        }}
+        onChange={onBulkSelect}
+        checked={checkboxStatus === 'CHECKED'}
+        title={title}
+        disabled={!data?.length}
+        aria-label={title}
+      />
     </Th>
   );
 };

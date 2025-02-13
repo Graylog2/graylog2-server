@@ -21,9 +21,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
-import type {
-  IndexSetTemplate,
-} from 'components/indices/IndexSetTemplates/types';
+import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
@@ -34,46 +32,52 @@ const INITIAL_DATA = {
 
 export const fetchIndexSetTemplates = async (searchParams: SearchParams) => {
   const indexSetTemplateUrl = qualifyUrl('/system/indices/index_sets/templates/paginated');
-  const url = PaginationURL(
-    indexSetTemplateUrl,
-    searchParams.page,
-    searchParams.pageSize,
-    searchParams.query,
-    { filters: FiltersForQueryParams(searchParams.filters), sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+  const url = PaginationURL(indexSetTemplateUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
+    filters: FiltersForQueryParams(searchParams.filters),
+    sort: searchParams.sort.attributeId,
+    order: searchParams.sort.direction,
+  });
 
-  return fetch('GET', url).then(
-    ({ elements, total, attributes }) => ({
-      list: elements,
-      pagination: { total },
-      attributes,
-    }));
+  return fetch('GET', url).then(({ elements, total, attributes }) => ({
+    list: elements,
+    pagination: { total },
+    attributes,
+  }));
 };
 
-export const keyFn = (searchParams: SearchParams) => (['indexSetTemplates', searchParams]);
+export const keyFn = (searchParams: SearchParams) => ['indexSetTemplates', searchParams];
 
-const useTemplates = (searchParams: SearchParams, { enabled } = { enabled: true }): {
+const useTemplates = (
+  searchParams: SearchParams,
+  { enabled } = { enabled: true },
+): {
   data: {
-    list: Readonly<Array<IndexSetTemplate>>,
-    pagination: { total: number },
-    attributes: Array<Attribute>
-  },
-  isLoading: boolean,
-  refetch: () => void,
+    list: Readonly<Array<IndexSetTemplate>>;
+    pagination: { total: number };
+    attributes: Array<Attribute>;
+  };
+  isLoading: boolean;
+  refetch: () => void;
 } => {
   const { data, isLoading, refetch } = useQuery(
     keyFn(searchParams),
-    () => defaultOnError(fetchIndexSetTemplates(searchParams), 'Loading index set templates failed with status', 'Could not load index set templates'),
+    () =>
+      defaultOnError(
+        fetchIndexSetTemplates(searchParams),
+        'Loading index set templates failed with status',
+        'Could not load index set templates',
+      ),
     {
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     isLoading,
     refetch,
-  });
+  };
 };
 
 export default useTemplates;

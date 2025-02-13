@@ -22,24 +22,22 @@ import ViewGenerator from 'views/logic/views/ViewGenerator';
 import type Parameter from 'views/logic/parameters/Parameter';
 
 type Props = {
-  streamId?: string | string[],
-  streamCategory?: string | string[],
-  timeRange?: TimeRange,
-  queryString?: ElasticsearchQueryString,
-  parameters?: Array<Parameter>,
-}
+  streamId?: string | string[];
+  streamCategory?: string | string[];
+  timeRange?: TimeRange;
+  queryString?: ElasticsearchQueryString;
+  parameters?: Array<Parameter>;
+};
 
 type Deps = Array<Props[keyof Props]> | [];
-const useCreateSavedSearch = ({
-  streamId,
-  streamCategory,
-  timeRange,
-  queryString,
-  parameters,
-}:Props, deps: Deps = []) => useMemo(
-  () => ViewGenerator({ type: View.Type.Search, streamId, streamCategory, timeRange, queryString, parameters }),
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  deps,
-);
+const useCreateSavedSearch = (
+  { streamId, streamCategory, timeRange, queryString, parameters }: Props,
+  deps: Deps = [],
+) =>
+  useMemo(
+    () => ViewGenerator({ type: View.Type.Search, streamId, streamCategory, timeRange, queryString, parameters }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    deps,
+  );
 
 export default useCreateSavedSearch;

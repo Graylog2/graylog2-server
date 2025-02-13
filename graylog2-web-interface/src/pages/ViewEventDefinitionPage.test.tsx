@@ -41,7 +41,15 @@ jest.mock('hooks/useCurrentUser');
 
 jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
   EventDefinitionsActions: {
-    get: mockAction(jest.fn(() => Promise.resolve({ event_definition: mockEventDefinition, context: { scheduler: { is_scheduled: true } }, is_mutable: true }))),
+    get: mockAction(
+      jest.fn(() =>
+        Promise.resolve({
+          event_definition: mockEventDefinition,
+          context: { scheduler: { is_scheduled: true } },
+          is_mutable: true,
+        }),
+      ),
+    ),
   },
 }));
 
@@ -49,10 +57,12 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
     listAll: mockAction(),
   },
-  EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [] })])),
+  EventNotificationsStore: MockStore(['getInitialState', () => ({ all: [] })]),
 }));
 
-jest.mock('components/event-definitions/event-definition-form/EventDefinitionSummary', () => mockComponent('EventDefinitionSummary'));
+jest.mock('components/event-definitions/event-definition-form/EventDefinitionSummary', () =>
+  mockComponent('EventDefinitionSummary'),
+);
 
 describe('<ViewEventDefinitionPage />', () => {
   beforeEach(() => {
@@ -66,9 +76,12 @@ describe('<ViewEventDefinitionPage />', () => {
   });
 
   it('should display event details when permitted', async () => {
-    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-      .permissions(Immutable.List([`eventdefinitions:read:${mockEventDefinition.id}`]))
-      .build());
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .permissions(Immutable.List([`eventdefinitions:read:${mockEventDefinition.id}`]))
+        .build(),
+    );
 
     render(<ViewEventDefinitionPage />);
 
@@ -76,9 +89,17 @@ describe('<ViewEventDefinitionPage />', () => {
   });
 
   it('should display the edit button when allowed', async () => {
-    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-      .permissions(Immutable.List([`eventdefinitions:read:${mockEventDefinition.id}`, `eventdefinitions:edit:${mockEventDefinition.id}`]))
-      .build());
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .permissions(
+          Immutable.List([
+            `eventdefinitions:read:${mockEventDefinition.id}`,
+            `eventdefinitions:edit:${mockEventDefinition.id}`,
+          ]),
+        )
+        .build(),
+    );
 
     render(<ViewEventDefinitionPage />);
 

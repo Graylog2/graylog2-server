@@ -22,25 +22,25 @@ import trim from 'lodash/trim';
 import type { QueryString, TimeRange } from '../queries/Query';
 
 export type SearchTypeOptions<T = any> = {
-  [searchTypeId: string]: T
+  [searchTypeId: string]: T;
 };
 
 type InternalState = {
-  timerange?: TimeRange,
-  query?: QueryString,
-  keepSearchTypes?: string[],
-  keepQueries?: string[],
-  searchTypes?: SearchTypeOptions,
-  now?: Moment | undefined | null,
+  timerange?: TimeRange;
+  query?: QueryString;
+  keepSearchTypes?: string[];
+  keepQueries?: string[];
+  searchTypes?: SearchTypeOptions;
+  now?: Moment | undefined | null;
 };
 
 type JsonRepresentation = {
-  timerange?: TimeRange,
-  query?: QueryString,
-  keep_search_types?: string[],
-  keep_queries?: string[],
-  search_types?: SearchTypeOptions,
-  now?: string,
+  timerange?: TimeRange;
+  query?: QueryString;
+  keep_search_types?: string[];
+  keep_queries?: string[];
+  search_types?: SearchTypeOptions;
+  now?: string;
 };
 
 function parseNow(now: string | undefined | null): Moment {
@@ -54,7 +54,14 @@ function parseNow(now: string | undefined | null): Moment {
 export default class GlobalOverride {
   private readonly _value: InternalState;
 
-  constructor(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions, keepQueries?: string[], now?: Moment) {
+  constructor(
+    timerange?: TimeRange,
+    query?: QueryString,
+    keepSearchTypes?: string[],
+    searchTypes?: SearchTypeOptions,
+    keepQueries?: string[],
+    now?: Moment,
+  ) {
     this._value = { timerange, query, keepSearchTypes, searchTypes, keepQueries, now };
   }
 
@@ -89,7 +96,14 @@ export default class GlobalOverride {
     return new Builder(Immutable.Map({ timerange, query, keepSearchTypes, searchTypes, keepQueries, now }));
   }
 
-  static create(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions, keepQueries?: string[], now?: Moment): GlobalOverride {
+  static create(
+    timerange?: TimeRange,
+    query?: QueryString,
+    keepSearchTypes?: string[],
+    searchTypes?: SearchTypeOptions,
+    keepQueries?: string[],
+    now?: Moment,
+  ): GlobalOverride {
     return new GlobalOverride(timerange, query, keepSearchTypes, searchTypes, keepQueries, now);
   }
 

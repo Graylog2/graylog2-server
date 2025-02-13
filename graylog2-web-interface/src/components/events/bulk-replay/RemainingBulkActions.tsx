@@ -26,10 +26,11 @@ const RemainingBulkActions = ({ completed, events }: RemainingBulkActionsProps) 
 
   return (
     <>
-      <DropdownButton title="Bulk actions"
-                      bsStyle={completed ? 'success' : 'default'}
-                      id="bulk-actions-dropdown"
-                      disabled={!events?.length}>
+      <DropdownButton
+        title="Bulk actions"
+        bsStyle={completed ? 'success' : 'default'}
+        id="bulk-actions-dropdown"
+        disabled={!events?.length}>
         {actions}
       </DropdownButton>
       {pluggableActionModals}

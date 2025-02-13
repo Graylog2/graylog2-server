@@ -22,16 +22,14 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const EventsActions = singletonActions(
-  'core.Events',
-  () => Reflux.createActions({
+export const EventsActions = singletonActions('core.Events', () =>
+  Reflux.createActions({
     search: { asyncResult: true },
   }),
 );
 
-export const EventsStore = singletonStore(
-  'core.Events',
-  () => Reflux.createStore({
+export const EventsStore = singletonStore('core.Events', () =>
+  Reflux.createStore({
     listenables: [EventsActions],
     sourceUrl: '/events/search',
     events: undefined,
@@ -98,43 +96,46 @@ export const EventsStore = singletonStore(
         timerange: timerange,
       });
 
-      promise.then((response) => {
-        this.events = response.events;
+      promise
+        .then((response) => {
+          this.events = response.events;
 
-        this.parameters = {
-          query: response.parameters.query,
-          page: response.parameters.page,
-          pageSize: response.parameters.per_page,
-          filter: response.parameters.filter,
-          timerange: response.parameters.timerange,
-        };
+          this.parameters = {
+            query: response.parameters.query,
+            page: response.parameters.page,
+            pageSize: response.parameters.per_page,
+            filter: response.parameters.filter,
+            timerange: response.parameters.timerange,
+          };
 
-        this.totalEvents = response.total_events;
-        this.context = response.context;
-        this.propagateChanges();
+          this.totalEvents = response.total_events;
+          this.context = response.context;
+          this.propagateChanges();
 
-        return response;
-      }).catch((error) => {
-        this.events = [];
+          return response;
+        })
+        .catch((error) => {
+          this.events = [];
 
-        this.parameters = {
-          query,
-          page,
-          pageSize,
-          filter,
-          timerange,
-        };
+          this.parameters = {
+            query,
+            page,
+            pageSize,
+            filter,
+            timerange,
+          };
 
-        this.totalEvents = 0;
+          this.totalEvents = 0;
 
-        this.context = {
-          event_definitions: {}, streams: {},
-        };
+          this.context = {
+            event_definitions: {},
+            streams: {},
+          };
 
-        this.propagateChanges();
+          this.propagateChanges();
 
-        return error;
-      });
+          return error;
+        });
 
       EventsActions.search.promise(promise);
     },

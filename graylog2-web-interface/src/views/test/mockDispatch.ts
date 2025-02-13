@@ -28,7 +28,7 @@ const defaultState = { view: { view: createSearch(), activeQuery: 'query-id-1' }
 const mockSearchExecutors: SearchExecutors = {
   resultMapper: (r) => r,
   parse: async () => SearchMetadata.empty(),
-  executeJobResult: async () => (({}) as SearchExecutionResult),
+  executeJobResult: async () => ({}) as SearchExecutionResult,
   startJob: async () => ({ nodeId: 'dummyNodeIdForTesting', asyncSearchId: 'dummySearchIdForTesting' }),
   cancelJob: async () => null,
 };
@@ -40,9 +40,9 @@ const isActionFn = (fn: UnknownAction | ActionFn): fn is ActionFn => typeof fn =
 const mockDispatch = (state: RootState = defaultState) => {
   const dispatch: AppDispatch = jest.fn();
 
-  asMock(dispatch).mockImplementation((fn) => (isActionFn(fn)
-    ? fn(dispatch, () => state, { searchExecutors: mockSearchExecutors })
-    : fn));
+  asMock(dispatch).mockImplementation((fn) =>
+    isActionFn(fn) ? fn(dispatch, () => state, { searchExecutors: mockSearchExecutors }) : fn,
+  );
 
   return dispatch;
 };
@@ -51,9 +51,7 @@ export const mockDispatchForView = (view: View, initialQuery: string = 'query-id
   const state = { ...defaultState, view: { view, activeQuery: initialQuery } } as RootState;
   const dispatch: AppDispatch = jest.fn();
 
-  asMock(dispatch).mockImplementation((fn) => (isActionFn(fn)
-    ? fn(dispatch, () => state)
-    : fn));
+  asMock(dispatch).mockImplementation((fn) => (isActionFn(fn) ? fn(dispatch, () => state) : fn));
 
   return dispatch;
 };

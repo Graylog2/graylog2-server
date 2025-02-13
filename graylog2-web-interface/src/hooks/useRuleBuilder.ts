@@ -36,17 +36,16 @@ export const removeSavedRuleSourceCode = () => {
 
 const createRule = async (rule: RuleBuilderRule) => {
   try {
-    const result = await fetch(
-      'POST',
-      qualifyUrl(ApiRoutes.RuleBuilderController.create().url),
-      rule,
-    );
+    const result = await fetch('POST', qualifyUrl(ApiRoutes.RuleBuilderController.create().url), rule);
 
     UserNotification.success(`Rule "${rule.title}" created successfully`);
 
     return result;
   } catch (errorThrown) {
-    UserNotification.error(`Creating the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Create the Rule Builder Rule.');
+    UserNotification.error(
+      `Creating the Rule Builder Rule failed with status: ${errorThrown}`,
+      'Could not Create the Rule Builder Rule.',
+    );
 
     return null;
   }
@@ -57,15 +56,14 @@ const updateRule = async (rule: RuleBuilderRule) => {
   const { source, errors, ...ruleToUpdate }: any = rule;
 
   try {
-    await fetch(
-      'PUT',
-      qualifyUrl(ApiRoutes.RuleBuilderController.update(rule.id).url),
-      ruleToUpdate,
-    );
+    await fetch('PUT', qualifyUrl(ApiRoutes.RuleBuilderController.update(rule.id).url), ruleToUpdate);
 
     UserNotification.success(`Rule "${rule.title}" updated successfully`);
   } catch (errorThrown) {
-    UserNotification.error(`Updating the Rule Builder Rule failed with status: ${errorThrown}`, 'Could not Update the Rule Builder Rule.');
+    UserNotification.error(
+      `Updating the Rule Builder Rule failed with status: ${errorThrown}`,
+      'Could not Update the Rule Builder Rule.',
+    );
   }
 };
 
@@ -73,38 +71,62 @@ const fetchValidateRule = async (rule: RuleBuilderRule): Promise<RuleBuilderRule
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { source, ...ruleToValidate }: any = rule;
 
-  return fetch(
-    'POST',
-    qualifyUrl(ApiRoutes.RuleBuilderController.validate().url),
-    ruleToValidate,
-  );
+  return fetch('POST', qualifyUrl(ApiRoutes.RuleBuilderController.validate().url), ruleToValidate);
 };
 
 const fetchRule = async (ruleId: string = '') => fetch('GET', qualifyUrl(ApiRoutes.RulesController.get(ruleId).url));
-const fetchConditionsDict = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listConditionsDict().url));
+const fetchConditionsDict = async () =>
+  fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listConditionsDict().url));
 const fetchActionsDict = async () => fetch('GET', qualifyUrl(ApiRoutes.RuleBuilderController.listActionsDict().url));
 
 const useRuleBuilder = () => {
   const { ruleId } = useParams();
   const enabled = !(ruleId === 'new');
 
-  const { data: rule, refetch: refetchRule, isFetching: isLoadingRule } = useQuery<RuleBuilderRule|null>(
+  const {
+    data: rule,
+    refetch: refetchRule,
+    isFetching: isLoadingRule,
+  } = useQuery<RuleBuilderRule | null>(
     ['rule'],
-    () => defaultOnError(fetchRule(ruleId), 'Loading Rule Builder Rule failed with status', 'Could not load Rule Builder Rule.'),
+    () =>
+      defaultOnError(
+        fetchRule(ruleId),
+        'Loading Rule Builder Rule failed with status',
+        'Could not load Rule Builder Rule.',
+      ),
     {
       enabled,
     },
   );
-  const { data: conditionsDict, refetch: refetchConditionsDict, isFetching: isLoadingConditionsDict } = useQuery<Array<BlockDict>>(
+  const {
+    data: conditionsDict,
+    refetch: refetchConditionsDict,
+    isFetching: isLoadingConditionsDict,
+  } = useQuery<Array<BlockDict>>(
     ['conditions'],
-    () => defaultOnError(fetchConditionsDict(), 'Loading Rule Builder Conditions list failed with status', 'Could not load Rule Builder Conditions list.'),
+    () =>
+      defaultOnError(
+        fetchConditionsDict(),
+        'Loading Rule Builder Conditions list failed with status',
+        'Could not load Rule Builder Conditions list.',
+      ),
     {
       keepPreviousData: true,
     },
   );
-  const { data: actionsDict, refetch: refetchActionsDict, isFetching: isLoadingActionsDict } = useQuery<Array<BlockDict>>(
+  const {
+    data: actionsDict,
+    refetch: refetchActionsDict,
+    isFetching: isLoadingActionsDict,
+  } = useQuery<Array<BlockDict>>(
     ['actions'],
-    () => defaultOnError(fetchActionsDict(), 'Loading Rule Builder Actions list failed with status', 'Could not load Rule Builder Actions list.'),
+    () =>
+      defaultOnError(
+        fetchActionsDict(),
+        'Loading Rule Builder Actions list failed with status',
+        'Could not load Rule Builder Actions list.',
+      ),
     {
       keepPreviousData: true,
     },

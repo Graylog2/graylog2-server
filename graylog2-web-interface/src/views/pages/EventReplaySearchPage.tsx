@@ -34,8 +34,12 @@ export const onErrorHandler = (error) => {
 
 const EventReplaySearchPage = () => {
   const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
-  const { alertId, definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
-  const { data: eventData, isLoading: eventIsLoading, isFetched: eventIsFetched } = useEventById(alertId, { onErrorHandler });
+  const { alertId, definitionId } = useParams<{ alertId?: string; definitionId?: string }>();
+  const {
+    data: eventData,
+    isLoading: eventIsLoading,
+    isFetched: eventIsFetched,
+  } = useEventById(alertId, { onErrorHandler });
   const { isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(eventData?.event_definition_id);
 
   useEffect(() => {
@@ -44,9 +48,7 @@ const EventReplaySearchPage = () => {
 
   const isLoading = eventIsLoading || EDIsLoading || !eventIsFetched || !EDIsFetched || !isNotificationLoaded;
 
-  return isLoading
-    ? <Spinner />
-    : <ReplaySearch alertId={alertId} definitionId={definitionId} />;
+  return isLoading ? <Spinner /> : <ReplaySearch alertId={alertId} definitionId={definitionId} />;
 };
 
 export default EventReplaySearchPage;

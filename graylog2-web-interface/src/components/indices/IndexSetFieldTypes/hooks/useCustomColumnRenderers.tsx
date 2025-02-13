@@ -23,28 +23,33 @@ import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/h
 import OriginCell from 'components/indices/IndexSetFieldTypes/originBadges/OriginCell';
 
 const useCustomColumnRenderers = () => {
-  const { data: { fieldTypes } } = useFieldTypesForMappings();
+  const {
+    data: { fieldTypes },
+  } = useFieldTypesForMappings();
 
-  return useMemo(() => ({
-    attributes: {
-      type: {
-        renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
+  return useMemo(
+    () => ({
+      attributes: {
+        type: {
+          renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
+        },
+        origin: {
+          renderCell: (origin: FieldTypeOrigin, { id }) => (
+            <ExpandedRowToggleWrapper id={id}>
+              <OriginCell origin={origin} />
+            </ExpandedRowToggleWrapper>
+          ),
+          staticWidth: 200,
+        },
+        is_reserved: {
+          renderCell: (isReserved: boolean) =>
+            isReserved ? <Icon title="Field has reserved field type" name="check" /> : null,
+          staticWidth: 120,
+        },
       },
-      origin: {
-        renderCell: (origin: FieldTypeOrigin, { id }) => (
-          <ExpandedRowToggleWrapper id={id}>
-            <OriginCell origin={origin} />
-          </ExpandedRowToggleWrapper>
-        ),
-        staticWidth: 200,
-      },
-      is_reserved: {
-        renderCell: (isReserved: boolean) => (isReserved
-          ? <Icon title="Field has reserved field type" name="check" /> : null),
-        staticWidth: 120,
-      },
-    },
-  }), [fieldTypes]);
+    }),
+    [fieldTypes],
+  );
 };
 
 export default useCustomColumnRenderers;

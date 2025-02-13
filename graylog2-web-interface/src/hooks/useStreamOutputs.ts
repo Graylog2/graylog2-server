@@ -33,33 +33,41 @@ export const fetchStreamOutputs = (streamId: string) => {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useStreamOutputs = (streamId: string, { enabled }: Options = { enabled: true }): {
+const useStreamOutputs = (
+  streamId: string,
+  { enabled }: Options = { enabled: true },
+): {
   data: {
-    outputs: Array<Output>,
-    total: number,
-  }
-  refetch: () => void,
-  isInitialLoading: boolean,
-  isError: boolean,
+    outputs: Array<Output>;
+    total: number;
+  };
+  refetch: () => void;
+  isInitialLoading: boolean;
+  isError: boolean;
 } => {
   const { data, refetch, isInitialLoading, isError } = useQuery(
     keyFn(streamId),
-    () => defaultOnError(fetchStreamOutputs(streamId), 'Loading stream outputs failed with status', 'Could not load stream outputs'),
+    () =>
+      defaultOnError(
+        fetchStreamOutputs(streamId),
+        'Loading stream outputs failed with status',
+        'Could not load stream outputs',
+      ),
     {
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
     isError,
-  });
+  };
 };
 
 export default useStreamOutputs;

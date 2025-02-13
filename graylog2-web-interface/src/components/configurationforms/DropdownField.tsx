@@ -22,18 +22,28 @@ import { Input } from 'components/bootstrap';
 import { optionableLabel } from 'components/configurationforms/FieldHelpers';
 
 type Props = {
-  autoFocus?: boolean,
-  field: DropdownFieldType,
-  onChange: (title: string, value: string, dirty?: boolean) => void,
-  title: string,
-  typeName: string,
-  value?: string
-  addPlaceholder?: boolean
+  autoFocus?: boolean;
+  field: DropdownFieldType;
+  onChange: (title: string, value: string, dirty?: boolean) => void;
+  title: string;
+  typeName: string;
+  value?: string;
+  addPlaceholder?: boolean;
 };
 
-const DropdownField = ({ autoFocus = false, field, onChange, title, typeName, value = '', addPlaceholder = false }: Props) => {
+const DropdownField = ({
+  autoFocus = false,
+  field,
+  onChange,
+  title,
+  typeName,
+  value = '',
+  addPlaceholder = false,
+}: Props) => {
   const formatOption = (key, displayValue, disabled = false) => (
-    <option key={`${typeName}-${title}-${key}`} value={key} id={key} disabled={disabled}>{displayValue}</option>
+    <option key={`${typeName}-${title}-${key}`} value={key} id={key} disabled={disabled}>
+      {displayValue}
+    </option>
   );
 
   const handleChange = (event) => {
@@ -47,15 +57,16 @@ const DropdownField = ({ autoFocus = false, field, onChange, title, typeName, va
   }
 
   return (
-    <Input id={`${typeName}-${title}`}
-           name={`configuration[${title}]`}
-           label={optionableLabel(field)}
-           type="select"
-           value={value}
-           help={field.description}
-           onChange={handleChange}
-           autoFocus={autoFocus}
-           required={!field.is_optional}>
+    <Input
+      id={`${typeName}-${title}`}
+      name={`configuration[${title}]`}
+      label={optionableLabel(field)}
+      type="select"
+      value={value}
+      help={field.description}
+      onChange={handleChange}
+      autoFocus={autoFocus}
+      required={!field.is_optional}>
       {options}
     </Input>
   );

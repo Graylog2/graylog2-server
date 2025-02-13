@@ -25,15 +25,12 @@ import { addWidget } from 'views/logic/slices/widgetActions';
 import type { GetState } from 'views/types';
 import { selectView } from 'views/logic/slices/viewSelectors';
 
-export const CreateCustomAggregation = ({ view }: CreatorProps) => AggregationWidget.builder()
-  .newId()
-  .timerange(view.type === View.Type.Dashboard ? DEFAULT_TIMERANGE : undefined)
-  .config(AggregationWidgetConfig.builder()
-    .rowPivots([])
-    .series([])
-    .visualization(DataTable.type)
-    .build())
-  .build();
+export const CreateCustomAggregation = ({ view }: CreatorProps) =>
+  AggregationWidget.builder()
+    .newId()
+    .timerange(view.type === View.Type.Dashboard ? DEFAULT_TIMERANGE : undefined)
+    .config(AggregationWidgetConfig.builder().rowPivots([]).series([]).visualization(DataTable.type).build())
+    .build();
 
 export default () => (dispatch: AppDispatch, getState: GetState) => {
   const view = selectView(getState());

@@ -21,7 +21,8 @@ import { alice } from 'fixtures/users';
 
 import ProfileSection from './ProfileSection';
 
-const exampleUser = alice.toBuilder()
+const exampleUser = alice
+  .toBuilder()
   .username('johndoe')
   .fullName('John Doe')
   .firstName('John')

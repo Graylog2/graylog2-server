@@ -20,11 +20,11 @@ import { Col } from 'components/bootstrap';
 import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 
 type ConfigurationSectionProps = {
-  ConfigurationComponent: React.ComponentType,
-  title: string
-}
+  ConfigurationComponent: React.ComponentType;
+  title: string;
+};
 
-const ConfigurationSection = ({ ConfigurationComponent, title } : ConfigurationSectionProps) => (
+const ConfigurationSection = ({ ConfigurationComponent, title }: ConfigurationSectionProps) => (
   <Col md={10}>
     <ConfigletContainer title={title}>
       <ConfigurationComponent />

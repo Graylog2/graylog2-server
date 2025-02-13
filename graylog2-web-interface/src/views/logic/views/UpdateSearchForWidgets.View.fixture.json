@@ -8,10 +8,7 @@
   "properties": [],
   "state": {
     "f678e6c5-43b1-4200-b5c3-d33eae164dea": {
-      "selected_fields": [
-        "source",
-        "message"
-      ],
+      "selected_fields": ["source", "message"],
       "formatting": {
         "highlighting": []
       },
@@ -271,12 +268,7 @@
           "id": "ef9e676a-2d08-4433-b082-2617878a6e59",
           "type": "messages",
           "config": {
-            "fields": [
-              "timestamp",
-              "source",
-              "lines_add",
-              "lines_removed"
-            ],
+            "fields": ["timestamp", "source", "lines_add", "lines_removed"],
             "show_message_row": true
           },
           "timerange": null,
@@ -285,30 +277,14 @@
         }
       ],
       "widget_mapping": {
-        "98ccf13e-6dec-4362-bcf3-a4776f457061": [
-          "02d6b549-6e56-451e-a2ab-6e4b257605ef"
-        ],
-        "897a0961-a548-4651-9ca6-f3d6f21b8379": [
-          "28c87846-a8b6-4b21-9aac-62a8ce886e8e"
-        ],
-        "3d568826-fe3d-413a-99a6-09e51d82c851": [
-          "fd32330f-f487-4bf3-a518-1f1bcef89aec"
-        ],
-        "fb496a41-4358-4bc8-b19f-244c71fe9143": [
-          "122d2764-160d-4acc-a2a7-c1ec8fdad28d"
-        ],
-        "ef9e676a-2d08-4433-b082-2617878a6e59": [
-          "81e69d89-4160-431f-9b90-95d29ca4cea6"
-        ],
-        "c78e9a51-2e36-4ec4-86de-9df4d29f0863": [
-          "3d6c9e26-9090-4aaf-bed8-313e75d9c477"
-        ],
-        "ec997825-6065-4fb7-ba86-427e74109ee4": [
-          "7949e87a-4a82-4e09-b939-f4c803ae12c6"
-        ],
-        "dc4a61b2-26e6-468e-bac2-f7702846ca92": [
-          "8dc4dc5c-1845-4c53-8519-8d02559ad8d7"
-        ]
+        "98ccf13e-6dec-4362-bcf3-a4776f457061": ["02d6b549-6e56-451e-a2ab-6e4b257605ef"],
+        "897a0961-a548-4651-9ca6-f3d6f21b8379": ["28c87846-a8b6-4b21-9aac-62a8ce886e8e"],
+        "3d568826-fe3d-413a-99a6-09e51d82c851": ["fd32330f-f487-4bf3-a518-1f1bcef89aec"],
+        "fb496a41-4358-4bc8-b19f-244c71fe9143": ["122d2764-160d-4acc-a2a7-c1ec8fdad28d"],
+        "ef9e676a-2d08-4433-b082-2617878a6e59": ["81e69d89-4160-431f-9b90-95d29ca4cea6"],
+        "c78e9a51-2e36-4ec4-86de-9df4d29f0863": ["3d6c9e26-9090-4aaf-bed8-313e75d9c477"],
+        "ec997825-6065-4fb7-ba86-427e74109ee4": ["7949e87a-4a82-4e09-b939-f4c803ae12c6"],
+        "dc4a61b2-26e6-468e-bac2-f7702846ca92": ["8dc4dc5c-1845-4c53-8519-8d02559ad8d7"]
       },
       "positions": {
         "98ccf13e-6dec-4362-bcf3-a4776f457061": {

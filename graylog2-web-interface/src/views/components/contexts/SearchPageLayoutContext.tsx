@@ -34,17 +34,17 @@ export const BLANK = {
 };
 
 export type LayoutState = {
-  sidebar: { isShown: boolean },
+  sidebar: { isShown: boolean };
   viewActions: {
-    save: { isShown: boolean },
-    saveAs: { isShown: boolean },
-    share: { isShown: boolean },
-    actionsDropdown: { isShown: boolean },
-  },
-  searchAreaContainer?: { component: React.ComponentType },
-  infoBar?: { component: React.ComponentType },
-  synchronizeUrl?: boolean,
-}
+    save: { isShown: boolean };
+    saveAs: { isShown: boolean };
+    share: { isShown: boolean };
+    actionsDropdown: { isShown: boolean };
+  };
+  searchAreaContainer?: { component: React.ComponentType };
+  infoBar?: { component: React.ComponentType };
+  synchronizeUrl?: boolean;
+};
 
 export const DEFAULT_STATE: LayoutState = {
   sidebar: { isShown: true },
