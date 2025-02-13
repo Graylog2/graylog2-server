@@ -187,7 +187,7 @@ public class DatanodeKeystore {
     }
 
     @Nullable
-    public Date getCertificateExpiration() {
+    public synchronized Date getCertificateExpiration() {
         try {
             final KeyStore keystore = loadKeystore();
             if (isSignedCertificateChain(keystore)) {
