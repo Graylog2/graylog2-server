@@ -69,10 +69,10 @@ type MarkerProps = {
 };
 
 const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, name, keys }: MarkerProps) => {
-  // eslint-disable-next-line no-restricted-globals
   const formattedCoordinates = coordinates
     .split(',')
     .map((component) => Number(component))
+    // eslint-disable-next-line no-restricted-globals
     .filter((n) => !isNaN(n));
 
   if (formattedCoordinates.length !== 2) {

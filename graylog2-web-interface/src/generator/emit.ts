@@ -250,8 +250,8 @@ const emitBlock = (
     true,
   );
 
-  // eslint-disable-next-line no-nested-ternary
   const body =
+    // eslint-disable-next-line no-nested-ternary
     formDataParameters.length > 0
       ? ts.factory.createIdentifier('formData')
       : bodyParameter

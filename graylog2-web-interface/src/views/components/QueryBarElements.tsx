@@ -23,11 +23,10 @@ const QueryBarElements = () => {
 
   return (
     <>
-      {queryBarElements
+      {queryBarElements.map((Component, idx) => (
         // eslint-disable-next-line react/no-array-index-key
-        .map((Component, idx) => (
-          <Component key={idx} />
-        ))}
+        <Component key={idx} />
+      ))}
     </>
   );
 };

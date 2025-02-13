@@ -155,8 +155,8 @@ class GrokPatterns extends React.Component<
   };
 
   confirmedRemove = (pattern) => {
-    // eslint-disable-next-line no-alert
     if (
+      // eslint-disable-next-line no-alert
       window.confirm(
         `Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`,
       )

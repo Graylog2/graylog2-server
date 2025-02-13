@@ -220,8 +220,8 @@ const _onSubmitAll = (
       });
 
   if (stepsState.authBackendMeta.backendGroupSyncIsActive && !formValues.synchronizeGroups) {
-    // eslint-disable-next-line no-alert
     if (
+      // eslint-disable-next-line no-alert
       window.confirm('Do you really want to remove the group synchronization config for this authentication service?')
     ) {
       return _submit();

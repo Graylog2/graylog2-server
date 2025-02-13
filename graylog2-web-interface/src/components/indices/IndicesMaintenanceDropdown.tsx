@@ -25,8 +25,8 @@ import { IndexRangesActions } from 'stores/indices/IndexRangesStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 const _onRecalculateIndexRange = (indexSetId: string) => {
-  // eslint-disable-next-line no-alert
   if (
+    // eslint-disable-next-line no-alert
     window.confirm(
       'This will recalculate index ranges for this index set using a background system job. Do you want to proceed?',
     )
@@ -36,8 +36,8 @@ const _onRecalculateIndexRange = (indexSetId: string) => {
 };
 
 const _onCycleDeflector = (indexSetId: string) => {
-  // eslint-disable-next-line no-alert
   if (
+    // eslint-disable-next-line no-alert
     window.confirm('This will manually cycle the current active write index on this index set. Do you want to proceed?')
   ) {
     DeflectorActions.cycle(indexSetId).then(() => {
