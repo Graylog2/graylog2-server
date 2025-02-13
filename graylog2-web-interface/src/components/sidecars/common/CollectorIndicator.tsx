@@ -20,9 +20,9 @@ import upperFirst from 'lodash/upperFirst';
 import OperatingSystemIcon from './OperatingSystemIcon';
 
 type Props = {
-  collector: React.ReactNode,
-  operatingSystem?: string,
-}
+  collector: React.ReactNode;
+  operatingSystem?: string;
+};
 
 const CollectorIndicator = ({ collector, operatingSystem }: Props) => (
   <span>

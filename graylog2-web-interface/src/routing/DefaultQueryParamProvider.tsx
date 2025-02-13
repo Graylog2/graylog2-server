@@ -20,9 +20,7 @@ import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 const DefaultQueryParamProvider = ({ children }: PropsWithChildren) => (
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
-    {children}
-  </QueryParamProvider>
+  <QueryParamProvider adapter={ReactRouter6Adapter}>{children}</QueryParamProvider>
 );
 
 export default DefaultQueryParamProvider;

@@ -50,21 +50,22 @@ const IndexSetFieldTypesPage = () => {
   return (
     <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
       <IndicesPageNavigation />
-      <PageHeader title={`Configure ${indexSet ? indexSet.title : 'Index Set'} Field Types`}
-                  documentationLink={{
-                    title: 'Index model documentation',
-                    path: DocsHelper.PAGES.INDEX_MODEL,
-                  }}
-                  actions={indexFieldTypeChangeAllowed && <ChangeFieldTypeButton indexSetId={indexSetId} />}>
+      <PageHeader
+        title={`Configure ${indexSet ? indexSet.title : 'Index Set'} Field Types`}
+        documentationLink={{
+          title: 'Index model documentation',
+          path: DocsHelper.PAGES.INDEX_MODEL,
+        }}
+        actions={indexFieldTypeChangeAllowed && <ChangeFieldTypeButton indexSetId={indexSetId} />}
+      >
         <span>
-          The data represents field types from 2 last indices and the fields with custom field type. You can modify the current field types configuration for this index set.
+          The data represents field types from 2 last indices and the fields with custom field type. You can modify the
+          current field types configuration for this index set.
         </span>
       </PageHeader>
 
       <Row className="content">
-        <Col md={12}>
-          {isLoading ? <Spinner /> : <IndexSetFieldTypesList />}
-        </Col>
+        <Col md={12}>{isLoading ? <Spinner /> : <IndexSetFieldTypesList />}</Col>
       </Row>
     </DocumentTitle>
   );

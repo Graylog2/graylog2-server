@@ -33,7 +33,10 @@ const formValidation = {
 
     const possibleErrors = [
       { invalid: isEmpty, message: providedMessage || 'A value is required.' },
-      { invalid: isIncorrectType, message: providedMessage || 'Please verify that your input is the expected type (ie: email address).' },
+      {
+        invalid: isIncorrectType,
+        message: providedMessage || 'Please verify that your input is the expected type (ie: email address).',
+      },
       { invalid: isIncorrectPattern, message: providedMessage || 'This input does not match the expected value.' },
       { invalid: isTooLong, message: providedMessage || 'Your input is too long.' },
       { invalid: isTooShort, message: providedMessage || 'Your input is too short.' },
@@ -45,7 +48,8 @@ const formValidation = {
     return customErrorMessage || errorOutput.message;
   },
 
-  isFormValid: (requiredFields, context) => !!requiredFields.find((field) => (!context[field] || !context[field].value || context[field].error)),
+  isFormValid: (requiredFields, context) =>
+    !!requiredFields.find((field) => !context[field] || !context[field].value || context[field].error),
 };
 
 export default formValidation;

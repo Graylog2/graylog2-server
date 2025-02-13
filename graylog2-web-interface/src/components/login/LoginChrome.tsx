@@ -28,7 +28,7 @@ const LogoContainer = styled.div`
   width: auto;
   margin: auto;
   margin-bottom: 1.5rem;
-  
+
   svg {
     width: 100%;
     height: 75px;
@@ -78,27 +78,33 @@ const TextContainer = styled.div`
   height: auto;
 `;
 
-const WelcomeMessage = styled.strong(({ theme }) => css`
-  display: block;
-  font-size: ${theme.fonts.size.extraLarge};
-  font-weight: 800;
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-`);
+const WelcomeMessage = styled.strong(
+  ({ theme }) => css`
+    display: block;
+    font-size: ${theme.fonts.size.extraLarge};
+    font-weight: 800;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  `,
+);
 
-const Claim = styled.h1(({ theme }) => css`
-  color: #fcfcfc;
-  text-transform: uppercase;
-  font-size: ${theme.fonts.size.huge};
-  line-height: 1;
-  font-weight: 600;
-`);
-const Highlight = styled.span(({ theme }) => css`
-  color: ${theme.colors.brand.primary};
-`);
+const Claim = styled.h1(
+  ({ theme }) => css`
+    color: #fcfcfc;
+    text-transform: uppercase;
+    font-size: ${theme.fonts.size.huge};
+    line-height: 1;
+    font-weight: 600;
+  `,
+);
+const Highlight = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.brand.primary};
+  `,
+);
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const LoginChrome = ({ children }: Props) => (
@@ -116,7 +122,9 @@ const LoginChrome = ({ children }: Props) => (
           <LogoContainer>
             <Logo color="#ffffff" />
           </LogoContainer>
-          <Claim>Data. Insights. <Highlight>Answers.</Highlight></Claim>
+          <Claim>
+            Data. Insights. <Highlight>Answers.</Highlight>
+          </Claim>
         </TextContainer>
       </BackgroundText>
     </Background>

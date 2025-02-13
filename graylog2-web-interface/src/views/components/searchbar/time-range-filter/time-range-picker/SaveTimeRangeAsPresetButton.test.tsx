@@ -36,22 +36,28 @@ let mockUpdate;
 jest.mock('stores/configurations/ConfigurationsStore', () => {
   mockUpdate = jest.fn().mockReturnValue(Promise.resolve());
 
-  return ({
-    ConfigurationsStore: MockStore(['getInitialState', () => ({
-      configuration: {
-        'org.graylog2.indexer.searches.SearchesClusterConfig': mockSearchClusterConfig,
-      },
-    })]),
+  return {
+    ConfigurationsStore: MockStore([
+      'getInitialState',
+      () => ({
+        configuration: {
+          'org.graylog2.indexer.searches.SearchesClusterConfig': mockSearchClusterConfig,
+        },
+      }),
+    ]),
     ConfigurationsActions: {
       list: jest.fn(() => Promise.resolve()),
       update: mockUpdate,
     },
-  });
+  };
 });
 
 describe('SaveTimeRangeAsPresetButton', () => {
   const SUT = ({ timeRange }: { timeRange: TimeRange }) => (
-    <Formik initialValues={{ timeRangeTabs: { [timeRange.type]: timeRange }, activeTab: timeRange.type }} onSubmit={() => {}}>
+    <Formik
+      initialValues={{ timeRangeTabs: { [timeRange.type]: timeRange }, activeTab: timeRange.type }}
+      onSubmit={() => {}}
+    >
       <SaveTimeRangeAsPresetButton />
     </Formik>
   );
@@ -65,16 +71,20 @@ describe('SaveTimeRangeAsPresetButton', () => {
     asMock(debounce as DebouncedFunc<(...args: any) => any>).mockImplementation((fn) => fn);
   });
 
-  const findOpenButton = () => screen.findByRole('button', {
-    name: /save current time range as preset/i,
-  });
+  const findOpenButton = () =>
+    screen.findByRole('button', {
+      name: /save current time range as preset/i,
+    });
 
   it('shows popover on click', async () => {
     render(
-      <SUT timeRange={{
-        type: 'relative',
-        from: 300,
-      }} />);
+      <SUT
+        timeRange={{
+          type: 'relative',
+          from: 300,
+        }}
+      />,
+    );
 
     const buttonIcon = await findOpenButton();
 
@@ -87,10 +97,13 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
   it('dont shows alert about duplication when there is no similar time range', async () => {
     render(
-      <SUT timeRange={{
-        type: 'relative',
-        from: 50,
-      }} />);
+      <SUT
+        timeRange={{
+          type: 'relative',
+          from: 50,
+        }}
+      />,
+    );
 
     const buttonIcon = await findOpenButton();
 
@@ -103,10 +116,13 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
   it('shows alert about duplication when there is similar time range', async () => {
     render(
-      <SUT timeRange={{
-        type: 'relative',
-        from: 300,
-      }} />);
+      <SUT
+        timeRange={{
+          type: 'relative',
+          from: 300,
+        }}
+      />,
+    );
 
     const buttonIcon = await findOpenButton();
 
@@ -117,10 +133,13 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
   it('runs action to update config on submitting form', async () => {
     render(
-      <SUT timeRange={{
-        type: 'relative',
-        from: 500,
-      }} />);
+      <SUT
+        timeRange={{
+          type: 'relative',
+          from: 500,
+        }}
+      />,
+    );
 
     const buttonIcon = await findOpenButton();
 
@@ -137,33 +156,35 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => expect(mockUpdate)
-      .toHaveBeenCalledWith('org.graylog2.indexer.searches.SearchesClusterConfig',
-        {
-          ...mockSearchClusterConfig,
-          quick_access_timerange_presets: [
-            ...mockSearchClusterConfig.quick_access_timerange_presets,
-            {
-              id: 'timerange-id',
-              description: 'My new time range',
-              timerange: {
-                type: 'relative',
-                from: 500,
-              },
+    await waitFor(() =>
+      expect(mockUpdate).toHaveBeenCalledWith('org.graylog2.indexer.searches.SearchesClusterConfig', {
+        ...mockSearchClusterConfig,
+        quick_access_timerange_presets: [
+          ...mockSearchClusterConfig.quick_access_timerange_presets,
+          {
+            id: 'timerange-id',
+            description: 'My new time range',
+            timerange: {
+              type: 'relative',
+              from: 500,
             },
-          ],
-        },
-      ));
+          },
+        ],
+      }),
+    );
 
     await waitForElementToBeRemoved(submitButton);
   });
 
   it('not runs action to update config on submitting form when description is empty', async () => {
     render(
-      <SUT timeRange={{
-        type: 'relative',
-        from: 500,
-      }} />);
+      <SUT
+        timeRange={{
+          type: 'relative',
+          from: 500,
+        }}
+      />,
+    );
 
     fireEvent.click(await findOpenButton());
 

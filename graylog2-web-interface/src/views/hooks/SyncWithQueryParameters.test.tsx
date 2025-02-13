@@ -26,14 +26,17 @@ jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/hooks/useViewType');
 
 const lastFiveMinutes: RelativeTimeRange = { type: 'relative', from: 300 };
-const createQuery = (timerange: TimeRange = lastFiveMinutes, streams: Array<string> = [], queryString = 'foo:42') => Query.builder()
-  .timerange(timerange)
-  .filter(filtersForQuery(streams) || Immutable.Map())
-  .query(createElasticsearchQueryString(queryString))
-  .build();
+const createQuery = (timerange: TimeRange = lastFiveMinutes, streams: Array<string> = [], queryString = 'foo:42') =>
+  Query.builder()
+    .timerange(timerange)
+    .filter(filtersForQuery(streams) || Immutable.Map())
+    .query(createElasticsearchQueryString(queryString))
+    .build();
 
 describe('SyncWithQueryParameters', () => {
-  afterEach(() => { jest.clearAllMocks(); });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('does not do anything if no view is loaded', () => {
     const push = jest.fn();
@@ -59,9 +62,16 @@ describe('SyncWithQueryParameters', () => {
 
     it('preserving query parameters present before', () => {
       const push = jest.fn();
-      syncWithQueryParameters(View.Type.Search, '/search?somevalue=23&somethingelse=foo', createQuery({ type: 'relative', range: 600 }), push);
+      syncWithQueryParameters(
+        View.Type.Search,
+        '/search?somevalue=23&somethingelse=foo',
+        createQuery({ type: 'relative', range: 600 }),
+        push,
+      );
 
-      expect(push).toHaveBeenCalledWith('/search?somevalue=23&somethingelse=foo&q=foo%3A42&rangetype=relative&relative=600');
+      expect(push).toHaveBeenCalledWith(
+        '/search?somevalue=23&somethingelse=foo&q=foo%3A42&rangetype=relative&relative=600',
+      );
     });
 
     it('if time range is relative with from and to', () => {
@@ -81,26 +91,36 @@ describe('SyncWithQueryParameters', () => {
     it('if time range is absolute', () => {
       const push = jest.fn();
 
-      syncWithQueryParameters(View.Type.Search, '/search', createQuery({
-        type: 'absolute',
-        from: '2019-01-12T13:42:23.000Z',
-        to: '2020-01-12T13:42:23.000Z',
-      }), push);
+      syncWithQueryParameters(
+        View.Type.Search,
+        '/search',
+        createQuery({
+          type: 'absolute',
+          from: '2019-01-12T13:42:23.000Z',
+          to: '2020-01-12T13:42:23.000Z',
+        }),
+        push,
+      );
 
-      expect(push)
-        .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=absolute&from=2019-01-12T13%3A42%3A23.000Z&to=2020-01-12T13%3A42%3A23.000Z');
+      expect(push).toHaveBeenCalledWith(
+        '/search?q=foo%3A42&rangetype=absolute&from=2019-01-12T13%3A42%3A23.000Z&to=2020-01-12T13%3A42%3A23.000Z',
+      );
     });
 
     it('if time range is keyword time range', () => {
       const push = jest.fn();
 
-      syncWithQueryParameters(View.Type.Search, '/search', createQuery({
-        type: 'keyword',
-        keyword: 'Last five minutes',
-      }), push);
+      syncWithQueryParameters(
+        View.Type.Search,
+        '/search',
+        createQuery({
+          type: 'keyword',
+          keyword: 'Last five minutes',
+        }),
+        push,
+      );
 
-      expect(push)
-        .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=keyword&keyword=Last+five+minutes');
+      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=keyword&keyword=Last+five+minutes');
     });
 
     it('by calling the provided action', () => {
@@ -114,16 +134,19 @@ describe('SyncWithQueryParameters', () => {
       const push = jest.fn();
       syncWithQueryParameters(View.Type.Search, '/search', createQuery(lastFiveMinutes, ['stream1', 'stream2']), push);
 
-      expect(push)
-        .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2');
+      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2');
     });
 
     it('removes list of streams to query if they become empty', () => {
       const push = jest.fn();
-      syncWithQueryParameters(View.Type.Search, '/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2', createQuery(lastFiveMinutes), push);
+      syncWithQueryParameters(
+        View.Type.Search,
+        '/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2',
+        createQuery(lastFiveMinutes),
+        push,
+      );
 
-      expect(push)
-        .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
+      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
     });
   });
 });

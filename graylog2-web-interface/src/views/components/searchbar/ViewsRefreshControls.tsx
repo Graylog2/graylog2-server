@@ -40,8 +40,8 @@ const useDisableOnFormChange = () => {
 };
 
 type Props = {
-  disable?: boolean
-}
+  disable?: boolean;
+};
 
 const ViewsRefreshControls = ({ disable = false }: Props) => {
   const { dirty, submitForm } = useFormikContext();
@@ -54,27 +54,33 @@ const ViewsRefreshControls = ({ disable = false }: Props) => {
   const defaultInterval = useDefaultInterval();
 
   useDisableOnFormChange();
-  const onSelectInterval = useCallback((interval: string) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_section: 'search-bar',
-      app_action_value: 'refresh-search-control-dropdown',
-      event_details: { interval: interval },
-    });
+  const onSelectInterval = useCallback(
+    (interval: string) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_section: 'search-bar',
+        app_action_value: 'refresh-search-control-dropdown',
+        event_details: { interval: interval },
+      });
 
-    if (dirty) {
-      submitForm();
-    }
-  }, [dirty, location.pathname, sendTelemetry, submitForm]);
+      if (dirty) {
+        submitForm();
+      }
+    },
+    [dirty, location.pathname, sendTelemetry, submitForm],
+  );
 
-  const onToggle = useCallback((enabled) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {
-      app_pathname: 'search',
-      app_section: 'search-bar',
-      app_action_value: 'refresh-search-control-enable',
-      event_details: { enabled },
-    });
-  }, [sendTelemetry]);
+  const onToggle = useCallback(
+    (enabled) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_TOGGLED, {
+        app_pathname: 'search',
+        app_section: 'search-bar',
+        app_action_value: 'refresh-search-control-enable',
+        event_details: { enabled },
+      });
+    },
+    [sendTelemetry],
+  );
 
   if (!config) {
     return null;
@@ -83,15 +89,17 @@ const ViewsRefreshControls = ({ disable = false }: Props) => {
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions);
 
   return (
-    <RefreshControls disable={disable}
-                     intervalOptions={intervalOptions}
-                     isLoadingMinimumInterval={isLoadingMinimumInterval}
-                     minimumRefreshInterval={minimumRefreshInterval}
-                     defaultInterval={defaultInterval}
-                     humanName="Search"
-                     onToggle={onToggle}
-                     onEnable={submitForm}
-                     onSelectInterval={onSelectInterval} />
+    <RefreshControls
+      disable={disable}
+      intervalOptions={intervalOptions}
+      isLoadingMinimumInterval={isLoadingMinimumInterval}
+      minimumRefreshInterval={minimumRefreshInterval}
+      defaultInterval={defaultInterval}
+      humanName="Search"
+      onToggle={onToggle}
+      onEnable={submitForm}
+      onSelectInterval={onSelectInterval}
+    />
   );
 };
 

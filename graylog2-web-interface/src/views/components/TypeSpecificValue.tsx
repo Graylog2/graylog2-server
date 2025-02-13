@@ -43,35 +43,52 @@ const _formatValue = (field: string, value: any, truncate: boolean, render: Valu
   const stringified = isString(value) ? value : JSON.stringify(value);
   const Component: ValueRenderer = render;
 
-  return trim(stringified) === ''
-    ? <EmptyValue />
-    : <Component field={field} value={(truncate ? trunc(stringified) : stringified)} type={type} />;
+  return trim(stringified) === '' ? (
+    <EmptyValue />
+  ) : (
+    <Component field={field} value={truncate ? trunc(stringified) : stringified} type={type} />
+  );
 };
 
 type TypeSpecificValueProps = {
-  field: string,
-  value?: any,
-  type?: FieldType
-  truncate?: boolean,
-  render?: React.ComponentType<ValueRendererProps>,
-  unit?: FieldUnit,
+  field: string;
+  value?: any;
+  type?: FieldType;
+  truncate?: boolean;
+  render?: React.ComponentType<ValueRendererProps>;
+  unit?: FieldUnit;
 };
 
-const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: FieldUnit}) => {
+const ValueWithUnitRenderer = ({ value, unit }: { value: number; unit: FieldUnit }) => {
   const prettified = getPrettifiedValue(value, { abbrev: unit.abbrev, unitType: unit.unitType });
 
   return <span title={value.toString()}>{formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev)}</span>;
 };
 
-const FormattedValue = ({ field, value = undefined, truncate = false, render = defaultComponent, unit = undefined, type = undefined }: TypeSpecificValueProps) => {
+const FormattedValue = ({
+  field,
+  value = undefined,
+  truncate = false,
+  render = defaultComponent,
+  unit = undefined,
+  type = undefined,
+}: TypeSpecificValueProps) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
-  const shouldRenderValueWithUnit = unitFeatureEnabled && unit?.isDefined && value && value !== MISSING_BUCKET_NAME && unitFeatureEnabled;
+  const shouldRenderValueWithUnit =
+    unitFeatureEnabled && unit?.isDefined && value && value !== MISSING_BUCKET_NAME && unitFeatureEnabled;
   if (shouldRenderValueWithUnit) return <ValueWithUnitRenderer value={value} unit={unit} />;
 
   return _formatValue(field, value, truncate, render, type);
 };
 
-const TypeSpecificValue = ({ field, value = undefined, render = defaultComponent, type = FieldType.Unknown, truncate = false, unit = undefined }: TypeSpecificValueProps) => {
+const TypeSpecificValue = ({
+  field,
+  value = undefined,
+  render = defaultComponent,
+  type = FieldType.Unknown,
+  truncate = false,
+  unit = undefined,
+}: TypeSpecificValueProps) => {
   const Component = render;
 
   if (value === undefined) {
@@ -83,14 +100,22 @@ const TypeSpecificValue = ({ field, value = undefined, render = defaultComponent
   }
 
   switch (type.type) {
-    case 'date': return <Timestamp dateTime={value} render={render} field={field} format="complete" />;
-    case 'boolean': return <Component value={String(value)} field={field} />;
-    case 'input': return <InputField value={String(value)} />;
-    case 'node': return <NodeField value={String(value)} />;
-    case 'streams': return <StreamsField value={value} />;
-    case 'percentage': return <PercentageField value={value} />;
-    case 'event-definition-id': return <EventDefinition value={value} />;
-    default: return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
+    case 'date':
+      return <Timestamp dateTime={value} render={render} field={field} format="complete" />;
+    case 'boolean':
+      return <Component value={String(value)} field={field} />;
+    case 'input':
+      return <InputField value={String(value)} />;
+    case 'node':
+      return <NodeField value={String(value)} />;
+    case 'streams':
+      return <StreamsField value={value} />;
+    case 'percentage':
+      return <PercentageField value={value} />;
+    case 'event-definition-id':
+      return <EventDefinition value={value} />;
+    default:
+      return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
   }
 };
 

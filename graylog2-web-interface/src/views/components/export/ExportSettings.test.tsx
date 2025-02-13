@@ -75,18 +75,14 @@ const SimpleExportSettings = (props: Omit<React.ComponentProps<typeof ExportSett
   <TestStoreProvider>
     <FieldTypesContext.Provider value={fieldTypes}>
       <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
-        {() => (
-          <ExportSettings {...props} />
-        )}
+        {() => <ExportSettings {...props} />}
       </Formik>
     </FieldTypesContext.Provider>
   </TestStoreProvider>
 );
-const customWidget = Widget.builder()
-  .id('widget-id-1')
-  .type('custom')
-  .build();
-const view = viewWithoutWidget(View.Type.Search).toBuilder()
+const customWidget = Widget.builder().id('widget-id-1').type('custom').build();
+const view = viewWithoutWidget(View.Type.Search)
+  .toBuilder()
   .state(Immutable.Map({ 'query-id-1': stateWithOneWidget(customWidget) }))
   .build();
 

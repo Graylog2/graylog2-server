@@ -26,16 +26,18 @@ const StyledButton = styled(Button)`
 `;
 
 type Props = {
-  hasError?: boolean
-  disabled?: boolean,
-  onClick?: (e: SyntheticEvent) => void,
+  hasError?: boolean;
+  disabled?: boolean;
+  onClick?: (e: SyntheticEvent) => void;
 };
 
 const TimeRangePickerButton = ({ hasError = false, disabled = false, onClick }: Props) => (
-  <StyledButton bsStyle={hasError ? 'danger' : 'info'}
-                disabled={disabled}
-                onClick={onClick}
-                aria-label="Open Time Range Selector">
+  <StyledButton
+    bsStyle={hasError ? 'danger' : 'info'}
+    disabled={disabled}
+    onClick={onClick}
+    aria-label="Open Time Range Selector"
+  >
     <Icon name={hasError ? 'warning' : 'schedule'} />
   </StyledButton>
 );

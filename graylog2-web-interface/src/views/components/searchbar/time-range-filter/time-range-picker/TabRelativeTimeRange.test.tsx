@@ -51,15 +51,14 @@ const initialValues = {
   activeTab: 'relative',
 };
 
-const renderSUT = (allProps = defaultProps, initialFormValues = initialValues) => render(
-  <Formik initialValues={initialFormValues}
-          onSubmit={() => {}}
-          validateOnMount>
-    <Form>
-      <TabRelativeTimeRange {...allProps} />
-    </Form>
-  </Formik>,
-);
+const renderSUT = (allProps = defaultProps, initialFormValues = initialValues) =>
+  render(
+    <Formik initialValues={initialFormValues} onSubmit={() => {}} validateOnMount>
+      <Form>
+        <TabRelativeTimeRange {...allProps} />
+      </Form>
+    </Formik>,
+  );
 
 const fromRangeValue = () => screen.findByRole('spinbutton', { name: /set the from value/i });
 const toRangeValue = () => screen.findByRole('spinbutton', { name: /set the to value/i });
@@ -112,7 +111,9 @@ describe('TabRelativeTimeRange', () => {
 
     renderSUT(undefined, initialFormValues);
 
-    expect((await screen.findByRole('spinbutton', { name: /Set the from value/i }) as HTMLInputElement).value).toBe('5');
+    expect(((await screen.findByRole('spinbutton', { name: /Set the from value/i })) as HTMLInputElement).value).toBe(
+      '5',
+    );
     expect((screen.getByRole('spinbutton', { name: /Set the to value/i }) as HTMLInputElement).value).toBe('4');
   });
 

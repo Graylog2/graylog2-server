@@ -31,11 +31,11 @@ import { Button } from 'components/bootstrap';
 import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
 
 type Props = {
-  input: Input,
-  openWizard: () => void,
-}
+  input: Input;
+  openWizard: () => void;
+};
 
-const InputStateControl = ({ input, openWizard } : Props) => {
+const InputStateControl = ({ input, openWizard }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -50,10 +50,9 @@ const InputStateControl = ({ input, openWizard } : Props) => {
       app_action_value: 'start-input',
     });
 
-    InputStatesStore.start(input)
-      .finally(() => {
-        setIsLoading(false);
-      });
+    InputStatesStore.start(input).finally(() => {
+      setIsLoading(false);
+    });
   };
 
   const stopInput = () => {
@@ -64,10 +63,9 @@ const InputStateControl = ({ input, openWizard } : Props) => {
       app_action_value: 'stop-input',
     });
 
-    InputStatesStore.stop(input)
-      .finally(() => {
-        setIsLoading(false);
-      });
+    InputStatesStore.stop(input).finally(() => {
+      setIsLoading(false);
+    });
   };
 
   const setupInput = () => {

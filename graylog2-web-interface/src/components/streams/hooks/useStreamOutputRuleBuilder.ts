@@ -22,24 +22,38 @@ import type { BlockDict, RuleBuilderRule } from 'components/rules/rule-builder/t
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import { defaultOnError } from 'util/conditional/onError';
 
-type ConditionsResponse ={conditions: Array<BlockDict>}
-const fetchRuleConditions = async () => StreamDestinationsFiltersBuilder.getConditions().then((resp: ConditionsResponse) => resp.conditions);
+type ConditionsResponse = { conditions: Array<BlockDict> };
+const fetchRuleConditions = async () =>
+  StreamDestinationsFiltersBuilder.getConditions().then((resp: ConditionsResponse) => resp.conditions);
 
 export const fetchValidateRule = async (currentRule: StreamOutputFilterRule): Promise<StreamOutputFilterRule> => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { stream_id, destination_type, status, source, rule: rule_builder, ...ruleToValidate }: any = currentRule;
 
-  return StreamDestinationsFiltersBuilder.validateRule({ rule_builder, ...ruleToValidate }).then((resp: { rule_builder: RuleBuilderRule }) => {
-    const { rule_builder: { rule_builder: rule, ...validRule } } = resp;
+  return StreamDestinationsFiltersBuilder.validateRule({ rule_builder, ...ruleToValidate }).then(
+    (resp: { rule_builder: RuleBuilderRule }) => {
+      const {
+        rule_builder: { rule_builder: rule, ...validRule },
+      } = resp;
 
-    return { ...currentRule, rule, ...validRule };
-  });
+      return { ...currentRule, rule, ...validRule };
+    },
+  );
 };
 
 const useStreamOutputRuleBuilder = () => {
-  const { data: conditions, refetch: refetchConditions, isFetching: isLoadingConditions } = useQuery<Array<BlockDict>>(
+  const {
+    data: conditions,
+    refetch: refetchConditions,
+    isFetching: isLoadingConditions,
+  } = useQuery<Array<BlockDict>>(
     ['stream', 'filter', 'conditions'],
-    () => defaultOnError(fetchRuleConditions(), 'Loading Stream Output Filter Rule Builder Conditions list failed with status', 'Could not load Stream Output Filter Rule Builder Conditions list.'),
+    () =>
+      defaultOnError(
+        fetchRuleConditions(),
+        'Loading Stream Output Filter Rule Builder Conditions list failed with status',
+        'Could not load Stream Output Filter Rule Builder Conditions list.',
+      ),
     {
       keepPreviousData: true,
     },

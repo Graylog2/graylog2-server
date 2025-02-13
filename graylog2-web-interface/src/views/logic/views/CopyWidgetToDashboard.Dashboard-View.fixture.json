@@ -8,10 +8,7 @@
   "properties": [],
   "state": {
     "f0a1f93c-8400-40de-83ac-94149dbf447c": {
-      "selected_fields": [
-        "source",
-        "message"
-      ],
+      "selected_fields": ["source", "message"],
       "formatting": {
         "highlighting": []
       },
@@ -64,9 +61,7 @@
         }
       ],
       "widget_mapping": {
-        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": [
-          "76414720-2191-4fa3-8037-074facf16a56"
-        ]
+        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": ["76414720-2191-4fa3-8037-074facf16a56"]
       },
       "positions": {
         "546b13fe-eae7-4fb8-abb9-e0e3a907c3e6": {

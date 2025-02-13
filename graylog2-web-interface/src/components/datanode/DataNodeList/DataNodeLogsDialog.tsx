@@ -37,15 +37,15 @@ const LogsContainer = styled.div`
 
 type LogsType = 'stdout' | 'stderr';
 
-const LogsTypeSegments: Array<{value: LogsType, label: string}> = [
+const LogsTypeSegments: Array<{ value: LogsType; label: string }> = [
   { value: 'stdout', label: 'STDOUT' },
   { value: 'stderr', label: 'STDERR' },
 ];
 
 type Props = {
-  show: boolean,
-  hostname: string,
-  onHide: () => void,
+  show: boolean;
+  hostname: string;
+  onHide: () => void;
 };
 
 const DataNodeLogsDialog = ({ show, hostname, onHide }: Props) => {
@@ -54,26 +54,29 @@ const DataNodeLogsDialog = ({ show, hostname, onHide }: Props) => {
   const logs = useDataNodeLogs(hostname, show && !!hostname);
 
   return (
-    <BootstrapModalWrapper showModal={show}
-                           onHide={onHide}
-                           bsSize="large"
-                           backdrop>
+    <BootstrapModalWrapper showModal={show} onHide={onHide} bsSize="large" backdrop>
       <Modal.Header closeButton>
         <Modal.Title>{hostname} logs</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <SegmentedControl<LogsType> data={LogsTypeSegments}
-                                    value={logsType}
-                                    onChange={setLogsType} />
+        <SegmentedControl<LogsType> data={LogsTypeSegments} value={logsType} onChange={setLogsType} />
         <pre>
           {logs[logsType] ? (
             <LogsContainer>
               <table>
-                {/* eslint-disable-next-line react/no-array-index-key */}
-                <tbody>{logs[logsType]?.map((log, key) => (<tr key={key}><td>{log}</td></tr>))}</tbody>
+                <tbody>
+                  {logs[logsType]?.map((log, key) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <tr key={key}>
+                      <td>{log}</td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
             </LogsContainer>
-          ) : ('No logs.')}
+          ) : (
+            'No logs.'
+          )}
         </pre>
       </Modal.Body>
     </BootstrapModalWrapper>

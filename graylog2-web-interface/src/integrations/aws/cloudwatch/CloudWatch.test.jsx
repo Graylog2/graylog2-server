@@ -40,19 +40,25 @@ jest.mock('react-router-dom', () => {
 });
 
 const TestCommonProviders = ({ children }) => (
-  <ApiContext.Provider value={{
-    availableStreams: [],
-  }}>
-    <StepsContext.Provider value={{
-      availableSteps: ['review'],
-      currentStep: 'review',
-      isDisabledStep: () => false,
-    }}>
+  <ApiContext.Provider
+    value={{
+      availableStreams: [],
+    }}
+  >
+    <StepsContext.Provider
+      value={{
+        availableSteps: ['review'],
+        currentStep: 'review',
+        isDisabledStep: () => false,
+      }}
+    >
       <FormDataProvider initialFormData={exampleFormDataWithKeySecretAuth}>
-        <SidebarContext.Provider value={{
-          sidebar: <></>,
-          clearSidebar: jest.fn(),
-        }}>
+        <SidebarContext.Provider
+          value={{
+            sidebar: <></>,
+            clearSidebar: jest.fn(),
+          }}
+        >
           {children}
         </SidebarContext.Provider>
       </FormDataProvider>

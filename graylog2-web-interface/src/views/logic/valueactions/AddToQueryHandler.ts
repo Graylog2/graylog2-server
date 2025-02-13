@@ -22,25 +22,25 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState } from 'views/types';
 
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
-  const predicateValue = type.type === 'date'
-    ? formatTimestamp(value)
-    : escape(value);
+  const predicateValue = type.type === 'date' ? formatTimestamp(value) : escape(value);
 
   return addToQuery(oldQuery, predicate(field, predicateValue));
 };
 
 type Arguments = {
-  queryId: string,
-  field: string,
-  value?: string | number,
-  type: FieldType,
+  queryId: string;
+  field: string;
+  value?: string | number;
+  type: FieldType;
 };
 
-const AddToQueryHandler = ({ queryId, field, value = '', type }: Arguments) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const oldQuery = selectQueryString(queryId)(getState());
-  const newQuery = formatNewQuery(oldQuery, field, value, type);
+const AddToQueryHandler =
+  ({ queryId, field, value = '', type }: Arguments) =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+    const oldQuery = selectQueryString(queryId)(getState());
+    const newQuery = formatNewQuery(oldQuery, field, value, type);
 
-  return dispatch(updateQueryString(queryId, newQuery));
-};
+    return dispatch(updateQueryString(queryId, newQuery));
+  };
 
 export default AddToQueryHandler;

@@ -41,19 +41,27 @@ import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import IndexSetOldestMessageCell from './IndexSetOldestMessageCell';
 
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 
-const ActionButtonsWrap = styled.span(() => css`
-  float: right;
-`);
+const ActionButtonsWrap = styled.span(
+  () => css`
+    float: right;
+  `,
+);
 
 const DestinationIndexSetSection = ({ stream }: Props) => {
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { data: indexSet, isInitialLoading: isLoadingIndexSet } = useSingleIndexSet(stream.index_set_id);
-  const archivingEnabled = indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY || indexSet?.data_tiering?.archive_before_deletion;
+  const archivingEnabled =
+    indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY ||
+    indexSet?.data_tiering?.archive_before_deletion;
   const { indexSets } = useStore(IndexSetsStore);
-  const { data: streamOutputFilters, isLoading: isLoadingStreamOutputFilters } = useStreamOutputFilters(stream.id, 'indexer', pagination);
+  const { data: streamOutputFilters, isLoading: isLoadingStreamOutputFilters } = useStreamOutputFilters(
+    stream.id,
+    'indexer',
+    pagination,
+  );
   const { data: indexerOverview, isSuccess: isLoadingIndexerOverviewSuccess } = useIndexerOverview(stream.index_set_id);
   /* eslint-disable no-constant-condition */
   const title = true ? 'Enabled' : 'Disabled'; // TODO use api to check if enabled
@@ -63,35 +71,45 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
     <Spinner />;
   }
 
-  const onPaginationChange = (newPage: number, newPerPage: number) => setPagination({
-    ...pagination,
-    page: newPage,
-    perPage: newPerPage,
-  });
+  const onPaginationChange = (newPage: number, newPerPage: number) =>
+    setPagination({
+      ...pagination,
+      page: newPage,
+      perPage: newPerPage,
+    });
 
   return (
-    <Section title="Index Set"
-             collapsible
-             defaultClosed
-             headerLeftSection={(
-               <>
-                 <DestinationSwitch aria-label="Toggle index set"
-                                    name="toggle-indexset"
-                                    checked
-                                    label={title}
-                                    disabled
-                                    onChange={() => {}} />
-                 <SectionCountLabel>FILTERS {streamOutputFilters?.pagination?.total || 0}</SectionCountLabel>
-               </>
-             )}
-             actions={(
-               <IndexSetUpdateForm initialValues={{ index_set_id: stream.index_set_id }}
-                                   indexSets={indexSets}
-                                   stream={stream} />
-            )}>
+    <Section
+      title="Index Set"
+      collapsible
+      defaultClosed
+      headerLeftSection={
+        <>
+          <DestinationSwitch
+            aria-label="Toggle index set"
+            name="toggle-indexset"
+            checked
+            label={title}
+            disabled
+            onChange={() => {}}
+          />
+          <SectionCountLabel>FILTERS {streamOutputFilters?.pagination?.total || 0}</SectionCountLabel>
+        </>
+      }
+      actions={
+        <IndexSetUpdateForm
+          initialValues={{ index_set_id: stream.index_set_id }}
+          indexSets={indexSets}
+          stream={stream}
+        />
+      }
+    >
       <Alert bsStyle="default">
-        Messages routed to the <b>Search Cluster</b> will be searchable in Graylog and count towards Graylog License usage.<br />
-        These messages will be stored in the defined Index Set until the retention policy criteria is met.<br />
+        Messages routed to the <b>Search Cluster</b> will be searchable in Graylog and count towards Graylog License
+        usage.
+        <br />
+        These messages will be stored in the defined Index Set until the retention policy criteria is met.
+        <br />
         Note: Messages not routed to the <b>Search Cluster</b> will not be searchable in Graylog.
       </Alert>
       <Table>
@@ -107,18 +125,19 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
           {indexSet && (
             <tr>
               <td>{indexSet?.title}</td>
-              <td>{(isStatsLoaded && indexSetStats?.size) ? NumberUtils.formatBytes(indexSetStats.size) : 0}</td>
-              <td>{isLoadingIndexerOverviewSuccess && <IndexSetOldestMessageCell index={indexerOverview?.indices?.pop()} />}</td>
+              <td>{isStatsLoaded && indexSetStats?.size ? NumberUtils.formatBytes(indexSetStats.size) : 0}</td>
+              <td>
+                {isLoadingIndexerOverviewSuccess && (
+                  <IndexSetOldestMessageCell index={indexerOverview?.indices?.pop()} />
+                )}
+              </td>
               <td>
                 <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
               </td>
               <td>
                 <ActionButtonsWrap>
                   <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet?.id)}>
-                    <Button bsStyle="default"
-                            bsSize="xsmall"
-                            onClick={() => {}}
-                            title="View index set">
+                    <Button bsStyle="default" bsSize="xsmall" onClick={() => {}} title="View index set">
                       <Icon name="pageview" type="regular" />
                     </Button>
                   </LinkContainer>
@@ -128,7 +147,13 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
           )}
         </tbody>
       </Table>
-      {streamOutputFilters && (<IndexSetFilters streamId={stream.id} paginatedFilters={streamOutputFilters} onPaginationChange={onPaginationChange} />)}
+      {streamOutputFilters && (
+        <IndexSetFilters
+          streamId={stream.id}
+          paginatedFilters={streamOutputFilters}
+          onPaginationChange={onPaginationChange}
+        />
+      )}
     </Section>
   );
 };

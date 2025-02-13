@@ -32,23 +32,20 @@ const AuthenticationOverviewPage = () => {
   return (
     <DocumentTitle title="All Authentication Services">
       <AuthenticationPageNavigation />
-      <PageHeader title="All Authentication Services"
-                  actions={(
-                    <BackendActionLinks activeBackend={activeBackend}
-                                        finishedLoading={finishedLoading} />
-                  )}
-                  documentationLink={{
-                    title: 'Authentication documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
+      <PageHeader
+        title="All Authentication Services"
+        actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
+        documentationLink={{
+          title: 'Authentication documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+      >
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
       </PageHeader>
       {!!(backendsTotal && backendsTotal >= 1 && !activeBackend) && (
         <Row className="content">
           <Col xs={12}>
-            <Alert bsStyle="warning">
-              None of the configured authentication services is currently active.
-            </Alert>
+            <Alert bsStyle="warning">None of the configured authentication services is currently active.</Alert>
           </Col>
         </Row>
       )}

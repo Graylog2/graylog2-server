@@ -30,15 +30,8 @@ const StyledField = styled(Field)`
 
 const BooleanField = ({ field, name, error, title }: FieldComponentProps) => (
   <>
-    <Input id={`${name}-input`}
-           label={title}
-           error={error}
-           labelClassName="col-sm-11"
-           wrapperClassName="col-sm-1">
-      <StyledField type="checkbox"
-                   className="pull-right"
-                   aria-label={field.title}
-                   name={name} />
+    <Input id={`${name}-input`} label={title} error={error} labelClassName="col-sm-11" wrapperClassName="col-sm-1">
+      <StyledField type="checkbox" className="pull-right" aria-label={field.title} name={name} />
     </Input>
     <HelpBlock>{field.description}</HelpBlock>
   </>

@@ -29,21 +29,23 @@ class TargetMock {
     this._offsetWidth = offsetWidth;
   }
 
-  get offsetHeight(): number { return this._offsetHeight(); }
+  get offsetHeight(): number {
+    return this._offsetHeight();
+  }
 
-  get offsetWidth(): number { return this._offsetWidth(); }
+  get offsetWidth(): number {
+    return this._offsetWidth();
+  }
 }
 
 describe('AutoFontSizer', () => {
   it('uses default size if element does not provide dimensions', () => {
     const target = { current: undefined };
-    const wrapper = mount((
-      <AutoFontSizer width={300}
-                     height={300}
-                     target={target}>
+    const wrapper = mount(
+      <AutoFontSizer width={300} height={300} target={target}>
         <span>Foo</span>
-      </AutoFontSizer>
-    ));
+      </AutoFontSizer>,
+    );
 
     expect(wrapper.children().props().fontSize).toBe(20);
   });
@@ -53,13 +55,11 @@ describe('AutoFontSizer', () => {
       jest.fn().mockReturnValueOnce(90).mockReturnValueOnce(300),
       jest.fn().mockReturnValueOnce(90).mockReturnValueOnce(300),
     );
-    const wrapper = mount((
-      <AutoFontSizer width={300}
-                     height={300}
-                     target={target}>
+    const wrapper = mount(
+      <AutoFontSizer width={300} height={300} target={target}>
         <span>Foo</span>
-      </AutoFontSizer>
-    ));
+      </AutoFontSizer>,
+    );
 
     expect(wrapper.children().props().fontSize).toBe(42);
   });
@@ -69,13 +69,11 @@ describe('AutoFontSizer', () => {
       jest.fn().mockReturnValueOnce(90).mockReturnValueOnce(300),
       jest.fn().mockReturnValueOnce(90).mockReturnValueOnce(300),
     );
-    const wrapper = mount((
-      <AutoFontSizer width={300}
-                     height={300}
-                     target={target}>
+    const wrapper = mount(
+      <AutoFontSizer width={300} height={300} target={target}>
         <span>Foo</span>
-      </AutoFontSizer>
-    ));
+      </AutoFontSizer>,
+    );
 
     expect(wrapper.children().props().fontSize).toBe(42);
 

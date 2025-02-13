@@ -23,12 +23,12 @@ import { Accordion, AccordionItem, Pluralize, Timestamp } from 'components/commo
 import { Table } from 'components/bootstrap';
 
 type Props = {
-  hostname: string,
-  opensearchVersion: string,
+  hostname: string;
+  opensearchVersion: string;
   nodeInfo: {
-    nodes: Array<NodeInfo>,
-    opensearch_data_location: string,
-  }
+    nodes: Array<NodeInfo>;
+    opensearch_data_location: string;
+  };
 };
 
 const Grid = styled.div`
@@ -45,7 +45,9 @@ const StyledSpan = styled.span`
 
 const CompatibilityStatus = ({ hostname, opensearchVersion, nodeInfo }: Props) => {
   const { opensearch_data_location: opensearchLocation, nodes } = nodeInfo;
-  const [activeAccordion, setActiveAccordion] = useState<string | undefined>(`Node: 1, Version: ${nodes[0]?.node_version}, ${nodes[0]?.indices.length} indices`);
+  const [activeAccordion, setActiveAccordion] = useState<string | undefined>(
+    `Node: 1, Version: ${nodes[0]?.node_version}, ${nodes[0]?.indices.length} indices`,
+  );
 
   const handleSelect = (nextKey: string | undefined) => {
     setActiveAccordion(nextKey ?? activeAccordion);
@@ -54,17 +56,26 @@ const CompatibilityStatus = ({ hostname, opensearchVersion, nodeInfo }: Props) =
   return (
     <Grid>
       <div>
-        <StyledSpan><strong>Datanode OpenSearch version</strong>: {opensearchVersion}</StyledSpan>
-        <StyledSpan><strong>OpenSearch data location</strong>: {opensearchLocation}</StyledSpan>
+        <StyledSpan>
+          <strong>Datanode OpenSearch version</strong>: {opensearchVersion}
+        </StyledSpan>
+        <StyledSpan>
+          <strong>OpenSearch data location</strong>: {opensearchLocation}
+        </StyledSpan>
       </div>
       <div>
-        <Accordion defaultActiveKey={activeAccordion}
-                   onSelect={handleSelect}
-                   id="nodes"
-                   data-testid="nodes"
-                   activeKey={activeAccordion}>
+        <Accordion
+          defaultActiveKey={activeAccordion}
+          onSelect={handleSelect}
+          id="nodes"
+          data-testid="nodes"
+          activeKey={activeAccordion}
+        >
           {nodes.map((node) => (
-            <AccordionItem key={`${node.node_version}${node.indices.length}`} name={`Node: ${hostname}, Version: ${node.node_version}, ${node.indices.length} indices`}>
+            <AccordionItem
+              key={`${node.node_version}${node.indices.length}`}
+              name={`Node: ${hostname}, Version: ${node.node_version}, ${node.indices.length} indices`}
+            >
               <Table striped bordered condensed>
                 <thead>
                   <tr>
@@ -78,9 +89,14 @@ const CompatibilityStatus = ({ hostname, opensearchVersion, nodeInfo }: Props) =
                   {node.indices.map((indice) => (
                     <tr key={indice.index_id}>
                       <td>{indice.index_name}</td>
-                      <td><Timestamp dateTime={indice.creation_date} /></td>
+                      <td>
+                        <Timestamp dateTime={indice.creation_date} />
+                      </td>
                       <td>{indice.index_version_created}</td>
-                      <td>{indice.shards.length} <Pluralize singular="shard" plural="shards" value={indice.shards.length} /> </td>
+                      <td>
+                        {indice.shards.length}{' '}
+                        <Pluralize singular="shard" plural="shards" value={indice.shards.length} />{' '}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

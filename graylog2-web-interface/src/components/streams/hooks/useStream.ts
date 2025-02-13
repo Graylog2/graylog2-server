@@ -28,11 +28,14 @@ const fetchStream = (streamId: string) => {
   return fetch('GET', qualifyUrl(url));
 };
 
-const useStream = (streamId: string, { enabled } = { enabled: true }): {
-  data: Stream
-  refetch: () => void,
-  isFetching: boolean,
-  isError,
+const useStream = (
+  streamId: string,
+  { enabled } = { enabled: true },
+): {
+  data: Stream;
+  refetch: () => void;
+  isFetching: boolean;
+  isError;
 } => {
   const { data, refetch, isFetching, isError } = useQuery(
     ['stream', streamId],
@@ -43,12 +46,12 @@ const useStream = (streamId: string, { enabled } = { enabled: true }): {
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isFetching,
     isError,
-  });
+  };
 };
 
 export default useStream;

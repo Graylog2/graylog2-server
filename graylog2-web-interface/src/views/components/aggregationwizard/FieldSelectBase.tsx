@@ -37,51 +37,59 @@ const ButtonRow = styled.div`
   margin-top: 5px;
   display: inline-flex;
   gap: 5px;
-  margin-bottom: 10px;  
+  margin-bottom: 10px;
 `;
 
 type Props = {
-  ariaLabel?: string,
-  autoFocus?: boolean,
-  allowCreate?: boolean,
-  className?: string,
-  clearable?: boolean,
-  excludedFields?: Array<string>,
-  id: string,
-  isFieldQualified?: (field: FieldTypeMapping) => boolean,
-  menuPortalTarget?: HTMLElement,
-  name: string,
-  onChange: (fieldName: string) => void,
-  onMenuClose?: () => void,
-  openMenuOnFocus?: boolean,
-  persistSelection?: boolean,
-  placeholder?: string,
-  selectRef?: SelectRef,
-  size?: 'normal' | 'small',
-  value: string | undefined,
-  onSelectAllRest?: (fieldNames: Array<string>) => void,
-  showSelectAllRest?: boolean,
-  onDeSelectAll?: (e: SyntheticEvent) => void,
-  options: Array<FieldTypeMapping>
-  showDeSelectAll?: boolean,
-}
+  ariaLabel?: string;
+  autoFocus?: boolean;
+  allowCreate?: boolean;
+  className?: string;
+  clearable?: boolean;
+  excludedFields?: Array<string>;
+  id: string;
+  isFieldQualified?: (field: FieldTypeMapping) => boolean;
+  menuPortalTarget?: HTMLElement;
+  name: string;
+  onChange: (fieldName: string) => void;
+  onMenuClose?: () => void;
+  openMenuOnFocus?: boolean;
+  persistSelection?: boolean;
+  placeholder?: string;
+  selectRef?: SelectRef;
+  size?: 'normal' | 'small';
+  value: string | undefined;
+  onSelectAllRest?: (fieldNames: Array<string>) => void;
+  showSelectAllRest?: boolean;
+  onDeSelectAll?: (e: SyntheticEvent) => void;
+  options: Array<FieldTypeMapping>;
+  showDeSelectAll?: boolean;
+};
 
-const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
+const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) =>
+  defaultCompare(label1, label2);
 
-const UnqualifiedOption = styled.span(({ theme }) => css`
-  color: ${theme.colors.gray[70]};
-`);
+const UnqualifiedOption = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[70]};
+  `,
+);
 
 type OptionRendererProps = {
-  label: string,
-  qualified: boolean,
-  type?: FieldType,
+  label: string;
+  qualified: boolean;
+  type?: FieldType;
 };
 
 const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
   const children = (
     <FieldName>
-      {type && <><FieldTypeIcon type={type} /> </>}{label}
+      {type && (
+        <>
+          <FieldTypeIcon type={type} />{' '}
+        </>
+      )}
+      {label}
     </FieldName>
   );
 
@@ -113,17 +121,24 @@ const FieldSelect = ({
   showDeSelectAll = false,
   options,
 }: Props) => {
-  const fieldOptions = useMemo(() => options
-    .filter((field) => !excludedFields.includes(field.name))
-    .map((field) => ({
-      label: field.name,
-      value: field.name,
-      type: field.type,
-      qualified: isFieldQualified(field),
-    }))
-    .sort(sortByLabel), [excludedFields, isFieldQualified, options]);
+  const fieldOptions = useMemo(
+    () =>
+      options
+        .filter((field) => !excludedFields.includes(field.name))
+        .map((field) => ({
+          label: field.name,
+          value: field.name,
+          type: field.type,
+          qualified: isFieldQualified(field),
+        }))
+        .sort(sortByLabel),
+    [excludedFields, isFieldQualified, options],
+  );
 
-  const _onSelectAllRest = useCallback(() => onSelectAllRest(fieldOptions.map(({ value: fieldValue }) => fieldValue)), [fieldOptions, onSelectAllRest]);
+  const _onSelectAllRest = useCallback(
+    () => onSelectAllRest(fieldOptions.map(({ value: fieldValue }) => fieldValue)),
+    [fieldOptions, onSelectAllRest],
+  );
 
   const _showSelectAllRest = !!fieldOptions?.length && showSelectAllRest && typeof _onSelectAllRest === 'function';
 
@@ -131,32 +146,41 @@ const FieldSelect = ({
 
   return (
     <>
-      <Select options={fieldOptions}
-              inputId={`select-${id}`}
-              forwardedRef={selectRef}
-              allowCreate={allowCreate}
-              className={className}
-              onMenuClose={onMenuClose}
-              openMenuOnFocus={openMenuOnFocus}
-              persistSelection={persistSelection}
-              clearable={clearable}
-              placeholder={placeholder}
-              name={name}
-              value={value}
-              aria-label={ariaLabel}
-              optionRenderer={OptionRenderer}
-              size={size}
-              autoFocus={autoFocus}
-              menuPortalTarget={menuPortalTarget}
-              onChange={onChange} />
+      <Select
+        options={fieldOptions}
+        inputId={`select-${id}`}
+        forwardedRef={selectRef}
+        allowCreate={allowCreate}
+        className={className}
+        onMenuClose={onMenuClose}
+        openMenuOnFocus={openMenuOnFocus}
+        persistSelection={persistSelection}
+        clearable={clearable}
+        placeholder={placeholder}
+        name={name}
+        value={value}
+        aria-label={ariaLabel}
+        optionRenderer={OptionRenderer}
+        size={size}
+        autoFocus={autoFocus}
+        menuPortalTarget={menuPortalTarget}
+        onChange={onChange}
+      />
       {(_showSelectAllRest || _showDeSelectAll) && (
         <ButtonRow>
-          {_showSelectAllRest && <Button bsSize="xs" onClick={_onSelectAllRest}>Select all fields</Button>}
-          {_showDeSelectAll && <Button bsSize="xs" onClick={onDeSelectAll}>Deselect all fields</Button>}
+          {_showSelectAllRest && (
+            <Button bsSize="xs" onClick={_onSelectAllRest}>
+              Select all fields
+            </Button>
+          )}
+          {_showDeSelectAll && (
+            <Button bsSize="xs" onClick={onDeSelectAll}>
+              Deselect all fields
+            </Button>
+          )}
         </ButtonRow>
       )}
     </>
-
   );
 };
 

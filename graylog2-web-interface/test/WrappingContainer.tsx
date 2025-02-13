@@ -21,15 +21,13 @@ import DefaultQueryClientProvider from './DefaultQueryClientProvider';
 import DefaultProviders from './DefaultProviders';
 
 type Props = {
-  children: React.ReactNode,
-}
+  children: React.ReactNode;
+};
 
 const WrappingContainer = ({ children }: Props) => (
   <DefaultQueryClientProvider>
     <MemoryRouter>
-      <DefaultProviders>
-        {children}
-      </DefaultProviders>
+      <DefaultProviders>{children}</DefaultProviders>
     </MemoryRouter>
   </DefaultQueryClientProvider>
 );
