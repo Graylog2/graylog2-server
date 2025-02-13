@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useFormikContext } from 'formik';
 
-import { FormConfig } from 'components/configurations/message-processors/Types';
+import type { FormConfig } from 'components/configurations/message-processors/Types';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { isProcessorEnabled } from 'components/configurations/helpers';
 
