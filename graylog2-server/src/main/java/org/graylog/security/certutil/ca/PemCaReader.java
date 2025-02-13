@@ -98,6 +98,15 @@ public class PemCaReader {
                     PEMDecryptorProvider decryptorProvider = new JcePEMDecryptorProviderBuilder().setProvider("BC").build(keyPassword.toCharArray());
                     final PrivateKeyInfo privateKeyInfo = pemEncryptedKeyPair.decryptKeyPair(decryptorProvider).getPrivateKeyInfo();
                     privateKey = converter.getPrivateKey(privateKeyInfo);
+                } else if (pemObject instanceof PEMKeyPair pemKeyPair) {
+                    privateKey = converter.getPrivateKey(pemKeyPair.getPrivateKeyInfo());
+                } else if (pemObject instanceof PEMEncryptedKeyPair pemEncryptedKeyPair) {
+                    if (keyPassword == null || keyPassword.isBlank()) {
+                        throw new CACreationException("Private key is encrypted, but no password was supplied!");
+                    }
+                    PEMDecryptorProvider decryptorProvider = new JcePEMDecryptorProviderBuilder().setProvider("BC").build(keyPassword.toCharArray());
+                    final PrivateKeyInfo privateKeyInfo = pemEncryptedKeyPair.decryptKeyPair(decryptorProvider).getPrivateKeyInfo();
+                    privateKey = converter.getPrivateKey(privateKeyInfo);
                 }
             }
 
