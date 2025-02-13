@@ -168,8 +168,8 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
     [activeQueryId, dashboardId, disablePageDelete, sendTelemetry, widgetIds],
   );
 
-  // eslint-disable-next-line react/no-unused-prop-types
   const customListItemRender = useCallback(
+    // eslint-disable-next-line react/no-unused-prop-types
     ({ item }: { item: PageListItem }) => (
       <ListItem item={item} onUpdateTitle={onUpdateTitle} onRemove={removePage} disableDelete={disablePageDelete} />
     ),
@@ -182,8 +182,7 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
       title="Update Dashboard Pages Configuration"
       onConfirm={onConfirmPagesConfiguration}
       onCancel={onPagesConfigurationModalClose}
-      confirmButtonText="Update configuration"
-    >
+      confirmButtonText="Update configuration">
       <>
         <h3>Order</h3>
         <p>

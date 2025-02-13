@@ -30,9 +30,9 @@ import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 // without CurrentUser & UserPreferences
 jest.mock('components/bootstrap/Popover');
 
-// eslint-disable-next-line global-require
 jest.mock(
   'views/components/visualizations/plotly/AsyncPlot',
+  // eslint-disable-next-line global-require
   () => require('views/components/visualizations/plotly/Plot').default,
 );
 jest.mock('components/common/ColorPicker', () => 'color-picker');

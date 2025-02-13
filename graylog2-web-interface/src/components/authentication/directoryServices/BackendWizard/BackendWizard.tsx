@@ -57,8 +57,7 @@ const SubmitAllError = ({ error, backendId }: { error: FetchError; backendId: st
       <Alert
         bsStyle="danger"
         style={{ wordBreak: 'break-word' }}
-        title={`Failed to ${backendId ? 'edit' : 'create'} authentication service`}
-      >
+        title={`Failed to ${backendId ? 'edit' : 'create'} authentication service`}>
         {error?.message && (
           <>
             {error.message}
@@ -221,8 +220,8 @@ const _onSubmitAll = (
       });
 
   if (stepsState.authBackendMeta.backendGroupSyncIsActive && !formValues.synchronizeGroups) {
-    // eslint-disable-next-line no-alert
     if (
+      // eslint-disable-next-line no-alert
       window.confirm('Do you really want to remove the group synchronization config for this authentication service?')
     ) {
       return _submit();
@@ -379,8 +378,7 @@ const BackendWizard = ({
       horizontal
       justified
       onStepChange={_setActiveStepKey}
-      steps={steps}
-    >
+      steps={steps}>
       <Sidebar prepareSubmitPayload={_getSubmitPayload} />
     </Wizard>
   );

@@ -18,8 +18,8 @@ import { formatNumber, formatPercentage, formatTrend } from './NumberFormatting'
 
 // eslint-disable-next-line jest/valid-expect
 const expectFormattedNumber = (num: number) => expect(formatNumber(num));
-// eslint-disable-next-line jest/valid-expect
 const expectFormattedTrend = (num: number, options?: Parameters<typeof formatTrend>[1]) =>
+  // eslint-disable-next-line jest/valid-expect
   expect(formatTrend(num, options));
 // eslint-disable-next-line jest/valid-expect
 const expectFormattedPercentage = (num: number) => expect(formatPercentage(num / 100));
