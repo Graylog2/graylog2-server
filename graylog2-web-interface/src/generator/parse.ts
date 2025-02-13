@@ -39,9 +39,10 @@ const typeMappings = {
   ZonedDateTime: 'string',
   Void: 'void',
 };
-const isPrimitiveType = (type: RawType): type is PrimitiveType => ('type' in type && Object.keys(primitiveTypeMappings).includes(type.type));
+const isPrimitiveType = (type: RawType): type is PrimitiveType =>
+  'type' in type && Object.keys(primitiveTypeMappings).includes(type.type);
 const mapPrimitiveType = (type: keyof typeof primitiveTypeMappings) => primitiveTypeMappings[type];
-const isEnumType = (type: RawType): type is EnumType => ('enum' in type && type.enum !== undefined);
+const isEnumType = (type: RawType): type is EnumType => 'enum' in type && type.enum !== undefined;
 const unknownType = {
   type: 'type_reference',
   name: 'unknown',
@@ -58,19 +59,19 @@ type EnumType = {
   type: Primitives;
   enum: Array<string>;
   defaultValue?: string;
-}
+};
 
 type ArrayType = {
   type: 'array';
   items: RawType;
-}
+};
 
 type ExistingRefType = {
   $ref: string;
-}
+};
 type LiteralRefType = {
   type: string;
-}
+};
 
 type RefType = ExistingRefType | LiteralRefType;
 
@@ -79,7 +80,7 @@ type ObjectType = {
   type: 'object';
   properties: Record<string, RawType>;
   additional_properties?: string | RawType;
-}
+};
 
 type RawType = PrimitiveType | EnumType | ArrayType | RefType | ObjectType;
 
@@ -93,8 +94,8 @@ const stripURN = (type) => {
   return splitted[splitted.length - 1];
 };
 
-const isArrayType = (typeDef: RawType): typeDef is ArrayType => ('type' in typeDef && typeDef.type === 'array');
-const isObjectType = (typeDef: RawType): typeDef is ObjectType => ('type' in typeDef && typeDef.type === 'object');
+const isArrayType = (typeDef: RawType): typeDef is ArrayType => 'type' in typeDef && typeDef.type === 'array';
+const isObjectType = (typeDef: RawType): typeDef is ObjectType => 'type' in typeDef && typeDef.type === 'object';
 
 const createEnumType = (enumType: EnumType) => {
   const { enum: options, defaultValue } = enumType;
@@ -132,7 +133,8 @@ function createTypeLiteralNode(properties: Record<string, Type>, additionalPrope
   } as const;
 }
 
-const wrapAdditionalProperties = (additionalProperties: RawModel['additional_properties']) => (typeof additionalProperties === 'string' ? ({ type: additionalProperties }) : additionalProperties);
+const wrapAdditionalProperties = (additionalProperties: RawModel['additional_properties']) =>
+  typeof additionalProperties === 'string' ? { type: additionalProperties } : additionalProperties;
 
 function createType(rawTypeDefinition: RawType): Type {
   if ('$ref' in rawTypeDefinition) {
@@ -160,7 +162,9 @@ function createType(rawTypeDefinition: RawType): Type {
   }
 
   if (isArrayType(typeDefinition)) {
-    return createArray(typeDefinition.items === undefined ? unknownType : createType(wrapAdditionalProperties(typeDefinition.items)));
+    return createArray(
+      typeDefinition.items === undefined ? unknownType : createType(wrapAdditionalProperties(typeDefinition.items)),
+    );
   }
 
   if (isObjectType(typeDefinition)) {
@@ -172,14 +176,16 @@ function createType(rawTypeDefinition: RawType): Type {
 
     const properties = typeDefinition.properties
       ? Object.fromEntries(
-        Object.entries(typeDefinition.properties).map(([propName, propType]) => [propName, createType(propType)]),
-      )
+          Object.entries(typeDefinition.properties).map(([propName, propType]) => [propName, createType(propType)]),
+        )
       : {};
 
     const additionalProperties = typeDefinition.additional_properties
-      ? createType(typeof typeDefinition.additional_properties === 'string'
-        ? { type: typeDefinition.additional_properties }
-        : typeDefinition.additional_properties)
+      ? createType(
+          typeof typeDefinition.additional_properties === 'string'
+            ? { type: typeDefinition.additional_properties }
+            : typeDefinition.additional_properties,
+        )
       : undefined;
 
     return createTypeLiteralNode(properties, additionalProperties);
@@ -188,7 +194,15 @@ function createType(rawTypeDefinition: RawType): Type {
   return createTypeReference(type, isOptional);
 }
 
-const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'TemporalUnit'];
+const bannedModels = [
+  ...Object.keys(typeMappings),
+  'DateTime',
+  'DateTimeZone',
+  'Chronology',
+  'String>',
+  'LocalDateTime',
+  'TemporalUnit',
+];
 const isNotBannedModel = ([name]) => !bannedModels.includes(name);
 
 type RawModel = {
@@ -196,7 +210,7 @@ type RawModel = {
   type: string;
   properties: Record<string, RawType>;
   additional_properties?: string | RawType;
-}
+};
 
 function createModel(model: RawModel): Model {
   return { ...createType(model), id: model.id };
@@ -209,8 +223,8 @@ type RawParameter = {
   type: string | RawType;
   defaultValue?: string;
   required: boolean;
-  enum?: Array<string>,
-}
+  enum?: Array<string>;
+};
 
 function mergeValues(enumValues: Array<string>, defaultValue: string) {
   if (enumValues === undefined || defaultValue === undefined) {
@@ -234,11 +248,15 @@ function createParameter({
     description,
     paramType,
     required,
-    type: createType(typeof type === 'string' ? {
-      type: type as Primitives,
-      enum: mergeValues(enumValues, defaultValue),
-      defaultValue,
-    } : type),
+    type: createType(
+      typeof type === 'string'
+        ? {
+            type: type as Primitives,
+            enum: mergeValues(enumValues, defaultValue),
+            defaultValue,
+          }
+        : type,
+    ),
   };
 
   if (defaultValue !== undefined) {
@@ -257,7 +275,7 @@ type RawOperation = {
   parameters: Array<RawParameter>;
   path?: string;
   produces: Array<RawContentType>;
-}
+};
 
 function createOperation({ summary, method, type, parameters, nickname, path, produces }: RawOperation): Operation {
   return {
@@ -274,7 +292,7 @@ function createOperation({ summary, method, type, parameters, nickname, path, pr
 type RawRoute = {
   path: string;
   operations: Array<RawOperation>;
-}
+};
 
 function createRoute({ path, operations }: RawRoute): Route {
   return {
@@ -295,7 +313,7 @@ function createApiObject(name: string, api: any, models: Record<string, Model>):
 type RawApi = {
   models: Record<string, RawModel>;
   apis: Array<RawRoute>;
-}
+};
 
 export function parseApi(name: string, api: RawApi) {
   const models = Object.fromEntries(

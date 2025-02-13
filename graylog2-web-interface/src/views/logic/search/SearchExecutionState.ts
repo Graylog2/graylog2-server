@@ -23,13 +23,13 @@ import ParameterBinding from '../parameters/ParameterBinding';
 export type ParameterBindings = Immutable.Map<string, ParameterBinding>;
 
 type InternalState = {
-  parameterBindings: ParameterBindings,
-  globalOverride: GlobalOverride | undefined | null,
+  parameterBindings: ParameterBindings;
+  globalOverride: GlobalOverride | undefined | null;
 };
 
 type JsonRepresentation = {
-  global_override: GlobalOverride | undefined | null,
-  parameter_bindings: ParameterBindings,
+  global_override: GlobalOverride | undefined | null;
+  parameter_bindings: ParameterBindings;
 };
 
 export default class SearchExecutionState {
@@ -102,8 +102,12 @@ class Builder {
   }
 }
 
-const getParameterBindingValue = (executionState: SearchExecutionState, parameterName: string) => executionState.parameterBindings.get(parameterName, ParameterBinding.empty()).value;
+const getParameterBindingValue = (executionState: SearchExecutionState, parameterName: string) =>
+  executionState.parameterBindings.get(parameterName, ParameterBinding.empty()).value;
 
-const getParameterBindingsAsMap = (bindings: ParameterBindings) => bindings.flatMap<string, string>((binding: ParameterBinding, name: string) => Immutable.Map({ [name]: binding.value }));
+const getParameterBindingsAsMap = (bindings: ParameterBindings) =>
+  bindings.flatMap<string, string>((binding: ParameterBinding, name: string) =>
+    Immutable.Map({ [name]: binding.value }),
+  );
 
 export { getParameterBindingsAsMap, getParameterBindingValue };

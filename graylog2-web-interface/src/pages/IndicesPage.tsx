@@ -29,23 +29,25 @@ import AllIndicesMaintenanceDropdown from 'components/indices/AllIndicesMaintena
 const IndicesPage = () => (
   <DocumentTitle title="Indices and Index Sets">
     <IndicesPageNavigation />
-    <PageHeader title="Indices & Index Sets"
-                actions={(
-                  <ButtonToolbar>
-                    <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
-                      <Button bsStyle="success">Create index set</Button>
-                    </LinkContainer>
-                    <AllIndicesMaintenanceDropdown />
-                  </ButtonToolbar>
-                )}
-                documentationLink={{
-                  title: 'Index model documentation',
-                  path: DocsHelper.PAGES.INDEX_MODEL,
-                }}>
+    <PageHeader
+      title="Indices & Index Sets"
+      actions={
+        <ButtonToolbar>
+          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
+            <Button bsStyle="success">Create index set</Button>
+          </LinkContainer>
+          <AllIndicesMaintenanceDropdown />
+        </ButtonToolbar>
+      }
+      documentationLink={{
+        title: 'Index model documentation',
+        path: DocsHelper.PAGES.INDEX_MODEL,
+      }}
+    >
       <span>
         A Graylog stream write messages to an index set, which is a configuration for retention, sharding, and
-        replication of the stored data.
-        By configuring index sets, you could, for example, have different retention times for certain streams.
+        replication of the stored data. By configuring index sets, you could, for example, have different retention
+        times for certain streams.
       </span>
     </PageHeader>
 

@@ -21,9 +21,8 @@ import { qualifyUrl } from 'util/URLUtils';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { defaultOnError } from 'util/conditional/onError';
 
-export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Promise<EventDefinition> => (
-  fetch('GET', qualifyUrl(`/events/definitions/${eventDefinitionId}`))
-);
+export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Promise<EventDefinition> =>
+  fetch('GET', qualifyUrl(`/events/definitions/${eventDefinitionId}`));
 
 const useEventDefinition = (eventDefId: string, enabled = true) => {
   const { data, isFetching, isInitialLoading } = useQuery({

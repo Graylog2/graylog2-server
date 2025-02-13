@@ -23,8 +23,8 @@ import { ConfigurationFormField } from 'components/configurationforms';
 
 import commonStyles from './LegacyNotificationCommonStyles.css';
 
-const formatLegacyTypes = (legacyTypes) => Object.keys(legacyTypes)
-  .map((typeName) => ({ label: `Legacy ${legacyTypes[typeName].name}`, value: typeName }));
+const formatLegacyTypes = (legacyTypes) =>
+  Object.keys(legacyTypes).map((typeName) => ({ label: `Legacy ${legacyTypes[typeName].name}`, value: typeName }));
 
 type LegacyNotificationFormProps = {
   config: any;
@@ -33,9 +33,12 @@ type LegacyNotificationFormProps = {
   legacyTypes: any;
 };
 
-class LegacyNotificationForm extends React.Component<LegacyNotificationFormProps, {
-  [key: string]: any;
-}> {
+class LegacyNotificationForm extends React.Component<
+  LegacyNotificationFormProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultConfig = {
     callback_type: '',
     configuration: {},
@@ -86,20 +89,18 @@ class LegacyNotificationForm extends React.Component<LegacyNotificationFormProps
       const configValue = config.configuration[configKey];
 
       return (
-        <ConfigurationFormField key={configKey}
-                                typeName={config.callback_type}
-                                configField={configField}
-                                configKey={configKey}
-                                configValue={configValue}
-                                onChange={this.handleFormFieldChange} />
+        <ConfigurationFormField
+          key={configKey}
+          typeName={config.callback_type}
+          configField={configField}
+          configKey={configKey}
+          configValue={configValue}
+          onChange={this.handleFormFieldChange}
+        />
       );
     });
 
-    return (
-      <fieldset>
-        {configFields}
-      </fieldset>
-    );
+    return <fieldset>{configFields}</fieldset>;
   }
 
   render() {
@@ -122,23 +123,32 @@ class LegacyNotificationForm extends React.Component<LegacyNotificationFormProps
     return (
       <>
         <fieldset>
-          <FormGroup controlId="notification-legacy-select"
-                     validationState={validation.errors.callback_type ? 'error' : null}>
+          <FormGroup
+            controlId="notification-legacy-select"
+            validationState={validation.errors.callback_type ? 'error' : null}
+          >
             <ControlLabel>Choose Legacy Notification</ControlLabel>
-            <Select id="notification-legacy-select"
-                    matchProp="label"
-                    placeholder="Select Legacy Notification"
-                    onChange={this.handleSelectNotificationChange}
-                    options={formatLegacyTypes(legacyTypes)}
-                    value={callbackType} />
+            <Select
+              id="notification-legacy-select"
+              matchProp="label"
+              placeholder="Select Legacy Notification"
+              onChange={this.handleSelectNotificationChange}
+              options={formatLegacyTypes(legacyTypes)}
+              value={callbackType}
+            />
             <HelpBlock>
-              {get(validation, 'errors.callback_type[0]', 'Select a Legacy Notification to use on this Event Definition.')}
+              {get(
+                validation,
+                'errors.callback_type[0]',
+                'Select a Legacy Notification to use on this Event Definition.',
+              )}
             </HelpBlock>
           </FormGroup>
         </fieldset>
 
         <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
-          Legacy alarm callbacks are deprecated and will be removed with the next major release. Please switch to the new notification types as soon as possible!
+          Legacy alarm callbacks are deprecated and will be removed with the next major release. Please switch to the
+          new notification types as soon as possible!
         </Alert>
 
         {content}

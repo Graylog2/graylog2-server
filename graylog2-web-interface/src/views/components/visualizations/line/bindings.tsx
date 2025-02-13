@@ -30,7 +30,11 @@ type LineVisualizationConfigFormValues = {
 
 const validate = hasAtLeastOneMetric('Line chart');
 
-const lineChart: VisualizationType<typeof LineVisualization.type, LineVisualizationConfig, LineVisualizationConfigFormValues> = {
+const lineChart: VisualizationType<
+  typeof LineVisualization.type,
+  LineVisualizationConfig,
+  LineVisualizationConfigFormValues
+> = {
   type: LineVisualization.type,
   displayName: 'Line Chart',
   component: LineVisualization,
@@ -40,20 +44,24 @@ const lineChart: VisualizationType<typeof LineVisualization.type, LineVisualizat
       interpolation: config?.interpolation ?? DEFAULT_INTERPOLATION,
       axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,
     }),
-    toConfig: (formValues: LineVisualizationConfigFormValues) => LineVisualizationConfig.create(formValues.interpolation, formValues.axisType),
-    fields: [{
-      name: 'interpolation',
-      title: 'Interpolation',
-      type: 'select',
-      options: interpolationTypes,
-      required: true,
-    }, {
-      name: 'axisType',
-      title: 'Axis Type',
-      type: 'select',
-      options: axisTypes,
-      required: true,
-    }],
+    toConfig: (formValues: LineVisualizationConfigFormValues) =>
+      LineVisualizationConfig.create(formValues.interpolation, formValues.axisType),
+    fields: [
+      {
+        name: 'interpolation',
+        title: 'Interpolation',
+        type: 'select',
+        options: interpolationTypes,
+        required: true,
+      },
+      {
+        name: 'axisType',
+        title: 'Axis Type',
+        type: 'select',
+        options: axisTypes,
+        required: true,
+      },
+    ],
   },
   capabilities: ['event-annotations'],
   validate,

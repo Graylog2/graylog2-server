@@ -21,7 +21,10 @@ import usePluginEntities from 'hooks/usePluginEntities';
 const useSaveViewFormControls = () => {
   const pluggableSaveViewControlFns = usePluginEntities('views.components.saveViewForm');
 
-  return useMemo(() => pluggableSaveViewControlFns.map((controlFn) => controlFn()).filter((control) => !!control), [pluggableSaveViewControlFns]);
+  return useMemo(
+    () => pluggableSaveViewControlFns.map((controlFn) => controlFn()).filter((control) => !!control),
+    [pluggableSaveViewControlFns],
+  );
 };
 
 export default useSaveViewFormControls;

@@ -26,8 +26,8 @@ import Version from 'util/Version';
 const useExtractors = (inputId: string) => useQuery(['extractors', inputId], () => API.Extractors.list(inputId));
 
 type Props = {
-  id: string,
-}
+  id: string;
+};
 
 const skippedAttributes = ['id', 'metrics', 'creator_user_id', 'exceptions', 'converter_exceptions'];
 
@@ -41,9 +41,13 @@ const ExportExtractors = ({ id }: Props) => {
   const extractorsExportObject = {
     // Create Graylog 1.x compatible export format.
     // TODO: This should be done on the server.
-    extractors: extractors.extractors.map((extractor) => Object.fromEntries(Object.entries(extractor)
-      .filter(([key]) => !skippedAttributes.includes(key))
-      .map(([key, value]) => (key === 'type' ? ['extractor_type', value] : [key, value])))),
+    extractors: extractors.extractors.map((extractor) =>
+      Object.fromEntries(
+        Object.entries(extractor)
+          .filter(([key]) => !skippedAttributes.includes(key))
+          .map(([key, value]) => (key === 'type' ? ['extractor_type', value] : [key, value])),
+      ),
+    ),
     version: Version.getFullVersion(),
   };
 

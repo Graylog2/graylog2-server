@@ -34,20 +34,24 @@ jest.mock('hooks/useEventById');
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/events/events/hooks/useEventDefinition');
 
-const renderEventDetails = () => render(
-  <PerspectivesProvider>
-    <EventDetails eventId="event-id" />
-  </PerspectivesProvider>,
-);
+const renderEventDetails = () =>
+  render(
+    <PerspectivesProvider>
+      <EventDetails eventId="event-id" />
+    </PerspectivesProvider>,
+  );
 
 describe('EventDetails', () => {
   beforeEach(() => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      'views.components.widgets.events.detailsComponent': [],
-      'views.components.eventActions': [],
-      eventDefinitionTypes: [],
-      perspectives: [defaultPerspective],
-    }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'views.components.widgets.events.detailsComponent': [],
+          'views.components.eventActions': [],
+          eventDefinitionTypes: [],
+          perspectives: [defaultPerspective],
+        })[entityKey],
+    );
 
     asMock(useCurrentUser).mockReturnValue(adminUser);
     asMock(useEventDefinition).mockReturnValue({ data: undefined, isFetching: false, isInitialLoading: false });
@@ -61,14 +65,19 @@ describe('EventDetails', () => {
   });
 
   it('should render pluggable event details', async () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      'views.components.widgets.events.detailsComponent': [{
-        component: () => <div>Pluggable details component</div>,
-        useCondition: () => true,
-        key: 'details-component',
-      }],
-      perspectives: [defaultPerspective],
-    }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'views.components.widgets.events.detailsComponent': [
+            {
+              component: () => <div>Pluggable details component</div>,
+              useCondition: () => true,
+              key: 'details-component',
+            },
+          ],
+          perspectives: [defaultPerspective],
+        })[entityKey],
+    );
 
     renderEventDetails();
 
@@ -76,7 +85,11 @@ describe('EventDetails', () => {
   });
 
   it('should render default event details', async () => {
-    asMock(useEventDefinition).mockReturnValue({ data: mockEventDefinitionTwoAggregations, isFetching: false, isInitialLoading: false });
+    asMock(useEventDefinition).mockReturnValue({
+      data: mockEventDefinitionTwoAggregations,
+      isFetching: false,
+      isInitialLoading: false,
+    });
 
     renderEventDetails();
 

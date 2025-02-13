@@ -28,23 +28,23 @@ import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesL
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
-const getData = (list = [profile1]) => (
-  {
-    list,
-    pagination: {
-      total: 1,
-    },
-    attributes,
-  }
-);
+const getData = (list = [profile1]) => ({
+  list,
+  pagination: {
+    total: 1,
+  },
+  attributes,
+});
 
-const renderIndexSetFieldTypeProfilesList = () => render(
-  <DefaultQueryParamProvider>
-    <TestStoreProvider>
-      <ProfilesList />
-    </TestStoreProvider>,
-  </DefaultQueryParamProvider>,
-);
+const renderIndexSetFieldTypeProfilesList = () =>
+  render(
+    <DefaultQueryParamProvider>
+      <TestStoreProvider>
+        <ProfilesList />
+      </TestStoreProvider>
+      ,
+    </DefaultQueryParamProvider>,
+  );
 
 jest.mock('routing/useParams', () => jest.fn());
 
@@ -60,10 +60,7 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['name',
-          'description',
-          'type',
-          'custom_field_mappings'],
+        displayedAttributes: ['name', 'description', 'type', 'custom_field_mappings'],
       },
       isInitialLoading: false,
     });

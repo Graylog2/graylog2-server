@@ -29,37 +29,40 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { CarouselProvider } from 'components/common/Carousel';
 
-const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(({ $enabled, theme }) => css`
-  overflow: hidden;
-  flex-grow: 3;
-  height: ${$enabled ? 'initial' : 'min-content'};
+const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(
+  ({ $enabled, theme }) => css`
+    overflow: hidden;
+    flex-grow: 3;
+    height: ${$enabled ? 'initial' : 'min-content'};
 
-  @media (max-width: ${theme.breakpoints.max.md}) {
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      flex-grow: 1;
+    }
+  `,
+);
+const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(
+  ({ $enabled }) => css`
     flex-grow: 1;
-  }
-`);
-const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(({ $enabled }) => css`
-  flex-grow: 1;
-  height: ${$enabled ? 'initial' : 'min-content'};
-`);
+    height: ${$enabled ? 'initial' : 'min-content'};
+  `,
+);
 
 const ContentStreamSection = () => {
   const { username } = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
-  const {
-    contentStreamSettings,
-    isLoadingContentStreamSettings,
-    onSaveContentStreamSetting,
-    refetchContentStream,
-  } = useContentStreamSettings();
+  const { contentStreamSettings, isLoadingContentStreamSettings, onSaveContentStreamSetting, refetchContentStream } =
+    useContentStreamSettings();
 
   if (isLoadingContentStreamSettings || !contentStreamSettings) {
     return null;
   }
 
-  const updateContentStreamSettings = async ({ enableContentStream, enableRelease }: {
-    enableContentStream?: boolean,
-    enableRelease?: boolean
+  const updateContentStreamSettings = async ({
+    enableContentStream,
+    enableRelease,
+  }: {
+    enableContentStream?: boolean;
+    enableRelease?: boolean;
   }) => {
     await onSaveContentStreamSetting({
       settings: {
@@ -107,12 +110,11 @@ const ContentStreamSection = () => {
 
   return (
     <SectionGrid $columns="2fr 1fr">
-      <StyledNewsSectionComponent title="News"
-                                  $enabled={contentStreamEnabled}
-                                  headerActions={(
-                                    <ToggleActionButton onClick={toggleNews}
-                                                        isOpen={contentStreamEnabled} />
-                                  )}>
+      <StyledNewsSectionComponent
+        title="News"
+        $enabled={contentStreamEnabled}
+        headerActions={<ToggleActionButton onClick={toggleNews} isOpen={contentStreamEnabled} />}
+      >
         {contentStreamEnabled && (
           <CarouselProvider carouselId={CAROUSEL_ID}>
             <ContentStreamNews />
@@ -120,15 +122,12 @@ const ContentStreamSection = () => {
           </CarouselProvider>
         )}
       </StyledNewsSectionComponent>
-      <StyledReleaseSectionComponent title="Releases"
-                                     $enabled={releasesSectionEnabled}
-                                     headerActions={(
-                                       <ToggleActionButton onClick={toggleRelease}
-                                                           isOpen={releasesSectionEnabled} />
-                                     )}>
-        {releasesSectionEnabled && (
-          <ContentStreamReleasesSection />
-        )}
+      <StyledReleaseSectionComponent
+        title="Releases"
+        $enabled={releasesSectionEnabled}
+        headerActions={<ToggleActionButton onClick={toggleRelease} isOpen={releasesSectionEnabled} />}
+      >
+        {releasesSectionEnabled && <ContentStreamReleasesSection />}
       </StyledReleaseSectionComponent>
     </SectionGrid>
   );

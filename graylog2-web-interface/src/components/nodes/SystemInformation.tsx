@@ -41,9 +41,12 @@ type SystemInformationProps = {
   jvmInformation?: any;
 };
 
-class SystemInformation extends React.Component<SystemInformationProps, {
-  [key: string]: any;
-}> {
+class SystemInformation extends React.Component<
+  SystemInformationProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     jvmInformation: undefined,
   };
@@ -64,12 +67,20 @@ class SystemInformation extends React.Component<SystemInformationProps, {
   }
 
   render() {
-    const { systemInformation: { hostname, version, codename, timezone }, jvmInformation, node } = this.props;
+    const {
+      systemInformation: { hostname, version, codename, timezone },
+      jvmInformation,
+      node,
+    } = this.props;
     const { time } = this.state;
     let jvmInformationText;
 
     if (jvmInformation) {
-      jvmInformationText = <span>PID {jvmInformation.pid}, {jvmInformation.info}</span>;
+      jvmInformationText = (
+        <span>
+          PID {jvmInformation.pid}, {jvmInformation.info}
+        </span>
+      );
     } else {
       jvmInformationText = <span>JMV information for this node is unavailable.</span>;
     }
@@ -81,11 +92,15 @@ class SystemInformation extends React.Component<SystemInformationProps, {
         <dt>Node ID:</dt>
         <dd>{node.node_id}</dd>
         <dt>Version:</dt>
-        <dd>{version}, codename <em>{codename}</em></dd>
+        <dd>
+          {version}, codename <em>{codename}</em>
+        </dd>
         <dt>JVM:</dt>
         <dd>{jvmInformationText}</dd>
         <dt>Time:</dt>
-        <dd><Timestamp dateTime={time} format="withTz" tz={timezone} /></dd>
+        <dd>
+          <Timestamp dateTime={time} format="withTz" tz={timezone} />
+        </dd>
       </StyledDl>
     );
   }

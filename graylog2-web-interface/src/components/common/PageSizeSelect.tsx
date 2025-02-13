@@ -33,23 +33,35 @@ const Container = styled.div`
 `;
 
 type Props = {
-  className?: string,
-  pageSize: number,
-  pageSizes?: Array<number>,
-  onChange: (newPageSize: number) => void,
-  showLabel?: boolean
+  className?: string;
+  pageSize: number;
+  pageSizes?: Array<number>;
+  onChange: (newPageSize: number) => void;
+  showLabel?: boolean;
 };
 
-const PageSizeSelect = ({ pageSizes = DEFAULT_PAGE_SIZES, pageSize, onChange, className = '', showLabel = true }: Props) => {
+const PageSizeSelect = ({
+  pageSizes = DEFAULT_PAGE_SIZES,
+  pageSize,
+  onChange,
+  className = '',
+  showLabel = true,
+}: Props) => {
   const select = (
-    <StyledDropdownButton className={className}
-                          id="page-size-select"
-                          title={`${pageSize} Rows`}
-                          aria-label="Configure page size"
-                          pullRight
-                          bsSize="small"
-                          bsStyle="default">
-      {pageSizes.map((size) => <MenuItem key={`option-${size}`} onSelect={() => onChange(size)}>{size}</MenuItem>)}
+    <StyledDropdownButton
+      className={className}
+      id="page-size-select"
+      title={`${pageSize} Rows`}
+      aria-label="Configure page size"
+      pullRight
+      bsSize="small"
+      bsStyle="default"
+    >
+      {pageSizes.map((size) => (
+        <MenuItem key={`option-${size}`} onSelect={() => onChange(size)}>
+          {size}
+        </MenuItem>
+      ))}
     </StyledDropdownButton>
   );
 

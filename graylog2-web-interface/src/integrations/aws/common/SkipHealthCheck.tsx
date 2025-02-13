@@ -29,28 +29,32 @@ type SkipHealthCheckProps = {
   onChange: (...args: any[]) => void;
 };
 
-const SkipHealthCheck = ({
-  onChange,
-  onSubmit,
-}: SkipHealthCheckProps) => {
+const SkipHealthCheck = ({ onChange, onSubmit }: SkipHealthCheckProps) => {
   const { formData } = useContext(FormDataContext);
 
   return (
     <AdditionalFields title="Skip Health Check">
-      <StyledFormWrap onSubmit={onSubmit}
-                      buttonContent="Confirm"
-                      title="Choose Log Type &amp; Skip Health Check"
-                      disabled={!(formData.awsCloudWatchKinesisInputType && formData.awsCloudWatchKinesisInputType.value)}
-                      description={(
-                        <p>If you&apos;re sure of the data contained within your new <strong>{formData.awsCloudWatchKinesisStream.value}</strong> stream, then choose your option below to skip our automated check.</p>
-                      )}>
-
-        <ValidatedInput id="awsCloudWatchKinesisInputType"
-                        type="select"
-                        fieldData={formData.awsCloudWatchKinesisInputType}
-                        onChange={onChange}
-                        label="Choose AWS Input Type"
-                        required>
+      <StyledFormWrap
+        onSubmit={onSubmit}
+        buttonContent="Confirm"
+        title="Choose Log Type &amp; Skip Health Check"
+        disabled={!(formData.awsCloudWatchKinesisInputType && formData.awsCloudWatchKinesisInputType.value)}
+        description={
+          <p>
+            If you&apos;re sure of the data contained within your new{' '}
+            <strong>{formData.awsCloudWatchKinesisStream.value}</strong> stream, then choose your option below to skip
+            our automated check.
+          </p>
+        }
+      >
+        <ValidatedInput
+          id="awsCloudWatchKinesisInputType"
+          type="select"
+          fieldData={formData.awsCloudWatchKinesisInputType}
+          onChange={onChange}
+          label="Choose AWS Input Type"
+          required
+        >
           {renderOptions(KINESIS_LOG_TYPES, 'Choose Log Type')}
         </ValidatedInput>
       </StyledFormWrap>

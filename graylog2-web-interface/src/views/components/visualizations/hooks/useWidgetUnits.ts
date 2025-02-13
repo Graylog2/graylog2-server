@@ -25,28 +25,39 @@ import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
 const useWidgetUnits = (config: AggregationWidgetConfig) => {
   const fieldTypesUnits = useFieldTypesUnits();
-  const usedFieldsInSeries = useMemo(() => config.series.map((s: Series) => {
-    const { field } = parseSeries(s.function) ?? {};
+  const usedFieldsInSeries = useMemo(
+    () =>
+      config.series.map((s: Series) => {
+        const { field } = parseSeries(s.function) ?? {};
 
-    return field;
-  }), [config.series]);
+        return field;
+      }),
+    [config.series],
+  );
   const usedFieldsInRowPivots = useMemo(() => config.rowPivots.flatMap((p) => p.fields), [config.rowPivots]);
   const usedFieldsInColumnPivots = useMemo(() => config.columnPivots.flatMap((p) => p.fields), [config.columnPivots]);
 
-  const allFields: Array<string> = useMemo(() => uniq(compact([...usedFieldsInSeries, ...usedFieldsInRowPivots, ...usedFieldsInColumnPivots])), [usedFieldsInColumnPivots, usedFieldsInRowPivots, usedFieldsInSeries]);
+  const allFields: Array<string> = useMemo(
+    () => uniq(compact([...usedFieldsInSeries, ...usedFieldsInRowPivots, ...usedFieldsInColumnPivots])),
+    [usedFieldsInColumnPivots, usedFieldsInRowPivots, usedFieldsInSeries],
+  );
 
   return useMemo(() => {
     const widgetUnits = config.units;
 
-    const filtratedFields = Object.fromEntries(allFields.filter((field) => {
-      const predefinedUnit = fieldTypesUnits?.[field];
+    const filtratedFields = Object.fromEntries(
+      allFields
+        .filter((field) => {
+          const predefinedUnit = fieldTypesUnits?.[field];
 
-      return !widgetUnits?.getFieldUnit(field) && !!predefinedUnit;
-    }).map((field) => {
-      const predefinedUnit = fieldTypesUnits?.[field];
+          return !widgetUnits?.getFieldUnit(field) && !!predefinedUnit;
+        })
+        .map((field) => {
+          const predefinedUnit = fieldTypesUnits?.[field];
 
-      return [field, predefinedUnit];
-    }));
+          return [field, predefinedUnit];
+        }),
+    );
 
     return widgetUnits.toBuilder().merge(filtratedFields).build();
   }, [allFields, config?.units, fieldTypesUnits]);

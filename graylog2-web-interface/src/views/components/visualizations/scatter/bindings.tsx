@@ -22,12 +22,16 @@ import { DEFAULT_AXIS_TYPE, axisTypes } from 'views/logic/aggregationbuilder/vis
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
 
 type ScatterVisualizationConfigFormValues = {
-  axisType: AxisType,
+  axisType: AxisType;
 };
 
 const validate = hasAtLeastOneMetric('Scatter plot');
 
-const scatterChart: VisualizationType<typeof ScatterVisualization.type, ScatterVisualizationConfig, ScatterVisualizationConfigFormValues> = {
+const scatterChart: VisualizationType<
+  typeof ScatterVisualization.type,
+  ScatterVisualizationConfig,
+  ScatterVisualizationConfigFormValues
+> = {
   type: ScatterVisualization.type,
   displayName: 'Scatter Plot',
   component: ScatterVisualization,
@@ -35,13 +39,15 @@ const scatterChart: VisualizationType<typeof ScatterVisualization.type, ScatterV
     createConfig: () => ({ axisType: DEFAULT_AXIS_TYPE }),
     fromConfig: (config) => ({ axisType: config?.axisType ?? DEFAULT_AXIS_TYPE }),
     toConfig: (formValues) => ScatterVisualizationConfig.create(formValues.axisType),
-    fields: [{
-      name: 'axisType',
-      title: 'Axis Type',
-      type: 'select',
-      options: axisTypes,
-      required: true,
-    }],
+    fields: [
+      {
+        name: 'axisType',
+        title: 'Axis Type',
+        type: 'select',
+        options: axisTypes,
+        required: true,
+      },
+    ],
   },
   capabilities: ['event-annotations'],
   validate,

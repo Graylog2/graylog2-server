@@ -24,9 +24,9 @@ import type { DateTime } from 'util/DateTime';
 import { validatePluggableValues } from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
 
 type FormValues = {
-  queryString: string,
-  timerange: TimeRange | NoTimeRangeOverride,
-}
+  queryString: string;
+  timerange: TimeRange | NoTimeRangeOverride;
+};
 
 const validate = async <T extends FormValues>(
   values: T,

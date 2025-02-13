@@ -18,13 +18,13 @@ import isString from 'lodash/isString';
 
 type Res = {
   text?: string;
-}
+};
 
 type Additional = {
   status: number;
   body?: any;
   res?: Res;
-}
+};
 
 export default class FetchError extends Error {
   name: 'FetchError';

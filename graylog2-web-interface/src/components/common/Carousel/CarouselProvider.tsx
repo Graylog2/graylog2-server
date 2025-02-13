@@ -21,29 +21,28 @@ import useEmblaCarousel from 'embla-carousel-react';
 import CarouselContext from './CarouselContext';
 
 type Props = React.PropsWithChildren<{
-  carouselId: string,
+  carouselId: string;
   options?: Partial<{
-    align: 'start',
-    slidesToScroll: number,
-    inViewThreshold: number,
-    watchDrag: boolean
-  }>
-}>
+    align: 'start';
+    slidesToScroll: number;
+    inViewThreshold: number;
+    watchDrag: boolean;
+  }>;
+}>;
 
-const CarouselProvider = ({ carouselId, children, options = {} } : Props) => {
+const CarouselProvider = ({ carouselId, children, options = {} }: Props) => {
   const existingContextValue = useContext(CarouselContext);
   const [ref, api] = useEmblaCarousel(options);
 
-  const value = useMemo(() => ({
-    ...(existingContextValue ?? {}),
-    [carouselId]: { ref, api },
-  }), [api, carouselId, existingContextValue, ref]);
-
-  return (
-    <CarouselContext.Provider value={value}>
-      {children}
-    </CarouselContext.Provider>
+  const value = useMemo(
+    () => ({
+      ...(existingContextValue ?? {}),
+      [carouselId]: { ref, api },
+    }),
+    [api, carouselId, existingContextValue, ref],
   );
+
+  return <CarouselContext.Provider value={value}>{children}</CarouselContext.Provider>;
 };
 
 export default CarouselProvider;
