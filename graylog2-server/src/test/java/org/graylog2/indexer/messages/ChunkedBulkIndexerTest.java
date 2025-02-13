@@ -40,8 +40,8 @@ class ChunkedBulkIndexerTest {
 
     @Test
     void retriesIndexingIfDataTooLarge() throws IOException {
-        final ChunkedBulkIndexer.BulkIndex bulkIndex = (chunk) -> {
-            if (chunk.size > 100) {
+        final ChunkedBulkIndexer.BulkIndex bulkIndex = (indexed, previous, chunk) -> {
+            if (chunk.size() > 100) {
                 throw circuitBreakerException();
             } else {
                 return success(chunk);
@@ -57,8 +57,8 @@ class ChunkedBulkIndexerTest {
             private int attempt = 0;
 
             @Override
-            public IndexingResults apply(ChunkedBulkIndexer.Chunk chunk) throws ChunkedBulkIndexer.EntityTooLargeException, IOException {
-                if (chunk.size > 1) {
+            public ChunkedBulkIndexer.BulkIndexResult apply(int indexedSuccessfully, IndexingResults previousResults, List<IndexingRequest> chunk) throws ChunkedBulkIndexer.EntityTooLargeException, IOException {
+                if (chunk.size() > 1) {
                     throw circuitBreakerException();
                 } else {
                     attempt += 1;
@@ -75,7 +75,7 @@ class ChunkedBulkIndexerTest {
 
     @Test
     void doesNotRetryPermanentCircuitBreakerExceptions() {
-        final ChunkedBulkIndexer.BulkIndex bulkIndex = chunk -> {
+        final ChunkedBulkIndexer.BulkIndex bulkIndex = (indexed, previous, chunk) -> {
             throw circuitBreakerException(ChunkedBulkIndexer.CircuitBreakerException.Durability.Permanent);
         };
         assertThatThrownBy(() -> indexer.index(indexingRequests, bulkIndex))
@@ -83,11 +83,11 @@ class ChunkedBulkIndexerTest {
                 .hasMessageContaining("Bulk index cannot split output batch any further.");
     }
 
-    private IndexingResults success(ChunkedBulkIndexer.Chunk chunk) {
-        final var results = chunk.requests.stream()
+    private ChunkedBulkIndexer.BulkIndexResult success(List<IndexingRequest> requests) {
+        final var results = requests.stream()
                 .map(request -> IndexingSuccess.create(request.message(), request.indexSet().getNewestIndex()))
                 .toList();
-        return IndexingResults.create(results, List.of());
+        return new ChunkedBulkIndexer.BulkIndexResult(IndexingResults.create(results, List.of()), () -> "", requests.size());
     }
 
     private ChunkedBulkIndexer.CircuitBreakerException circuitBreakerException() {
