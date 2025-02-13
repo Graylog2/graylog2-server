@@ -22,7 +22,7 @@ import { SearchForm } from 'components/common';
 import BackendsQueryHelper from './BackendsQueryHelper';
 
 type Props = {
-  onSearch: (query: string, resetLoadingStateCb?: () => void) => void,
+  onSearch: (query: string, resetLoadingStateCb?: () => void) => void;
 };
 
 const Container = styled.div`
@@ -31,11 +31,13 @@ const Container = styled.div`
 
 const BackendsFilter = ({ onSearch }: Props) => (
   <Container>
-    <SearchForm onReset={() => onSearch('')}
-                onSearch={onSearch}
-                queryHelpComponent={<BackendsQueryHelper />}
-                topMargin={0}
-                useLoadingState />
+    <SearchForm
+      onReset={() => onSearch('')}
+      onSearch={onSearch}
+      queryHelpComponent={<BackendsQueryHelper />}
+      topMargin={0}
+      useLoadingState
+    />
   </Container>
 );
 

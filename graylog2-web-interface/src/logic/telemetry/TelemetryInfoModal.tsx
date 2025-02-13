@@ -15,30 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { ConfirmDialog } from 'components/common';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
 
 type Props = {
-  show: boolean,
-  onConfirm: () => void,
-}
+  show: boolean;
+  onConfirm: () => void;
+};
 
 const TelemetryInfoModal = ({ show, onConfirm }: Props) => (
-  <ConfirmDialog show={show}
-                 onConfirm={onConfirm}
-                 hideCancelButton={false}
-                 onCancel={onConfirm}
-                 title="Help us improve Graylog"
-                 btnConfirmText="Ok">
+  <ConfirmDialog
+    show={show}
+    onConfirm={onConfirm}
+    hideCancelButton={false}
+    onCancel={onConfirm}
+    title="Help us improve Graylog"
+    btnConfirmText="Ok"
+  >
     <TelemetryInfoText showProfile />
   </ConfirmDialog>
 );
-
-TelemetryInfoModal.propTypes = {
-  show: PropTypes.bool.isRequired,
-  onConfirm: PropTypes.func.isRequired,
-};
 
 export default TelemetryInfoModal;

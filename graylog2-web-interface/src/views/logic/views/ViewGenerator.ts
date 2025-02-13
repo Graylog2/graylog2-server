@@ -28,20 +28,20 @@ import QueryGenerator from '../queries/QueryGenerator';
 export default async ({
   type,
   streamId,
+  streamCategory,
   timeRange,
   queryString,
   parameters,
 }: {
-  type: ViewType,
-  streamId?: string | string[],
-  timeRange?: TimeRange,
-  queryString?: ElasticsearchQueryString,
-  parameters?: Array<Parameter>,
-},
-) => {
-  const query = QueryGenerator(streamId, undefined, timeRange, queryString);
-  const search = Search.create().toBuilder().queries([query]).parameters(parameters)
-    .build();
+  type: ViewType;
+  streamId?: string | string[];
+  streamCategory?: string | string[];
+  timeRange?: TimeRange;
+  queryString?: ElasticsearchQueryString;
+  parameters?: Array<Parameter>;
+}) => {
+  const query = QueryGenerator(streamId, streamCategory, undefined, timeRange, queryString);
+  const search = Search.create().toBuilder().queries([query]).parameters(parameters).build();
   const viewState = await ViewStateGenerator(type, streamId);
 
   const view = View.create()

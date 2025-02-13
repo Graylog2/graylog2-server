@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import capitalize from 'lodash/capitalize';
 import uniq from 'lodash/uniq';
 
@@ -29,8 +28,8 @@ import type { SidecarCollectorPairType } from '../types';
 const PROCESS_ACTIONS = ['start', 'restart', 'stop'];
 
 type Props = {
-  selectedSidecarCollectorPairs: SidecarCollectorPairType[],
-  onProcessAction: (action: string, pairs: SidecarCollectorPairType[], callback: () => void) => void,
+  selectedSidecarCollectorPairs: SidecarCollectorPairType[];
+  onProcessAction: (action: string, pairs: SidecarCollectorPairType[], callback: () => void) => void;
 };
 
 const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessAction }: Props) => {
@@ -84,14 +83,12 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
   const renderConfigurationWarning = () => (
     <Panel bsStyle="info" header="Collectors without Configuration">
       <p>
-        At least one selected Collector is not configured yet. To start a new Collector, assign a
-        Configuration to it and the Sidecar will start the process for you.
+        At least one selected Collector is not configured yet. To start a new Collector, assign a Configuration to it
+        and the Sidecar will start the process for you.
       </p>
-      <p>
-        {capitalize(selectedAction)}ing a Collector without Configuration will have no effect.
-      </p>
-      <Button bsSize="xsmall" bsStyle="primary" onClick={hideConfigurationWarning}>Understood, continue
-        anyway
+      <p>{capitalize(selectedAction)}ing a Collector without Configuration will have no effect.</p>
+      <Button bsSize="xsmall" bsStyle="primary" onClick={hideConfigurationWarning}>
+        Understood, continue anyway
       </Button>
     </Panel>
   );
@@ -100,20 +97,22 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     const selectedSidecars = uniq<string>(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name));
 
     // Check if all selected collectors have assigned configurations
-    const allHaveConfigurationsAssigned = selectedSidecarCollectorPairs.every(({ collector, sidecar }) => sidecar.assignments.some(({ collector_id }) => collector_id === collector.id));
+    const allHaveConfigurationsAssigned = selectedSidecarCollectorPairs.every(({ collector, sidecar }) =>
+      sidecar.assignments.some(({ collector_id }) => collector_id === collector.id),
+    );
 
     const shouldShowConfigurationWarning = !isConfigurationWarningHidden && !allHaveConfigurationsAssigned;
 
     return (
-      <BootstrapModalConfirm showModal={showModal}
-                             title="Process action summary"
-                             confirmButtonDisabled={shouldShowConfigurationWarning}
-                             onConfirm={confirmProcessAction}
-                             onCancel={cancelProcessAction}>
+      <BootstrapModalConfirm
+        showModal={showModal}
+        title="Process action summary"
+        confirmButtonDisabled={shouldShowConfigurationWarning}
+        onConfirm={confirmProcessAction}
+        onCancel={cancelProcessAction}
+      >
         <div>
-          {shouldShowConfigurationWarning
-            ? renderConfigurationWarning()
-            : renderSummaryContent(selectedSidecars)}
+          {shouldShowConfigurationWarning ? renderConfigurationWarning() : renderSummaryContent(selectedSidecars)}
         </div>
       </BootstrapModalConfirm>
     );
@@ -123,24 +122,23 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
 
   return (
     <span>
-      <SelectPopover id="process-management-action"
-                     title="Manage collector processes"
-                     triggerNode={(
-                       <Button bsStyle="primary" bsSize="small">Process</Button>
-                     )}
-                     items={PROCESS_ACTIONS}
-                     itemFormatter={actionFormatter}
-                     selectedItems={selectedAction ? [selectedAction] : []}
-                     displayDataFilter={false}
-                     onItemSelect={handleProcessActionSelect} />
+      <SelectPopover
+        id="process-management-action"
+        title="Manage collector processes"
+        triggerNode={
+          <Button bsStyle="primary" bsSize="small">
+            Process
+          </Button>
+        }
+        items={PROCESS_ACTIONS}
+        itemFormatter={actionFormatter}
+        selectedItems={selectedAction ? [selectedAction] : []}
+        displayDataFilter={false}
+        onItemSelect={handleProcessActionSelect}
+      />
       {renderProcessActionSummary()}
     </span>
   );
-};
-
-CollectorProcessControl.propTypes = {
-  selectedSidecarCollectorPairs: PropTypes.array.isRequired,
-  onProcessAction: PropTypes.func.isRequired,
 };
 
 export default CollectorProcessControl;

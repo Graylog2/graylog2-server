@@ -19,15 +19,15 @@ package org.graylog.datanode.integration;
 import com.github.rholder.retry.RetryException;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
+import org.graylog.testing.containermatrix.MongodbServer;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.DatanodeRestApiWait;
 import org.graylog.testing.restoperations.DatanodeStatusChangeOperation;
 import org.graylog.testing.restoperations.OpensearchTestIndexCreation;
 import org.graylog.testing.restoperations.RestOperationParameters;
-import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,6 +63,7 @@ public class DatanodeClusterIT {
     private FilesystemKeystoreInformation ca;
     private Network network;
     private MongoDBTestService mongoDBTestService;
+
     @BeforeEach
     void setUp() throws GeneralSecurityException, IOException {
         // first generate a self-signed CA
@@ -221,12 +222,12 @@ public class DatanodeClusterIT {
 
                     // configure transport security
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE", "datanode-transport-certificates.p12");
-                    datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE_PASSWORD", transportKeystore.passwordAsString());
+                    datanodeContainer.withEnv("GRAYLOG_DATANODE_TRANSPORT_CERTIFICATE_PASSWORD", new String(transportKeystore.password()));
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "false");
 
                     // configure http security
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE", "datanode-https-certificates.p12");
-                    datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE_PASSWORD", httpKeystore.passwordAsString());
+                    datanodeContainer.withEnv("GRAYLOG_DATANODE_HTTP_CERTIFICATE_PASSWORD", new String(httpKeystore.password()));
 
                     // this is the interface that we bind opensearch to. It must be 0.0.0.0 if we want
                     // to be able to reach opensearch from outside the container and docker network (true?)

@@ -18,8 +18,9 @@ import * as React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import type { SearchBarFormValues } from 'views/Constants';
 import { SearchQueryStrings } from '@graylog/server-api';
+
+import type { SearchBarFormValues } from 'views/Constants';
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
 
@@ -32,20 +33,25 @@ jest.mock('@graylog/server-api', () => ({
 }));
 
 type Props = {
-  onSubmit: (v: SearchBarFormValues) => Promise<void>,
-  values: SearchBarFormValues,
-}
+  onSubmit: (v: SearchBarFormValues) => Promise<void>;
+  values: SearchBarFormValues;
+};
 
 const initialValues: SearchBarFormValues = {
   queryString: 'action:login',
   timerange: { type: 'relative', range: 300 },
   streams: [],
+  streamCategories: [],
 };
 
 const Wrapper = ({ onSubmit, values }: Props) => {
   const { onSubmit: _onSubmit, enableReinitialize } = useSearchBarSubmit(initialValues, onSubmit);
 
-  return <button type="button" onClick={() => _onSubmit(values)}>{enableReinitialize ? 'submit' : 'busy'}</button>;
+  return (
+    <button type="button" onClick={() => _onSubmit(values)}>
+      {enableReinitialize ? 'submit' : 'busy'}
+    </button>
+  );
 };
 
 const clickSubmit = async () => userEvent.click(await screen.findByRole('button', { name: 'submit' }));
@@ -61,6 +67,7 @@ describe('useSearchBarSubmit', () => {
       queryString: ' http_method:POST ',
       streams: [],
       timerange: { type: 'relative', range: 60 },
+      streamCategories: [],
     };
     render(<Wrapper onSubmit={onSubmit} values={values} />);
 
@@ -81,6 +88,7 @@ describe('useSearchBarSubmit', () => {
       queryString: '  ',
       streams: [],
       timerange: { type: 'relative', range: 60 },
+      streamCategories: [],
     };
     render(<Wrapper onSubmit={onSubmit} values={values} />);
 
@@ -101,6 +109,7 @@ describe('useSearchBarSubmit', () => {
       queryString: ' action:login ',
       streams: [],
       timerange: { type: 'relative', range: 60 },
+      streamCategories: [],
     };
     render(<Wrapper onSubmit={onSubmit} values={values} />);
 
@@ -121,6 +130,7 @@ describe('useSearchBarSubmit', () => {
       queryString: ' http_method:POST ',
       streams: [],
       timerange: { type: 'relative', range: 60 },
+      streamCategories: [],
     };
     asMock(SearchQueryStrings.queryStringUsed).mockRejectedValue(new Error('Boom!'));
     render(<Wrapper onSubmit={onSubmit} values={values} />);

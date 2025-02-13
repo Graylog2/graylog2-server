@@ -19,6 +19,7 @@ package org.graylog.scheduler;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.primitives.Ints;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
@@ -41,7 +42,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
-import org.mongojack.DBQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,6 +52,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.mongodb.client.model.Filters.and;
@@ -145,12 +146,13 @@ public class DBJobTriggerService {
     }
 
     /**
-     * Loads all existing records and returns them.
+     * Streams all existing records and returns the stream.
      *
-     * @return list of records
+     * @return stream of records
      */
-    public List<JobTriggerDto> all() {
-        return stream(collection.find().sort(descending(FIELD_ID))).toList();
+    @MustBeClosed
+    public Stream<JobTriggerDto> streamAll() {
+        return stream(collection.find().sort(descending(FIELD_ID)));
     }
 
     /**
@@ -171,24 +173,27 @@ public class DBJobTriggerService {
      * @return One found job trigger
      */
     public Optional<JobTriggerDto> getOneForJob(String jobDefinitionId) {
-        final List<JobTriggerDto> triggers = getAllForJob(jobDefinitionId);
-        // We are currently expecting only one trigger per job definition. This will most probably change in the
-        // future once we extend our scheduler usage.
-        // TODO: Don't throw exception when there is more than one trigger for a job definition.
-        //       To be able to do this, we need some kind of label system to make sure we can differentiate between
-        //       automatically created triggers (e.g. by event definition) and manually created ones.
-        if (triggers.size() > 1) {
-            throw new IllegalStateException("More than one trigger for job definition <" + jobDefinitionId + ">");
+        try (final Stream<JobTriggerDto> triggerStream = streamAllForJob(jobDefinitionId)) {
+            final List<JobTriggerDto> triggers = triggerStream.toList();
+            // We are currently expecting only one trigger per job definition. This will most probably change in the
+            // future once we extend our scheduler usage.
+            // TODO: Don't throw exception when there is more than one trigger for a job definition.
+            //       To be able to do this, we need some kind of label system to make sure we can differentiate between
+            //       automatically created triggers (e.g. by event definition) and manually created ones.
+            if (triggers.size() > 1) {
+                throw new IllegalStateException("More than one trigger for job definition <" + jobDefinitionId + ">");
+            }
+            return triggers.stream().findFirst();
         }
-        return triggers.stream().findFirst();
     }
 
-    public List<JobTriggerDto> getAllForJob(String jobDefinitionId) {
+    @MustBeClosed
+    public Stream<JobTriggerDto> streamAllForJob(String jobDefinitionId) {
         if (isNullOrEmpty(jobDefinitionId)) {
             throw new IllegalArgumentException("jobDefinitionId cannot be null or empty");
         }
 
-        return stream(collection.find(eq(FIELD_JOB_DEFINITION_ID, jobDefinitionId))).toList();
+        return stream(collection.find(eq(FIELD_JOB_DEFINITION_ID, jobDefinitionId)));
     }
 
     /**
@@ -224,6 +229,18 @@ public class DBJobTriggerService {
         }
 
         return groupedTriggers;
+    }
+
+    /**
+     * Creates the given {@link JobTriggerDto} as new entry or returns an existing one. The ID of the given trigger
+     * must not be null!
+     *
+     * @param trigger the trigger to get or create
+     * @return the trigger from the database
+     * @throws NullPointerException when the trigger or trigger ID is null
+     */
+    public JobTriggerDto getOrCreate(JobTriggerDto trigger) {
+        return mongoUtils.getOrCreate(requireNonNull(trigger, "trigger cannot be null"));
     }
 
     /**
@@ -323,20 +340,8 @@ public class DBJobTriggerService {
         return Ints.saturatedCast(collection.deleteMany(query).getDeletedCount());
     }
 
-    @Deprecated
-    public int deleteByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return deleteByQuery((Bson) query);
-    }
-
     public long countByQuery(Bson query) {
         return collection.countDocuments(query);
-    }
-
-    @Deprecated
-    public long countByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return countByQuery((Bson) query);
     }
 
     /**
@@ -418,6 +423,8 @@ public class DBJobTriggerService {
 
         final List<Bson> updates = new ArrayList<>();
         updates.add(unset(FIELD_LOCK_OWNER));
+        // Reset the cancellation status on release to make sure we start uncancelled on the next trigger execution
+        updates.add(set(FIELD_IS_CANCELLED, false));
 
         if (triggerUpdate.concurrencyReschedule()) {
             updates.add(inc(FIELD_CONCURRENCY_RESCHEDULE_COUNT, 1));
@@ -466,6 +473,8 @@ public class DBJobTriggerService {
         );
         final var update = combine(
                 unset(FIELD_LOCK_OWNER),
+                // Reset the cancellation status on force-release to make sure we start uncancelled on the next trigger execution
+                set(FIELD_IS_CANCELLED, false),
                 set(FIELD_STATUS, JobTriggerStatus.RUNNABLE));
 
         return Ints.saturatedCast(collection.updateMany(filter, update).getModifiedCount());
@@ -529,27 +538,15 @@ public class DBJobTriggerService {
         return Optional.ofNullable(collection.findOneAndUpdate(query, update));
     }
 
-    @Deprecated
-    public Optional<JobTriggerDto> cancelTriggerByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return cancelTriggerByQuery((Bson) query);
-    }
-
-
     /**
-     * Find triggers by using the provided query. Use judiciously!
+     * Stream triggers by using the provided query. Use judiciously!
      *
      * @param query The query
-     * @return All found JobTriggers
+     * @return Stream of all found JobTriggers
      */
-    public List<JobTriggerDto> findByQuery(Bson query) {
-        return stream(collection.find(query).sort(descending(FIELD_UPDATED_AT))).toList();
-    }
-
-    @Deprecated
-    public List<JobTriggerDto> findByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return findByQuery((Bson) query);
+    @MustBeClosed
+    public Stream<JobTriggerDto> streamByQuery(Bson query) {
+        return stream(collection.find(query).sort(descending(FIELD_UPDATED_AT)));
     }
 
     private record OverdueTrigger(@JsonProperty("_id") String type, @JsonProperty("count") long count) {}

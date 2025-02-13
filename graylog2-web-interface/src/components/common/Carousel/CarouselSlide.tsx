@@ -20,34 +20,25 @@ import styled, { css } from 'styled-components';
 
 export interface CarouselSlideProps extends React.ComponentPropsWithoutRef<'div'> {
   children?: React.ReactNode;
-  className?: string,
+  className?: string;
   gap?: number;
   size?: string | number;
 }
 
-const StyledSlide = styled.div<{ $size?: string | number, $gap?: number }>(({ $size, $gap, theme }: {
-  theme: DefaultTheme,
-  $size: string | number,
-  $gap: number
-}) => css`
-  flex: 0 0 ${$size ?? '24%'};
-  min-width: 0;
-  min-height: 100px;
-  margin-right: ${$gap ?? theme.spacings.sm};
-  position: relative;
-`);
+const StyledSlide = styled.div<{ $size?: string | number; $gap?: number }>(
+  ({ $size, $gap, theme }: { theme: DefaultTheme; $size: string | number; $gap: number }) => css`
+    flex: 0 0 ${$size ?? '24%'};
+    min-width: 0;
+    min-height: 100px;
+    margin-right: ${$gap ?? theme.spacings.sm};
+    position: relative;
+  `,
+);
 
 const CarouselSlide = ({ children, size, gap, className }: CarouselSlideProps) => (
   <StyledSlide $size={size} $gap={gap} className={className}>
     {children}
   </StyledSlide>
 );
-
-CarouselSlide.defaultProps = {
-  children: undefined,
-  className: undefined,
-  gap: undefined,
-  size: undefined,
-};
 
 export default CarouselSlide;

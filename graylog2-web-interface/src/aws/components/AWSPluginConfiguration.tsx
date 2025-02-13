@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import omit from 'lodash/omit';
 
@@ -29,15 +28,15 @@ import { PLUGIN_API_ENDPOINT, PLUGIN_CONFIG_CLASS_NAME } from '../Constants';
 import UserNotification from '../../util/UserNotification';
 
 type Props = {
-  config: {
-    lookups_enabled: boolean,
-    lookup_regions: string,
-    access_key: string,
-    secret_key: string,
-    proxy_enabled: boolean,
-    secret_key_salt?: string
-  }
-}
+  config?: {
+    lookups_enabled: boolean;
+    lookup_regions: string;
+    access_key: string;
+    secret_key: string;
+    proxy_enabled: boolean;
+    secret_key_salt?: string;
+  };
+};
 
 const _initialState = (config) => omit(config, ['secret_key', 'secret_key_salt']);
 
@@ -47,7 +46,15 @@ const postConfigUpdate = (update) => {
   return fetch('PUT', url, update);
 };
 
-const AWSPluginConfiguration = ({ config }: Props) => {
+const AWSPluginConfiguration = ({
+  config = {
+    lookups_enabled: false,
+    lookup_regions: 'us-east-1,us-west-1,us-west-2,eu-west-1,eu-central-1',
+    access_key: '',
+    secret_key: '',
+    proxy_enabled: false,
+  },
+}: Props) => {
   const [updateConfig, setUpdateConfig] = useState(_initialState(config));
   const [showAwsConfigModal, setShowAwsConfigModal] = useState(false);
 
@@ -81,16 +88,18 @@ const AWSPluginConfiguration = ({ config }: Props) => {
   };
 
   const saveConfig = () => {
-    postConfigUpdate(updateConfig)
-      .then(
-        () => {
-          ConfigurationsActions.list(PLUGIN_CONFIG_CLASS_NAME);
-          closeModal();
-        },
-        (error) => {
-          UserNotification.error(`AWS plugin configuration failed with status: ${error}`,
-            'Could not save AWS plugin configuration.');
-        });
+    postConfigUpdate(updateConfig).then(
+      () => {
+        ConfigurationsActions.list(PLUGIN_CONFIG_CLASS_NAME);
+        closeModal();
+      },
+      (error) => {
+        UserNotification.error(
+          `AWS plugin configuration failed with status: ${error}`,
+          'Could not save AWS plugin configuration.',
+        );
+      },
+    );
   };
 
   return (
@@ -98,43 +107,26 @@ const AWSPluginConfiguration = ({ config }: Props) => {
       <h3>AWS Plugin Configuration</h3>
 
       <p>
-        Base configuration for all plugins the AWS module is providing. Note
-        that some parameters will be stored in MongoDB without encryption.
-        Graylog users with required permissions will be able to read them in
-        the configuration dialog on this page.
+        Base configuration for all plugins the AWS module is providing. Note that some parameters will be stored in
+        MongoDB without encryption. Graylog users with required permissions will be able to read them in the
+        configuration dialog on this page.
       </p>
 
       <dl className="deflist">
         <dt>Instance detail lookups:</dt>
-        <dd>
-          {config.lookups_enabled === true
-            ? 'Enabled'
-            : 'Disabled'}
-        </dd>
+        <dd>{config.lookups_enabled === true ? 'Enabled' : 'Disabled'}</dd>
 
         <dt>Connect through proxy:</dt>
-        <dd>
-          {config.proxy_enabled === true
-            ? 'Enabled'
-            : 'Disabled'}
-        </dd>
+        <dd>{config.proxy_enabled === true ? 'Enabled' : 'Disabled'}</dd>
 
         <dt>Lookup regions:</dt>
-        <dd>
-          {config.lookup_regions
-            ? config.lookup_regions
-            : '[not set]'}
-        </dd>
+        <dd>{config.lookup_regions ? config.lookup_regions : '[not set]'}</dd>
 
         <dt>Access Key:</dt>
-        <dd>
-          {config.access_key ? config.access_key : '[not set]'}
-        </dd>
+        <dd>{config.access_key ? config.access_key : '[not set]'}</dd>
 
         <dt>Secret Key:</dt>
-        <dd>
-          {config.secret_key ? '***********' : '[not set]'}
-        </dd>
+        <dd>{config.secret_key ? '***********' : '[not set]'}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
@@ -143,111 +135,98 @@ const AWSPluginConfiguration = ({ config }: Props) => {
         </Button>
       </IfPermitted>
 
-      <BootstrapModalForm show={showAwsConfigModal}
-                          title="Update AWS Plugin Configuration"
-                          onSubmitForm={saveConfig}
-                          onCancel={resetConfig}
-                          submitButtonText="Update configuration">
+      <BootstrapModalForm
+        show={showAwsConfigModal}
+        title="Update AWS Plugin Configuration"
+        onSubmitForm={saveConfig}
+        onCancel={resetConfig}
+        submitButtonText="Update configuration"
+      >
         <fieldset>
-          <Input id="aws-lookups-enabled"
-                 type="checkbox"
-                 label="Run AWS instance detail lookups for IP addresses?"
-                 help={(
-                   <span>
-                     When enabled, a message processor will try to identify IP
-                     addresses of your AWS entities (like EC2, ELB, RDS, ...) and
-                     add additional information abut the service or instance behind
-                     it. It can take up to a minute for a change of this to take
-                     effect.
-                   </span>
-                 )}
-                 name="lookups_enabled"
-                 checked={updateConfig.lookups_enabled}
-                 onChange={onUpdate('lookups_enabled')} />
+          <Input
+            id="aws-lookups-enabled"
+            type="checkbox"
+            label="Run AWS instance detail lookups for IP addresses?"
+            help={
+              <span>
+                When enabled, a message processor will try to identify IP addresses of your AWS entities (like EC2, ELB,
+                RDS, ...) and add additional information abut the service or instance behind it. It can take up to a
+                minute for a change of this to take effect.
+              </span>
+            }
+            name="lookups_enabled"
+            checked={updateConfig.lookups_enabled}
+            onChange={onUpdate('lookups_enabled')}
+          />
 
-          <Input id="aws-access-key"
-                 type="text"
-                 label="AWS Access Key"
-                 help={(
-                   <span>
-                     Note that this will only be used in encrypted connections but
-                     stored in plaintext. Please consult the documentation for
-                     suggested rights to assign to the underlying IAM user.
-                   </span>
-                 )}
-                 name="access_key"
-                 value={updateConfig.access_key}
-                 onChange={onUpdate('access_key')} />
+          <Input
+            id="aws-access-key"
+            type="text"
+            label="AWS Access Key"
+            help={
+              <span>
+                Note that this will only be used in encrypted connections but stored in plaintext. Please consult the
+                documentation for suggested rights to assign to the underlying IAM user.
+              </span>
+            }
+            name="access_key"
+            value={updateConfig.access_key}
+            onChange={onUpdate('access_key')}
+          />
 
-          <Input id="aws-secret-key"
-                 type="password"
-                 label="AWS Secret Key"
-                 help={(
-                   <span>
-                     Note that this will only be used in encrypted connections and will be
-                     stored encrypted (using the system secret). Please consult the documentation for
-                     suggested rights to assign to the underlying IAM user.
-                   </span>
-                 )}
-                 name="secret_key"
-                 value={updateConfig.secret_key !== undefined ? updateConfig.secret_key : config.secret_key}
-                 onFocus={onFocusSecretKey}
-                 onChange={onUpdate('secret_key')} />
+          <Input
+            id="aws-secret-key"
+            type="password"
+            label="AWS Secret Key"
+            help={
+              <span>
+                Note that this will only be used in encrypted connections and will be stored encrypted (using the system
+                secret). Please consult the documentation for suggested rights to assign to the underlying IAM user.
+              </span>
+            }
+            name="secret_key"
+            value={updateConfig.secret_key !== undefined ? updateConfig.secret_key : config.secret_key}
+            onFocus={onFocusSecretKey}
+            onChange={onUpdate('secret_key')}
+          />
 
-          <Input id="aws-lookup-regions"
-                 type="text"
-                 label="Lookup regions"
-                 help={(
-                   <span>
-                     The AWS instance lookup message processor keeps a table of
-                     instances for fast address translation. Define the AWS regions
-                     you want to include in the tables. This should be all regions
-                     you run AWS services in. Remember that your IAM user needs
-                     permission for these regions or you will see warnings in your
-                     graylog-server log files.
-                   </span>
-                 )}
-                 name="lookup_regions"
-                 value={updateConfig.lookup_regions}
-                 onChange={onUpdate('lookup_regions')} />
+          <Input
+            id="aws-lookup-regions"
+            type="text"
+            label="Lookup regions"
+            help={
+              <span>
+                The AWS instance lookup message processor keeps a table of instances for fast address translation.
+                Define the AWS regions you want to include in the tables. This should be all regions you run AWS
+                services in. Remember that your IAM user needs permission for these regions or you will see warnings in
+                your graylog-server log files.
+              </span>
+            }
+            name="lookup_regions"
+            value={updateConfig.lookup_regions}
+            onChange={onUpdate('lookup_regions')}
+          />
 
-          <Input id="aws-proxy-enabled"
-                 type="checkbox"
-                 label="Use HTTP proxy?"
-                 help={(
-                   <span>
-                     When enabled, we&apos;ll access the AWS APIs through the HTTP proxy configured (<code>http_proxy_uri</code>)
-                     in your Graylog configuration file.<br />
-                     <em>Important:</em> You have to restart all AWS inputs for this configuration to take effect.
-                   </span>
-                 )}
-                 name="proxy_enabled"
-                 checked={updateConfig.proxy_enabled}
-                 onChange={onUpdate('proxy_enabled')} />
+          <Input
+            id="aws-proxy-enabled"
+            type="checkbox"
+            label="Use HTTP proxy?"
+            help={
+              <span>
+                When enabled, we&apos;ll access the AWS APIs through the HTTP proxy configured (
+                <code>http_proxy_uri</code>) in your Graylog configuration file.
+                <br />
+                <em>Important:</em> You have to restart all AWS inputs for this configuration to take effect.
+              </span>
+            }
+            name="proxy_enabled"
+            checked={updateConfig.proxy_enabled}
+            onChange={onUpdate('proxy_enabled')}
+          />
         </fieldset>
       </BootstrapModalForm>
     </div>
   );
-};
-
-AWSPluginConfiguration.propTypes = {
-  config: PropTypes.shape({
-    lookups_enabled: PropTypes.bool,
-    lookup_regions: PropTypes.string,
-    access_key: PropTypes.string,
-    secret_key: PropTypes.string,
-    proxy_enabled: PropTypes.bool,
-  }),
-};
-
-AWSPluginConfiguration.defaultProps = {
-  config: {
-    lookups_enabled: false,
-    lookup_regions: 'us-east-1,us-west-1,us-west-2,eu-west-1,eu-central-1',
-    access_key: '',
-    secret_key: '',
-    proxy_enabled: false,
-  },
 };
 
 export default AWSPluginConfiguration;

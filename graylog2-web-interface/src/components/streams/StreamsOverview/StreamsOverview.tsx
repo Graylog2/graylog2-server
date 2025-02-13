@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -46,8 +45,8 @@ const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
 };
 
 type Props = {
-  indexSets: Array<IndexSet>
-}
+  indexSets: Array<IndexSet>;
+};
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
@@ -57,30 +56,33 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
   useRefetchStreamsOnStoreChange(() => queryClient.invalidateQueries(KEY_PREFIX));
 
-  const columnRenderers = useMemo(() => CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions), [indexSets, isPipelineColumnPermitted, currentUser.permissions]);
-  const streamTableElements = useMemo(() => getStreamTableElements(currentUser.permissions, isPipelineColumnPermitted), [currentUser.permissions, isPipelineColumnPermitted]);
-  const { columnOrder, additionalAttributes, defaultLayout } = streamTableElements;
+  const columnRenderers = useMemo(
+    () => CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions),
+    [indexSets, isPipelineColumnPermitted, currentUser.permissions],
+  );
+  const { columnOrder, additionalAttributes, defaultLayout } = useMemo(
+    () => getStreamTableElements(currentUser.permissions, isPipelineColumnPermitted),
+    [currentUser.permissions, isPipelineColumnPermitted],
+  );
 
   return (
-    <PaginatedEntityTable<Stream> humanName="streams"
-                                  columnsOrder={columnOrder}
-                                  additionalAttributes={additionalAttributes}
-                                  queryHelpComponent={<QueryHelper entityName="stream" />}
-                                  entityActions={entityActions}
-                                  tableLayout={defaultLayout}
-                                  fetchEntities={fetchStreams}
-                                  keyFn={keyFn}
-                                  actionsCellWidth={200}
-                                  expandedSectionsRenderer={expandedSections}
-                                  bulkSelection={{ actions: bulkActions }}
-                                  entityAttributesAreCamelCase={false}
-                                  filterValueRenderers={FilterValueRenderers}
-                                  columnRenderers={columnRenderers} />
+    <PaginatedEntityTable<Stream>
+      humanName="streams"
+      columnsOrder={columnOrder}
+      additionalAttributes={additionalAttributes}
+      queryHelpComponent={<QueryHelper entityName="stream" />}
+      entityActions={entityActions}
+      tableLayout={defaultLayout}
+      fetchEntities={fetchStreams}
+      keyFn={keyFn}
+      actionsCellWidth={220}
+      expandedSectionsRenderer={expandedSections}
+      bulkSelection={{ actions: bulkActions }}
+      entityAttributesAreCamelCase={false}
+      filterValueRenderers={FilterValueRenderers}
+      columnRenderers={columnRenderers}
+    />
   );
-};
-
-StreamsOverview.propTypes = {
-  indexSets: PropTypes.array.isRequired,
 };
 
 export default StreamsOverview;

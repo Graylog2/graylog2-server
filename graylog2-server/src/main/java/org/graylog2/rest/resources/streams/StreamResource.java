@@ -35,6 +35,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -62,6 +63,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.DefaultFailureContextCreator;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.audit.jersey.SuccessContextCreator;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
@@ -81,6 +83,7 @@ import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -118,6 +121,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -243,7 +247,7 @@ public class StreamResource extends RestResource {
                                                          allowableValues = "title,description,created_at,updated_at,status")
                                                @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                               @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+                                               @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
         final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
         final PaginatedList<StreamDTO> result = paginatedStreamService
@@ -275,6 +279,21 @@ public class StreamResource extends RestResource {
         final List<Stream> streams = streamService.loadAll()
                 .stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                .toList();
+
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
+    }
+
+    @GET
+    @Path("/byIndex/{indexSetId}")
+    @Timed
+    @ApiOperation(value = "Get a list of all streams connected to a given index set")
+    @Produces(MediaType.APPLICATION_JSON)
+    public StreamListResponse getByIndexSet(@ApiParam(name = "indexSetId", required = true)
+                                            @PathParam("indexSetId") @NotEmpty String indexSetId) {
+        checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
+        final List<Stream> streams = streamService.loadAll().stream()
+                .filter(stream -> stream.getIndexSetId().equals(indexSetId))
                 .toList();
 
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
@@ -609,6 +628,10 @@ public class StreamResource extends RestResource {
     @ApiOperation(value = "Get pipelines associated with a stream")
     @Produces(MediaType.APPLICATION_JSON)
     public List<PipelineCompactSource> getConnectedPipelines(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
+        if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+            throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
+        }
+
         PipelineConnections pipelineConnections = pipelineStreamConnectionsService.load(streamId);
         List<PipelineCompactSource> list = new ArrayList<>();
 
@@ -617,6 +640,41 @@ public class StreamResource extends RestResource {
             list.add(PipelineCompactSource.create(pipelineDao.id(), pipelineDao.title()));
         }
         return list;
+    }
+
+    public record GetConnectedPipelinesRequest(List<String> streamIds) {}
+
+    @POST
+    @Path("/pipelines")
+    @ApiOperation(value = "Get pipelines associated with specified streams")
+    @NoAuditEvent("No data is changed.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, List<PipelineCompactSource>> getConnectedPipelinesForStreams(@ApiParam(name = "streamIds", required = true) GetConnectedPipelinesRequest request) {
+        final var streamIds = request.streamIds.stream()
+                .filter((streamId) -> {
+                    if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+                        throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
+                    }
+                    return true;
+                })
+                .collect(Collectors.toSet());
+
+        final var pipelineConnections = pipelineStreamConnectionsService.loadByStreamIds(streamIds);
+        final var pipelineIds = pipelineConnections.values().stream()
+                .flatMap(connection -> connection.pipelineIds().stream())
+                .collect(Collectors.toSet());
+        final var pipelines = pipelineService.loadByIds(pipelineIds).stream()
+                .collect(Collectors.toMap(MongoEntity::id, pipeline -> pipeline));
+        return request.streamIds().stream()
+                .collect(Collectors.toMap(streamId -> streamId, streamId -> {
+                    final var pipelinesForStream = Optional.ofNullable(pipelineConnections.get(streamId))
+                            .map(PipelineConnections::pipelineIds)
+                            .orElse(Set.of());
+                    return pipelinesForStream.stream()
+                            .flatMap(pipeline -> Optional.ofNullable(pipelines.get(pipeline)).stream())
+                            .map(pipeline -> PipelineCompactSource.create(pipeline.id(), pipeline.title()))
+                            .toList();
+                }));
     }
 
     @PUT
@@ -680,7 +738,8 @@ public class StreamResource extends RestResource {
                 stream.getContentPack(),
                 stream.isDefaultStream(),
                 stream.getRemoveMatchesFromDefaultStream(),
-                stream.getIndexSetId()
+                stream.getIndexSetId(),
+                stream.getCategories()
         );
     }
 

@@ -46,9 +46,7 @@ describe('AddToTableActionHandler.condition', () => {
   });
 
   it('enables action if field is present in message table', () => {
-    const widget = MessagesWidget.builder()
-      .config(MessagesWidgetConfig.builder().build())
-      .build();
+    const widget = MessagesWidget.builder().config(MessagesWidgetConfig.builder().build()).build();
     const contexts = { widget };
 
     const result = AddToTableActionHandler.isEnabled({ ...actionArgs, contexts }, getState);

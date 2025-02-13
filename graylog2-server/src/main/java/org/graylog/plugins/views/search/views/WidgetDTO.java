@@ -55,6 +55,7 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
     public static final String FIELD_TIMERANGE = "timerange";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -78,6 +79,10 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
 
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
+
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    @Nullable
+    public abstract Set<String> streamCategories();
 
     @JsonProperty(FIELD_CONFIG)
     public abstract WidgetConfigDTO config();
@@ -111,6 +116,9 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
 
+        @JsonProperty(FIELD_STREAM_CATEGORIES)
+        public abstract Builder streamCategories(@Nullable Set<String> streamCategories);
+
         @JsonProperty(FIELD_CONFIG)
         @JsonTypeInfo(
                 use = JsonTypeInfo.Id.NAME,
@@ -126,7 +134,8 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
         static Builder builder() {
             return new AutoValue_WidgetDTO.Builder()
                     .streams(Collections.emptySet())
-                    .filters(Collections.emptyList());
+                    .filters(Collections.emptyList())
+                    .streamCategories(Collections.emptySet());
         }
     }
 
@@ -143,6 +152,7 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
                 .filter(this.filter())
                 .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .streams(mappedStreams)
+                .streamCategories(streamCategories())
                 .type(this.type());
         if (this.query().isPresent()) {
             builder.query(this.query().get());

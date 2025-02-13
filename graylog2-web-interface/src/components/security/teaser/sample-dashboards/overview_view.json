@@ -49,9 +49,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "event_source_product"
-                ],
+                "fields": ["event_source_product"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -101,9 +99,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "event_source_product"
-                ],
+                "fields": ["event_source_product"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -221,9 +217,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "event_source"
-                ],
+                "fields": ["event_source"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -263,9 +257,7 @@
           "config": {
             "column_pivots": [
               {
-                "fields": [
-                  "event_outcome"
-                ],
+                "fields": ["event_outcome"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -287,9 +279,7 @@
             "rollup": false,
             "row_pivots": [
               {
-                "fields": [
-                  "event_source_product"
-                ],
+                "fields": ["event_source_product"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -339,9 +329,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -394,9 +382,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "gim_event_subcategory"
-                ],
+                "fields": ["gim_event_subcategory"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -480,9 +466,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "user_name"
-                ],
+                "fields": ["user_name"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -532,9 +516,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "event_source"
-                ],
+                "fields": ["event_source"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -584,9 +566,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "alert_signature"
-                ],
+                "fields": ["alert_signature"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -622,12 +602,8 @@
         }
       ],
       "widget_mapping": {
-        "0158561e-7807-4d47-80a1-dbafabf71e40": [
-          "7d34455e-9680-47b7-b781-7fe648461fa3"
-        ],
-        "c7d9d7f9-7431-47d1-ae7a-5e958aa89906": [
-          "e8bd4945-b4dd-49ef-83aa-479e638b0957"
-        ],
+        "0158561e-7807-4d47-80a1-dbafabf71e40": ["7d34455e-9680-47b7-b781-7fe648461fa3"],
+        "c7d9d7f9-7431-47d1-ae7a-5e958aa89906": ["e8bd4945-b4dd-49ef-83aa-479e638b0957"],
         "b92598f2-7ffd-45bd-bb4a-6df8d7bf69ac": [
           "fb0aa7b5-9bac-429f-ae3d-c6206d81e2b5",
           "cf0149a8-906d-4a29-b0f6-6cc22b3f0d30"
@@ -636,31 +612,17 @@
           "cb1c4108-ec60-434d-8811-93d52aee5510",
           "d131d892-f0dc-4c12-a1d0-8a0e5a603755"
         ],
-        "bbd6f20c-fb4a-4c44-b4a2-bb4e06d6f369": [
-          "de1e5a85-4947-48e2-b8a2-88c99e6133e5"
-        ],
-        "7b3035f8-b363-46bc-b3f8-dd62a67be4b6": [
-          "4a6d4d7e-0cce-48a9-89cb-f2d1fd822c91"
-        ],
-        "3cc84937-9207-4a02-b826-4793763c1355": [
-          "6ffb5cda-7534-4eaf-b9fe-5aba76a720dc"
-        ],
-        "22b924fe-61a0-48ed-bf16-46d7dd1275a8": [
-          "1af3fa21-0856-4e40-b6bb-d3770c7b405f"
-        ],
-        "819ae1b2-c3a9-40fe-8a1b-35ecb3ee1aaa": [
-          "55b21db0-c39a-4824-a791-419c62d7c0de"
-        ],
-        "7e7fbc8e-4ddf-4d5f-86d5-c6983a2781c3": [
-          "c89d6eca-ea11-43cd-b931-8d3b96e43226"
-        ],
+        "bbd6f20c-fb4a-4c44-b4a2-bb4e06d6f369": ["de1e5a85-4947-48e2-b8a2-88c99e6133e5"],
+        "7b3035f8-b363-46bc-b3f8-dd62a67be4b6": ["4a6d4d7e-0cce-48a9-89cb-f2d1fd822c91"],
+        "3cc84937-9207-4a02-b826-4793763c1355": ["6ffb5cda-7534-4eaf-b9fe-5aba76a720dc"],
+        "22b924fe-61a0-48ed-bf16-46d7dd1275a8": ["1af3fa21-0856-4e40-b6bb-d3770c7b405f"],
+        "819ae1b2-c3a9-40fe-8a1b-35ecb3ee1aaa": ["55b21db0-c39a-4824-a791-419c62d7c0de"],
+        "7e7fbc8e-4ddf-4d5f-86d5-c6983a2781c3": ["c89d6eca-ea11-43cd-b931-8d3b96e43226"],
         "748ce594-2965-4322-83ec-88c0258550fe": [
           "9246abe7-14b7-427c-abc8-ed48b36a4061",
           "0374d9ce-61dc-43d9-9715-45a2f8691193"
         ],
-        "3c193653-3d7f-4915-b786-361e33c17f91": [
-          "3a78178a-18c7-48ad-9cfc-b55f4bb3cd73"
-        ]
+        "3c193653-3d7f-4915-b786-361e33c17f91": ["3a78178a-18c7-48ad-9cfc-b55f4bb3cd73"]
       },
       "positions": {
         "0158561e-7807-4d47-80a1-dbafabf71e40": {

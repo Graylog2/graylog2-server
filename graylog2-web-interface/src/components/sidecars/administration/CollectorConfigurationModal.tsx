@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import isEqual from 'lodash/isEqual';
 import styled, { css } from 'styled-components';
 
@@ -59,12 +58,14 @@ const SecondaryText = styled.div`
   margin-bottom: -2px;
 `;
 
-const TableRow = styled.tr<{ disabled?: boolean }>(({ disabled = false }) => css`
-  cursor: ${disabled ? 'auto' : 'pointer'};
-  background-color: ${disabled ? '#E8E8E8 !important' : 'initial'};
-  border-bottom: 1px solid lightgray;
-  height: 49px;
-`);
+const TableRow = styled.tr<{ disabled?: boolean }>(
+  ({ disabled = false }) => css`
+    cursor: ${disabled ? 'auto' : 'pointer'};
+    background-color: ${disabled ? '#E8E8E8 !important' : 'initial'};
+    border-bottom: 1px solid lightgray;
+    height: 49px;
+  `,
+);
 
 const StickyTableRowFooter = styled.tr`
   height: 32px;
@@ -127,20 +128,20 @@ const getFilterQuery = (_query: string) => {
 };
 
 type Props = {
-  show: boolean,
-  onCancel: () => void,
-  onSave: (selectedConfigurations: string[], partiallySelectedConfigurations: string[]) => void,
-  selectedCollectorName: string,
-  selectedSidecarNames: string[],
-  initialAssignedConfigs: string[],
-  initialPartiallyAssignedConfigs: string[],
-  unassignedConfigs: string[],
+  show: boolean;
+  onCancel: () => void;
+  onSave: (selectedConfigurations: string[], partiallySelectedConfigurations: string[]) => void;
+  selectedCollectorName: string;
+  selectedSidecarNames: string[];
+  initialAssignedConfigs: string[];
+  initialPartiallyAssignedConfigs: string[];
+  unassignedConfigs: string[];
   getRowData: (configName: string) => {
-    configuration: Configuration,
-    collector: Collector,
-    sidecars: SidecarSummary[],
-    autoAssignedTags: string[],
-  }
+    configuration: Configuration;
+    collector: Collector;
+    sidecars: SidecarSummary[];
+    autoAssignedTags: string[];
+  };
 };
 
 const CollectorConfigurationModal = ({
@@ -156,7 +157,9 @@ const CollectorConfigurationModal = ({
 }: Props) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedConfigurations, setSelectedConfigurations] = useState<string[]>(initialAssignedConfigs);
-  const [partiallySelectedConfigurations, setPartiallySelectedConfigurations] = useState<string[]>(initialPartiallyAssignedConfigs);
+  const [partiallySelectedConfigurations, setPartiallySelectedConfigurations] = useState<string[]>(
+    initialPartiallyAssignedConfigs,
+  );
 
   const onReset = () => {
     setSelectedConfigurations(initialAssignedConfigs);
@@ -164,35 +167,50 @@ const CollectorConfigurationModal = ({
     setSearchQuery('');
   };
 
-  const isNotDirty = isEqual(selectedConfigurations, initialAssignedConfigs) && isEqual(partiallySelectedConfigurations, initialPartiallyAssignedConfigs);
+  const isNotDirty =
+    isEqual(selectedConfigurations, initialAssignedConfigs) &&
+    isEqual(partiallySelectedConfigurations, initialPartiallyAssignedConfigs);
 
-  const filteredOptions = [...initialAssignedConfigs, ...initialPartiallyAssignedConfigs, ...unassignedConfigs].filter((configuration) => configuration.match(getFilterQuery(searchQuery)));
+  const filteredOptions = [...initialAssignedConfigs, ...initialPartiallyAssignedConfigs, ...unassignedConfigs].filter(
+    (configuration) => configuration.match(getFilterQuery(searchQuery)),
+  );
 
   const rows = filteredOptions.map((configName) => {
     const { configuration, collector, sidecars, autoAssignedTags } = getRowData(configName);
 
     const selected = selectedConfigurations.includes(configName);
     const partiallySelected = !selected && partiallySelectedConfigurations.includes(configName);
-    const secondaryText = (selected && selectedSidecarNames.join(', ')) || (partiallySelected && sidecars.map((sidecar) => sidecar.node_name).join(', ')) || '';
+    const secondaryText =
+      (selected && selectedSidecarNames.join(', ')) ||
+      (partiallySelected && sidecars.map((sidecar) => sidecar.node_name).join(', ')) ||
+      '';
     const isAssignedFromTags = autoAssignedTags.length > 0;
 
     return (
-      <TableRow key={configName}
-                disabled={isAssignedFromTags}
-                onClick={() => {
-                  if (!isAssignedFromTags) {
-                    if (partiallySelected) {
-                      setPartiallySelectedConfigurations(partiallySelectedConfigurations.filter((name) => name !== configName));
-                    } else {
-                      setSelectedConfigurations(selected ? selectedConfigurations.filter((name) => name !== configName) : [...selectedConfigurations, configName]);
-                    }
-                  }
-                }}>
+      <TableRow
+        key={configName}
+        disabled={isAssignedFromTags}
+        onClick={() => {
+          if (!isAssignedFromTags) {
+            if (partiallySelected) {
+              setPartiallySelectedConfigurations(partiallySelectedConfigurations.filter((name) => name !== configName));
+            } else {
+              setSelectedConfigurations(
+                selected
+                  ? selectedConfigurations.filter((name) => name !== configName)
+                  : [...selectedConfigurations, configName],
+              );
+            }
+          }
+        }}
+      >
         <IconTableCell>
           {selected && <Icon name="check" title={`${configName} is selected`} />}
           {partiallySelected && <Icon type="regular" name="radio_button_partial" title={`${configName} is selected`} />}
         </IconTableCell>
-        <IconTableCell><ColorLabel color={configuration.color} size="xsmall" /></IconTableCell>
+        <IconTableCell>
+          <ColorLabel color={configuration.color} size="xsmall" />
+        </IconTableCell>
         <ConfigurationTableCell>
           {configName}
           <SecondaryText title={secondaryText}>
@@ -204,21 +222,24 @@ const CollectorConfigurationModal = ({
         </IconTableCell>
         <CollectorTableCell>
           <small>
-            {collector
-              ? <CollectorIndicator collector={collector.name} operatingSystem={collector.node_operating_system} />
-              : <em>Unknown collector</em>}
+            {collector ? (
+              <CollectorIndicator collector={collector.name} operatingSystem={collector.node_operating_system} />
+            ) : (
+              <em>Unknown collector</em>
+            )}
           </small>
         </CollectorTableCell>
-        <UnselectTableCell>{(selected || partiallySelected) && !isAssignedFromTags
-          && <Icon name="close" title={`Remove ${configName}`} />}
+        <UnselectTableCell>
+          {(selected || partiallySelected) && !isAssignedFromTags && (
+            <Icon name="close" title={`Remove ${configName}`} />
+          )}
         </UnselectTableCell>
       </TableRow>
     );
   });
 
   return (
-    <BootstrapModalWrapper showModal={show}
-                           onHide={onCancel}>
+    <BootstrapModalWrapper showModal={show} onHide={onCancel}>
       <Modal.Header>
         <ModalTitle>
           Edit <b>{selectedCollectorName}</b> Configurations
@@ -231,23 +252,22 @@ const CollectorConfigurationModal = ({
         </ModalTitle>
       </Modal.Header>
       <Modal.Body>
-        <StyledSearchForm query={searchQuery}
-                          onQueryChange={(q) => setSearchQuery(q)}
-                          topMargin={0} />
-        {(rows.length > 0) && (
+        <StyledSearchForm query={searchQuery} onQueryChange={(q) => setSearchQuery(q)} topMargin={0} />
+        {rows.length > 0 && (
           <InfoContainer bsStyle="info">
-            Collector configurations that have a lock icon &nbsp;<Icon name="lock" size="xs" />&nbsp; have been assigned
-            using tags and cannot be changed here.
+            Collector configurations that have a lock icon &nbsp;
+            <Icon name="lock" size="xs" />
+            &nbsp; have been assigned using tags and cannot be changed here.
           </InfoContainer>
         )}
         <ConfigurationContainer>
           <ConfigurationTable className="table-condensed table-hover">
             <tbody>
-              {(rows.length === 0) ? (
+              {rows.length === 0 ? (
                 <TableRow>
                   <td colSpan={6}>
-                    <NoConfigurationMessage>No configurations available for the selected log
-                      collector.
+                    <NoConfigurationMessage>
+                      No configurations available for the selected log collector.
                     </NoConfigurationMessage>
                   </td>
                 </TableRow>
@@ -257,8 +277,9 @@ const CollectorConfigurationModal = ({
               <StickyTableRowFooter>
                 <td colSpan={6}>
                   <AddNewConfiguration>
-                    <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}><Icon name="add" />&nbsp;Add a new
-                      configuration
+                    <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}>
+                      <Icon name="add" />
+                      &nbsp;Add a new configuration
                     </Link>
                   </AddNewConfiguration>
                 </td>
@@ -268,26 +289,20 @@ const CollectorConfigurationModal = ({
         </ConfigurationContainer>
       </Modal.Body>
       <Modal.Footer>
-        <ModalSubmit submitButtonText="Save"
-                     disabledSubmit={isNotDirty}
-                     onSubmit={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}
-                     onCancel={onCancel}
-                     leftCol={<Button type="button" onClick={onReset}>Reset</Button>} />
+        <ModalSubmit
+          submitButtonText="Save"
+          disabledSubmit={isNotDirty}
+          onSubmit={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}
+          onCancel={onCancel}
+          leftCol={
+            <Button type="button" onClick={onReset}>
+              Reset
+            </Button>
+          }
+        />
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
-};
-
-CollectorConfigurationModal.propTypes = {
-  show: PropTypes.bool.isRequired,
-  selectedCollectorName: PropTypes.string.isRequired,
-  selectedSidecarNames: PropTypes.array.isRequired,
-  initialAssignedConfigs: PropTypes.array.isRequired,
-  initialPartiallyAssignedConfigs: PropTypes.array.isRequired,
-  unassignedConfigs: PropTypes.array.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-  getRowData: PropTypes.func.isRequired,
 };
 
 export default CollectorConfigurationModal;

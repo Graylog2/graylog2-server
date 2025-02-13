@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useCallback, useState, useEffect } from 'react';
 
 import { useStore } from 'stores/connect';
@@ -23,9 +22,9 @@ import { Spinner } from 'components/common';
 import { NodesStore } from 'stores/nodes/NodesStore';
 
 type Props = {
-  global: boolean,
-  node: string,
-  onChange: (type: 'node' | 'global', value: boolean | string | undefined | null) => void,
+  global?: boolean;
+  node?: string;
+  onChange: (type: 'node' | 'global', value: boolean | string | undefined | null) => void;
 };
 
 const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
@@ -44,69 +43,73 @@ const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
     }
   }, [nodes]);
 
-  const _onChangeGlobal = useCallback((evt) => {
-    const isGlobal = evt.target.checked;
+  const _onChangeGlobal = useCallback(
+    (evt) => {
+      const isGlobal = evt.target.checked;
 
-    setGlobal(isGlobal);
+      setGlobal(isGlobal);
 
-    if (isGlobal) {
-      setNode('placeholder');
-      onChange('node', undefined);
-    } else {
-      onChange('node', nodeState);
-    }
+      if (isGlobal) {
+        setNode('placeholder');
+        onChange('node', undefined);
+      } else {
+        onChange('node', nodeState);
+      }
 
-    onChange('global', isGlobal);
-  }, [onChange, nodeState, setNode, setGlobal]);
+      onChange('global', isGlobal);
+    },
+    [onChange, nodeState, setNode, setGlobal],
+  );
 
-  const _onChangeNode = useCallback((evt) => {
-    setNode(evt.target.value);
-    onChange('node', evt.target.value);
-  }, [setNode, onChange]);
+  const _onChangeNode = useCallback(
+    (evt) => {
+      setNode(evt.target.value);
+      onChange('node', evt.target.value);
+    },
+    [setNode, onChange],
+  );
 
   if (!nodes) {
     return <Spinner />;
   }
 
-  const options = Object.keys(nodes)
-    .map((nodeId) => <option key={nodeId} value={nodeId}>{nodes[nodeId].short_node_id} / {nodes[nodeId].hostname}</option>);
+  const options = Object.keys(nodes).map((nodeId) => (
+    <option key={nodeId} value={nodeId}>
+      {nodes[nodeId].short_node_id} / {nodes[nodeId].hostname}
+    </option>
+  ));
 
   const nodeSelect = !globalState ? (
-    <Input id="node-select"
-           type="select"
-           label="Node"
-           placeholder="placeholder"
-           value={node}
-           help="On which node should this input start"
-           onChange={_onChangeNode}
-           required>
-      <option key="placeholder" value="">Select Node</option>
+    <Input
+      id="node-select"
+      type="select"
+      label="Node"
+      placeholder="placeholder"
+      value={node}
+      help="On which node should this input start"
+      onChange={_onChangeNode}
+      required
+    >
+      <option key="placeholder" value="">
+        Select Node
+      </option>
       {options}
     </Input>
   ) : null;
 
   return (
     <span>
-      <Input id="global-checkbox"
-             type="checkbox"
-             label="Global"
-             help="Should this input start on all nodes"
-             checked={globalState}
-             onChange={_onChangeGlobal} />
+      <Input
+        id="global-checkbox"
+        type="checkbox"
+        label="Global"
+        help="Should this input start on all nodes"
+        checked={globalState}
+        onChange={_onChangeGlobal}
+      />
       {nodeSelect}
     </span>
   );
-};
-
-NodeOrGlobalSelect.propTypes = {
-  global: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  node: PropTypes.string,
-};
-
-NodeOrGlobalSelect.defaultProps = {
-  global: false,
-  node: undefined,
 };
 
 export default NodeOrGlobalSelect;

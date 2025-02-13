@@ -31,42 +31,42 @@ import { ConfigurationType } from 'components/configurations/ConfigurationTypes'
 import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import Select from 'components/common/Select';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 
+import { TIME_UNITS_UPPER } from '../Constants';
+import type { TIME_UNITS } from '../Constants';
+
 type RenewalPolicy = {
-  mode: 'AUTOMATIC' | 'MANUAL',
-  certificate_lifetime: string,
-}
-const TIME_UNITS = ['hours', 'days', 'months', 'years'] as const;
-const TIME_UNITS_UPPER = TIME_UNITS.map((unit) => unit.toLocaleUpperCase());
+  mode: 'AUTOMATIC' | 'MANUAL';
+  certificate_lifetime: string;
+};
 
 type FormConfig = {
-  mode: RenewalPolicy['mode'],
-  lifetimeUnit: typeof TIME_UNITS[number],
-  lifetimeValue: number,
-}
+  mode: RenewalPolicy['mode'];
+  lifetimeUnit: (typeof TIME_UNITS)[number];
+  lifetimeValue: number;
+};
 
 const StyledDefList = styled.dl.attrs({
   className: 'deflist',
-})(({ theme }: { theme: DefaultTheme }) => css`
-  &&.deflist {
-    dt {
-      float: left;
-    }
+})(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    &&.deflist {
+      dt {
+        float: left;
+      }
 
-    dd {
-      padding-left: ${theme.spacings.md};
-      margin-left: 200px;
+      dd {
+        padding-left: ${theme.spacings.md};
+        margin-left: 200px;
+      }
     }
-  }
-`);
-
-const handleSaveConfig = async (configToSave: RenewalPolicy) => (
-  ConfigurationsActions.update(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG, configToSave)
+  `,
 );
+
+const handleSaveConfig = async (configToSave: RenewalPolicy) =>
+  ConfigurationsActions.update(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG, configToSave);
 
 const smallestUnit = (duration: string) => {
   if (duration.endsWith('H')) {
@@ -88,12 +88,12 @@ const smallestUnit = (duration: string) => {
   throw new Error(`Invalid duration specified: ${duration}`);
 };
 
-const fetchCurrentConfig = () => ConfigurationsActions.list(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG) as Promise<RenewalPolicy>;
+const fetchCurrentConfig = () =>
+  ConfigurationsActions.list(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG) as Promise<RenewalPolicy>;
 
 const NoExistingPolicy = ({ createPolicy }: { createPolicy: () => void }) => (
-  <Button onClick={createPolicy}
-          bsSize="small"
-          bsStyle="primary">Configure Certificate Renewal Policy
+  <Button onClick={createPolicy} bsSize="small" bsStyle="primary">
+    Configure Certificate Renewal Policy
   </Button>
 );
 
@@ -107,21 +107,22 @@ const DEFAULT_CONFIG = {
 
 const queryKey = ['config', 'certificate-renewal-policy'];
 
-const renewalModeExplanation = 'Setting the renewal policy to "Automatic" will '
-  + 'renew all expiring certificates without any user interaction. Setting it to "Manual" will create a system '
-  + 'notification when one or more certificates are about to expire, allowing you to confirm their renewal.';
-const lifetimeExplanation = 'The certificate lifetime will be used for the length of the validity of newly created certificates.';
+const renewalModeExplanation =
+  'Setting the renewal policy to "Automatic" will ' +
+  'renew all expiring certificates without any user interaction. Setting it to "Manual" will create a system ' +
+  'notification when one or more certificates are about to expire, allowing you to confirm their renewal.';
+const lifetimeExplanation =
+  'The certificate lifetime will be used for the length of the validity of newly created certificates.';
 
 type Props = {
-  className?: string
-}
+  className?: string;
+};
 
-const CertificateRenewalPolicyConfig = ({ className }: Props) => {
+const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const { data: currentConfig, isLoading } = useQuery(queryKey, fetchCurrentConfig);
 
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
   const queryClient = useQueryClient();
 
   const { mutateAsync: updateConfig } = useMutation(handleSaveConfig, {
@@ -131,7 +132,10 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
       setShowModal(false);
     },
     onError: (err: Error) => {
-      UserNotification.error(`Error Updating Detector Definition: ${err.toString()}`, 'Unable to update detector definition');
+      UserNotification.error(
+        `Error Updating Detector Definition: ${err.toString()}`,
+        'Unable to update detector definition',
+      );
     },
   });
 
@@ -166,10 +170,9 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
   };
 
   const saveConfig = (values: FormConfig) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.CERTIFICATE_RENEWAL_POLICY_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'certificate-renewal-policy',
-      app_action_value: 'configuration-save',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CR_UPDATE_CONFIGURATION_CLICKED, {
+      app_pathname: 'datanode',
+      app_section: 'migration',
     });
 
     const newConfig = {
@@ -183,37 +186,48 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
   return (
     <div className={className}>
       <h2>Certificate Renewal Policy Configuration</h2>
-      <p>
-        These settings will be used when detecting expiration of certificates and/or when renewing them.
-      </p>
-      {!currentConfig ? <NoExistingPolicy createPolicy={() => setShowModal(true)} /> : (
+      <p>These settings will be used when detecting expiration of certificates and/or when renewing them.</p>
+      {!currentConfig ? (
+        <NoExistingPolicy createPolicy={() => setShowModal(true)} />
+      ) : (
         <>
           <StyledDefList>
             <dt>Renewal Mode:</dt>
             <dd>{capitalize(currentConfig.mode)}</dd>
-            <dd><i>{renewalModeExplanation}</i></dd>
+            <dd>
+              <i>{renewalModeExplanation}</i>
+            </dd>
             <dt>Certificate Lifetime:</dt>
-            <dd>{formConfig.lifetimeValue} {formConfig.lifetimeUnit}</dd>
-            <dd><i>{lifetimeExplanation}</i></dd>
+            <dd>
+              {formConfig.lifetimeValue} {formConfig.lifetimeUnit}
+            </dd>
+            <dd>
+              <i>{lifetimeExplanation}</i>
+            </dd>
           </StyledDefList>
 
           <p className="no-bm">
             <IfPermitted permissions="indices:changestate">
-              <Button bsStyle="primary"
-                      bsSize="small"
-                      onClick={() => {
-                        setShowModal(true);
-                      }}>Edit configuration
+              <Button
+                bsStyle="primary"
+                bsSize="small"
+                onClick={() => {
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CR_EDIT_CONFIGURATION_CLICKED, {
+                    app_pathname: 'datanode',
+                    app_section: 'migration',
+                  });
+
+                  setShowModal(true);
+                }}
+              >
+                Edit configuration
               </Button>
             </IfPermitted>
           </p>
         </>
       )}
 
-      <Modal show={showModal}
-             onHide={resetConfig}
-             aria-modal="true"
-             aria-labelledby="dialog_label">
+      <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
         <Formik<FormConfig> onSubmit={saveConfig} initialValues={formConfig}>
           {({ values, setFieldValue, isSubmitting, isValid, isValidating }) => (
             <Form>
@@ -227,42 +241,46 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
                     <Col md={12}>
                       <Field name="mode">
                         {({ field: { name, value, onChange } }) => (
-                          <Input id={name}
-                                 label="Certificate Renewal Mode"
-                                 help={renewalModeExplanation}>
-                            <Select options={certicateRenewalModes}
-                                    clearable={false}
-                                    name={name}
-                                    value={value ?? 'AUTOMATIC'}
-                                    aria-label="Select certificate renewal mode"
-                                    size="small"
-                                    onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+                          <Input id={name} label="Certificate Renewal Mode" help={renewalModeExplanation}>
+                            <Select
+                              options={certicateRenewalModes}
+                              clearable={false}
+                              name={name}
+                              value={value ?? 'AUTOMATIC'}
+                              aria-label="Select certificate renewal mode"
+                              size="small"
+                              onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                            />
                           </Input>
                         )}
                       </Field>
-                      <TimeUnitInput label="Certificate Lifetime"
-                                     help={lifetimeExplanation}
-                                     update={(value, unit) => {
-                                       setFieldValue('lifetimeValue', value);
-                                       setFieldValue('lifetimeUnit', unit);
-                                     }}
-                                     value={values.lifetimeValue}
-                                     unit={values.lifetimeUnit.toLocaleUpperCase()}
-                                     enabled
-                                     hideCheckbox
-                                     units={TIME_UNITS_UPPER} />
+                      <TimeUnitInput
+                        label="Certificate Lifetime"
+                        help={lifetimeExplanation}
+                        update={(value, unit) => {
+                          setFieldValue('lifetimeValue', value);
+                          setFieldValue('lifetimeUnit', unit);
+                        }}
+                        value={values.lifetimeValue}
+                        unit={values.lifetimeUnit.toLocaleUpperCase()}
+                        enabled
+                        hideCheckbox
+                        units={TIME_UNITS_UPPER}
+                      />
                     </Col>
                   </Row>
                 </div>
               </Modal.Body>
 
               <Modal.Footer>
-                <ModalSubmit onCancel={resetConfig}
-                             disabledSubmit={isValidating || !isValid}
-                             isSubmitting={isSubmitting}
-                             isAsyncSubmit
-                             submitLoadingText="Updating configuration"
-                             submitButtonText="Update configuration" />
+                <ModalSubmit
+                  onCancel={resetConfig}
+                  disabledSubmit={isValidating || !isValid}
+                  isSubmitting={isSubmitting}
+                  isAsyncSubmit
+                  submitLoadingText="Updating configuration"
+                  submitButtonText="Update configuration"
+                />
               </Modal.Footer>
             </Form>
           )}
@@ -270,10 +288,6 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
       </Modal>
     </div>
   );
-};
-
-CertificateRenewalPolicyConfig.defaultProps = {
-  className: undefined,
 };
 
 export default CertificateRenewalPolicyConfig;

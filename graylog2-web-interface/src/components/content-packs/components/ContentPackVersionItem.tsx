@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import { useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -31,23 +30,25 @@ import {
   ButtonToolbar,
   MenuItem,
   Modal,
+  DeleteMenuItem,
 } from 'components/bootstrap';
-import type { ContentPackVersionsType, ContentPackInstallation } from 'components/content-packs/Types';
+import type { ContentPackInstallation } from 'components/content-packs/Types';
+import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 
 type Props = {
-  pack: ContentPackInstallation
-  contentPackRevisions: ContentPackVersionsType,
-  onDeletePack: (id: string, rev: number) => void,
-  onChange: (id: string) => void,
-  onInstall: (id: string, contentPackRev: string, parameters: unknown) => void,
+  pack: ContentPackInstallation;
+  contentPackRevisions: ContentPackRevisions;
+  onDeletePack?: (id: string, rev: number) => void;
+  onChange?: (id: string) => void;
+  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void;
 };
 
 const ContentPackVersionItem = ({
   pack,
   contentPackRevisions,
-  onChange: onChangeProp,
-  onDeletePack,
-  onInstall: onInstallProp,
+  onChange: onChangeProp = () => {},
+  onDeletePack = () => {},
+  onInstall: onInstallProp = () => {},
 }: Props) => {
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -78,43 +79,37 @@ const ContentPackVersionItem = ({
   return (
     <tr key={pack.id + pack.rev}>
       <td>
-        <input type="radio"
-               value={pack.rev}
-               onChange={onChange}
-               checked={selectedVersion === pack.rev} />
+        <input type="radio" value={pack.rev} onChange={onChange} checked={selectedVersion === pack.rev} />
       </td>
       <td>{pack.rev}</td>
       <td className="text-right">
         <ButtonToolbar className="pull-right">
-          <Button bsStyle="success"
-                  bsSize="small"
-                  onClick={() => handleDownload()}>
+          <Button bsStyle="success" bsSize="small" onClick={() => handleDownload()}>
             Download
           </Button>
           <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">
             <MenuItem onClick={() => handleInstall()}>Install</MenuItem>
-            <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
+            <LinkContainer
+              to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}
+            >
               <MenuItem>Create New From Revision</MenuItem>
             </LinkContainer>
             <MenuItem divider />
-            <MenuItem onClick={() => {
-              onDeletePack(pack.id, pack.rev);
-            }}>Delete
-            </MenuItem>
+            <DeleteMenuItem
+              onClick={() => {
+                onDeletePack(pack.id, pack.rev);
+              }}
+            />
           </DropdownButton>
         </ButtonToolbar>
       </td>
       {showInstallModal && (
-        <BootstrapModalWrapper showModal={showInstallModal}
-                               onHide={onCloseInstallModal}
-                               bsSize="large">
+        <BootstrapModalWrapper showModal={showInstallModal} onHide={onCloseInstallModal} bsSize="large">
           <Modal.Header closeButton>
             <Modal.Title>Install Content Pack</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <ContentPackInstall ref={installRef}
-                                contentPack={pack}
-                                onInstall={onInstallProp} />
+            <ContentPackInstall ref={installRef} contentPack={pack} onInstall={onInstallProp} />
           </Modal.Body>
           <Modal.Footer>
             <ModalSubmit submitButtonText="Install" onSubmit={onInstall} onCancel={onCloseInstallModal} />
@@ -122,28 +117,15 @@ const ContentPackVersionItem = ({
         </BootstrapModalWrapper>
       )}
       {showDownloadModal && (
-        <ContentPackDownloadControl show={showDownloadModal}
-                                    onHide={() => setShowDownloadModal(false)}
-                                    contentPackId={pack.id}
-                                    revision={pack.rev} />
+        <ContentPackDownloadControl
+          show={showDownloadModal}
+          onHide={() => setShowDownloadModal(false)}
+          contentPackId={pack.id}
+          revision={pack.rev}
+        />
       )}
-
     </tr>
   );
-};
-
-ContentPackVersionItem.propTypes = {
-  pack: PropTypes.object.isRequired,
-  contentPackRevisions: PropTypes.object.isRequired,
-  onChange: PropTypes.func,
-  onDeletePack: PropTypes.func,
-  onInstall: PropTypes.func,
-};
-
-ContentPackVersionItem.defaultProps = {
-  onChange: () => {},
-  onDeletePack: () => {},
-  onInstall: () => {},
 };
 
 export default ContentPackVersionItem;

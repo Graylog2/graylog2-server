@@ -23,18 +23,20 @@ import { timeRangeToQueryParameter } from 'views/logic/TimeRange';
 import { addToQuery, escape } from 'views/logic/queries/QueryHelper';
 
 type InternalState = {
-  id: string,
-  timerange: TimeRange,
-  query: QueryString,
-  streams: Array<string>,
-  highlightedMessage: string,
-  filterFields: { [key: string]: unknown },
+  id: string;
+  timerange: TimeRange;
+  query: QueryString;
+  streams: Array<string>;
+  streamCategories: Array<string>;
+  highlightedMessage: string;
+  filterFields: { [key: string]: unknown };
 };
 
-const _mergeFilterFieldsToQuery = (query: QueryString, filterFields: { [key: string]: unknown } = {}) => Object.keys(filterFields)
-  .filter((key) => (filterFields[key] !== null && filterFields[key] !== undefined))
-  .map((key) => `${key}:"${escape(String(filterFields[key]))}"`)
-  .reduce((prev, cur) => addToQuery(prev, cur), query ? query.query_string : '');
+const _mergeFilterFieldsToQuery = (query: QueryString, filterFields: { [key: string]: unknown } = {}) =>
+  Object.keys(filterFields)
+    .filter((key) => filterFields[key] !== null && filterFields[key] !== undefined)
+    .map((key) => `${key}:"${escape(String(filterFields[key]))}"`)
+    .reduce((prev, cur) => addToQuery(prev, cur), query ? query.query_string : '');
 
 export default class SearchLink {
   _value: InternalState;
@@ -44,6 +46,7 @@ export default class SearchLink {
     timerange: InternalState['timerange'],
     query: InternalState['query'],
     streams: InternalState['streams'],
+    streamCategories: InternalState['streamCategories'],
     highlightedMessage: InternalState['highlightedMessage'],
     filterFields: InternalState['filterFields'],
   ) {
@@ -52,6 +55,7 @@ export default class SearchLink {
       timerange,
       query,
       streams,
+      streamCategories,
       highlightedMessage,
       filterFields,
     };
@@ -73,6 +77,10 @@ export default class SearchLink {
     return this._value.streams;
   }
 
+  get streamCategories() {
+    return this._value.streamCategories;
+  }
+
   get highlightedMessage() {
     return this._value.highlightedMessage;
   }
@@ -87,7 +95,7 @@ export default class SearchLink {
   }
 
   toURL() {
-    const { id, query, highlightedMessage, streams, filterFields, timerange } = this._value;
+    const { id, query, highlightedMessage, streams, streamCategories, filterFields, timerange } = this._value;
     const queryWithFilterFields = _mergeFilterFieldsToQuery(query, filterFields);
 
     const searchTimerange = timerange ? timeRangeToQueryParameter(timerange) : {};
@@ -98,14 +106,16 @@ export default class SearchLink {
       highlightMessage: highlightedMessage,
     };
 
-    const paramsWithStreams = streams && streams.length > 0
-      ? { ...params, streams: streams.join(',') }
-      : params;
+    const paramsWithStreams = streams && streams.length > 0 ? { ...params, streams: streams.join(',') } : params;
+
+    const paramsWithStreamsAndCategories =
+      streamCategories && streamCategories.length > 0
+        ? { ...params, stream_categories: streamCategories.join(',') }
+        : paramsWithStreams;
 
     const urlPrefix = id ? `${Routes.SEARCH}/${id}` : Routes.SEARCH;
 
-    const uri = new URI(urlPrefix)
-      .setSearch(paramsWithStreams);
+    const uri = new URI(urlPrefix).setSearch(paramsWithStreamsAndCategories);
 
     return uri.toString();
   }
@@ -136,6 +146,10 @@ class Builder {
     return new Builder(this.value.set('streams', value));
   }
 
+  streamCategories(value: InternalState['streamCategories']) {
+    return new Builder(this.value.set('streamCategories', value));
+  }
+
   highlightedMessage(value: InternalState['highlightedMessage']) {
     return new Builder(this.value.set('highlightedMessage', value));
   }
@@ -145,15 +159,8 @@ class Builder {
   }
 
   build() {
-    const {
-      id,
-      timerange,
-      query,
-      streams,
-      highlightedMessage,
-      filterFields,
-    } = this.value.toObject();
+    const { id, timerange, query, streams, streamCategories, highlightedMessage, filterFields } = this.value.toObject();
 
-    return new SearchLink(id, timerange, query, streams, highlightedMessage, filterFields);
+    return new SearchLink(id, timerange, query, streams, streamCategories, highlightedMessage, filterFields);
   }
 }

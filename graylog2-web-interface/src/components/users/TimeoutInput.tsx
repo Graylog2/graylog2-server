@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 
 import { Row, Col, HelpBlock, Input, Alert } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
@@ -24,8 +23,8 @@ import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
 
 type Props = {
-  value: number,
-  onChange: (value: number) => void;
+  value?: number;
+  onChange?: (value: number) => void;
 };
 
 const _estimateUnit = (value: number): number => {
@@ -48,7 +47,7 @@ const _estimateUnit = (value: number): number => {
   return MS_SECOND;
 };
 
-const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
+const TimeoutInput = ({ value: propsValue = MS_HOUR, onChange = () => {} }: Props) => {
   const [sessionTimeoutNever, setSessionTimeoutNever] = useState(propsValue === -1);
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
   const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
@@ -78,67 +77,54 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   };
 
   return (
-    <Input id="timeout-controls"
-           labelClassName="col-sm-3"
-           wrapperClassName="col-sm-9"
-           label="Sessions Timeout">
+    <Input id="timeout-controls" labelClassName="col-sm-3" wrapperClassName="col-sm-9" label="Sessions Timeout">
       <Row className="no-bm">
         <Col xs={12}>
           <Alert bsStyle="info" title="Changing the session timeout">
             Changing the timeout setting for sessions will log the user out of Graylog and will invalidate all their
-            current sessions. If you are changing the setting for your own user, you will be logged out at the moment
-            of saving the setting. In that case, make sure to save any pending changes before changing the timeout.
+            current sessions. If you are changing the setting for your own user, you will be logged out at the moment of
+            saving the setting. In that case, make sure to save any pending changes before changing the timeout.
           </Alert>
         </Col>
       </Row>
       <>
-        <Input type="checkbox"
-               id="session-timeout-never"
-               name="session_timeout_never"
-               label="Sessions do not time out"
-               help="When checked, sessions never time out due to inactivity."
-               formGroupClassName="no-bm"
-               onChange={_onClick}
-               checked={sessionTimeoutNever} />
+        <Input
+          type="checkbox"
+          id="session-timeout-never"
+          name="session_timeout_never"
+          label="Sessions do not time out"
+          help="When checked, sessions never time out due to inactivity."
+          formGroupClassName="no-bm"
+          onChange={_onClick}
+          checked={sessionTimeoutNever}
+        />
 
         <div className="clearfix">
           <Col xs={2}>
-            <Input type="number"
-                   id="timeout"
-                   placeholder="Timeout amount"
-                   name="timeout"
-                   min={1}
-                   formGroupClassName="form-group no-bm"
-                   disabled={sessionTimeoutNever}
-                   value={value}
-                   onChange={_onChangeValue} />
+            <Input
+              type="number"
+              id="timeout"
+              placeholder="Timeout amount"
+              name="timeout"
+              min={1}
+              formGroupClassName="form-group no-bm"
+              disabled={sessionTimeoutNever}
+              value={value}
+              onChange={_onChangeValue}
+            />
           </Col>
           <Col xs={4}>
-            <TimeoutUnitSelect disabled={sessionTimeoutNever}
-                               value={String(unit)}
-                               onChange={_onChangeUnit} />
+            <TimeoutUnitSelect disabled={sessionTimeoutNever} value={String(unit)} onChange={_onChangeUnit} />
           </Col>
           <Row className="no-bm">
             <Col xs={12}>
-              <HelpBlock>
-                Session automatically end after this amount of time, unless they are actively used.
-              </HelpBlock>
+              <HelpBlock>Session automatically end after this amount of time, unless they are actively used.</HelpBlock>
             </Col>
           </Row>
         </div>
       </>
     </Input>
   );
-};
-
-TimeoutInput.propTypes = {
-  value: PropTypes.number,
-  onChange: PropTypes.func,
-};
-
-TimeoutInput.defaultProps = {
-  value: MS_HOUR,
-  onChange: () => {},
 };
 
 export default TimeoutInput;

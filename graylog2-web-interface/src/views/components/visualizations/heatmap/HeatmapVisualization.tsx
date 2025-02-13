@@ -21,9 +21,8 @@ import fill from 'lodash/fill';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
 import type { DefaultTheme } from 'styled-components';
-import { useTheme } from 'styled-components';
+import styled, { useTheme, css } from 'styled-components';
 
-import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
@@ -33,6 +32,13 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
 import GenericPlot from '../GenericPlot';
+
+const Container = styled.div<{ $height: number; $width: number }>(
+  ({ $height, $width }) => css`
+    height: ${$height ? `${$height}px` : '100%'};
+    width: ${$width ? `${$width}px` : '100%'};
+  `,
+);
 
 const _generateSeriesTitles = (config, x, y) => {
   const seriesTitles = config.series.map((s) => s.function);
@@ -47,49 +53,45 @@ const _generateSeriesTitles = (config, x, y) => {
   return y.map(() => columnSeriesTitles);
 };
 
-const _generateSeries = (visualizationConfig: HeatmapVisualizationConfig, mapKeys: KeyMapper, theme: DefaultTheme): Generator => ({
-  type,
-  name,
-  labels,
-  values,
-  data: z,
-  config,
-}): ChartDefinition => {
-  const rowPivots = config.rowPivots.flatMap((pivot) => pivot.fields);
-  const columnPivots = config.columnPivots.flatMap((pivot) => pivot.fields);
-  const xAxisTitle = rowPivots.join('-');
-  const yAxisTitle = columnPivots.join('-');
-  const zSeriesTitles = _generateSeriesTitles(config, values, labels);
-  const hovertemplate = `${xAxisTitle}: %{y}<br>${yAxisTitle}: %{x}<br>%{text}: %{customdata}<extra></extra>`;
-  const { colorScale, reverseScale, zMin, zMax } = visualizationConfig;
-  const y = labels.map((value) => mapKeys(value, rowPivots[0]));
-  const x = values.map((value) => mapKeys(value, columnPivots[0]));
+const _generateSeries =
+  (visualizationConfig: HeatmapVisualizationConfig, mapKeys: KeyMapper, theme: DefaultTheme): Generator =>
+  ({ type, name, labels, values, data: z, config }): ChartDefinition => {
+    const rowPivots = config.rowPivots.flatMap((pivot) => pivot.fields);
+    const columnPivots = config.columnPivots.flatMap((pivot) => pivot.fields);
+    const xAxisTitle = rowPivots.join('-');
+    const yAxisTitle = columnPivots.join('-');
+    const zSeriesTitles = _generateSeriesTitles(config, values, labels);
+    const hovertemplate = `${xAxisTitle}: %{y}<br>${yAxisTitle}: %{x}<br>%{text}: %{customdata}<extra></extra>`;
+    const { colorScale, reverseScale, zMin, zMax } = visualizationConfig;
+    const y = labels.map((value) => mapKeys(value, rowPivots[0]));
+    const x = values.map((value) => mapKeys(value, columnPivots[0]));
 
-  return {
-    type,
-    name,
-    x,
-    y,
-    z,
-    text: zSeriesTitles,
-    customdata: z,
-    hovertemplate,
-    colorscale: colorScale,
-    reversescale: reverseScale,
-    zmin: zMin,
-    zmax: zMax,
-    originalName: name,
-    colorbar: {
-      tickfont: { color: theme.colors.global.textDefault },
-    },
+    return {
+      type,
+      name,
+      x,
+      y,
+      z,
+      text: zSeriesTitles,
+      customdata: z,
+      hovertemplate,
+      colorscale: colorScale,
+      reversescale: reverseScale,
+      zmin: zMin,
+      zmax: zMax,
+      originalName: name,
+      colorbar: {
+        tickfont: { color: theme.colors.global.textDefault },
+      },
+    };
   };
-};
 
-const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue: number | 'None' = 'None') => z.map((series) => {
-  const newSeries = fill(Array(xLabels.length), defaultValue);
+const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>, defaultValue: number | 'None' = 'None') =>
+  z.map((series) => {
+    const newSeries = fill(Array(xLabels.length), defaultValue);
 
-  return merge(newSeries, series);
-});
+    return merge(newSeries, series);
+  });
 
 const _transposeMatrix = (z: Array<Array<any>> = []) => {
   if (!z[0]) {
@@ -99,29 +101,27 @@ const _transposeMatrix = (z: Array<Array<any>> = []) => {
   return z[0].map((_, c) => z.map((r) => r[c]));
 };
 
-const _findSmallestValue = (valuesFound: Array<Array<number>>) => valuesFound.reduce((result, valueArray) => valueArray.reduce((acc, value) => (acc > value ? value : acc), result), (valuesFound[0] || [])[0]);
+const _findSmallestValue = (valuesFound: Array<Array<number>>) =>
+  valuesFound.reduce(
+    (result, valueArray) => valueArray.reduce((acc, value) => (acc > value ? value : acc), result),
+    (valuesFound[0] || [])[0],
+  );
 
-const _formatSeries = (visualizationConfig: HeatmapVisualizationConfig) => ({
-  valuesBySeries,
-  xLabels,
-}: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
-  const valuesFoundBySeries = _values(valuesBySeries);
-  // When using the hovertemplate, we need to provide a value for empty z values.
-  // Otherwise, plotly would throw errors when hovering over a field.
-  // We need to transpose the z matrix, because we are changing the x and y label in the generator function
-  const defaultValue = visualizationConfig.useSmallestAsDefault
-    ? _findSmallestValue(valuesFoundBySeries)
-    : (visualizationConfig.defaultValue ?? 'None');
-  const z = _transposeMatrix(_fillUpMatrix(valuesFoundBySeries, xLabels, defaultValue));
-  const yLabels = Object.keys(valuesBySeries);
+const _formatSeries =
+  (visualizationConfig: HeatmapVisualizationConfig) =>
+  ({ valuesBySeries, xLabels }: { valuesBySeries: ValuesBySeries; xLabels: Array<any> }): ExtractedSeries => {
+    const valuesFoundBySeries = _values(valuesBySeries);
+    // When using the hovertemplate, we need to provide a value for empty z values.
+    // Otherwise, plotly would throw errors when hovering over a field.
+    // We need to transpose the z matrix, because we are changing the x and y label in the generator function
+    const defaultValue = visualizationConfig.useSmallestAsDefault
+      ? _findSmallestValue(valuesFoundBySeries)
+      : (visualizationConfig.defaultValue ?? 'None');
+    const z = _transposeMatrix(_fillUpMatrix(valuesFoundBySeries, xLabels, defaultValue));
+    const yLabels = Object.keys(valuesBySeries);
 
-  return [[
-    'Heatmap Chart',
-    xLabels,
-    yLabels,
-    z,
-  ]];
-};
+    return [['Heatmap Chart', xLabels, yLabels, z]];
+  };
 
 const _axisConfig = (chartHasContent: ChartDefinition) => {
   const axisConfig = {
@@ -152,9 +152,10 @@ const _chartLayout = (heatmapData: ChartDefinition[]) => {
 
 const _leafSourceMatcher = ({ source }: { source: string }) => source.endsWith('leaf') && source !== 'row-leaf';
 
-const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+const HeatmapVisualization = makeVisualization(({ config, data, height, width }: VisualizationComponentProps) => {
   const theme = useTheme();
-  const visualizationConfig = (config.visualizationConfig ?? HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
+  const visualizationConfig = (config.visualizationConfig ??
+    HeatmapVisualizationConfig.empty()) as HeatmapVisualizationConfig;
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
   const heatmapData = useChartData(rows, {
@@ -167,13 +168,10 @@ const HeatmapVisualization = makeVisualization(({ config, data }: VisualizationC
   const layout = _chartLayout(heatmapData);
 
   return (
-    <GenericPlot chartData={heatmapData} layout={layout} />
+    <Container $height={height} $width={width}>
+      <GenericPlot chartData={heatmapData} layout={layout} />
+    </Container>
   );
 }, 'heatmap');
-
-HeatmapVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-};
 
 export default HeatmapVisualization;

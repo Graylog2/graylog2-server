@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
@@ -28,8 +29,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.ClusterClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
@@ -65,8 +64,6 @@ public class OpensearchProcessImplTest {
     @Mock
     private Configuration configuration;
     @Mock
-    private NodeService<DataNodeDto> nodeService;
-    @Mock
     private ObjectMapper objectMapper;
     @Mock
     private OpensearchStateMachine processState;
@@ -83,8 +80,9 @@ public class OpensearchProcessImplTest {
     @Before
     public void setup() throws IOException {
         when(datanodeConfiguration.processLogsBufferSize()).thenReturn(100);
+        when(configuration.getDatanodeNodeName()).thenReturn(nodeName);
         this.opensearchProcess = spy(new OpensearchProcessImpl(datanodeConfiguration, trustmManager, configuration,
-                nodeService, objectMapper, processState, nodeName, nodeId, eventBus));
+                 objectMapper, processState, nodeId, eventBus));
         when(opensearchProcess.restClient()).thenReturn(Optional.of(restClient));
         when(restClient.cluster()).thenReturn(clusterClient);
     }
@@ -128,7 +126,7 @@ public class OpensearchProcessImplTest {
         final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
         opensearchProcess.executorService = executor;
         opensearchProcess.checkRemovalStatus();
-        verify(opensearchProcess).stop();
+        verify(processState).fire(OpensearchEvent.PROCESS_STOPPED);
         verify(executor).shutdown();
     }
 

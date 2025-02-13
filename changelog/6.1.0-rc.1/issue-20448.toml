@@ -1,0 +1,5 @@
+type="f"
+message="Use the correct Data Node configuration file server.conf instead of graylog.conf"
+
+issues=["20448"]
+pulls=["20450"]

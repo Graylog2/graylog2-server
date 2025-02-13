@@ -26,17 +26,17 @@ import type { FiltersType } from 'views/types';
 import EventsWidgetConfig from './EventsWidgetConfig';
 
 export default class EventsWidget extends Widget {
-  constructor(id: string, config: EventsWidgetConfig, filter?: string, timerange?: TimeRange, query?: QueryString, streams?: Array<string>, filters?: FiltersType) {
-    super(
-      id,
-      EventsWidget.type,
-      config,
-      filter,
-      timerange,
-      query,
-      streams,
-      filters,
-    );
+  constructor(
+    id: string,
+    config: EventsWidgetConfig,
+    filter?: string,
+    timerange?: TimeRange,
+    query?: QueryString,
+    streams?: Array<string>,
+    streamCategories?: Array<string>,
+    filters?: FiltersType,
+  ) {
+    super(id, EventsWidget.type, config, filter, timerange, query, streams, streamCategories, filters);
   }
 
   static type = 'events';
@@ -44,14 +44,25 @@ export default class EventsWidget extends Widget {
   static defaultTitle = 'Untitled Events Overview';
 
   static fromJSON(value: WidgetState) {
-    const { id, config, filter, timerange, query, streams, filters } = value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters } = value;
 
-    return new EventsWidget(id, EventsWidgetConfig.fromJSON(config), filter, timerange, query, streams, filters);
+    return new EventsWidget(
+      id,
+      EventsWidgetConfig.fromJSON(config),
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+    );
   }
 
   equals(other: any) {
     if (other instanceof EventsWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'filters'].every((key) => isDeepEqual(this._value[key], other[key]));
+      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) =>
+        isDeepEqual(this._value[key], other[key]),
+      );
     }
 
     return false;
@@ -59,17 +70,19 @@ export default class EventsWidget extends Widget {
 
   equalsForSearch(other: any) {
     if (other instanceof EventsWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'filters'].every((key) => isEqualForSearch(this._value[key], other[key]));
+      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) =>
+        isEqualForSearch(this._value[key], other[key]),
+      );
     }
 
     return false;
   }
 
   toBuilder() {
-    const { id, config, filter, timerange, query, streams, filters } = this._value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Map({ id, config, filter, timerange, query, streams, filters }));
+    return new Builder(Map({ id, config, filter, timerange, query, streams, stream_categories, filters }));
   }
 
   static builder() {
@@ -80,8 +93,8 @@ export default class EventsWidget extends Widget {
 
 class Builder extends Widget.Builder {
   build(): EventsWidget {
-    const { id, config, filter, timerange, query, streams, filters } = this.value.toObject();
+    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this.value.toObject();
 
-    return new EventsWidget(id, config, filter, timerange, query, streams, filters);
+    return new EventsWidget(id, config, filter, timerange, query, streams, stream_categories, filters);
   }
 }

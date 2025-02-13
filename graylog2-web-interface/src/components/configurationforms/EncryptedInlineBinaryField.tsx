@@ -14,38 +14,43 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { Button, Input } from 'components/bootstrap';
-import { optionalMarker } from 'components/configurationforms/FieldHelpers';
+import { optionableLabel } from 'components/configurationforms/FieldHelpers';
 
 import type { EncryptedFieldValue, InlineBinaryField as InlineBinaryFieldType } from './types';
 
 type Props = {
-  autoFocus: boolean,
-  field: InlineBinaryFieldType,
-  dirty: boolean,
-  onChange: (title: string, value: any, dirty?: boolean) => void,
-  title: string,
-  typeName: string,
-  value?: EncryptedFieldValue<string>,
+  autoFocus?: boolean;
+  field: InlineBinaryFieldType;
+  dirty?: boolean;
+  onChange: (title: string, value: any, dirty?: boolean) => void;
+  title: string;
+  typeName: string;
+  value?: EncryptedFieldValue<string>;
 };
 
 const FileContent = styled.span`
   vertical-align: middle;
 `;
 
-const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, value, autoFocus }: Props) => {
+const EncryptedInlineBinaryField = ({
+  field,
+  title,
+  typeName,
+  dirty = false,
+  onChange,
+  value = {},
+  autoFocus = false,
+}: Props) => {
   const [fileName, setFileName] = useState(undefined);
   const [isResetted, setIsResetted] = useState<boolean>(false);
   const isValuePresent = value.is_set;
   const isRequired = !field.is_optional;
   const showReadOnly = !dirty && isValuePresent;
   const fieldId = `${typeName}-${title}`;
-
-  const labelContent = <>{field.human_name} {optionalMarker(field)}</>;
 
   const handleFileRead = (fileReader: FileReader, file) => {
     const dataUrl = fileReader.result;
@@ -98,7 +103,13 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, v
   const removeButton = () => {
     if (fileName) {
       return (
-        <Button type="button" onClick={() => { setFileName(undefined); onChange(title, ''); }}>
+        <Button
+          type="button"
+          onClick={() => {
+            setFileName(undefined);
+            onChange(title, '');
+          }}
+        >
           Remove
         </Button>
       );
@@ -118,60 +129,53 @@ const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, v
   };
 
   const readOnlyFileInput = () => (
-    <Input id={fieldId}
-           type="password"
-           name={`configuration[${title}]`}
-           label={labelContent}
-           required={isRequired}
-           readOnly
-           help={field.description}
-           value="encrypted value"
-           buttonAfter={resetButton()}
-           autoFocus={autoFocus} />
+    <Input
+      id={fieldId}
+      type="password"
+      name={`configuration[${title}]`}
+      label={optionableLabel(field)}
+      required={isRequired}
+      readOnly
+      help={field.description}
+      value="encrypted value"
+      buttonAfter={resetButton()}
+      autoFocus={autoFocus}
+    />
   );
 
-  const fileInput = () => (
-    (fileName) ? (
-      <Input id={fieldId}
-             name={`configuration[${title}]`}
-             label={labelContent}
-             required={isRequired}
-             help={field.description}
-             autoFocus={autoFocus}
-             buttonAfter={<>{removeButton()}{undoResetButton()}</>}>
+  const fileInput = () =>
+    fileName ? (
+      <Input
+        id={fieldId}
+        name={`configuration[${title}]`}
+        label={optionableLabel(field)}
+        required={isRequired}
+        help={field.description}
+        autoFocus={autoFocus}
+        buttonAfter={
+          <>
+            {removeButton()}
+            {undoResetButton()}
+          </>
+        }
+      >
         <FileContent>{fileName}</FileContent>
       </Input>
     ) : (
-      <Input id={fieldId}
-             type="file"
-             name={`configuration[${title}]`}
-             label={labelContent}
-             required={isRequired}
-             help={field.description}
-             buttonAfter={undoResetButton()}
-             onChange={(e) => handleFileUpload(e.target.files[0])}
-             autoFocus={autoFocus} />
-    )
-  );
+      <Input
+        id={fieldId}
+        type="file"
+        name={`configuration[${title}]`}
+        label={optionableLabel(field)}
+        required={isRequired}
+        help={field.description}
+        buttonAfter={undoResetButton()}
+        onChange={(e) => handleFileUpload(e.target.files[0])}
+        autoFocus={autoFocus}
+      />
+    );
 
-  return (
-    showReadOnly ? readOnlyFileInput() : fileInput());
-};
-
-EncryptedInlineBinaryField.propTypes = {
-  autoFocus: PropTypes.bool,
-  dirty: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.object,
-};
-
-EncryptedInlineBinaryField.defaultProps = {
-  autoFocus: false,
-  dirty: false,
-  value: {},
+  return showReadOnly ? readOnlyFileInput() : fileInput();
 };
 
 export default EncryptedInlineBinaryField;

@@ -16,49 +16,31 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { PanelGroup } from 'components/bootstrap/imports';
 
 type Props = {
-  activeKey?: string,
-  children: React.ReactNode,
-  defaultActiveKey?: string,
-  id: string,
-  onSelect?: (nextKey: string) => void,
-}
+  activeKey?: string;
+  children: React.ReactNode;
+  defaultActiveKey?: string;
+  id: string;
+  onSelect?: (nextKey: string) => void;
+};
 
 const StyledPanelGroup = styled(PanelGroup)`
   margin-bottom: 0;
 `;
 
-const Accordion = ({ activeKey, children, id, onSelect, ...restProps }:Props) => {
+const Accordion = ({ activeKey, children, id, onSelect = () => {}, ...restProps }: Props) => {
   const cleanActiveKey = activeKey?.replace(/[^0-9a-zA-Z-]/g, '-').toLowerCase();
   const _onSelect = useCallback((eventKey: any) => onSelect(eventKey), [onSelect]);
 
   return (
-    <StyledPanelGroup {...restProps}
-                      activeKey={cleanActiveKey}
-                      id={id}
-                      onSelect={_onSelect}
-                      accordion>
+    <StyledPanelGroup {...restProps} activeKey={cleanActiveKey} id={id} onSelect={_onSelect} accordion>
       {children}
     </StyledPanelGroup>
   );
-};
-
-Accordion.propTypes = {
-  activeKey: PropTypes.string,
-  children: PropTypes.node.isRequired,
-  id: PropTypes.string.isRequired,
-  onSelect: PropTypes.func,
-};
-
-Accordion.defaultProps = {
-  activeKey: undefined,
-  defaultActiveKey: undefined,
-  onSelect: () => {},
 };
 
 export default Accordion;

@@ -22,6 +22,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.ElasticsearchQueryString;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.TimeRange;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -35,6 +36,7 @@ public abstract class MessagesSearchType implements SearchType {
     private static final String FIELD_TIMERANGE = "timerange";
     private static final String FIELD_QUERY = "query";
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_STREAM_CATEGORIES = "stream_categories";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_LIMIT = "limit";
     private static final String FIELD_OFFSET = "offset";
@@ -59,6 +61,12 @@ public abstract class MessagesSearchType implements SearchType {
 
     @JsonProperty(FIELD_STREAMS)
     public Set<String> streams() {
+        return Collections.emptySet();
+    }
+
+    @Nullable
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    public Set<String> streamCategories() {
         return Collections.emptySet();
     }
 

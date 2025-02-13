@@ -52,7 +52,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.HasOptionalFiel
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
@@ -78,7 +77,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.graylog.events.search.MoreSearch.luceneEscape;
-import static org.graylog2.notifications.Notification.Type.EVENT_LIMIT_REACHED;
 
 public class AggregationEventProcessor implements EventProcessor {
     public interface Factory extends EventProcessor.Factory<AggregationEventProcessor> {
@@ -229,7 +227,17 @@ public class AggregationEventProcessor implements EventProcessor {
      * @return the actual streams
      */
     private Set<String> getStreams(AggregationEventProcessorParameters parameters) {
-        return parameters.streams().isEmpty() ? config.streams() : parameters.streams();
+        if (parameters.streams().isEmpty()) {
+            Set<String> configStreams = new HashSet<>(config.streams());
+            if (!config.streamCategories().isEmpty()) {
+                // TODO: We need to account for permissions of the user who created the event here in place of
+                //      a blanket `true` here.
+                configStreams.addAll(permittedStreams.loadWithCategories(config.streamCategories(), streamId -> true));
+            }
+            return configStreams;
+        } else {
+            return parameters.streams();
+        }
     }
 
     private void filterSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
@@ -275,15 +283,6 @@ public class AggregationEventProcessor implements EventProcessor {
             moreSearch.scrollQuery(config.query(), streams, config.filters(), config.queryParameters(),
                     parameters.timerange(), parameters.batchSize(), callback);
         } catch (EventLimitReachedException e) {
-            notificationService.publishIfFirst(notificationService.buildNow()
-                    .addType(EVENT_LIMIT_REACHED)
-                    .addKey(eventDefinition.id())
-                    .addDetail("event_definition_title", eventDefinition.title())
-                    .addDetail("event_definition_id", eventDefinition.id())
-                    .addDetail("event_limit", config.eventLimit())
-                    .addSeverity(Notification.Severity.NORMAL)
-            );
-
             LOG.debug("Event limit reached at {} for '{}/{}' event definition.", config.eventLimit(), eventDefinition.title(), eventDefinition.id());
         }
     }

@@ -20,9 +20,9 @@ import { useRef } from 'react';
 import useElementDimensions from 'hooks/useElementDimensions';
 
 type Props = {
-  children: (dimensions: { width: number, height: number}) => React.ReactNode
-  className?: string,
-  resizeDelay?: number,
+  children: (dimensions: { width: number; height: number }) => React.ReactNode;
+  className?: string;
+  resizeDelay?: number;
 };
 
 /**
@@ -37,11 +37,6 @@ const ElementDimensions = ({ children, className, resizeDelay }: Props) => {
       {children(dimensions)}
     </div>
   );
-};
-
-ElementDimensions.defaultProps = {
-  className: undefined,
-  resizeDelay: undefined,
 };
 
 export default ElementDimensions;

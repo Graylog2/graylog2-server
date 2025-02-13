@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.plugin.Version;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -29,18 +30,26 @@ import java.time.temporal.ChronoUnit;
 @AutoValue
 @WithBeanGetter
 public abstract class UserConfiguration {
-    public static final UserConfiguration DEFAULT_VALUES = create(false, Duration.of(8, ChronoUnit.HOURS));
+    private static final boolean IS_BEFORE_VERSION_6_2 = !Version.CURRENT_CLASSPATH.sameOrHigher(Version.from(6, 2, 0));
+
+    //Starting with graylog version 6.2, external users are not allowed to own access tokens by default.
+    // Before this version, it is allowed, to not introduce a breaking change:
+    public static final UserConfiguration DEFAULT_VALUES = create(false, Duration.of(8, ChronoUnit.HOURS), IS_BEFORE_VERSION_6_2);
 
     @JsonProperty("enable_global_session_timeout")
     public abstract boolean enableGlobalSessionTimeout();
 
     @JsonProperty("global_session_timeout_interval")
-    public abstract java.time.Duration globalSessionTimeoutInterval();
+    public abstract Duration globalSessionTimeoutInterval();
+
+    @JsonProperty("allow_access_token_for_external_user")
+    public abstract boolean allowAccessTokenForExternalUsers();
 
     @JsonCreator
     public static UserConfiguration create(
             @JsonProperty("enable_global_session_timeout") boolean enableGlobalSessionTimeout,
-            @JsonProperty("global_session_timeout_interval") java.time.Duration globalSessionTimeoutInterval) {
-        return new AutoValue_UserConfiguration(enableGlobalSessionTimeout, globalSessionTimeoutInterval);
+            @JsonProperty("global_session_timeout_interval") Duration globalSessionTimeoutInterval,
+            @JsonProperty("allow_access_token_for_external_user") boolean allowAccessTokenForExternalUsers) {
+        return new AutoValue_UserConfiguration(enableGlobalSessionTimeout, globalSessionTimeoutInterval, allowAccessTokenForExternalUsers);
     }
 }

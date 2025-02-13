@@ -29,33 +29,41 @@ import StreamPipelinesConnectionForm from 'components/streams/StreamDetails/Stre
 import type { Stream } from 'logic/streams/types';
 
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 
-const ActionButtonsWrap = styled.span(({ theme }) => css`
-  margin-right: ${theme.spacings.xxs};
-  float: right;
-`);
+const ActionButtonsWrap = styled.span(
+  ({ theme }) => css`
+    margin-right: ${theme.spacings.xxs};
+    float: right;
+  `,
+);
 
 const StreamDataRoutingProcessing = ({ stream }: Props) => {
   const { id: streamId } = stream;
-  const { data: connectedPipelines, isInitialLoading: isLoadingConnectPipelines } = usePipelinesConnectedStream(streamId);
+  const { data: connectedPipelines, isInitialLoading: isLoadingConnectPipelines } =
+    usePipelinesConnectedStream(streamId);
   const hasConnectedPipelines = !isLoadingConnectPipelines && connectedPipelines?.length > 0;
   const { data: pipelines } = usePipelines();
-  const sortPipelines = (pipelinesList: StreamConnectedPipelines) => pipelinesList.sort((s1, s2) => naturalSort(s1.title, s2.title));
-  const StreamIlluminateProcessingSection = PluginStore.exports('dataWarehouse')?.[0]?.StreamIlluminateProcessingSection;
+  const sortPipelines = (pipelinesList: StreamConnectedPipelines) =>
+    pipelinesList.sort((s1, s2) => naturalSort(s1.title, s2.title));
+  const StreamIlluminateProcessingSection = PluginStore.exports('dataLake')?.[0]?.StreamIlluminateProcessingSection;
 
   return (
     <>
-      {StreamIlluminateProcessingSection && (<StreamIlluminateProcessingSection stream={stream} />)}
-      <Section title="Pipelines"
-               actions={(
-                 <IfPermitted permissions="streams:create">
-                   <StreamPipelinesConnectionForm streamId={streamId}
-                                                  pipelines={pipelines}
-                                                  connectedPipelines={connectedPipelines} />
-                 </IfPermitted>
-               )}>
+      {StreamIlluminateProcessingSection && <StreamIlluminateProcessingSection stream={stream} />}
+      <Section
+        title="Pipelines"
+        actions={
+          <IfPermitted permissions="streams:create">
+            <StreamPipelinesConnectionForm
+              streamId={streamId}
+              pipelines={pipelines}
+              connectedPipelines={connectedPipelines}
+            />
+          </IfPermitted>
+        }
+      >
         <Table condensed striped hover>
           <thead>
             <tr>
@@ -63,29 +71,26 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
             </tr>
           </thead>
           <tbody>
-            {hasConnectedPipelines && sortPipelines(connectedPipelines).map((pipeline) => (
-              <tr key={pipeline.id}>
-                <td>
-                  {pipeline.title}
-                </td>
-                {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-                <td>
-                  <ActionButtonsWrap className="align-right">
-                    <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
-                      <Button bsStyle="default"
-                              bsSize="xsmall"
-                              title="View">
-                        <Icon name="pageview" type="regular" />
-                      </Button>
-                    </LinkContainer>
-                  </ActionButtonsWrap>
-                </td>
-              </tr>
-            ))}
+            {hasConnectedPipelines &&
+              sortPipelines(connectedPipelines).map((pipeline) => (
+                <tr key={pipeline.id}>
+                  <td>{pipeline.title}</td>
+                  {}
+                  <td>
+                    <ActionButtonsWrap className="align-right">
+                      <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
+                        <Button bsStyle="default" bsSize="xsmall" title="View">
+                          <Icon name="pageview" type="regular" />
+                        </Button>
+                      </LinkContainer>
+                    </ActionButtonsWrap>
+                  </td>
+                </tr>
+              ))}
             {!hasConnectedPipelines && (
-            <tr>
-              <td colSpan={2}>This stream is not connected to any Pipeline.</td>
-            </tr>
+              <tr>
+                <td colSpan={2}>This stream is not connected to any Pipeline.</td>
+              </tr>
             )}
           </tbody>
         </Table>

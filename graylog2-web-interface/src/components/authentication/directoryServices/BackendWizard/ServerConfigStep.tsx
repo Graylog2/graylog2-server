@@ -84,18 +84,21 @@ const ProtocolOptions = styled.div`
 `;
 
 type Props = {
-  formRef: React.Ref<FormikProps<WizardFormValues>>,
-  help: { [inputName: string]: React.ReactElement | string | null | undefined },
-  onSubmit: () => void,
-  onSubmitAll: () => Promise<void>,
-  submitAllError: React.ReactNode | null | undefined,
-  validateOnMount: boolean,
+  formRef: React.Ref<FormikProps<WizardFormValues>>;
+  help: { [inputName: string]: React.ReactElement | string | null | undefined };
+  onSubmit: () => void;
+  onSubmitAll: () => Promise<void>;
+  submitAllError: React.ReactNode | null | undefined;
+  validateOnMount: boolean;
 };
 
 const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAllError, validateOnMount }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
-  const { backendValidationErrors, authBackendMeta: { backendHasPassword } } = stepsState;
+  const {
+    backendValidationErrors,
+    authBackendMeta: { backendHasPassword },
+  } = stepsState;
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
@@ -131,139 +134,172 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
   };
 
   return (
-    <Formik initialValues={stepsState.formValues}
-            innerRef={formRef}
-            initialErrors={backendValidationErrors}
-            onSubmit={onSubmit}
-            validateOnBlur={false}
-            validateOnChange={false}
-            validateOnMount={validateOnMount}>
+    <Formik
+      initialValues={stepsState.formValues}
+      innerRef={formRef}
+      initialErrors={backendValidationErrors}
+      onSubmit={onSubmit}
+      validateOnBlur={false}
+      validateOnChange={false}
+      validateOnMount={validateOnMount}
+    >
       {({ isSubmitting, setFieldValue, values, validateForm }) => (
         <Form className="form form-horizontal">
-          <FormikFormGroup help={help.title}
-                           label="Title"
-                           name="title"
-                           placeholder="Title" />
+          <FormikFormGroup help={help.title} label="Title" name="title" placeholder="Title" />
 
-          <FormikFormGroup help={help.description}
-                           label={<>Description <Opt /></>}
-                           type="textarea"
-                           name="description"
-                           placeholder="Description" />
+          <FormikFormGroup
+            help={help.description}
+            label={
+              <>
+                Description <Opt />
+              </>
+            }
+            type="textarea"
+            name="description"
+            placeholder="Description"
+          />
 
-          <Input id="uri-host"
-                 label="Server Address"
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
+          <Input id="uri-host" label="Server Address" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
             <>
               <ServerUrl className="input-group">
-                <FormikInput formGroupClassName=""
-                             name="serverHost"
-                             id="serverHost"
-                             error={backendValidationErrors?.serverHost}
-                             placeholder="Hostname"
-                             validate={validateField(FORM_VALIDATION.serverHost)} />
+                <FormikInput
+                  formGroupClassName=""
+                  name="serverHost"
+                  id="serverHost"
+                  error={backendValidationErrors?.serverHost}
+                  placeholder="Hostname"
+                  validate={validateField(FORM_VALIDATION.serverHost)}
+                />
                 <span className="input-group-addon input-group-separator">:</span>
-                <FormikInput formGroupClassName=""
-                             name="serverPort"
-                             id="serverPort"
-                             error={backendValidationErrors?.serverPort}
-                             placeholder="Port"
-                             type="number"
-                             validate={validateField(FORM_VALIDATION.serverPort)} />
+                <FormikInput
+                  formGroupClassName=""
+                  name="serverPort"
+                  id="serverPort"
+                  error={backendValidationErrors?.serverPort}
+                  placeholder="Port"
+                  type="number"
+                  validate={validateField(FORM_VALIDATION.serverPort)}
+                />
               </ServerUrl>
 
               <ProtocolOptions>
                 <Field name="transportSecurity">
                   {({ field: { name, onChange, onBlur, value } }) => (
                     <>
-                      <Input defaultChecked={value === 'none'}
-                             formGroupClassName=""
-                             id={name}
-                             label="None"
-                             onBlur={onBlur}
-                             onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
-                             type="radio"
-                             value="none" />
-                      <Input defaultChecked={value === 'tls'}
-                             formGroupClassName=""
-                             id={name}
-                             label="TLS"
-                             onBlur={onBlur}
-                             onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
-                             type="radio"
-                             value="tls" />
-                      <Input defaultChecked={value === 'start_tls'}
-                             formGroupClassName=""
-                             id={name}
-                             label="StartTLS"
-                             onBlur={onBlur}
-                             onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
-                             type="radio"
-                             value="start_tls" />
+                      <Input
+                        defaultChecked={value === 'none'}
+                        formGroupClassName=""
+                        id={name}
+                        label="None"
+                        onBlur={onBlur}
+                        onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
+                        type="radio"
+                        value="none"
+                      />
+                      <Input
+                        defaultChecked={value === 'tls'}
+                        formGroupClassName=""
+                        id={name}
+                        label="TLS"
+                        onBlur={onBlur}
+                        onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
+                        type="radio"
+                        value="tls"
+                      />
+                      <Input
+                        defaultChecked={value === 'start_tls'}
+                        formGroupClassName=""
+                        id={name}
+                        label="StartTLS"
+                        onBlur={onBlur}
+                        onChange={(e) => _onTransportSecurityChange(e, values, setFieldValue, onChange)}
+                        type="radio"
+                        value="start_tls"
+                      />
                     </>
                   )}
                 </Field>
 
-                <FormikInput formGroupClassName=""
-                             label="Verify Certificates"
-                             name="verifyCertificates"
-                             id="verifyCertificates"
-                             type="checkbox" />
+                <FormikInput
+                  formGroupClassName=""
+                  label="Verify Certificates"
+                  name="verifyCertificates"
+                  id="verifyCertificates"
+                  type="checkbox"
+                />
               </ProtocolOptions>
-
             </>
           </Input>
-          <FormikFormGroup help={help.systemUserDn}
-                           error={backendValidationErrors?.systemUserDn}
-                           label={<>System User DN <Opt /></>}
-                           name="systemUserDn"
-                           validate={validateField(FORM_VALIDATION.systemUserDn)}
-                           placeholder="System User DN" />
+          <FormikFormGroup
+            help={help.systemUserDn}
+            error={backendValidationErrors?.systemUserDn}
+            label={
+              <>
+                System User DN <Opt />
+              </>
+            }
+            name="systemUserDn"
+            validate={validateField(FORM_VALIDATION.systemUserDn)}
+            placeholder="System User DN"
+          />
 
-          {(backendHasPassword && values.systemUserPassword === undefined) ? (
-            <Input id="systemPassword"
-                   label={<>System Password <Opt /></>}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9">
+          {backendHasPassword && values.systemUserPassword === undefined ? (
+            <Input
+              id="systemPassword"
+              label={
+                <>
+                  System Password <Opt />
+                </>
+              }
+              labelClassName="col-sm-3"
+              wrapperClassName="col-sm-9"
+            >
               <Button type="button" onClick={() => setFieldValue('systemUserPassword', '')}>
                 Reset Password
               </Button>
             </Input>
           ) : (
-            <FormikFormGroup autoComplete="authentication-service-password"
-                             buttonAfter={(backendHasPassword && values.systemUserPassword !== undefined) ? (
-                               <Button type="button" onClick={() => setFieldValue('systemUserPassword', undefined)}>
-                                 Undo Reset
-                               </Button>
-                             ) : undefined}
-                             help={help.systemUserPassword}
-                             label={<>System Password <Opt /></>}
-                             name="systemUserPassword"
-                             error={backendValidationErrors?.systemUserPassword}
-                             placeholder="System Password"
-                             validate={validateField(FORM_VALIDATION.systemUserPassword)}
-                             type="password" />
+            <FormikFormGroup
+              autoComplete="authentication-service-password"
+              buttonAfter={
+                backendHasPassword && values.systemUserPassword !== undefined ? (
+                  <Button type="button" onClick={() => setFieldValue('systemUserPassword', undefined)}>
+                    Undo Reset
+                  </Button>
+                ) : undefined
+              }
+              help={help.systemUserPassword}
+              label={
+                <>
+                  System Password <Opt />
+                </>
+              }
+              name="systemUserPassword"
+              error={backendValidationErrors?.systemUserPassword}
+              placeholder="System Password"
+              validate={validateField(FORM_VALIDATION.systemUserPassword)}
+              type="password"
+            />
           )}
 
           {submitAllError}
 
           <ButtonToolbar className="pull-right">
-            <Button disabled={isSubmitting}
-                    onClick={() => _onSubmitAll(validateForm)}
-                    type="button">
+            <Button disabled={isSubmitting} onClick={() => _onSubmitAll(validateForm)} type="button">
               Finish & Save Service
             </Button>
-            <Button bsStyle="primary"
-                    disabled={isSubmitting}
-                    onClick={() => {
-                      sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_NEXT_USER_SYNC_CLICKED, {
-                        app_pathname: getPathnameWithoutId(pathname),
-                        app_section: 'directory-service',
-                        app_action_value: 'usersync-button',
-                      });
-                    }}
-                    type="submit">
+            <Button
+              bsStyle="primary"
+              disabled={isSubmitting}
+              onClick={() => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_NEXT_USER_SYNC_CLICKED, {
+                  app_pathname: getPathnameWithoutId(pathname),
+                  app_section: 'directory-service',
+                  app_action_value: 'usersync-button',
+                });
+              }}
+              type="submit"
+            >
               Next: User Synchronization
             </Button>
           </ButtonToolbar>

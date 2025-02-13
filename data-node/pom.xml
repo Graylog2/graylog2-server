@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>6.1.0-SNAPSHOT</version>
+        <version>6.2.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -524,12 +524,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.2.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -650,6 +650,7 @@
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-reports-scheduler"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-security-analytics"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-sql"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-observability"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-alerting"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-custom-codecs"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-geospatial"/>
@@ -661,6 +662,7 @@
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-reports-scheduler"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-security-analytics"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-sql"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins//opensearch-observability"/>
                             </target>
                         </configuration>
                     </execution>
@@ -832,6 +834,25 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <RestrictImports>
+                            <groups>
+                                <group>
+                                    <reason>Data Node packages must be allowed for the data-node/ module.</reason>
+                                    <allowedImports>
+                                        <allowedImport>org.graylog.datanode.**</allowedImport>
+                                    </allowedImports>
+                                </group>
+                            </groups>
+                        </RestrictImports>
+                    </rules>
+                </configuration>
             </plugin>
         </plugins>
     </build>

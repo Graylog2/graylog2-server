@@ -27,19 +27,21 @@ import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation
 const UserCreatePage = () => (
   <DocumentTitle title="Create New User">
     <UsersPageNavigation />
-    <PageHeader title="Create New User"
-                actions={(
-                  <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-                    <Button bsStyle="success">Create user</Button>
-                  </LinkContainer>
-                )}
-                documentationLink={{
-                  title: 'Permissions documentation',
-                  path: DocsHelper.PAGES.USERS_ROLES,
-                }}>
+    <PageHeader
+      title="Create New User"
+      actions={
+        <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
+          <Button bsStyle="success">Create user</Button>
+        </LinkContainer>
+      }
+      documentationLink={{
+        title: 'Permissions documentation',
+        path: DocsHelper.PAGES.USERS_ROLES,
+      }}
+    >
       <span>
-        Use this page to create new Graylog users. The users and their permissions created here are not limited
-        to the web interface but valid and required for the REST APIs of your Graylog server nodes, too.
+        Use this page to create new Graylog users. The users and their permissions created here are not limited to the
+        web interface but valid and required for the REST APIs of your Graylog server nodes, too.
       </span>
     </PageHeader>
 

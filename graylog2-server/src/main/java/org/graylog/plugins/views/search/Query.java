@@ -32,6 +32,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.filter.AndFilter;
+import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.StreamCategoryFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
@@ -52,6 +53,7 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -251,6 +253,22 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
         return toBuilder().filter(newFilter).build();
     }
 
+    // This is a very specific call to set a flat OrFilter of a set of streamIds and categories when replaying a search.
+    // It is unlikely that it would need to be called outside the context of recreating a top-level search.
+    public Query orStreamAndStreamCategoryFilters(Set<String> streamIds, Set<String> categories) {
+        List<Filter> combinedFilters = new ArrayList<>();
+        if (streamIds != null && !streamIds.isEmpty()) {
+            combinedFilters.add(StreamFilter.anyIdOf(streamIds.toArray(new String[]{})));
+        }
+
+        if (categories != null && !categories.isEmpty()) {
+            categories.forEach(category -> {
+                combinedFilters.add(StreamCategoryFilter.ofCategory(category));
+            });
+        }
+        return toBuilder().filter(OrFilter.or(combinedFilters.toArray(new Filter[]{}))).build();
+    }
+
     public Query replaceStreamCategoryFilters(Function<Collection<String>, Stream<String>> categoryMappingFunction,
                                               StreamPermissions streamPermissions) {
         if (filter() == null) {
@@ -366,6 +384,9 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                                     final StreamFilter streamFilter = (StreamFilter) filter;
                                     final String streamId = getStreamEntityIdOrThrow(streamFilter.streamId(), entityDescriptorIds);
                                     return streamFilter.toBuilder().streamId(streamId).build();
+                                } else if (filter.type().equals(StreamCategoryFilter.NAME)) {
+                                    final StreamCategoryFilter streamFilter = (StreamCategoryFilter) filter;
+                                    return streamFilter.toBuilder().category(streamFilter.category()).build();
                                 }
                                 return filter;
                             }).collect(toSet());

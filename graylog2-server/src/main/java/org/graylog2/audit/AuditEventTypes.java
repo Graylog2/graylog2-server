@@ -91,6 +91,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String INDEX_SET_CREATE = PREFIX + "index_set:create";
     public static final String INDEX_SET_DELETE = PREFIX + "index_set:delete";
     public static final String INDEX_SET_UPDATE = PREFIX + "index_set:update";
+    public static final String INDEX_SET_DELETE_FAILED_SNAPSHOT = PREFIX + "index_set:delete_failed_snapshot";
     public static final String INDEX_SET_TEMPLATE_CREATE = PREFIX + "index_set_template:create";
     public static final String INDEX_SET_TEMPLATE_DELETE = PREFIX + "index_set_template:delete";
     public static final String INDEX_SET_TEMPLATE_UPDATE = PREFIX + "index_set_template:update";
@@ -113,6 +114,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String MESSAGE_INPUT_DELETE = PREFIX + "message_input:delete";
     public static final String MESSAGE_INPUT_START = PREFIX + "message_input:start";
     public static final String MESSAGE_INPUT_STOP = PREFIX + "message_input:stop";
+    public static final String MESSAGE_INPUT_SETUP = PREFIX + "message_input:setup";
     public static final String MESSAGE_INPUT_UPDATE = PREFIX + "message_input:update";
     public static final String MESSAGE_OUTPUT_CREATE = PREFIX + "message_output:create";
     public static final String MESSAGE_OUTPUT_DELETE = PREFIX + "message_output:delete";
@@ -242,6 +244,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(INDEX_SET_CREATE)
             .add(INDEX_SET_DELETE)
             .add(INDEX_SET_UPDATE)
+            .add(INDEX_SET_DELETE_FAILED_SNAPSHOT)
             .add(INDEX_SET_TEMPLATE_CREATE)
             .add(INDEX_SET_TEMPLATE_DELETE)
             .add(INDEX_SET_TEMPLATE_UPDATE)
@@ -264,6 +267,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(MESSAGE_INPUT_DELETE)
             .add(MESSAGE_INPUT_START)
             .add(MESSAGE_INPUT_STOP)
+            .add(MESSAGE_INPUT_SETUP)
             .add(MESSAGE_INPUT_UPDATE)
             .add(MESSAGE_OUTPUT_CREATE)
             .add(MESSAGE_OUTPUT_DELETE)

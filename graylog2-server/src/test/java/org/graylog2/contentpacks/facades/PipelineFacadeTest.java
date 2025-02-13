@@ -30,6 +30,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.db.SystemPipelineScope;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -48,8 +49,10 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
@@ -93,17 +96,20 @@ public class PipelineFacadeTest {
     @Mock
     private StreamService streamService;
 
+    private EntityScopeService entityScopeService;
     private PipelineFacade facade;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
-        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+    public void setUp() {
+        entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new SystemPipelineScope()));
+
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
 
-        pipelineService = new MongoDbPipelineService(mongoConnection, mapperProvider, clusterEventBus);
-        connectionsService = new MongoDbPipelineStreamConnectionsService(mongoConnection, mapperProvider, clusterEventBus);
+        final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
+                mongodb.mongoConnection());
+        pipelineService = new MongoDbPipelineService(mongoCollections, entityScopeService, clusterEventBus);
+        connectionsService = new MongoDbPipelineStreamConnectionsService(mongoCollections, clusterEventBus);
 
         facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService, streamService);
     }
@@ -238,12 +244,20 @@ public class PipelineFacadeTest {
     public void delete() throws NotFoundException {
         final PipelineDao pipelineDao = pipelineService.load("5a85c4854b900afd5d662be3");
 
-        assertThat(pipelineService.loadAll()).hasSize(1);
+        assertThat(pipelineService.loadAll()).hasSize(2);
         facade.delete(pipelineDao);
-        assertThat(pipelineService.loadAll()).isEmpty();
+        assertThat(pipelineService.loadAll()).hasSize(1);
 
         assertThatThrownBy(() -> pipelineService.load("5a85c4854b900afd5d662be3"))
                 .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
+    public void deleteSystemPipeline() throws NotFoundException {
+        final PipelineDao pipelineDao = pipelineService.load("5a85c4854b900afd5d662be4");
+        assertThatThrownBy(() -> facade.delete(pipelineDao))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -311,14 +325,20 @@ public class PipelineFacadeTest {
     @Test
     @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void listEntityExcerpts() {
-        final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
+        final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
                 .id(ModelId.of("5a85c4854b900afd5d662be3"))
                 .type(ModelTypes.PIPELINE_V1)
                 .title("Test")
                 .build();
+        final EntityExcerpt expectedEntityExcerpt2 = EntityExcerpt.builder()
+                .id(ModelId.of("5a85c4854b900afd5d662be4"))
+                .type(ModelTypes.PIPELINE_V1)
+                .title("All Messages Routing")
+                .build();
+        final Set<EntityExcerpt> expected = Set.of(expectedEntityExcerpt1, expectedEntityExcerpt2);
 
         final Set<EntityExcerpt> entityExcerpts = facade.listEntityExcerpts();
-        assertThat(entityExcerpts).containsOnly(expectedEntityExcerpt);
+        assertThat(entityExcerpts).isEqualTo(expected);
     }
 
     @Test

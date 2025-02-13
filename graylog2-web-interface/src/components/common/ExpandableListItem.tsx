@@ -15,32 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Checkbox } from 'components/bootstrap';
 
 import Icon from './Icon';
 
-const ItemWrap = styled.li<{ $padded: boolean }>(({ $padded }) => css`
-  padding: ${$padded ? '10px 5px' : ''};
-`);
+const ItemWrap = styled.li<{ $padded: boolean }>(
+  ({ $padded }) => css`
+    padding: ${$padded ? '10px 5px' : ''};
+  `,
+);
 
-const Container = styled.div(({ theme }) => css`
-  display: flex;
-  font-size: ${theme.fonts.size.body};
-  line-height: 20px;
+const Container = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    font-size: ${theme.fonts.size.body};
+    line-height: 20px;
 
-  label {
-    min-height: 20px;
-    margin-bottom: 2px;
-    margin-right: 5px;
+    label {
+      min-height: 20px;
+      margin-bottom: 2px;
+      margin-right: 5px;
 
-    * {
-      cursor: pointer;
+      * {
+        cursor: pointer;
+      }
     }
-  }
-`);
+  `,
+);
 
 const Toggle = styled.div`
   display: inline-block;
@@ -48,23 +51,27 @@ const Toggle = styled.div`
   margin-right: 5px;
 `;
 
-const IconContainer = styled.div(({ theme }) => css`
-  cursor: pointer;
-  font-size: ${theme.fonts.size.large};
-  line-height: 20px;
-  width: 1em;
-  height: 1em;
-  vertical-align: text-top;
+const IconContainer = styled.div(
+  ({ theme }) => css`
+    cursor: pointer;
+    font-size: ${theme.fonts.size.large};
+    line-height: 20px;
+    width: 1em;
+    height: 1em;
+    vertical-align: text-top;
 
-  &:hover {
-    color: ${theme.colors.variant.primary};
-    opacity: 1;
-  }
-`);
+    &:hover {
+      color: ${theme.colors.variant.primary};
+      opacity: 1;
+    }
+  `,
+);
 
-const HeaderWrap = styled.span(({ theme }) => css`
-  font-size: ${theme.fonts.size.large};
-`);
+const HeaderWrap = styled.span(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.large};
+  `,
+);
 
 const Header = styled.button`
   display: flex;
@@ -74,18 +81,22 @@ const Header = styled.button`
   background: transparent;
 `;
 
-const Subheader = styled.span(({ theme }) => css`
-  font-size: ${theme.fonts.size.body};
-  margin-left: 0.5em;
-  color: ${theme.colors.gray[70]};
-`);
+const Subheader = styled.span(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.body};
+    margin-left: 0.5em;
+    color: ${theme.colors.gray[70]};
+  `,
+);
 
-const ExpandableContent = styled.div(({ theme }) => css`
-  border-left: 1px ${theme.colors.gray[90]} solid;
-  margin-left: 35px;
-  margin-top: 10px;
-  padding-left: 5px;
-`);
+const ExpandableContent = styled.div(
+  ({ theme }) => css`
+    border-left: 1px ${theme.colors.gray[90]} solid;
+    margin-left: 35px;
+    margin-top: 10px;
+    padding-left: 5px;
+  `,
+);
 
 const _filterInputProps = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -95,27 +106,27 @@ const _filterInputProps = (props) => {
 };
 
 type Props = React.ComponentProps<typeof Checkbox> & {
-  header: React.ReactNode,
-  checked?: boolean,
-  indetermined?: boolean,
-  selectable?: boolean,
-  expandable?: boolean,
-  expanded?: boolean,
-  stayExpanded?: boolean,
-  subheader?: React.ReactNode,
-  children?: React.ReactNode,
-  padded?: boolean,
-  readOnly?: boolean,
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void,
+  header: React.ReactNode;
+  checked?: boolean;
+  indetermined?: boolean;
+  selectable?: boolean;
+  expandable?: boolean;
+  expanded?: boolean;
+  stayExpanded?: boolean;
+  subheader?: React.ReactNode;
+  children?: React.ReactNode;
+  padded?: boolean;
+  readOnly?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 type State = {
-  expanded: boolean,
+  expanded: boolean;
 };
 
 interface CheckboxInstance {
-  indeterminate: boolean,
-  click: () => void,
+  indeterminate: boolean;
+  click: () => void;
 }
 
 /**
@@ -123,41 +134,6 @@ interface CheckboxInstance {
  */
 class ExpandableListItem extends React.Component<Props, State> {
   private _checkbox: CheckboxInstance | undefined;
-
-  static propTypes = {
-    /** Is the Item checked */
-    checked: PropTypes.bool,
-    /**
-     * Indicates whether the checkbox on this item should be in an indetermined state or not.
-     * This is mostly helpful to represent cases where the element is only partially checked,
-     * for instance when ExpandableListItem's child is an ExpandableList and some of its items
-     * are checked, but others are not.
-     */
-    indetermined: PropTypes.bool,
-    /** Is the item selectable */
-    selectable: PropTypes.bool,
-    /** Is the Item expandable */
-    expandable: PropTypes.bool,
-    /** Is the Item expanded */
-    expanded: PropTypes.bool,
-    /** Forces to stay expanded regardless of clicking on the arrow */
-    stayExpanded: PropTypes.bool,
-    /** The header of the item */
-    header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
-    /** The possible subheader of the item */
-    subheader: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-    /** Can be a html tag or again a ExpandableList */
-    children: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.arrayOf(PropTypes.element),
-    ]),
-    /** Leave space before and after list item */
-    padded: PropTypes.bool,
-    /** Mark checkbox as read only */
-    readOnly: PropTypes.bool,
-    /** onChange handler for the checkbox */
-    onChange: PropTypes.func,
-  };
 
   static defaultProps = {
     checked: false,
@@ -222,21 +198,36 @@ class ExpandableListItem extends React.Component<Props, State> {
     const { expanded } = this.state;
     const { padded } = this.props;
     const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
-    const headerToRender = selectable ? (<Header type="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</Header>) : header;
+    const headerToRender = selectable ? (
+      <Header type="button" tabIndex={0} onClick={this._clickOnHeader}>
+        {header}
+      </Header>
+    ) : (
+      header
+    );
     const inputProps = _filterInputProps(otherProps);
 
     return (
       <ItemWrap $padded={padded}>
         <Container>
           {selectable && (
-          <Checkbox inputRef={(ref) => { this._checkbox = ref; }}
-                    inline
-                    title="Select item"
-                    checked={checked}
-                    {...inputProps} />
+            <Checkbox
+              inputRef={(ref) => {
+                this._checkbox = ref;
+              }}
+              inline
+              title="Select item"
+              checked={checked}
+              {...inputProps}
+            />
           )}
           {expandable && (
-            <Toggle role="button" tabIndex={0} onClick={this._toggleExpand} title={`${expanded ? 'Shrink' : 'Expand'} list item`}>
+            <Toggle
+              role="button"
+              tabIndex={0}
+              onClick={this._toggleExpand}
+              title={`${expanded ? 'Shrink' : 'Expand'} list item`}
+            >
               <IconContainer>
                 <Icon name={expanded ? 'expand_circle_up' : 'expand_circle_down'} />
               </IconContainer>
@@ -248,9 +239,7 @@ class ExpandableListItem extends React.Component<Props, State> {
           </HeaderWrap>
         </Container>
 
-        <ExpandableContent>
-          {expanded && children}
-        </ExpandableContent>
+        <ExpandableContent>{expanded && children}</ExpandableContent>
       </ItemWrap>
     );
   }

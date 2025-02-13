@@ -47,6 +47,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testWelcomePage() {
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_WELCOME_PAGE);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATION_WELCOME_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
@@ -65,6 +66,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testCaCreationPage() {
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_WELCOME_PAGE);
         when(migrationActions.caDoesNotExist()).thenReturn(true);
@@ -79,8 +81,9 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
         verify(migrationActions, times(1)).caDoesNotExist();
         verify(migrationActions, times(1)).renewalPolicyDoesNotExist();
-        verify(migrationActions, times(2)).caAndRenewalPolicyExist();
+        verify(migrationActions, times(3)).caAndRenewalPolicyExist();
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.caDoesNotExist()).thenReturn(false);
         when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(false);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
@@ -90,6 +93,7 @@ public class MigrationStateMachineBuilderTest {
         verify(migrationActions, times(1)).renewalPolicyDoesNotExist();
         verify(migrationActions, times(2)).caAndRenewalPolicyExist();
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.caDoesNotExist()).thenReturn(false);
         when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(false);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
@@ -104,6 +108,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testRenewalPolicyCreationPage() {
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.CA_CREATION_PAGE);
         stateMachine.fire(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
@@ -112,11 +117,13 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
         verify(migrationActions, times(2)).caAndRenewalPolicyExist();
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         verify(migrationActions, times(2)).caAndRenewalPolicyExist();
         verify(migrationActions, times(2)).isCompatibleInPlaceMigrationVersion();
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
         when(migrationActions.isCompatibleInPlaceMigrationVersion()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_MIGRATION_SELECTION);
@@ -127,6 +134,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testMigrationSelectionPage() {
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
         when(migrationActions.isCompatibleInPlaceMigrationVersion()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.CA_CREATION_PAGE);
@@ -134,9 +142,11 @@ public class MigrationStateMachineBuilderTest {
         verify(migrationActions).caAndRenewalPolicyExist();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATION_SELECTION_PAGE);
         reset(migrationActions);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         reset(migrationActions);
         when(migrationActions.isCompatibleInPlaceMigrationVersion()).thenReturn(true);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers())
                 .containsOnly(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         verify(migrationActions, times(1)).isCompatibleInPlaceMigrationVersion();
@@ -147,15 +157,16 @@ public class MigrationStateMachineBuilderTest {
     public void testRemoteReindexWelcomePage() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_SELECTION_PAGE);
         when(migrationActions.compatibleDatanodesRunning()).thenReturn(true);
+        when(migrationActions.isRemoteReindexMigrationEnabled()).thenReturn(true);
         stateMachine.fire(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
         verify(migrationActions).reindexUpgradeSelected();
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
-        verify(migrationActions, times(2)).dataNodeStartupFinished();
+        verify(migrationActions, times(2)).allDatanodesAvailable();
         reset(migrationActions);
-        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
+        when(migrationActions.allDatanodesAvailable()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_DATA_MIGRATION_QUESTION);
-        verify(migrationActions, times(2)).dataNodeStartupFinished();
+        verify(migrationActions, times(2)).allDatanodesAvailable();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -164,16 +175,16 @@ public class MigrationStateMachineBuilderTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
         when(migrationActions.compatibleDatanodesRunning()).thenReturn(true);
         stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
-        verify(migrationActions, times(1)).dataNodeStartupFinished();
+        verify(migrationActions, times(1)).allDatanodesAvailable();
         verify(migrationActions, times(1)).provisionAndStartDataNodes();
         reset(migrationActions);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(1)).dataNodeStartupFinished();
+        verify(migrationActions, times(1)).allDatanodesAvailable();
         reset(migrationActions);
-        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
+        when(migrationActions.allDatanodesAvailable()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_DATA_MIGRATION_QUESTION);
-        verify(migrationActions, times(1)).dataNodeStartupFinished();
+        verify(migrationActions, times(1)).allDatanodesAvailable();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -258,6 +269,7 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.SHOW_STOP_PROCESSING_PAGE);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MESSAGE_PROCESSING_STOP);
         verify(migrationActions).stopMessageProcessing();
+        when(migrationActions.isOldClusterStopped()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER);
         verifyNoMoreInteractions(migrationActions);
         stateMachine.fire(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER);
@@ -266,10 +278,11 @@ public class MigrationStateMachineBuilderTest {
     @Test
     public void testDataNodeClusterStart() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MESSAGE_PROCESSING_STOP);
+        when(migrationActions.isOldClusterStopped()).thenReturn(true);
         stateMachine.fire(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.RESTART_GRAYLOG);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
+        when(migrationActions.allDatanodesAvailable()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
         stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
     }
@@ -277,7 +290,7 @@ public class MigrationStateMachineBuilderTest {
     @Test
     public void testFinishRollingMigration() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.RESTART_GRAYLOG);
-        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
+        when(migrationActions.allDatanodesAvailable()).thenReturn(true);
         stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
@@ -287,12 +300,7 @@ public class MigrationStateMachineBuilderTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE);
         stateMachine.fire(MigrationStep.SKIP_EXISTING_DATA_MIGRATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
-        assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(1)).isOldClusterStopped();
-        reset(migrationActions);
-        when(migrationActions.isOldClusterStopped()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED);
-        verify(migrationActions, times(1)).isOldClusterStopped();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -307,7 +315,6 @@ public class MigrationStateMachineBuilderTest {
     @Test
     public void testManuallyRemoveOldConnectionStringFromConfig() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
-        when(migrationActions.isOldClusterStopped()).thenReturn(true);
         stateMachine.fire(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED);
         verify(migrationActions, times(1)).finishRemoteReindexMigration();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);

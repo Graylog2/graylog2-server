@@ -23,23 +23,19 @@ import generateId from 'logic/generateId';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 
 export type ValidationQuery = {
-  queryString: ElasticsearchQueryString | string,
-  timeRange?: TimeRange | undefined,
-  streams?: Array<string>,
-  filter?: ElasticsearchQueryString | string,
-  validation_mode?: 'QUERY' | 'SEARCH_FILTER'
-}
+  queryString: ElasticsearchQueryString | string;
+  timeRange?: TimeRange | undefined;
+  streams?: Array<string>;
+  streamCategories?: Array<string>;
+  filter?: ElasticsearchQueryString | string;
+  validation_mode?: 'QUERY' | 'SEARCH_FILTER';
+};
 
-const queryExists = (query: string | ElasticsearchQueryString) => (typeof query === 'object' ? !!query.query_string : !!query);
+const queryExists = (query: string | ElasticsearchQueryString) =>
+  typeof query === 'object' ? !!query.query_string : !!query;
 
 export const validateQuery = (
-  {
-    queryString,
-    timeRange,
-    streams,
-    filter,
-    ...rest
-  }: ValidationQuery,
+  { queryString, timeRange, streams, streamCategories, filter, ...rest }: ValidationQuery,
   userTimezone: string,
 ): Promise<QueryValidationState> => {
   if (!queryExists(queryString) && !queryExists(filter) && !timeRange && streams?.length === 0) {
@@ -50,50 +46,56 @@ export const validateQuery = (
     query: queryString,
     timerange: timeRange ? normalizeFromSearchBarForBackend(timeRange, userTimezone) : undefined,
     streams,
+    stream_categories: streamCategories,
     filter,
     ...rest,
   };
 
-  return fetch('POST', qualifyUrl('/search/validate'), payload).then((result) => {
-    if (result) {
-      const explanations = result.explanations?.map(({
-        error_type: errorType,
-        error_title: errorTitle,
-        error_message: errorMessage,
-        begin_line: beginLine,
-        end_line: endLine,
-        begin_column: beginColumn,
-        end_column: endColumn,
-        related_property: relatedProperty,
-      }) => ({
-        id: generateId(),
-        errorMessage,
-        errorType,
-        errorTitle,
-        beginLine: beginLine ? beginLine - 1 : 0,
-        endLine: endLine ? endLine - 1 : 0,
-        beginColumn,
-        endColumn,
-        relatedProperty,
-      } as const));
+  return fetch('POST', qualifyUrl('/search/validate'), payload)
+    .then((result) => {
+      if (result) {
+        const explanations = result.explanations?.map(
+          ({
+            error_type: errorType,
+            error_title: errorTitle,
+            error_message: errorMessage,
+            begin_line: beginLine,
+            end_line: endLine,
+            begin_column: beginColumn,
+            end_column: endColumn,
+            related_property: relatedProperty,
+          }) =>
+            ({
+              id: generateId(),
+              errorMessage,
+              errorType,
+              errorTitle,
+              beginLine: beginLine ? beginLine - 1 : 0,
+              endLine: endLine ? endLine - 1 : 0,
+              beginColumn,
+              endColumn,
+              relatedProperty,
+            }) as const,
+        );
 
-      return ({
-        status: result.status,
-        explanations,
-        context: result.context,
-      } as const);
-    }
+        return {
+          status: result.status,
+          explanations,
+          context: result.context,
+        } as const;
+      }
 
-    return undefined;
-  }).catch((error) => {
-    UserNotification.error(`Validating search query failed with status: ${error}`);
+      return undefined;
+    })
+    .catch((error) => {
+      UserNotification.error(`Validating search query failed with status: ${error}`);
 
-    return ({
-      status: 'OK',
-      explanations: [],
-      context: { searched_index_ranges: [] },
+      return {
+        status: 'OK',
+        explanations: [],
+        context: { searched_index_ranges: [] },
+      };
     });
-  });
 };
 
 export default validateQuery;

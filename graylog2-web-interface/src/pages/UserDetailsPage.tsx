@@ -28,17 +28,18 @@ import type User from 'logic/users/User';
 
 type Props = {
   params: {
-    userId: string,
-  },
+    userId: string;
+  };
 };
 
-const PageTitle = ({ fullName }: {fullName: string}) => (
+const PageTitle = ({ fullName }: { fullName: string }) => (
   <>
-    User Details {fullName && (
+    User Details{' '}
+    {fullName && (
       <>
         - <i>{fullName}</i>
       </>
-  )}
+    )}
   </>
 );
 
@@ -53,18 +54,15 @@ const UserDetailsPage = ({ params }: Props) => {
   return (
     <DocumentTitle title={`User Details ${loadedUser?.fullName ?? ''}`}>
       <UsersPageNavigation />
-      <PageHeader title={<PageTitle fullName={loadedUser?.fullName} />}
-                  actions={(
-                    <UserActionLinks userId={userId}
-                                     userIsReadOnly={loadedUser?.readOnly ?? false} />
-                  )}
-                  documentationLink={{
-                    title: 'Permissions documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
-        <span>
-          Overview of details like profile information, settings, teams and roles.
-        </span>
+      <PageHeader
+        title={<PageTitle fullName={loadedUser?.fullName} />}
+        actions={<UserActionLinks userId={userId} userIsReadOnly={loadedUser?.readOnly ?? false} />}
+        documentationLink={{
+          title: 'Permissions documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+      >
+        <span>Overview of details like profile information, settings, teams and roles.</span>
       </PageHeader>
 
       <UserDetails user={userId === loadedUser?.id ? loadedUser : undefined} />

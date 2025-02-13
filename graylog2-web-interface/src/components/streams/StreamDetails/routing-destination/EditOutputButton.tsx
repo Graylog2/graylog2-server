@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 import { useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -29,13 +28,13 @@ import { Icon } from 'components/common';
 import type { AvailableOutputRequestedConfiguration } from 'components/streams/useAvailableOutputTypes';
 
 type Props = {
-  output: Output,
-  disabled?: boolean,
-  onUpdate: (output: Output, data: ConfigurationFormData<Output['configuration']>) => void,
-  getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration,
+  output: Output;
+  disabled?: boolean;
+  onUpdate: (output: Output, data: ConfigurationFormData<Output['configuration']>) => void;
+  getTypeDefinition: (type: string) => undefined | AvailableOutputRequestedConfiguration;
 };
 
-const EditOutputButton = ({ output, disabled, onUpdate, getTypeDefinition }: Props) => {
+const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinition }: Props) => {
   const currentUser = useCurrentUser();
   const [typeDefinition, setTypeDefinition] = useState<AvailableOutputRequestedConfiguration>(undefined);
   const configFormRef = useRef(null);
@@ -52,33 +51,29 @@ const EditOutputButton = ({ output, disabled, onUpdate, getTypeDefinition }: Pro
 
   return (
     <>
-      <Button bsStyle="link"
-              disabled={!isPermitted(currentUser.permissions, 'stream:edit') || disabled}
-              bsSize="xsmall"
-              onClick={onClick}
-              title="Edit Output">
+      <Button
+        bsStyle="link"
+        disabled={!isPermitted(currentUser.permissions, 'stream:edit') || disabled}
+        bsSize="xsmall"
+        onClick={onClick}
+        title="Edit Output"
+      >
         <Icon name="edit_square" />
       </Button>
-      <ConfigurationForm<Output['configuration']> ref={configFormRef}
-                                                  key={`configuration-form-output-${output.id}`}
-                                                  configFields={typeDefinition}
-                                                  title={`Editing Output ${output.title}`}
-                                                  typeName={output.type}
-                                                  titleHelpText="Select a name of your new output that describes it."
-                                                  submitAction={handleUpdate}
-                                                  submitButtonText="Update output"
-                                                  values={output.configuration}
-                                                  titleValue={output.title} />
+      <ConfigurationForm<Output['configuration']>
+        ref={configFormRef}
+        key={`configuration-form-output-${output.id}`}
+        configFields={typeDefinition}
+        title={`Editing Output ${output.title}`}
+        typeName={output.type}
+        titleHelpText="Select a name of your new output that describes it."
+        submitAction={handleUpdate}
+        submitButtonText="Update output"
+        values={output.configuration}
+        titleValue={output.title}
+      />
     </>
   );
-};
-
-EditOutputButton.propTypes = {
-  disabled: PropTypes.bool,
-};
-
-EditOutputButton.defaultProps = {
-  disabled: false,
 };
 
 export default EditOutputButton;

@@ -91,7 +91,7 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
                 .filter(Optional::isPresent)
                 .count();
         if (extendedLocks > 0) {
-            LOG.info("Extended TTL of {} datanode migration locks", extendedLocks);
+            LOG.trace("Extended TTL of {} datanode migration locks", extendedLocks);
         }
     }
 
@@ -135,7 +135,7 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
         try {
             return RetryerBuilder.<Optional<Lock>>newBuilder()
                     .withRetryListener(loggingRetryListener(caller, indexSet, waitConfig))
-                    .withStopStrategy(StopStrategies.stopAfterDelay(waitConfig.lockAcquireTimeout().getSeconds(), TimeUnit.SECONDS))
+                    .withStopStrategy(StopStrategies.stopAfterDelay(waitConfig.lockAcquireTimeout().toSeconds(), TimeUnit.SECONDS))
                     .withWaitStrategy(WaitStrategies.fixedWait(waitConfig.delayBetweenAttempts().toMillis(), TimeUnit.MILLISECONDS))
                     .retryIfResult(Optional::isEmpty)
                     .build()

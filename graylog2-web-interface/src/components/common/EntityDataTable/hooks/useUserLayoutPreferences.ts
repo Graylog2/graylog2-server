@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {};
 
@@ -32,22 +32,22 @@ const preferencesFromJSON = ({
   sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
   perPage: per_page,
 });
-const fetchUserLayoutPreferences = (entityId: string) => fetch(
-  'GET',
-  qualifyUrl(`/entitylists/preferences/${entityId}`),
-).then((res) => preferencesFromJSON(res ?? {}));
+const fetchUserLayoutPreferences = (entityId: string) =>
+  fetch('GET', qualifyUrl(`/entitylists/preferences/${entityId}`)).then((res) => preferencesFromJSON(res ?? {}));
 
-const useUserLayoutPreferences = (entityId: string): { data: TableLayoutPreferences, isInitialLoading: boolean } => {
+const useUserLayoutPreferences = (entityId: string): { data: TableLayoutPreferences; isInitialLoading: boolean } => {
   const { data, isInitialLoading } = useQuery(
     ['table-layout', entityId],
-    () => fetchUserLayoutPreferences(entityId),
+    () =>
+      defaultOnError(
+        fetchUserLayoutPreferences(entityId),
+        `Loading layout preferences for "${entityId}" overview failed with`,
+      ),
     {
-      onError: (error) => {
-        UserNotification.error(`Loading layout preferences for "${entityId}" overview failed with ${error}`);
-      },
       keepPreviousData: true,
       staleTime: 60 * (60 * 1000), // 1 hour
-    });
+    },
+  );
 
   return {
     data: data ?? INITIAL_DATA,

@@ -37,10 +37,12 @@ import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
+import org.graylog2.configuration.Documentation;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.BatchSizeConfig;
 import org.graylog2.plugin.Tools;
+import org.graylog2.security.hashing.PBKDF2PasswordAlgorithm;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
@@ -60,7 +62,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * Helper class to hold configuration of Graylog
  */
 @SuppressWarnings("FieldMayBeFinal")
-public class Configuration extends CaConfiguration {
+public class Configuration extends CaConfiguration implements CommonNodeConfiguration {
     public static final String SAFE_CLASSES = "safe_classes";
 
     public static final String CONTENT_PACKS_DIR = "content_packs_dir";
@@ -170,6 +172,9 @@ public class Configuration extends CaConfiguration {
     @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
 
+    @Parameter(value = "user_password_pbkdf2_iterations", validators = PositiveIntegerValidator.class)
+    private int userPasswordPbkdf2Iterations = PBKDF2PasswordAlgorithm.DEFAULT_ITERATIONS;
+
     @Parameter(value = "content_packs_loader_enabled")
     private boolean contentPacksLoaderEnabled = false;
 
@@ -248,6 +253,14 @@ public class Configuration extends CaConfiguration {
 
     @Parameter(value = "field_value_suggestion_mode", required = true, converter = FieldValueSuggestionModeConverter.class)
     private FieldValueSuggestionMode fieldValueSuggestionMode = FieldValueSuggestionMode.ON;
+
+    @Documentation("""
+            Enabling this parameter will activate automatic security configuration. Graylog server will
+            set a default 30-day automatic certificate renewal policy and create a self-signed CA. This CA
+            will be used to sign certificates for SSL communication between the server and datanodes.
+            """)
+    @Parameter(value = "selfsigned_startup")
+    private boolean selfsignedStartup = false;
 
     public static final String INSTALL_HTTP_CONNECTION_TIMEOUT = "install_http_connection_timeout";
     public static final String INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL = "install_output_buffer_drain_interval";
@@ -559,6 +572,10 @@ public class Configuration extends CaConfiguration {
         return queryLatencyMonitoringWindowSize;
     }
 
+    public boolean selfsignedStartupEnabled() {
+        return selfsignedStartup;
+    }
+
     public static class NodeIdFileValidator implements Validator<String> {
         @Override
         public void validate(String name, String path) throws ValidationException {
@@ -653,4 +670,13 @@ public class Configuration extends CaConfiguration {
         return Math.round(Tools.availableProcessors() * 0.162f + 0.625f);
     }
 
+    @Override
+    public boolean withPlugins() {
+        return true;
+    }
+
+    @Override
+    public boolean withInputs() {
+        return true;
+    }
 }

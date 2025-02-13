@@ -19,30 +19,35 @@ import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { ConfirmDialog } from 'components/common';
-import useStreamDataWarehouseHasData from 'components/streams/StreamsOverview/hooks/useStreamDataWarehouseHasData';
-import useIsStreamDataWarehouseEnabled from 'components/streams/StreamsOverview/hooks/useIsStreamDataWarehouseEnabled';
+import useStreamDataLakeHasData from 'components/streams/StreamsOverview/hooks/useStreamDataLakeHasData';
+import useIsStreamDataLakeEnabled from 'components/streams/StreamsOverview/hooks/useIsStreamDataLakeEnabled';
 
 type Props = {
-  onDelete: () => void,
-  streamId: string,
-  streamTitle: string,
-  onCancel: () => void,
+  onDelete: () => void;
+  streamId: string;
+  streamTitle: string;
+  onCancel: () => void;
 };
 
 const StreamDeleteModal = ({ onDelete, streamId, streamTitle, onCancel }: Props) => {
-  const DataWarehouseStreamDeleteWarning = usePluginEntities('dataWarehouse')?.[0]?.DataWarehouseStreamDeleteWarning;
-  const streamDataWarehouseHasData = useStreamDataWarehouseHasData(streamId, !!DataWarehouseStreamDeleteWarning);
-  const isDataWarehouseEnable = useIsStreamDataWarehouseEnabled(streamId, !!DataWarehouseStreamDeleteWarning);
+  const DataLakeStreamDeleteWarning = usePluginEntities('dataLake')?.[0]?.DataLakeStreamDeleteWarning;
+  const streamDataLakeHasData = useStreamDataLakeHasData(streamId, !!DataLakeStreamDeleteWarning);
+  const isDataLakeEnable = useIsStreamDataLakeEnabled(streamId, !!DataLakeStreamDeleteWarning);
 
-  const shouldShowWarning = useMemo(() => isDataWarehouseEnable || streamDataWarehouseHasData, [isDataWarehouseEnable, streamDataWarehouseHasData]);
+  const shouldShowWarning = useMemo(
+    () => isDataLakeEnable || streamDataLakeHasData,
+    [isDataLakeEnable, streamDataLakeHasData],
+  );
 
   return (
-    <ConfirmDialog show
-                   onConfirm={onDelete}
-                   btnConfirmDisabled={shouldShowWarning}
-                   onCancel={onCancel}
-                   title="Delete Stream">
-      {shouldShowWarning ? <DataWarehouseStreamDeleteWarning /> : `Do you really want to remove stream:  ${streamTitle}?`}
+    <ConfirmDialog
+      show
+      onConfirm={onDelete}
+      btnConfirmDisabled={shouldShowWarning}
+      onCancel={onCancel}
+      title="Delete Stream"
+    >
+      {shouldShowWarning ? <DataLakeStreamDeleteWarning /> : `Do you really want to remove stream:  ${streamTitle}?`}
     </ConfirmDialog>
   );
 };

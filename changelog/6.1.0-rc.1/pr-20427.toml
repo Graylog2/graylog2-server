@@ -1,0 +1,5 @@
+type = "c" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Display Warm Tier Search warning as streams with timestamp."
+
+issues = ["graylog-plugin-enterprise#8402"]
+pulls = ["20427"]

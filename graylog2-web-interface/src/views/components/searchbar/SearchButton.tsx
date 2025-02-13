@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -29,33 +28,37 @@ import useLocation from 'routing/useLocation';
 
 export const SEARCH_BUTTON_WIDTH = '64';
 
-const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => css`
-  position: relative;
-  min-width: ${SEARCH_BUTTON_WIDTH}px;
+const StyledButton = styled(Button)<{ $dirty: boolean }>(
+  ({ theme, $dirty }) => css`
+    position: relative;
+    min-width: ${SEARCH_BUTTON_WIDTH}px;
 
-  &&&.disabled {
-    color: ${theme.utils.contrastingColor(theme.colors.variant.success)};
-  }
-
-  ${$dirty ? css`
-    &::after {
-      position: absolute;
-      content: '';
-      height: 16px;
-      width: 16px;
-      top: -5px;
-      right: -6px;
-      border-radius: 50%;
-      background-color: ${theme.colors.variant.warning};
+    &&&.disabled {
+      color: ${theme.utils.contrastingColor(theme.colors.variant.success)};
     }
-` : ''}
-`);
+
+    ${$dirty
+      ? css`
+          &::after {
+            position: absolute;
+            content: '';
+            height: 16px;
+            width: 16px;
+            top: -5px;
+            right: -6px;
+            border-radius: 50%;
+            background-color: ${theme.colors.variant.warning};
+          }
+        `
+      : ''}
+  `,
+);
 
 type Props = {
-  disabled: boolean,
-  glyph: IconName,
-  dirty: boolean,
-  displaySpinner?: boolean,
+  disabled?: boolean;
+  glyph?: IconName;
+  dirty?: boolean;
+  displaySpinner?: boolean;
 };
 
 const onButtonClick = (e: MouseEvent, disabled: Boolean, triggerTelemetry: () => void) => {
@@ -67,7 +70,7 @@ const onButtonClick = (e: MouseEvent, disabled: Boolean, triggerTelemetry: () =>
   triggerTelemetry();
 };
 
-const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
+const SearchButton = ({ dirty = false, disabled = false, glyph = 'search', displaySpinner = false }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
   const className = disabled ? 'disabled' : '';
@@ -85,29 +88,17 @@ const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
   };
 
   return (
-    <StyledButton onClick={(e) => onButtonClick(e, disabled, triggerTelemetry)}
-                  title={title}
-                  className={className}
-                  type="submit"
-                  bsStyle="success"
-                  $dirty={dirty}>
+    <StyledButton
+      onClick={(e) => onButtonClick(e, disabled, triggerTelemetry)}
+      title={title}
+      className={className}
+      type="submit"
+      bsStyle="success"
+      $dirty={dirty}
+    >
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>
   );
-};
-
-SearchButton.defaultProps = {
-  disabled: false,
-  displaySpinner: false,
-  dirty: false,
-  glyph: 'search',
-};
-
-SearchButton.propTypes = {
-  disabled: PropTypes.bool,
-  displaySpinner: PropTypes.bool,
-  dirty: PropTypes.bool,
-  glyph: PropTypes.string,
 };
 
 export default SearchButton;

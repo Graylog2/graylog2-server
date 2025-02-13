@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { DataTable, Icon } from 'components/common';
@@ -30,12 +29,12 @@ const TitleTd = styled.td`
 `;
 
 type Props = {
-  pipeline: PipelineType,
-  stage: StageType,
-  rules: RuleType[],
+  pipeline: PipelineType;
+  stage: StageType;
+  rules?: RuleType[];
 };
 
-const StageRules = ({ pipeline, stage, rules }: Props) => {
+const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
   const headers = ['Title', 'Description', 'Throughput', 'Errors'];
 
   const _ruleRowFormatter = (ruleArg, ruleIdx) => {
@@ -50,31 +49,33 @@ const StageRules = ({ pipeline, stage, rules }: Props) => {
         description: `Rule ${stage.rules[ruleIdx]} has been renamed or removed. This rule will be skipped.`,
       };
 
-      ruleTitle = <span><Icon name="warning" className="text-danger" /> {stage.rules[ruleIdx]}</span>;
+      ruleTitle = (
+        <span>
+          <Icon name="warning" className="text-danger" /> {stage.rules[ruleIdx]}
+        </span>
+      );
     } else {
       const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
 
-      ruleTitle = (
-        <Link to={`${Routes.SYSTEM.PIPELINES.RULE(rule.id)}${isRuleBuilder}`}>
-          {rule.title}
-        </Link>
-      );
+      ruleTitle = <Link to={`${Routes.SYSTEM.PIPELINES.RULE(rule.id)}${isRuleBuilder}`}>{rule.title}</Link>;
     }
 
     return (
       <tr key={rule.id}>
-        <TitleTd>
-          {ruleTitle}
-        </TitleTd>
+        <TitleTd>{ruleTitle}</TitleTd>
         <td>{rule.description}</td>
         <td>
-          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.executed`}>
-            <CounterRate zeroOnMissing suffix="msg/s" />
+          <MetricContainer
+            name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.executed`}
+          >
+            <CounterRate suffix="msg/s" />
           </MetricContainer>
         </td>
         <td>
-          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.failed`}>
-            <CounterRate showTotal zeroOnMissing suffix="errors/s" />
+          <MetricContainer
+            name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.failed`}
+          >
+            <CounterRate showTotal suffix="errors/s" />
           </MetricContainer>
         </td>
       </tr>
@@ -82,27 +83,19 @@ const StageRules = ({ pipeline, stage, rules }: Props) => {
   };
 
   return (
-    <DataTable id="processing-timeline"
-               className="table-hover"
-               headers={headers}
-               // eslint-disable-next-line react/no-unstable-nested-components
-               headerCellFormatter={(header) => (<th>{header}</th>)}
-               rows={rules}
-               dataRowFormatter={_ruleRowFormatter}
-               noDataText="This stage has no rules yet. Click on edit to add some."
-               filterLabel=""
-               filterKeys={[]} />
+    <DataTable
+      id="processing-timeline"
+      className="table-hover"
+      headers={headers}
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerCellFormatter={(header) => <th>{header}</th>}
+      rows={rules}
+      dataRowFormatter={_ruleRowFormatter}
+      noDataText="This stage has no rules yet. Click on edit to add some."
+      filterLabel=""
+      filterKeys={[]}
+    />
   );
-};
-
-StageRules.propTypes = {
-  pipeline: PropTypes.object.isRequired,
-  stage: PropTypes.object.isRequired,
-  rules: PropTypes.array,
-};
-
-StageRules.defaultProps = {
-  rules: [],
 };
 
 export default StageRules;

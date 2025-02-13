@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Rnd } from 'react-rnd';
 import styled, { css } from 'styled-components';
 import debounce from 'lodash/debounce';
@@ -24,8 +23,9 @@ import { Button } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 const DEFAULT_SIZE = { width: 450, height: 400 };
-const halfWidth = Math.ceil((window.innerWidth / 2) - (DEFAULT_SIZE.width / 2));
-const halfHeight = Math.ceil((window.innerHeight / 2) - (DEFAULT_SIZE.height / 2));
+const DEFAULT_STRING_SIZE = { width: DEFAULT_SIZE.width.toString(), height: DEFAULT_SIZE.height.toString() };
+const halfWidth = Math.ceil(window.innerWidth / 2 - DEFAULT_SIZE.width / 2);
+const halfHeight = Math.ceil(window.innerHeight / 2 - DEFAULT_SIZE.height / 2);
 const stayOnScreenHeight = halfHeight < 0 ? 55 : halfHeight;
 const DEFAULT_POSITION = {
   x: halfWidth,
@@ -39,53 +39,64 @@ const InteractableModalWrapper = styled.div`
   pointer-events: none;
 `;
 
-const StyledRnd = styled(Rnd)(({ theme }) => css`
-  box-shadow: 0 0 9px ${theme.colors.global.navigationBoxShadow},
-    0 0 6px ${theme.colors.global.navigationBoxShadow},
-    0 0 3px ${theme.colors.global.navigationBoxShadow};
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lightest.default};
-  border-radius: 3px;
-  flex-direction: column;
-  display: flex !important;
-  pointer-events: auto;
-`);
+const StyledRnd = styled(Rnd)(
+  ({ theme }) => css`
+    box-shadow:
+      0 0 9px ${theme.colors.global.navigationBoxShadow},
+      0 0 6px ${theme.colors.global.navigationBoxShadow},
+      0 0 3px ${theme.colors.global.navigationBoxShadow};
+    background-color: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.variant.lightest.default};
+    border-radius: 3px;
+    flex-direction: column;
+    display: flex !important;
+    pointer-events: auto;
+  `,
+);
 
 const Content = styled.div`
   flex: 1;
   padding: 0 15px;
 `;
 
-const Header = styled.header(({ theme }) => css`
-  padding: 6px 12px 9px;
-  display: flex;
-  align-items: center;
-  background-color: ${theme.colors.variant.lightest.default};
-  border-bottom: 1px solid ${theme.colors.variant.lighter.default};
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  cursor: move;
-`);
+const Header = styled.header(
+  ({ theme }) => css`
+    padding: 6px 12px 9px;
+    display: flex;
+    align-items: center;
+    background-color: ${theme.colors.variant.lightest.default};
+    border-bottom: 1px solid ${theme.colors.variant.lighter.default};
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    cursor: move;
+  `,
+);
 
-const Title = styled.h3(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-  flex: 1;
-`);
+const Title = styled.h3(
+  ({ theme }) => css`
+    color: ${theme.colors.global.textDefault};
+    flex: 1;
+  `,
+);
 
-const DragBars = styled(Icon)(({ theme }) => css`
-  color: ${theme.colors.variant.darker.default};
-  margin-right: 9px;
-`);
+const DragBars = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.darker.default};
+    margin-right: 9px;
+  `,
+);
 
-const CloseButton = styled(Button)(({ theme }) => css`
-  && {
-    color: ${theme.colors.variant.light.default};
-    
-    &:hover {
-      color: ${theme.colors.variant.default};
+const CloseButton = styled(Button)(
+  ({ theme }) => css`
+    && {
+      color: ${theme.colors.variant.light.default};
+
+      &:hover {
+        color: ${theme.colors.variant.default};
+      }
     }
-  }
-`);
+  `,
+);
 
 /**
  * A resizable and draggable modal component
@@ -93,33 +104,33 @@ const CloseButton = styled(Button)(({ theme }) => css`
  * Can be controlled or uncontrolled, using [`react-rnd`](https://github.com/bokuweb/react-rnd) under the hood
  */
 
-type Coords = { x: number, y: number };
-type Size = { width: string, height: string };
+type Coords = { x: number; y: number };
+type Size = { width: string; height: string };
 
 type Props = {
-  className?: string,
-  minHeight?: number,
-  minWidth?: number,
-  onClose: () => void,
-  onDrag: (newCoords: Coords) => void,
-  onResize: (newSize: Size) => void,
-  position: Coords,
-  size: Size,
-  title: string,
-  wrapperClassName?: string,
+  className?: string;
+  minHeight?: number;
+  minWidth?: number;
+  onClose?: () => void;
+  onDrag?: (newCoords: Coords) => void;
+  onResize?: (newSize: Size) => void;
+  position?: Coords;
+  size?: Size;
+  title?: string;
+  wrapperClassName?: string;
 };
 
 const InteractableModal = ({
   children,
   className,
-  minHeight,
-  minWidth,
-  onClose,
-  onDrag,
-  onResize,
-  position,
-  size,
-  title,
+  minHeight = DEFAULT_SIZE.height,
+  minWidth = DEFAULT_SIZE.width,
+  onClose = () => {},
+  onDrag = () => {},
+  onResize = () => {},
+  position = DEFAULT_POSITION,
+  size = DEFAULT_STRING_SIZE,
+  title = '',
   wrapperClassName,
 }: React.PropsWithChildren<Props>) => {
   const dragHandleRef = useRef(null);
@@ -212,76 +223,35 @@ const InteractableModal = ({
 
   return (
     <InteractableModalWrapper className={wrapperClassName} role="dialog">
-      <StyledRnd default={{ ...position, ...size }}
-                 minHeight={minHeight}
-                 minWidth={minWidth}
-                 maxHeight={window.innerHeight}
-                 maxWidth={window.innerWidth}
-                 dragHandleClassName={dragHandleClassName}
-                 onDragStop={handleDragStop}
-                 onResizeStop={handleResizeStop}
-                 position={dragPosition}
-                 size={resizeSize}
-                 className={className}
-                 bounds="window">
+      <StyledRnd
+        default={{ ...position, ...size }}
+        minHeight={minHeight}
+        minWidth={minWidth}
+        maxHeight={window.innerHeight}
+        maxWidth={window.innerWidth}
+        dragHandleClassName={dragHandleClassName}
+        onDragStop={handleDragStop}
+        onResizeStop={handleResizeStop}
+        position={dragPosition}
+        size={resizeSize}
+        className={className}
+        bounds="window"
+      >
         <Header ref={dragHandleRef}>
-          <Title><DragBars name="drag_indicator" />{title}</Title>
+          <Title>
+            <DragBars name="drag_indicator" />
+            {title}
+          </Title>
 
           <CloseButton bsStyle="link" onClick={onClose} bsSize="small" title="Close">
             <Icon name="close" size="lg" />
           </CloseButton>
         </Header>
 
-        <Content>
-          {children}
-        </Content>
+        <Content>{children}</Content>
       </StyledRnd>
     </InteractableModalWrapper>
   );
-};
-
-InteractableModal.propTypes = {
-  /** className that will be applied to `react-rnd` */
-  className: PropTypes.string,
-  /** Content of the InteractableModal modal */
-  children: PropTypes.node.isRequired,
-  /** Minimum height that modal can be reduced to */
-  minHeight: PropTypes.number,
-  /** Minimum width that modal can be reduced to */
-  minWidth: PropTypes.number,
-  /** Function that is called when InteractableModal is closed */
-  onClose: PropTypes.func,
-  /** Function that is called when InteractableModal has finished being dragged */
-  onDrag: PropTypes.func,
-  /** Function that is called when InteractableModal has finished being resized */
-  onResize: PropTypes.func,
-  /** If you want to control InteractableModal you can pass specific position */
-  position: PropTypes.shape({
-    x: PropTypes.number,
-    y: PropTypes.number,
-  }),
-  /** If you want to control InteractableModal you can pass specific size */
-  size: PropTypes.shape({
-    height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  }),
-  /** Title that appears at the top of the window */
-  title: PropTypes.string,
-  /** Used to style wrapping component */
-  wrapperClassName: PropTypes.string,
-};
-
-InteractableModal.defaultProps = {
-  className: undefined,
-  minHeight: DEFAULT_SIZE.height,
-  minWidth: DEFAULT_SIZE.width,
-  onClose: () => {},
-  onDrag: () => {},
-  onResize: () => {},
-  position: DEFAULT_POSITION,
-  size: DEFAULT_SIZE,
-  title: '',
-  wrapperClassName: undefined,
 };
 
 export default InteractableModal;

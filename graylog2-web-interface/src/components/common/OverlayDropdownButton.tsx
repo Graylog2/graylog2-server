@@ -23,27 +23,27 @@ import type { BsSize } from 'components/bootstrap/types';
 import { Icon } from 'components/common/index';
 
 type Props = {
-  alwaysShowCaret?: boolean,
-  bsSize?: BsSize,
-  buttonTitle?: string,
-  children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode),
-  closeOnSelect?: boolean,
-  disabled?: boolean
-  dropdownZIndex?: number,
-  onToggle?: (isOpen: boolean) => void,
-  title: React.ReactNode,
+  alwaysShowCaret?: boolean;
+  bsSize?: BsSize;
+  buttonTitle?: string;
+  children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode);
+  closeOnSelect?: boolean;
+  disabled?: boolean;
+  dropdownZIndex?: number;
+  onToggle?: (isOpen: boolean) => void;
+  title: React.ReactNode;
 };
 
 /**
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
  */
 const OverlayDropdownButton = ({
-  alwaysShowCaret,
+  alwaysShowCaret = false,
   bsSize,
   buttonTitle,
   children,
-  closeOnSelect,
-  disabled,
+  closeOnSelect = true,
+  disabled = false,
   dropdownZIndex,
   onToggle: onToggleProp,
   title,
@@ -59,36 +59,30 @@ const OverlayDropdownButton = ({
   };
 
   return (
-    <OverlayDropdown show={show}
-                     closeOnSelect={closeOnSelect}
-                     dropdownZIndex={dropdownZIndex}
-                     alwaysShowCaret={alwaysShowCaret}
-                     toggleChild={(
-                       <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
-                         <Button bsSize={bsSize}
-                                 className="dropdown-toggle"
-                                 aria-label={buttonTitle}
-                                 title={buttonTitle}
-                                 disabled={disabled}>
-                           {title} <Icon name="arrow_drop_down" />
-                         </Button>
-                       </div>
-                     )}
-                     placement="bottom"
-                     onToggle={_onToggle}>
+    <OverlayDropdown
+      show={show}
+      closeOnSelect={closeOnSelect}
+      dropdownZIndex={dropdownZIndex}
+      alwaysShowCaret={alwaysShowCaret}
+      toggleChild={
+        <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
+          <Button
+            bsSize={bsSize}
+            className="dropdown-toggle"
+            aria-label={buttonTitle}
+            title={buttonTitle}
+            disabled={disabled}
+          >
+            {title} <Icon name="arrow_drop_down" />
+          </Button>
+        </div>
+      }
+      placement="bottom"
+      onToggle={_onToggle}
+    >
       {typeof children === 'function' ? children({ toggleDropdown: _onToggle }) : children}
     </OverlayDropdown>
   );
-};
-
-OverlayDropdownButton.defaultProps = {
-  alwaysShowCaret: false,
-  bsSize: undefined,
-  buttonTitle: undefined,
-  closeOnSelect: true,
-  disabled: false,
-  dropdownZIndex: undefined,
-  onToggle: undefined,
 };
 
 export default OverlayDropdownButton;

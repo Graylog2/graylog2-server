@@ -24,16 +24,29 @@ import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatan
 const RestartGraylog = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => (
   <>
     <p>Almost there!</p>
-    <p>Please remove the <code>elasticsearch_hosts</code> line from your <code>graylog.conf</code></p>
-    <p>E.g., <code>elasticsearch_hosts = https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200</code></p>
+    <p>
+      Please remove the <code>elasticsearch_hosts</code> line from your <code>server.conf</code>
+    </p>
+    <p>
+      E.g.,{' '}
+      <code>
+        elasticsearch_hosts =
+        https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200
+      </code>
+    </p>
     <Space h="md" />
     <MigrationDatanodeList showProvisioningState={false} />
-    <p>Please wait for all data nodes to become &apos;AVAILABLE&apos;. Please check the data node&apos;s log if they do
+    <p>
+      Please wait for all data nodes to become &apos;AVAILABLE&apos;. Please check the data node&apos;s log if they do
       not become available within 1-2 minutes.
     </p>
     {/* eslint-disable-next-line react/no-unescaped-entities */}
     <p>Once that's done, please restart Graylog to finish the migration.</p>
-    <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+    <MigrationStepTriggerButtonToolbar
+      hidden={hideActions}
+      nextSteps={currentStep.next_steps}
+      onTriggerStep={onTriggerStep}
+    />
   </>
 );
 

@@ -28,48 +28,83 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { NO_FIELD_NAME_SERIES, UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
-import useChartDataSettingsWithCustomUnits
-  from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
+import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 
-const useBarChartDataSettingsWithCustomUnits = ({ config, barmode, effectiveTimerange }: {
-  config: AggregationWidgetConfig,
-  barmode?: BarMode,
-  effectiveTimerange: AbsoluteTimeRange,
+const useBarChartDataSettingsWithCustomUnits = ({
+  config,
+  barmode,
+  effectiveTimerange,
+}: {
+  config: AggregationWidgetConfig;
+  barmode?: BarMode;
+  effectiveTimerange: AbsoluteTimeRange;
 }) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
-  const { fieldNameToAxisCountMapper, unitTypeMapper } = useMemo(() => generateMappersForYAxis({ series: config.series, units: widgetUnits }), [config.series, widgetUnits]);
+  const { fieldNameToAxisCountMapper, unitTypeMapper } = useMemo(
+    () => generateMappersForYAxis({ series: config.series, units: widgetUnits }),
+    [config.series, widgetUnits],
+  );
   const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
 
-  return useCallback(({
-    originalName, values, idx, total, xAxisItemsLength, fullPath,
-  }: { xAxisItemsLength: number, originalName: string, name: string, values: Array<any>, idx: number, total: number, fullPath: string }):Partial<ChartDefinition> => {
-    if (!unitFeatureEnabled) return ({});
-
-    const fieldNameKey = getFieldNameFromTrace({ fullPath, series: config.series }) ?? NO_FIELD_NAME_SERIES;
-    const { y: convertedValues, yaxis, ...hoverTemplateSettings } = getChartDataSettingsWithCustomUnits({ originalName, fullPath, values });
-    const axisNumber = fieldNameToAxisCountMapper?.[fieldNameKey];
-    const totalAxis = Object.keys(unitTypeMapper).length;
-
-    const offsetSettings = getBarChartTraceOffsetSettings(barmode, {
-      yaxis,
-      totalAxis,
-      axisNumber,
-      traceIndex: idx,
-      totalTraces: total,
-      effectiveTimerange,
-      isTimeline: config.isTimeline,
-      xAxisItemsLength: xAxisItemsLength,
-    });
-
-    return ({
-      yaxis,
-      y: convertedValues,
+  return useCallback(
+    ({
+      values,
+      idx,
+      total,
+      xAxisItemsLength,
       fullPath,
-      ...hoverTemplateSettings,
-      ...offsetSettings,
-    });
-  }, [barmode, config.isTimeline, config.series, effectiveTimerange, fieldNameToAxisCountMapper, getChartDataSettingsWithCustomUnits, unitFeatureEnabled, unitTypeMapper]);
+      name,
+    }: {
+      xAxisItemsLength: number;
+      originalName: string;
+      name: string;
+      values: Array<any>;
+      idx: number;
+      total: number;
+      fullPath: string;
+    }): Partial<ChartDefinition> => {
+      if (!unitFeatureEnabled) return {};
+
+      const fieldNameKey = getFieldNameFromTrace({ fullPath, series: config.series }) ?? NO_FIELD_NAME_SERIES;
+      const {
+        y: convertedValues,
+        yaxis,
+        ...hoverTemplateSettings
+      } = getChartDataSettingsWithCustomUnits({ name, fullPath, values });
+      const axisNumber = fieldNameToAxisCountMapper?.[fieldNameKey];
+      const totalAxis = Object.keys(unitTypeMapper).length;
+
+      const offsetSettings = getBarChartTraceOffsetSettings(barmode, {
+        yaxis,
+        totalAxis,
+        axisNumber,
+        traceIndex: idx,
+        totalTraces: total,
+        effectiveTimerange,
+        isTimeline: config.isTimeline,
+        xAxisItemsLength: xAxisItemsLength,
+      });
+
+      return {
+        yaxis,
+        y: convertedValues,
+        fullPath,
+        ...hoverTemplateSettings,
+        ...offsetSettings,
+      };
+    },
+    [
+      barmode,
+      config.isTimeline,
+      config.series,
+      effectiveTimerange,
+      fieldNameToAxisCountMapper,
+      getChartDataSettingsWithCustomUnits,
+      unitFeatureEnabled,
+      unitTypeMapper,
+    ],
+  );
 };
 
 export default useBarChartDataSettingsWithCustomUnits;

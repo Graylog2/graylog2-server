@@ -52,7 +52,9 @@ jest.mock('util/AppConfig', () => ({
 
 jest.mock('components/content-stream/ContentStreamNews', () => () => <div>ContentStreamNews</div>);
 
-jest.mock('components/content-stream/ContentStreamReleasesSection', () => () => <div>ContentStreamReleasesSection</div>);
+jest.mock('components/content-stream/ContentStreamReleasesSection', () => () => (
+  <div>ContentStreamReleasesSection</div>
+));
 
 jest.mock('hooks/useCurrentUser');
 

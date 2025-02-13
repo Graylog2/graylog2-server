@@ -29,29 +29,33 @@ const Row = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: .6rem;
+  gap: 0.6rem;
 `;
 
-const DateRow = styled(Row)(({ theme }) => css`
-  margin-top: 10px;
-  margin-bottom: -10px;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: .9rem;
-  font-weight: normal;
-  background-color: ${theme.colors.global.background};
-  color: ${theme.colors.global.textDefault};
-`);
+const DateRow = styled(Row)(
+  ({ theme }) => css`
+    margin-top: 10px;
+    margin-bottom: -10px;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: normal;
+    background-color: ${theme.colors.global.background};
+    color: ${theme.colors.global.textDefault};
+  `,
+);
 
-const ClearDate = styled(Icon)(({ theme }) => css`
-  padding-left: 5px;
-  cursor: pointer;
-  color: ${theme.colors.variant.default};
-`);
+const ClearDate = styled(Icon)(
+  ({ theme }) => css`
+    padding-left: 5px;
+    cursor: pointer;
+    color: ${theme.colors.variant.default};
+  `,
+);
 
 type Props = {
-  values: Array<string>,
-  onChange: (arg: Array<string>) => void,
+  values: Array<string>;
+  onChange: (arg: Array<string>) => void;
 };
 
 const DateFilter = ({ values = [], onChange }: Props) => {
@@ -79,8 +83,8 @@ const DateFilter = ({ values = [], onChange }: Props) => {
     } else if (values.length === 2 || !dateRange) {
       onChange([isoDate]);
     } else {
-      onChange([...values, isoDate]
-        .sort((d1, d2) => {
+      onChange(
+        [...values, isoDate].sort((d1, d2) => {
           const d1Int = new Date(d1).getTime();
           const d2Int = new Date(d2).getTime();
 
@@ -99,18 +103,17 @@ const DateFilter = ({ values = [], onChange }: Props) => {
     <Column>
       <Row>
         <span>Single Date</span>
-        <Switch checked={dateRange}
-                aria-label={`Select type ${dateRange ? 'single date' : 'range'}`}
-                onChange={toggleDateRange} />
+        <Switch
+          checked={dateRange}
+          aria-label={`Select type ${dateRange ? 'single date' : 'range'}`}
+          onChange={toggleDateRange}
+        />
         <span>Range</span>
       </Row>
       {values.length > 0 && (
         <DateRow>
           {values.join(' to ')}
-          <ClearDate data-testid="clear-date"
-                     name="close"
-                     size="xs"
-                     onClick={() => onChange([])} />
+          <ClearDate data-testid="clear-date" name="close" size="xs" onClick={() => onChange([])} />
         </DateRow>
       )}
       <DatePicker date={currentDate} onChange={onDateChange} />

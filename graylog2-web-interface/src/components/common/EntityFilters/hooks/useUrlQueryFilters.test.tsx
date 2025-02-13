@@ -17,37 +17,36 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { OrderedMap } from 'immutable';
 import * as React from 'react';
-import { useQueryParam, QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { MemoryRouter } from 'react-router-dom';
 
+import { useQueryParam } from 'routing/QueryParams';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import { asMock } from 'helpers/mocking';
 
 import useUrlQueryFilters from './useUrlQueryFilters';
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 
 describe('useUrlQueryFilters', () => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <MemoryRouter>
-      <QueryParamProvider adapter={ReactRouter6Adapter}>
-        {children}
-      </QueryParamProvider>
+      <DefaultQueryParamProvider>{children}</DefaultQueryParamProvider>
     </MemoryRouter>
   );
 
   beforeEach(() => {
-    asMock(useQueryParam).mockReturnValue([
-      ['index_set_id=index_set_id_1', 'index_set_id=index_set_id_2'], () => {}]);
+    asMock(useQueryParam).mockReturnValue([['index_set_id=index_set_id_1', 'index_set_id=index_set_id_2'], () => {}]);
   });
 
   it('provides correct response for URL query params', async () => {
     const { waitFor, result } = renderHook(() => useUrlQueryFilters(), { wrapper });
 
-    await waitFor(() => expect(result.current[0]).toEqual(OrderedMap({ index_set_id: ['index_set_id_1', 'index_set_id_2'] })));
+    await waitFor(() =>
+      expect(result.current[0]).toEqual(OrderedMap({ index_set_id: ['index_set_id_1', 'index_set_id_2'] })),
+    );
   });
 
   it('updates URL query params correctly', async () => {
@@ -57,6 +56,8 @@ describe('useUrlQueryFilters', () => {
 
     result.current[1](OrderedMap({ index_set_id: ['index_set_id_1', 'index_set_id_2'] }));
 
-    await waitFor(() => expect(updateUrlQueryParams).toHaveBeenCalledWith(['index_set_id=index_set_id_1', 'index_set_id=index_set_id_2']));
+    await waitFor(() =>
+      expect(updateUrlQueryParams).toHaveBeenCalledWith(['index_set_id=index_set_id_1', 'index_set_id=index_set_id_2']),
+    );
   });
 });

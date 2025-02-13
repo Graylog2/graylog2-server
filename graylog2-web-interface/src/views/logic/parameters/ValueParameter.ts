@@ -28,11 +28,27 @@ export default class ValueParameter extends Parameter {
 
   static Builder: typeof Builder;
 
-  constructor(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding?: ParameterBinding) {
+  constructor(
+    name: string,
+    title: string,
+    description: string,
+    dataType: string,
+    defaultValue: any,
+    optional: boolean,
+    binding?: ParameterBinding,
+  ) {
     super(ValueParameter.type, name, title, description, dataType, defaultValue, optional, binding);
   }
 
-  static create(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding?: ParameterBinding): ValueParameter {
+  static create(
+    name: string,
+    title: string,
+    description: string,
+    dataType: string,
+    defaultValue: any,
+    optional: boolean,
+    binding?: ParameterBinding,
+  ): ValueParameter {
     return new ValueParameter(name, title, description, dataType, defaultValue, optional, binding);
   }
 
@@ -61,16 +77,20 @@ export default class ValueParameter extends Parameter {
   static fromJSON(value: ParameterJson): ValueParameter {
     const { name, title, description, data_type, default_value, optional, binding } = value;
 
-    return new ValueParameter(name, title, description, data_type, default_value, optional, ParameterBinding.fromJSON(binding));
+    return new ValueParameter(
+      name,
+      title,
+      description,
+      data_type,
+      default_value,
+      optional,
+      ParameterBinding.fromJSON(binding),
+    );
   }
 
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .type(ValueParameter.type)
-      .optional(false)
-      .dataType('any')
-      .binding(ParameterBinding.empty());
+    return new Builder().type(ValueParameter.type).optional(false).dataType('any').binding(ParameterBinding.empty());
   }
 }
 

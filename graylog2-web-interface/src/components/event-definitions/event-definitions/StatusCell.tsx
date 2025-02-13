@@ -24,13 +24,16 @@ import { Icon } from 'components/common';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 import type { EventDefinition } from '../event-definitions-types';
+import { isSystemEventDefinition } from '../event-definitions-types';
 
-const StatusLabel = styled(Label)<{ $clickable: boolean }>(({ $clickable }) => css`
-  cursor: ${$clickable ? 'pointer' : 'default'};
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
-`);
+const StatusLabel = styled(Label)<{ $clickable: boolean }>(
+  ({ $clickable }) => css`
+    cursor: ${$clickable ? 'pointer' : 'default'};
+    display: inline-flex;
+    justify-content: center;
+    gap: 4px;
+  `,
+);
 
 const Spacer = styled.div`
   border-left: 1px solid currentColor;
@@ -45,15 +48,15 @@ const _title = (disabled: boolean, disabledChange: boolean, description: string)
   return disabled ? 'Enable' : 'Disable';
 };
 
-type Props ={
-  eventDefinition: EventDefinition,
-}
+type Props = {
+  eventDefinition: EventDefinition;
+};
 
-const StatusCell = ({ eventDefinition } : Props) => {
+const StatusCell = ({ eventDefinition }: Props) => {
   const [showConfirmDisableModal, setShowConfirmDisableModal] = useState<boolean>(false);
   const { refetch: refetchEventDefinitions } = useTableFetchContext();
   const isEnabled = eventDefinition?.state === 'ENABLED';
-  const disableChange = eventDefinition?.config?.type === 'system-notifications-v1';
+  const disableChange = isSystemEventDefinition(eventDefinition);
   const description = isEnabled ? 'enabled' : 'disabled';
   const title = _title(!isEnabled, disableChange, description);
 
@@ -74,12 +77,14 @@ const StatusCell = ({ eventDefinition } : Props) => {
 
   return (
     <>
-      <StatusLabel bsStyle={isEnabled ? 'success' : 'warning'}
-                   onClick={disableChange ? undefined : toggleEventDefinitionStatus}
-                   title={title}
-                   aria-label={title}
-                   role="button"
-                   $clickable={!disableChange}>
+      <StatusLabel
+        bsStyle={isEnabled ? 'success' : 'warning'}
+        onClick={disableChange ? undefined : toggleEventDefinitionStatus}
+        title={title}
+        aria-label={title}
+        role="button"
+        $clickable={!disableChange}
+      >
         {description}
         {!disableChange && (
           <>
@@ -89,10 +94,12 @@ const StatusCell = ({ eventDefinition } : Props) => {
         )}
       </StatusLabel>
       {showConfirmDisableModal && (
-        <BootstrapModalConfirm showModal
-                               title="Disable event definition"
-                               onConfirm={handleConfirmDisable}
-                               onCancel={() => setShowConfirmDisableModal(false)}>
+        <BootstrapModalConfirm
+          showModal
+          title="Disable event definition"
+          onConfirm={handleConfirmDisable}
+          onCancel={() => setShowConfirmDisableModal(false)}
+        >
           {`Do you really want to disable event definition '${eventDefinition.title}'?`}
         </BootstrapModalConfirm>
       )}

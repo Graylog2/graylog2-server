@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.graph.MutableGraph;
+import org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchValidator;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
@@ -66,6 +67,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     public static final String FIELD_REQUIRES = "requires";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
+    public static final String FIELD_SKIP_NO_STREAMS_CHECK = "skip_no_streams_check";
 
     // generated during build to help quickly find a parameter by name.
     private ImmutableMap<String, Parameter> parameterIndex;
@@ -94,6 +96,9 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
+
+    @JsonProperty(FIELD_SKIP_NO_STREAMS_CHECK)
+    public abstract boolean skipNoStreamsCheck();
 
     @Override
     @JsonIgnore
@@ -129,7 +134,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
 
     public Search addStreamsToQueriesWithoutStreams(Supplier<Set<String>> defaultStreamsSupplier) {
-        if (!hasQueriesWithoutStreams()) {
+        if (!hasQueriesWithoutStreams() || DataWarehouseSearchValidator.containsDataWarehouseSearchElements(this)) {
             return this;
         }
         final Set<Query> withStreams = queries().stream().filter(Query::hasStreams).collect(toSet());
@@ -137,7 +142,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
         final Set<String> defaultStreams = defaultStreamsSupplier.get();
 
-        if (defaultStreams.isEmpty()) {
+        if (!skipNoStreamsCheck() && defaultStreams.isEmpty()) {
             throw new MissingStreamPermissionException("User doesn't have access to any streams",
                     Collections.emptySet());
         }
@@ -153,7 +158,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
     public Search addStreamsToQueriesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
                                                     StreamPermissions streamPermissions) {
-        if (!hasQueriesWithStreamCategories()) {
+        if (!hasQueriesWithStreamCategories() || DataWarehouseSearchValidator.containsDataWarehouseSearchElements(this)) {
             return this;
         }
         final Set<Query> withStreamCategories = queries().stream().filter(q -> !q.usedStreamCategories().isEmpty()).collect(toSet());
@@ -172,12 +177,51 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         return toBuilder().queries(newQueries).build();
     }
 
+    public Search addStreamsToSearchTypesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                                        StreamPermissions streamPermissions) {
+        if (!hasQuerySearchTypesWithStreamCategories() || DataWarehouseSearchValidator.containsDataWarehouseSearchElements(this)) {
+            return this;
+        }
+        final Set<Query> withStreamCategories = queries().stream()
+                .filter(q -> q.searchTypes().stream()
+                        .anyMatch(SearchType::hasStreamCategories))
+                .collect(toSet());
+        final Set<Query> withoutStreamCategories = Sets.difference(queries(), withStreamCategories);
+        final Set<Query> withMappedStreamCategories = new HashSet<>();
+
+        for (Query query : withStreamCategories) {
+            final Set<SearchType> mappedSearchTypes = new HashSet<>();
+            for (SearchType st : query.searchTypes()) {
+                if (!st.hasStreamCategories()) {
+                    mappedSearchTypes.add(st);
+                } else {
+                    final Set<String> mappedStreamIds = categoryMappingFunction.apply(st.streamCategories())
+                            .filter(streamPermissions::canReadStream)
+                            .collect(toSet());
+                    mappedStreamIds.addAll(st.streams());
+                    mappedSearchTypes.add(st.toBuilder().streams(mappedStreamIds).build());
+                }
+            }
+            withMappedStreamCategories.add(query.toBuilder().searchTypes(mappedSearchTypes).build());
+        }
+
+        final ImmutableSet<Query> newQueries = Sets.union(withMappedStreamCategories, withoutStreamCategories).immutableCopy();
+
+        return toBuilder().queries(newQueries).build();
+    }
+
     private boolean hasQueriesWithoutStreams() {
         return !queries().stream().allMatch(Query::hasStreams);
     }
 
     private boolean hasQueriesWithStreamCategories() {
         return queries().stream().anyMatch(q -> !q.usedStreamCategories().isEmpty());
+    }
+
+    private boolean hasQuerySearchTypesWithStreamCategories() {
+        return queries().stream()
+                .flatMap(q -> q.searchTypes().stream())
+                .anyMatch(SearchType::hasStreamCategories);
     }
 
     public abstract Builder toBuilder();
@@ -244,6 +288,9 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);
 
+        @JsonProperty(FIELD_SKIP_NO_STREAMS_CHECK)
+        public abstract Builder skipNoStreamsCheck(boolean skipNoStreamsCheck);
+
         abstract Search autoBuild();
 
         @JsonCreator
@@ -251,7 +298,8 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
             return new AutoValue_Search.Builder()
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC))
-                    .parameters(ImmutableSet.of());
+                    .parameters(ImmutableSet.of())
+                    .skipNoStreamsCheck(false);
         }
 
         public Search build() {

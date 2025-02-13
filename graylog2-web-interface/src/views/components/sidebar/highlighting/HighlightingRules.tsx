@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useState, forwardRef } from 'react';
 
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
 import IconButton from 'components/common/IconButton';
 import { SortableList } from 'components/common';
-import { updateHighlightingRules } from 'views/logic/slices/highlightActions';
-import useAppDispatch from 'stores/useAppDispatch';
-import type HighlightingRuleType from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type { Value, Condition, Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import HighlightingRuleClass from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 
 import HighlightingRule, { Container, RuleContainer } from './HighlightingRule';
@@ -34,58 +33,111 @@ import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
 
 type SortableHighlightingRuleProps = {
-  item: { id: string, rule: HighlightingRuleType },
-  draggableProps: DraggableProps,
-  dragHandleProps: DragHandleProps,
-  className?: string,
-  ref: React.Ref<HTMLDivElement>
-}
-const SortableHighlightingRule = ({ item: { id, rule }, draggableProps, dragHandleProps, className, ref }: SortableHighlightingRuleProps) => (
-  <HighlightingRule key={id}
-                    rule={rule}
-                    dragHandleProps={dragHandleProps}
-                    draggableProps={draggableProps}
-                    className={className}
-                    ref={ref} />
-);
-
-SortableHighlightingRule.defaultProps = {
-  className: undefined,
+  item: { id: string; rule: HighlightingRuleClass };
+  draggableProps: DraggableProps;
+  dragHandleProps: DragHandleProps;
+  className?: string;
+  onUpdate: (
+    existingRule: HighlightingRuleClass,
+    field: string,
+    value: Value,
+    condition: Condition,
+    color: Color,
+  ) => Promise<void>;
+  onDelete: (rule: HighlightingRuleClass) => Promise<void>;
 };
 
-const HighlightingRules = () => {
+const SortableHighlightingRule = forwardRef<HTMLDivElement, SortableHighlightingRuleProps>(
+  ({ item: { id, rule }, draggableProps, dragHandleProps, className = undefined, onUpdate, onDelete }, ref) => (
+    <HighlightingRule
+      key={id}
+      rule={rule}
+      onUpdate={onUpdate}
+      onDelete={onDelete}
+      dragHandleProps={dragHandleProps}
+      draggableProps={draggableProps}
+      className={className}
+      ref={ref}
+    />
+  ),
+);
+
+type Props = {
+  description: string;
+  onUpdateRules: (newRules: Array<HighlightingRuleClass>) => Promise<void>;
+  onCreateRule: (newRule: HighlightingRuleClass) => Promise<void>;
+  onUpdateRule: (
+    targetRule: HighlightingRuleClass,
+    field: string,
+    value: Value,
+    condition: Condition,
+    color: Color,
+  ) => Promise<void>;
+  onDeleteRule: (rule: HighlightingRuleClass) => Promise<void>;
+  showSearchHighlightInfo?: boolean;
+};
+
+const HighlightingRules = ({
+  description,
+  onUpdateRules,
+  onCreateRule: onCreateRuleProp,
+  onUpdateRule,
+  onDeleteRule,
+  showSearchHighlightInfo = true,
+}: Props) => {
   const [showForm, setShowForm] = useState(false);
   const rules = useContext(HighlightingRulesContext) ?? [];
-  const rulesWithId = rules.map((rule) => ({ rule, id: `${rule.field}-${rule.value}-${rule.color}-${rule.condition}` }));
-  const dispatch = useAppDispatch();
+  const rulesWithId = rules.map((rule) => ({
+    rule,
+    id: `${rule.field}-${rule.value}-${rule.color}-${rule.condition}`,
+  }));
 
-  const updateRules = useCallback((newRulesWithId: Array<{ id: string, rule: HighlightingRuleType }>) => {
-    const newRules = newRulesWithId.map(({ rule }) => rule);
+  const updateRules = useCallback(
+    (newRulesWithId: Array<{ id: string; rule: HighlightingRuleClass }>) => {
+      const newRules = newRulesWithId.map(({ rule }) => rule);
 
-    return dispatch(updateHighlightingRules(newRules));
-  }, [dispatch]);
+      return onUpdateRules(newRules);
+    },
+    [onUpdateRules],
+  );
+
+  const onCreateRule = useCallback(
+    (field: string, value: Value, condition: Condition, color: Color) =>
+      onCreateRuleProp(HighlightingRuleClass.create(field, value, condition, color)),
+    [onCreateRuleProp],
+  );
+
+  const listItemRender = useCallback(
+    (props: {
+      item: { id: string; rule: HighlightingRuleClass };
+      draggableProps: DraggableProps;
+      dragHandleProps: DragHandleProps;
+      className?: string;
+    }) => <SortableHighlightingRule {...props} onUpdate={onUpdateRule} onDelete={onDeleteRule} />,
+    [onDeleteRule, onUpdateRule],
+  );
 
   return (
     <>
-      <SectionInfo>
-        Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the graylog server config.
-        Any field value can be highlighted by clicking on the value and selecting &quot;Highlight this value&quot;.
-        If a term or a value has more than one rule, the first matching rule is used.
-      </SectionInfo>
+      <SectionInfo>{description}</SectionInfo>
       <SectionSubheadline>
-        Active highlights <IconButton className="pull-right"
-                                      name="add"
-                                      onClick={() => setShowForm(!showForm)}
-                                      title="Add highlighting rule" />
+        Active highlights{' '}
+        <IconButton
+          className="pull-right"
+          name="add"
+          onClick={() => setShowForm(!showForm)}
+          title="Add highlighting rule"
+        />
       </SectionSubheadline>
-      {showForm && <HighlightForm onClose={() => setShowForm(false)} />}
-      <Container $displayBorder={!!rulesWithId?.length}>
-        <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
-        <RuleContainer>Search terms</RuleContainer>
-      </Container>
-      <SortableList items={rulesWithId}
-                    onMoveItem={updateRules}
-                    customListItemRender={SortableHighlightingRule} />
+      {showForm && <HighlightForm onClose={() => setShowForm(false)} onSubmit={onCreateRule} />}
+
+      {showSearchHighlightInfo && (
+        <Container $displayBorder={!!rulesWithId?.length}>
+          <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
+          <RuleContainer>Search terms</RuleContainer>
+        </Container>
+      )}
+      <SortableList items={rulesWithId} onMoveItem={updateRules} customListItemRender={listItemRender} />
     </>
   );
 };

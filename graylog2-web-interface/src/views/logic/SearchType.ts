@@ -21,6 +21,5 @@ const searchTypesKey = 'searchTypes';
 export type SearchTypeId = string;
 
 export default function searchTypeDefinition(type: string) {
-  return PluginStore.exports(searchTypesKey)
-    .find((s) => s.type.toLocaleUpperCase() === type.toLocaleUpperCase());
+  return PluginStore.exports(searchTypesKey).find((s) => s.type.toLocaleUpperCase() === type.toLocaleUpperCase());
 }

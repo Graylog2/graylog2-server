@@ -56,21 +56,21 @@ const StreamsPage = () => {
 
   return (
     <DocumentTitle title="Streams">
-      <PageHeader title="Streams"
-                  documentationLink={{
-                    title: 'Streams documentation',
-                    path: DocsHelper.PAGES.STREAMS,
-                  }}
-                  actions={(
-                    <IfPermitted permissions="streams:create">
-                      <CreateStreamButton bsStyle="success"
-                                          onCreate={onSave}
-                                          indexSets={indexSets} />
-                    </IfPermitted>
-                  )}>
+      <PageHeader
+        title="Streams"
+        documentationLink={{
+          title: 'Streams documentation',
+          path: DocsHelper.PAGES.STREAMS,
+        }}
+        actions={
+          <IfPermitted permissions="streams:create">
+            <CreateStreamButton bsStyle="success" onCreate={onSave} indexSets={indexSets} />
+          </IfPermitted>
+        }
+      >
         <span>
-          You can route incoming messages into streams by applying rules against them. Messages matching
-          the rules of a stream are routed into it. A message can also be routed into multiple streams.
+          You can route incoming messages into streams by applying rules against them. Messages matching the rules of a
+          stream are routed into it. A message can also be routed into multiple streams.
         </span>
       </PageHeader>
 

@@ -17,9 +17,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { ContentStream } from '@graylog/server-api';
+
 import UserNotification from 'preflight/util/UserNotification';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { CONTENT_STREAM_CONTENT_KEY } from 'components/content-stream/hook/useContentStream';
+import { defaultOnError } from 'util/conditional/onError';
 
 export const CONTENT_STREAM_SETTINGS_KEY = ['content-stream', 'settings'];
 export const CONTENT_STREAM_TAGS_KEY = ['content-stream', 'tags'];
@@ -37,25 +39,28 @@ type ContentStreamSettings = {
 };
 
 const useContentStreamSettings = (): {
-  contentStreamSettings: ContentStreamSettings,
-  isLoadingContentStreamSettings: boolean,
-  onSaveContentStreamSetting: ({ settings, username }: {
-    settings: ContentStreamSettingsApi,
-    username: string,
-  }) => Promise<void>,
+  contentStreamSettings: ContentStreamSettings;
+  isLoadingContentStreamSettings: boolean;
+  onSaveContentStreamSetting: ({
+    settings,
+    username,
+  }: {
+    settings: ContentStreamSettingsApi;
+    username: string;
+  }) => Promise<void>;
   contenStreamTags: {
-    currentTag: string,
-    isLoadingTags: boolean,
-    refetchContentStreamTag: () => void,
-    contentStreamTagError: Error,
-  },
-  refetchContentStream: () => void,
+    currentTag: string;
+    isLoadingTags: boolean;
+    refetchContentStreamTag: () => void;
+    contentStreamTagError: Error;
+  };
+  refetchContentStream: () => void;
 } => {
   const queryClient = useQueryClient();
   const currentUser = useCurrentUser();
   const { getContentStreamUserSettings, setContentStreamUserSettings, getContentStreamTags } = ContentStream;
 
-  const saveSettings = async ({ settings, username }: { settings: ContentStreamSettingsApi, username: string }) => {
+  const saveSettings = async ({ settings, username }: { settings: ContentStreamSettingsApi; username: string }) => {
     await setContentStreamUserSettings(settings, username);
   };
 
@@ -63,31 +68,35 @@ const useContentStreamSettings = (): {
     data,
     isLoading,
     refetch: refetchContentStream,
-  } = useQuery<ContentStreamSettingsApi, Error>([CONTENT_STREAM_SETTINGS_KEY], () => getContentStreamUserSettings(currentUser.username), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading content stream config failed with status: ${errorThrown}`,
-        'Could not load content stream.');
-    },
-  });
+  } = useQuery<ContentStreamSettingsApi, Error>([CONTENT_STREAM_SETTINGS_KEY], () =>
+    defaultOnError(
+      getContentStreamUserSettings(currentUser.username),
+      'Loading content stream config failed with status',
+      'Could not load content stream.',
+    ),
+  );
   const {
     data: tags,
     isLoading: isLoadingTags,
     refetch: refetchContentStreamTag,
     error: contentStreamTagError,
-  } = useQuery<Array<string>, Error>([CONTENT_STREAM_TAGS_KEY], () => getContentStreamTags(), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading content stream tag failed with status: ${errorThrown}`,
-        'Could not load content stream tags.');
-    },
-  });
+  } = useQuery<Array<string>, Error>([CONTENT_STREAM_TAGS_KEY], () =>
+    defaultOnError(
+      getContentStreamTags(),
+      'Loading content stream tag failed with status',
+      'Could not load content stream tags.',
+    ),
+  );
   const { mutateAsync: onSaveContentStreamSetting } = useMutation(saveSettings, {
     onSuccess: () => {
       queryClient.invalidateQueries(CONTENT_STREAM_SETTINGS_KEY);
       queryClient.invalidateQueries(CONTENT_STREAM_CONTENT_KEY);
     },
     onError: (errorThrown) => {
-      UserNotification.error(`Enabling content stream failed with status: ${errorThrown}`,
-        'Could not cancel instant archiving jobs');
+      UserNotification.error(
+        `Enabling content stream failed with status: ${errorThrown}`,
+        'Could not cancel instant archiving jobs',
+      );
     },
   });
 

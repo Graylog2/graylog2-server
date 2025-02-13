@@ -34,6 +34,7 @@ public class IOState<T extends Stoppable> {
 
     public enum Type {
         CREATED,
+        SETUP,
         INITIALIZED,
         INVALID_CONFIGURATION,
         STARTING,
@@ -47,7 +48,7 @@ public class IOState<T extends Stoppable> {
     }
 
     protected T stoppable;
-    private EventBus eventbus;
+    final private EventBus eventbus;
     protected Type state;
     protected DateTime startedAt;
     protected String detailedMessage;
@@ -78,13 +79,10 @@ public class IOState<T extends Stoppable> {
     }
 
     public boolean canBeStarted() {
-        switch (getState()) {
-            case RUNNING:
-            case STARTING:
-                return false;
-            default:
-                return true;
-        }
+        return switch (getState()) {
+            case RUNNING, STARTING -> false;
+            default -> true;
+        };
     }
 
     public void setState(Type state, String detailedMessage) {

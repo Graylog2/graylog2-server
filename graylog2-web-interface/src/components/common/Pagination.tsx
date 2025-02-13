@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { createUltimatePagination, ITEM_TYPES } from 'react-ultimate-pagination';
@@ -24,84 +23,81 @@ import styled, { css } from 'styled-components';
 import Icon from './Icon';
 
 type Props = {
-  currentPage: number,
-  totalPages: number,
-  boundaryPagesRange?: number,
-  siblingPagesRange?: number,
-  hideEllipsis?: boolean,
-  hidePreviousAndNextPageLinks?: boolean,
-  hideFirstAndLastPageLinks?: boolean,
-  disabled?: boolean,
-  onChange: (nextPage: number) => void,
+  currentPage: number;
+  totalPages: number;
+  boundaryPagesRange?: number;
+  siblingPagesRange?: number;
+  hideEllipsis?: boolean;
+  hidePreviousAndNextPageLinks?: boolean;
+  hideFirstAndLastPageLinks?: boolean;
+  disabled?: boolean;
+  onChange?: (nextPage: number) => void;
 };
 
-const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css`
-  &.pagination {
-    font-size: ${theme.fonts.size.small};
-    margin-top: 10px;
-    margin-bottom: 0;
+const StyledBootstrapPagination = styled(BootstrapPagination)(
+  ({ theme }) => css`
+    &.pagination {
+      font-size: ${theme.fonts.size.small};
+      margin-top: 10px;
+      margin-bottom: 0;
 
-    > li {
-      > a,
-      > span {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
-        background-color: ${theme.colors.global.contentBackground};
-        border-color: ${theme.colors.variant.light.default};
-        border-radius: 0;
-        height: 32px;
-
-        &:hover,
-        &:focus {
-          color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default)};
-          background-color: ${theme.colors.variant.lighter.default};
-          border-color: ${theme.colors.variant.light.default};
-        }
-      }
-
-      &.active > a,
-      &.active > span {
-        &,
-        &:hover,
-        &:focus {
-          color: ${theme.colors.pagination.active.color};
-          background-color: ${theme.colors.pagination.active.background};
-          border-color: ${theme.colors.pagination.active.border};
-          z-index: 1;
-        }
-      }
-
-      &.disabled {
+      > li {
         > a,
-        > a:hover,
-        > a:focus,
-        > span,
-        > span:hover,
-        > span:focus {
-          color: ${theme.colors.variant.light.default};
+        > span {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
           background-color: ${theme.colors.global.contentBackground};
-          border-color: ${theme.colors.variant.lighter.default};
+          border-color: ${theme.colors.variant.light.default};
+          border-radius: 0;
+          height: 32px;
+
+          &:hover,
+          &:focus {
+            color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default)};
+            background-color: ${theme.colors.variant.lighter.default};
+            border-color: ${theme.colors.variant.light.default};
+          }
+        }
+
+        &.active > a,
+        &.active > span {
+          &,
+          &:hover,
+          &:focus {
+            color: ${theme.colors.pagination.active.color};
+            background-color: ${theme.colors.pagination.active.background};
+            border-color: ${theme.colors.pagination.active.border};
+            z-index: 1;
+          }
+        }
+
+        &.disabled {
+          > a,
+          > a:hover,
+          > a:focus,
+          > span,
+          > span:hover,
+          > span:focus {
+            color: ${theme.colors.variant.light.default};
+            background-color: ${theme.colors.global.contentBackground};
+            border-color: ${theme.colors.variant.lighter.default};
+          }
         }
       }
-      
     }
-  }
-`);
+  `,
+);
 
 const UltimatePagination = createUltimatePagination({
   WrapperComponent: StyledBootstrapPagination,
   itemTypeToComponent: {
-    /* eslint-disable react/prop-types */
     [ITEM_TYPES.PAGE]: ({ value, isActive, onClick }) => {
       const title = isActive ? 'Active page' : `Open page ${value}`;
 
       return (
-        <BootstrapPagination.Item active={isActive}
-                                  onClick={onClick}
-                                  title={title}
-                                  aria-label={title}>
+        <BootstrapPagination.Item active={isActive} onClick={onClick} title={title} aria-label={title}>
           {value}
         </BootstrapPagination.Item>
       );
@@ -110,11 +106,13 @@ const UltimatePagination = createUltimatePagination({
       const title = 'Open following page';
 
       return (
-        <BootstrapPagination.Ellipsis disabled={isActive}
-                                      onClick={onClick}
-                                      title={title}
-                                      aria-label={title}
-                                      className="pagination-control">
+        <BootstrapPagination.Ellipsis
+          disabled={isActive}
+          onClick={onClick}
+          title={title}
+          aria-label={title}
+          className="pagination-control"
+        >
           <Icon name="more_horiz" />
         </BootstrapPagination.Ellipsis>
       );
@@ -123,11 +121,13 @@ const UltimatePagination = createUltimatePagination({
       const title = 'Open first page';
 
       return (
-        <BootstrapPagination.First disabled={isActive}
-                                   onClick={onClick}
-                                   title={title}
-                                   aria-label={title}
-                                   className="pagination-control">
+        <BootstrapPagination.First
+          disabled={isActive}
+          onClick={onClick}
+          title={title}
+          aria-label={title}
+          className="pagination-control"
+        >
           <Icon name="keyboard_double_arrow_left" />
         </BootstrapPagination.First>
       );
@@ -136,11 +136,13 @@ const UltimatePagination = createUltimatePagination({
       const title = 'Open previous page';
 
       return (
-        <BootstrapPagination.Prev disabled={isActive}
-                                  onClick={onClick}
-                                  title={title}
-                                  aria-label={title}
-                                  className="pagination-control">
+        <BootstrapPagination.Prev
+          disabled={isActive}
+          onClick={onClick}
+          title={title}
+          aria-label={title}
+          className="pagination-control"
+        >
           <Icon name="chevron_left" />
         </BootstrapPagination.Prev>
       );
@@ -149,11 +151,13 @@ const UltimatePagination = createUltimatePagination({
       const title = 'Open next page';
 
       return (
-        <BootstrapPagination.Next disabled={isActive}
-                                  onClick={onClick}
-                                  title={title}
-                                  aria-label={title}
-                                  className="pagination-control">
+        <BootstrapPagination.Next
+          disabled={isActive}
+          onClick={onClick}
+          title={title}
+          aria-label={title}
+          className="pagination-control"
+        >
           <Icon name="chevron_right" />
         </BootstrapPagination.Next>
       );
@@ -162,29 +166,30 @@ const UltimatePagination = createUltimatePagination({
       const title = 'Open last page';
 
       return (
-        <BootstrapPagination.Last disabled={isActive}
-                                  onClick={onClick}
-                                  title={title}
-                                  aria-label={title}
-                                  className="pagination-control">
+        <BootstrapPagination.Last
+          disabled={isActive}
+          onClick={onClick}
+          title={title}
+          aria-label={title}
+          className="pagination-control"
+        >
           <Icon name="keyboard_double_arrow_right" />
         </BootstrapPagination.Last>
       );
     },
-    /* eslint-enable react/prop-types */
   },
 });
 
 const Pagination = ({
   currentPage,
   totalPages,
-  boundaryPagesRange,
-  siblingPagesRange,
-  hideEllipsis,
-  hidePreviousAndNextPageLinks,
-  hideFirstAndLastPageLinks,
-  disabled,
-  onChange,
+  boundaryPagesRange = 1,
+  siblingPagesRange = 1,
+  hideEllipsis = false,
+  hidePreviousAndNextPageLinks = false,
+  hideFirstAndLastPageLinks = false,
+  disabled = false,
+  onChange = () => {},
 }: Props) => {
   if (totalPages <= 1) {
     return null;
@@ -198,67 +203,19 @@ const Pagination = ({
   }
 
   return (
-    <UltimatePagination currentPage={currentPage}
-                        totalPages={totalPages}
-                        boundaryPagesRange={boundaryPagesRange}
-                        siblingPagesRange={siblingPagesRange}
-                        hideEllipsis={hideEllipsis}
-                        hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
-                        hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
-                        disabled={disabled}
-                        onChange={onChange}
-                        data-testid="graylog-pagination" />
+    <UltimatePagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      boundaryPagesRange={boundaryPagesRange}
+      siblingPagesRange={siblingPagesRange}
+      hideEllipsis={hideEllipsis}
+      hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
+      hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
+      disabled={disabled}
+      onChange={onChange}
+      data-testid="graylog-pagination"
+    />
   );
-};
-
-Pagination.propTypes = {
-  /**
-   * @required
-   */
-  currentPage: PropTypes.number.isRequired,
-  /**
-   * @required
-   */
-  totalPages: PropTypes.number.isRequired,
-  /**
-   * number of always visible pages at the beginning and end
-   */
-  boundaryPagesRange: PropTypes.number,
-  /**
-   * number of always visible pages before and after the current one
-   */
-  siblingPagesRange: PropTypes.number,
-  /**
-   * boolean flag to hide ellipsis
-   */
-  hideEllipsis: PropTypes.bool,
-  /**
-   * boolean flag to hide first and last page links
-   */
-  hidePreviousAndNextPageLinks: PropTypes.bool,
-  /**
-   * number of always visible pages at the beginning and end
-   */
-  hideFirstAndLastPageLinks: PropTypes.bool,
-  /**
-   * boolean flag to disable all buttons in pagination
-   */
-  disabled: PropTypes.bool,
-  /**
-   * callback that will be called with new page when it should be changed by user interaction (optional)
-   * @returns {nextPageNumber: number}
-   */
-  onChange: PropTypes.func,
-};
-
-Pagination.defaultProps = {
-  boundaryPagesRange: 1,
-  siblingPagesRange: 1,
-  hideEllipsis: false,
-  hidePreviousAndNextPageLinks: false,
-  hideFirstAndLastPageLinks: false,
-  disabled: false,
-  onChange: () => {},
 };
 
 export default Pagination;

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { FormSubmit } from 'components/common';
@@ -30,9 +29,9 @@ const StyledFormSubmit = styled(FormSubmit)`
 `;
 
 type LoadMessageFormProps = {
-  loadMessage: (e: React.FormEvent) => void,
-  children: React.ReactNode,
-  loading: boolean,
+  loadMessage: (e: React.FormEvent) => void;
+  children: React.ReactNode;
+  loading: boolean;
 };
 
 const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProps) => {
@@ -42,26 +41,34 @@ const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProp
     <div>
       <form className="form-inline message-loader-form" onSubmit={loadMessage}>
         {children}
-        <StyledFormSubmit submitButtonText="Load message"
-                          isSubmitting={loading}
-                          submitLoadingText="Loading message..."
-                          isAsyncSubmit
-                          displayCancel
-                          onCancel={() => history.goBack()} />
+        <StyledFormSubmit
+          submitButtonText="Load message"
+          isSubmitting={loading}
+          submitLoadingText="Loading message..."
+          isAsyncSubmit
+          displayCancel
+          onCancel={() => history.goBack()}
+        />
       </form>
     </div>
   );
 };
 
 type Props = {
-  hidden: boolean,
-  hideText: string,
-  onMessageLoaded: (data: any) => void,
-  messageId?: string,
-  index?: string,
+  hidden?: boolean;
+  hideText?: boolean;
+  onMessageLoaded: (data: any) => void;
+  messageId?: string;
+  index?: string;
 };
 
-const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMessageId, index: defaultIndex }: Props) => {
+const MessageLoader = ({
+  hidden = true,
+  hideText = false,
+  onMessageLoaded,
+  messageId: defaultMessageId = '',
+  index: defaultIndex = '',
+}: Props) => {
   const [loading, setLoading] = useState(false);
   const [isHidden, setIsHidden] = useState(hidden);
 
@@ -72,12 +79,17 @@ const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMe
   const [index, setIndex] = useState<string>(defaultIndex);
   const onChangeIndex = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setIndex(e.target.value), []);
 
-  const _loadMessage = useCallback((e?: React.FormEvent) => {
-    e?.preventDefault?.();
+  const _loadMessage = useCallback(
+    (e?: React.FormEvent) => {
+      e?.preventDefault?.();
 
-    setLoading(true);
-    fetchMessage(index, messageId).then(onMessageLoaded).finally(() => setLoading(false));
-  }, [index, messageId, onMessageLoaded]);
+      setLoading(true);
+      fetchMessage(index, messageId)
+        .then(onMessageLoaded)
+        .finally(() => setLoading(false));
+    },
+    [index, messageId, onMessageLoaded],
+  );
 
   const toggleMessageForm = useCallback(() => {
     setIsHidden(!isHidden);
@@ -93,32 +105,35 @@ const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMe
     <div className="message-loader">
       {hideText || (
         <p>
-          Wrong example? <Button bsSize="sm" onClick={toggleMessageForm}>Load another message</Button>
+          Wrong example?{' '}
+          <Button bsSize="sm" onClick={toggleMessageForm}>
+            Load another message
+          </Button>
         </p>
       )}
       {isHidden || (
         <LoadMessageForm loading={loading} loadMessage={_loadMessage}>
-          <input ref={messageIdRef} type="text" className="form-control message-id-input" placeholder="Message ID" required value={messageId} onChange={onChangeMessageId} />
-          <input type="text" className="form-control" placeholder="Index" required value={index} onChange={onChangeIndex} />
+          <input
+            ref={messageIdRef}
+            type="text"
+            className="form-control message-id-input"
+            placeholder="Message ID"
+            required
+            value={messageId}
+            onChange={onChangeMessageId}
+          />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Index"
+            required
+            value={index}
+            onChange={onChangeIndex}
+          />
         </LoadMessageForm>
       )}
     </div>
   );
-};
-
-MessageLoader.propTypes = {
-  hidden: PropTypes.bool,
-  hideText: PropTypes.bool,
-  onMessageLoaded: PropTypes.func.isRequired,
-  messageId: PropTypes.string,
-  index: PropTypes.string,
-};
-
-MessageLoader.defaultProps = {
-  hidden: true,
-  hideText: false,
-  messageId: '',
-  index: '',
 };
 
 export default MessageLoader;

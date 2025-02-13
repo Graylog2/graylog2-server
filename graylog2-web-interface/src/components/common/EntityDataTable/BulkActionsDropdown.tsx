@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import type { PropsWithChildren } from 'react';
 
-import MenuItem from 'components/bootstrap/MenuItem';
-import { DropdownButton } from 'components/bootstrap';
+import { MenuItem, DropdownButton } from 'components/bootstrap';
 
 import useSelectedEntities from './hooks/useSelectedEntities';
 
@@ -28,10 +27,7 @@ const BulkActionsDropdown = ({ children }: PropsWithChildren) => {
   const cancelEntitySelection = useCallback(() => setSelectedEntities([]), [setSelectedEntities]);
 
   return (
-    <DropdownButton bsSize="small"
-                    title="Bulk actions"
-                    id="bulk-actions-dropdown"
-                    disabled={!selectedEntities?.length}>
+    <DropdownButton bsSize="small" title="Bulk actions" id="bulk-actions-dropdown" disabled={!selectedEntities?.length}>
       {children}
       {Boolean(React.Children.count(children)) && <MenuItem divider />}
       <MenuItem onClick={cancelEntitySelection}>Cancel selection</MenuItem>

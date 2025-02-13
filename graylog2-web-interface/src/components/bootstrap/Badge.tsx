@@ -19,48 +19,39 @@ import type { ColorVariant } from '@graylog/sawmill';
 import { Badge as MantineBadge } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
-const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(({ theme, color }) => css`
-  color: ${theme.colors.contrast[color]};
-  text-transform: none;
+const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(
+  ({ theme, color }) => css`
+    color: ${theme.colors.contrast[color]};
+    text-transform: none;
 
-  .mantine-Badge-label {
-    font-size: ${theme.fonts.size.small};
-  }
-`);
+    .mantine-Badge-label {
+      font-size: ${theme.fonts.size.small};
+    }
+  `,
+);
 
 type Props = React.PropsWithChildren<{
-  bsStyle?: ColorVariant,
-  className?: string
-  'data-testid'?: string,
-  onClick?: () => void
-  title?: string,
-}>
+  bsStyle?: ColorVariant;
+  className?: string;
+  'data-testid'?: string;
+  onClick?: () => void;
+  title?: string;
+}>;
 
-const Badge = React.forwardRef<HTMLDivElement, Props>(({
-  bsStyle,
-  className,
-  children,
-  'data-testid': dataTestid,
-  onClick,
-  title,
-}, ref) => (
-  <StyledBadge color={bsStyle}
-               className={className}
-               title={title}
-               data-testid={dataTestid}
-               ref={ref}
-               variant="filled"
-               onClick={onClick}>
-    {children}
-  </StyledBadge>
-));
-
-Badge.defaultProps = {
-  bsStyle: 'default',
-  className: undefined,
-  'data-testid': undefined,
-  onClick: undefined,
-  title: undefined,
-};
+const Badge = React.forwardRef<HTMLDivElement, Props>(
+  ({ bsStyle = 'default', className, children, 'data-testid': dataTestid, onClick, title }, ref) => (
+    <StyledBadge
+      color={bsStyle}
+      className={className}
+      title={title}
+      data-testid={dataTestid}
+      ref={ref}
+      variant="filled"
+      onClick={onClick}
+    >
+      {children}
+    </StyledBadge>
+  ),
+);
 
 export default Badge;

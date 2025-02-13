@@ -25,12 +25,15 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const resetMigration = async () => fetch('DELETE', qualifyUrl('/migration/state'));
 
 const ResetMigrationButton = () => {
   const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
+  const sendTelemetry = useSendTelemetry();
 
   const { mutateAsync: onResetMigration } = useMutation(resetMigration, {
     onSuccess: () => {
@@ -39,23 +42,44 @@ const ResetMigrationButton = () => {
       queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
     },
     onError: (error) => {
-      UserNotification.error(`Resetting migration state failed with status: ${error}`, 'Could not reset the migration state.');
+      UserNotification.error(
+        `Resetting migration state failed with status: ${error}`,
+        'Could not reset the migration state.',
+      );
     },
   });
 
+  const handleResetClick = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.RESET_MIGRATION_CLICKED, {
+      app_pathname: 'datanode',
+      app_section: 'migration',
+    });
+
+    setShowDialog(true);
+  };
+
+  const handleConfirmClick = async () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.RESET_MIGRATION_CONFIRM_CLICKED, {
+      app_pathname: 'datanode',
+      app_section: 'migration',
+    });
+
+    await onResetMigration();
+    setShowDialog(false);
+  };
+
   return (
     <>
-      <Button bsStyle="primary" bsSize="small" onClick={() => setShowDialog(true)}>
+      <Button bsStyle="primary" bsSize="small" onClick={handleResetClick}>
         Reset Migration
       </Button>
       {showDialog && (
-        <ConfirmDialog title="Reset Migration"
-                       show
-                       onConfirm={async () => {
-                         await onResetMigration();
-                         setShowDialog(false);
-                       }}
-                       onCancel={() => setShowDialog(false)}>
+        <ConfirmDialog
+          title="Reset Migration"
+          show
+          onConfirm={handleConfirmClick}
+          onCancel={() => setShowDialog(false)}
+        >
           Are you sure you want to reset the migration?
         </ConfirmDialog>
       )}

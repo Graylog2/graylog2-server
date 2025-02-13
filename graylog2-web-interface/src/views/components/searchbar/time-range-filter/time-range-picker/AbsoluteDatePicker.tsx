@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { DateUtils } from 'react-day-picker';
 
 import { DatePicker } from 'components/common';
@@ -23,12 +22,12 @@ import { toUTCFromTz, toDateObject } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 
 type Props = {
-  dateTime: string,
-  onChange?: (string) => void,
-  startDate?: Date,
-}
+  dateTime: string;
+  onChange?: (string) => void;
+  startDate?: Date;
+};
 
-const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
+const AbsoluteDatePicker = ({ dateTime, onChange = () => {}, startDate }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
   const initialDateTime = toUTCFromTz(dateTime, userTimezone);
   const initialDate = formatTime(initialDateTime, 'date');
@@ -49,22 +48,7 @@ const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
     return onChange(formatTime(newDate, 'default'));
   };
 
-  return (
-    <DatePicker date={initialDate}
-                onChange={_onDatePicked}
-                fromDate={startDate} />
-  );
-};
-
-AbsoluteDatePicker.propTypes = {
-  dateTime: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-  startDate: PropTypes.instanceOf(Date),
-};
-
-AbsoluteDatePicker.defaultProps = {
-  onChange: () => {},
-  startDate: undefined,
+  return <DatePicker date={initialDate} onChange={_onDatePicked} fromDate={startDate} />;
 };
 
 export default AbsoluteDatePicker;

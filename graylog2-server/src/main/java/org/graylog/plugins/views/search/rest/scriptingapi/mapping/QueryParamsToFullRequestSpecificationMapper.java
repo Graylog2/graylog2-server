@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
+import jakarta.inject.Inject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.graylog.plugins.views.search.rest.scriptingapi.parsing.TimerangeParser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
@@ -23,8 +24,6 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
-
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +41,7 @@ public class QueryParamsToFullRequestSpecificationMapper {
 
     public MessagesRequestSpec simpleQueryParamsToFullRequestSpecification(final String query,
                                                                            final Set<String> streams,
+                                                                           final Set<String> streamCategories,
                                                                            final String timerangeKeyword,
                                                                            final List<String> fields,
                                                                            final String sort,
@@ -51,6 +51,7 @@ public class QueryParamsToFullRequestSpecificationMapper {
 
         return new MessagesRequestSpec(query,
                 streams,
+                streamCategories,
                 timerangeParser.parseTimeRange(timerangeKeyword),
                 sort,
                 sortOrder,
@@ -61,6 +62,7 @@ public class QueryParamsToFullRequestSpecificationMapper {
 
     public AggregationRequestSpec simpleQueryParamsToFullRequestSpecification(final String query,
                                                                               final Set<String> streams,
+                                                                              final Set<String> streamCategories,
                                                                               final String timerangeKeyword,
                                                                               List<String> groups,
                                                                               List<String> metrics) {
@@ -80,6 +82,7 @@ public class QueryParamsToFullRequestSpecificationMapper {
         return new AggregationRequestSpec(
                 query,
                 streams,
+                streamCategories,
                 timerangeParser.parseTimeRange(timerangeKeyword),
                 groups.stream().map(Grouping::new).collect(Collectors.toList()),
                 metrics.stream().map(Metric::fromStringRepresentation).flatMap(Optional::stream).collect(Collectors.toList())

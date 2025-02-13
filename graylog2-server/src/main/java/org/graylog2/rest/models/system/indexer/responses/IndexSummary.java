@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 @WithBeanGetter
 @JsonAutoDetect
 public abstract class IndexSummary {
+    public enum TierType {HOT, WARM}
 
     @JsonProperty("index_name")
     public abstract String indexName();
@@ -49,13 +50,21 @@ public abstract class IndexSummary {
     @JsonProperty("is_reopened")
     public abstract boolean isReopened();
 
+    @JsonProperty("tier")
+    public abstract TierType tier();
+
+    @JsonProperty("shard_count")
+    public abstract long shardCount();
+
     @JsonCreator
     public static IndexSummary create(@JsonProperty("index_name") String indexName,
                                       @JsonProperty("size") @Nullable IndexSizeSummary size,
                                       @JsonProperty("range") @Nullable IndexRangeSummary range,
                                       @JsonProperty("is_deflector") boolean isDeflector,
                                       @JsonProperty("is_closed") boolean isClosed,
-                                      @JsonProperty("is_reopened") boolean isReopened) {
-        return new AutoValue_IndexSummary(indexName, size, range, isDeflector, isClosed, isReopened);
+                                      @JsonProperty("is_reopened") boolean isReopened,
+                                      @JsonProperty("tier") TierType tier,
+                                      @JsonProperty("shard_count") long shardCount) {
+        return new AutoValue_IndexSummary(indexName, size, range, isDeflector, isClosed, isReopened, tier, shardCount);
     }
 }

@@ -18,10 +18,10 @@ package org.graylog2.inputs.persistence;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
-import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mongojack.JacksonDBCollection;
 
 import java.util.Optional;
 
@@ -58,19 +57,13 @@ public class MongoInputStatusServiceTest {
     @Mock
     private InputService inputService;
 
-    private JacksonDBCollection<InputStatusRecord, ObjectId> db;
-
     @Before
     public void setUp() {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
-        cut = new MongoInputStatusService(mongodb.mongoConnection(), mapperProvider, inputService, mockEventBus);
-
-        db = JacksonDBCollection.wrap(mongodb.mongoConnection().getDatabase().getCollection(MongoInputStatusService.COLLECTION_NAME),
-                InputStatusRecord.class,
-                ObjectId.class,
-                mapperProvider.get());
+        cut = new MongoInputStatusService(
+                new MongoCollections(mapperProvider, mongodb.mongoConnection()), inputService, mockEventBus);
     }
 
     @Test

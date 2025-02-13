@@ -37,8 +37,8 @@ public class IOStateTest {
         MessageInput messageInput1 = mock(MessageInput.class);
         MessageInput messageInput2 = mock(MessageInput.class);
 
-        IOState<MessageInput> inputState1 = new IOState<>(eventBus, messageInput1);
-        IOState<MessageInput> inputState2 = new IOState<>(eventBus, messageInput2);
+        IOState<MessageInput> inputState1 = new IOState<>(eventBus, messageInput1, IOState.Type.SETUP);
+        IOState<MessageInput> inputState2 = new IOState<>(eventBus, messageInput2, IOState.Type.SETUP);
 
         assertFalse(inputState1.equals(inputState2));
         assertFalse(inputState2.equals(inputState1));

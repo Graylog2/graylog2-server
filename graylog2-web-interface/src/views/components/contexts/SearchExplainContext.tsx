@@ -20,32 +20,33 @@ import { singleton } from 'logic/singleton';
 import type { WidgetMapping } from 'views/logic/views/types';
 
 export type WidgetExplain = {
-  query_string: string,
+  query_string: string;
   searched_index_ranges: Array<{
-    index_name: string,
-    begin: number,
-    end: number,
-    is_warm_tiered: boolean
-  }>
-}
+    index_name: string;
+    begin: number;
+    end: number;
+    is_warm_tiered: boolean;
+    stream_names: Array<string>;
+  }>;
+};
 
 type ExplainedSearch = {
-    search_id: string,
-    search: {
-      queries: {
-        [key:string]: {
-          search_types: {
-             [key:string]: WidgetExplain
-          }
-        }
-      }
-    },
-    search_errors: Array<Object>,
-  }
+  search_id: string;
+  search: {
+    queries: {
+      [key: string]: {
+        search_types: {
+          [key: string]: WidgetExplain;
+        };
+      };
+    };
+  };
+  search_errors: Array<Object>;
+};
 
 export type SearchExplainContextType = {
-  getExplainForWidget: (queryId: string, widgetId: string, widgetMapping: WidgetMapping) => WidgetExplain | undefined,
-  explainedSearch: ExplainedSearch,
+  getExplainForWidget: (queryId: string, widgetId: string, widgetMapping: WidgetMapping) => WidgetExplain | undefined;
+  explainedSearch: ExplainedSearch;
 };
 
 const defaultContext = {

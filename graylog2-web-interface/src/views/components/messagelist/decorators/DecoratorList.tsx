@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -29,27 +28,20 @@ const AlertContainer = styled.div`
 
 type ReorderedItems = Array<{ id: string }>;
 type DecoratorSummary = {
-  id: string,
-  order?: number,
-  title: React.ReactElement,
+  id: string;
+  order?: number;
+  title: React.ReactElement;
 };
 type Props = {
-  decorators: Array<DecoratorSummary>,
-  disableDragging?: boolean,
-  onReorder: (items: ReorderedItems) => unknown,
+  decorators: Array<DecoratorSummary>;
+  disableDragging?: boolean;
+  onReorder: (items: ReorderedItems) => unknown;
 };
 
 class DecoratorList extends React.Component<Props> {
-  static propTypes = {
-    decorators: PropTypes.arrayOf(PropTypes.object).isRequired,
-    disableDragging: PropTypes.bool,
-    onReorder: PropTypes.func,
-  };
-
   static defaultProps = {
     disableDragging: false,
-    onReorder: () => {
-    },
+    onReorder: () => {},
   };
 
   _onReorderWrapper = (orderedItems: ReorderedItems) => {
@@ -72,10 +64,12 @@ class DecoratorList extends React.Component<Props> {
     }
 
     return (
-      <SortableList items={decorators}
-                    onMoveItem={this._onReorderWrapper}
-                    disableDragging={disableDragging}
-                    displayOverlayInPortal />
+      <SortableList
+        items={decorators}
+        onMoveItem={this._onReorderWrapper}
+        disableDragging={disableDragging}
+        displayOverlayInPortal
+      />
     );
   }
 }

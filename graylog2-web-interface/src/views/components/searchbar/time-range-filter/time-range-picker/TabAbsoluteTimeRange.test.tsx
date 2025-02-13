@@ -30,20 +30,19 @@ const defaultProps = {
   },
 } as const;
 
-const renderWithForm = (element) => render((
-  <Formik initialValues={{ timeRangeTabs: { absolute: defaultProps.timeRange }, activeTab: 'absolute' }}
-          onSubmit={() => {}}>
-    <Form>
-      {element}
-    </Form>
-  </Formik>
-));
+const renderWithForm = (element) =>
+  render(
+    <Formik
+      initialValues={{ timeRangeTabs: { absolute: defaultProps.timeRange }, activeTab: 'absolute' }}
+      onSubmit={() => {}}
+    >
+      <Form>{element}</Form>
+    </Formik>,
+  );
 
 describe('TabAbsoluteTimeRange', () => {
   it('renders Accordions that work', async () => {
-    renderWithForm((
-      <TabAbsoluteTimeRange {...defaultProps} />
-    ));
+    renderWithForm(<TabAbsoluteTimeRange {...defaultProps} />);
 
     const accordion = screen.getByTestId('absolute-time-ranges');
     const accordionItemCal = screen.getByRole('button', { name: 'Calendar' });

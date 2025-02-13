@@ -17,9 +17,11 @@
 package org.graylog.plugins.pipelineprocessor.db;
 
 import org.graylog2.database.NotFoundException;
-import org.mongojack.DBQuery;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public interface PipelineService {
     PipelineDao save(PipelineDao pipeline);
@@ -32,5 +34,13 @@ public interface PipelineService {
 
     void delete(String id);
 
-    long count(DBQuery.Query query);
+    default Set<PipelineDao> loadByIds(Set<String> pipelineIds) {
+        return pipelineIds.stream().flatMap(id -> {
+            try {
+                return Stream.of(load(id));
+            } catch (NotFoundException e) {
+                return Stream.empty();
+            }
+        }).collect(Collectors.toSet());
+    }
 }

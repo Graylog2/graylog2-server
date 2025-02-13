@@ -28,7 +28,7 @@ public enum SearchServer {
     OS1(OPENSEARCH, "1.3.12"),
     OS2(OPENSEARCH, "2.0.1"),
     OS2_4(OPENSEARCH, "2.4.1"),
-    OS2_LATEST(OPENSEARCH, "2.15.0"),
+    OS2_LATEST(OPENSEARCH, "2.17.0"),
     DATANODE_PRE_52(DATANODE, "5.1.0"),
     DATANODE_DEV(DATANODE, "5.2.0");
 

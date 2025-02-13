@@ -25,17 +25,14 @@ import Select from './index';
 const createOption = (x) => ({ label: x, value: x });
 
 describe('Select', () => {
-  const SimpleSelect = (props) => <Select inputProps={{ 'aria-label': 'Select value' }} {...props} />;
+  const SimpleSelect = (props) => <Select placeholder="Select value" {...props} />;
 
   it('calls `onChange` upon selecting option', async () => {
     const options = ['foo', 'bar'].map(createOption);
 
     const onChange = jest.fn();
 
-    render((
-      <SimpleSelect options={options}
-                    onChange={onChange} />
-    ));
+    render(<SimpleSelect options={options} onChange={onChange} />);
 
     const select = screen.getByLabelText('Select value');
 
@@ -51,10 +48,7 @@ describe('Select', () => {
 
     const onChange = jest.fn();
 
-    render((
-      <SimpleSelect options={options}
-                    onChange={onChange} />
-    ));
+    render(<SimpleSelect options={options} onChange={onChange} />);
 
     const select = screen.getByLabelText('Select value');
 
@@ -67,7 +61,7 @@ describe('Select', () => {
 
   describe('Upgrade to react-select v2', () => {
     const options = [{ label: 'label', value: 'value' }];
-    const onChange = () => { };
+    const onChange = () => {};
 
     it('should convert multi to isMulti', () => {
       const multiWrapper = mount(<Select multi options={options} onChange={onChange} />);
@@ -134,16 +128,20 @@ describe('Select', () => {
       expect(matchValueFilter(prepareOption(options[0]), 'value')).toBeTruthy();
     });
 
-    it('should use optionRenderer to customize options\' appearance', () => {
+    it("should use optionRenderer to customize options' appearance", () => {
       const optionRenderer = (option) => `Custom ${option.label}`;
-      const wrapper = mount(<Select options={options} onChange={onChange} optionRenderer={optionRenderer} menuIsOpen />);
+      const wrapper = mount(
+        <Select options={options} onChange={onChange} optionRenderer={optionRenderer} menuIsOpen />,
+      );
 
       expect(wrapper.find(Components.Option).props().children).toBe('Custom label');
     });
 
-    it('should use valueRenderer to customize selected value\'s appearance', () => {
+    it("should use valueRenderer to customize selected value's appearance", () => {
       const valueRenderer = (option) => `Custom ${option.value}`;
-      const wrapper = mount(<Select options={options} onChange={onChange} valueRenderer={valueRenderer} value={options[0].value} />);
+      const wrapper = mount(
+        <Select options={options} onChange={onChange} valueRenderer={valueRenderer} value={options[0].value} />,
+      );
 
       expect(wrapper.find(Components.SingleValue).props().children).toBe('Custom value');
     });

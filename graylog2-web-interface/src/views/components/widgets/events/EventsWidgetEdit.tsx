@@ -28,10 +28,7 @@ import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 import StickyBottomActions from 'views/components/widgets/StickyBottomActions';
 import type { VisualizationType, Filter } from 'views/logic/widgets/events/EventsWidgetConfig';
-import EventsWidgetConfig, {
-  LIST_MODE,
-  NUMBER_MODE,
-} from 'views/logic/widgets/events/EventsWidgetConfig';
+import EventsWidgetConfig, { LIST_MODE, NUMBER_MODE } from 'views/logic/widgets/events/EventsWidgetConfig';
 import WidgetModeConfiguration from 'views/components/widgets/overview-configuration/WidgetModeConfiguration';
 import ColumnsConfiguration from 'views/components/widgets/overview-configuration/ColumnsConfiguration';
 import SortConfiguration from 'views/components/widgets/overview-configuration/SortConfiguration';
@@ -47,11 +44,11 @@ const WIDGET_MODE_OPTIONS = [
 ];
 
 type FormValues = {
-  mode: VisualizationType,
-  fields: Immutable.OrderedSet<string>,
-  filters: Immutable.OrderedSet<Filter>,
-  sort: { field: string, direction: DirectionJson },
-}
+  mode: VisualizationType;
+  fields: Immutable.OrderedSet<string>;
+  filters: Immutable.OrderedSet<Filter>;
+  sort: { field: string; direction: DirectionJson };
+};
 
 const StyledForm = styled(Form)`
   display: flex;
@@ -60,14 +57,14 @@ const StyledForm = styled(Form)`
 
 const Container = styled.div`
   height: 100%;
-  
+
   .form-group {
     margin: 0 0 3px;
-    
+
     &:last-child {
       margin: 0;
     }
-    
+
     .control-label {
       padding-left: 0;
       padding-right: 0;
@@ -78,7 +75,7 @@ const Container = styled.div`
     }
   }
 
-  div[class^="col-"] {
+  div[class^='col-'] {
     padding-right: 0;
     padding-left: 0;
   }
@@ -97,53 +94,49 @@ const FullHeightCol = styled(Col)`
 const SubmitOnChange = () => {
   const { values, submitForm } = useFormikContext();
 
-  useEffect(
-    () => {
-      submitForm();
-    }, [values, submitForm],
-  );
+  useEffect(() => {
+    submitForm();
+  }, [values, submitForm]);
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;
 };
 
-const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: EditWidgetComponentProps<EventsWidgetConfig>) => {
+const EventsWidgetEdit = ({ children, onCancel, config, onChange }: EditWidgetComponentProps<EventsWidgetConfig>) => {
   const filterComponents = usePluginEntities('views.components.widgets.events.filterComponents');
   const eventAttributes = useEventAttributes();
 
-  const initialValues = useMemo(() => ({
-    mode: config.mode,
-    filters: config.filters,
-    fields: config.fields,
-    sort: { field: config.sort.field, direction: config.sort.direction.direction },
-  }), [config.fields, config.filters, config.sort.direction, config.sort.field, config.mode]);
+  const initialValues = useMemo(
+    () => ({
+      mode: config.mode,
+      filters: config.filters,
+      fields: config.fields,
+      sort: { field: config.sort.field, direction: config.sort.direction.direction },
+    }),
+    [config.fields, config.filters, config.sort.direction, config.sort.field, config.mode],
+  );
 
   const _onSubmit = ({ sort, mode, filters, fields }: FormValues) => {
-    const newSort = config.sort.toBuilder()
-      .field(sort.field)
-      .direction(Direction.fromJSON(sort.direction))
-      .build();
+    const newSort = config.sort.toBuilder().field(sort.field).direction(Direction.fromJSON(sort.direction)).build();
 
-    onChange(
-      config.toBuilder()
-        .mode(mode)
-        .filters(filters)
-        .fields(fields)
-        .sort(newSort)
-        .build(),
-    );
+    onChange(config.toBuilder().mode(mode).filters(filters).fields(fields).sort(newSort).build());
   };
 
   const columns = eventAttributes.map(({ attribute }) => attribute);
   const sortableColumns = eventAttributes.filter(({ sortable }) => sortable).map(({ attribute }) => attribute);
-  const columnTitle = useCallback((column: string) => eventAttributes.find(({ attribute }) => column === attribute)?.title ?? 'unknown', [eventAttributes]);
+  const columnTitle = useCallback(
+    (column: string) => eventAttributes.find(({ attribute }) => column === attribute)?.title ?? 'unknown',
+    [eventAttributes],
+  );
 
   return (
-    <Formik<FormValues> initialValues={initialValues}
-                        enableReinitialize
-                        validateOnChange
-                        validateOnMount
-                        onSubmit={_onSubmit}>
+    <Formik<FormValues>
+      initialValues={initialValues}
+      enableReinitialize
+      validateOnChange
+      validateOnMount
+      onSubmit={_onSubmit}
+    >
       {({ setValues, values }) => {
         const onChangeType = (newMode: VisualizationType) => {
           if (newMode !== values.mode) {
@@ -172,32 +165,37 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
             <FullHeightRow>
               <FullHeightCol md={4} lg={3}>
                 <Container>
-                  <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
-                                       alignActionsAtBottom>
+                  <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} />} alignActionsAtBottom>
                     <DescriptionBox description="Visualization">
                       <WidgetModeConfiguration name="mode" onChange={onChangeType} options={WIDGET_MODE_OPTIONS} />
                     </DescriptionBox>
                     {values.mode === LIST_MODE && (
                       <DescriptionBox description="Columns">
-                        <ColumnsConfiguration columns={columns}
-                                              createSelectPlaceholder="Select a new column"
-                                              name="fields"
-                                              menuPortalTarget={document.body}
-                                              columnTitle={columnTitle} />
+                        <ColumnsConfiguration
+                          columns={columns}
+                          createSelectPlaceholder="Select a new column"
+                          name="fields"
+                          menuPortalTarget={document.body}
+                          columnTitle={columnTitle}
+                        />
                       </DescriptionBox>
                     )}
                     <DescriptionBox description="Filter">
-                      <FiltersConfiguration columnTitle={columnTitle}
-                                            name="filters"
-                                            filterComponents={filterComponents} />
+                      <FiltersConfiguration
+                        columnTitle={columnTitle}
+                        name="filters"
+                        filterComponents={filterComponents}
+                      />
                     </DescriptionBox>
 
                     {values.mode === LIST_MODE && (
                       <DescriptionBox description="Sorting">
-                        <SortConfiguration columns={sortableColumns}
-                                           name="sort"
-                                           columnTitle={columnTitle}
-                                           directions={SORT_DIRECTION_OPTIONS} />
+                        <SortConfiguration
+                          columns={sortableColumns}
+                          name="sort"
+                          columnTitle={columnTitle}
+                          directions={SORT_DIRECTION_OPTIONS}
+                        />
                       </DescriptionBox>
                     )}
                   </StickyBottomActions>

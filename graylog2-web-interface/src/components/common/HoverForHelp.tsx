@@ -15,38 +15,41 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { OverlayTrigger } from 'components/common';
 import type { SizeProp } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 
-const StyledPopover = styled.span(({ theme }) => css`
-  ul {
-    padding-left: 0;
-  }
-
-  li {
-    margin-bottom: 5px;
-
-    &:last-child {
-      margin-bottom: 0;
+const StyledPopover = styled.span(
+  ({ theme }) => css`
+    ul {
+      padding-left: 0;
     }
-  }
 
-  h4 {
-    font-size: ${theme.fonts.size.large};
-  }
-`);
+    li {
+      margin-bottom: 5px;
 
-const StyledIcon = styled(Icon)<{ $type: Type, $displayLeftMargin: boolean }>(({ theme, $type, $displayLeftMargin }) => css`
-  display: inline-flex;
-  color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
-  margin: 0;
-  margin-left: ${$displayLeftMargin ? '0.3em' : 0};
-  pointer-events: auto !important;
-`);
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    h4 {
+      font-size: ${theme.fonts.size.large};
+    }
+  `,
+);
+
+const StyledIcon = styled(Icon)<{ $type: Type; $displayLeftMargin: boolean }>(
+  ({ theme, $type, $displayLeftMargin }) => css`
+    display: inline-flex;
+    color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
+    margin: 0;
+    margin-left: ${$displayLeftMargin ? '0.3em' : 0};
+    pointer-events: auto !important;
+  `,
+);
 
 const iconName = (type: Type) => {
   switch (type) {
@@ -61,70 +64,49 @@ const iconName = (type: Type) => {
 type Type = 'info' | 'error';
 
 type Props = {
-  children: React.ReactNode,
-  className?: string,
-  displayLeftMargin?: boolean,
-  id?: string,
-  placement?: 'top' | 'right' | 'bottom' | 'left',
-  iconSize?: SizeProp
-  pullRight?: boolean,
-  title?: string,
-  testId?: string,
-  trigger?: React.ComponentProps<typeof OverlayTrigger>['trigger'],
-  type?: 'info' | 'error',
+  children: React.ReactNode;
+  className?: string;
+  displayLeftMargin?: boolean;
+  id?: string;
+  placement?: 'top' | 'right' | 'bottom' | 'left';
+  iconSize?: SizeProp;
+  pullRight?: boolean;
+  title?: string;
+  testId?: string;
+  trigger?: React.ComponentProps<typeof OverlayTrigger>['trigger'];
+  type?: 'info' | 'error';
 };
 
 const HoverForHelp = ({
   children,
-  className,
-  displayLeftMargin,
+  className = '',
+  displayLeftMargin = false,
   title,
-  id,
-  pullRight,
-  placement,
+  id = 'help-popover',
+  pullRight = true,
+  placement = 'bottom',
   testId,
-  type,
+  type = 'info',
   iconSize,
-  trigger,
+  trigger = ['hover', 'focus'],
 }: Props) => (
-  <OverlayTrigger trigger={trigger}
-                  placement={placement}
-                  overlay={<StyledPopover id={id}>{children}</StyledPopover>}
-                  title={title}
-                  testId={testId}>
-    <StyledIcon className={`${className} ${pullRight ? 'pull-right' : ''}`}
-                name={iconName(type)}
-                type="regular"
-                $type={type}
-                $displayLeftMargin={displayLeftMargin}
-                size={iconSize} />
+  <OverlayTrigger
+    trigger={trigger}
+    placement={placement}
+    overlay={<StyledPopover id={id}>{children}</StyledPopover>}
+    title={title}
+    testId={testId}
+  >
+    <StyledIcon
+      className={`${className} ${pullRight ? 'pull-right' : ''}`}
+      name={iconName(type)}
+      type="regular"
+      $type={type}
+      $displayLeftMargin={displayLeftMargin}
+      size={iconSize}
+    />
   </OverlayTrigger>
 );
-
-HoverForHelp.propTypes = {
-  displayLeftMargin: PropTypes.bool,
-  children: PropTypes.any.isRequired,
-  className: PropTypes.string,
-  id: PropTypes.string,
-  placement: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-  pullRight: PropTypes.bool,
-  title: PropTypes.string,
-  testId: PropTypes.string,
-  trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'focus', 'hover'])) || PropTypes.oneOf(['click', 'focus', 'hover']),
-};
-
-HoverForHelp.defaultProps = {
-  id: 'help-popover',
-  className: '',
-  pullRight: true,
-  placement: 'bottom',
-  testId: undefined,
-  title: undefined,
-  type: 'info',
-  iconSize: undefined,
-  trigger: ['hover', 'focus'],
-  displayLeftMargin: false,
-};
 
 /** @component */
 export default HoverForHelp;

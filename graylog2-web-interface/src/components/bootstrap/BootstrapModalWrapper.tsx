@@ -14,19 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import Modal from './Modal';
 
 type Props = {
-  title?: string | undefined,
-  backdrop: boolean|'static'|undefined,
-  bsSize: 'lg'|'large'|'sm'|'small',
-  showModal: boolean,
-  role: string,
-  onHide: () => void,
-  children: React.ReactNode,
+  title?: string | undefined;
+  backdrop?: boolean | 'static' | undefined;
+  bsSize?: 'lg' | 'large' | 'sm' | 'small';
+  showModal: boolean;
+  role?: string;
+  onHide: () => void;
+  children: React.ReactNode;
 };
 
 const BootstrapModalWrapper = ({
@@ -34,39 +33,13 @@ const BootstrapModalWrapper = ({
   children,
   onHide,
   bsSize,
-  backdrop,
-  role,
+  backdrop = 'static',
+  role = 'dialog',
   ...restProps
 }: Props) => (
-  <Modal show={showModal}
-         onHide={onHide}
-         bsSize={bsSize}
-         backdrop={backdrop}
-         role={role}
-         {...restProps}>
+  <Modal show={showModal} onHide={onHide} bsSize={bsSize} backdrop={backdrop} role={role} {...restProps}>
     {children}
   </Modal>
 );
-
-BootstrapModalWrapper.propTypes = {
-  showModal: PropTypes.bool.isRequired,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
-  onHide: PropTypes.func.isRequired,
-  bsSize: PropTypes.oneOf([
-    'large', 'lg', 'small', 'sm',
-  ]),
-  backdrop: PropTypes.oneOf(['static', true, false]),
-  role: PropTypes.string,
-};
-
-BootstrapModalWrapper.defaultProps = {
-  bsSize: undefined,
-  backdrop: 'static',
-  role: 'dialog',
-  title: undefined,
-};
 
 export default BootstrapModalWrapper;

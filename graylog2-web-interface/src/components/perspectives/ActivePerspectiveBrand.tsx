@@ -33,7 +33,7 @@ const BrandLink = styled(Link)`
   min-height: ${NAV_ITEM_HEIGHT};
 `;
 
-const ActivePerspectiveBrand = ({ children, className }: PropsWithChildren<{ className?: string }>) => {
+const ActivePerspectiveBrand = ({ children, className = '' }: PropsWithChildren<{ className?: string }>) => {
   const { activePerspective } = useActivePerspective();
   const ActiveBrandComponent = activePerspective?.brandComponent;
 
@@ -49,10 +49,6 @@ const ActivePerspectiveBrand = ({ children, className }: PropsWithChildren<{ cla
       {children}
     </BrandContainer>
   );
-};
-
-ActivePerspectiveBrand.defaultProps = {
-  className: '',
 };
 
 export default ActivePerspectiveBrand;

@@ -26,13 +26,19 @@ import { asMock } from 'helpers/mocking';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useQuery from 'routing/useQuery';
 
-const mockView = createSearch({ queryId: 'somequery' }).toBuilder()
+const mockView = createSearch({ queryId: 'somequery' })
+  .toBuilder()
   .type(View.Type.Dashboard)
   .id('view-id')
   .title('view title')
   .build();
 
-jest.mock('views/pages/ShowViewPage', () => ({ children }: React.PropsWithChildren<{}>) => children);
+jest.mock(
+  'views/pages/ShowViewPage',
+  () =>
+    ({ children }: React.PropsWithChildren<{}>) =>
+      children,
+);
 jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/withParams', () => (x) => x);
 jest.mock('views/hooks/useAutoRefresh');
@@ -49,6 +55,8 @@ describe('ShowDashboardInBigDisplayMode', () => {
     refreshConfig: null,
     startAutoRefresh: () => {},
     stopAutoRefresh: () => {},
+    restartAutoRefresh: () => {},
+    animationId: 'animation-id',
   };
 
   useViewsPlugin();
@@ -60,11 +68,7 @@ describe('ShowDashboardInBigDisplayMode', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    asMock(useAutoRefresh).mockReturnValue({
-      refreshConfig: null,
-      startAutoRefresh: () => {},
-      stopAutoRefresh: () => {},
-    });
+    asMock(useAutoRefresh).mockReturnValue(autoRefreshContextValue);
   });
 
   it('set refresh interval correctly based on location query', async () => {

@@ -20,14 +20,24 @@ import { createSearch } from 'fixtures/searches';
 import PluggableStoreProvider from 'components/PluggableStoreProvider';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
-const TestStoreProvider = ({ children, undoRedoState, ...rest }: React.PropsWithChildren<Partial<React.ComponentProps<typeof PluggableStoreProvider>>>) => {
+const TestStoreProvider = ({
+  children,
+  undoRedoState,
+  ...rest
+}: React.PropsWithChildren<Partial<React.ComponentProps<typeof PluggableStoreProvider>>>) => {
   const view = rest.view ?? createSearch();
   const isNew = rest.isNew ?? false;
   const initialQuery = rest.initialQuery ?? 'query-id-1';
   const executionState = rest.executionState ?? SearchExecutionState.empty();
 
   return (
-    <PluggableStoreProvider undoRedoState={undoRedoState} view={view} initialQuery={initialQuery} isNew={isNew} executionState={executionState}>
+    <PluggableStoreProvider
+      undoRedoState={undoRedoState}
+      view={view}
+      initialQuery={initialQuery}
+      isNew={isNew}
+      executionState={executionState}
+    >
       {children}
     </PluggableStoreProvider>
   );

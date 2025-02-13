@@ -16,7 +16,6 @@
  */
 
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -32,9 +31,11 @@ import GraphDaysContextProvider from 'components/common/Graph/contexts/GraphDays
 const StyledDl = styled.dl`
   margin-bottom: 0;
 `;
-const StyledH2 = styled.h2(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
+const StyledH2 = styled.h2(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
 const Header = () => <StyledH2>Graylog cluster</StyledH2>;
 
@@ -58,17 +59,21 @@ const ClusterInfo = () => {
 };
 
 type Props = {
-  layout?: 'default' | 'compact',
-  children: React.ReactNode,
-  showLicenseGraph?: boolean,
-}
+  layout?: 'default' | 'compact';
+  children?: React.ReactNode;
+  showLicenseGraph?: boolean;
+};
 
-const GraylogClusterOverview = ({ layout, children, showLicenseGraph }: Props) => {
+const GraylogClusterOverview = ({ layout = 'default', children = null, showLicenseGraph = false }: Props) => {
   const licensePlugin = PluginStore.exports('license');
   const currentUser = useCurrentUser();
 
-  const LicenseGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.LicenseGraphWithMetrics) || ClusterTrafficGraph;
-  const EnterpriseGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) || ClusterTrafficGraph;
+  const LicenseGraphComponent =
+    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.LicenseGraphWithMetrics) ||
+    ClusterTrafficGraph;
+  const EnterpriseGraphComponent =
+    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) ||
+    ClusterTrafficGraph;
 
   if (layout === 'compact') {
     return (
@@ -82,10 +87,7 @@ const GraylogClusterOverview = ({ layout, children, showLicenseGraph }: Props) =
                 <hr />
                 {children}
               </Col>
-              <Col md={6}>
-                {showLicenseGraph ? (<LicenseGraphComponent />
-                ) : (<EnterpriseGraphComponent />)}
-              </Col>
+              <Col md={6}>{showLicenseGraph ? <LicenseGraphComponent /> : <EnterpriseGraphComponent />}</Col>
             </Row>
           </Col>
         </Row>
@@ -102,27 +104,12 @@ const GraylogClusterOverview = ({ layout, children, showLicenseGraph }: Props) =
           <hr />
           {children}
           <Row>
-            <Col md={12}>
-              {showLicenseGraph ? (<LicenseGraphComponent />
-              ) : (<EnterpriseGraphComponent />)}
-            </Col>
+            <Col md={12}>{showLicenseGraph ? <LicenseGraphComponent /> : <EnterpriseGraphComponent />}</Col>
           </Row>
         </Col>
       </Row>
     </GraphDaysContextProvider>
   );
-};
-
-GraylogClusterOverview.propTypes = {
-  layout: PropTypes.oneOf(['default', 'compact']),
-  children: PropTypes.node,
-  showLicenseGraph: PropTypes.bool,
-};
-
-GraylogClusterOverview.defaultProps = {
-  layout: 'default',
-  children: null,
-  showLicenseGraph: false,
 };
 
 export default GraylogClusterOverview;

@@ -51,6 +51,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -121,7 +122,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     public SidecarListResponse administration(@ApiParam(name = "JSON body", required = true)
                                               @Valid @NotNull AdministrationRequest request) {
         final String sort = Sidecar.FIELD_NODE_NAME;
-        final String order = "asc";
+        final SortOrder order = SortOrder.ASCENDING;
         final String mappedQuery = sidecarStatusMapper.replaceStringStatusSearchQuery(request.query());
         SearchQuery searchQuery;
         try {

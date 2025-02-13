@@ -27,6 +27,27 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -34,6 +55,7 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.UserContext;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
@@ -41,9 +63,11 @@ import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.PermissionEditRequest;
@@ -71,37 +95,13 @@ import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
+import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -145,6 +145,7 @@ public class UsersResource extends RestResource {
     private final UserSessionTerminationService sessionTerminationService;
     private final DefaultSecurityManager securityManager;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
+    private final ClusterConfigService clusterConfigService;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
@@ -160,7 +161,7 @@ public class UsersResource extends RestResource {
                          RoleService roleService,
                          MongoDBSessionService sessionService,
                          UserSessionTerminationService sessionTerminationService, DefaultSecurityManager securityManager,
-                         GlobalAuthServiceConfig globalAuthServiceConfig) {
+                         GlobalAuthServiceConfig globalAuthServiceConfig, ClusterConfigService clusterConfigService) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -170,6 +171,7 @@ public class UsersResource extends RestResource {
         this.securityManager = securityManager;
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
         this.globalAuthServiceConfig = globalAuthServiceConfig;
+        this.clusterConfigService = clusterConfigService;
     }
 
     /**
@@ -233,17 +235,23 @@ public class UsersResource extends RestResource {
      */
     @GET
     @Deprecated
-    @RequiresPermissions(RestPermissions.USERS_LIST)
     @ApiOperation(value = "List all users", notes = "Permissions and session data included by default")
     public UserList listUsers(
             @ApiParam(name = "include_permissions") @QueryParam("include_permissions") @DefaultValue("true") boolean includePermissions,
-            @ApiParam(name = "include_sessions") @QueryParam("include_sessions") @DefaultValue("true") boolean includeSessions) {
-        return listUsersSelective(includePermissions, includeSessions);
+            @ApiParam(name = "include_sessions") @QueryParam("include_sessions") @DefaultValue("true") boolean includeSessions,
+            @Context SearchUser searchUser) {
+        final Optional<AllUserSessions> optSessions = includeSessions ? Optional.of(AllUserSessions.create(sessionService)) : Optional.empty();
+        return searchUser.isPermitted(RestPermissions.USERS_LIST) ?
+                listUsersSelective(includePermissions, optSessions) :
+                listForLoggedInUser(searchUser, includePermissions, optSessions);
     }
 
-    private UserList listUsersSelective(boolean includePermissions, boolean includeSessions) {
+    private UserList listForLoggedInUser(final SearchUser searchUser, final boolean includePermissions, Optional<AllUserSessions> optSessions) {
+        return UserList.create(List.of(toUserResponse(searchUser.getUser(), includePermissions, optSessions)));
+    }
+
+    private UserList listUsersSelective(final boolean includePermissions, final Optional<AllUserSessions> optSessions) {
         final List<User> users = userManagementService.loadAll();
-        final Optional<AllUserSessions> optSessions = includeSessions ? Optional.of(AllUserSessions.create(sessionService)) : Optional.empty();
 
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
         userManagementService.getRootUser().ifPresent(adminUser ->
@@ -272,7 +280,7 @@ public class UsersResource extends RestResource {
                                                                 allowableValues = "title,description")
                                                       @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
                                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                      @DefaultValue("asc") @QueryParam("order") String order) {
+                                                      @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
         final AllUserSessions sessions = AllUserSessions.create(sessionService);
@@ -712,7 +720,9 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "JSON Body", value = "Placeholder because POST requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body) {
         final User user = loadUserById(userId);
         final String username = user.getName();
-        if (!isPermitted(USERS_TOKENCREATE, username)) {
+
+        if (!isPermitted(USERS_TOKENCREATE, username) ||
+                isExternalUserDenied(user)) {
             throw new ForbiddenException("Not allowed to create tokens for user " + username);
         }
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
@@ -745,6 +755,11 @@ public class UsersResource extends RestResource {
         } else {
             throw new NotFoundException("Couldn't find access token for user " + username);
         }
+    }
+
+    private boolean isExternalUserDenied(User user) {
+        return user.isExternalUser()
+                && !clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).allowAccessTokenForExternalUsers();
     }
 
     private User loadUserById(String userId) {

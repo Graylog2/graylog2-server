@@ -24,14 +24,14 @@ import DocsHelper from 'util/DocsHelper';
 const SidecarNewConfigurationPage = () => (
   <DocumentTitle title="New Collector Configuration">
     <SidecarsPageNavigation />
-    <PageHeader title="New Collector Configuration"
-                documentationLink={{
-                  title: 'Sidecar documentation',
-                  path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-                }}>
-      <span>
-        Some words about collector configurations.
-      </span>
+    <PageHeader
+      title="New Collector Configuration"
+      documentationLink={{
+        title: 'Sidecar documentation',
+        path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+      }}
+    >
+      <span>Some words about collector configurations.</span>
     </PageHeader>
     <ConfigurationForm action="create" />
   </DocumentTitle>

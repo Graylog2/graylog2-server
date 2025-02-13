@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import URI from 'urijs';
-import PropTypes from 'prop-types';
 
 import * as URLUtils from 'util/URLUtils';
 import { DocumentTitle, ExternalLinkButton, PageHeader, Spinner } from 'components/common';
@@ -25,15 +24,15 @@ import type { NodeInfo } from 'stores/nodes/NodesStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 
-import useCurrentUser from '../hooks/useCurrentUser';
-
 const GLOBAL_API_BROWSER_URL = '/api-browser/global/index.html';
 
 const hasExternalURI = (nodes: { [nodeId: string]: NodeInfo }) => {
   const nodeVals = Object.values(nodes);
   const publishURI = URLUtils.qualifyUrl('/');
 
-  return (nodeVals.findIndex((node) => new URI(node.transport_address).normalizePathname().toString() !== publishURI) >= 0);
+  return (
+    nodeVals.findIndex((node) => new URI(node.transport_address).normalizePathname().toString() !== publishURI) >= 0
+  );
 };
 
 const GlobalAPIButton = ({ nodes }: { nodes: { [nodeId: string]: NodeInfo } }) => {
@@ -52,12 +51,7 @@ const GlobalAPIButton = ({ nodes }: { nodes: { [nodeId: string]: NodeInfo } }) =
   return null;
 };
 
-GlobalAPIButton.propTypes = {
-  nodes: PropTypes.object.isRequired,
-};
-
 const NodesPage = () => {
-  const currentUser = useCurrentUser();
   const { nodes } = useStore(NodesStore);
 
   return (
@@ -65,13 +59,13 @@ const NodesPage = () => {
       <div>
         <PageHeader title="Nodes" actions={<GlobalAPIButton nodes={nodes} />}>
           <span>
-            This page provides a real-time overview of the nodes in your Graylog cluster.
-            You can pause message processing at any time. The process buffers will not accept any new messages until
-            you resume it. If the message journal is enabled for a node, which it is by default, incoming messages
-            will be persisted to disk, even when processing is disabled.
+            This page provides a real-time overview of the nodes in your Graylog cluster. You can pause message
+            processing at any time. The process buffers will not accept any new messages until you resume it. If the
+            message journal is enabled for a node, which it is by default, incoming messages will be persisted to disk,
+            even when processing is disabled.
           </span>
         </PageHeader>
-        <NodesList permissions={currentUser.permissions} nodes={nodes} />
+        <NodesList nodes={nodes} />
       </div>
     </DocumentTitle>
   );

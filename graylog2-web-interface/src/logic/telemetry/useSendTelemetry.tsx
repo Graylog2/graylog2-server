@@ -21,32 +21,35 @@ import type { DataRouterContextObject } from 'react-router/dist/lib/context';
 
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
-import { currentPathnameWithoutPrefix } from 'util/URLUtils';
+import { currentPathname, stripPrefixFromPathname } from 'util/URLUtils';
+import { singleton } from 'logic/singleton';
 
 const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
   if (!dataRouterContext?.router?.routes) {
     return undefined;
   }
 
-  const { router: { routes } } = dataRouterContext;
-  const pathname = currentPathnameWithoutPrefix();
+  const {
+    router: { routes },
+  } = dataRouterContext;
+  const pathname = currentPathname();
   const matches = matchRoutes(routes, pathname);
 
-  return matches.at(-1).route.path;
+  return stripPrefixFromPathname(matches?.at(-1)?.route.path);
 };
 
 const useSendTelemetry = () => {
   const { sendTelemetry } = useContext(TelemetryContext);
   const dataRouterContext = useContext(DataRouterContext);
 
-  return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
-    const route = retrieveCurrentRoute(dataRouterContext);
+  return useCallback(
+    (eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
+      const route = retrieveCurrentRoute(dataRouterContext);
 
-    return sendTelemetry(
-      eventType,
-      { app_path_pattern: route, ...event },
-    );
-  }, [dataRouterContext, sendTelemetry]);
+      return sendTelemetry(eventType, { app_path_pattern: route, ...event });
+    },
+    [dataRouterContext, sendTelemetry],
+  );
 };
 
-export default useSendTelemetry;
+export default singleton('core.useSendTelemetry', () => useSendTelemetry);

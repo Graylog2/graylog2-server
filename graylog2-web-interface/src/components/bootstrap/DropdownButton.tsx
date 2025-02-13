@@ -35,17 +35,19 @@ const StyledIcon = styled(Icon)`
  * This is the default dropdown button component. If you need to display the dropdown in a portal, please use the `OverlayDropdownButton`.
  */
 type ButtonProps = Omit<React.ComponentProps<typeof Button>, 'title' | 'children'>;
-type Props = React.PropsWithChildren<ButtonProps & {
-  buttonTitle?: string,
-  closeOnItemClick?: boolean,
-  dropup?: boolean,
-  keepMounted?: boolean,
-  noCaret?: boolean,
-  onMouseDown?: () => void,
-  onToggle?: (isOpen: boolean) => void,
-  pullRight?: boolean,
-  title?: React.ReactNode,
-}>;
+type Props = React.PropsWithChildren<
+  ButtonProps & {
+    buttonTitle?: string;
+    closeOnItemClick?: boolean;
+    dropup?: boolean;
+    keepMounted?: boolean;
+    noCaret?: boolean;
+    onMouseDown?: () => void;
+    onToggle?: (isOpen: boolean) => void;
+    pullRight?: boolean;
+    title?: React.ReactNode;
+  }
+>;
 
 const position = (pullRight: boolean, dropup: boolean): 'top' | 'bottom' | 'top-end' | 'bottom-end' => {
   const orientation = dropup ? 'top' : 'bottom';
@@ -54,28 +56,39 @@ const position = (pullRight: boolean, dropup: boolean): 'top' | 'bottom' | 'top-
   return `${orientation}${suffix}`;
 };
 
-const DropdownButton = ({ buttonTitle, children, closeOnItemClick, dropup, title, onMouseDown, onToggle, pullRight, noCaret, keepMounted, ...rest }: Props) => (
-  <Menu position={position(pullRight, dropup)} onChange={onToggle} keepMounted={keepMounted} closeOnItemClick={closeOnItemClick}>
+const DropdownButton = ({
+  buttonTitle,
+  children,
+  closeOnItemClick = true,
+  dropup,
+  title,
+  onMouseDown,
+  onToggle,
+  pullRight,
+  noCaret,
+  keepMounted,
+  ...rest
+}: Props) => (
+  <Menu
+    position={position(pullRight, dropup)}
+    onChange={onToggle}
+    keepMounted={keepMounted}
+    closeOnItemClick={closeOnItemClick}
+  >
     <Menu.Target>
       <Button onClick={onMouseDown} aria-label={buttonTitle} {...rest} title={buttonTitle}>
-        {title}{noCaret ? null : <>{' '}<StyledIcon name="arrow_drop_down" /></>}
+        {title}
+        {noCaret ? null : (
+          <>
+            {' '}
+            <StyledIcon name="arrow_drop_down" />
+          </>
+        )}
       </Button>
     </Menu.Target>
     <Menu.Dropdown>{children}</Menu.Dropdown>
   </Menu>
 );
-
-DropdownButton.defaultProps = {
-  closeOnItemClick: true,
-  buttonTitle: undefined,
-  dropup: undefined,
-  keepMounted: undefined,
-  noCaret: undefined,
-  onMouseDown: undefined,
-  onToggle: undefined,
-  pullRight: undefined,
-  title: undefined,
-};
 
 /** @component */
 export default DropdownButton;

@@ -36,35 +36,36 @@ import type { WidgetFormattingSettingsJSON } from './WidgetFormattingSettings';
 import WidgetConfig from '../widgets/WidgetConfig';
 
 type InternalState = {
-  columnPivots: Array<Pivot>,
-  formattingSettings: WidgetFormattingSettings,
-  rollup: boolean,
-  rowPivots: Array<Pivot>,
-  series: Array<Series>,
-  sort: Array<SortConfig>,
-  visualization: string,
-  visualizationConfig: VisualizationConfig | undefined | null,
-  eventAnnotation: boolean,
-  units: UnitsConfig,
+  columnPivots: Array<Pivot>;
+  formattingSettings: WidgetFormattingSettings;
+  rollup: boolean;
+  rowPivots: Array<Pivot>;
+  series: Array<Series>;
+  sort: Array<SortConfig>;
+  visualization: string;
+  visualizationConfig: VisualizationConfig | undefined | null;
+  eventAnnotation: boolean;
+  units: UnitsConfig;
 };
 
 type AggregationWidgetConfigJson = {
-  column_pivots: Array<PivotJson>,
-  formatting_settings: WidgetFormattingSettingsJSON,
-  rollup: boolean,
-  row_pivots: Array<PivotJson>,
-  series: Array<SeriesJson>,
-  sort: Array<SortConfigJson>,
-  visualization: string,
-  visualization_config: VisualizationConfigJson,
-  event_annotation: boolean,
-  units: UnitsConfigJson,
+  column_pivots: Array<PivotJson>;
+  formatting_settings: WidgetFormattingSettingsJSON;
+  rollup: boolean;
+  row_pivots: Array<PivotJson>;
+  series: Array<SeriesJson>;
+  sort: Array<SortConfigJson>;
+  visualization: string;
+  visualization_config: VisualizationConfigJson;
+  event_annotation: boolean;
+  units: UnitsConfigJson;
 };
 
 export default class AggregationWidgetConfig extends WidgetConfig {
   _value: InternalState;
 
-  constructor(columnPivots: Array<Pivot>,
+  constructor(
+    columnPivots: Array<Pivot>,
     rowPivots: Array<Pivot>,
     series: Array<Series>,
     sort: Array<SortConfig>,
@@ -76,7 +77,18 @@ export default class AggregationWidgetConfig extends WidgetConfig {
     units: UnitsConfig = UnitsConfig.empty(),
   ) {
     super();
-    this._value = { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig, formattingSettings, eventAnnotation, units };
+    this._value = {
+      columnPivots,
+      rowPivots,
+      series,
+      sort,
+      visualization,
+      rollup,
+      visualizationConfig,
+      formattingSettings,
+      eventAnnotation,
+      units,
+    };
   }
 
   get rowPivots() {
@@ -120,11 +132,16 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   get isTimeline() {
-    return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].type === DateType && this.rowPivots[0].fields?.[0] === TIMESTAMP_FIELD;
+    return (
+      this.rowPivots &&
+      this.rowPivots.length === 1 &&
+      this.rowPivots[0].type === DateType &&
+      this.rowPivots[0].fields?.[0] === TIMESTAMP_FIELD
+    );
   }
 
   get isEmpty(): boolean {
-    const empty = (arr) => !arr.length;
+    const empty = (arr: Array<unknown>) => !arr.length;
 
     return empty(this.rowPivots) && empty(this.columnPivots) && empty(this.series);
   }
@@ -195,8 +212,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
         'visualization',
         'formattingSettings',
         'units',
-      ]
-        .every((key) => isDeepEqual(this[key], other[key]));
+      ].every((key) => isDeepEqual(this[key], other[key]));
     }
 
     return false;
@@ -204,8 +220,9 @@ export default class AggregationWidgetConfig extends WidgetConfig {
 
   equalsForSearch(other: any) {
     if (other instanceof AggregationWidgetConfig) {
-      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'eventAnnotation', 'visualizationConfig']
-        .every((key) => isEqualForSearch(this[key], other[key]));
+      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'eventAnnotation', 'visualizationConfig'].every(
+        (key) => isEqualForSearch(this[key], other[key]),
+      );
     }
 
     return false;
@@ -233,7 +250,9 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       .sort(sort.map(SortConfig.fromJSON))
       .visualization(visualization)
       .rollup(rollup)
-      .visualizationConfig(visualization_config ? VisualizationConfig.fromJSON(visualization, visualization_config) : null)
+      .visualizationConfig(
+        visualization_config ? VisualizationConfig.fromJSON(visualization, visualization_config) : null,
+      )
       .formattingSettings(formatting_settings ? WidgetFormattingSettings.fromJSON(formatting_settings) : undefined)
       .eventAnnotation(event_annotation)
       .units(UnitsConfig.fromJSON(units))
@@ -305,8 +324,11 @@ class Builder {
     } = this.value.toObject();
 
     const availableSorts = [].concat(rowPivots, columnPivots, series);
-    const filteredSorts = sort.filter((s) => availableSorts
-      .find((availableSort) => (s.field === availableSort.function || availableSort.fields?.includes(s.field))));
+    const filteredSorts = sort.filter((s) =>
+      availableSorts.find(
+        (availableSort) => s.field === availableSort.function || availableSort.fields?.includes(s.field),
+      ),
+    );
 
     return new AggregationWidgetConfig(
       columnPivots,

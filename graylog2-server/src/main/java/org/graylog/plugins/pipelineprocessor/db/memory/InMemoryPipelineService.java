@@ -17,19 +17,19 @@
 package org.graylog.plugins.pipelineprocessor.db.memory;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
-import org.mongojack.DBQuery;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * A PipelineService that does not persist any data, but simply keeps it in memory.
@@ -105,12 +105,14 @@ public class InMemoryPipelineService implements PipelineService {
         clusterBus.post(PipelinesChangedEvent.deletedPipelineId(id));
     }
 
-    private String createId() {
-        return String.valueOf(idGen.incrementAndGet());
+    @Override
+    public Set<PipelineDao> loadByIds(Set<String> pipelineIds) {
+        return pipelineIds.stream()
+                .map(store::get)
+                .collect(Collectors.toSet());
     }
 
-    @Override
-    public long count(DBQuery.Query query) {
-        return store.size();
+    private String createId() {
+        return String.valueOf(idGen.incrementAndGet());
     }
 }

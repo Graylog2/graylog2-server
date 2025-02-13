@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import DOMPurify from 'dompurify';
 
@@ -26,25 +25,29 @@ import { NotificationsActions } from 'stores/notifications/NotificationsStore';
 import useNotificationMessage from 'hooks/useNotificationMessage';
 
 type Props = {
-  notification: NotificationType,
+  notification: NotificationType;
 };
 
-const StyledAlert = styled(Alert)(({ theme }) => css`
-  margin-top: 10px;
+const StyledAlert = styled(Alert)(
+  ({ theme }) => css`
+    margin-top: 10px;
 
-  i {
-    color: ${theme.colors.gray[10]};
-  }
+    i {
+      color: ${theme.colors.gray[10]};
+    }
 
-  form {
-    margin-bottom: 0;
-  }
-`);
+    form {
+      margin-bottom: 0;
+    }
+  `,
+);
 
-const NotificationTimestamp = styled.span(({ theme }) => css`
-  margin-left: 3px;
-  font-size: ${theme.fonts.size.small};
-`);
+const NotificationTimestamp = styled.span(
+  ({ theme }) => css`
+    margin-left: 3px;
+    font-size: ${theme.fonts.size.small};
+  `,
+);
 
 const _sanitizeDescription = (description) => DOMPurify.sanitize(description);
 
@@ -64,31 +67,24 @@ const Notification = ({ notification }: Props) => {
 
   /* eslint-disable react/no-danger */
   return (
-    <StyledAlert bsStyle="danger"
-                 title={(
-                   <>
-                     <div dangerouslySetInnerHTML={{ __html: _sanitizeDescription(message?.title) }} />
-                     <NotificationTimestamp>
-                       (triggered <RelativeTime dateTime={notification.timestamp} />)
-                     </NotificationTimestamp>
-                   </>
-                 )}
-                 onDismiss={_onClose}>
-      <div dangerouslySetInnerHTML={{ __html: _sanitizeDescription(message?.description) }}
-           className="notification-description" />
+    <StyledAlert
+      bsStyle="danger"
+      title={
+        <>
+          <div dangerouslySetInnerHTML={{ __html: _sanitizeDescription(message?.title) }} />
+          <NotificationTimestamp>
+            (triggered <RelativeTime dateTime={notification.timestamp} />)
+          </NotificationTimestamp>
+        </>
+      }
+      onDismiss={_onClose}
+    >
+      <div
+        dangerouslySetInnerHTML={{ __html: _sanitizeDescription(message?.description) }}
+        className="notification-description"
+      />
     </StyledAlert>
   );
-};
-
-Notification.propTypes = {
-  notification: PropTypes.exact({
-    severity: PropTypes.string.isRequired,
-    details: PropTypes.object,
-    type: PropTypes.string.isRequired,
-    key: PropTypes.string,
-    timestamp: PropTypes.string.isRequired,
-    node_id: PropTypes.string.isRequired,
-  }).isRequired,
 };
 
 export default Notification;

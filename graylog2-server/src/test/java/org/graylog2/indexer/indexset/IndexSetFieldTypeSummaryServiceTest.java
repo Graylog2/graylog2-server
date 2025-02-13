@@ -86,7 +86,7 @@ class IndexSetFieldTypeSummaryServiceTest {
 
         doReturn(List.of("Stream1", "Stream2")).when(streamService).streamTitlesForIndexSet("canSee");
         doReturn(List.of("text", "keyword")).when(indexFieldTypesService).fieldTypeHistory("canSee", "field_name", true);
-        mockIndexSetConfig("canSee", "Index Set From The Top Of The Universe");
+        mockIndexSetConfig("canSee", "Index Set From The Top Of The Universe", true);
 
         final PageListResponse<IndexSetFieldTypeSummary> summary = toTest.getIndexSetFieldTypeSummary(Set.of("stream_id"), "field_name", indexSetPermissionPredicate);
         assertThat(summary.elements())
@@ -98,7 +98,7 @@ class IndexSetFieldTypeSummaryServiceTest {
     void testComplexPaginationScenario() {
         Predicate<String> indexSetPermissionPredicate = indexSetID -> indexSetID.contains("canSee");
         final Set<String> allStreams = Set.of("stream_id_1", "stream_id_2", "stream_id_3", "stream_id_4", "stream_id_5");
-        doReturn(Set.of("canSee1", "cannotSee", "canSeeButDoesNotExist", "canSee2", "canSee3"))
+        doReturn(Set.of("canSee1", "cannotSee", "canSeeButDoesNotExist", "canSee2", "canSee3", "canSeeButCannotChangeFieldType"))
                 .when(streamService)
                 .indexSetIdsByIds(allStreams);
 
@@ -110,9 +110,10 @@ class IndexSetFieldTypeSummaryServiceTest {
         doReturn(List.of("text")).when(indexFieldTypesService).fieldTypeHistory("canSee2", "field_name", true);
         doReturn(List.of()).when(indexFieldTypesService).fieldTypeHistory("canSee3", "field_name", true);
 
-        mockIndexSetConfig("canSee1", "Aa");
-        mockIndexSetConfig("canSee2", "Ab");
-        mockIndexSetConfig("canSee3", "Z");
+        mockIndexSetConfig("canSee1", "Aa", true);
+        mockIndexSetConfig("canSee2", "Ab", true);
+        mockIndexSetConfig("canSee3", "Z", true);
+        mockIndexSetConfig("canSeeButCannotChangeFieldType", "Nope!", false);
         doReturn(Optional.empty()).when(indexSetService).get("canSeeButDoesNotExist");
 
         final PageListResponse<IndexSetFieldTypeSummary> allResultsOnSinglePageSortedByIdAsc = toTest.getIndexSetFieldTypeSummary(allStreams, "field_name", indexSetPermissionPredicate,
@@ -150,10 +151,15 @@ class IndexSetFieldTypeSummaryServiceTest {
 
     }
 
-    private void mockIndexSetConfig(final String id, final String title) {
+    private void mockIndexSetConfig(final String id,
+                                    final String title,
+                                    final boolean canHaveCustomFields) {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
-        doReturn(title).when(indexSetConfig).title();
-        doReturn(id).when(indexSetConfig).id();
+        if (canHaveCustomFields) {
+            doReturn(title).when(indexSetConfig).title();
+            doReturn(id).when(indexSetConfig).id();
+        }
+        doReturn(canHaveCustomFields).when(indexSetConfig).canHaveCustomFieldMappings();
         doReturn(Optional.of(indexSetConfig)).when(indexSetService).get(id);
     }
 }

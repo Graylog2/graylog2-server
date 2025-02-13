@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import PropTypes from 'prop-types';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import { useStore } from 'stores/connect';
@@ -34,12 +33,12 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
 type Props = {
-  newUrlEntry: string,
-  onUpdate: () => void,
-  urlType?: 'regex' | 'literal',
+  newUrlEntry?: string;
+  onUpdate?: () => void;
+  urlType?: 'regex' | 'literal';
 };
 
-const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
+const URLWhiteListFormModal = ({ newUrlEntry = '', urlType, onUpdate = () => {} }: Props) => {
   const prevNewUrlEntry = useRef<string>();
   const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -58,20 +57,26 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
     }
   }, [currentUser]);
 
-  const setDefaultWhiteListState = useCallback((defaultUrlWhiteListConfig) => {
-    const id = generateId();
-    const defaultConfig = {
-      entries: [...defaultUrlWhiteListConfig.entries, {
-        id: id,
-        title: '',
-        value: newUrlEntry,
-        type: urlType ?? 'literal',
-      }],
-      disabled: defaultUrlWhiteListConfig.disabled,
-    };
-    setNewUrlEntryId(id);
-    setConfig(defaultConfig);
-  }, [newUrlEntry, urlType]);
+  const setDefaultWhiteListState = useCallback(
+    (defaultUrlWhiteListConfig) => {
+      const id = generateId();
+      const defaultConfig = {
+        entries: [
+          ...defaultUrlWhiteListConfig.entries,
+          {
+            id: id,
+            title: '',
+            value: newUrlEntry,
+            type: urlType ?? 'literal',
+          },
+        ],
+        disabled: defaultUrlWhiteListConfig.disabled,
+      };
+      setNewUrlEntryId(id);
+      setConfig(defaultConfig);
+    },
+    [newUrlEntry, urlType],
+  );
 
   useEffect(() => {
     const { entries } = config;
@@ -124,40 +129,33 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
     return (
       <>
         <IfPermitted permissions="urlwhitelist:write">
-          <Button bsStyle="info" bsSize="xs" onClick={openModal}>Add to URL Whitelist</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={openModal}>
+            Add to URL Whitelist
+          </Button>
         </IfPermitted>
-        <BootstrapModalForm show={showConfigModal}
-                            bsSize="lg"
-                            title="Update Whitelist Configuration"
-                            onCancel={closeModal}
-                            onSubmitForm={saveConfig}
-                            submitButtonDisabled={!isValid}
-                            submitButtonText="Update configuration">
+        <BootstrapModalForm
+          show={showConfigModal}
+          bsSize="lg"
+          title="Update Whitelist Configuration"
+          onCancel={closeModal}
+          onSubmitForm={saveConfig}
+          submitButtonDisabled={!isValid}
+          submitButtonText="Update configuration"
+        >
           <h3>Whitelist URLs</h3>
-          <UrlWhiteListForm key={newUrlEntryId}
-                            urls={entries}
-                            disabled={disabled}
-                            onUpdate={handleUpdate}
-                            newEntryId={newUrlEntryId} />
+          <UrlWhiteListForm
+            key={newUrlEntryId}
+            urls={entries}
+            disabled={disabled}
+            onUpdate={handleUpdate}
+            newEntryId={newUrlEntryId}
+          />
         </BootstrapModalForm>
       </>
     );
   }
 
   return null;
-};
-
-URLWhiteListFormModal.propTypes = {
-  newUrlEntry: PropTypes.string,
-  onUpdate: PropTypes.func,
-  urlType: PropTypes.oneOf(['regex', 'literal']),
-};
-
-URLWhiteListFormModal.defaultProps = {
-  newUrlEntry: '',
-  onUpdate: () => {
-  },
-  urlType: undefined,
 };
 
 export default URLWhiteListFormModal;

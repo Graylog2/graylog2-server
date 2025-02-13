@@ -35,23 +35,22 @@ const IndexSetTemplatePage = () => {
   return (
     <DocumentTitle title={title}>
       <IndicesPageNavigation />
-      <PageHeader title={title}
-                  actions={(
-                    <ButtonToolbar>
-                      {!isFetching && !data.built_in && (
-                        <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(templateId)}>
-                          <Button bsStyle="success">Edit</Button>
-                        </LinkContainer>
-                      )}
-                      <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW}>
-                        <Button>Overview</Button>
-                      </LinkContainer>
-                    </ButtonToolbar>
-                  )}>
-        <span>
-          {description}
-        </span>
-
+      <PageHeader
+        title={title}
+        actions={
+          <ButtonToolbar>
+            {!isFetching && !data.built_in && (
+              <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(templateId)}>
+                <Button bsStyle="success">Edit</Button>
+              </LinkContainer>
+            )}
+            <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW}>
+              <Button>Overview</Button>
+            </LinkContainer>
+          </ButtonToolbar>
+        }
+      >
+        <span>{description}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>

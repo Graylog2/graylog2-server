@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { ModalSubmit } from 'components/common';
@@ -23,20 +22,22 @@ import { Input } from 'components/bootstrap';
 import useLogin from 'components/login/useLogin';
 
 type Props = {
-  onErrorChange: (message?: string) => void,
+  onErrorChange: (message?: string) => void;
 };
 
-const SigninButton = styled(ModalSubmit)(({ theme }) => css`
-  button.mantine-Button-root {
-    background-color: ${theme.colors.brand.primary};
-    border-color: ${theme.colors.brand.primary};
-    
-    &:hover {
+const SigninButton = styled(ModalSubmit)(
+  ({ theme }) => css`
+    button.mantine-Button-root {
       background-color: ${theme.colors.brand.primary};
       border-color: ${theme.colors.brand.primary};
+
+      &:hover {
+        background-color: ${theme.colors.brand.primary};
+        border-color: ${theme.colors.brand.primary};
+      }
     }
-  }
-`);
+  `,
+);
 
 const LoginForm = ({ onErrorChange }: Props) => {
   const { login, isLoading } = useLogin(onErrorChange);
@@ -54,30 +55,19 @@ const LoginForm = ({ onErrorChange }: Props) => {
 
   return (
     <form onSubmit={onSignInClicked}>
-      <Input id="username"
-             type="text"
-             label="Username"
-             autoComplete="username"
-             autoFocus
-             required />
+      <Input id="username" type="text" label="Username" autoComplete="username" autoFocus required />
 
-      <Input id="password"
-             type="password"
-             label="Password"
-             autoComplete="current-password"
-             required />
+      <Input id="password" type="password" label="Password" autoComplete="current-password" required />
 
-      <SigninButton displayCancel={false}
-                    isSubmitting={isLoading}
-                    isAsyncSubmit
-                    submitLoadingText="Signing in..."
-                    submitButtonText="Sign in" />
+      <SigninButton
+        displayCancel={false}
+        isSubmitting={isLoading}
+        isAsyncSubmit
+        submitLoadingText="Signing in..."
+        submitButtonText="Sign in"
+      />
     </form>
   );
-};
-
-LoginForm.propTypes = {
-  onErrorChange: PropTypes.func.isRequired,
 };
 
 export default LoginForm;

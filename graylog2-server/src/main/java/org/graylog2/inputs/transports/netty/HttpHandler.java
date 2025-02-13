@@ -33,11 +33,20 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
     private final boolean enableCors;
+    private final String authorizationHeader;
+    private final String authorizationHeaderValue;
+    private final String path;
 
-    public HttpHandler(boolean enableCors) {
+    public HttpHandler(boolean enableCors, String authorizationHeader, String authorizationHeaderValue, String path) {
         this.enableCors = enableCors;
+        this.authorizationHeader = authorizationHeader;
+        this.authorizationHeaderValue = authorizationHeaderValue;
+        this.path = path;
     }
 
     @Override
@@ -46,6 +55,14 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
         final boolean keepAlive = HttpUtil.isKeepAlive(request);
         final HttpVersion httpRequestVersion = request.protocolVersion();
         final String origin = request.headers().get(HttpHeaderNames.ORIGIN);
+
+        if (isNotBlank(authorizationHeader)) {
+            // Authentication is required.
+            final String suppliedAuthHeaderValue = request.headers().get(authorizationHeader);
+            if (isBlank(suppliedAuthHeaderValue) || !suppliedAuthHeaderValue.equals(authorizationHeaderValue)) {
+                writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.UNAUTHORIZED, origin);
+            }
+        }
 
         // to allow for future changes, let's be at least a little strict in what we accept here.
         if (HttpMethod.OPTIONS.equals(request.method())) {
@@ -56,7 +73,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
             return;
         }
 
-        final boolean correctPath = "/gelf".equals(request.uri());
+        final boolean correctPath = path.equals(request.uri());
         if (correctPath && request instanceof FullHttpRequest) {
             final FullHttpRequest fullHttpRequest = (FullHttpRequest) request;
             final ByteBuf buffer = fullHttpRequest.content();

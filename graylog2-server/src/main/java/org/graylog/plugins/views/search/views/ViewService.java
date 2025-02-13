@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.views;
 
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
@@ -226,8 +226,11 @@ public class ViewService implements ViewUtils<ViewDTO> {
         try {
             final var save = collection.insertOne(requirementsForView(viewDTO));
             return mongoUtils.getById(MongoUtils.insertedId(save)).orElseThrow(() -> new IllegalStateException("Unable to retrieve saved View!"));
-        } catch (DuplicateKeyException e) {
-            throw new IllegalStateException("Unable to save view, it already exists.");
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new IllegalStateException("Unable to save view, it already exists.");
+            }
+            throw e;
         }
     }
 

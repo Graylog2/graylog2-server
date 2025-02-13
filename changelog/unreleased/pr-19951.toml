@@ -1,4 +1,0 @@
-type = "fixed"
-message = "Fixed issue where unescaped quotes in Custom HTTP notification JSON payloads breaks the notifications."
-
-pulls = ["19951"]

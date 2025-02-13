@@ -29,6 +29,7 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.io.IOUtils;
+import jakarta.ws.rs.ForbiddenException;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -36,6 +37,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
@@ -71,11 +74,17 @@ import org.graylog2.indexer.migration.RemoteIndex;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.indexer.migration.TaskStatus;
+import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
+import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
+import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -124,6 +133,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final DatanodeRestApiProxy datanodeRestApiProxy;
     private final NotificationService notificationService;
 
+    private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
+    private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
+    private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
+    private final SystemJobManager systemJobManager;
+
     private final DatanodeMigrationLockService migrationLockService;
 
     @Inject
@@ -135,6 +149,10 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                RemoteReindexMigrationService reindexMigrationService,
                                                DatanodeRestApiProxy datanodeRestApiProxy,
                                                NotificationService notificationService,
+                                               IndexRangesCleanupPeriodical indexRangesCleanupPeriodical,
+                                               RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
+                                               CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
+                                               SystemJobManager systemJobManager,
                                                DatanodeMigrationLockService migrationLockService) {
         this.client = client;
         this.indices = indices;
@@ -144,6 +162,10 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.reindexMigrationService = reindexMigrationService;
         this.datanodeRestApiProxy = datanodeRestApiProxy;
         this.notificationService = notificationService;
+        this.indexRangesCleanupPeriodical = indexRangesCleanupPeriodical;
+        this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
+        this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
+        this.systemJobManager = systemJobManager;
         this.migrationLockService = migrationLockService;
     }
 
@@ -185,6 +207,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 final Set<Lock> locks = lockIndexSets(migration);
                 createIndicesInNewCluster(migration);
                 startAsyncTasks(migration, request, locks);
+                recaluculateAllIndexRanges();
                 createSystemNotification(Status.RUNNING);
             }).start();
         } catch (Exception e) {
@@ -460,6 +483,10 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 postMigrationActions.add(() -> closeLocalIndex(migration, indexName));
             }
 
+            retrieveIndexBlock(indexName)
+                    .ifPresent(block -> removeLocalBlock(migration, indexName, block));
+
+
             final BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
             logInfo(migration, "Executing async reindex for " + indexName);
             final TaskSubmissionResponse task = client.execute((c, requestOptions) -> {
@@ -474,9 +501,45 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             postMigrationActions.forEach(Runnable::run);
 
         } catch (Exception e) {
-            final String message = "Could not reindex index: " + indexName + " - " + e.getMessage();
+            final String message = "Could not reindex index: " + indexName + " - " + formatErrorMessage(e);
             logError(migration, message, e);
         }
+    }
+
+    private static String formatErrorMessage(Exception e) {
+        StringBuilder message = new StringBuilder();
+        if (e.getMessage() != null) {
+            message.append(e.getMessage());
+        }
+
+        if (e.getCause() != null && e.getCause().getMessage() != null) {
+            message.append(" ").append(e.getCause().getMessage());
+        }
+        return message.toString();
+    }
+
+    private void removeLocalBlock(MigrationConfiguration migration, String indexName, BlockResponse.IndexBlock block) {
+        logInfo(migration, "Index " + indexName + " is blocked: " + block.description() + ". Removing the block now.");
+        final AcknowledgedResponse acknowledgedResponse = client.execute((restHighLevelClient, requestOptions) -> {
+            final UpdateSettingsRequest settingsRequest = new UpdateSettingsRequest();
+            settingsRequest.indices(indexName);
+            settingsRequest.settings(Map.of(
+                    "index.blocks.write", false,
+                    "index.blocks.read_only_allow_delete", false
+            ));
+            return restHighLevelClient.indices().putSettings(settingsRequest, requestOptions);
+        });
+    }
+
+    private Optional<BlockResponse.IndexBlock> retrieveIndexBlock(String indexName) {
+        return client.execute((restHighLevelClient, requestOptions) -> {
+            final Response blocksResponse = restHighLevelClient.getLowLevelClient().performRequest(new Request("GET", "_cluster/state/blocks/"));
+            try (final InputStream is = blocksResponse.getEntity().getContent()) {
+                final BlockResponse indexBlocks = objectMapper.readValue(is, BlockResponse.class);
+                return indexBlocks.blocks().forIndex(indexName)
+                        .filter(b -> b.levels().contains(BlockResponse.BlockLevel.write));
+            }
+        });
     }
 
     private void closeLocalIndex(MigrationConfiguration migration, String indexName) {
@@ -591,15 +654,39 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 onTaskSuccess(migration, index, t.task(), duration);
             }
         });
+        recalculateIndexRanges(index);
         Status status = getMigrationStatus(migration);
         if (status == Status.FINISHED || status == Status.ERROR) {
             onMigrationFinished(status, locks);
         }
     }
 
+    private void recalculateIndexRanges(String index) {
+        indices.refresh(index);
+        try {
+            systemJobManager.submit(singleIndexRangeJobFactory.create(Set.of(), index));
+        } catch (SystemJobConcurrencyException e) {
+            LOG.warn("Unable to trigger index range calculation for index: {}", index, e);
+        }
+    }
+
     private void onMigrationFinished(Status status, Set<Lock> locks) {
+        LOG.info("Remote reindexing migration finished");
+        recaluculateAllIndexRanges();
         createSystemNotification(status);
         locks.forEach(migrationLockService::release);
+    }
+
+    private void recaluculateAllIndexRanges() {
+        this.indexRangesCleanupPeriodical.doRun();
+        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSetRegistry.getAll());
+        try {
+            this.systemJobManager.submit(rebuildJob);
+        } catch (SystemJobConcurrencyException e) {
+            final String errorMsg = "Concurrency level of this job reached: " + e.getMessage();
+            LOG.error(errorMsg, e);
+            throw new ForbiddenException(errorMsg);
+        }
     }
 
     private Status getMigrationStatus(MigrationConfiguration migration) {

@@ -33,13 +33,14 @@ import type {
   GroupByFormValues,
   GroupingDirection,
   ValuesGrouping,
-  WidgetConfigFormValues, WidgetConfigValidationErrors,
+  WidgetConfigFormValues,
+  WidgetConfigValidationErrors,
 } from '../WidgetConfigForm';
 
 export type GroupByError = {
-  fields?: string,
-  interval?: string,
-  limit?: string,
+  fields?: string;
+  interval?: string;
+  limit?: string;
 };
 
 export const toValuesGrouping = (grouping: GroupByFormValues): ValuesGrouping => {
@@ -78,12 +79,12 @@ export const onGroupingFieldsChange = ({
   newFields,
   setFieldValue,
 }: {
-  fieldTypes: FieldTypes,
-  activeQueryId: string,
-  groupingIndex: number,
-  grouping: GroupByFormValues,
-  newFields: Array<string>,
-  setFieldValue: (key: string, value: GroupByFormValues) => void,
+  fieldTypes: FieldTypes;
+  activeQueryId: string;
+  groupingIndex: number;
+  grouping: GroupByFormValues;
+  newFields: Array<string>;
+  setFieldValue: (key: string, value: GroupByFormValues) => void;
 }) => {
   const updateFormState = (data: GroupByFormValues) => setFieldValue(`groupBy.groupings.${groupingIndex}`, data);
 
@@ -96,9 +97,9 @@ export const onGroupingFieldsChange = ({
     return;
   }
 
-  const groupingHasValuesField = fieldTypes.queryFields.get(activeQueryId, fieldTypes.all).some(({ name, type }) => (
-    newFields.includes(name) && type.type !== 'date'),
-  );
+  const groupingHasValuesField = fieldTypes.queryFields
+    .get(activeQueryId, fieldTypes.all)
+    .some(({ name, type }) => newFields.includes(name) && type.type !== 'date');
   const newGroupingType = groupingHasValuesField ? ValuesType : DateType;
 
   if (grouping.type === newGroupingType) {
@@ -174,7 +175,8 @@ const validateValuesGrouping = (grouping: ValuesGrouping): GroupByError => {
   return groupByError;
 };
 
-const hasErrors = <T extends {}> (errors: Array<T>): boolean => errors.filter((error) => Object.keys(error).length > 0).length > 0;
+const hasErrors = <T extends {}>(errors: Array<T>): boolean =>
+  errors.filter((error) => Object.keys(error).length > 0).length > 0;
 
 const validateGrouping = (grouping: GroupByFormValues): GroupByError => {
   if ('interval' in grouping) {
@@ -206,7 +208,7 @@ const validateGroupings = (values: WidgetConfigFormValues): WidgetConfigValidati
 
   if (hasErrors([groupByErrors])) return groupByErrors;
 
-  if (hasErrors(groupingErrors)) return ({ groupBy: { groupings: groupingErrors } });
+  if (hasErrors(groupingErrors)) return { groupBy: { groupings: groupingErrors } };
 
   return emptyErrors;
 };
@@ -262,7 +264,10 @@ const pivotsToGrouping = (config: AggregationWidgetConfig) => {
 };
 
 const groupingToPivot = (grouping: GroupByFormValues) => {
-  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: parseNumber(grouping.limit), skip_empty_values: grouping.skipEmptyValues };
+  const pivotConfig =
+    'interval' in grouping
+      ? { interval: grouping.interval }
+      : { limit: parseNumber(grouping.limit), skip_empty_values: grouping.skipEmptyValues };
 
   return Pivot.create(grouping.fields, grouping.type, pivotConfig);
 };
@@ -272,47 +277,42 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
   const columnPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'column').map(groupingToPivot);
   const { columnRollup } = groupBy;
 
-  return config
-    .rowPivots(rowPivots)
-    .columnPivots(columnPivots)
-    .rollup(columnRollup);
+  return config.rowPivots(rowPivots).columnPivots(columnPivots).rollup(columnRollup);
 };
 
-export const createEmptyGrouping = () => addRandomId<ValuesGrouping>({
-  direction: 'row',
-  fields: [],
-  type: ValuesType,
-  limit: DEFAULT_PIVOT_LIMIT,
-});
+export const createEmptyGrouping = () =>
+  addRandomId<ValuesGrouping>({
+    direction: 'row',
+    fields: [],
+    type: ValuesType,
+    limit: DEFAULT_PIVOT_LIMIT,
+  });
 
 const GroupByElement: AggregationElement<'groupBy'> = {
   sectionTitle: 'Group By',
   title: 'Grouping',
   key: 'groupBy',
   order: 1,
-  allowCreate: (formValues : WidgetConfigFormValues) => !(formValues.visualization.type === 'numeric'),
+  allowCreate: (formValues: WidgetConfigFormValues) => !(formValues.visualization.type === 'numeric'),
   onCreate: (formValues: WidgetConfigFormValues) => ({
     ...formValues,
     groupBy: {
       columnRollup: formValues.groupBy ? formValues.groupBy.columnRollup : false,
-      groupings: [
-        ...(formValues.groupBy?.groupings ?? []),
-        createEmptyGrouping(),
-      ],
+      groupings: [...(formValues.groupBy?.groupings ?? []), createEmptyGrouping()],
     },
   }),
-  onRemove: ((index, formValues) => {
+  onRemove: (index, formValues) => {
     const newFormValues = { ...formValues };
-    const newGroupings = formValues.groupBy?.groupings.filter((_value, i) => (index !== i));
+    const newGroupings = formValues.groupBy?.groupings.filter((_value, i) => index !== i);
 
-    return ({
+    return {
       ...newFormValues,
       groupBy: {
         columnRollup: newFormValues.groupBy.columnRollup ?? false,
         groupings: newGroupings,
       },
-    });
-  }),
+    };
+  },
   fromConfig: (config: AggregationWidgetConfig) => {
     const groupings = pivotsToGrouping(config);
 
@@ -327,7 +327,8 @@ const GroupByElement: AggregationElement<'groupBy'> = {
       },
     };
   },
-  toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => groupByToConfig(formValues.groupBy, configBuilder),
+  toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) =>
+    groupByToConfig(formValues.groupBy, configBuilder),
   component: GroupingsConfiguration,
   validate: validateGroupings,
   isEmpty: (formValues: WidgetConfigFormValues['groupBy']) => (formValues?.groupings ?? []).length === 0,

@@ -24,24 +24,36 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
 import { getPieHoverTemplateSettings } from 'views/components/visualizations/utils/chartLayoutGenerators';
 
-export type PieHoverTemplateSettings = { text: Array<string>, hovertemplate: string, meta: string, textinfo: 'percent' };
-export type PieChartDataSettingsWithCustomUnits = (props: { originalName: string, fullPath: string, values: Array<any> }) => PieHoverTemplateSettings | {};
+export type PieHoverTemplateSettings = {
+  text: Array<string>;
+  hovertemplate: string;
+  meta: string;
+  textinfo: 'percent';
+};
+export type PieChartDataSettingsWithCustomUnits = (props: {
+  name: string;
+  fullPath: string;
+  values: Array<any>;
+}) => PieHoverTemplateSettings | {};
 
 const usePieChartDataSettingsWithCustomUnits = ({ config }: { config: AggregationWidgetConfig }) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
 
-  return useCallback<PieChartDataSettingsWithCustomUnits>(({ originalName, fullPath, values }) => {
-    if (!unitFeatureEnabled) return ({});
+  return useCallback<PieChartDataSettingsWithCustomUnits>(
+    ({ name, fullPath, values }) => {
+      if (!unitFeatureEnabled) return {};
 
-    const fieldNameKey = getFieldNameFromTrace({ fullPath, series: config.series }) ?? NO_FIELD_NAME_SERIES;
-    const unit = widgetUnits.getFieldUnit(fieldNameKey);
+      const fieldNameKey = getFieldNameFromTrace({ fullPath, series: config.series }) ?? NO_FIELD_NAME_SERIES;
+      const unit = widgetUnits.getFieldUnit(fieldNameKey);
 
-    return ({
-      fullPath,
-      ...getPieHoverTemplateSettings({ convertedValues: values, unit, originalName }),
-    });
-  }, [config.series, unitFeatureEnabled, widgetUnits]);
+      return {
+        fullPath,
+        ...getPieHoverTemplateSettings({ convertedValues: values, unit, name }),
+      };
+    },
+    [config.series, unitFeatureEnabled, widgetUnits],
+  );
 };
 
 export default usePieChartDataSettingsWithCustomUnits;

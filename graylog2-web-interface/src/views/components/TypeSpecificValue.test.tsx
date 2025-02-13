@@ -24,23 +24,25 @@ import useFeature from 'hooks/useFeature';
 
 jest.mock('hooks/useFeature');
 
-describe('SearchResult', () => {
+describe('TypeSpecificValue', () => {
   beforeEach(() => {
     asMock(useFeature).mockReturnValue(true);
   });
 
   it('should render prettified value if unit defined', async () => {
     render(
-      <TypeSpecificValue field="field1" value={6543.21} unit={FieldUnit.fromJSON({ abbrev: 'ms', unit_type: 'time' })} />,
+      <TypeSpecificValue
+        field="field1"
+        value={6543.21}
+        unit={FieldUnit.fromJSON({ abbrev: 'ms', unit_type: 'time' })}
+      />,
     );
 
     await screen.findByText('6.5 s');
   });
 
   it('should render original value if unit not defined', async () => {
-    render(
-      <TypeSpecificValue field="field1" value={6543.21} />,
-    );
+    render(<TypeSpecificValue field="field1" value={6543.21} />);
 
     await screen.findByText(6543.21);
   });

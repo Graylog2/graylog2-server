@@ -20,20 +20,23 @@ import { useCallback, useState } from 'react';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 export type OverrideComponentType = React.ComponentType<{ retry: () => unknown }> | Error;
 
 export type OverrideProps = {
-  override: (override: OverrideComponentType) => void,
+  override: (override: OverrideComponentType) => void;
 };
 
 const WidgetOverrideElements = ({ children }: Props) => {
   const widgetOverrideElements = usePluginEntities('views.overrides.widgetEdit');
   const [OverrideComponent, setOverrideComponent] = useState<OverrideComponentType | undefined>(undefined);
   const retry = useCallback(() => setOverrideComponent(undefined), []);
-  const override = useCallback((thrownComponent: OverrideComponentType) => setOverrideComponent(() => thrownComponent), []);
+  const override = useCallback(
+    (thrownComponent: OverrideComponentType) => setOverrideComponent(() => thrownComponent),
+    [],
+  );
 
   if (OverrideComponent) {
     if (OverrideComponent instanceof Error) {
@@ -44,7 +47,7 @@ const WidgetOverrideElements = ({ children }: Props) => {
   }
 
   const widgetOverrideChecks = widgetOverrideElements
-  // eslint-disable-next-line react/no-array-index-key
+    // eslint-disable-next-line react/no-array-index-key
     .map((Component, idx) => <Component key={idx} override={override} />);
 
   return (

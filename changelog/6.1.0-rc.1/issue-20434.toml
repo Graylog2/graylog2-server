@@ -1,0 +1,5 @@
+type="f"
+message="Use name instead of originName in hover labels templates to fix that advanced field types not resolved in label texts for charts with custom units"
+
+issues=["20434"]
+pulls=["20453"]

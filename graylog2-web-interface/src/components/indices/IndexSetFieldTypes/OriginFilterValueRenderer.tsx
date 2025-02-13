@@ -16,15 +16,13 @@
  */
 import React from 'react';
 
-import type {
-  FieldTypeOrigin,
-} from 'components/indices/IndexSetFieldTypes/types';
+import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
 import OriginBadge from 'components/indices/IndexSetFieldTypes/originBadges/OriginBadge';
 
 type Props = {
-  title: string,
-  origin: FieldTypeOrigin,
-}
+  title: string;
+  origin: FieldTypeOrigin;
+};
 
 const OriginFilterValueRenderer = ({ origin, title }: Props) => <OriginBadge origin={origin} title={title} />;
 

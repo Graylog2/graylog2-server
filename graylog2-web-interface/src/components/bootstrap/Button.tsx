@@ -26,12 +26,16 @@ import type { BsSize } from 'components/bootstrap/types';
 const sizeForMantine = (size: BsSize) => {
   switch (size) {
     case 'xs':
-    case 'xsmall': return 'xs';
+    case 'xsmall':
+      return 'xs';
     case 'sm':
-    case 'small': return 'sm';
+    case 'small':
+      return 'sm';
     case 'lg':
-    case 'large': return 'lg';
-    default: return 'md';
+    case 'large':
+      return 'lg';
+    default:
+      return 'md';
   }
 };
 
@@ -43,8 +47,10 @@ const mapStyle = (style: StyleProps) => (style === 'default' ? 'gray' : style);
 
 const stylesProps = (style: StyleProps) => {
   switch (style) {
-    case 'link': return { variant: 'subtle' };
-    default: return {};
+    case 'link':
+      return { variant: 'subtle' };
+    default:
+      return {};
   }
 };
 
@@ -116,7 +122,7 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
     case 'warning':
     case 'transparent':
       return css`
-          color: ${themeColors.global.textDefault};
+        color: ${themeColors.global.textDefault};
 
         &:hover {
           color: ${themeColors.global.textDefault};
@@ -125,8 +131,9 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
         &:focus {
           color: ${themeColors.global.textDefault};
         }
-    `;
-    default: return '';
+      `;
+    default:
+      return '';
   }
 };
 
@@ -159,15 +166,10 @@ const textColor = (style: StyleProps, colors: DefaultTheme['colors']) => {
 };
 
 const StyledButton = styled(MantineButton)<{
-  $bsStyle: StyleProps,
-  $bsSize: BsSize,
-  $active: boolean
-}>(({
-  theme,
-  $bsStyle,
-  $bsSize,
-  $active,
-}) => {
+  $bsStyle: StyleProps;
+  $bsSize: BsSize;
+  $active: boolean;
+}>(({ theme, $bsStyle, $bsSize, $active }) => {
   const isLink = isLinkStyle($bsStyle);
   const isTransparent = isTransparentStyle($bsStyle);
   const color = textColor($bsStyle, theme.colors);
@@ -206,36 +208,56 @@ const StyledButton = styled(MantineButton)<{
 });
 
 type Props = React.PropsWithChildren<{
-  active?: boolean,
-  'aria-label'?: string,
-  bsStyle?: StyleProps,
-  bsSize?: BsSize,
-  className?: string,
-  'data-testid'?: string,
-  disabled?: boolean,
-  form?: string,
-  href?: string,
-  id?: string,
-  name?: string,
-  onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void),
-  rel?: 'noopener noreferrer',
-  role?: string,
-  tabIndex?: number,
-  target?: '_blank',
-  title?: string,
-  type?: 'button' | 'reset' | 'submit',
+  active?: boolean;
+  'aria-label'?: string;
+  bsStyle?: StyleProps;
+  bsSize?: BsSize;
+  className?: string;
+  'data-testid'?: string;
+  disabled?: boolean;
+  form?: string;
+  href?: string;
+  id?: string;
+  name?: string;
+  onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void);
+  rel?: 'noopener noreferrer';
+  role?: string;
+  style?: React.ComponentProps<typeof StyledButton>['style'];
+  tabIndex?: number;
+  target?: '_blank';
+  title?: string;
+  type?: 'button' | 'reset' | 'submit';
 }>;
 
 const Button = React.forwardRef<HTMLButtonElement, Props>(
-  ({
-    'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
-    title, form, target, type, rel, role, name, tabIndex, children, active,
-  }, ref) => {
+  (
+    {
+      'aria-label': ariaLabel,
+      bsStyle = 'default',
+      bsSize,
+      className,
+      'data-testid': dataTestId,
+      id,
+      onClick,
+      disabled = false,
+      href,
+      title,
+      form,
+      target,
+      type,
+      rel,
+      role,
+      name,
+      tabIndex,
+      children,
+      active,
+    },
+    ref,
+  ) => {
     const theme = useTheme();
     const style = mapStyle(bsStyle);
-    const color = (isLinkStyle(style) || isTransparentStyle(style))
-      ? 'transparent'
-      : theme.colors.button[style].background;
+    const color =
+      isLinkStyle(style) || isTransparentStyle(style) ? 'transparent' : theme.colors.button[style].background;
 
     const sharedProps = {
       id,
@@ -258,47 +280,31 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
 
     if (href) {
       return (
-        <StyledButton component={Link}
-                      to={href}
-                      target={target}
-                      rel={rel}
-                      onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-                      {...sharedProps}>
+        <StyledButton
+          component={Link}
+          to={href}
+          target={target}
+          rel={rel}
+          onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+          {...sharedProps}
+        >
           {children}
         </StyledButton>
       );
     }
 
     return (
-      <StyledButton ref={ref}
-                    form={form}
-                    onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
-                    name={name}
-                    {...sharedProps}>
+      <StyledButton
+        ref={ref}
+        form={form}
+        onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
+        name={name}
+        {...sharedProps}
+      >
         {children}
       </StyledButton>
     );
-  });
-
-Button.defaultProps = {
-  active: undefined,
-  'aria-label': undefined,
-  bsStyle: 'default',
-  bsSize: undefined,
-  className: undefined,
-  'data-testid': undefined,
-  disabled: false,
-  form: undefined,
-  href: undefined,
-  id: undefined,
-  name: undefined,
-  onClick: undefined,
-  rel: undefined,
-  role: undefined,
-  tabIndex: undefined,
-  target: undefined,
-  title: undefined,
-  type: undefined,
-};
+  },
+);
 
 export default Button;

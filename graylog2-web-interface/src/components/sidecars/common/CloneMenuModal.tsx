@@ -15,43 +15,53 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 
-const CloneMenuModal = ({ error, id, showModal, onClose, name, onChange, onSave }) => (
-  <BootstrapModalForm show={showModal}
-                      title="Clone"
-                      onSubmitForm={onSave}
-                      onCancel={onClose}
-                      submitButtonDisabled={Boolean(error)}
-                      submitButtonText="Done">
+type CloneMenuModalProps = {
+  error?: string;
+  id: string;
+  showModal: boolean;
+  name: string;
+  onChange: (...args: any[]) => void;
+  onSave: (...args: any[]) => void;
+  onSelect?: () => void;
+  onClose: (...args: any[]) => void;
+};
+
+const CloneMenuModal = ({
+  error,
+  id,
+  showModal,
+  onClose,
+  name,
+  onChange,
+  onSave,
+  // TODO: Find out why this is not in use (anymore)
+  onSelect: _onSelect,
+}: CloneMenuModalProps) => (
+  <BootstrapModalForm
+    show={showModal}
+    title="Clone"
+    onSubmitForm={onSave}
+    onCancel={onClose}
+    submitButtonDisabled={Boolean(error)}
+    submitButtonText="Done"
+  >
     <fieldset>
-      <Input type="text"
-             id={id}
-             label="Name"
-             defaultValue={name}
-             onChange={onChange}
-             bsStyle={error ? 'error' : null}
-             help={error || 'Type a name for the new collector'}
-             autoFocus
-             required />
+      <Input
+        type="text"
+        id={id}
+        label="Name"
+        defaultValue={name}
+        onChange={onChange}
+        bsStyle={error ? 'error' : null}
+        help={error || 'Type a name for the new collector'}
+        autoFocus
+        required
+      />
     </fieldset>
   </BootstrapModalForm>
 );
-
-CloneMenuModal.propTypes = {
-  error: PropTypes.string,
-  id: PropTypes.string.isRequired,
-  showModal: PropTypes.bool.isRequired,
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
-
-CloneMenuModal.defaultProps = {
-  error: undefined,
-};
 
 export default CloneMenuModal;

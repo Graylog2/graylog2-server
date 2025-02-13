@@ -28,6 +28,8 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_STREAM_INPUT_CHANGED: 'Search Stream Input Changed',
   SEARCH_REFRESH_CONTROL_PRESET_SELECTED: 'Search Refresh Control Preset Selected',
   SEARCH_REFRESH_CONTROL_TOGGLED: 'Search Refresh Control Toggled',
+  ALERTS_REFRESH_CONTROL_PRESET_SELECTED: 'Alerts Refresh Control Preset Selected',
+  ALERTS_REFRESH_CONTROL_TOGGLED: 'Alerts Refresh Control Toggled',
   SEARCH_BUTTON_CLICKED: 'Search Button Clicked',
   SEARCH_WIDGET_EXPORT_DOWNLOADED: 'Search Widget Export Downloaded',
   SEARCH_TIMERANGE_PRESET_ADD_QUICK_ACCESS: 'Search TimeRange Preset Add Quick Access',
@@ -181,6 +183,23 @@ export const TELEMETRY_EVENT_TYPE = {
     STREAM_ITEM_CLONED: 'Stream Item Cloned',
     STREAM_ITEM_RULE_SAVED: 'Stream Item Rule SAVED',
     STREAM_ITEM_DELETED: 'Stream Item Deleted',
+    STREAM_ITEM_DATA_ROUTING_CLICKED: 'Stream Item Data Routing Clicked',
+    STREAM_ITEM_DATA_ROUTING_UPDATE_CLICKED: 'Stream Item Data Routing Update Clicked',
+    STREAM_ITEM_DATA_ROUTING_STREAM_INDEXSET_UPDATE_OPENED: 'Stream Item Data Routing Stream IndexSet Update Opened',
+    STREAM_ITEM_DATA_ROUTING_INDEXER_FILTER_UPDATE_OPENED: 'Stream Item Data Routing Indexer Filter Update Opened',
+    STREAM_ITEM_DATA_ROUTING_INDEXER_FILTER_CREATE_OPENED: 'Stream Item Data Routing Indexer Filter Create Opened',
+    STREAM_ITEM_DATA_ROUTING_DATA_WAREHOUSE_FILTER_CREATE_OPENED:
+      'Stream Item Data Routing Data Warehouse Filter Create Opened',
+    STREAM_ITEM_DATA_ROUTING_DATA_WAREHOUSE_FILTER_UPDATE_OPENED:
+      'Stream Item Data Routing Data Warehouse Filter Update Opened',
+    STREAM_ITEM_DATA_ROUTING_FILTER_DELETE_OPENED: 'Stream Item Data Routing Filter Delete Opened',
+    STREAM_ITEM_DATA_ROUTING_INTAKE_OPENED: 'Stream Item Data Routing Intake Opened',
+    STREAM_ITEM_DATA_ROUTING_PROCESSING_OPENED: 'Stream Item Data Routing Processing Opened',
+    STREAM_ITEM_DATA_ROUTING_DESTINATIONS_OPENED: 'Stream Item Data Routing Destination Opened',
+    STREAM_ITEM_DATA_ROUTING_DESTINATIONS_OUTPUT_ASSIGN_OPENED:
+      'Stream Item Data Routing Destination Output Assign Opened',
+    STREAM_ITEM_DATA_ROUTING_INTAKE_CREATE_RULE_OPENED: 'Stream Item Data Routing Intake Create Rule Opened',
+    STREAM_ITEM_DATA_ROUTING_PROCESSING_EDIT_PIPELINES_CONNECTION: 'Stream Item Data Routing Edit Pipelines Connection',
   },
   ENTITYSHARE: {
     ENTITY_STREAM_SHARED: 'Entity Share: Entity Stream Shared',
@@ -241,11 +260,15 @@ export const TELEMETRY_EVENT_TYPE = {
     INPUT_DELETED: 'Inputs Input Deleted',
     INPUT_EDIT_CLICKED: 'Inputs Input Edit Clicked',
     INPUT_UPDATED: 'Inputs Input Updated',
+    INPUT_SETUP_ENTERED: 'Inputs Input Setup Mode Entered',
+    INPUT_SETUP_EXITED: 'Inputs Input Setup Mode Exited',
     SHOW_RECEIVED_MESSAGES_CLICKED: 'Inputs Show Received Messages Clicked',
     MANAGE_EXTRACTORS_CLICKED: 'Inputs Manage Extractors Clicked',
     SHOW_METRICS_CLICKED: 'Inputs Show Metrics Clicked',
+    INPUT_DIAGNOSIS_CLICKED: 'Inputs Input Diagnosis Clicked',
     INPUT_START_CLICKED: 'Inputs Input Start Clicked',
     INPUT_STOP_CLICKED: 'Inputs Input Stop Clicked',
+    INPUT_SETUP_CLICKED: 'Inputs Input Setup Clicked',
   },
   OUTPUTS: {
     OUTPUT_CREATED: 'Outputs Output Created',
@@ -347,5 +370,59 @@ export const TELEMETRY_EVENT_TYPE = {
     SELECTED: 'Index Set Template Selected',
     SELECT_OPENED: 'Index Set Template Selected Opened',
     SELECT_CLOSED: 'Index Set Template Selected Cancelled',
+  },
+  DATANODE_MIGRATION: {
+    RESET_MIGRATION_CLICKED: 'Datanode Migration Reset Migration Clicked',
+    RESET_MIGRATION_CONFIRM_CLICKED: 'Datanode Migration Reset Migration Confirm Clicked',
+    WELCOME_GO_TO_MIGRATION_STEPS_CLICKED: 'Datanode Migration Welcome Go To Migration Steps Clicked',
+    WELCOME_CONFIGURE_CERTIFICATE_RENEWAL_POLICY_CLICKED:
+      'Datanode Migration Welcome Configure Certificate Renewal Policy Clicked',
+    WELCOME_NEXT_CLICKED: 'Datanode Migration Welcome Next Clicked',
+    CA_CREATE_TAB_CLICKED: 'Datanode Migration CA Create Tab Clicked',
+    CA_UPLOAD_TAB_CLICKED: 'Datanode Migration CA Upload Tab Clicked',
+    CA_CREATE_CA_CLICKED: 'Datanode Migration CA Create CA Clicked',
+    CA_UPLOAD_CA_CLICKED: 'Datanode Migration CA Upload CA Clicked',
+    CA_GO_TO_MIGRATION_STEPS_CLICKED: 'Datanode Migration CA Go To Migration Steps Clicked',
+    CA_CONFIGURE_CERTIFICATE_RENEWAL_POLICY_CLICKED:
+      'Datanode Migration CA Configure Certificate Renewal Policy Clicked',
+    CA_NEXT_CLICKED: 'Datanode Migration CA Next Clicked',
+    CR_EDIT_CONFIGURATION_CLICKED: 'Datanode Migration CR Edit Configuration Clicked',
+    CR_UPDATE_CONFIGURATION_CLICKED: 'Datanode Migration CR Update Configuration Clicked',
+    CR_GO_TO_MIGRATION_STEPS_CLICKED: 'Datanode Migration CR Go To Migration Steps Clicked',
+    CR_NEXT_CLICKED: 'Datanode Migration CR Next Clicked',
+    MIGRATION_TYPE_SELECTED: 'Datanode Migration Migration Type Selected',
+    INPLACE_RUN_DIRECTORY_COMPATIBILITY_CHECK_CLICKED:
+      'Datanode Migration Inplace Run Directory Compatibility Check Clicked',
+    INPLACE_DIRECTORY_COMPATIBILITY_CHECK_NEXT_CLICKED:
+      'Datanode Migration Inplace Directory Compatibility Check Next Clicked',
+    INPLACE_JOURNAL_SIZE_DOWNTIME_WARNING_NEXT_CLICKED:
+      'Datanode Migration Inplace Journal Size Downtime Warning Next Clicked',
+    INPLACE_STOP_MESSAGE_PROCESSING_NEXT_CLICKED: 'Datanode Migration Inplace Stop Message Processing Next Clicked',
+    INPLACE_RESTART_GRAYLOG_NEXT_CLICKED: 'Datanode Migration Inplace Restart Graylog Next Clicked',
+    REMOTEREINDEX_WELCOME_NEXT_CLICKED: 'Datanode Migration RemoteReindex Welcome Next Clicked',
+    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_NEXT_CLICKED:
+      'Datanode Migration RemoteReindex Migrate Existing Data Question Next Clicked',
+    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_SKIP_CLICKED:
+      'Datanode Migration RemoteReindex Migrate Existing Data Question Skip Clicked',
+    REMOTEREINDEX_MIGRATE_EXISTING_DATA_CHECK_CONNECTION_CLICKED:
+      'Datanode Migration RemoteReindex Migrate Existing Data Check Connection Clicked',
+    REMOTEREINDEX_MIGRATE_EXISTING_DATA_START_CLICKED:
+      'Datanode Migration RemoteReindex Migrate Existing Data Start Clicked',
+    REMOTEREINDEX_RUNNING_LOGVIEW_CLICKED: 'Datanode Migration RemoteReindex Running Logview Clicked',
+    REMOTEREINDEX_RUNNING_RETRY_CLICKED: 'Datanode Migration RemoteReindex Running Retry Clicked',
+    REMOTEREINDEX_RUNNING_RETRY_CONFIRM_CLICKED: 'Datanode Migration RemoteReindex Running Retry Confirm Clicked',
+    REMOTEREINDEX_SHUTDOWN_OLD_CLUSTER_NEXT_CLICKED:
+      'Datanode Migration RemoteReindex Shutdown Old Cluster Next Clicked',
+  },
+  ALERTS_AND_EVENTS: {
+    ACTION_RAN: 'Alerts And Events Action Ran',
+  },
+  ENTITY_DATA_TABLE: {
+    COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
+    SORT_CHANGED: 'Entity Data Table Sort Changed',
+    PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
+    FILTER_CREATED: 'Entity Data Table Filter Created',
+    FILTER_DELETED: 'Entity Data Table Filter Deleted',
+    FILTER_CHANGED: 'Entity Data Table Filter Changed',
   },
 } as const;

@@ -27,24 +27,26 @@ import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/Cer
 import useDataNode from 'components/datanode/hooks/useDataNode';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 
-const StyledHorizontalDl = styled.dl(({ theme }) => css`
-  margin: ${theme.spacings.md} 0;
-  
-  > dt {
-    clear: left;
-    float: left;
-    margin-bottom: ${theme.spacings.md};
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 160px;
-  }
-  
-  > *:not(dt) {
-    margin-bottom: ${theme.spacings.md};
-    margin-left: 140px;
-  }
-`);
+const StyledHorizontalDl = styled.dl(
+  ({ theme }) => css`
+    margin: ${theme.spacings.md} 0;
+
+    > dt {
+      clear: left;
+      float: left;
+      margin-bottom: ${theme.spacings.md};
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 160px;
+    }
+
+    > *:not(dt) {
+      margin-bottom: ${theme.spacings.md};
+      margin-left: 140px;
+    }
+  `,
+);
 const StatusLabel = styled(Label)`
   display: inline-flex;
   justify-content: center;
@@ -57,7 +59,7 @@ const ActionsCol = styled(Col)`
 
 const DataNodePage = () => {
   const { dataNodeId } = useParams();
-  const { data, isInitialLoading, error } = useDataNode(dataNodeId);
+  const { data, isInitialLoading, error, refetch } = useDataNode(dataNodeId);
 
   if (isInitialLoading) {
     return <Spinner />;
@@ -73,11 +75,13 @@ const DataNodePage = () => {
   return (
     <DocumentTitle title={`Data Nodes: ${datanode.hostname}`}>
       <DataNodesPageNavigation />
-      <PageHeader title={`Data Nodes: ${datanode.hostname}`}
-                  documentationLink={{
-                    title: 'Data Nodes documentation',
-                    path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-                  }} />
+      <PageHeader
+        title={`Data Nodes: ${datanode.hostname}`}
+        documentationLink={{
+          title: 'Data Nodes documentation',
+          path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
+        }}
+      />
       <Row className="content">
         <Col xs={12}>
           <Col xs={9}>
@@ -89,23 +93,26 @@ const DataNodePage = () => {
               <dd>{datanode.transport_address || '-'}</dd>
               <dt>Status:</dt>
               <dd>
-                <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                             title={datanode.data_node_status}
-                             aria-label={datanode.data_node_status}
-                             role="button">
+                <StatusLabel
+                  bsStyle={datanodeDisabled ? 'warning' : 'success'}
+                  title={datanode.data_node_status}
+                  aria-label={datanode.data_node_status}
+                  role="button"
+                >
                   {datanode.data_node_status || 'N/A'}
                 </StatusLabel>
               </dd>
               <dt>Certificate valid until:</dt>
-              <dd><RelativeTime dateTime={datanode.cert_valid_until} /> <CertRenewalButton nodeId={datanode.node_id}
-                                                                                           status={datanode.status} />
+              <dd>
+                <RelativeTime dateTime={datanode.cert_valid_until} />{' '}
+                <CertRenewalButton nodeId={datanode.node_id} status={datanode.status} />
               </dd>
               <dt>Datanode version:</dt>
               <dd>{datanode.datanode_version}</dd>
             </StyledHorizontalDl>
           </Col>
           <ActionsCol xs={3}>
-            <DataNodeActions dataNode={datanode} displayAs="buttons" />
+            <DataNodeActions dataNode={datanode} refetch={refetch} displayAs="buttons" />
           </ActionsCol>
         </Col>
       </Row>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { SyntheticEvent } from 'react';
 import { useState, useMemo } from 'react';
 import { Formik, Form } from 'formik';
 import { useQueryClient } from '@tanstack/react-query';
@@ -27,12 +28,14 @@ import { Icon, ModalSubmit } from 'components/common';
 import UserNotification from 'util/UserNotification';
 import { isPermitted } from 'util/PermissionsMixin';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-type FormValues = Partial<Pick<Stream, 'index_set_id'>>
+type FormValues = Partial<Pick<Stream, 'index_set_id'>>;
 type Props = {
-  initialValues: FormValues,
-  indexSets: Array<IndexSet>,
-  stream: Stream,
+  initialValues: FormValues;
+  indexSets: Array<IndexSet>;
+  stream: Stream;
 };
 
 const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => ({
@@ -53,17 +56,20 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
   const queryClient = useQueryClient();
   const currentUser = useCurrentUser();
   const [showModal, setShowModal] = useState<boolean>(false);
-  const _initialValues = useMemo(
-    () => prepareInitialValues(initialValues, indexSets),
-    [indexSets, initialValues],
-  );
+  const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
+  const sendTelemetry = useSendTelemetry();
 
-  const openModal = () => {
+  const openModal = (event: SyntheticEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     setShowModal(true);
   };
 
   const onCloseModal = () => {
     setShowModal(false);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_STREAM_INDEXSET_UPDATE_OPENED, {
+      app_pathname: 'streams',
+    });
   };
 
   const onSave = (values: FormValues) => {
@@ -78,39 +84,39 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
 
   return (
     <>
-      <Button disabled={!isPermitted(currentUser.permissions, 'stream:edit')}
-              bsSize="sm"
-              onClick={openModal}
-              title="Edit index set">
+      <Button
+        disabled={!isPermitted(currentUser.permissions, 'stream:edit')}
+        bsSize="sm"
+        onClick={openModal}
+        title="Edit index set"
+      >
         <Icon name="add" /> Edit Index Set
       </Button>
 
       {showModal && (
-      <Modal show={showModal}
-             onHide={onCloseModal}>
-        <Formik<FormValues> initialValues={_initialValues}
-                            onSubmit={onSave}
-                            validate={validate}>
-          {({ isSubmitting, isValidating }) => (
-            <Form>
-              <Modal.Header closeButton>
-                <Modal.Title>Edit Stream IndexSet</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <IndexSetSelect indexSets={indexSets} />
-              </Modal.Body>
-              <Modal.Footer>
-                <ModalSubmit submitButtonText="Update"
-                             submitLoadingText="Saving stream"
-                             onCancel={onCloseModal}
-                             disabledSubmit={isValidating}
-                             isSubmitting={isSubmitting} />
-              </Modal.Footer>
-
-            </Form>
-          )}
-        </Formik>
-      </Modal>
+        <Modal show={showModal} onHide={onCloseModal}>
+          <Formik<FormValues> initialValues={_initialValues} onSubmit={onSave} validate={validate}>
+            {({ isSubmitting, isValidating }) => (
+              <Form>
+                <Modal.Header closeButton>
+                  <Modal.Title>Edit Stream IndexSet</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <IndexSetSelect indexSets={indexSets} />
+                </Modal.Body>
+                <Modal.Footer>
+                  <ModalSubmit
+                    submitButtonText="Update"
+                    submitLoadingText="Saving stream"
+                    onCancel={onCloseModal}
+                    disabledSubmit={isValidating}
+                    isSubmitting={isSubmitting}
+                  />
+                </Modal.Footer>
+              </Form>
+            )}
+          </Formik>
+        </Modal>
       )}
     </>
   );

@@ -22,16 +22,19 @@ import { Button } from 'components/bootstrap';
 import { ConfirmDialog, Icon } from 'components/common';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import useStreamOutputRuleMutation from 'components/streams/hooks/useStreamOutputRuleMutation';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-type Props ={
-  streamId: string,
-  filterOutputRule: StreamOutputFilterRule,
+type Props = {
+  streamId: string;
+  filterOutputRule: StreamOutputFilterRule;
 };
 
 const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
   const [showDialog, setShowDialog] = useState(false);
   const { removeStreamOutputRule } = useStreamOutputRuleMutation();
   const queryClient = useQueryClient();
+  const sendTelemetry = useSendTelemetry();
 
   const onConfirmDelete = async () => {
     await removeStreamOutputRule({ streamId, filterId: filterOutputRule.id }).then(() => {
@@ -41,21 +44,23 @@ const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
     setShowDialog(false);
   };
 
+  const onDelete = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_FILTER_DELETE_OPENED, {
+      app_pathname: 'streams',
+    });
+
+    setShowDialog(true);
+  };
+
   return (
     <>
-      <Button bsStyle="danger"
-              bsSize="xsmall"
-              onClick={() => setShowDialog(true)}
-              title="View">
+      <Button bsStyle="danger" bsSize="xsmall" onClick={onDelete} title="View">
         <Icon name="delete" type="regular" />
       </Button>
       {showDialog && (
-      <ConfirmDialog title="Delete Rule"
-                     show
-                     onConfirm={onConfirmDelete}
-                     onCancel={() => setShowDialog(false)}>
-        {`Are you sure you want to delete  ${filterOutputRule.title} rule ?`}
-      </ConfirmDialog>
+        <ConfirmDialog title="Delete Rule" show onConfirm={onConfirmDelete} onCancel={() => setShowDialog(false)}>
+          {`Are you sure you want to delete  ${filterOutputRule.title} rule ?`}
+        </ConfirmDialog>
       )}
     </>
   );
