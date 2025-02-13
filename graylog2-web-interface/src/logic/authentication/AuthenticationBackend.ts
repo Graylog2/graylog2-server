@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import type { DirectoryServiceAuthenticationService } from 'components/authentication/types';
 import { getAuthServicePlugin } from 'util/AuthenticationService';
@@ -42,7 +41,7 @@ export type AuthenticationBackendJSON = {
   config: DirectoryServiceBackendConfig | OktaBackendConfig;
 };
 
-const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
+const configFromJson = (config: AuthenticationBackendJSON['config']) => {
   const authService = getAuthServicePlugin((config as TypedConfig).type, true);
 
   if (authService && typeof authService.configFromJson === 'function') {
@@ -52,7 +51,7 @@ const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config
   return config;
 };
 
-const configToJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
+const configToJson = (config: AuthenticationBackendJSON['config']) => {
   const authService = getAuthServicePlugin((config as TypedConfig).type, true);
 
   if (authService && typeof authService.configToJson === 'function') {
@@ -66,11 +65,11 @@ export default class AuthenticationBackend {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<InternalState, 'id'>,
-    title: $PropertyType<InternalState, 'title'>,
-    description: $PropertyType<InternalState, 'description'>,
-    defaultRoles: $PropertyType<InternalState, 'defaultRoles'>,
-    config: $PropertyType<InternalState, 'config'>,
+    id: InternalState['id'],
+    title: InternalState['title'],
+    description: InternalState['description'],
+    defaultRoles: InternalState['defaultRoles'],
+    config: InternalState['config'],
   ) {
     this._value = {
       id,
@@ -81,23 +80,23 @@ export default class AuthenticationBackend {
     };
   }
 
-  get id(): $PropertyType<InternalState, 'id'> {
+  get id(): InternalState['id'] {
     return this._value.id;
   }
 
-  get title(): $PropertyType<InternalState, 'title'> {
+  get title(): InternalState['title'] {
     return this._value.title;
   }
 
-  get description(): $PropertyType<InternalState, 'description'> {
+  get description(): InternalState['description'] {
     return this._value.description;
   }
 
-  get defaultRoles(): $PropertyType<InternalState, 'defaultRoles'> {
+  get defaultRoles(): InternalState['defaultRoles'] {
     return this._value.defaultRoles;
   }
 
-  get config(): $PropertyType<InternalState, 'config'> {
+  get config(): InternalState['config'] {
     return this._value.config;
   }
 
@@ -153,23 +152,23 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<InternalState, 'id'>): Builder {
+  id(value: InternalState['id']): Builder {
     return new Builder(this.value.set('id', value));
   }
 
-  title(value: $PropertyType<InternalState, 'title'>): Builder {
+  title(value: InternalState['title']): Builder {
     return new Builder(this.value.set('title', value));
   }
 
-  description(value: $PropertyType<InternalState, 'description'>): Builder {
+  description(value: InternalState['description']): Builder {
     return new Builder(this.value.set('description', value));
   }
 
-  defaultRoles(value: $PropertyType<InternalState, 'defaultRoles'>): Builder {
+  defaultRoles(value: InternalState['defaultRoles']): Builder {
     return new Builder(this.value.set('defaultRoles', value));
   }
 
-  config(value: $PropertyType<InternalState, 'config'>): Builder {
+  config(value: InternalState['config']): Builder {
     return new Builder(this.value.set('config', value));
   }
 
