@@ -138,8 +138,8 @@ public class DatanodeKeystore {
             Key privateKey = keystore.getKey(DATANODE_KEY_ALIAS, passwordSecret.toCharArray());
             // replace the existing self-signed certificates chain with the signed chain from the event
             keystore.setKeyEntry(DATANODE_KEY_ALIAS, privateKey, passwordSecret.toCharArray(), certificateChain.toCertificateChainArray());
-            LOG.info("Persisting signed certificates to the datanode keystore finished");
             persistKeystore(keystore);
+            LOG.info("Persisting signed certificates to the datanode keystore finished");
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
             throw new DatanodeKeystoreException(e);
         }
