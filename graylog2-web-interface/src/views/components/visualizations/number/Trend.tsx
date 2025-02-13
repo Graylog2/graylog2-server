@@ -90,7 +90,6 @@ const _trendDirection = (delta: number, trendPreference: TrendPreference): Trend
   }
 };
 
-// eslint-disable-next-line no-nested-ternary
 const _trendIcon = (delta: number) =>
   delta === 0 ? 'arrow_circle_right' : delta > 0 ? 'arrow_circle_up' : 'arrow_circle_down';
 

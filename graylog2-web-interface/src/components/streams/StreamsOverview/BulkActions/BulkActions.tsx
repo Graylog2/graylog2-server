@@ -70,7 +70,6 @@ const BulkActions = ({ indexSets }: Props) => {
   );
 
   const onDelete = useCallback(() => {
-    // eslint-disable-next-line no-alert
     if (
       window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}? This action cannot be undone.`)
     ) {

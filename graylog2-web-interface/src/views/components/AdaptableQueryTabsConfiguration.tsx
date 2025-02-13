@@ -168,7 +168,6 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
     [activeQueryId, dashboardId, disablePageDelete, sendTelemetry, widgetIds],
   );
 
-  // eslint-disable-next-line react/no-unused-prop-types
   const customListItemRender = useCallback(
     ({ item }: { item: PageListItem }) => (
       <ListItem item={item} onUpdateTitle={onUpdateTitle} onRemove={removePage} disableDelete={disablePageDelete} />

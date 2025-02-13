@@ -74,7 +74,7 @@ const _defaultWidgets: DefaultWidgets = {
     const byStreamCategory = matchesDecoratorStreamCategories(streamCategory);
     const streamDecorators = decorators ? decorators.filter(byStreamId) : [];
     const streamCategoryDecorators = decorators?.length ? decorators.filter(byStreamCategory) : [];
-    // eslint-disable-next-line no-nested-ternary
+
     const allDecorators =
       streamDecorators.length && streamCategoryDecorators.length
         ? [...streamDecorators, ...streamCategoryDecorators]

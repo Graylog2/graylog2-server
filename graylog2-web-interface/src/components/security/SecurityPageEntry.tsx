@@ -24,7 +24,6 @@ const SecurityPageEntry = () => {
   const securityPagePlugins = usePluginEntities('securityPage');
 
   if (securityPagePlugins?.length) {
-    // eslint-disable-next-line react/no-array-index-key
     return (
       <>
         {securityPagePlugins.map((Page, index) => (

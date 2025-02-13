@@ -40,7 +40,6 @@ const ResumeStartupButton = ({
   const { data: dataNodes } = useDataNodes();
 
   const onResumeStartup = useCallback(() => {
-    // eslint-disable-next-line no-alert
     if (
       dataNodes?.length ||
       window.confirm(

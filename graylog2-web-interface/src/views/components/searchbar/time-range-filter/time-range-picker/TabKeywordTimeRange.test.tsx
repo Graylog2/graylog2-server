@@ -71,7 +71,6 @@ describe('TabKeywordTimeRange', () => {
     return formGroup && formGroup.className.includes('has-error') ? 'error' : null;
   };
 
-  // eslint-disable-next-line testing-library/no-unnecessary-act
   const changeInput = async (input, value) =>
     act(async () => {
       const { name } = asElement(input, HTMLInputElement);

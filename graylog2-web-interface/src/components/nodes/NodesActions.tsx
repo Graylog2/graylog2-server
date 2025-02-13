@@ -40,7 +40,6 @@ class NodesActions extends React.Component<
   _toggleMessageProcessing = () => {
     const { systemOverview, node } = this.props;
 
-    // eslint-disable-next-line no-alert
     if (
       window.confirm(
         `You are about to ${systemOverview.is_processing ? 'pause' : 'resume'} message processing in this node. Are you sure?`,

@@ -23,11 +23,9 @@ const QueryBarElements = () => {
 
   return (
     <>
-      {queryBarElements
-        // eslint-disable-next-line react/no-array-index-key
-        .map((Component, idx) => (
-          <Component key={idx} />
-        ))}
+      {queryBarElements.map((Component, idx) => (
+        <Component key={idx} />
+      ))}
     </>
   );
 };

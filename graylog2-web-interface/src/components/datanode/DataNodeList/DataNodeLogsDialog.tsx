@@ -64,7 +64,7 @@ const DataNodeLogsDialog = ({ show, hostname, onHide }: Props) => {
           {logs[logsType] ? (
             <LogsContainer>
               <table>
-                {/* eslint-disable-next-line react/no-array-index-key */}
+                {}
                 <tbody>
                   {logs[logsType]?.map((log, key) => (
                     <tr key={key}>

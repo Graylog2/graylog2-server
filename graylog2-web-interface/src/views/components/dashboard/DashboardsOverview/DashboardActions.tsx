@@ -34,7 +34,6 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
-// eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) =>
   window.confirm(`Are you sure you want to delete "${view.title}"?`);
 
