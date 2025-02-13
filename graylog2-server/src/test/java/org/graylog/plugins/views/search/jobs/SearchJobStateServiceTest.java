@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.views.search.jobs;
 
+import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
-import org.graylog.plugins.views.search.SearchType;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
@@ -226,7 +226,7 @@ public class SearchJobStateServiceTest {
 
     }
 
-    private SearchType.Result noResult() {
-        return null;
+    private QueryResult noResult() {
+        return QueryResult.emptyResult();
     }
 }

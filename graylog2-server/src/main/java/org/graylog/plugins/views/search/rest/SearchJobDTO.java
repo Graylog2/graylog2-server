@@ -20,13 +20,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.jobs.SearchJobState;
 import org.graylog.plugins.views.search.jobs.SearchJobStatus;
@@ -72,18 +69,7 @@ public record SearchJobDTO(
         return new SearchJobDTO(
                 searchJob.identifier(),
                 searchJob.errors(),
-                //TODO: replace hardcoded stuff or ... consider storing top-level element in Mongo
-                Map.of("TBD",
-                        QueryResult.builder()
-                                .query(Query.builder()
-                                        .id("")
-                                        .timerange(EmptyTimeRange.emptyTimeRange())
-                                        .query(ElasticsearchQueryString.empty())
-                                        .filter(null)
-                                        .build())
-                                .searchTypes(Map.of("TBD", searchJob.result()))
-
-                                .build()),
+                Map.of(searchJob.result().query().id(), searchJob.result()),
                 executionInfo);
     }
 
