@@ -68,13 +68,15 @@ const MigrationWizard = () => {
   ];
 
   return (
-    <Wizard steps={steps}
-            activeStep={activeStep}
-            onStepChange={() => {}}
-            horizontal
-            justified
-            containerClassName="migration-wizard"
-            hidePreviousNextButtons />
+    <Wizard
+      steps={steps}
+      activeStep={activeStep}
+      onStepChange={() => {}}
+      horizontal
+      justified
+      containerClassName="migration-wizard"
+      hidePreviousNextButtons
+    />
   );
 };
 

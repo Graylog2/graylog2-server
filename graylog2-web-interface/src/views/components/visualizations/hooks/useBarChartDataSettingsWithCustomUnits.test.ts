@@ -20,15 +20,13 @@ import { act } from '@testing-library/react-hooks';
 import useFeature from 'hooks/useFeature';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import { asMock } from 'helpers/mocking';
-import useChartDataSettingsWithCustomUnits
-  from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
+import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
-import useBarChartDataSettingsWithCustomUnits
-  from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
+import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useBarChartDataSettingsWithCustomUnits';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
 import * as chartLayoutGenerators from 'views/components/visualizations/utils/chartLayoutGenerators';
 import type { MappersForYAxis } from 'views/components/visualizations/utils/chartLayoutGenerators';
@@ -39,21 +37,26 @@ jest.mock('views/components/visualizations/hooks/useWidgetUnits');
 jest.mock('views/components/visualizations/utils/getFieldNameFromTrace');
 jest.mock('views/components/visualizations/utils/chartLayoutGenerators');
 
-const testConfig: AggregationWidgetConfig = AggregationWidgetConfig.builder().series([
-  Series.create('avg', 'fieldTime')
-    .toBuilder()
-    .config(SeriesConfig.empty().toBuilder().name('Name1').build()).build(),
-  Series.create('avg', 'fieldSize')
-    .toBuilder()
-    .config(SeriesConfig.empty().toBuilder().name('Name2').build()).build(),
-  Series.create('avg', 'fieldPercent')
-    .toBuilder()
-    .config(SeriesConfig.empty().toBuilder().name('Name3').build()).build(),
-  Series.create('count'),
-]).build();
+const testConfig: AggregationWidgetConfig = AggregationWidgetConfig.builder()
+  .series([
+    Series.create('avg', 'fieldTime')
+      .toBuilder()
+      .config(SeriesConfig.empty().toBuilder().name('Name1').build())
+      .build(),
+    Series.create('avg', 'fieldSize')
+      .toBuilder()
+      .config(SeriesConfig.empty().toBuilder().name('Name2').build())
+      .build(),
+    Series.create('avg', 'fieldPercent')
+      .toBuilder()
+      .config(SeriesConfig.empty().toBuilder().name('Name3').build())
+      .build(),
+    Series.create('count'),
+  ])
+  .build();
 
-const units: UnitsConfig = UnitsConfig
-  .empty().toBuilder()
+const units: UnitsConfig = UnitsConfig.empty()
+  .toBuilder()
   .setFieldUnit('fieldTime', new FieldUnit('time', 'ms'))
   .setFieldUnit('fieldSize', new FieldUnit('size', 'kb'))
   .setFieldUnit('fieldPercent', new FieldUnit('percent', '%'))
@@ -61,10 +64,12 @@ const units: UnitsConfig = UnitsConfig
 
 describe('useBarChartDataSettingsWithCustomUnits', () => {
   beforeEach(() => {
-    asMock(useChartDataSettingsWithCustomUnits).mockReturnValue(jest.fn(() => ({
-      y: [1, 2, 3],
-      yaxis: 'y1',
-    })));
+    asMock(useChartDataSettingsWithCustomUnits).mockReturnValue(
+      jest.fn(() => ({
+        y: [1, 2, 3],
+        yaxis: 'y1',
+      })),
+    );
 
     asMock(useFeature).mockReturnValue(true);
     asMock(useWidgetUnits).mockReturnValue(units);
@@ -110,8 +115,8 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
   });
 
   it('Runs all related functions and return combined result from them', async () => {
-    const { result } = renderHook(() => useBarChartDataSettingsWithCustomUnits(
-      {
+    const { result } = renderHook(() =>
+      useBarChartDataSettingsWithCustomUnits({
         config: testConfig,
         barmode: 'group',
         effectiveTimerange: {
@@ -119,15 +124,21 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
           to: '2024-08-12T15:01:10.000Z',
           type: 'absolute',
         },
-      },
-    ));
+      }),
+    );
 
     let barChartDataSettingsWithCustomUnits;
 
     act(() => {
-      barChartDataSettingsWithCustomUnits = result.current(
-        { originalName: 'Name1', name: 'Name1', fullPath: 'Name1', values: [1000, 2000, 3000], idx: 1, total: 4, xAxisItemsLength: 10 },
-      );
+      barChartDataSettingsWithCustomUnits = result.current({
+        originalName: 'Name1',
+        name: 'Name1',
+        fullPath: 'Name1',
+        values: [1000, 2000, 3000],
+        idx: 1,
+        total: 4,
+        xAxisItemsLength: 10,
+      });
     });
 
     expect(chartLayoutGenerators.generateMappersForYAxis).toHaveBeenCalledWith({

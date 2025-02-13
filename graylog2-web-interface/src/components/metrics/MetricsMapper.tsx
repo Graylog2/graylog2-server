@@ -21,9 +21,9 @@ import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import { useStore } from 'stores/connect';
 
 type Props = {
-  map: {},
-  computeValue: (map: any) => string,
-}
+  map: {};
+  computeValue: (map: any) => string;
+};
 
 const MetricsMapper = ({ map, computeValue }: Props) => {
   const { metrics } = useStore(MetricsStore);
@@ -59,11 +59,7 @@ const MetricsMapper = ({ map, computeValue }: Props) => {
 
   const value = computeValue(metricsMap);
 
-  return (
-    <span>
-      {value}
-    </span>
-  );
+  return <span>{value}</span>;
 };
 
 export default MetricsMapper;

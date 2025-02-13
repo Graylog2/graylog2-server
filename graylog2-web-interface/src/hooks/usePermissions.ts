@@ -21,7 +21,10 @@ import { isPermitted } from 'util/PermissionsMixin';
 
 const usePermissions = () => {
   const currentUser = useCurrentUser();
-  const _isPermitted = useCallback((permissions: Array<string> | string) => isPermitted(currentUser?.permissions, permissions), [currentUser?.permissions]);
+  const _isPermitted = useCallback(
+    (permissions: Array<string> | string) => isPermitted(currentUser?.permissions, permissions),
+    [currentUser?.permissions],
+  );
 
   return useMemo(() => ({ isPermitted: _isPermitted }), [_isPermitted]);
 };

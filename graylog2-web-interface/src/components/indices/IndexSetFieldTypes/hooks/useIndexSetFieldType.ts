@@ -30,50 +30,60 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
-export const keyFn = (searchParams: SearchParams) => (['indexSetFieldTypes', searchParams]);
+export const keyFn = (searchParams: SearchParams) => ['indexSetFieldTypes', searchParams];
 
-export const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchParams): Promise<IndexSetFieldTypesQueryData> => {
+export const fetchIndexSetFieldTypes = async (
+  indexSetId: string,
+  searchParams: SearchParams,
+): Promise<IndexSetFieldTypesQueryData> => {
   const indexSetFieldTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
-  const url = PaginationURL(
-    indexSetFieldTypeUrl,
-    searchParams.page,
-    searchParams.pageSize,
-    searchParams.query,
-    { filters: FiltersForQueryParams(searchParams.filters), sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+  const url = PaginationURL(indexSetFieldTypeUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
+    filters: FiltersForQueryParams(searchParams.filters),
+    sort: searchParams.sort.attributeId,
+    order: searchParams.sort.direction,
+  });
 
-  return fetch('GET', url).then(
-    ({ elements, total, attributes }) => ({
-      list: elements.map((fieldType: IndexSetFieldTypeJson) => ({
-        id: fieldType.field_name,
-        fieldName: fieldType.field_name,
-        type: fieldType.type,
-        origin: fieldType.origin,
-        isReserved: fieldType.is_reserved,
-      })),
-      pagination: { total },
-      attributes,
-    }));
+  return fetch('GET', url).then(({ elements, total, attributes }) => ({
+    list: elements.map((fieldType: IndexSetFieldTypeJson) => ({
+      id: fieldType.field_name,
+      fieldName: fieldType.field_name,
+      type: fieldType.type,
+      origin: fieldType.origin,
+      isReserved: fieldType.is_reserved,
+    })),
+    pagination: { total },
+    attributes,
+  }));
 };
 
-const useIndexSetFieldTypes = (indexSetId: string, searchParams: SearchParams, { enabled }): {
-  data: IndexSetFieldTypesQueryData,
-  isLoading: boolean,
-  refetch: () => void,
+const useIndexSetFieldTypes = (
+  indexSetId: string,
+  searchParams: SearchParams,
+  { enabled },
+): {
+  data: IndexSetFieldTypesQueryData;
+  isLoading: boolean;
+  refetch: () => void;
 } => {
   const { data, isLoading, refetch } = useQuery(
     keyFn(searchParams),
-    () => defaultOnError(fetchIndexSetFieldTypes(indexSetId, searchParams), 'Loading index field types failed with status', 'Could not load index field types'),
+    () =>
+      defaultOnError(
+        fetchIndexSetFieldTypes(indexSetId, searchParams),
+        'Loading index field types failed with status',
+        'Could not load index field types',
+      ),
     {
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     isLoading,
     refetch,
-  });
+  };
 };
 
 export default useIndexSetFieldTypes;

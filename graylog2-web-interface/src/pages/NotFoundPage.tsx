@@ -19,8 +19,8 @@ import React from 'react';
 import ErrorPage from 'components/errors/ErrorPage';
 
 type Props = {
-  displayPageLayout?: boolean,
-}
+  displayPageLayout?: boolean;
+};
 
 const NotFoundPage = ({ displayPageLayout = true }: Props) => {
   const description = (
@@ -30,7 +30,7 @@ const NotFoundPage = ({ displayPageLayout = true }: Props) => {
     </>
   );
 
-  return (<ErrorPage title="Page not found" description={description} displayPageLayout={displayPageLayout} />);
+  return <ErrorPage title="Page not found" description={description} displayPageLayout={displayPageLayout} />;
 };
 
 export default NotFoundPage;

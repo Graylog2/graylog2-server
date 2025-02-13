@@ -19,11 +19,13 @@ import React from 'react';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import OriginExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/OriginExpandedSection';
 
-const expandedSections = ({
+const expandedSections = {
   overriddenProfile: {
     title: 'Origin explanation',
-    content: ({ type, origin, fieldName }: IndexSetFieldType) => <OriginExpandedSection origin={origin} type={type} fieldName={fieldName} />,
+    content: ({ type, origin, fieldName }: IndexSetFieldType) => (
+      <OriginExpandedSection origin={origin} type={type} fieldName={fieldName} />
+    ),
   },
-});
+};
 
 export default expandedSections;

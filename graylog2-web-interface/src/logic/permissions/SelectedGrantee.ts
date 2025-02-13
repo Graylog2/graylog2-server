@@ -22,10 +22,10 @@ import type Capability from './Capability';
 import type { ActiveShares } from './EntityShareState';
 
 type InternalState = {
-  id: $PropertyType<Grantee, 'id'>,
-  title: $PropertyType<Grantee, 'title'>,
-  type: $PropertyType<Grantee, 'type'>,
-  capabilityId: $PropertyType<Capability, 'id'>,
+  id: $PropertyType<Grantee, 'id'>;
+  title: $PropertyType<Grantee, 'title'>;
+  type: $PropertyType<Grantee, 'type'>;
+  capabilityId: $PropertyType<Capability, 'id'>;
 };
 
 export type CurrentState = 'new' | 'changed' | 'unchanged';

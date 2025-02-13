@@ -28,7 +28,7 @@ import { MIGRATION_STATE } from 'components/datanode/Constants';
 import ResetMigrationButton from 'components/datanode/migrations/common/ResetMigrationButton';
 
 const WizardContainer = styled(Col)`
-  .nav-pills > li > a  {
+  .nav-pills > li > a {
     pointer-events: none;
   }
 `;
@@ -46,14 +46,16 @@ const DataNodesMigrationPage = () => {
   return (
     <DocumentTitle title="Data Nodes Migration">
       <DataNodesPageNavigation />
-      <PageHeader title="Data Nodes Migration"
-                  actions={<ResetMigrationButton />}
-                  documentationLink={{
-                    title: 'Data Nodes documentation',
-                    path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-                  }}>
+      <PageHeader
+        title="Data Nodes Migration"
+        actions={<ResetMigrationButton />}
+        documentationLink={{
+          title: 'Data Nodes documentation',
+          path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
+        }}>
         <span>
-          Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
+          Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to
+          index and search through all the messages in your Graylog message database.
         </span>
       </PageHeader>
       <Row className="content">

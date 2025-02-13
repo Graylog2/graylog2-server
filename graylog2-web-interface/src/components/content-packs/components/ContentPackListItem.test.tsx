@@ -41,10 +41,8 @@ describe('<ContentPackListItem />', () => {
 
   it('render content pack item', async () => {
     render(
-      <ContentPackListItem pack={pack}
-                           contentPackMetadata={metadata}
-                           onDeletePack={() => {}}
-                           onInstall={() => {}} />);
+      <ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={() => {}} onInstall={() => {}} />,
+    );
 
     await screen.findByText('SSH Archive');
   });
@@ -53,10 +51,8 @@ describe('<ContentPackListItem />', () => {
     const deleteFn = jest.fn();
 
     render(
-      <ContentPackListItem pack={pack}
-                           contentPackMetadata={metadata}
-                           onDeletePack={deleteFn}
-                           onInstall={() => {}} />);
+      <ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={deleteFn} onInstall={() => {}} />,
+    );
 
     userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
     userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);
@@ -72,10 +68,8 @@ describe('<ContentPackListItem />', () => {
     const deleteFn = jest.fn();
 
     render(
-      <ContentPackListItem pack={pack}
-                           contentPackMetadata={metadata}
-                           onDeletePack={deleteFn}
-                           onInstall={() => {}} />);
+      <ContentPackListItem pack={pack} contentPackMetadata={metadata} onDeletePack={deleteFn} onInstall={() => {}} />,
+    );
 
     userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
     userEvent.click((await screen.findAllByRole('menuitem', { name: 'Delete All Versions' }))[0]);

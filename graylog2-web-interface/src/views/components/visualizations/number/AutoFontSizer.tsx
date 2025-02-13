@@ -26,15 +26,20 @@ import styled, { css } from 'styled-components';
 const TOLERANCE = 0.05;
 const CHILD_SIZE_RATIO = 0.8; // Proportion of the child size in relation to the container
 
-const FontSize = styled.div<{ fontSize: number, $center: boolean }>`
+const FontSize = styled.div<{ fontSize: number; $center: boolean }>`
   height: 100%;
   width: 100%;
-  font-size: ${(props) => css`${props.fontSize}px`};
-  ${(props) => (props.$center ? css`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  ` : '')}
+  font-size: ${(props) => css`
+    ${props.fontSize}px
+  `};
+  ${(props) =>
+    props.$center
+      ? css`
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        `
+      : ''}
 `;
 
 type ElementWithDimensions = {
@@ -43,11 +48,11 @@ type ElementWithDimensions = {
 };
 
 type Props = {
-  children: React.ReactElement,
-  target?: React.Ref<any> | ElementWithDimensions,
-  height: number,
-  width: number,
-  center?: boolean,
+  children: React.ReactElement;
+  target?: React.Ref<any> | ElementWithDimensions;
+  height: number;
+  width: number;
+  center?: boolean;
 };
 
 const _multiplierForElement = (element, targetWidth, targetHeight) => {

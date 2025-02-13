@@ -23,11 +23,7 @@ import TextField from './TextField';
 
 describe('<TextField>', () => {
   const SUT = (props: Partial<React.ComponentProps<typeof TextField>>) => (
-    <TextField field={textField}
-               onChange={() => {}}
-               title="example_text_field"
-               typeName="text"
-               {...props} />
+    <TextField field={textField} onChange={() => {}} title="example_text_field" typeName="text" {...props} />
   );
 
   afterEach(() => {

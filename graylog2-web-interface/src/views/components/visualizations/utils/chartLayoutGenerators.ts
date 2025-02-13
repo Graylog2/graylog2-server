@@ -39,16 +39,14 @@ import {
 } from 'views/components/visualizations/Constants';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
-import type {
-  PieHoverTemplateSettings,
-} from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
+import type { PieHoverTemplateSettings } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
 type DefaultAxisKey = 'withoutUnit';
 
 const getYAxisPosition = (axisCount: number) => {
-  const diff = (Math.floor(axisCount / 2)) * Y_POSITION_AXIS_STEP;
+  const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
 
   if (axisCount % 2 === 0) {
     return 1 - diff + Y_POSITION_AXIS_STEP;
@@ -68,9 +66,9 @@ const getYAxisSide = (axisCount: number) => {
 const getTicklabelPositionSettings = (axisCount: number) => {
   switch (axisCount) {
     case 4:
-      return ({ ticklabelposition: 'inside' });
+      return { ticklabelposition: 'inside' };
     default:
-      return ({});
+      return {};
   }
 };
 
@@ -93,36 +91,47 @@ const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: Fiel
   const max = Math.max(...values);
   const step = (max - min) / TIME_AXIS_LABELS_QUANTITY;
 
-  const tickvals = Array(TIME_AXIS_LABELS_QUANTITY).fill(null).map((_, index) => (index + 1) * step);
+  const tickvals = Array(TIME_AXIS_LABELS_QUANTITY)
+    .fill(null)
+    .map((_, index) => (index + 1) * step);
   const timeBaseUnit = getBaseUnit(fieldType);
-  const prettyValues = tickvals.map((value) => getPrettifiedValue(value, { abbrev: timeBaseUnit.abbrev, unitType: timeBaseUnit.unitType }));
+  const prettyValues = tickvals.map((value) =>
+    getPrettifiedValue(value, { abbrev: timeBaseUnit.abbrev, unitType: timeBaseUnit.unitType }),
+  );
 
-  const ticktext = prettyValues.map((prettified) => formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev));
+  const ticktext = prettyValues.map((prettified) =>
+    formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev),
+  );
 
-  return ({
+  return {
     tickvals,
     ticktext,
-  });
+  };
 };
 
 const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, values: Array<any>) => {
   switch (unitTypeKey) {
     case 'percent':
-      return ({
+      return {
         tickformat: `.${DECIMAL_PLACES}%`,
-      });
+      };
     case 'size':
       return getFormatSettingsWithCustomTickVals(values, 'size');
     case 'time':
       return getFormatSettingsWithCustomTickVals(values, 'time');
     default:
-      return ({
+      return {
         tickformat: ',~r',
-      });
+      };
   }
 };
 
-const getUnitLayoutWithData = (unitTypeKey: FieldUnitType | DefaultAxisKey, axisCount: number, values: Array<any>, theme: DefaultTheme) => ({
+const getUnitLayoutWithData = (
+  unitTypeKey: FieldUnitType | DefaultAxisKey,
+  axisCount: number,
+  values: Array<any>,
+  theme: DefaultTheme,
+) => ({
   ...getFormatSettingsByData(unitTypeKey, values),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
@@ -143,81 +152,92 @@ const getOffset = (offsetNumber: number, totalOffsets: number, offsetMultiplier:
 };
 
 export type AdditionalSettings = {
-  yaxis: string, /**  y axis name y, y2 etc */
-  totalAxis: number, /**  total number of y-axis */
-  axisNumber: number, /**  number of y-axis (1...N) */
-  totalTraces: number, /**  total number of traces for each x value (in fact total amount of series) */
-  traceIndex: number, /**  number (0...N) */
-  effectiveTimerange?: AbsoluteTimeRange,
-  isTimeline?: boolean,
-  xAxisItemsLength?: number, /** total amount of x values */
-}
+  yaxis: string /**  y axis name y, y2 etc */;
+  totalAxis: number /**  total number of y-axis */;
+  axisNumber: number /**  number of y-axis (1...N) */;
+  totalTraces: number /**  total number of traces for each x value (in fact total amount of series) */;
+  traceIndex: number /**  number (0...N) */;
+  effectiveTimerange?: AbsoluteTimeRange;
+  isTimeline?: boolean;
+  xAxisItemsLength?: number /** total amount of x values */;
+};
 
 type BarChartTraceOffsetSettings = {
   /** Needs to group traces. In case if barmode: 'stack' | 'relative' | 'overlay'
    * we are grouping by y-axis to join traces into same trace on chart */
-  offsetgroup: number | string,
+  offsetgroup: number | string;
   /** In case if barmode: 'stack' | 'relative' | 'overlay'we are divide whole possible
    * width for traces by total axis. In other case we divide by total traces */
-  width: number,
+  width: number;
   /** alignment is relative to the trace center */
-  offset: number,
-}
+  offset: number;
+};
 
-export const getBarChartTraceOffsetSettings = (barmode: BarMode, {
-  yaxis,
-  totalAxis,
-  axisNumber,
-  traceIndex,
-  totalTraces,
-  effectiveTimerange,
-  isTimeline,
-  xAxisItemsLength,
-}: AdditionalSettings): BarChartTraceOffsetSettings | {} => {
-  const offsetMultiplier = (xAxisItemsLength && isTimeline && effectiveTimerange) ? (moment(effectiveTimerange.to).diff(effectiveTimerange.from) / xAxisItemsLength) : 1;
+export const getBarChartTraceOffsetSettings = (
+  barmode: BarMode,
+  {
+    yaxis,
+    totalAxis,
+    axisNumber,
+    traceIndex,
+    totalTraces,
+    effectiveTimerange,
+    isTimeline,
+    xAxisItemsLength,
+  }: AdditionalSettings,
+): BarChartTraceOffsetSettings | {} => {
+  const offsetMultiplier =
+    xAxisItemsLength && isTimeline && effectiveTimerange
+      ? moment(effectiveTimerange.to).diff(effectiveTimerange.from) / xAxisItemsLength
+      : 1;
 
   if (barmode === 'stack' || barmode === 'relative' || barmode === 'overlay') {
     const width = getWidth(totalAxis, offsetMultiplier);
     const offset = getOffset(axisNumber, totalAxis, offsetMultiplier);
 
-    return ({
+    return {
       offsetgroup: yaxis,
       width,
       offset,
-    });
+    };
   }
 
   if (barmode === 'group') {
     const width = getWidth(totalTraces, offsetMultiplier);
     const offset = getOffset(traceIndex + 1, totalTraces, offsetMultiplier);
 
-    return ({
+    return {
       offsetgroup: traceIndex,
       width,
       offset,
-    });
+    };
   }
 
-  return ({});
+  return {};
 };
 
-export type UnitTypeMapper = {} | Record<FieldUnitType, { axisKeyName: string, axisCount: number }>;
+export type UnitTypeMapper = {} | Record<FieldUnitType, { axisKeyName: string; axisCount: number }>;
 type SeriesUnitMapper = {} | Record<SeriesName, FieldUnitType | DefaultAxisKey>;
 type MapperAxisNumber = Record<string, number>;
 type YAxisMapper = Record<SeriesName, AxisName>;
 type FieldNameToAxisNameMapper = {} | Record<string, string>;
 type FieldNameToAxisCountMapper = {} | Record<string, number>;
 export type MappersForYAxis = {
-  seriesUnitMapper: SeriesUnitMapper,
-  mapperAxisNumber: MapperAxisNumber,
-  unitTypeMapper: UnitTypeMapper,
-  yAxisMapper: YAxisMapper
-  fieldNameToAxisNameMapper: FieldNameToAxisNameMapper,
-  fieldNameToAxisCountMapper: FieldNameToAxisCountMapper,
-}
+  seriesUnitMapper: SeriesUnitMapper;
+  mapperAxisNumber: MapperAxisNumber;
+  unitTypeMapper: UnitTypeMapper;
+  yAxisMapper: YAxisMapper;
+  fieldNameToAxisNameMapper: FieldNameToAxisNameMapper;
+  fieldNameToAxisCountMapper: FieldNameToAxisCountMapper;
+};
 
-export const generateMappersForYAxis = (
-  { series, units }: { series: AggregationWidgetConfig['series'], units: AggregationWidgetConfig['units'] }): MappersForYAxis => {
+export const generateMappersForYAxis = ({
+  series,
+  units,
+}: {
+  series: AggregationWidgetConfig['series'];
+  units: AggregationWidgetConfig['units'];
+}): MappersForYAxis => {
   let axisCount = 1;
   const unitTypeMapper: {} | UnitTypeMapper = {};
   const mapper = {};
@@ -259,14 +279,14 @@ export const generateMappersForYAxis = (
     seriesUnitMapper[seriesName] = unitTypeKey;
   });
 
-  return ({
+  return {
     unitTypeMapper,
     yAxisMapper: mapper,
     mapperAxisNumber,
     seriesUnitMapper,
     fieldNameToAxisNameMapper,
     fieldNameToAxisCountMapper,
-  });
+  };
 };
 
 // eslint-disable-next-line default-param-last
@@ -279,71 +299,92 @@ const joinValues = (values: Array<Array<number>> = [], barmode: BarMode): Array<
 };
 
 export type GenerateLayoutsParams = {
-  unitTypeMapper: UnitTypeMapper,
-  chartData: Array<ChartDefinition>,
-  barmode?: BarMode,
-  widgetUnits: UnitsConfig,
-  config: AggregationWidgetConfig,
-  theme: DefaultTheme
-}
-
-export const generateLayouts = (
-  { unitTypeMapper, chartData, barmode, widgetUnits, config, theme }: GenerateLayoutsParams,
-) => {
-  const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaultAxisKey, Array<Array<any>>>>((res, value: ChartDefinition) => {
-    const traceName = value.fullPath;
-    const fieldName = getFieldNameFromTrace({ series: config.series, fullPath: traceName });
-    const unit = widgetUnits.getFieldUnit(fieldName);
-    const unitType = unit?.unitType ?? DEFAULT_AXIS_KEY;
-
-    if (!res[unitType]) {
-      res[unitType] = [value.y];
-    } else {
-      res[unitType].push(value.y);
-    }
-
-    return res;
-  }, {});
-
-  return Object.fromEntries(Object.entries(unitTypeMapper).map(([unitTypeKey, { axisKeyName, axisCount }]) => {
-    const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
-
-    return [axisKeyName, getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme)];
-  }));
+  unitTypeMapper: UnitTypeMapper;
+  chartData: Array<ChartDefinition>;
+  barmode?: BarMode;
+  widgetUnits: UnitsConfig;
+  config: AggregationWidgetConfig;
+  theme: DefaultTheme;
 };
 
-const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>,
-  unit: FieldUnit }) => convertedValues.map((value) => {
-  const prettified = unit && unit.isDefined && getPrettifiedValue(value, {
-    abbrev: unit.abbrev,
-    unitType: unit.unitType,
+export const generateLayouts = ({
+  unitTypeMapper,
+  chartData,
+  barmode,
+  widgetUnits,
+  config,
+  theme,
+}: GenerateLayoutsParams) => {
+  const groupYValuesByUnitTypeKey = chartData.reduce<{} | Record<FieldUnitType | DefaultAxisKey, Array<Array<any>>>>(
+    (res, value: ChartDefinition) => {
+      const traceName = value.fullPath;
+      const fieldName = getFieldNameFromTrace({ series: config.series, fullPath: traceName });
+      const unit = widgetUnits.getFieldUnit(fieldName);
+      const unitType = unit?.unitType ?? DEFAULT_AXIS_KEY;
+
+      if (!res[unitType]) {
+        res[unitType] = [value.y];
+      } else {
+        res[unitType].push(value.y);
+      }
+
+      return res;
+    },
+    {},
+  );
+
+  return Object.fromEntries(
+    Object.entries(unitTypeMapper).map(([unitTypeKey, { axisKeyName, axisCount }]) => {
+      const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
+
+      return [axisKeyName, getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme)];
+    }),
+  );
+};
+
+const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>; unit: FieldUnit }) =>
+  convertedValues.map((value) => {
+    const prettified =
+      unit &&
+      unit.isDefined &&
+      getPrettifiedValue(value, {
+        abbrev: unit.abbrev,
+        unitType: unit.unitType,
+      });
+
+    if (!prettified) return value;
+
+    return formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev);
   });
 
-  if (!prettified) return value;
-
-  return formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev);
-});
-
-export const getHoverTemplateSettings = ({ convertedValues, unit, name }: {
-  convertedValues: Array<any>,
-  unit: FieldUnit,
-  name: string,
-}): { text: Array<string>, hovertemplate: string, meta: string } | {} => {
+export const getHoverTemplateSettings = ({
+  convertedValues,
+  unit,
+  name,
+}: {
+  convertedValues: Array<any>;
+  unit: FieldUnit;
+  name: string;
+}): { text: Array<string>; hovertemplate: string; meta: string } | {} => {
   if (unit?.unitType === 'time' || unit?.unitType === 'size') {
-    return ({
+    return {
       text: getHoverTexts({ convertedValues, unit }),
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',
       meta: name,
-    });
+    };
   }
 
-  return ({});
+  return {};
 };
 
-export const getPieHoverTemplateSettings = ({ convertedValues, unit, name }: {
-  convertedValues: Array<any>,
-  unit: FieldUnit,
-  name: string,
+export const getPieHoverTemplateSettings = ({
+  convertedValues,
+  unit,
+  name,
+}: {
+  convertedValues: Array<any>;
+  unit: FieldUnit;
+  name: string;
 }): PieHoverTemplateSettings | {} => ({
   text: getHoverTexts({ convertedValues, unit }),
   hovertemplate: '<b>%{label}</b><br>%{text}<br>%{percent}',

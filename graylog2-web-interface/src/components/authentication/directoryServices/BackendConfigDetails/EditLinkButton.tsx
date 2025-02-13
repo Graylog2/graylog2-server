@@ -21,13 +21,15 @@ import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 
 type Props = {
-  authenticationBackendId: string,
-  stepKey: string,
+  authenticationBackendId: string;
+  stepKey: string;
 };
 
 const EditLinkButton = ({ authenticationBackendId, stepKey }: Props) => (
   <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId, stepKey)}>
-    <Button bsStyle="success" bsSize="small">Edit</Button>
+    <Button bsStyle="success" bsSize="small">
+      Edit
+    </Button>
   </LinkContainer>
 );
 
