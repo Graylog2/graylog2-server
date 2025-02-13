@@ -89,8 +89,7 @@ const NodeLoggers = ({ nodeId, subsystems }: Props) => {
                     app_action_value: 'show-metrics',
                     event_details: { showing: !showDetails },
                   });
-                }}
-              >
+                }}>
                 <Icon name="speed" /> {showDetails ? 'Hide' : 'Show'} log level metrics
               </Button>
             </div>

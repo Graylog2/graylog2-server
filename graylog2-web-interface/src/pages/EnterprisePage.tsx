@@ -79,8 +79,7 @@ const EnterprisePage = () => {
               <ProductLinkComponent
                 href="https://go2.graylog.org/request-graylog-security"
                 licenseSubject="/license/security"
-                clusterId={clusterId}
-              >
+                clusterId={clusterId}>
                 Request now
               </ProductLinkComponent>
             </Col>

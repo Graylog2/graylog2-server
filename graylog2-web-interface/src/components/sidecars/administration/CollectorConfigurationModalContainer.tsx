@@ -192,8 +192,7 @@ const CollectorConfigurationModalContainer = ({
         showModal={showConfirmModal}
         title="Configuration summary"
         onConfirm={confirmConfigurationChange}
-        onCancel={cancelConfigurationChange}
-      >
+        onCancel={cancelConfigurationChange}>
         <ConfigurationSummary>
           <p>
             Are you sure you want to proceed with this action for <b>{summary}</b>?

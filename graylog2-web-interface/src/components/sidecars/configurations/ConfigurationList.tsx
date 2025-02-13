@@ -112,8 +112,7 @@ class ConfigurationList extends React.Component<
               pageSizes={[10, 25]}
               totalItems={pagination.total}
               onChange={onPageChange}
-              useQueryParameter={false}
-            >
+              useQueryParameter={false}>
               <div className={style.configurationTable}>
                 <DataTable
                   id="collector-configurations-list"

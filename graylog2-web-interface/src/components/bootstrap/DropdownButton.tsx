@@ -73,8 +73,7 @@ const DropdownButton = ({
     position={position(pullRight, dropup)}
     onChange={onToggle}
     keepMounted={keepMounted}
-    closeOnItemClick={closeOnItemClick}
-  >
+    closeOnItemClick={closeOnItemClick}>
     <Menu.Target>
       <Button onClick={onMouseDown} aria-label={buttonTitle} {...rest} title={buttonTitle}>
         {title}

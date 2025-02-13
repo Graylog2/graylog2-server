@@ -96,8 +96,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
         bsStyle="default"
         bsSize="xsmall"
         onClick={() => setShowStreamRuleForm(true)}
-        title="Edit stream rule"
-      >
+        title="Edit stream rule">
         <Icon name="edit_square" type="regular" />
       </StyledDeleteButton>
       <Button bsStyle="danger" bsSize="xsmall" onClick={() => setShowConfirmDelete(true)} title="Delete stream rule">
@@ -133,8 +132,7 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
           onConfirm={onConfirmDelete}
           onCancel={() => setShowConfirmDelete(false)}
           title="Delete stream rule."
-          btnConfirmText="Ok"
-        >
+          btnConfirmText="Ok">
           Do you really want to delete this stream rule?
         </ConfirmDialog>
       )}

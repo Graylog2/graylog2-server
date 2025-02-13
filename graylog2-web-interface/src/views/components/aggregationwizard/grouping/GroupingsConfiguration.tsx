@@ -97,8 +97,7 @@ const GroupingsConfiguration = () => {
         testIdPrefix={`grouping-${index}`}
         onRemove={removeGrouping(index)}
         elementTitle={GroupingElement.title}
-        ref={ref}
-      >
+        ref={ref}>
         <GroupingConfiguration index={index} />
       </ElementConfigurationContainer>
     ),
@@ -129,8 +128,7 @@ const GroupingsConfiguration = () => {
                 <RollupColumnsCheckbox
                   onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
                   checked={value ?? false}
-                  disabled={disableColumnRollup}
-                >
+                  disabled={disableColumnRollup}>
                   <RollupColumnsLabel>
                     Rollup Columns
                     <RollupHoverForHelp title="Rollup Columns">

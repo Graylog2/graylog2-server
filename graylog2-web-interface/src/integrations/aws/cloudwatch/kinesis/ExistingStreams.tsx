@@ -82,8 +82,7 @@ const KinesisStreams = ({
             clearSidebar();
             toggleSetup();
           }}
-          type="button"
-        >
+          type="button">
           Setup Kinesis Automatically
         </Button>
       </Panel>,
@@ -135,16 +134,14 @@ const KinesisStreams = ({
               documentation for more details on this set up.
             </p>
           </>
-        }
-      >
+        }>
         <ValidatedInput
           id="awsCloudWatchKinesisStream"
           type="select"
           fieldData={formData.awsCloudWatchKinesisStream}
           onChange={onChange}
           label="Select Stream"
-          required
-        >
+          required>
           {renderOptions(availableStreams, 'Select Kinesis Stream')}
         </ValidatedInput>
 

@@ -161,8 +161,7 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit }: CloudWatchProps) 
         onStepChange={handleStepChange}
         horizontal
         justified
-        hidePreviousNextButtons
-      >
+        hidePreviousNextButtons>
         {sidebar}
       </Wizard>
     </>

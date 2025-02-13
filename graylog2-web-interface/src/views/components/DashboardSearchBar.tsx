@@ -161,8 +161,7 @@ const DashboardSearchBar = () => {
               onSubmit={submitForm}
               validateQueryString={(values) =>
                 _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
-              }
-            >
+              }>
               {({
                 dirty,
                 errors,

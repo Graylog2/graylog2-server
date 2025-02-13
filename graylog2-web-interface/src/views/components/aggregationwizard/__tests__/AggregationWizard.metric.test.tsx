@@ -100,8 +100,7 @@ describe('AggregationWizard', () => {
           id="widget-id"
           type="AGGREGATION"
           fields={Immutable.List([])}
-          {...props}
-        >
+          {...props}>
           {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
           <>The Visualization</>
         </AggregationWizard>

@@ -56,8 +56,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
   const SUT = ({ timeRange }: { timeRange: TimeRange }) => (
     <Formik
       initialValues={{ timeRangeTabs: { [timeRange.type]: timeRange }, activeTab: timeRange.type }}
-      onSubmit={() => {}}
-    >
+      onSubmit={() => {}}>
       <SaveTimeRangeAsPresetButton />
     </Formik>
   );

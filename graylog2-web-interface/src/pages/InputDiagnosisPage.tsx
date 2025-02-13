@@ -155,8 +155,7 @@ const InputDiagnosisPage = () => {
                       </dd>
                     }
                     key={state}
-                    bsSize="xs"
-                  >
+                    bsSize="xs">
                     {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
                       <LinkContainer key={node_id} to={Routes.SYSTEM.NODES.SHOW(node_id)}>
                         <MenuItem>

@@ -104,8 +104,7 @@ const VisualizationConfiguration = () => {
             label="Type"
             error={error}
             labelClassName="col-sm-3"
-            wrapperClassName="col-sm-9"
-          >
+            wrapperClassName="col-sm-9">
             <Select
               options={visualizationTypeOptions}
               aria-label="Select visualization type"
@@ -131,8 +130,7 @@ const VisualizationConfiguration = () => {
               label="Show Event annotations"
               error={error}
               labelClassName="col-sm-11"
-              wrapperClassName="col-sm-1"
-            >
+              wrapperClassName="col-sm-1">
               <EventAnnotationCheckbox
                 id={`${name}-input`}
                 name={name}

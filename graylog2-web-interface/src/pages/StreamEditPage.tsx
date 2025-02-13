@@ -42,8 +42,7 @@ const StreamEditPage = () => {
           documentationLink={{
             title: 'Streams documentation',
             path: DocsHelper.PAGES.STREAMS,
-          }}
-        >
+          }}>
           <span>
             This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can see
             the effect configured stream rules have on message matching here.

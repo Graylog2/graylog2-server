@@ -151,8 +151,7 @@ const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) =
       noCaret
       bsStyle="link"
       keepMounted
-      pullRight
-    >
+      pullRight>
       {menuItems.toArray()}
     </DropdownButton>
   </li>
@@ -351,8 +350,7 @@ const AdaptableQueryTabs = ({
             onClick={() => {
               setLockedTab(undefined);
               onSelect(id);
-            }}
-          >
+            }}>
             {tabTitle}
           </QueryTab>
         ),
@@ -369,8 +367,7 @@ const AdaptableQueryTabs = ({
             onClick={() => {
               setLockedTab(id);
               onSelect(id);
-            }}
-          >
+            }}>
             {tabTitle}
           </MenuItem>
         ),
@@ -416,8 +413,7 @@ const AdaptableQueryTabs = ({
 
             onSelect('new');
           }}
-          className={NEW_TAB_BUTTON_CLASS}
-        >
+          className={NEW_TAB_BUTTON_CLASS}>
           <Icon name="add" />
         </QueryTab>
       </StyledQueryNav>

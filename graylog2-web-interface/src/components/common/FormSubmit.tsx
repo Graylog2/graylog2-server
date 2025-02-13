@@ -93,8 +93,7 @@ const FormSubmit = (props: Props) => {
         title={submitButtonText}
         aria-label={submitButtonText}
         type={submitButtonType}
-        onClick={onSubmit}
-      >
+        onClick={onSubmit}>
         {submitIcon && !submittingAsync && <StyledIcon name={submitIcon} />}
         {submittingAsync ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
@@ -106,8 +105,7 @@ const FormSubmit = (props: Props) => {
           onClick={props.onCancel}
           title="Cancel"
           aria-label="Cancel"
-          disabled={props.disabledCancel || submittingAsync}
-        >
+          disabled={props.disabledCancel || submittingAsync}>
           Cancel
         </Button>
       )}

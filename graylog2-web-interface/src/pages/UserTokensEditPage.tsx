@@ -111,8 +111,7 @@ const UserEditPage = ({ params }: Props) => {
         documentationLink={{
           title: 'Permissions documentation',
           path: DocsHelper.PAGES.USERS_ROLES,
-        }}
-      >
+        }}>
         <span>You can create new tokens or delete old ones.</span>
       </PageHeader>
 

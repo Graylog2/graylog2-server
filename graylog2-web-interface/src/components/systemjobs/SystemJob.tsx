@@ -135,8 +135,7 @@ const SystemJob = ({ job }: SystemJobProps) => {
             onClick={_onAcknowledge()}
             bsSize="xs"
             className="pull-right"
-            title="Acknowledge"
-          >
+            title="Acknowledge">
             <Icon name="close" />
           </AcknowledgeButton>
         )}

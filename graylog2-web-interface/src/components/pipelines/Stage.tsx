@@ -45,8 +45,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
 
   const throughput = (
     <MetricContainer
-      name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.stage.${stage.stage}.executed`}
-    >
+      name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.stage.${stage.stage}.executed`}>
       <CounterRate showTotal={false} prefix="Throughput: " suffix="msg/s" />
     </MetricContainer>
   );
@@ -56,8 +55,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
       disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
       key={`delete-stage-${stage}`}
       bsStyle="danger"
-      onClick={onDelete}
-    >
+      onClick={onDelete}>
       Delete
     </Button>,
     <StageForm key={`edit-stage-${stage}`} pipeline={pipeline} stage={stage} save={onUpdate} />,

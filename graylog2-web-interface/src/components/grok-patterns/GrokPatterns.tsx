@@ -198,8 +198,7 @@ class GrokPatterns extends React.Component<
                 style={{ marginRight: 5 }}
                 bsStyle="danger"
                 bsSize="xs"
-                onClick={() => this.confirmedRemove(pattern)}
-              >
+                onClick={() => this.confirmedRemove(pattern)}>
                 Delete
               </Button>
             </IfPermitted>
@@ -236,8 +235,7 @@ class GrokPatterns extends React.Component<
                 />
               </ButtonToolbar>
             </IfPermitted>
-          }
-        >
+          }>
           <span>
             This is a list of grok patterns you can use in your Graylog grok extractors. You can add your own manually
             or import a whole list of patterns from a so called pattern file.

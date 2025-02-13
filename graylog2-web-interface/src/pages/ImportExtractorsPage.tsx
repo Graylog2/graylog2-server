@@ -47,8 +47,7 @@ const ImportExtractorsPage = ({ params }: Props) => {
             <span>
               Import extractors to <em>{input.title}</em>
             </span>
-          }
-        >
+          }>
           <span>
             Exported extractors can be imported to an input. All you need is the JSON export of extractors from any
             other Graylog setup or from{' '}

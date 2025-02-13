@@ -52,8 +52,7 @@ const WidgetModeConfiguration = ({ name, onChange: onChangeProp, options }: Prop
           label="Type"
           error={error}
           labelClassName="col-sm-3"
-          wrapperClassName="col-sm-9"
-        >
+          wrapperClassName="col-sm-9">
           <DirectionOptions>
             {options.map(({ value: optionValue, label }) => (
               <Input

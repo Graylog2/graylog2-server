@@ -115,8 +115,7 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
         withinPortal
         onClose={onClose}
         opened={open}
-        width={container?.current?.offsetWidth}
-      >
+        width={container?.current?.offsetWidth}>
         <Menu.Target>
           <HiddenButton type="button" />
         </Menu.Target>

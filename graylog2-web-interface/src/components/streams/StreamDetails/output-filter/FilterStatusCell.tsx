@@ -44,8 +44,7 @@ const FilterStatusCell = ({ filterOutputRule }: Props) => {
       title={title}
       aria-label={title}
       role="button"
-      $clickable={false}
-    >
+      $clickable={false}>
       {title}
     </StatusLabel>
   );

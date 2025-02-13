@@ -71,8 +71,7 @@ const FilterValueDropdown = ({
       }
       placement="bottom"
       onToggle={_onToggle}
-      dropdownZIndex={1050}
-    >
+      dropdownZIndex={1050}>
       <FilterConfiguration
         attribute={attribute}
         filterValueRenderer={filterValueRenderer}

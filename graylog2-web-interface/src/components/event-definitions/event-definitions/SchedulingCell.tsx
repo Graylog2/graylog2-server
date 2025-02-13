@@ -145,8 +145,7 @@ const SchedulingInfo = ({
         placement="left"
         title={`${title} details.`}
         overlay={detailsPopover(scheduler, clearNotifications)}
-        width={500}
-      >
+        width={500}>
         <DetailsButton bsStyle="link">
           <Icon name="info" />
         </DetailsButton>

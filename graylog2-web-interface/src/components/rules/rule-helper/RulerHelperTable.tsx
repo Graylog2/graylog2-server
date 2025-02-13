@@ -75,8 +75,7 @@ const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick = undefined }
         <tbody key={d.name}>
           <tr
             onClick={onFunctionClick ? () => onFunctionClick(d.name) : undefined}
-            className={onFunctionClick ? RuleHelperStyle.clickableRow : undefined}
-          >
+            className={onFunctionClick ? RuleHelperStyle.clickableRow : undefined}>
             <td className={RuleHelperStyle.functionTableCell}>
               <code>{functionSignature(d)}</code>
             </td>

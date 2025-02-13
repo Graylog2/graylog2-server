@@ -48,8 +48,7 @@ const StatusCell = ({ accountStatus, authServiceEnabled }: Props) => (
           {`User is ${accountStatus}`}
           {!authServiceEnabled ? ' (authentication service is disabled)' : ''}
         </>
-      }
-    >
+      }>
       <Wrapper $enabled={authServiceEnabled && accountStatus === 'enabled'}>
         <Icon name={accountStatus === 'enabled' ? 'check_circle' : 'cancel'} />
       </Wrapper>

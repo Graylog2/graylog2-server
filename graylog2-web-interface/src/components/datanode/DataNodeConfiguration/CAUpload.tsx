@@ -144,8 +144,7 @@ const CAUpload = () => {
                   onDrop={(files) => onChange({ target: { name, value: files } })}
                   onReject={onRejectUpload}
                   data-testid="upload-dropzone"
-                  loading={isLoading}
-                >
+                  loading={isLoading}>
                   <DropzoneInner>
                     <Dropzone.Accept>
                       <Icon name="draft" type="solid" size="2x" />

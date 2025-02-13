@@ -146,8 +146,7 @@ const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Pr
         value: isNil(rule?.value) ? '' : String(rule?.value),
         condition: rule?.condition ?? 'equal',
         color: colorToObject(rule?.color),
-      }}
-    >
+      }}>
       {({ isValid, values: { field: selectedField } }) => {
         const selectedFieldType = fieldTypeFor(fields, selectedField);
         const isNumeric = selectedFieldType?.type?.isNumeric() ?? false;

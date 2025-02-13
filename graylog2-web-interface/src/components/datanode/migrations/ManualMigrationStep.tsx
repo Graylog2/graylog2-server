@@ -68,8 +68,7 @@ const ManualMigrationStep = () => {
               autoFocus
               help="The type of migration you want to do."
               labelClassName="col-sm-3"
-              wrapperClassName="col-sm-9"
-            >
+              wrapperClassName="col-sm-9">
               <Select
                 placeholder="Select migration type"
                 clearable={false}

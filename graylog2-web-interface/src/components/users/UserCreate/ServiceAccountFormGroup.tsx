@@ -53,8 +53,7 @@ const ServiceAccountFormGroup = () => {
               id="service-account-controls"
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9"
-              label="Service Account"
-            >
+              label="Service Account">
               <Input
                 label="User is a Service Account"
                 id="service_account"
@@ -70,8 +69,7 @@ const ServiceAccountFormGroup = () => {
               showModal={showModal}
               title="Are you sure?"
               onConfirm={handleCheckServiceAccount}
-              onCancel={handleCancel}
-            >
+              onCancel={handleCancel}>
               Changing this user to a Service Account prevents the user from logging into the web interface and editing
               their settings. (e.g., API tokens) Do you wish to proceed?
             </BootstrapModalConfirm>

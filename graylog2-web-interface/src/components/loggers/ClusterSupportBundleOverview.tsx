@@ -108,8 +108,7 @@ const ClusterSupportBundleOverview = () => {
           onDelete(bundleNameToDelete);
           setBundleNameToDelete(null);
         }}
-        onCancel={() => setBundleNameToDelete(null)}
-      >
+        onCancel={() => setBundleNameToDelete(null)}>
         <>
           Are you sure you want to delete <strong>{bundleNameToDelete}</strong>?
         </>

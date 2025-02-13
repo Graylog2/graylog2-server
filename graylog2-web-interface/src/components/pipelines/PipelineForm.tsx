@@ -109,8 +109,7 @@ const PipelineForm = ({ pipeline = emptyPipeline, create = false, modal = true, 
         <Button
           disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
           onClick={_openModal}
-          bsStyle="success"
-        >
+          bsStyle="success">
           {create ? 'Add new pipeline' : 'Edit pipeline details'}
         </Button>
         <BootstrapModalForm
@@ -119,8 +118,7 @@ const PipelineForm = ({ pipeline = emptyPipeline, create = false, modal = true, 
           data-telemetry-title={`${create ? 'Add new' : 'Edit'} pipeline`}
           onSubmitForm={_handleSubmit}
           onCancel={_closeModal}
-          submitButtonText={create ? 'Add pipeline' : 'Update pipeline'}
-        >
+          submitButtonText={create ? 'Add pipeline' : 'Update pipeline'}>
           {content}
         </BootstrapModalForm>
       </span>

@@ -73,8 +73,7 @@ const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, o
               id={`${column}-filter-configuration`}
               label={_columnTitle === 'unknown' ? <UnknownAttributeTitle /> : _columnTitle}
               labelClassName="col-sm-3"
-              wrapperClassName="col-sm-9"
-            >
+              wrapperClassName="col-sm-9">
               {values.map((value, valueIndex) => {
                 const _onEdit = (newValue: string) => {
                   onEdit(filterIndex, valueIndex, newValue);

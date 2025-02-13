@@ -134,8 +134,7 @@ const Sidebar = ({
           enableSidebarPinning={enableSidebarPinning}
           searchPageLayout={searchPageLayout}
           sectionTitle={activeSection.title}
-          forceSideBarPinned={forceSideBarPinned}
-        >
+          forceSideBarPinned={forceSideBarPinned}>
           <SectionContent
             results={results}
             sidebarChildren={children}

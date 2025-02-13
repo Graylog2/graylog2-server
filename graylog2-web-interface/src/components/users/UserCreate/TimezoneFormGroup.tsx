@@ -28,8 +28,7 @@ const TimezoneFormGroup = () => (
         label="Time Zone"
         help="Choose your local time zone or leave it as it is to use the system's default."
         labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9"
-      >
+        wrapperClassName="col-sm-9">
         <TimezoneSelect
           className="timezone-select"
           value={value}

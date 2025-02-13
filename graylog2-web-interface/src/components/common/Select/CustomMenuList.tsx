@@ -92,8 +92,7 @@ export const WindowList = ({ children, listRef, ...rest }: WindowListProps) => {
         itemSize={getSize}
         itemData={children}
         width={width}
-        {...rest}
-      >
+        {...rest}>
         {({ data, index, style }) => (
           <Row data={data} style={style} index={index} setSize={setSize} containerWidth={width} />
         )}
@@ -115,8 +114,7 @@ const CustomMenuList = ({
           ...innerProps,
           // @ts-ignore
           'data-testid': 'react-select-list',
-        }}
-      >
+        }}>
         {children}
       </Components.MenuList>
     );

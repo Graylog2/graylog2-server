@@ -33,8 +33,7 @@ describe('WidgetConfigForm', () => {
               initialValues={{}}
               onSubmit={() => {}}
               validate={validate}
-              config={AggregationWidgetConfig.builder().build()}
-            >
+              config={AggregationWidgetConfig.builder().build()}>
               <span>Hello world!</span>
             </WidgetConfigForm>
             <span>{disabled ? 'Form submission is disabled' : 'Form submission is not disabled'}</span>

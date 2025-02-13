@@ -85,8 +85,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
       label="Fields"
       labelClassName="col-sm-3"
       error={(errors?.groupBy?.groupings?.[groupingIndex] as GroupByError)?.fields}
-      wrapperClassName="col-sm-9"
-    >
+      wrapperClassName="col-sm-9">
       <FieldsConfiguration
         onChange={onChangeSelectedFields}
         selectedFields={grouping.fields}

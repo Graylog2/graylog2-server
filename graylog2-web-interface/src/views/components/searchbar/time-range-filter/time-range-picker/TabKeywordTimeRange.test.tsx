@@ -43,8 +43,7 @@ const TabKeywordTimeRange = ({
         ? { timeRangeTabs: { keyword: { keyword: 'validation error' } } }
         : {}
     }
-    validateOnMount
-  >
+    validateOnMount>
     <Form>
       <OriginalTabKeywordTimeRange {...(props as React.ComponentProps<typeof TabKeywordTimeRange>)} />
     </Form>

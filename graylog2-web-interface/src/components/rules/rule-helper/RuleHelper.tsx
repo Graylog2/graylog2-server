@@ -126,8 +126,7 @@ const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExample
                 totalItems={ruleDescriptors.length}
                 pageSize={pageSize}
                 onChange={onPageChange}
-                showPageSizeSelect={false}
-              >
+                showPageSizeSelect={false}>
                 <RuleHelperTable entries={pagedEntries} expanded={expanded} onFunctionClick={toggleFunctionDetail} />
               </PaginatedList>
             </div>
@@ -157,8 +156,7 @@ const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExample
                         totalItems={ruleDescriptors.length}
                         pageSize={pageSize}
                         onChange={onPageChange}
-                        showPageSizeSelect={false}
-                      >
+                        showPageSizeSelect={false}>
                         <RuleHelperTable
                           entries={pagedEntries}
                           expanded={expanded}

@@ -140,8 +140,7 @@ const AWSPluginConfiguration = ({
         title="Update AWS Plugin Configuration"
         onSubmitForm={saveConfig}
         onCancel={resetConfig}
-        submitButtonText="Update configuration"
-      >
+        submitButtonText="Update configuration">
         <fieldset>
           <Input
             id="aws-lookups-enabled"

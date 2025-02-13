@@ -51,8 +51,7 @@ const ScratchpadToggle = () => {
         type="button"
         aria-label="Scratchpad"
         id="scratchpad-toggle"
-        onClick={toggleScratchpadVisibility}
-      >
+        onClick={toggleScratchpadVisibility}>
         <NavItemStateIndicator>
           <Icon name="edit_square" size="lg" title="Scratchpad" />
         </NavItemStateIndicator>

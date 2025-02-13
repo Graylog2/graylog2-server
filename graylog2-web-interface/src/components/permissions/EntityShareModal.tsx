@@ -105,8 +105,7 @@ const EntityShareModal = ({
         <>
           Sharing {entityTypeTitle ?? entityType}: <i>{entityTitle}</i>
         </>
-      }
-    >
+      }>
       {entityShareState && entityShareState.entity === entityGRN ? (
         <EntityShareSettings
           description={description}

@@ -131,8 +131,7 @@ const EditActions = ({
             <MenuItem
               id={`set-status-user-${id}`}
               onClick={_toggleStatus}
-              title={`Set new account status for ${fullName}`}
-            >
+              title={`Set new account status for ${fullName}`}>
               {accountStatus === 'enabled' ? 'Disable' : 'Enable'}
             </MenuItem>
           )}

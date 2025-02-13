@@ -92,8 +92,7 @@ class RegexExtractorConfiguration extends React.Component<
           label="Regular expression"
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
-          help={helpMessage}
-        >
+          help={helpMessage}>
           <Row className="row-sm">
             <Col md={11}>
               <input

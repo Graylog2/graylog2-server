@@ -177,8 +177,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
               sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_CLICKED, {
                 app_pathname: 'stream',
               });
-            }}
-          >
+            }}>
             Data routing
           </Button>
         </LinkContainer>

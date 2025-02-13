@@ -74,8 +74,7 @@ const CollectorsAdministrationActions = ({
         bsStyle="primary"
         bsSize="small"
         disabled={disableConfigButton}
-        onClick={() => setShowConfigurationModal(true)}
-      >
+        onClick={() => setShowConfigurationModal(true)}>
         <Icon name="edit_square" /> Assign Configurations
       </ConfigurationButton>
       <CollectorConfigurationModalContainer

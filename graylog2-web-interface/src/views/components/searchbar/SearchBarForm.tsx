@@ -98,8 +98,7 @@ const SearchBarForm = ({
       innerRef={formRef}
       validate={_validate}
       validateOnBlur={false}
-      validateOnMount={validateOnMount}
-    >
+      validateOnMount={validateOnMount}>
       {(...args) => <Form>{_isFunction(children) ? children(...args) : children}</Form>}
     </Formik>
   );

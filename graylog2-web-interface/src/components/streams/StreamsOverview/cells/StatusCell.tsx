@@ -83,8 +83,7 @@ const StatusCell = ({ stream }: Props) => {
       title={title}
       aria-label={title}
       role="button"
-      $clickable={!disableChange}
-    >
+      $clickable={!disableChange}>
       {stream.disabled ? 'Paused' : 'Running'}
       {!disableChange && (
         <>

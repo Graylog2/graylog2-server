@@ -36,8 +36,7 @@ const TestStoreProvider = ({
       view={view}
       initialQuery={initialQuery}
       isNew={isNew}
-      executionState={executionState}
-    >
+      executionState={executionState}>
       {children}
     </PluggableStoreProvider>
   );

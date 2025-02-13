@@ -86,8 +86,7 @@ const IndexSetConfigurationPage = () => {
             documentationLink={{
               title: 'Index model documentation',
               path: DocsHelper.PAGES.INDEX_MODEL,
-            }}
-          >
+            }}>
             <span>
               Modify the current configuration for this index set, allowing you to customize the retention, sharding,
               and replication of messages coming from one or more streams.

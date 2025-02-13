@@ -143,8 +143,7 @@ class GrokPatternFilter extends React.Component<
               header={displayedPattern.name}
               bsStyle={active ? 'info' : undefined}
               onKeyDown={this._onPatternFilterKeyDown}
-              key={displayedPattern.name}
-            >
+              key={displayedPattern.name}>
               <span className={GrokPatternFilterStyle.patternDisplay}>{displayedPattern.pattern}</span>
               <span className={GrokPatternFilterStyle.addButton}>
                 <Button
@@ -152,8 +151,7 @@ class GrokPatternFilter extends React.Component<
                   bsStyle="primary"
                   onClick={() => {
                     addToPattern(displayedPattern.name);
-                  }}
-                >
+                  }}>
                   Add
                 </Button>
               </span>

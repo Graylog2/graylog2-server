@@ -135,8 +135,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
           bsSize="xs"
           onClick={() => {
             setShowModal(true);
-          }}
-        >
+          }}>
           Edit configuration
         </Button>
       </IfPermitted>

@@ -158,8 +158,7 @@ const BulkActions = () => {
           title={ACTION_TEXT[actionType]?.dialogTitle}
           show
           onConfirm={handleConfirm}
-          onCancel={handleClearState}
-        >
+          onCancel={handleClearState}>
           {ACTION_TEXT[actionType]?.dialogBody(selectedItemsAmount)}
         </ConfirmDialog>
       )}

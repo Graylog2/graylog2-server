@@ -315,8 +315,7 @@ class ContentPackSelection extends React.Component<
             stayExpanded={isFiltered}
             expanded={isFiltered}
             padded={false}
-            header={ContentPackSelection._toDisplayTitle(entityType)}
-          >
+            header={ContentPackSelection._toDisplayTitle(entityType)}>
             <ExpandableList>{entities}</ExpandableList>
           </ExpandableListItem>
         );
@@ -333,8 +332,7 @@ class ContentPackSelection extends React.Component<
               id="content-selection-form"
               onSubmit={(e) => {
                 e.preventDefault();
-              }}
-            >
+              }}>
               <fieldset>
                 <Input
                   name="name"

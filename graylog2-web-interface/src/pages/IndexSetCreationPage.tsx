@@ -44,8 +44,7 @@ const IndexSetCreationPage = () => {
               title: 'Index model documentation',
               path: DocsHelper.PAGES.INDEX_MODEL,
             }}
-            actions={<SelectTemplateButton onClick={() => setShowSelectTemplateModal(true)} />}
-          >
+            actions={<SelectTemplateButton onClick={() => setShowSelectTemplateModal(true)} />}>
             <span>
               Create a new index set that will let you configure the retention, sharding, and replication of messages
               coming from one or more streams.

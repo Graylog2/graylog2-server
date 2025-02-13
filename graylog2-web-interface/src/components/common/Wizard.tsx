@@ -382,8 +382,7 @@ class Wizard extends React.Component<Props, State> {
           $style={style}
           activeKey={selectedStep}
           onSelect={this._wizardChanged as SelectCallback}
-          justified={justified}
-        >
+          justified={justified}>
           {steps.map((navItem) => (
             <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>
               {navItem.title}
@@ -399,8 +398,7 @@ class Wizard extends React.Component<Props, State> {
                   onClick={this._onPrevious}
                   bsSize="small"
                   bsStyle="info"
-                  disabled={this._disableButton('previous')}
-                >
+                  disabled={this._disableButton('previous')}>
                   Previous
                 </Button>
               </Col>
@@ -430,8 +428,7 @@ class Wizard extends React.Component<Props, State> {
                 aria-label="Previous"
                 bsSize="xsmall"
                 bsStyle="info"
-                disabled={this._disableButton('previous')}
-              >
+                disabled={this._disableButton('previous')}>
                 <Icon name="arrow_left" />
               </Button>
               <Button
@@ -439,8 +436,7 @@ class Wizard extends React.Component<Props, State> {
                 aria-label="Next"
                 bsSize="xsmall"
                 bsStyle="info"
-                disabled={this._disableButton('next')}
-              >
+                disabled={this._disableButton('next')}>
                 <Icon name="arrow_right" />
               </Button>
             </HorizontalButtonToolbar>
@@ -451,8 +447,7 @@ class Wizard extends React.Component<Props, State> {
           activeKey={selectedStep}
           $style={style}
           onSelect={this._wizardChanged as SelectCallback}
-          justified={justified}
-        >
+          justified={justified}>
           {steps.map((navItem) => (
             <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>
               {navItem.title}

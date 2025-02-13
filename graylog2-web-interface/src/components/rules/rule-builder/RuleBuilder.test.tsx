@@ -69,8 +69,7 @@ describe('RuleBuilder', () => {
           simulateRule: () => {},
           setRawMessageToSimulate: () => {},
           setRuleSimulationResult: () => {},
-        }}
-      >
+        }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>,
     );
@@ -107,8 +106,7 @@ describe('RuleBuilder', () => {
           simulateRule: () => {},
           setRawMessageToSimulate: () => {},
           setRuleSimulationResult: () => {},
-        }}
-      >
+        }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>,
     );
@@ -142,8 +140,7 @@ describe('RuleBuilder', () => {
           simulateRule: () => {},
           setRawMessageToSimulate: () => {},
           setRuleSimulationResult: () => {},
-        }}
-      >
+        }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>,
     );
@@ -173,8 +170,7 @@ describe('RuleBuilder', () => {
           simulateRule: () => {},
           setRawMessageToSimulate: () => {},
           setRuleSimulationResult: () => {},
-        }}
-      >
+        }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>,
     );
@@ -211,8 +207,7 @@ describe('RuleBuilder', () => {
           simulateRule: () => {},
           setRawMessageToSimulate: () => {},
           setRuleSimulationResult: () => {},
-        }}
-      >
+        }}>
         <RuleBuilder />
       </PipelineRulesContext.Provider>,
     );

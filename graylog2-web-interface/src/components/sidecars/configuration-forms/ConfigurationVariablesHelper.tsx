@@ -221,8 +221,7 @@ class ConfigurationVariablesHelper extends React.Component<
           showModal={showConfirmModal}
           title="Delete Configuration Variable?"
           onConfirm={this._handleDeleteConfirm}
-          onCancel={this._closeErrorModal}
-        >
+          onCancel={this._closeErrorModal}>
           <p>
             Are you sure you want to remove the configuration variable <strong>{variableToDelete?.name}</strong>?
           </p>

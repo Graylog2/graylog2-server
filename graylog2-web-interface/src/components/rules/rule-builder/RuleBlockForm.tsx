@@ -248,8 +248,7 @@ const RuleBlockForm = ({
                               entries={[selectedBlockDict]}
                               expanded={{ [selectedBlockDict.name]: true }}
                             />
-                          }
-                        >
+                          }>
                           <Button bsStyle="link">
                             <Icon name="help" title="Function Syntax Help" data-testid="funcSyntaxHelpIcon" />
                           </Button>

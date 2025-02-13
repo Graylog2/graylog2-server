@@ -120,8 +120,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
       disabled={isFormValid}
       error={formError}
       title="Create Input &amp; Authorize AWS"
-      description="This integration allows Graylog to read messages directly from a Kinesis stream. CloudWatch messages can optionally be forwarded to Kinesis via CloudWatch subscriptions and then read by Graylog."
-    >
+      description="This integration allows Graylog to read messages directly from a Kinesis stream. CloudWatch messages can optionally be forwarded to Kinesis via CloudWatch subscriptions and then read by Graylog.">
       <DisappearingInput id="name" type="text" />
       <DisappearingInput id="password" type="password" />
 
@@ -146,8 +145,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
         label="AWS Region"
         help="The AWS Region your service is running in."
         disabled={fetchRegionsStatus.loading}
-        required
-      >
+        required>
         {renderOptions(availableRegions, 'Choose AWS Region', fetchRegionsStatus.loading)}
       </ValidatedInput>
 

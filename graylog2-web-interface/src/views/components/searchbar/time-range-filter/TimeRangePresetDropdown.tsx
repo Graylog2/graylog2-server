@@ -185,8 +185,7 @@ const TimeRangePresetDropdown = ({
       bsSize={bsSize}
       className={className}
       onToggle={onToggle}
-      onMouseDown={onMouseDown}
-    >
+      onMouseDown={onMouseDown}>
       {header && <MenuItem header>{header}</MenuItem>}
       {options ? (
         options.map(({ eventKey, key, disabled: isDisabled, label }) => (

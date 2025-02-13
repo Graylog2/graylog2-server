@@ -132,8 +132,7 @@ const UrlWhiteListConfig = () => {
           onSubmitForm={saveConfig}
           onCancel={closeModal}
           submitButtonDisabled={!isValid}
-          submitButtonText="Update configuration"
-        >
+          submitButtonText="Update configuration">
           <h3>Whitelist URLs</h3>
           <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={update} />
         </BootstrapModalForm>

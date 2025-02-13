@@ -43,8 +43,7 @@ const DashboardsPage = () => {
                     app_section: 'dashboard',
                     app_action_value: 'dashboard-create-button',
                   });
-                }}
-              >
+                }}>
                 Create new dashboard
               </Button>
             </LinkContainer>
@@ -53,8 +52,7 @@ const DashboardsPage = () => {
         documentationLink={{
           title: 'Dashboard documentation',
           path: DocsHelper.PAGES.DASHBOARDS,
-        }}
-      >
+        }}>
         <span>
           Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or
           chart you create in other parts of Graylog with one click.

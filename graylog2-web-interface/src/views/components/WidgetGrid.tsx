@@ -141,8 +141,7 @@ const Grid = ({ children, locked, onPositionsChange, onSyncLayout, positions, wi
       onPositionsChange={onPositionsChange}
       onSyncLayout={onSyncLayout}
       width={width}
-      draggableHandle=".widget-drag-handle"
-    >
+      draggableHandle=".widget-drag-handle">
       {children}
     </StyledReactGridContainer>
   );
@@ -243,8 +242,7 @@ const WidgetGrid = () => {
           key={widgetId}
           className="widgetFrame"
           data-widget-id={widgetId}
-          isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}
-        >
+          isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
           <WidgetGridItem
             positions={positions}
             widgetId={widgetId}
@@ -275,8 +273,7 @@ const WidgetGrid = () => {
           positions={newPositions}
           onPositionsChange={onPositionsChange}
           onSyncLayout={onSyncLayout}
-          width={width}
-        >
+          width={width}>
           {children}
         </Grid>
       )}

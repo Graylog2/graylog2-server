@@ -58,8 +58,7 @@ const SUT = ({
       unsetWidgetFocusing: jest.fn(),
       unsetWidgetEditing: jest.fn(),
       setWidgetEditing: jest.fn(),
-    }}
-  >
+    }}>
     <ChartColorContext.Provider value={{ colors, setColor }}>
       <PlotLegend config={plotConfig} chartData={chartDataProp} height={480} width={640} neverHide={neverHide}>
         <div>Plot</div>

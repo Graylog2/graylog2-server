@@ -39,8 +39,7 @@ const ServerConfigSection = ({ authenticationBackend }: Props) => {
   return (
     <SectionComponent
       title="Server Configuration"
-      headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={SERVER_CONFIG_KEY} />}
-    >
+      headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={SERVER_CONFIG_KEY} />}>
       <ReadOnlyFormGroup label="Title" value={title} />
       <ReadOnlyFormGroup label="Description" value={description} />
       <ReadOnlyFormGroup label="Server Address" value={serverUrls} />

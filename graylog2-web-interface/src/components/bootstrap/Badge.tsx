@@ -47,8 +47,7 @@ const Badge = React.forwardRef<HTMLDivElement, Props>(
       data-testid={dataTestid}
       ref={ref}
       variant="filled"
-      onClick={onClick}
-    >
+      onClick={onClick}>
       {children}
     </StyledBadge>
   ),

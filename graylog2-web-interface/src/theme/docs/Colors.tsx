@@ -92,8 +92,7 @@ const ColorSwatch = ({ className, color, name = '', copyText }: ColorSwatchProps
         placement="top"
         opened={opened}
         positionTop={-32}
-        id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}
-      >
+        id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}>
         Copied!
       </StyledTooltip>
       <Swatch color={color} onClick={copyCallback}>

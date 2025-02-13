@@ -251,8 +251,7 @@ const UserCreate = () => {
                   id="roles-selector-input"
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9"
-                  label="Assign Roles"
-                >
+                  label="Assign Roles">
                   <RolesSelector
                     onSubmit={_onAssignRole}
                     assignedRolesIds={user.roles}
@@ -265,8 +264,7 @@ const UserCreate = () => {
                   id="selected-roles-overview"
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9"
-                  label="Selected Roles"
-                >
+                  label="Selected Roles">
                   <>
                     {selectedRoles
                       .map((role) => (

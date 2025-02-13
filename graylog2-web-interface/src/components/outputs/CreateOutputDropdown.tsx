@@ -81,8 +81,7 @@ class CreateOutputDropdown extends React.Component<
             defaultValue={this.PLACEHOLDER}
             value={this.state.typeName}
             onChange={this._onTypeChange}
-            className="form-control"
-          >
+            className="form-control">
             <option value={this.PLACEHOLDER} disabled>
               Select Output Type
             </option>

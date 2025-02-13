@@ -153,8 +153,7 @@ const CacheForm = ({
             validateOnChange={false}
             validateOnMount={!create}
             onSubmit={handleSubmit}
-            enableReinitialize
-          >
+            enableReinitialize>
             {({ errors, values, setValues, isSubmitting }) => (
               <Form className="form form-horizontal">
                 <fieldset>

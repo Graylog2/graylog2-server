@@ -51,15 +51,13 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
         placement="right"
         onToggle={_onMenuToggle}
         menuContainer={menuContainer}
-        dropdownZIndex={1031}
-      >
+        dropdownZIndex={1031}>
         <ActionDropdown
           handlerArgs={handlerArgs}
           type={type}
           setOverflowingComponents={setOverflowingComponents}
           onMenuToggle={_onMenuToggle}
-          overflowingComponents={overflowingComponents}
-        >
+          overflowingComponents={overflowingComponents}>
           {children}
         </ActionDropdown>
       </OverlayDropdown>

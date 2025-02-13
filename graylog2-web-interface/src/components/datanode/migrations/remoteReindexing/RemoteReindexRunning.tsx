@@ -143,8 +143,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
       <MigrationStepTriggerButtonToolbar
         hidden={hideActions}
         nextSteps={(nextSteps || currentStep.next_steps).filter((step) => step !== RetryMigrateExistingData)}
-        onTriggerStep={handleTriggerStep}
-      >
+        onTriggerStep={handleTriggerStep}>
         <Button bsStyle="default" bsSize="small" onClick={handleLogViewClick}>
           Log View
         </Button>
@@ -157,8 +156,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
           show={showRetryMigrationConfirmDialog}
           title="Retry migrating existing data"
           onCancel={() => setShowRetryMigrationConfirmDialog(false)}
-          onConfirm={handleRetryConfirmClick}
-        >
+          onConfirm={handleRetryConfirmClick}>
           Are you sure you want to stop the current running remote reindexing migration and retry migrating existing
           data?
         </ConfirmDialog>

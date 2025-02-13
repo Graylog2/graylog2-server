@@ -62,8 +62,7 @@ const SidecarSearchForm = ({ query, onSearch, onReset, children }: Props) => (
     placeholder="Find sidecars"
     queryHelpComponent={queryHelp}
     topMargin={0}
-    useLoadingState
-  >
+    useLoadingState>
     {children}
   </SearchForm>
 );

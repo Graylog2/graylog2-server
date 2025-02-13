@@ -101,8 +101,7 @@ const Section = ({
             <FlexWrapper
               onClick={(e) => {
                 e.stopPropagation();
-              }}
-            >
+              }}>
               {headerLeftSection}
             </FlexWrapper>
           )}
@@ -113,8 +112,7 @@ const Section = ({
             <div
               onClick={(e) => {
                 e.stopPropagation();
-              }}
-            >
+              }}>
               {actions}
             </div>
           )}
@@ -125,8 +123,7 @@ const Section = ({
               onClick={toggle}
               data-testid="collapseButton"
               title={`Toggle ${title.toLowerCase()} section`}
-              disabled={disableCollapseButton}
-            >
+              disabled={disableCollapseButton}>
               <Icon size="sm" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
             </Button>
           )}

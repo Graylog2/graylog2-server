@@ -148,8 +148,7 @@ class IndexSetDeletionForm extends React.Component<
         onCancel={this.close}
         onSubmitForm={this._onDelete}
         submitButtonText="Delete"
-        submitButtonDisabled={!this._isDeletable()}
-      >
+        submitButtonDisabled={!this._isDeletable()}>
         {this._modalContent()}
       </BootstrapModalForm>
     );

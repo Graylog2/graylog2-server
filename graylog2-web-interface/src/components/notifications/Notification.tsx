@@ -77,8 +77,7 @@ const Notification = ({ notification }: Props) => {
           </NotificationTimestamp>
         </>
       }
-      onDismiss={_onClose}
-    >
+      onDismiss={_onClose}>
       <div
         dangerouslySetInnerHTML={{ __html: _sanitizeDescription(message?.description) }}
         className="notification-description"

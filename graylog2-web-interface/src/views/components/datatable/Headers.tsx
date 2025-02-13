@@ -117,8 +117,7 @@ const HeaderField = ({
       key={`${prefix}${field}`}
       colSpan={span}
       $isNumeric={type.isNumeric()}
-      $borderedHeader={borderedHeader}
-    >
+      $borderedHeader={borderedHeader}>
       <Field name={field} queryId={activeQuery} type={type}>
         {title}
       </Field>
@@ -127,8 +126,7 @@ const HeaderField = ({
           data-testid={`pin-${prefix}${field}`}
           type="button"
           onClick={_togglePin}
-          className={isPinned ? 'active' : ''}
-        >
+          className={isPinned ? 'active' : ''}>
           <Icon name="keep" />
         </PinIcon>
       )}

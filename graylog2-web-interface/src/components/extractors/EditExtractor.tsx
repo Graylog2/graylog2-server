@@ -172,8 +172,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
           bsStyle={inputStyle}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
-          help={conditionInputHelp}
-        >
+          help={conditionInputHelp}>
           <Row className="row-sm">
             <Col md={11}>
               <input
@@ -298,8 +297,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                     label="Condition"
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
-                    help={conditionTypeHelpMessage}
-                  >
+                    help={conditionTypeHelpMessage}>
                     <span>
                       <div className="radio">
                         <label htmlFor="condition_type_none">
@@ -353,8 +351,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                     label="Extraction strategy"
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
-                    help={cursorStrategyHelpMessage}
-                  >
+                    help={cursorStrategyHelpMessage}>
                     <span>
                       <label className="radio-inline" htmlFor="cursor_strategy_copy">
                         <input

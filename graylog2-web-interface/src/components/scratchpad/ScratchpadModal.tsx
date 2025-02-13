@@ -207,8 +207,7 @@ const Scratchpad = () => {
       onDrag={handleDrag}
       onResize={handleSize}
       size={size}
-      position={position}
-    >
+      position={position}>
       <ContentArea>
         {!isSecurityWarningConfirmed && (
           <StyledAlert bsStyle="warning">
@@ -239,8 +238,7 @@ const Scratchpad = () => {
                 without leaving your browser window. For example, store timestamps, user IDs, or IP addresses you need
                 in various investigations.
               </>
-            }
-          >
+            }>
             <Button bsStyle="link">
               <Icon name="help" />
             </Button>
@@ -265,8 +263,7 @@ const Scratchpad = () => {
         showModal={showModal}
         title="Are you sure?"
         onConfirm={handleClearText}
-        onCancel={handleCancelClear}
-      >
+        onCancel={handleCancelClear}>
         This will clear out your Scratchpad content, do you wish to proceed?
       </BootstrapModalConfirm>
     </InteractableModal>

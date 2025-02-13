@@ -83,8 +83,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       pageSize={layoutConfig.pageSize}
       activePage={activePage}
       showPageSizeSelect={false}
-      useQueryParameter={false}
-    >
+      useQueryParameter={false}>
       <div style={{ marginBottom: '5px' }}>
         <SearchForm
           focusAfterMount

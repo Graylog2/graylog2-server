@@ -125,8 +125,7 @@ const AggregationWizard = ({
       onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange, config)}
       initialValues={initialFormValues}
       config={config}
-      validate={validateForm}
-    >
+      validate={validateForm}>
       <>
         <Controls>
           <Section data-testid="configure-elements-section">
