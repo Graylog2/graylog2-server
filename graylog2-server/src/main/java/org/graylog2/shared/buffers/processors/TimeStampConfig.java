@@ -21,6 +21,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Duration;
 
 public record TimeStampConfig(@JsonProperty("grace_period") Duration gracePeriod) {
-    public static final TimeStampConfig NONE = new TimeStampConfig(Duration.ofSeconds(0));
-    public static final TimeStampConfig DEFAULT = new TimeStampConfig(Duration.ofDays(2));
+    public static final TimeStampConfig THRESHOLD_2DAYS = new TimeStampConfig(Duration.ofDays(2));
+    private static final TimeStampConfig THRESHOLD_DISTANT_FUTURE = new TimeStampConfig(Duration.ofSeconds(1000000000000L));
+
+    public static TimeStampConfig getDefault() {
+        // Off by default
+        return THRESHOLD_DISTANT_FUTURE;
+    }
 }

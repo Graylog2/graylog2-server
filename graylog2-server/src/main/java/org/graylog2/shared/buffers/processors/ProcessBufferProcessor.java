@@ -67,6 +67,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final Provider<Stream> defaultStreamProvider;
     private final FailureSubmissionService failureSubmissionService;
     private final ClusterConfigService clusterConfigService;
+    private final EventBus eventBus;
 
     private volatile Message currentMessage;
     private volatile Duration cachedGracePeriod = null;
@@ -82,7 +83,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                                   FailureSubmissionService failureSubmissionService,
                                   StreamMetrics streamMetrics,
                                   ClusterConfigService clusterConfigService,
-                                  final EventBus eventBus) {
+                                  EventBus eventBus) {
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
         this.processingStatusRecorder = processingStatusRecorder;
@@ -91,6 +92,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         this.defaultStreamProvider = defaultStreamProvider;
         this.failureSubmissionService = failureSubmissionService;
         this.clusterConfigService = clusterConfigService;
+        this.eventBus = eventBus;
 
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
@@ -198,7 +200,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
 
     public Duration getTimeStampGracePeriod() {
         if (cachedGracePeriod == null) {
-            cachedGracePeriod = clusterConfigService.getOrDefault(TimeStampConfig.class, TimeStampConfig.NONE).gracePeriod();
+            cachedGracePeriod = clusterConfigService.getOrDefault(TimeStampConfig.class, TimeStampConfig.getDefault()).gracePeriod();
         }
         return cachedGracePeriod;
     }
@@ -213,5 +215,10 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
 
     public interface Factory {
         ProcessBufferProcessor create(DecodingProcessor decodingProcessor);
+    }
+
+    @Override
+    public void onShutdown() {
+        eventBus.unregister(this);
     }
 }
