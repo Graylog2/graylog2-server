@@ -125,8 +125,7 @@ class LegacyNotificationForm extends React.Component<
         <fieldset>
           <FormGroup
             controlId="notification-legacy-select"
-            validationState={validation.errors.callback_type ? 'error' : null}
-          >
+            validationState={validation.errors.callback_type ? 'error' : null}>
             <ControlLabel>Choose Legacy Notification</ControlLabel>
             <Select
               id="notification-legacy-select"

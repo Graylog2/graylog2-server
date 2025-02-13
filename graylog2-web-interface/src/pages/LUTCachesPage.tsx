@@ -160,8 +160,7 @@ class LUTCachesPage extends React.Component<
                 Create cache
               </Button>
             </LinkContainer>
-          }
-        >
+          }>
           <span>Caches provide the actual values for lookup tables</span>
         </PageHeader>
         {content}

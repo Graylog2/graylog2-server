@@ -177,8 +177,7 @@ const DashboardActionsMenu = () => {
           pullRight
           keepMounted
           buttonTitle="More Actions"
-          noCaret
-        >
+          noCaret>
           {dashboardActions.length > 0 && (
             <>
               {dashboardActions}

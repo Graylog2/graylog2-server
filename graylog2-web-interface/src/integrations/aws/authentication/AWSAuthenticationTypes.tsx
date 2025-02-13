@@ -81,8 +81,7 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
             id="awsAuthType"
             onChange={handleTypeChange}
             label="AWS Authentication Type"
-            defaultValue={currentType}
-          >
+            defaultValue={currentType}>
             {Object.keys(AWS_AUTH_TYPES).map((type) => (
               <option value={AWS_AUTH_TYPES[type]} key={`option-${type}`}>
                 {AWS_AUTH_TYPES[type]}

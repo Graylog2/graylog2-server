@@ -107,8 +107,7 @@ const EditEventDefinitionPage = () => {
         documentationLink={{
           title: 'Alerts documentation',
           path: DocsHelper.PAGES.ALERTS,
-        }}
-      >
+        }}>
         <span>Event Definitions allow you to create Events from different Conditions and alert on them.</span>
       </PageHeader>
       <Row className="content">

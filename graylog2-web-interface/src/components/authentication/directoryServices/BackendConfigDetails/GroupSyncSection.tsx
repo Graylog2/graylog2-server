@@ -41,8 +41,7 @@ const GroupSyncSection = ({ authenticationBackend, roles, excludedFields }: Prop
     return (
       <SectionComponent
         title="Group Synchronization"
-        headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={GROUP_SYNC_KEY} />}
-      >
+        headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={GROUP_SYNC_KEY} />}>
         <EnterprisePluginNotFound featureName="group synchronization" />
       </SectionComponent>
     );

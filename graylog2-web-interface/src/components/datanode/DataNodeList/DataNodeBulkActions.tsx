@@ -83,8 +83,7 @@ const DataNodeBulkActions = () => {
           title={CONFIRM_DIALOG[showDialogType].dialogTitle}
           show
           onConfirm={CONFIRM_DIALOG[showDialogType].handleConfirm}
-          onCancel={() => setShowDialogType(null)}
-        >
+          onCancel={() => setShowDialogType(null)}>
           {CONFIRM_DIALOG[showDialogType].dialogBody}
         </ConfirmDialog>
       )}

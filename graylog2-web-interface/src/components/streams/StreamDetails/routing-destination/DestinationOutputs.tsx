@@ -84,8 +84,7 @@ const DestinationOutputs = ({ stream }: Props) => {
           assignableOutputs={assignableOutputs}
           getTypeDefinition={getTypeDefinition}
         />
-      }
-    >
+      }>
       <OutputsList
         streamId={stream.id}
         outputs={data.outputs}

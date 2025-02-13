@@ -113,8 +113,7 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
       labelFields={rowPivotsToFields}
       neverHide
       height={height}
-      width={width}
-    >
+      width={width}>
       <GenericPlot chartData={transformedData} setChartColor={setChartColor} />
     </PlotLegend>
   );

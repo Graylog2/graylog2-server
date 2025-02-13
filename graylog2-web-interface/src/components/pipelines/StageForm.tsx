@@ -109,8 +109,7 @@ const StageForm = ({
       <Button
         disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
         onClick={openModal}
-        bsStyle={create ? 'success' : 'info'}
-      >
+        bsStyle={create ? 'success' : 'info'}>
         {create ? 'Add new stage' : 'Edit'}
       </Button>
       <BootstrapModalForm
@@ -119,8 +118,7 @@ const StageForm = ({
         data-telemetry-title={`${create ? 'Add new' : 'Edit'} stage`}
         onSubmitForm={_handleSave}
         onCancel={_closeModal}
-        submitButtonText={create ? 'Add stage' : 'Update stage'}
-      >
+        submitButtonText={create ? 'Add stage' : 'Update stage'}>
         <fieldset>
           <Input
             type="number"

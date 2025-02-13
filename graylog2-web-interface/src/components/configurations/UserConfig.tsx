@@ -115,8 +115,7 @@ const UserConfig = () => {
                 bsStyle="info"
                 onClick={() => {
                   setShowModal(true);
-                }}
-              >
+                }}>
                 Edit configuration
               </Button>
             </p>

@@ -122,8 +122,7 @@ const SuggestionsList = ({
           activePage={page}
           pageSize={pageSize}
           onChange={handlePaginationChange}
-          useQueryParameter={false}
-        >
+          useQueryParameter={false}>
           <StyledListGroup>
             {suggestions.map((suggestion) => {
               const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value }) => value === suggestion.id);

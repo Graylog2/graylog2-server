@@ -286,8 +286,7 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
           target={target}
           rel={rel}
           onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-          {...sharedProps}
-        >
+          {...sharedProps}>
           {children}
         </StyledButton>
       );
@@ -299,8 +298,7 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
         form={form}
         onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
         name={name}
-        {...sharedProps}
-      >
+        {...sharedProps}>
         {children}
       </StyledButton>
     );

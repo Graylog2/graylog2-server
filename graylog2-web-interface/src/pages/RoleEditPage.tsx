@@ -66,8 +66,7 @@ const RoleEditPage = ({ params }: Props) => {
         documentationLink={{
           title: 'Permissions documentation',
           path: DocsHelper.PAGES.USERS_ROLES,
-        }}
-      >
+        }}>
         <span>You can assign the role to users.</span>
       </PageHeader>
       <RoleEdit role={roleId === loadedRole?.id ? loadedRole : undefined} />

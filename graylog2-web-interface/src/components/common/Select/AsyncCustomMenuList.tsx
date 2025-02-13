@@ -49,8 +49,7 @@ const AsyncCustomMenuList = ({
       itemCount={total}
       threshold={30}
       minimumBatchSize={50}
-      loadMoreItems={loadOptions}
-    >
+      loadMoreItems={loadOptions}>
       {({ onItemsRendered, ref }) => (
         <WindowList listRef={ref} onItemsRendered={onItemsRendered}>
           {items}

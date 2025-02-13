@@ -141,8 +141,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
       onSubmit={onSubmit}
       validateOnBlur={false}
       validateOnChange={false}
-      validateOnMount={validateOnMount}
-    >
+      validateOnMount={validateOnMount}>
       {({ isSubmitting, setFieldValue, values, validateForm }) => (
         <Form className="form form-horizontal">
           <FormikFormGroup help={help.title} label="Title" name="title" placeholder="Title" />
@@ -252,8 +251,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                 </>
               }
               labelClassName="col-sm-3"
-              wrapperClassName="col-sm-9"
-            >
+              wrapperClassName="col-sm-9">
               <Button type="button" onClick={() => setFieldValue('systemUserPassword', '')}>
                 Reset Password
               </Button>
@@ -298,8 +296,7 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
                   app_action_value: 'usersync-button',
                 });
               }}
-              type="submit"
-            >
+              type="submit">
               Next: User Synchronization
             </Button>
           </ButtonToolbar>

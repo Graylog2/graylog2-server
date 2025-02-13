@@ -76,8 +76,7 @@ const SettingsSection = ({
       <Formik<SettingsFormValues>
         onSubmit={onSubmit}
         validate={_validate}
-        initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}
-      >
+        initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             <IfPermitted permissions="*">

@@ -219,8 +219,7 @@ class LUTTablesPage extends React.Component<
                 Create lookup table
               </Button>
             </LinkContainer>
-          }
-        >
+          }>
           <span>
             Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or
             to enrich messages.

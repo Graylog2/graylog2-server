@@ -201,8 +201,7 @@ class LUTDataAdaptersPage extends React.Component<
                 Create data adapter
               </Button>
             </LinkContainer>
-          }
-        >
+          }>
           <span>Data adapters provide the actual values for lookup tables</span>
         </PageHeader>
 

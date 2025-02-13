@@ -44,8 +44,7 @@ const DataAdapterPicker = ({ dataAdapters = [] }: Props) => {
         bsStyle={errorMessage ? 'error' : undefined}
         help={errorMessage || 'Select an existing data adapter'}
         labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9"
-      >
+        wrapperClassName="col-sm-9">
         <Select
           placeholder="Select a data adapter"
           clearable={false}

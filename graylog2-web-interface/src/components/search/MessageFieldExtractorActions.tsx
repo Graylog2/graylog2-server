@@ -69,8 +69,7 @@ class MessageFieldExtractorActions extends React.Component<
             bsSize="xsmall"
             title="Select extractor type"
             key={1}
-            id={`select-extractor-type-dropdown-field-${fieldName}`}
-          >
+            id={`select-extractor-type-dropdown-field-${fieldName}`}>
             {ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => this._formatExtractorMenuItem(extractorType))}
           </DropdownButton>
         </div>
@@ -84,8 +83,7 @@ class MessageFieldExtractorActions extends React.Component<
           bsSize="xsmall"
           title="Select extractor type"
           key={1}
-          id={`select-extractor-type-dropdown-field-${fieldName}`}
-        >
+          id={`select-extractor-type-dropdown-field-${fieldName}`}>
           <MenuItem key="select-extractor-type-disabled" disabled>
             Extractors can only be used with string fields.
           </MenuItem>

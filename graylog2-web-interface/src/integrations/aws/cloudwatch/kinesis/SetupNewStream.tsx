@@ -106,16 +106,14 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup = null }: KinesisSetupPr
       loading={groupNamesStatus.loading}
       error={formError}
       title="Set Up Kinesis Automatically"
-      description=""
-    >
+      description="">
       <p>
         Complete the fields below and Graylog will perform the automated Kinesis setup, which performs the following
         operations within your AWS account. See{' '}
         <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html"
-        >
+          href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html">
           Using CloudWatch Logs Subscription Filters
         </a>{' '}
         in the AWS documentation for more information.
@@ -147,8 +145,7 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup = null }: KinesisSetupPr
         onChange={onChange}
         label="CloudWatch Group Name"
         required
-        disabled={groupNamesStatus.loading || disabledGroups || disabledForm}
-      >
+        disabled={groupNamesStatus.loading || disabledGroups || disabledForm}>
         {renderOptions(availableGroups, 'Choose CloudWatch Group', groupNamesStatus.loading)}
       </ValidatedInput>
 

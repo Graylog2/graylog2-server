@@ -68,8 +68,7 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }: SetupModalPro
             <a
               href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Subscriptions.html"
               target="_blank"
-              rel="noopener noreferrer"
-            >
+              rel="noopener noreferrer">
               CloudWatch Subscriptions
             </a>{' '}
             documentation for more information.

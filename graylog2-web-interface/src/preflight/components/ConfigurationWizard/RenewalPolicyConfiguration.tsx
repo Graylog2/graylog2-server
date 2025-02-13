@@ -100,8 +100,7 @@ const RenewalPolicyConfiguration = () => {
       <Formik
         initialValues={defaultFormValues}
         onSubmit={(formValues: FormValues) => onSubmit(formValues)}
-        validate={validateForm}
-      >
+        validate={validateForm}>
         {({ isSubmitting, isValid, setFieldValue, errors }) => (
           <StyledForm>
             <Field name="renewal_policy">

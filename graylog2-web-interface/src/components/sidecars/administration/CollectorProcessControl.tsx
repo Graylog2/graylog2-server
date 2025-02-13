@@ -109,8 +109,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
         title="Process action summary"
         confirmButtonDisabled={shouldShowConfigurationWarning}
         onConfirm={confirmProcessAction}
-        onCancel={cancelProcessAction}
-      >
+        onCancel={cancelProcessAction}>
         <div>
           {shouldShowConfigurationWarning ? renderConfigurationWarning() : renderSummaryContent(selectedSidecars)}
         </div>

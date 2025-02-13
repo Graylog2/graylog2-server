@@ -254,8 +254,7 @@ class TypeAheadDataFilter extends React.Component<
         <form
           className="form-inline"
           onSubmit={this._onSearchTextChanged}
-          style={{ display: 'inline-flex', alignItems: 'flex-end' }}
-        >
+          style={{ display: 'inline-flex', alignItems: 'flex-end' }}>
           <TypeAheadInput
             id={id}
             ref={(typeAheadInput) => {
@@ -272,8 +271,7 @@ class TypeAheadDataFilter extends React.Component<
           <StyledButton
             type="button"
             onClick={this._resetFilters}
-            disabled={filters.count() === 0 && filterText === ''}
-          >
+            disabled={filters.count() === 0 && filterText === ''}>
             Reset
           </StyledButton>
         </form>

@@ -42,8 +42,7 @@ const CreateEventDefinitionPage = () => {
         documentationLink={{
           title: 'Alerts documentation',
           path: DocsHelper.PAGES.ALERTS,
-        }}
-      >
+        }}>
         <span>
           Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly to
           you or to other systems you use for that purpose.

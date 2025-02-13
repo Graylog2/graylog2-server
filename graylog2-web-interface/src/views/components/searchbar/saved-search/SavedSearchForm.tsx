@@ -77,8 +77,7 @@ const SavedSearchForm = ({ children, show, isCreateNew, saveSearch, saveAsSearch
                 type="submit"
                 bsSize="sm"
                 title="Save search"
-                onClick={_saveSearch}
-              >
+                onClick={_saveSearch}>
                 Save
               </Button>
             )}
@@ -89,8 +88,7 @@ const SavedSearchForm = ({ children, show, isCreateNew, saveSearch, saveAsSearch
               type="submit"
               bsSize="sm"
               title={createNewButtonTitle}
-              onClick={_saveAsSearch}
-            >
+              onClick={_saveAsSearch}>
               {createNewTitle}
             </Button>
             <Button className={styles.button} onClick={toggleModal} bsSize="sm">

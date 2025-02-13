@@ -102,8 +102,7 @@ class CollectorList extends React.Component<CollectorListProps> {
               pageSizes={[10, 25]}
               totalItems={pagination.total}
               onChange={onPageChange}
-              useQueryParameter={false}
-            >
+              useQueryParameter={false}>
               <div className={style.collectorTable}>
                 <DataTable
                   id="collector-list"

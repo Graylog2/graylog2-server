@@ -119,8 +119,7 @@ class DateConverterConfiguration extends React.Component<
                 id={`${this.props.type}_converter_timezone`}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9"
-                help={timezoneHelpMessage}
-              >
+                help={timezoneHelpMessage}>
                 <TimezoneSelect
                   id={`${this.props.type}_converter_timezone`}
                   className="timezone-select"
@@ -133,8 +132,7 @@ class DateConverterConfiguration extends React.Component<
                 id={`${this.props.type}_converter_locale`}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9"
-                help={localeHelpMessage}
-              >
+                help={localeHelpMessage}>
                 <LocaleSelect
                   id={`${this.props.type}_converter_locale`}
                   className="locale-select"

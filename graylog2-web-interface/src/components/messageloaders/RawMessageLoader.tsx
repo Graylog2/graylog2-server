@@ -79,8 +79,7 @@ const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<
           Message input <small>(optional)</small>
         </>
       }
-      help="Select the message input ID that should be assigned to the parsed message."
-    >
+      help="Select the message input ID that should be assigned to the parsed message.">
       <Select
         inputId="inputSelect"
         name="inputSelect"
@@ -131,8 +130,7 @@ const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSele
         label="Select an Input type (optional)"
         help="Select the Input type you want to load the message from."
         value={selectedInputType ?? 'placeholder'}
-        onChange={(e) => setSelectedInputType(e.target.value as 'server' | 'forwarder')}
-      >
+        onChange={(e) => setSelectedInputType(e.target.value as 'server' | 'forwarder')}>
         <option value="placeholder" disabled>
           Select an Input type
         </option>
@@ -388,8 +386,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, codecTypes
               name="codec"
               label="Message codec"
               help="Select the codec that should be used to decode the message."
-              required
-            >
+              required>
               <Select
                 id="codec"
                 aria-label="Message codec"

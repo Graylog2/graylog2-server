@@ -51,8 +51,7 @@ const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => 
           <>Not logged in</>
         )
       }
-      rootClose
-    >
+      rootClose>
       <LoggedInIcon active={sessionActive} />
     </OverlayTrigger>
   </Td>

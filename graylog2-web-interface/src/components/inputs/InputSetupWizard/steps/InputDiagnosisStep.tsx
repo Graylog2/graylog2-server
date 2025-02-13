@@ -65,8 +65,7 @@ const InputDiagnosisStep = ({ onClose }: Props) => {
           <Button
             bsSize="xs"
             bsStyle="primary"
-            onClick={() => window.open(Routes.SYSTEM.INPUT_DIAGNOSIS(input?.id), '_blank')}
-          >
+            onClick={() => window.open(Routes.SYSTEM.INPUT_DIAGNOSIS(input?.id), '_blank')}>
             Go to Input Diagnosis
           </Button>
         )}

@@ -132,8 +132,7 @@ const EventsList = ({
         activePage={currentPage}
         pageSize={PAGINATION.PER_PAGE}
         showPageSizeSelect={false}
-        totalItems={data.totalResults ?? 0}
-      >
+        totalItems={data.totalResults ?? 0}>
         {!pageErrors?.length ? (
           <EventsTable
             config={config}

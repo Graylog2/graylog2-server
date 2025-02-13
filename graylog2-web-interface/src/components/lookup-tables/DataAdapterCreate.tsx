@@ -103,8 +103,7 @@ class DataAdapterCreate extends React.Component<
                 autoFocus
                 help="The type of data adapter to configure."
                 labelClassName="col-sm-3"
-                wrapperClassName="col-sm-9"
-              >
+                wrapperClassName="col-sm-9">
                 <Select
                   placeholder="Select Data Adapter Type"
                   clearable={false}

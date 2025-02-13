@@ -59,8 +59,7 @@ const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof Aggr
         fields={Immutable.List([])}
         onCancel={() => {}}
         onChange={() => {}}
-        {...props}
-      >
+        {...props}>
         <span>The visualization</span>
       </AggregationWizard>
     </FieldTypesContext.Provider>

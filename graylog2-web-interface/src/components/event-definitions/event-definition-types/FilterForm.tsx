@@ -584,8 +584,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
             <>
               <FormGroup
                 controlId="cron-expression"
-                validationState={validation.errors.cron_expression ? 'error' : null}
-              >
+                validationState={validation.errors.cron_expression ? 'error' : null}>
                 <Input
                   id="cron-expression"
                   name="cron_expression"

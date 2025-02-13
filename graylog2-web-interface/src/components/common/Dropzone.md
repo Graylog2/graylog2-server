@@ -16,8 +16,7 @@ const DropzoneInner = styled.div`
   onReject={() => alert('File rejected!')}
   accept={['image/png', 'image/jpeg']}
   maxSize={1024 * 1024}
-  loading={false}
->
+  loading={false}>
   <DropzoneInner>
     <Dropzone.Accept>
       <Icon name="image" type="regular" size="2x" />

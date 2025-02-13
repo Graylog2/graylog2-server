@@ -102,8 +102,7 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
       <Button
         disabled={!isPermitted(currentUser.permissions, 'pipeline_connection:edit')}
         onClick={openModal}
-        bsStyle="info"
-      >
+        bsStyle="info">
         Edit pipelines connection
       </Button>
       {showModal && (
@@ -116,8 +115,7 @@ const StreamPipelinesConnectionForm = ({ streamId, pipelines, connectedPipelines
           }
           onSubmitForm={onSave}
           onCancel={onCancel}
-          submitButtonText="Update connections"
-        >
+          submitButtonText="Update connections">
           <fieldset>
             <FormGroup id="pipelinesConnections">
               <ControlLabel>Pipelines</ControlLabel>

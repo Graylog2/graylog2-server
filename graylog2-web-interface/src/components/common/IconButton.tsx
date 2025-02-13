@@ -88,8 +88,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, Props>(
       onClick={(e) => handleClick(onClick, e)}
       className={className}
       type="button"
-      disabled={disabled}
-    >
+      disabled={disabled}>
       <Icon type={iconType} {...rest} />
     </Wrapper>
   ),

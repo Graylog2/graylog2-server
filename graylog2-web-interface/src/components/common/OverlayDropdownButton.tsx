@@ -71,15 +71,13 @@ const OverlayDropdownButton = ({
             className="dropdown-toggle"
             aria-label={buttonTitle}
             title={buttonTitle}
-            disabled={disabled}
-          >
+            disabled={disabled}>
             {title} <Icon name="arrow_drop_down" />
           </Button>
         </div>
       }
       placement="bottom"
-      onToggle={_onToggle}
-    >
+      onToggle={_onToggle}>
       {typeof children === 'function' ? children({ toggleDropdown: _onToggle }) : children}
     </OverlayDropdown>
   );

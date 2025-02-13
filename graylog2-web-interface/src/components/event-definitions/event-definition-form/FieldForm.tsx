@@ -290,8 +290,7 @@ class FieldForm extends React.Component<
 
           <FormGroup
             controlId="event-field-provider"
-            validationState={validation.errors['config.providers[0].type'] ? 'error' : null}
-          >
+            validationState={validation.errors['config.providers[0].type'] ? 'error' : null}>
             <ControlLabel>Set Value From</ControlLabel>
             <Select
               name="event-field-provider"

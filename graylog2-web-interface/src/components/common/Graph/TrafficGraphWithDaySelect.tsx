@@ -110,8 +110,7 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title }: Props) => {
           label="Days"
           value={graphDays}
           onChange={onGraphDaysChange}
-          formGroupClassName="graph-days-select"
-        >
+          formGroupClassName="graph-days-select">
           {DAYS.map((size) => (
             <option key={`option-${size}`} value={size}>
               {size}

@@ -345,8 +345,7 @@ const StartInputStep = () => {
           disabled={startInputStatus === 'ROLLING_BACK'}
           onClick={handleRollback}
           bsStyle="primary"
-          data-testid="rollback-input-button"
-        >
+          data-testid="rollback-input-button">
           Rollback Input
         </Button>
       );
@@ -358,8 +357,7 @@ const StartInputStep = () => {
           disabled={isNextStepDisabled || startInputStatus === 'RUNNING'}
           onClick={goToInputDiagnosis}
           bsStyle="primary"
-          data-testid="input-diagnosis-button"
-        >
+          data-testid="input-diagnosis-button">
           Input Diagnosis
         </Button>
       );

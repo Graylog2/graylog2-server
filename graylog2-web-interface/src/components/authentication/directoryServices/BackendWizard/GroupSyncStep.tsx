@@ -78,8 +78,7 @@ const GroupSyncStep = ({
               });
 
               onSubmitAll(false);
-            }}
-          >
+            }}>
             Finish & Save Service
           </Button>
         </ButtonToolbar>

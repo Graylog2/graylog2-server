@@ -225,8 +225,7 @@ const SearchActionsMenu = () => {
         saveAsSearch={saveAsSearch}
         isCreateNew={isNew || !isAllowedToEdit}
         toggleModal={toggleFormModal}
-        value={currentTitle}
-      >
+        value={currentTitle}>
         <SaveViewButton title={title} ref={formTarget} onClick={toggleFormModal} />
       </SavedSearchForm>
       <Button title="Load a previously saved search" onClick={toggleListModal}>
@@ -251,8 +250,7 @@ const SearchActionsMenu = () => {
         aria-label="Open search actions dropdown"
         id="search-actions-dropdown"
         pullRight
-        noCaret
-      >
+        noCaret>
         <MenuItem onSelect={toggleMetadataEdit} disabled={!isAllowedToEdit} icon="edit">
           Edit metadata
         </MenuItem>

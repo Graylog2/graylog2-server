@@ -72,8 +72,7 @@ class IndexerFailuresPage extends React.Component<
             documentationLink={{
               title: 'Indexer failures documentation',
               path: DocsHelper.PAGES.INDEXER_FAILURES,
-            }}
-          >
+            }}>
             <span>
               This is a list of message index attempts that failed. A failure means that a message you sent to Graylog
               was properly processed but writing it to the Elasticsearch cluster failed. Note that the list is capped to

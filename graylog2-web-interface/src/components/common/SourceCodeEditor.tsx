@@ -290,8 +290,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
                     bsStyle="link"
                     bsSize="sm"
                     title="Paste (Ctrl+V / &#8984;V)"
-                    disabled={this.isPasteDisabled()}
-                  >
+                    disabled={this.isPasteDisabled()}>
                     <Icon name="content_copy" />
                   </Button>
                 </OverlayTrigger>
@@ -302,8 +301,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
                   bsSize="sm"
                   onClick={this.handleUndo}
                   title="Undo (Ctrl+Z / &#8984;Z)"
-                  disabled={this.isUndoDisabled()}
-                >
+                  disabled={this.isUndoDisabled()}>
                   <Icon name="undo" />
                 </Button>
                 <Button
@@ -311,8 +309,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
                   bsSize="sm"
                   onClick={this.handleRedo}
                   title="Redo (Ctrl+Shift+Z / &#8984;&#8679;Z)"
-                  disabled={this.isRedoDisabled()}
-                >
+                  disabled={this.isRedoDisabled()}>
                   <Icon name="redo" />
                 </Button>
               </ButtonGroup>

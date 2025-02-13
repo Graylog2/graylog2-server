@@ -116,8 +116,7 @@ const SurroundingSearchButton = ({ searchConfig, timestamp, id, messageFields }:
         onClick={() => sendEvent(range)}
         href={searchLink(range, timestamp, id, messageFields, searchConfig, streams, streamCategories)}
         target="_blank"
-        rel="noopener noreferrer"
-      >
+        rel="noopener noreferrer">
         {timeRangeOptions[range]}
       </MenuItem>
     ));

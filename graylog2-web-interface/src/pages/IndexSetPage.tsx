@@ -52,8 +52,7 @@ const ElasticsearchUnavailableInformation = () => (
             <span>
               <Icon name="warning" /> Indices overview unavailable
             </span>
-          }
-        >
+          }>
           <p>
             We could not get the indices overview information. This usually means there was a problem connecting to
             Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from Graylog</strong>.
@@ -168,8 +167,7 @@ class IndexSetPage extends React.Component<Props, State> {
             <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
             <IndicesConfigurationDropdown indexSetId={indexSetId} />
           </ButtonToolbar>
-        }
-      >
+        }>
         <span>
           This is an overview of all indices (message stores) in this index set Graylog is currently taking in account
           for searches and analysis.

@@ -224,8 +224,7 @@ class DataTable extends React.Component<
             filterBy={filterBy}
             filterSuggestions={filterSuggestions}
             filterKeys={filterKeys}
-            onDataFiltered={this.filterDataRows}
-          >
+            onDataFiltered={this.filterDataRows}>
             {children}
           </Filter>
         )}

@@ -133,8 +133,7 @@ const RefreshControls = ({
       <Button
         onClick={toggleEnable}
         title={refreshConfig?.enabled ? 'Pause Refresh' : 'Start Refresh'}
-        disabled={disable || isLoadingMinimumInterval || !defaultInterval}
-      >
+        disabled={disable || isLoadingMinimumInterval || !defaultInterval}>
         <Icon name={refreshConfig?.enabled ? 'pause' : 'update'} />
       </Button>
 
@@ -148,8 +147,7 @@ const RefreshControls = ({
               <MenuItem
                 key={`RefreshControls-${label}`}
                 onClick={() => selectInterval(interval)}
-                disabled={isBelowMinimum}
-              >
+                disabled={isBelowMinimum}>
                 {label}
                 {isBelowMinimum && (
                   <HoverForHelp displayLeftMargin>

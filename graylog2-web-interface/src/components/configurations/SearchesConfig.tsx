@@ -375,8 +375,7 @@ const SearchesConfig = () => {
           title="Update Search Configuration"
           onSubmitForm={saveConfig}
           onCancel={handleModalCancel}
-          submitButtonText="Update configuration"
-        >
+          submitButtonText="Update configuration">
           <fieldset>
             <label htmlFor="query-limit-checkbox">Query Time Range Limit</label>
             <Input
@@ -479,8 +478,7 @@ const SearchesConfig = () => {
               label="Default Auto-Refresh Option"
               id="default-auto-refresh-option"
               required
-              help="Select the interval which is used when auto-refresh is started without explicitly selecting one"
-            >
+              help="Select the interval which is used when auto-refresh is started without explicitly selecting one">
               <Select
                 placeholder="Select the default interval"
                 clearable={false}

@@ -135,8 +135,7 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange }: EditWidgetCo
       enableReinitialize
       validateOnChange
       validateOnMount
-      onSubmit={_onSubmit}
-    >
+      onSubmit={_onSubmit}>
       {({ setValues, values }) => {
         const onChangeType = (newMode: VisualizationType) => {
           if (newMode !== values.mode) {

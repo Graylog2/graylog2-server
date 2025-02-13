@@ -90,8 +90,7 @@ class ContentPackUploadControls extends React.Component {
           active={isOpen}
           id="upload-content-pack-button"
           bsStyle="info"
-          onClick={this._openModal}
-        >
+          onClick={this._openModal}>
           Upload
         </Button>
         <BootstrapModalForm
@@ -99,8 +98,7 @@ class ContentPackUploadControls extends React.Component {
           show={isOpen}
           onSubmitForm={this._save}
           title="Upload Content Pack"
-          submitButtonText="Upload"
-        >
+          submitButtonText="Upload">
           <Input
             ref={(node) => {
               this.uploadInput = node;

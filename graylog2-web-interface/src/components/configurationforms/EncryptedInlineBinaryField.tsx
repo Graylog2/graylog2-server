@@ -108,8 +108,7 @@ const EncryptedInlineBinaryField = ({
           onClick={() => {
             setFileName(undefined);
             onChange(title, '');
-          }}
-        >
+          }}>
           Remove
         </Button>
       );
@@ -157,8 +156,7 @@ const EncryptedInlineBinaryField = ({
             {removeButton()}
             {undoResetButton()}
           </>
-        }
-      >
+        }>
         <FileContent>{fileName}</FileContent>
       </Input>
     ) : (

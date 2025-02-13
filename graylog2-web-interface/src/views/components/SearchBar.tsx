@@ -226,8 +226,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
               onSubmit={_onSubmit}
               validateQueryString={(values) =>
                 _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
-              }
-            >
+              }>
               {({
                 dirty,
                 errors,

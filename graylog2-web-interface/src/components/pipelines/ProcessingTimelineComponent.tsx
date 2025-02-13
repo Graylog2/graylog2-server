@@ -227,8 +227,7 @@ const ProcessingTimelineComponent = () => {
               disabled={!isPermitted(currentUser.permissions, 'pipeline:delete')}
               bsStyle="danger"
               bsSize="xsmall"
-              onClick={_deletePipeline(pipeline)}
-            >
+              onClick={_deletePipeline(pipeline)}>
               Delete
             </Button>
           </ButtonToolbar>

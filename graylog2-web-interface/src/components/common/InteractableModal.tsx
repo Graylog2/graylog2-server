@@ -235,8 +235,7 @@ const InteractableModal = ({
         position={dragPosition}
         size={resizeSize}
         className={className}
-        bounds="window"
-      >
+        bounds="window">
         <Header ref={dragHandleRef}>
           <Title>
             <DragBars name="drag_indicator" />

@@ -104,8 +104,7 @@ const UserSyncStep = ({
       onSubmit={onSubmit}
       validateOnBlur={false}
       validateOnChange={false}
-      validateOnMount={validateOnMount}
-    >
+      validateOnMount={validateOnMount}>
       {({ isSubmitting, validateForm }) => (
         <Form className="form form-horizontal">
           <FormikFormGroup
@@ -145,8 +144,7 @@ const UserSyncStep = ({
                   id="email-attributes-input"
                   label="Email Attributes"
                   labelClassName="col-sm-3"
-                  wrapperClassName="col-sm-9"
-                >
+                  wrapperClassName="col-sm-9">
                   <StyledInputList
                     id="userEmailAttributes"
                     placeholder="Email Attributes"
@@ -198,8 +196,7 @@ const UserSyncStep = ({
                 id="default-roles-select"
                 label="Default Roles"
                 labelClassName="col-sm-3"
-                wrapperClassName="col-sm-9"
-              >
+                wrapperClassName="col-sm-9">
                 <Select
                   multi
                   onBlur={onBlur}
@@ -236,8 +233,7 @@ const UserSyncStep = ({
                   app_action_value: 'groupsync-button',
                 });
               }}
-              type="submit"
-            >
+              type="submit">
               Next: Group Synchronization
             </Button>
           </ButtonToolbar>

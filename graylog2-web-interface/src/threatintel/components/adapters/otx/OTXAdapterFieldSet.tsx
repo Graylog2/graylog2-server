@@ -75,8 +75,7 @@ class OTXAdapterFieldSet extends React.Component<
           help={this.props.validationMessage('indicator', 'The OTX indicator type that should be used for lookups.')}
           bsStyle={this.props.validationState('indicator')}
           labelClassName="col-sm-3"
-          wrapperClassName="col-sm-9"
-        >
+          wrapperClassName="col-sm-9">
           <Select
             placeholder="Select indicator"
             clearable={false}

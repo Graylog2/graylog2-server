@@ -100,8 +100,7 @@ const PublicNotifications = ({ readFromConfig = false }: Props) => {
           bsStyle={variant}
           onDismiss={isDismissible ? _dismiss : undefined}
           key={title}
-          title={!hiddenTitle && title}
-        >
+          title={!hiddenTitle && title}>
           <FlexWrap>
             <ShortContent>{shortMessage}</ShortContent>
             {longMessage && (

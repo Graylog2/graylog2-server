@@ -41,8 +41,7 @@ const WrappedHeatMap = (props: React.ComponentProps<typeof HeatmapVisualization>
       value={{
         all: Immutable.List(),
         queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }),
-      }}
-    >
+      }}>
       <HeatmapVisualization {...props} />
     </FieldTypesContext.Provider>
   </TestStoreProvider>

@@ -98,8 +98,7 @@ const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
           show
           title={`Switch matching type to ${matchingType === 'AND' ? 'ALL' : 'ANY'}`}
           onConfirm={() => handleTypeChange(matchingType)}
-          onCancel={() => setMatchingType(undefined)}
-        >
+          onCancel={() => setMatchingType(undefined)}>
           You are about to change how rules are applied to this stream, do you want to continue? Changes will take
           effect immediately.
         </ConfirmDialog>

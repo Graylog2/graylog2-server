@@ -112,8 +112,7 @@ class Input extends React.Component<
         this.input = ref;
       }}
       componentClass={componentClass}
-      {...controlProps}
-    >
+      {...controlProps}>
       {children}
     </FormControl>
   );
@@ -171,8 +170,7 @@ class Input extends React.Component<
                 inputRef={(ref) => {
                   this.input = ref;
                 }}
-                {...controlProps}
-              >
+                {...controlProps}>
                 {label}
               </Checkbox>
               {buttonAfter && <InputGroup.Button>{buttonAfter}</InputGroup.Button>}
@@ -182,8 +180,7 @@ class Input extends React.Component<
               inputRef={(ref) => {
                 this.input = ref;
               }}
-              {...controlProps}
-            >
+              {...controlProps}>
               {label}
             </Checkbox>
           )}
@@ -203,8 +200,7 @@ class Input extends React.Component<
             inputRef={(ref) => {
               this.input = ref;
             }}
-            {...controlProps}
-          >
+            {...controlProps}>
             {label}
           </Radio>
           <InputDescription error={error} help={help} className={inputDescClassName} />

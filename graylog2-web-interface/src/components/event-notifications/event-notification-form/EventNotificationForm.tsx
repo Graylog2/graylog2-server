@@ -212,16 +212,14 @@ class EventNotificationForm extends React.Component<
                     bsStyle="info"
                     bsSize="small"
                     disabled={testResult.isLoading}
-                    onClick={this.handleTestTrigger}
-                  >
+                    onClick={this.handleTestTrigger}>
                     {testButtonText}
                   </Button>
                 </FormControl.Static>
                 {testResult.message && (
                   <Alert
                     bsStyle={testResult.error ? 'danger' : 'success'}
-                    title={testResult.error ? 'Error: ' : 'Success: '}
-                  >
+                    title={testResult.error ? 'Error: ' : 'Success: '}>
                     {testResult.message}
                   </Alert>
                 )}

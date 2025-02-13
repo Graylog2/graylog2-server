@@ -85,8 +85,7 @@ const ActionsCell = ({ roleId, roleName, readOnly }: Props) => {
                 bsSize="xs"
                 title={`Delete role ${roleName}`}
                 onClick={() => _deleteRole(roleId, roleName, setDeleting)}
-                type="button"
-              >
+                type="button">
                 {deleting ? <Spinner text="Deleting" delay={0} /> : 'Delete'}
               </Button>
             </>

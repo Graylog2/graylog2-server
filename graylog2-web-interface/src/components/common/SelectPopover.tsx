@@ -195,8 +195,7 @@ class SelectPopover extends React.Component<
                 key={item}
                 onClick={disabled ? () => {} : this.handleItemSelection(item)}
                 active={selectedItems.includes(item)}
-                disabled={disabled}
-              >
+                disabled={disabled}>
                 {itemFormatter(item)}
               </ListGroupItem>
             ))}
@@ -214,8 +213,7 @@ class SelectPopover extends React.Component<
         placement={placement}
         overlay={popover}
         title={title}
-        rootClose
-      >
+        rootClose>
         {triggerNode}
       </OverlayTrigger>
     );

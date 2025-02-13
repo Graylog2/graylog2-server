@@ -93,8 +93,7 @@ const SectionComponent = ({
                 bsStyle={opened ? 'primary' : 'default'}
                 onClick={toggle}
                 data-testid="collapseButton"
-                disabled={disableCollapseButton}
-              >
+                disabled={disableCollapseButton}>
                 <Icon size="xs" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
               </Button>
             )}
