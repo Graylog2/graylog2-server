@@ -22,7 +22,6 @@ import { Modal } from 'components/bootstrap';
 import { Wizard as CommonWizard } from 'components/common';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
-import { getStepConfigOrData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 
 import InputSetupWizardStepsProvider from './contexts/InputSetupWizardStepsProvider';
 import type { WizardData } from './types';
@@ -35,23 +34,10 @@ type Props = {
 }
 
 const Wizard = ({ show, input, onClose }: Props) => {
-  const { activeStep, setActiveStep, orderedSteps, setOrderedSteps, stepsConfig, setStepsConfig, setWizardData, wizardData } = useInputSetupWizard();
+  const { activeStep, setActiveStep, orderedSteps, setOrderedSteps, setWizardData, wizardData } = useInputSetupWizard();
   const EnterpriseWizard = PluginStore.exports('inputSetupWizard').find(plugin => !!plugin.EnterpriseInputSetupWizard)?.EnterpriseInputSetupWizard;
 
-  const initialStepsConfig = {
-    [INPUT_WIZARD_STEPS.SETUP_ROUTING]: {
-      enabled: true,
-    },
-    [INPUT_WIZARD_STEPS.START_INPUT]: {
-      enabled: true,
-    },
-    [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
-      enabled: true,
-    },
-  };
-
   useEffect(() => {
-    setStepsConfig(initialStepsConfig);
     setWizardData({ ...wizardData, input }); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Initial setup: intentionally ommiting dependencies to prevent from unneccesary rerenders
 
@@ -66,7 +52,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
         component: (
           <SetupRoutingStep />
         ),
-        disabled: !getStepConfigOrData(stepsConfig, INPUT_WIZARD_STEPS.SETUP_ROUTING, 'enabled'),
+        disabled: true,
       },
       [INPUT_WIZARD_STEPS.START_INPUT]: {
         key: INPUT_WIZARD_STEPS.START_INPUT,
@@ -78,7 +64,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
         component: (
           <StartInputStep />
         ),
-        disabled: !getStepConfigOrData(stepsConfig, INPUT_WIZARD_STEPS.START_INPUT, 'enabled'),
+        disabled: true,
       },
       [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
         key: INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
@@ -90,10 +76,10 @@ const Wizard = ({ show, input, onClose }: Props) => {
         component: (
           <InputDiagnosisStep onClose={() => onClose()} />
         ),
-        disabled: !getStepConfigOrData(stepsConfig, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, 'enabled'),
+        disabled: true,
       },
     }
-  ), [onClose, stepsConfig]);
+  ), [onClose]);
 
   const setInitialSteps = useCallback(() => {
     setOrderedSteps([INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.START_INPUT, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]);
