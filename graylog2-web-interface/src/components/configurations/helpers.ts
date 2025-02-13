@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { Processor, ProcessorConfig } from "components/configurations/message-processors/Types";
+import type { Processor, ProcessorConfig } from "components/configurations/message-processors/Types";
 
 const getConfig = (configType, configuration) => configuration?.[configType] ?? null;
 
