@@ -18,6 +18,8 @@ package org.graylog.plugins.otel.input.codec;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.ArrayValue;
 import io.opentelemetry.proto.common.v1.InstrumentationScope;
@@ -27,7 +29,6 @@ import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.semconv.incubating.HostIncubatingAttributes;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import jakarta.inject.Inject;
 import org.apache.commons.codec.binary.Hex;
 import org.graylog.plugins.otel.input.Journal;
 import org.graylog2.plugin.Message;
@@ -55,39 +56,55 @@ public class LogsCodec {
     private static final Logger LOG = getLogger(LogsCodec.class);
     private final MessageFactory messageFactory;
     private final ObjectMapper objectMapper;
+    private final boolean addOtelPrefix;
 
-    @Inject
-    public LogsCodec(MessageFactory messageFactory, ObjectMapper objectMapper) {
+    public interface Factory {
+        LogsCodec create(boolean addOtelPrefix);
+    }
+
+    @AssistedInject
+    public LogsCodec(MessageFactory messageFactory, ObjectMapper objectMapper, @Assisted boolean addOtelPrefix) {
         this.messageFactory = messageFactory;
         this.objectMapper = objectMapper;
+        this.addOtelPrefix = addOtelPrefix;
     }
 
     public Optional<Message> decode(@Nonnull Journal.Log log, DateTime receiveTimestamp, ResolvableInetSocketAddress remoteAddress) {
         final var logRecord = log.getLogRecord();
 
         final String body = asString("body", logRecord.getBody()).orElse("");
-        final Message message = messageFactory.createMessage(body, source(log, remoteAddress), timestamp(logRecord).orElse(receiveTimestamp));
+        final String source = source(log, remoteAddress);
+        final DateTime timestamp = timestamp(logRecord).orElse(receiveTimestamp);
 
-        message.addField("trace_id", Hex.encodeHexString(logRecord.getTraceId().toByteArray()));
-        message.addField("span_id", Hex.encodeHexString(logRecord.getSpanId().toByteArray()));
-        message.addField("trace_flags", logRecord.getFlags());
-        message.addField("severity_text", logRecord.getSeverityText());
-        message.addField("severity_number", logRecord.getSeverityNumberValue());
+        final Message message = messageFactory.createMessage(body, source, timestamp);
+
+        message.addField(prefixed("trace_id"), Hex.encodeHexString(logRecord.getTraceId().toByteArray()));
+        message.addField(prefixed("span_id"), Hex.encodeHexString(logRecord.getSpanId().toByteArray()));
+        message.addField(prefixed("trace_flags"), logRecord.getFlags());
+        message.addField(prefixed("severity_text"), logRecord.getSeverityText());
+        message.addField(prefixed("severity_number"), logRecord.getSeverityNumberValue());
 
         if (logRecord.getTimeUnixNano() > 0) {
-            message.addField("time_unix_nano", dateTime(logRecord.getTimeUnixNano()));
+            message.addField(prefixed("time_unix_nano"), logRecord.getTimeUnixNano());
         }
         if (logRecord.getObservedTimeUnixNano() > 0) {
-            message.addField("observed_time_unix_nano", dateTime(logRecord.getObservedTimeUnixNano()));
+            message.addField(prefixed("observed_time_unix_nano"), logRecord.getObservedTimeUnixNano());
         }
 
         Stream.of(
-                convertKvList("resource_attributes", log.getResource().getAttributesList()),
-                convertKvList("attributes", logRecord.getAttributesList()),
+                convertKvList(prefixed("resource_attributes"), log.getResource().getAttributesList()),
+                convertKvList(prefixed("attributes"), logRecord.getAttributesList()),
                 scope(log.getScope())
         ).flatMap(s -> s).forEach(field -> message.addField(field.getKey().replace('.', '_'), field.getValue()));
 
         return Optional.of(message);
+    }
+
+    private String prefixed(String fieldName) {
+        if (addOtelPrefix) {
+            return "otel_" + fieldName;
+        }
+        return fieldName;
     }
 
     private Optional<DateTime> timestamp(LogRecord logRecord) {
@@ -115,9 +132,9 @@ public class LogsCodec {
 
     private Stream<Map.Entry<String, ?>> scope(InstrumentationScope scope) {
         return Stream.concat(Stream.of(
-                        Map.entry("scope_name", scope.getName()),
-                        Map.entry("scope_version", scope.getVersion())),
-                convertKvList("scope_attributes", scope.getAttributesList())
+                        Map.entry(prefixed("scope_name"), scope.getName()),
+                        Map.entry(prefixed("scope_version"), scope.getVersion())),
+                convertKvList(prefixed("scope_attributes"), scope.getAttributesList())
         );
     }
 

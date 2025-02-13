@@ -18,6 +18,7 @@ package org.graylog.plugins.otel.bindings;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.otel.input.OpenTelemetryGrpcInput;
+import org.graylog.plugins.otel.input.codec.LogsCodec;
 import org.graylog.plugins.otel.input.codec.OpenTelemetryCodec;
 import org.graylog.plugins.otel.input.grpc.LogsService;
 import org.graylog.plugins.otel.input.grpc.OpenTelemetryGrpcTransport;
@@ -29,6 +30,8 @@ public class OpenTelemetryModule extends PluginModule {
         addMessageInput(OpenTelemetryGrpcInput.class);
         addTransport(OpenTelemetryGrpcTransport.NAME, OpenTelemetryGrpcTransport.class);
         addCodec(OpenTelemetryCodec.NAME, OpenTelemetryCodec.class);
+
+        install(new FactoryModuleBuilder().build(LogsCodec.Factory.class));
         install(new FactoryModuleBuilder().build(LogsService.Factory.class));
     }
 }

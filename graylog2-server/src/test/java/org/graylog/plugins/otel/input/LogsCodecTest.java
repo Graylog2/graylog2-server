@@ -22,6 +22,7 @@ import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import org.graylog.plugins.otel.input.codec.LogsCodec;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -37,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,7 +54,7 @@ class LogsCodecTest {
 
     @BeforeEach
     void setUp() {
-        codec = new LogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get());
+        codec = new LogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get(), false);
     }
 
     // Uses a modified official example that was copied from
@@ -69,8 +71,8 @@ class LogsCodecTest {
         final Map<String, Object> expected = new HashMap<>();
         expected.put("message", "Example log record");
         expected.put("timestamp", DateTime.parse("2018-12-13T14:51:00.300Z"));
-        expected.put("time_unix_nano", DateTime.parse("2018-12-13T14:51:00.300Z"));
-        expected.put("observed_time_unix_nano", DateTime.parse("2018-12-13T14:51:00.300Z"));
+        expected.put("time_unix_nano", 1544712660300000000L);
+        expected.put("observed_time_unix_nano", 1544712660300000000L);
         expected.put("severity_number", 10);
         expected.put("trace_id", "5b8efff798038103d269b633813fc60c");
         expected.put("span_id", "eee19b7ec3c1b174");
@@ -88,6 +90,20 @@ class LogsCodecTest {
 
         assertThat(message.getFields()).containsAllEntriesOf(expected);
         assertThat(message.getSource()).isEqualTo("127.0.0.1:12345");
+    }
+
+    @Test
+    void prefixesFieldNames() throws IOException {
+        final var prefixingCodec = new LogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get(), true);
+        final var decoded = prefixingCodec.decode(parseFixture("logs.json"), new DateTime(DateTimeZone.UTC), remoteAddress);
+        assertThat(decoded).isNotEmpty();
+
+        final var coreFields = Set.of(Message.FIELD_ID, Message.FIELD_MESSAGE, Message.FIELD_SOURCE, Message.FIELD_TIMESTAMP);
+
+        assertThat(decoded.get().getFieldNames())
+                .containsAll(coreFields)
+                .filteredOn(name -> !coreFields.contains(name))
+                .allSatisfy(name -> assertThat(name).startsWith("otel_"));
     }
 
     @Test
