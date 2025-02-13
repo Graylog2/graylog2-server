@@ -78,10 +78,17 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
                     .properties(properties(searchRoleEnabled))
                     .keystoreItems(keystoreItems())
                     .build();
+        } else if (searchRoleExplicitlyConfigured() && !snapshotsAreEnabled()) {
+            throw new OpensearchConfigurationException("Your configuration contains the search node role in node_roles but there is no" +
+                    "snapshots repository configured. Please remove the role or provide path_repo or S3 repository credentials.");
         } else {
             LOG.info("Opensearch snapshots not configured, skipping search role and cache configuration.");
             return DatanodeConfigurationPart.builder().build();
         }
+    }
+
+    private boolean searchRoleExplicitlyConfigured() {
+        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(SEARCH_NODE_ROLE);
     }
 
     private boolean searchRoleEnabled() {
