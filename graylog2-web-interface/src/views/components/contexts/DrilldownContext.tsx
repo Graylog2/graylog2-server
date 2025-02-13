@@ -21,10 +21,10 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 
 export type Drilldown = {
-  query: QueryString,
-  streams: Array<string>,
-  streamCategories: Array<string>,
-  timerange: TimeRange,
+  query: QueryString;
+  streams: Array<string>;
+  streamCategories: Array<string>;
+  timerange: TimeRange;
 };
 
 const defaultValue: Drilldown = {

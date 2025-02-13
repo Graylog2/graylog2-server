@@ -76,12 +76,16 @@ describe('ActionMenuItem', () => {
       help: () => ({ title: 'The help title', description: 'The help description' }),
     };
 
-    render(<ActionMenuItem action={action}
-                           handlerArgs={handlerArgs}
-                           onMenuToggle={() => {}}
-                           overflowingComponents={{ foo: <span /> }}
-                           setOverflowingComponents={() => {}}
-                           type="value" />);
+    render(
+      <ActionMenuItem
+        action={action}
+        handlerArgs={handlerArgs}
+        onMenuToggle={() => {}}
+        overflowingComponents={{ foo: <span /> }}
+        setOverflowingComponents={() => {}}
+        type="value"
+      />,
+    );
 
     expect(screen.getByTestId('menu-item-help')).toBeInTheDocument();
   });
@@ -93,12 +97,16 @@ describe('ActionMenuItem', () => {
       help: () => ({ title: 'The help title', description: 'The help description' }),
     };
 
-    render(<ActionMenuItem action={action}
-                           handlerArgs={handlerArgs}
-                           onMenuToggle={() => {}}
-                           overflowingComponents={{ foo: <span /> }}
-                           setOverflowingComponents={() => {}}
-                           type="value" />);
+    render(
+      <ActionMenuItem
+        action={action}
+        handlerArgs={handlerArgs}
+        onMenuToggle={() => {}}
+        overflowingComponents={{ foo: <span /> }}
+        setOverflowingComponents={() => {}}
+        type="value"
+      />,
+    );
 
     expect(screen.getByTestId('menu-item-help')).toBeInTheDocument();
   });

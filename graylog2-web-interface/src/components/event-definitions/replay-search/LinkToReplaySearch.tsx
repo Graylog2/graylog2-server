@@ -38,7 +38,8 @@ const LinkToReplaySearch = ({ isEvent = false, id = undefined, onClick = undefin
     <ReplaySearchButtonComponent
       searchLink={searchLink}
       onClick={onClick}
-      component={isMenuitem ? MenuItem : undefined}>
+      component={isMenuitem ? MenuItem : undefined}
+    >
       Replay search
     </ReplaySearchButtonComponent>
   );

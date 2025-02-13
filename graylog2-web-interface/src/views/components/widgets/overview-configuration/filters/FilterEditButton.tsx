@@ -23,17 +23,26 @@ import { IconButton } from 'components/common';
 import type { FilterComponent } from './types';
 
 type Props = {
-  column: string,
-  columnTitle: (column: string) => string,
-  containerWidth: number
-  filterComponent: FilterComponent
-  onDelete: () => void,
-  onEdit: (value: string) => void,
-  selectedValues: Array<string>,
-  value: string
-}
+  column: string;
+  columnTitle: (column: string) => string;
+  containerWidth: number;
+  filterComponent: FilterComponent;
+  onDelete: () => void;
+  onEdit: (value: string) => void;
+  selectedValues: Array<string>;
+  value: string;
+};
 
-const FilterEditButton = ({ filterComponent, column, value, columnTitle, onEdit, selectedValues, containerWidth, onDelete }: Props) => {
+const FilterEditButton = ({
+  filterComponent,
+  column,
+  value,
+  columnTitle,
+  onEdit,
+  selectedValues,
+  containerWidth,
+  onDelete,
+}: Props) => {
   const [open, setOpen] = useState(false);
   const [editValue, setEditValue] = React.useState<string>(value);
 
@@ -49,7 +58,7 @@ const FilterEditButton = ({ filterComponent, column, value, columnTitle, onEdit,
   };
 
   const onChange = (newValue: unknown, shouldSubmit = true) => {
-    const normalizedValue = filterComponent?.valueForConfig?.(newValue) ?? newValue as string;
+    const normalizedValue = filterComponent?.valueForConfig?.(newValue) ?? (newValue as string);
 
     setEditValue(normalizedValue);
 
@@ -71,19 +80,23 @@ const FilterEditButton = ({ filterComponent, column, value, columnTitle, onEdit,
   }
 
   return (
-    <Menu position="bottom-end"
-          withinPortal
-          opened={open}
-          width={containerWidth}
-          offset={{ alignmentAxis: -25 }}
-          onClose={onClose}>
+    <Menu
+      position="bottom-end"
+      withinPortal
+      opened={open}
+      width={containerWidth}
+      offset={{ alignmentAxis: -25 }}
+      onClose={onClose}
+    >
       <Menu.Target>
-        <IconButton name="edit"
-                    title={`Edit ${columnTitle(column)} filter`}
-                    onClick={() => setOpen(true)} />
+        <IconButton name="edit" title={`Edit ${columnTitle(column)} filter`} onClick={() => setOpen(true)} />
       </Menu.Target>
       <Menu.Dropdown>
-        {filterComponent.configuration(selectedValues, filterComponent.valueFromConfig?.(editValue) ?? editValue, onChange)}
+        {filterComponent.configuration(
+          selectedValues,
+          filterComponent.valueFromConfig?.(editValue) ?? editValue,
+          onChange,
+        )}
       </Menu.Dropdown>
     </Menu>
   );

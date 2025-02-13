@@ -49,29 +49,35 @@ const ServiceAccountFormGroup = () => {
 
         return (
           <>
-            <Input id="service-account-controls"
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9"
-                   label="Service Account">
-              <Input label="User is a Service Account"
-                     id="service_account"
-                     type="checkbox"
-                     wrapperClassName="col-sm-9"
-                     name="service_account"
-                     checked={value ?? false}
-                     help="When checked, the user becomes a Service Account and will be unable to log into the web interface and edit their settings. (e.g., API tokens)"
-                     onChange={(newValue) => onValueChange(newValue)} />
+            <Input
+              id="service-account-controls"
+              labelClassName="col-sm-3"
+              wrapperClassName="col-sm-9"
+              label="Service Account"
+            >
+              <Input
+                label="User is a Service Account"
+                id="service_account"
+                type="checkbox"
+                wrapperClassName="col-sm-9"
+                name="service_account"
+                checked={value ?? false}
+                help="When checked, the user becomes a Service Account and will be unable to log into the web interface and edit their settings. (e.g., API tokens)"
+                onChange={(newValue) => onValueChange(newValue)}
+              />
             </Input>
-            <BootstrapModalConfirm showModal={showModal}
-                                   title="Are you sure?"
-                                   onConfirm={handleCheckServiceAccount}
-                                   onCancel={handleCancel}>
-              Changing this user to a Service Account prevents the user from logging into the web interface and editing their settings. (e.g., API tokens) Do you wish to proceed?
+            <BootstrapModalConfirm
+              showModal={showModal}
+              title="Are you sure?"
+              onConfirm={handleCheckServiceAccount}
+              onCancel={handleCancel}
+            >
+              Changing this user to a Service Account prevents the user from logging into the web interface and editing
+              their settings. (e.g., API tokens) Do you wish to proceed?
             </BootstrapModalConfirm>
           </>
         );
       }}
-
     </Field>
   );
 };

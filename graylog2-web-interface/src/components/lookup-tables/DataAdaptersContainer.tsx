@@ -18,11 +18,14 @@ import * as React from 'react';
 import { useEffect } from 'react';
 
 import { Spinner } from 'components/common';
-import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import {
+  LookupTableDataAdaptersActions,
+  LookupTableDataAdaptersStore,
+} from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import { useStore } from 'stores/connect';
 
 type Props = {
-  children: React.ReactElement[],
+  children: React.ReactElement[];
 };
 
 const DataAdaptersContainer = ({ children }: Props) => {
@@ -37,9 +40,9 @@ const DataAdaptersContainer = ({ children }: Props) => {
     return <Spinner />;
   }
 
-  const childrenWithProps = React.Children.map(children,
-    (child) => React.cloneElement(child,
-      { dataAdapters, pagination }));
+  const childrenWithProps = React.Children.map(children, (child) =>
+    React.cloneElement(child, { dataAdapters, pagination }),
+  );
 
   return <div>{childrenWithProps}</div>;
 };

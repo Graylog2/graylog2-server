@@ -51,9 +51,7 @@
           "config": {
             "column_pivots": [
               {
-                "fields": [
-                  "anomaly_detector_name"
-                ],
+                "fields": ["anomaly_detector_name"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -63,9 +61,7 @@
             "rollup": false,
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -110,9 +106,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "user_name"
-                ],
+                "fields": ["user_name"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -152,9 +146,7 @@
           "config": {
             "column_pivots": [
               {
-                "fields": [
-                  "anomaly_detector_name"
-                ],
+                "fields": ["anomaly_detector_name"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -164,9 +156,7 @@
             "rollup": false,
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -245,9 +235,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "anomaly_detector_name"
-                ],
+                "fields": ["anomaly_detector_name"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -331,9 +319,7 @@
             "rollup": true,
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -376,9 +362,7 @@
           "config": {
             "column_pivots": [
               {
-                "fields": [
-                  "user_name"
-                ],
+                "fields": ["user_name"],
                 "type": "values",
                 "config": {
                   "limit": 0
@@ -388,9 +372,7 @@
             "rollup": false,
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -501,36 +483,24 @@
           "1328c9b4-73fd-43d4-a64c-3c82706c7d90",
           "eb43d78b-e874-494c-9299-4aff97bffc13"
         ],
-        "f73a902f-a154-4b2d-8a11-e6b98a391a9f": [
-          "1fa3fbfe-0d41-42d1-86b1-d666cdcd6273"
-        ],
+        "f73a902f-a154-4b2d-8a11-e6b98a391a9f": ["1fa3fbfe-0d41-42d1-86b1-d666cdcd6273"],
         "59a1729d-2fe3-4687-a3b8-5c81d84a9bb1": [
           "1a43c579-b833-425c-aed4-fc68b7bbb4c5",
           "d79aaf59-307c-458f-81ac-1b70ceeb20c7"
         ],
-        "221246ac-a8ec-46a1-840d-769f25d73a3b": [
-          "12aad469-7450-4615-becb-f8b85734c77b"
-        ],
-        "71069faa-433b-4d2a-b908-5f5585a1e837": [
-          "773fee94-65f4-49d4-9fc3-43c26f51eee7"
-        ],
-        "4b6e4eac-539c-4eff-9d44-40b61e079a2f": [
-          "21f587b5-01dc-41e4-8e2a-7e8b81c3cc29"
-        ],
+        "221246ac-a8ec-46a1-840d-769f25d73a3b": ["12aad469-7450-4615-becb-f8b85734c77b"],
+        "71069faa-433b-4d2a-b908-5f5585a1e837": ["773fee94-65f4-49d4-9fc3-43c26f51eee7"],
+        "4b6e4eac-539c-4eff-9d44-40b61e079a2f": ["21f587b5-01dc-41e4-8e2a-7e8b81c3cc29"],
         "aa1c8d2f-e385-40eb-94de-a7eed9c07984": [
           "b25e0d1f-2784-4adc-ade9-63ad9d4ad227",
           "fed6c1cd-f163-4477-8d90-197fb9e335a9"
         ],
-        "10494c16-95dd-4613-adc3-9bc0ba9a5c26": [
-          "0f79f847-f210-4333-86c2-71e58ee8230d"
-        ],
+        "10494c16-95dd-4613-adc3-9bc0ba9a5c26": ["0f79f847-f210-4333-86c2-71e58ee8230d"],
         "fd47d65f-5c84-4aca-b2a2-70877dbf84e9": [
           "12b9aec3-574d-445a-9048-13c66cdbd4fd",
           "f2bd8935-d87d-4bfe-a342-a938c55f37db"
         ],
-        "c85c1315-69ff-4467-8b87-97aa238b1fcf": [
-          "d78463c2-70c3-449d-bc54-9f9c751b8541"
-        ]
+        "c85c1315-69ff-4467-8b87-97aa238b1fcf": ["d78463c2-70c3-449d-bc54-9f9c751b8541"]
       },
       "positions": {
         "81fc0ad4-3cdb-4245-b6fd-e28df25091e7": {

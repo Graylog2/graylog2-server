@@ -27,16 +27,18 @@ import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation
 const UsersOverviewPage = () => (
   <DocumentTitle title="Users Overview">
     <UsersPageNavigation />
-    <PageHeader title="Users Overview"
-                actions={(
-                  <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-                    <Button bsStyle="success">Create user</Button>
-                  </LinkContainer>
-                )}
-                documentationLink={{
-                  title: 'Permissions documentation',
-                  path: DocsHelper.PAGES.USERS_ROLES,
-                }}>
+    <PageHeader
+      title="Users Overview"
+      actions={
+        <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
+          <Button bsStyle="success">Create user</Button>
+        </LinkContainer>
+      }
+      documentationLink={{
+        title: 'Permissions documentation',
+        path: DocsHelper.PAGES.USERS_ROLES,
+      }}
+    >
       <span>Overview of Graylog&apos;s registered users.</span>
     </PageHeader>
 

@@ -38,20 +38,17 @@ const checked = {
   streams: true,
 };
 const onClose = jest.fn();
-const renderCreateDefinitionModal = ({
-  modalData = modalDataResult,
-  mappedData = mappedDataResult,
-}) => render(
-  <CreateEventDefinitionModal onClose={onClose} modalData={modalData} mappedData={mappedData} show />,
-);
+const renderCreateDefinitionModal = ({ modalData = modalDataResult, mappedData = mappedDataResult }) =>
+  render(<CreateEventDefinitionModal onClose={onClose} modalData={modalData} mappedData={mappedData} show />);
 
-const renderWithAllChecked = () => renderCreateDefinitionModal({
-  mappedData: {
-    ...mappedDataResult,
-    rowValuePath: 'action:login',
-    columnValuePath: 'action:login',
-  },
-});
+const renderWithAllChecked = () =>
+  renderCreateDefinitionModal({
+    mappedData: {
+      ...mappedDataResult,
+      rowValuePath: 'action:login',
+      columnValuePath: 'action:login',
+    },
+  });
 const mockedDispatch = jest.fn();
 
 describe('CreateEventDefinitionModal', () => {

@@ -23,9 +23,12 @@ type SystemMessageProps = {
   message: any;
 };
 
-class SystemMessage extends React.Component<SystemMessageProps, {
-  [key: string]: any;
-}> {
+class SystemMessage extends React.Component<
+  SystemMessageProps,
+  {
+    [key: string]: any;
+  }
+> {
   render() {
     const { message } = this.props;
 

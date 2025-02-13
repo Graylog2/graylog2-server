@@ -23,28 +23,24 @@ import type { Stream } from 'logic/streams/types';
 import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 
 export type RoutingParams = {
-  stream_id?: string,
-  input_id: string,
-}
+  stream_id?: string;
+  input_id: string;
+};
 
-export type StreamConfiguration = Pick<Stream,
-  'index_set_id' |
-  'title' |
-  'remove_matches_from_default_stream'
-> & Partial<Pick<Stream, 'description'>>
+export type StreamConfiguration = Pick<Stream, 'index_set_id' | 'title' | 'remove_matches_from_default_stream'> &
+  Partial<Pick<Stream, 'description'>>;
 
-type PipelineConfiguration = Pick<PipelineType,
-  'title' |
-  'description'
-> & Partial<Pick<PipelineType, 'source' | 'stages'>>;
+type PipelineConfiguration = Pick<PipelineType, 'title' | 'description'> &
+  Partial<Pick<PipelineType, 'source' | 'stages'>>;
 
-const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> => Streams.create({
-  matching_type: undefined,
-  rules: undefined,
-  content_pack: undefined,
-  description: undefined,
-  ...stream,
-});
+const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> =>
+  Streams.create({
+    matching_type: undefined,
+    rules: undefined,
+    content_pack: undefined,
+    description: undefined,
+    ...stream,
+  });
 
 const startStream = async (streamId) => Streams.resume(streamId);
 
@@ -64,7 +60,8 @@ const createPipeline = (pipeline: PipelineConfiguration): Promise<PipelineType> 
   });
 };
 
-const updateRouting = async (params: RoutingParams): Promise <{rule_id: string}> => PipelinesPipelines.routing({ remove_from_default: undefined, stream_id: undefined, ...params });
+const updateRouting = async (params: RoutingParams): Promise<{ rule_id: string }> =>
+  PipelinesPipelines.routing({ remove_from_default: undefined, stream_id: undefined, ...params });
 
 const deleteStream = async (streamId: string) => Streams.remove(streamId);
 
@@ -81,7 +78,7 @@ const usePipelineRoutingMutation = () => {
   const deletePipelineMutation = useMutation(deletePipeline);
   const deleteRoutingRuleMutation = useMutation(deleteRoutingRule);
 
-  return ({
+  return {
     createStreamMutation,
     startStreamMutation,
     createPipelineMutation,
@@ -89,7 +86,7 @@ const usePipelineRoutingMutation = () => {
     deleteStreamMutation,
     deletePipelineMutation,
     deleteRoutingRuleMutation,
-  });
+  };
 };
 
 export default usePipelineRoutingMutation;

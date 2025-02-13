@@ -19,19 +19,19 @@ import type { QueryId } from 'views/logic/queries/Query';
 import type { SearchTypeId } from 'views/logic/SearchType';
 
 export type SearchErrorResponse = {
-  query_id: QueryId,
-  search_type_id: SearchTypeId,
-  type: string,
-  backtrace: string,
-  description: string,
+  query_id: QueryId;
+  search_type_id: SearchTypeId;
+  type: string;
+  backtrace: string;
+  description: string;
 };
 
 export type SearchErrorState = {
-  backtrace: string,
-  description: string,
-  query_id: QueryId,
-  search_type_id: SearchTypeId,
-  type: string,
+  backtrace: string;
+  description: string;
+  query_id: QueryId;
+  search_type_id: SearchTypeId;
+  type: string;
 };
 
 export default class SearchError {
@@ -49,13 +49,23 @@ export default class SearchError {
     };
   }
 
-  get backtrace() { return this._state.backtrace; }
+  get backtrace() {
+    return this._state.backtrace;
+  }
 
-  get description() { return this._state.description; }
+  get description() {
+    return this._state.description;
+  }
 
-  get queryId() { return this._state.query_id; }
+  get queryId() {
+    return this._state.query_id;
+  }
 
-  get searchTypeId() { return this._state.search_type_id; }
+  get searchTypeId() {
+    return this._state.search_type_id;
+  }
 
-  get type() { return this._state.type; }
+  get type() {
+    return this._state.type;
+  }
 }

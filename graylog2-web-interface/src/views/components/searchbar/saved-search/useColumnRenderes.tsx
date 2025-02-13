@@ -26,11 +26,7 @@ import FavoriteIcon from 'views/components/FavoriteIcon';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { createGRN } from 'logic/permissions/GRN';
 
-const onLoad = (
-  onLoadSavedSearch: () => void,
-  selectedSavedSearchId: string,
-  loadFunc: (searchId: string) => void,
-) => {
+const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, loadFunc: (searchId: string) => void) => {
   if (!selectedSavedSearchId || !loadFunc) {
     return false;
   }
@@ -42,13 +38,10 @@ const onLoad = (
   return false;
 };
 
-const useColumnRenderers = (
-  onLoadSavedSearch: () => void,
-  searchParams: SearchParams,
-): ColumnRenderers<View> => {
+const useColumnRenderers = (onLoadSavedSearch: () => void, searchParams: SearchParams): ColumnRenderers<View> => {
   const queryClient = useQueryClient();
 
-  return ({
+  return {
     attributes: {
       title: {
         renderCell: (title: string, search) => (
@@ -60,8 +53,7 @@ const useColumnRenderers = (
               };
 
               return (
-                <Link onClick={onClick}
-                      to={Routes.getPluginRoute('SEARCH_VIEWID')(search.id)}>
+                <Link onClick={onClick} to={Routes.getPluginRoute('SEARCH_VIEWID')(search.id)}>
                   {title}
                 </Link>
               );
@@ -71,27 +63,29 @@ const useColumnRenderers = (
       },
       favorite: {
         renderCell: (favorite: boolean, search) => (
-          <FavoriteIcon isFavorite={favorite}
-                        grn={createGRN('search', search.id)}
-                        onChange={(newValue) => {
-                          queryClient.setQueriesData(['saved-searches', 'overview', searchParams], (cur: {
-                          list: Array<View>,
-                          pagination: { total: number }
-                        }) => ({
-                            ...cur,
-                            list: cur.list.map((view) => {
-                              if (view.id === search.id) {
-                                return view.toBuilder().favorite(newValue).build();
-                              }
+          <FavoriteIcon
+            isFavorite={favorite}
+            grn={createGRN('search', search.id)}
+            onChange={(newValue) => {
+              queryClient.setQueriesData(
+                ['saved-searches', 'overview', searchParams],
+                (cur: { list: Array<View>; pagination: { total: number } }) => ({
+                  ...cur,
+                  list: cur.list.map((view) => {
+                    if (view.id === search.id) {
+                      return view.toBuilder().favorite(newValue).build();
+                    }
 
-                              return view;
-                            }),
-                          }));
-                        }} />
+                    return view;
+                  }),
+                }),
+              );
+            }}
+          />
         ),
       },
     },
-  });
+  };
 };
 
 export default useColumnRenderers;

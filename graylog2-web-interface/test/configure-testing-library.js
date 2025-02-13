@@ -18,5 +18,8 @@ import { configure } from '@testing-library/react';
 import { timeoutMultiplier, applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 if (timeoutMultiplier() !== 1.0) {
-  configure((existingConfig) => ({ ...existingConfig, asyncUtilTimeout: applyTimeoutMultiplier(existingConfig.asyncUtilTimeout) }));
+  configure((existingConfig) => ({
+    ...existingConfig,
+    asyncUtilTimeout: applyTimeoutMultiplier(existingConfig.asyncUtilTimeout),
+  }));
 }

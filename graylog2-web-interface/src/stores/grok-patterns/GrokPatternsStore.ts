@@ -24,53 +24,51 @@ import UserNotification from 'util/UserNotification';
 import { singletonStore } from 'logic/singleton';
 
 type GrokPattern = {
-  id: string,
-  name: string,
-  pattern: string,
-  content_pack: string,
+  id: string;
+  name: string;
+  pattern: string;
+  content_pack: string;
 };
 
 type PaginatedResponse = {
-  count: number,
-  total: number,
-  page: number,
-  per_page: number,
-  patterns: Array<GrokPattern>,
+  count: number;
+  total: number;
+  page: number;
+  per_page: number;
+  patterns: Array<GrokPattern>;
 };
 
 type GrokPatternTest = {
-  name: string,
-  pattern: string,
-  sampleData: string,
+  name: string;
+  pattern: string;
+  sampleData: string;
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export const GrokPatternsStore = singletonStore(
-  'core.GrokPatterns',
-  () => Reflux.createStore({
+export const GrokPatternsStore = singletonStore('core.GrokPatterns', () =>
+  Reflux.createStore({
     URL: qualifyUrl('/system/grok'),
 
     loadPatterns(callback: (patterns: Array<GrokPattern>) => void) {
       const failCallback = (error) => {
-        UserNotification.error(`Loading Grok patterns failed with status: ${error.message}`,
-          'Could not load Grok patterns');
+        UserNotification.error(
+          `Loading Grok patterns failed with status: ${error.message}`,
+          'Could not load Grok patterns',
+        );
       };
 
       // get the current list of patterns and sort it by name
-      return fetch('GET', this.URL)
-        .then(
-          (resp: any) => {
-            const { patterns } = resp;
+      return fetch('GET', this.URL).then((resp: any) => {
+        const { patterns } = resp;
 
-            patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) => pattern1.name.toLowerCase()
-              .localeCompare(pattern2.name.toLowerCase()));
-
-            callback(patterns);
-
-            return resp;
-          },
-          failCallback,
+        patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) =>
+          pattern1.name.toLowerCase().localeCompare(pattern2.name.toLowerCase()),
         );
+
+        callback(patterns);
+
+        return resp;
+      }, failCallback);
     },
 
     searchPaginated(page, perPage, query) {
@@ -92,12 +90,15 @@ export const GrokPatternsStore = singletonStore(
           };
         })
         .catch((errorThrown) => {
-          UserNotification.error(`Loading patterns failed with status: ${errorThrown}`,
-            'Could not load streams');
+          UserNotification.error(`Loading patterns failed with status: ${errorThrown}`, 'Could not load streams');
         });
     },
 
-    testPattern(pattern: GrokPatternTest, callback: (request: any) => void, errCallback: (errorMessage: string) => void) {
+    testPattern(
+      pattern: GrokPatternTest,
+      callback: (request: any) => void,
+      errCallback: (errorMessage: string) => void,
+    ) {
       const failCallback = (error) => {
         let errorMessage = error.message;
         const errorBody = error.additional.body;
@@ -117,15 +118,11 @@ export const GrokPatternsStore = singletonStore(
         sampleData: pattern.sampleData,
       };
 
-      fetch('POST', qualifyUrl(ApiRoutes.GrokPatternsController.test().url), requestPatternTest)
-        .then(
-          (response) => {
-            callback(response);
+      fetch('POST', qualifyUrl(ApiRoutes.GrokPatternsController.test().url), requestPatternTest).then((response) => {
+        callback(response);
 
-            return response;
-          },
-          failCallback,
-        );
+        return response;
+      }, failCallback);
     },
 
     savePattern(pattern: GrokPattern, callback: () => void) {
@@ -137,8 +134,10 @@ export const GrokPatternsStore = singletonStore(
           errorMessage = error.additional.body.message;
         }
 
-        UserNotification.error(`Testing Grok pattern "${pattern.name}" failed with status: ${errorMessage}`,
-          'Could not test Grok pattern');
+        UserNotification.error(
+          `Testing Grok pattern "${pattern.name}" failed with status: ${errorMessage}`,
+          'Could not test Grok pattern',
+        );
       };
 
       const requestPattern = {
@@ -158,37 +157,31 @@ export const GrokPatternsStore = singletonStore(
         method = 'PUT';
       }
 
-      fetch(method, url, requestPattern)
-        .then(
-          (response) => {
-            callback();
-            const action = pattern.id === '' ? 'created' : 'updated';
-            const message = `Grok pattern "${pattern.name}" successfully ${action}`;
+      fetch(method, url, requestPattern).then((response) => {
+        callback();
+        const action = pattern.id === '' ? 'created' : 'updated';
+        const message = `Grok pattern "${pattern.name}" successfully ${action}`;
 
-            UserNotification.success(message);
+        UserNotification.success(message);
 
-            return response;
-          },
-          failCallback,
-        );
+        return response;
+      }, failCallback);
     },
 
     deletePattern(pattern: GrokPattern, callback: () => void) {
       const failCallback = (error) => {
-        UserNotification.error(`Deleting Grok pattern "${pattern.name}" failed with status: ${error.message}`,
-          'Could not delete Grok pattern');
+        UserNotification.error(
+          `Deleting Grok pattern "${pattern.name}" failed with status: ${error.message}`,
+          'Could not delete Grok pattern',
+        );
       };
 
-      fetch('DELETE', `${this.URL}/${pattern.id}`)
-        .then(
-          (response) => {
-            callback();
-            UserNotification.success(`Grok pattern "${pattern.name}" successfully deleted`);
+      fetch('DELETE', `${this.URL}/${pattern.id}`).then((response) => {
+        callback();
+        UserNotification.success(`Grok pattern "${pattern.name}" successfully deleted`);
 
-            return response;
-          },
-          failCallback,
-        );
+        return response;
+      }, failCallback);
     },
 
     bulkImport(patterns: string, importStrategy: string) {
@@ -206,8 +199,10 @@ export const GrokPatternsStore = singletonStore(
           }
         }
 
-        UserNotification.error(`Importing Grok pattern file failed with status: ${errorMessage}`,
-          'Could not load Grok patterns');
+        UserNotification.error(
+          `Importing Grok pattern file failed with status: ${errorMessage}`,
+          'Could not load Grok patterns',
+        );
       };
 
       const promise = fetchPlainText('POST', `${this.URL}?import-strategy=${importStrategy}`, patterns);

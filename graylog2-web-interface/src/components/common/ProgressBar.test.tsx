@@ -41,8 +41,8 @@ describe('<ProgressBar />', () => {
 
     const progressBars = await screen.findAllByRole('progressbar');
 
-    expect((progressBars[0]).getAttribute('value')).toBe('35');
-    expect((progressBars[1]).getAttribute('value')).toBe('55');
+    expect(progressBars[0].getAttribute('value')).toBe('35');
+    expect(progressBars[1].getAttribute('value')).toBe('55');
   });
 
   it('properly renders with label', async () => {

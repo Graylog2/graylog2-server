@@ -35,9 +35,9 @@ import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashb
 import useWidgetIds from 'views/components/useWidgetIds';
 
 type PageListItem = {
-  id: string,
-  title: string
-}
+  id: string;
+  title: string;
+};
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -52,32 +52,31 @@ const ListItem = ({
   onUpdateTitle,
   disableDelete,
 }: {
-  item: PageListItem,
-  onUpdateTitle: (id: string, title: string) => void,
-  onRemove: (id: string) => void,
-  disableDelete: boolean,
+  item: PageListItem;
+  onUpdateTitle: (id: string, title: string) => void;
+  onRemove: (id: string) => void;
+  disableDelete: boolean;
 }) => (
   <ListItemContainer>
-    <EditableTitle key={title}
-                   disabled={!onUpdateTitle}
-                   value={title}
-                   onChange={(newTitle) => onUpdateTitle(id, newTitle)} />
+    <EditableTitle
+      key={title}
+      disabled={!onUpdateTitle}
+      value={title}
+      onChange={(newTitle) => onUpdateTitle(id, newTitle)}
+    />
     <div>
-      <IconButton title={`Remove page ${title}`}
-                  name="delete"
-                  onClick={() => onRemove(id)}
-                  disabled={disableDelete} />
+      <IconButton title={`Remove page ${title}`} name="delete" onClick={() => onRemove(id)} disabled={disableDelete} />
     </div>
   </ListItemContainer>
 );
 
 type Props = {
-  show: boolean,
-  setShow: Dispatch<SetStateAction<boolean>>,
-  queriesList: Immutable.OrderedSet<PageListItem>,
-  activeQueryId: string,
-  dashboardId: string,
-}
+  show: boolean;
+  setShow: Dispatch<SetStateAction<boolean>>;
+  queriesList: Immutable.OrderedSet<PageListItem>;
+  activeQueryId: string;
+  dashboardId: string;
+};
 
 const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQueryId, dashboardId }: Props) => {
   const { setDashboardPage } = useContext(DashboardPageContext);
@@ -103,18 +102,21 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
       setDashboardPage(newActiveQueryId);
     }
 
-    dispatch(setQueriesOrder(nextQueriesList.map(({ id }) => id).toOrderedSet()))
-      .then(() => {
-        const newTitles = nextQueriesList.map(({ id, title }) => {
+    dispatch(setQueriesOrder(nextQueriesList.map(({ id }) => id).toOrderedSet())).then(() => {
+      const newTitles = nextQueriesList
+        .map(({ id, title }) => {
           const titleMap = Immutable.Map<string, string>({ title });
-          const titlesMap = Immutable.Map<TitleType, Immutable.Map<string, string>>({ [TitleTypes.Tab]: titleMap }) as TitlesMap;
+          const titlesMap = Immutable.Map<TitleType, Immutable.Map<string, string>>({
+            [TitleTypes.Tab]: titleMap,
+          }) as TitlesMap;
 
-          return ({ queryId: id, titlesMap });
-        }).toArray();
+          return { queryId: id, titlesMap };
+        })
+        .toArray();
 
-        dispatch(mergeQueryTitles(newTitles));
-        setShow(false);
-      });
+      dispatch(mergeQueryTitles(newTitles));
+      setShow(false);
+    });
   }, [nextQueriesList, sendTelemetry, dispatch, activeQueryId, queriesList, setDashboardPage, setShow]);
 
   const onPagesConfigurationModalClose = useCallback(() => {
@@ -126,66 +128,74 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
 
     setShow(false);
   }, [sendTelemetry, setShow]);
-  const updatePageSorting = useCallback((order: Array<PageListItem>) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_SORTING_UPDATED, {
-      app_pathname: 'dashboard',
-      app_section: 'dashboard',
-      app_action_value: 'dashboard-page-configuration-sorting',
-    });
-
-    setNextQueriesList(Immutable.OrderedSet(order));
-  }, [sendTelemetry, setNextQueriesList]);
-
-  const onUpdateTitle = useCallback((id: string, title: string) => {
-    setNextQueriesList((currentQueries) => currentQueries
-      .map((query) => (query.id === id ? { id, title } : query))
-      .toOrderedSet());
-  }, []);
-
-  const removePage = useCallback(async (queryId: string) => {
-    if (disablePageDelete) {
-      return Promise.resolve();
-    }
-
-    if (await ConfirmDeletingDashboardPage(dashboardId, activeQueryId, widgetIds)) {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_PAGE_REMOVED, {
+  const updatePageSorting = useCallback(
+    (order: Array<PageListItem>) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_SORTING_UPDATED, {
         app_pathname: 'dashboard',
         app_section: 'dashboard',
-        app_action_value: 'dashboard-page-configuration-remove-page',
+        app_action_value: 'dashboard-page-configuration-sorting',
       });
 
-      setNextQueriesList((currentQueries) => currentQueries
-        .filter((query) => query.id !== queryId).toOrderedSet());
-    }
+      setNextQueriesList(Immutable.OrderedSet(order));
+    },
+    [sendTelemetry, setNextQueriesList],
+  );
 
-    return Promise.resolve();
-  }, [activeQueryId, dashboardId, disablePageDelete, sendTelemetry, widgetIds]);
+  const onUpdateTitle = useCallback((id: string, title: string) => {
+    setNextQueriesList((currentQueries) =>
+      currentQueries.map((query) => (query.id === id ? { id, title } : query)).toOrderedSet(),
+    );
+  }, []);
+
+  const removePage = useCallback(
+    async (queryId: string) => {
+      if (disablePageDelete) {
+        return Promise.resolve();
+      }
+
+      if (await ConfirmDeletingDashboardPage(dashboardId, activeQueryId, widgetIds)) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION_PAGE_REMOVED, {
+          app_pathname: 'dashboard',
+          app_section: 'dashboard',
+          app_action_value: 'dashboard-page-configuration-remove-page',
+        });
+
+        setNextQueriesList((currentQueries) => currentQueries.filter((query) => query.id !== queryId).toOrderedSet());
+      }
+
+      return Promise.resolve();
+    },
+    [activeQueryId, dashboardId, disablePageDelete, sendTelemetry, widgetIds],
+  );
 
   // eslint-disable-next-line react/no-unused-prop-types
-  const customListItemRender = useCallback(({ item }: { item: PageListItem }) => (
-    <ListItem item={item}
-              onUpdateTitle={onUpdateTitle}
-              onRemove={removePage}
-              disableDelete={disablePageDelete} />
-  ), [disablePageDelete, removePage, onUpdateTitle]);
+  const customListItemRender = useCallback(
+    ({ item }: { item: PageListItem }) => (
+      <ListItem item={item} onUpdateTitle={onUpdateTitle} onRemove={removePage} disableDelete={disablePageDelete} />
+    ),
+    [disablePageDelete, removePage, onUpdateTitle],
+  );
 
   return (
-    <BootstrapModalConfirm showModal={show}
-                           title="Update Dashboard Pages Configuration"
-                           onConfirm={onConfirmPagesConfiguration}
-                           onCancel={onPagesConfigurationModalClose}
-                           confirmButtonText="Update configuration">
+    <BootstrapModalConfirm
+      showModal={show}
+      title="Update Dashboard Pages Configuration"
+      onConfirm={onConfirmPagesConfiguration}
+      onCancel={onPagesConfigurationModalClose}
+      confirmButtonText="Update configuration"
+    >
       <>
         <h3>Order</h3>
         <p>
-          Use drag and drop to change the order of the dashboard pages.
-          Double-click on a dashboard title to change it.
+          Use drag and drop to change the order of the dashboard pages. Double-click on a dashboard title to change it.
         </p>
-        <SortableList<PageListItem> items={nextQueriesList.toArray()}
-                                    onMoveItem={updatePageSorting}
-                                    displayOverlayInPortal
-                                    alignItemContent="center"
-                                    customContentRender={customListItemRender} />
+        <SortableList<PageListItem>
+          items={nextQueriesList.toArray()}
+          onMoveItem={updatePageSorting}
+          displayOverlayInPortal
+          alignItemContent="center"
+          customContentRender={customListItemRender}
+        />
       </>
     </BootstrapModalConfirm>
   );

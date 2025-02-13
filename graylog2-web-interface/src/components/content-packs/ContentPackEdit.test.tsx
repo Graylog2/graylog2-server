@@ -21,9 +21,7 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 
 describe('<ContentPackEdit />', () => {
-  const emptyContentPack = ContentPack.builder()
-    .id('9950ba5a-0887-40a9-2b8f-8b50292cc7fb')
-    .build();
+  const emptyContentPack = ContentPack.builder().id('9950ba5a-0887-40a9-2b8f-8b50292cc7fb').build();
 
   const enrichedEntity = {
     id: '111-beef',
@@ -64,20 +62,21 @@ describe('<ContentPackEdit />', () => {
   });
 
   it('should render empty content pack for create', async () => {
-    render(<ContentPackEdit contentPack={emptyContentPack}
-                            selectedEntities={{}}
-                            appliedParameter={{}}
-                            entityIndex={{}} />);
+    render(
+      <ContentPackEdit contentPack={emptyContentPack} selectedEntities={{}} appliedParameter={{}} entityIndex={{}} />,
+    );
 
     await screen.findByText('Content Selection');
   });
 
   it('should render with content pack for edit', async () => {
     render(
-      <ContentPackEdit contentPack={filledContentPack}
-                       appliedParameter={appliedParameter}
-                       entityIndex={serverEntities}
-                       selectedEntities={selectedEntities} />,
+      <ContentPackEdit
+        contentPack={filledContentPack}
+        appliedParameter={appliedParameter}
+        entityIndex={serverEntities}
+        selectedEntities={selectedEntities}
+      />,
     );
 
     await screen.findByText('Content Selection');
@@ -87,11 +86,13 @@ describe('<ContentPackEdit />', () => {
     const saveFn = jest.fn();
 
     render(
-      <ContentPackEdit contentPack={filledContentPack}
-                       appliedParameter={appliedParameter}
-                       entityIndex={serverEntities}
-                       onSave={saveFn}
-                       selectedEntities={selectedEntities} />,
+      <ContentPackEdit
+        contentPack={filledContentPack}
+        appliedParameter={appliedParameter}
+        entityIndex={serverEntities}
+        onSave={saveFn}
+        selectedEntities={selectedEntities}
+      />,
     );
 
     (await screen.findByRole('button', { name: 'Next' })).click();

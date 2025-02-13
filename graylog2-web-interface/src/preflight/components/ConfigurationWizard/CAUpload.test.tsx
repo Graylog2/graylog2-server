@@ -45,9 +45,7 @@ describe('CAUpload', () => {
     asMock(fetchMultiPartFormData).mockReturnValue(Promise.resolve());
   });
 
-  const files = [
-    new File(['fileBits'], 'fileName', { type: 'application/x-pem-file' }),
-  ];
+  const files = [new File(['fileBits'], 'fileName', { type: 'application/x-pem-file' })];
 
   const formData = () => {
     const f = new FormData();
@@ -70,11 +68,9 @@ describe('CAUpload', () => {
     userEvent.upload(dropzone, files);
     userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
-    await waitFor(() => expect(fetchMultiPartFormData).toHaveBeenCalledWith(
-      expect.stringContaining('/api/ca/upload'),
-      formData(),
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetchMultiPartFormData).toHaveBeenCalledWith(expect.stringContaining('/api/ca/upload'), formData(), false),
+    );
 
     expect(UserNotification.success).toHaveBeenCalledWith('CA uploaded successfully');
   });
@@ -93,11 +89,9 @@ describe('CAUpload', () => {
 
     userEvent.click(await screen.findByRole('button', { name: /Upload CA/i }));
 
-    await waitFor(() => expect(fetchMultiPartFormData).toHaveBeenCalledWith(
-      expect.stringContaining('/api/ca/upload'),
-      formData(),
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetchMultiPartFormData).toHaveBeenCalledWith(expect.stringContaining('/api/ca/upload'), formData(), false),
+    );
 
     expect(UserNotification.error).toHaveBeenCalledWith('CA upload failed with error: Error: Something bad happened');
   });

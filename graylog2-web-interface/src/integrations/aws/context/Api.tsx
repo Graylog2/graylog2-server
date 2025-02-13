@@ -23,9 +23,7 @@ type ApiProviderProps = {
   children: any;
 };
 
-export const ApiProvider = ({
-  children,
-}: ApiProviderProps) => {
+export const ApiProvider = ({ children }: ApiProviderProps) => {
   const [availableRegions, setRegionsState] = useState([]);
   const [availableStreams, setStreamsState] = useState([]);
   const [availableGroups, setGroupsState] = useState([]);
@@ -56,17 +54,19 @@ export const ApiProvider = ({
   };
 
   return (
-    <ApiContext.Provider value={{
-      availableStreams,
-      setStreams,
-      availableRegions,
-      setRegions,
-      logData,
-      setLogData,
-      clearLogData,
-      availableGroups,
-      setGroups,
-    }}>
+    <ApiContext.Provider
+      value={{
+        availableStreams,
+        setStreams,
+        availableRegions,
+        setRegions,
+        logData,
+        setLogData,
+        clearLogData,
+        availableGroups,
+        setGroups,
+      }}
+    >
       {children}
     </ApiContext.Provider>
   );

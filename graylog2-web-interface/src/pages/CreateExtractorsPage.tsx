@@ -34,16 +34,21 @@ import useQuery from 'routing/useQuery';
 const useInput = (inputId: string) => useReactQuery(['inputs', inputId], () => SystemInputs.get(inputId));
 
 type QueryParameters = {
-  example_index: string,
-  example_id: string,
-  extractor_type: string,
-  field: string,
-}
+  example_index: string;
+  example_id: string;
+  extractor_type: string;
+  field: string;
+};
 
 const CreateExtractorsPage = () => {
   const params = useParams();
   const history = useHistory();
-  const { example_index: exampleIndex, example_id: exampleId, extractor_type: extractorType, field } = useQuery() as QueryParameters;
+  const {
+    example_index: exampleIndex,
+    example_id: exampleId,
+    extractor_type: extractorType,
+    field,
+  } = useQuery() as QueryParameters;
   const { data: exampleMessage, isInitialLoading: messageIsLoading } = useMessage(exampleIndex, exampleId);
   const { data: input, isInitialLoading: inputIsLoading } = useInput(params.inputId);
   const isLoading = messageIsLoading || inputIsLoading;
@@ -66,21 +71,29 @@ const CreateExtractorsPage = () => {
   return (
     <DocumentTitle title={`New extractor for input ${input.title}`}>
       <div>
-        <PageHeader title={<span>New extractor for input <em>{input.title}</em></span>}
-                    documentationLink={{
-                      title: 'Extractors documentation',
-                      path: DocsHelper.PAGES.EXTRACTORS,
-                    }}>
+        <PageHeader
+          title={
+            <span>
+              New extractor for input <em>{input.title}</em>
+            </span>
+          }
+          documentationLink={{
+            title: 'Extractors documentation',
+            path: DocsHelper.PAGES.EXTRACTORS,
+          }}
+        >
           <span>
-            Extractors are applied on every message that is received by an input. Use them to extract and
-            transform any text data into fields that allow you easy filtering and analysis later on.
+            Extractors are applied on every message that is received by an input. Use them to extract and transform any
+            text data into fields that allow you easy filtering and analysis later on.
           </span>
         </PageHeader>
-        <EditExtractor action="create"
-                       extractor={extractor}
-                       inputId={input.id}
-                       exampleMessage={stringifiedExampleMessage}
-                       onSave={_extractorSaved} />
+        <EditExtractor
+          action="create"
+          extractor={extractor}
+          inputId={input.id}
+          exampleMessage={stringifiedExampleMessage}
+          onSave={_extractorSaved}
+        />
       </div>
     </DocumentTitle>
   );

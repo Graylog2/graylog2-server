@@ -22,10 +22,10 @@ import useCurrentUser from 'hooks/useCurrentUser';
 type ChildFun = (props: { disabled: boolean }) => React.ReactElement;
 
 type Props = {
-  children: React.ReactNode | ChildFun,
-  id?: string
-  type: string,
-  hideChildren?: boolean
+  children: React.ReactNode | ChildFun;
+  id?: string;
+  type: string;
+  hideChildren?: boolean;
 };
 
 const HasOwnership = ({ children, id, type, hideChildren = false }: Props) => {

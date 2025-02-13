@@ -24,11 +24,11 @@ import WidgetActionDropdown from './WidgetActionDropdown';
 
 describe('WidgetActionDropdown', () => {
   it('opens menu when trigger element is clicked', async () => {
-    render((
+    render(
       <WidgetActionDropdown>
         <MenuItem>Foo</MenuItem>
-      </WidgetActionDropdown>
-    ));
+      </WidgetActionDropdown>,
+    );
 
     const menuButton = await screen.findByRole('button', { name: /open actions dropdown/i });
 
@@ -42,11 +42,11 @@ describe('WidgetActionDropdown', () => {
   it('closes menu when MenuItem is clicked', async () => {
     const onSelect = jest.fn();
 
-    render((
+    render(
       <WidgetActionDropdown>
         <MenuItem onSelect={onSelect}>Foo</MenuItem>
-      </WidgetActionDropdown>
-    ));
+      </WidgetActionDropdown>,
+    );
 
     const menuButton = await screen.findByRole('button', { name: /open actions dropdown/i });
     await userEvent.click(menuButton);

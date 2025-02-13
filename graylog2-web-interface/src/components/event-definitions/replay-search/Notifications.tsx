@@ -34,13 +34,17 @@ const Notifications = () => {
     EventNotificationsActions.listAll();
   }, []);
 
-  const allNotifications = useStore(EventNotificationsStore, ({ all }) => Object.fromEntries(
-    (all ?? []).map((notification) => [notification.id, notification]),
-  ));
+  const allNotifications = useStore(EventNotificationsStore, ({ all }) =>
+    Object.fromEntries((all ?? []).map((notification) => [notification.id, notification])),
+  );
 
-  const notificationList = useMemo(() => eventDefinition.notifications
-    .flatMap(({ notification_id }) => (allNotifications[notification_id] ? [allNotifications[notification_id]] : [])),
-  [allNotifications, eventDefinition.notifications]);
+  const notificationList = useMemo(
+    () =>
+      eventDefinition.notifications.flatMap(({ notification_id }) =>
+        allNotifications[notification_id] ? [allNotifications[notification_id]] : [],
+      ),
+    [allNotifications, eventDefinition.notifications],
+  );
 
   return notificationList.length ? (
     <>
@@ -50,12 +54,16 @@ const Notifications = () => {
         return (
           <span key={id}>
             {prefix}
-            <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(id)}>{title}</Link>
+            <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(id)}>
+              {title}
+            </Link>
           </span>
         );
       })}
     </>
-  ) : <NoAttributeProvided name="Notifications" />;
+  ) : (
+    <NoAttributeProvided name="Notifications" />
+  );
 };
 
 export default Notifications;

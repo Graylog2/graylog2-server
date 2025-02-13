@@ -32,7 +32,9 @@ describe('<KeyCapture />', () => {
   });
 
   it('renders its children', () => {
-    render(<KeyCapture shortcuts={[{ scope: 'general', callback: () => {}, actionKey: 'test' }]}>The children</KeyCapture>);
+    render(
+      <KeyCapture shortcuts={[{ scope: 'general', callback: () => {}, actionKey: 'test' }]}>The children</KeyCapture>,
+    );
 
     expect(screen.getByText('The children')).toBeInTheDocument();
   });
@@ -40,10 +42,14 @@ describe('<KeyCapture />', () => {
   it('runs useHotkey hooks with proper params', () => {
     const mockCallback = jest.fn();
 
-    render(<KeyCapture shortcuts={[
-      { scope: 'general', callback: mockCallback, actionKey: 'make' },
-      { scope: 'search', callback: mockCallback, actionKey: 'do' },
-    ]} />);
+    render(
+      <KeyCapture
+        shortcuts={[
+          { scope: 'general', callback: mockCallback, actionKey: 'make' },
+          { scope: 'search', callback: mockCallback, actionKey: 'do' },
+        ]}
+      />,
+    );
 
     expect(mockUseHotkey).toHaveBeenCalledWith({ scope: 'general', callback: mockCallback, actionKey: 'make' });
     expect(mockUseHotkey).toHaveBeenCalledWith({ scope: 'search', callback: mockCallback, actionKey: 'do' });

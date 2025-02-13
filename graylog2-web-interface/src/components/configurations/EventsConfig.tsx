@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';//
+import { useEffect, useState } from 'react'; //
 import capitalize from 'lodash/capitalize';
 import moment from 'moment';
 
@@ -35,12 +35,12 @@ const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 const DEFAULT_CATCH_UP_WINDOW = 3600000;
 
 type Config = {
-  events_search_timeout: number,
-  events_notification_retry_period: number,
-  events_notification_default_backlog: number,
-  events_catchup_window: number,
-  events_notification_tcp_keepalive: boolean,
-}
+  events_search_timeout: number;
+  events_notification_retry_period: number;
+  events_notification_default_backlog: number;
+  events_catchup_window: number;
+  events_notification_tcp_keepalive: boolean;
+};
 
 const DEFAULT_CONFIG = {
   events_search_timeout: 60000,
@@ -131,10 +131,13 @@ const EventsConfig = () => {
 
   const titleCase = (str) => capitalize(str);
 
-  if (!loaded || !viewConfig) { return <Spinner />; }
+  if (!loaded || !viewConfig) {
+    return <Spinner />;
+  }
 
   const eventsSearchTimeout = (config) => extractDurationAndUnit(config.events_search_timeout, TIME_UNITS);
-  const eventsNotificationRetryPeriod = (config) => extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
+  const eventsNotificationRetryPeriod = (config) =>
+    extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
   const eventsCatchupWindow = (config) => extractDurationAndUnit(config.events_catchup_window, TIME_UNITS);
   const eventsNotificationDefaultBacklog = (config) => config.events_notification_default_backlog;
   const eventsNotificationTcpKeepalive = (config) => config.events_notification_tcp_keepalive;
@@ -145,81 +148,103 @@ const EventsConfig = () => {
 
       <dl className="deflist">
         <dt>Search Timeout:</dt>
-        <dd>{eventsSearchTimeout(viewConfig).duration} {titleCase(eventsSearchTimeout(viewConfig).unit)}</dd>
+        <dd>
+          {eventsSearchTimeout(viewConfig).duration} {titleCase(eventsSearchTimeout(viewConfig).unit)}
+        </dd>
         <dt>Notification Retry:</dt>
-        <dd>{eventsNotificationRetryPeriod(viewConfig).duration} {titleCase(eventsNotificationRetryPeriod(viewConfig).unit)}</dd>
+        <dd>
+          {eventsNotificationRetryPeriod(viewConfig).duration}{' '}
+          {titleCase(eventsNotificationRetryPeriod(viewConfig).unit)}
+        </dd>
         <dt>Notification Backlog:</dt>
         <dd>{eventsNotificationDefaultBacklog(viewConfig)}</dd>
         <dt>Catch Up Window:</dt>
-        <dd>{eventsCatchupWindow(viewConfig).duration > 0 ? eventsCatchupWindow(viewConfig).duration : 'disabled'} {eventsCatchupWindow(viewConfig).duration > 0 ? titleCase(eventsCatchupWindow(viewConfig).unit) : ''}</dd>
+        <dd>
+          {eventsCatchupWindow(viewConfig).duration > 0 ? eventsCatchupWindow(viewConfig).duration : 'disabled'}{' '}
+          {eventsCatchupWindow(viewConfig).duration > 0 ? titleCase(eventsCatchupWindow(viewConfig).unit) : ''}
+        </dd>
         <dt>TCP keep-alive probes:</dt>
         <dd>{eventsNotificationTcpKeepalive(viewConfig) ? 'enabled' : 'disabled'}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
-        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
+        <Button bsStyle="info" bsSize="xs" onClick={openModal}>
+          Edit configuration
+        </Button>
       </IfPermitted>
 
       {showConfigModal && formConfig && (
-      <BootstrapModalForm show
-                          title="Update Events System Configuration"
-                          onSubmitForm={saveConfig}
-                          onCancel={closeModal}
-                          submitButtonText="Update configuration">
-        <fieldset>
-          <FormGroup controlId="search-timeout-field">
-            <TimeUnitInput label="Search Timeout"
-                           update={onSearchTimeoutUpdate}
-                           value={eventsSearchTimeout(formConfig).duration}
-                           unit={eventsSearchTimeout(formConfig).unit}
-                           units={TIME_UNITS}
-                           required />
-            <HelpBlock>
-              Amount of time after which an Elasticsearch query is interrupted. (Minimum timeout is 1s)
-            </HelpBlock>
-          </FormGroup>
-          <FormGroup controlId="notifications-retry-field">
-            <TimeUnitInput label="Notifications retry period"
-                           update={onRetryPeriodUpdate}
-                           value={eventsNotificationRetryPeriod(formConfig).duration}
-                           unit={eventsNotificationRetryPeriod(formConfig).unit}
-                           units={TIME_UNITS}
-                           required />
-            <HelpBlock>
-              Amount of time after which a failed notification is resend. (Minimum is 0 or immediate retry)
-            </HelpBlock>
-          </FormGroup>
-          <Input id="notification-backlog-field"
-                 type="number"
-                 onChange={onBacklogUpdate}
-                 label="Default notifications backlog size"
-                 help="Amount of log messages included in a notification by default."
-                 value={eventsNotificationDefaultBacklog(formConfig)}
-                 min="0"
-                 required />
-          <FormGroup controlId="catch-up-window">
-            <TimeUnitInput label="Catch up window size"
-                           update={onCatchUpWindowUpdate}
-                           value={eventsCatchupWindow(formConfig).duration}
-                           unit={eventsCatchupWindow(formConfig).unit}
-                           enabled={eventsCatchupWindow(formConfig).duration > 0}
-                           units={TIME_UNITS} />
-            <HelpBlock>If Event processor execution is behind schedule, queries on older data will be run with this window size to speed up processing.
-              (If the &quot;search within the last&quot; setting of an event definition is greater, this setting will be ignored)
-            </HelpBlock>
-          </FormGroup>
-          <FormGroup controlId="notification-tcp-keepalive-field">
-            <Input id="notification-tcp-keepalive-field"
-                   label="Send TCP keep-alive probes for notification connections"
-                   type="checkbox"
-                   onChange={onNotificationTcpKeepAliveUpdate}
-                   checked={eventsNotificationTcpKeepalive(formConfig)} />
-            <HelpBlock>
-              If enabled, http connections for notifications will send TCP keep-alive probes
-            </HelpBlock>
-          </FormGroup>
-        </fieldset>
-      </BootstrapModalForm>
+        <BootstrapModalForm
+          show
+          title="Update Events System Configuration"
+          onSubmitForm={saveConfig}
+          onCancel={closeModal}
+          submitButtonText="Update configuration"
+        >
+          <fieldset>
+            <FormGroup controlId="search-timeout-field">
+              <TimeUnitInput
+                label="Search Timeout"
+                update={onSearchTimeoutUpdate}
+                value={eventsSearchTimeout(formConfig).duration}
+                unit={eventsSearchTimeout(formConfig).unit}
+                units={TIME_UNITS}
+                required
+              />
+              <HelpBlock>
+                Amount of time after which an Elasticsearch query is interrupted. (Minimum timeout is 1s)
+              </HelpBlock>
+            </FormGroup>
+            <FormGroup controlId="notifications-retry-field">
+              <TimeUnitInput
+                label="Notifications retry period"
+                update={onRetryPeriodUpdate}
+                value={eventsNotificationRetryPeriod(formConfig).duration}
+                unit={eventsNotificationRetryPeriod(formConfig).unit}
+                units={TIME_UNITS}
+                required
+              />
+              <HelpBlock>
+                Amount of time after which a failed notification is resend. (Minimum is 0 or immediate retry)
+              </HelpBlock>
+            </FormGroup>
+            <Input
+              id="notification-backlog-field"
+              type="number"
+              onChange={onBacklogUpdate}
+              label="Default notifications backlog size"
+              help="Amount of log messages included in a notification by default."
+              value={eventsNotificationDefaultBacklog(formConfig)}
+              min="0"
+              required
+            />
+            <FormGroup controlId="catch-up-window">
+              <TimeUnitInput
+                label="Catch up window size"
+                update={onCatchUpWindowUpdate}
+                value={eventsCatchupWindow(formConfig).duration}
+                unit={eventsCatchupWindow(formConfig).unit}
+                enabled={eventsCatchupWindow(formConfig).duration > 0}
+                units={TIME_UNITS}
+              />
+              <HelpBlock>
+                If Event processor execution is behind schedule, queries on older data will be run with this window size
+                to speed up processing. (If the &quot;search within the last&quot; setting of an event definition is
+                greater, this setting will be ignored)
+              </HelpBlock>
+            </FormGroup>
+            <FormGroup controlId="notification-tcp-keepalive-field">
+              <Input
+                id="notification-tcp-keepalive-field"
+                label="Send TCP keep-alive probes for notification connections"
+                type="checkbox"
+                onChange={onNotificationTcpKeepAliveUpdate}
+                checked={eventsNotificationTcpKeepalive(formConfig)}
+              />
+              <HelpBlock>If enabled, http connections for notifications will send TCP keep-alive probes</HelpBlock>
+            </FormGroup>
+          </fieldset>
+        </BootstrapModalForm>
       )}
     </div>
   );

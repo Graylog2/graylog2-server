@@ -34,20 +34,16 @@ const FullName = styled.span`
 
 const UserMenu = () => {
   const { fullName, readOnly, id: userId } = useCurrentUser();
-  const route = readOnly
-    ? Routes.SYSTEM.USERS.show(userId)
-    : Routes.SYSTEM.USERS.edit(userId);
-  const label = readOnly
-    ? 'Show profile'
-    : 'Edit profile';
+  const route = readOnly ? Routes.SYSTEM.USERS.show(userId) : Routes.SYSTEM.USERS.edit(userId);
+  const label = readOnly ? 'Show profile' : 'Edit profile';
 
   const onLogoutClicked = useLogout();
 
   return (
-    <NavDropdown title={<Icon name="person" size="lg" />}
-                 hoverTitle={`User Menu for ${fullName}`}
-                 noCaret>
-      <Menu.Label><FullName>{fullName}</FullName></Menu.Label>
+    <NavDropdown title={<Icon name="person" size="lg" />} hoverTitle={`User Menu for ${fullName}`} noCaret>
+      <Menu.Label>
+        <FullName>{fullName}</FullName>
+      </Menu.Label>
       <Menu.Divider />
       <Menu.Label>
         <ThemeModeToggle />

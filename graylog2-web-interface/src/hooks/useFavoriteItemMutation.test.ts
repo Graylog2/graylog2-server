@@ -53,8 +53,7 @@ describe('useFavoriteItemMutation', () => {
         result.current.putItem('111');
       });
 
-      await waitFor(() => expect(fetch)
-        .toHaveBeenCalledWith('PUT', putUrl));
+      await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl));
     });
 
     it('should display notification on fail', async () => {
@@ -66,9 +65,12 @@ describe('useFavoriteItemMutation', () => {
         result.current.putItem('111').catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Adding item to favorites failed with status: Error: Error',
-        'Could not add item to favorites'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Adding item to favorites failed with status: Error: Error',
+          'Could not add item to favorites',
+        ),
+      );
     });
   });
 
@@ -95,9 +97,12 @@ describe('useFavoriteItemMutation', () => {
         result.current.deleteItem('111').catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Deleting item from favorites failed with status: Error: Error',
-        'Could not delete item from favorites'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Deleting item from favorites failed with status: Error: Error',
+          'Could not delete item from favorites',
+        ),
+      );
     });
   });
 });
