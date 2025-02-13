@@ -24,10 +24,10 @@ const useWidgetExportActionComponent = (widget: Widget) => {
   const widgetExportAction =
     exportActions &&
     exportActions
-      // eslint-disable-next-line react-hooks/rules-of-hooks
       .filter(
         ({ action, useCondition }) =>
           typeof useCondition === 'function' &&
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           useCondition() &&
           action &&
           (typeof action.isHidden !== 'function' || !action.isHidden(widget)),

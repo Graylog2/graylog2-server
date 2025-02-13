@@ -69,10 +69,10 @@ type MarkerProps = {
 };
 
 const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, name, keys }: MarkerProps) => {
-  // eslint-disable-next-line no-restricted-globals
   const formattedCoordinates = coordinates
     .split(',')
     .map((component) => Number(component))
+    // eslint-disable-next-line no-restricted-globals
     .filter((n) => !isNaN(n));
 
   if (formattedCoordinates.length !== 2) {
@@ -95,8 +95,7 @@ const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, na
       color={color.hex()}
       fillColor={color.hex()}
       weight={2}
-      opacity={0.8}
-    >
+      opacity={0.8}>
       <Popup>
         <dl>
           <dt>Name</dt>
@@ -242,8 +241,7 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
               whenReady={this._handleMapReady}
               zoom={viewport.zoom}
               zoomAnimation={interactive}
-              zoomControl={interactive}
-            >
+              zoomControl={interactive}>
               <MapEvents onViewportChanged={onChange} />
               <TileLayer url={url} attribution={attribution} eventHandlers={{ load: this._handleTilesReady }} />
               {markers}

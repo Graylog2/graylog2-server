@@ -101,20 +101,18 @@ const Section = ({
             <FlexWrapper
               onClick={(e) => {
                 e.stopPropagation();
-              }}
-            >
+              }}>
               {headerLeftSection}
             </FlexWrapper>
           )}
         </FlexWrapper>
         <FlexWrapper>
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
           {actions && (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
             <div
               onClick={(e) => {
                 e.stopPropagation();
-              }}
-            >
+              }}>
               {actions}
             </div>
           )}
@@ -125,8 +123,7 @@ const Section = ({
               onClick={toggle}
               data-testid="collapseButton"
               title={`Toggle ${title.toLowerCase()} section`}
-              disabled={disableCollapseButton}
-            >
+              disabled={disableCollapseButton}>
               <Icon size="sm" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
             </Button>
           )}
