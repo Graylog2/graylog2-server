@@ -25,7 +25,11 @@ export async function onError<T, E = Error>(promise: Promise<T>, handler: (e: E)
   }
 }
 
-export async function onSettled<T, R, E = Error>(promise: Promise<T>, handleSuccess: (r: T) => R, handleError: (e: E) => void) {
+export async function onSettled<T, R, E = Error>(
+  promise: Promise<T>,
+  handleSuccess: (r: T) => R,
+  handleError: (e: E) => void,
+) {
   try {
     const result = await promise;
     handleSuccess(result);

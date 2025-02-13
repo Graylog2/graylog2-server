@@ -63,7 +63,9 @@ describe('useRemoveCustomFieldTypeMutation', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Set index set profile successfully', 'Success!'));
+      await waitFor(() =>
+        expect(UserNotification.success).toHaveBeenCalledWith('Set index set profile successfully', 'Success!'),
+      );
     });
 
     it('should display notification on fail', async () => {
@@ -75,9 +77,12 @@ describe('useRemoveCustomFieldTypeMutation', () => {
         result.current.setIndexSetFieldTypeProfile(requestBody).catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Setting index set profile failed with status: Error: Error',
-        'Could not set index set profile'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Setting index set profile failed with status: Error: Error',
+          'Could not set index set profile',
+        ),
+      );
     });
   });
 });

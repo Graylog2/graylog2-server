@@ -25,10 +25,19 @@ import type { RelativeTimeRangeClassified } from './types';
 import {
   classifyFromRange,
   isTypeRelativeClassified,
-  normalizeClassifiedRange, RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+  normalizeClassifiedRange,
+  RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from './RelativeTimeRangeClassifiedHelper';
 
-const getDefaultAbsoluteFromRange = (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null) => {
+const getDefaultAbsoluteFromRange = (
+  oldTimeRange:
+    | RelativeTimeRangeClassified
+    | AbsoluteTimeRange
+    | KeywordTimeRange
+    | NoTimeRangeOverride
+    | undefined
+    | null,
+) => {
   if (isTypeRelativeClassified(oldTimeRange)) {
     return normalizeClassifiedRange(oldTimeRange.from);
   }
@@ -36,7 +45,15 @@ const getDefaultAbsoluteFromRange = (oldTimeRange: RelativeTimeRangeClassified |
   return DEFAULT_RELATIVE_FROM;
 };
 
-const getDefaultAbsoluteToRange = (oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null) => {
+const getDefaultAbsoluteToRange = (
+  oldTimeRange:
+    | RelativeTimeRangeClassified
+    | AbsoluteTimeRange
+    | KeywordTimeRange
+    | NoTimeRangeOverride
+    | undefined
+    | null,
+) => {
   if (isTypeRelativeClassified(oldTimeRange)) {
     return normalizeClassifiedRange(oldTimeRange.to);
   }
@@ -49,32 +66,49 @@ const migrationStrategies = {
     oldTimeRange,
     formatTime,
   }: {
-    oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null,
-    formatTime: (dateTime: DateTime, tz: string) => string,
-  },
-  ) => ({
+    oldTimeRange:
+      | RelativeTimeRangeClassified
+      | AbsoluteTimeRange
+      | KeywordTimeRange
+      | NoTimeRangeOverride
+      | undefined
+      | null;
+    formatTime: (dateTime: DateTime, tz: string) => string;
+  }) => ({
     type: 'absolute',
     from: formatTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'), 'complete'),
     to: formatTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'), 'complete'),
   }),
-  relative: () => ({ type: 'relative', from: classifyFromRange(DEFAULT_RELATIVE_FROM), to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE }),
-  keyword: ({ userTimezone }: { userTimezone: string }) => ({ type: 'keyword', keyword: 'Last five minutes', timezone: userTimezone }),
+  relative: () => ({
+    type: 'relative',
+    from: classifyFromRange(DEFAULT_RELATIVE_FROM),
+    to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
+  }),
+  keyword: ({ userTimezone }: { userTimezone: string }) => ({
+    type: 'keyword',
+    keyword: 'Last five minutes',
+    timezone: userTimezone,
+  }),
   disabled: () => undefined,
 };
 
-const migrateTimeRangeToNewType = (
-  {
-    oldTimeRange,
-    type,
-    formatTime,
-    userTimezone,
-  }: {
-    oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null,
-    type: string,
-    formatTime: (dateTime: DateTime, tz: string) => string,
-    userTimezone: string,
-  },
-): RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null => {
+const migrateTimeRangeToNewType = ({
+  oldTimeRange,
+  type,
+  formatTime,
+  userTimezone,
+}: {
+  oldTimeRange:
+    | RelativeTimeRangeClassified
+    | AbsoluteTimeRange
+    | KeywordTimeRange
+    | NoTimeRangeOverride
+    | undefined
+    | null;
+  type: string;
+  formatTime: (dateTime: DateTime, tz: string) => string;
+  userTimezone: string;
+}): RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null => {
   const oldType = oldTimeRange && 'type' in oldTimeRange ? oldTimeRange.type : 'disabled';
 
   if (type === oldType) {

@@ -1,4 +1,5 @@
 Search form with uncontrolled query string:
+
 ```js
 import { Button } from 'components/bootstrap';
 
@@ -15,20 +16,17 @@ class SearchFormExample extends React.Component {
   onSearch(query, resetState) {
     this.setState({ query: query });
     setTimeout(resetState, 2 * 1000);
-  };
+  }
 
   onReset() {
     this.setState({ query: '' });
-  };
+  }
 
   render() {
     return (
       <div>
         <span>Query: "{this.state.query}"</span>
-        <SearchForm onSearch={this.onSearch}
-                    onReset={this.onReset}
-                    label="Search"
-                    useLoadingState>
+        <SearchForm onSearch={this.onSearch} onReset={this.onReset} label="Search" useLoadingState>
           <Button>Add-on</Button>
         </SearchForm>
       </div>
@@ -36,7 +34,7 @@ class SearchFormExample extends React.Component {
   }
 }
 
-<SearchFormExample />
+<SearchFormExample />;
 ```
 
 Search form with controlled query string and help:
@@ -59,16 +57,16 @@ class SearchFormExample extends React.Component {
 
   onQueryTemplateChange(e) {
     this.setState({ queryTemplate: e.target.value });
-  };
+  }
 
   onSearch(query, resetState) {
     this.setState({ query: query });
     setTimeout(resetState, 2 * 1000);
-  };
+  }
 
   onReset() {
     this.setState({ query: '' });
-  };
+  }
 
   render() {
     return (
@@ -77,19 +75,22 @@ class SearchFormExample extends React.Component {
         <input type="text" value={this.state.queryTemplate} onChange={this.onQueryTemplateChange} />
         <br />
         <span>Query: "{this.state.query}"</span>
-        <SearchForm onSearch={this.onSearch}
-                    onReset={this.onReset}
-                    query={this.state.queryTemplate}
-                    label="Search"
-                    queryHelpComponent={(
-                      <Button onClick={() => alert('help!')} bsStyle="link">
-                        <Icon name="help" />
-                      </Button>)}
-                    useLoadingState />
+        <SearchForm
+          onSearch={this.onSearch}
+          onReset={this.onReset}
+          query={this.state.queryTemplate}
+          label="Search"
+          queryHelpComponent={
+            <Button onClick={() => alert('help!')} bsStyle="link">
+              <Icon name="help" />
+            </Button>
+          }
+          useLoadingState
+        />
       </div>
     );
   }
 }
 
-<SearchFormExample />
+<SearchFormExample />;
 ```

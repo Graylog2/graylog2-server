@@ -21,8 +21,10 @@ import type { EmblaCarouselType } from 'embla-carousel';
 
 import { singleton } from 'logic/singleton';
 
-type CarouselId = string
+type CarouselId = string;
 
-const CarouselContext = React.createContext<Record<CarouselId, { ref: React.Ref<HTMLDivElement>, api: EmblaCarouselType | undefined }> | undefined>(undefined);
+const CarouselContext = React.createContext<
+  Record<CarouselId, { ref: React.Ref<HTMLDivElement>; api: EmblaCarouselType | undefined }> | undefined
+>(undefined);
 
 export default singleton('contexts.CarouselContext', () => CarouselContext);

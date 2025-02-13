@@ -8,10 +8,7 @@
   "properties": [],
   "state": {
     "595447e8-50f8-48a9-a99c-078aa5b1f6f4": {
-      "selected_fields": [
-        "source",
-        "message"
-      ],
+      "selected_fields": ["source", "message"],
       "formatting": {
         "highlighting": []
       },
@@ -62,9 +59,7 @@
         }
       ],
       "widget_mapping": {
-        "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981": [
-          "68083979-98b6-4714-802a-f632b8a85b12"
-        ]
+        "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981": ["68083979-98b6-4714-802a-f632b8a85b12"]
       },
       "positions": {
         "da99bfc5-6542-4b4d-b2eb-cf7b2dfca981": {
@@ -76,10 +71,7 @@
       }
     },
     "f0a1f93c-8400-40de-83ac-94149dbf447c": {
-      "selected_fields": [
-        "source",
-        "message"
-      ],
+      "selected_fields": ["source", "message"],
       "formatting": {
         "highlighting": []
       },
@@ -130,9 +122,7 @@
         }
       ],
       "widget_mapping": {
-        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": [
-          "76414720-2191-4fa3-8037-074facf16a56"
-        ]
+        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": ["76414720-2191-4fa3-8037-074facf16a56"]
       },
       "positions": {
         "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": {

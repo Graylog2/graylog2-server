@@ -20,10 +20,10 @@ import { singleton } from 'logic/singleton';
 import type { Perspective } from 'components/perspectives/types';
 
 type PerspectivesContextType = {
-  activePerspective: Perspective,
-  availablePerspectives: Array<Perspective>
-  setActivePerspective: (perspectiveId: string) => void
-}
+  activePerspective: Perspective;
+  availablePerspectives: Array<Perspective>;
+  setActivePerspective: (perspectiveId: string) => void;
+};
 
 const PerspectivesContext = React.createContext<PerspectivesContextType | undefined>(undefined);
 

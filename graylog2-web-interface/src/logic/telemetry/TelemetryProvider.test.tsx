@@ -75,9 +75,7 @@ const renderSUT = () => {
 
   render(
     <TelemetryProvider>
-      <TelemetryContext.Consumer>
-        {consume}
-      </TelemetryContext.Consumer>
+      <TelemetryContext.Consumer>{consume}</TelemetryContext.Consumer>
     </TelemetryProvider>,
   );
 

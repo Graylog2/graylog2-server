@@ -39,17 +39,20 @@ import ShowContentPackStyle from './ShowContentPackPage.css';
 const ShowContentPackPage = () => {
   const history = useHistory();
   const params = useParams<{ contentPackId: string }>();
-  const onFetchError = useCallback((error: FetchError) => {
-    if (error.status === 404) {
-      UserNotification.error(
-        `Cannot find Content Pack with the id ${params.contentPackId} and may have been deleted.`,
-      );
-    } else {
-      UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
-    }
+  const onFetchError = useCallback(
+    (error: FetchError) => {
+      if (error.status === 404) {
+        UserNotification.error(
+          `Cannot find Content Pack with the id ${params.contentPackId} and may have been deleted.`,
+        );
+      } else {
+        UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
+      }
 
-    history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
-  }, [history, params?.contentPackId]);
+      history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
+    },
+    [history, params?.contentPackId],
+  );
 
   const [showModal, setShowModal] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState(undefined);
@@ -74,19 +77,22 @@ const ShowContentPackPage = () => {
   const _deleteContentPackRev = (contentPackId: string, revision?: number) => {
     /* eslint-disable-next-line no-alert */
     if (window.confirm('You are about to delete this content pack revision, are you sure?')) {
-      ContentPacksActions.deleteRev(contentPackId, revision).then(() => {
-        UserNotification.success('Content pack revision deleted successfully.', 'Success');
+      ContentPacksActions.deleteRev(contentPackId, revision).then(
+        () => {
+          UserNotification.success('Content pack revision deleted successfully.', 'Success');
 
-        refetchContentPack();
-      }, (error) => {
-        let errMessage = error.message;
+          refetchContentPack();
+        },
+        (error) => {
+          let errMessage = error.message;
 
-        if (error.responseMessage) {
-          errMessage = error.responseMessage;
-        }
+          if (error.responseMessage) {
+            errMessage = error.responseMessage;
+          }
 
-        UserNotification.error(`Deleting content pack failed: ${errMessage}`, 'Error');
-      });
+          UserNotification.error(`Deleting content pack failed: ${errMessage}`, 'Error');
+        },
+      );
     }
   };
 
@@ -108,27 +114,33 @@ const ShowContentPackPage = () => {
   };
 
   const _uninstallContentPackRev = () => {
-    ContentPacksActions.uninstall(uninstallContentPackId, uninstallInstallId).then(() => {
-      UserNotification.success('Content Pack uninstalled successfully.', 'Success');
-      refetchInstallations();
-      _clearUninstall();
-    }, () => {
-      UserNotification.error('Uninstall content pack failed, please check your logs for more information.', 'Error');
-    });
+    ContentPacksActions.uninstall(uninstallContentPackId, uninstallInstallId).then(
+      () => {
+        UserNotification.success('Content Pack uninstalled successfully.', 'Success');
+        refetchInstallations();
+        _clearUninstall();
+      },
+      () => {
+        UserNotification.error('Uninstall content pack failed, please check your logs for more information.', 'Error');
+      },
+    );
   };
 
   const _installContentPack = (contentPackId: string, contentPackRev: string, parameters) => {
-    ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(() => {
-      UserNotification.success('Content Pack installed successfully.', 'Success');
-      refetchInstallations();
-    }, (error) => {
-      UserNotification.error(`Installing content pack failed with status: ${error}.
+    ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(
+      () => {
+        UserNotification.success('Content Pack installed successfully.', 'Success');
+        refetchInstallations();
+      },
+      (error) => {
+        UserNotification.error(`Installing content pack failed with status: ${error}.
          Could not install content pack with ID: ${contentPackId}`);
-    });
+      },
+    );
   };
 
   if (isLoadingContentPack || isLoadingInstallations) {
-    return (<Spinner />);
+    return <Spinner />;
   }
 
   const { contentPackRevisions, constraints, selectedVersion: currentVersion } = contentPack;
@@ -137,19 +149,24 @@ const ShowContentPackPage = () => {
   return (
     <DocumentTitle title="Content packs">
       <span>
-        <PageHeader title="Content packs"
-                    topActions={(
-                      <ButtonToolbar>
-                        <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                          <Button bsStyle="info">Content Packs</Button>
-                        </LinkContainer>
-                      </ButtonToolbar>
-                      )}>
+        <PageHeader
+          title="Content packs"
+          topActions={
+            <ButtonToolbar>
+              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
+                <Button bsStyle="info">Content Packs</Button>
+              </LinkContainer>
+            </ButtonToolbar>
+          }>
           <span>
-            Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
+            Content packs accelerate the set up process for a specific data source. A content pack can include
+            inputs/extractors, streams, and dashboards.
             <br />
-            Find more content packs in {' '}
-            <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
+            Find more content packs in{' '}
+            <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">
+              the Graylog Marketplace
+            </a>
+            .
           </span>
         </PageHeader>
 
@@ -159,33 +176,37 @@ const ShowContentPackPage = () => {
               <Row className={ShowContentPackStyle.leftRow}>
                 <Col>
                   <h2>Versions</h2>
-                  <ContentPackVersions contentPackRevisions={contentPackRevisions}
-                                       onInstall={_installContentPack}
-                                       onChange={_onVersionChanged}
-                                       onDeletePack={_deleteContentPackRev} />
+                  <ContentPackVersions
+                    contentPackRevisions={contentPackRevisions}
+                    onInstall={_installContentPack}
+                    onChange={_onVersionChanged}
+                    onDeletePack={_deleteContentPackRev}
+                  />
                 </Col>
               </Row>
               <Row className={ShowContentPackStyle.leftRow}>
                 <Col>
                   <h2>Installations</h2>
-                  <ContentPackInstallations installations={installations}
-                                            onUninstall={_onUninstallContentPackRev} />
+                  <ContentPackInstallations installations={installations} onUninstall={_onUninstallContentPackRev} />
                 </Col>
               </Row>
             </div>
           </Col>
           <Col md={8} className="content">
-            <ContentPackDetails contentPack={contentPackRevisions.contentPack(selectedVersion ?? currentVersion)}
-                                constraints={constraints[selectedVersion ?? currentVersion]}
-                                showConstraints
-                                verbose />
+            <ContentPackDetails
+              contentPack={contentPackRevisions.contentPack(selectedVersion ?? currentVersion)}
+              constraints={constraints[selectedVersion ?? currentVersion]}
+              showConstraints
+              verbose
+            />
           </Col>
         </Row>
       </span>
-      <BootstrapModalConfirm showModal={showModal}
-                             title="Do you really want to uninstall this Content Pack?"
-                             onConfirm={_uninstallContentPackRev}
-                             onCancel={_clearUninstall}>
+      <BootstrapModalConfirm
+        showModal={showModal}
+        title="Do you really want to uninstall this Content Pack?"
+        onConfirm={_uninstallContentPackRev}
+        onCancel={_clearUninstall}>
         <ContentPackInstallEntityList uninstall entities={uninstallEntities} />
       </BootstrapModalConfirm>
     </DocumentTitle>

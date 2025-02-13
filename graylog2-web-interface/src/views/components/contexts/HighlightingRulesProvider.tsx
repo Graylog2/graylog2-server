@@ -26,13 +26,11 @@ const useHighlightingRules = () => useAppSelector(selectHighlightingRules);
 const HighlightingRulesProvider = ({ children }: { children: React.ReactElement }): React.ReactElement => {
   const highlightingRules = useHighlightingRules();
 
-  return highlightingRules
-    ? (
-      <HighlightingRulesContext.Provider value={highlightingRules}>
-        {children}
-      </HighlightingRulesContext.Provider>
-    )
-    : children;
+  return highlightingRules ? (
+    <HighlightingRulesContext.Provider value={highlightingRules}>{children}</HighlightingRulesContext.Provider>
+  ) : (
+    children
+  );
 };
 
 export default HighlightingRulesProvider;

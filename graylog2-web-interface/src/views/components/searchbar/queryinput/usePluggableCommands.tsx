@@ -30,14 +30,21 @@ const useCommandsContext = (usage: Usage): CustomCommandContext => {
 
 const usePluggableCommands = (usage: Usage): Array<Command> => {
   const pluggableCommands = usePluginEntities('views.queryInput.commands');
-  const commandsForUsage = useMemo(() => pluggableCommands.filter(({ usages = [] }) => usages.includes(usage)), [pluggableCommands, usage]);
+  const commandsForUsage = useMemo(
+    () => pluggableCommands.filter(({ usages = [] }) => usages.includes(usage)),
+    [pluggableCommands, usage],
+  );
   const context = useCommandsContext(usage);
 
-  return useMemo(() => commandsForUsage.map(({ name, bindKey, exec: commandExec }) => ({
-    name,
-    bindKey,
-    exec: (editor: Editor) => commandExec(editor, context),
-  })), [commandsForUsage, context]);
+  return useMemo(
+    () =>
+      commandsForUsage.map(({ name, bindKey, exec: commandExec }) => ({
+        name,
+        bindKey,
+        exec: (editor: Editor) => commandExec(editor, context),
+      })),
+    [commandsForUsage, context],
+  );
 };
 
 export default usePluggableCommands;

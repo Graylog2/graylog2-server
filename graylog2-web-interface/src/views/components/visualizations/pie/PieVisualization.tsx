@@ -27,9 +27,7 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import type {
-  PieChartDataSettingsWithCustomUnits,
-} from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
+import type { PieChartDataSettingsWithCustomUnits } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import usePieChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 
 import type { ChartConfig } from '../GenericPlot';
@@ -44,7 +42,7 @@ const _verticalDimensions = (idx: number, total: number): [number, number] => {
   const sliceSize = 1 / rows;
   const spacer = sliceSize * 0.1;
 
-  return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
+  return [sliceSize * position + spacer, sliceSize * (position + 1) - spacer];
 };
 
 const _horizontalDimensions = (idx: number, total: number): [number, number] => {
@@ -53,40 +51,37 @@ const _horizontalDimensions = (idx: number, total: number): [number, number] => 
   const sliceSize = 1 / Math.min(total, maxItemsPerRow);
   const spacer = sliceSize * 0.1;
 
-  return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
+  return [sliceSize * position + spacer, sliceSize * (position + 1) - spacer];
 };
 
-const _generateSeries = (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUnits: PieChartDataSettingsWithCustomUnits): Generator => ({
-  type,
-  name,
-  labels,
-  values,
-  idx,
-  total,
-  originalName,
-  config,
-  fullPath,
-}): ChartDefinition => {
-  const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
-  const extendedSettings = getPieChartDataSettingsWithCustomUnits({ values, name, fullPath });
+const _generateSeries =
+  (mapKeys: KeyMapper, getPieChartDataSettingsWithCustomUnits: PieChartDataSettingsWithCustomUnits): Generator =>
+  ({ type, name, labels, values, idx, total, originalName, config, fullPath }): ChartDefinition => {
+    const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
+    const extendedSettings = getPieChartDataSettingsWithCustomUnits({ values, name, fullPath });
 
-  return {
-    type,
-    name,
-    hole: 0.4,
-    labels: labels.map((label) => label.split(keySeparator).map((l, i) => mapKeys(l, rowPivots[i])).join(humanSeparator)),
-    originalLabels: labels,
-    values,
-    automargin: true,
-    textposition: 'inside',
-    domain: {
-      x: _horizontalDimensions(idx, total),
-      y: _verticalDimensions(idx, total),
-    },
-    originalName,
-    ...extendedSettings,
+    return {
+      type,
+      name,
+      hole: 0.4,
+      labels: labels.map((label) =>
+        label
+          .split(keySeparator)
+          .map((l, i) => mapKeys(l, rowPivots[i]))
+          .join(humanSeparator),
+      ),
+      originalLabels: labels,
+      values,
+      automargin: true,
+      textposition: 'inside',
+      domain: {
+        x: _horizontalDimensions(idx, total),
+        y: _verticalDimensions(idx, total),
+      },
+      originalName,
+      ...extendedSettings,
+    };
   };
-};
 
 const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
   const colors = chart.originalLabels.map((label) => colorMap.get(label));
@@ -94,7 +89,7 @@ const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
   return { marker: { colors } };
 };
 
-const labelMapper = (data: Array<{ labels: Array<string>, originalLabels?: Array<string> }>) => [
+const labelMapper = (data: Array<{ labels: Array<string>; originalLabels?: Array<string> }>) => [
   ...new Set(data.flatMap(({ labels, originalLabels }) => originalLabels ?? labels)),
 ];
 
@@ -104,12 +99,22 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const mapKeys = useMapKeys();
   const getPieChartDataSettingsWithCustomUnits = usePieChartDataSettingsWithCustomUnits({ config });
-  const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries(mapKeys, getPieChartDataSettingsWithCustomUnits) });
+  const transformedData = useChartData(rows, {
+    widgetConfig: config,
+    chartType: 'pie',
+    generator: _generateSeries(mapKeys, getPieChartDataSettingsWithCustomUnits),
+  });
 
   return (
-    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} labelFields={rowPivotsToFields} neverHide height={height} width={width}>
-      <GenericPlot chartData={transformedData}
-                   setChartColor={setChartColor} />
+    <PlotLegend
+      config={config}
+      chartData={transformedData}
+      labelMapper={labelMapper}
+      labelFields={rowPivotsToFields}
+      neverHide
+      height={height}
+      width={width}>
+      <GenericPlot chartData={transformedData} setChartColor={setChartColor} />
     </PlotLegend>
   );
 }, 'pie');

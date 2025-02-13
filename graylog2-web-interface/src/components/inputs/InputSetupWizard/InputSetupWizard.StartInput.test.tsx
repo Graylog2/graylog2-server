@@ -54,10 +54,7 @@ jest.mock('views/stores/StreamsStore', () => ({ StreamsStore: MockStore() }));
 jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 
 jest.mock('stores/inputs/InputStatesStore', () => ({
-  InputStatesStore: MockStore(
-    ['start', jest.fn(() => Promise.resolve())],
-    ['stop', jest.fn(() => Promise.resolve())],
-  ),
+  InputStatesStore: MockStore(['start', jest.fn(() => Promise.resolve())], ['stop', jest.fn(() => Promise.resolve())]),
 }));
 
 jest.mock('stores/nodes/NodesStore', () => ({
@@ -72,19 +69,18 @@ const input = {
   name: 'inputName',
   created_at: '',
   creator_user_id: 'creatorId',
-  static_fields: { },
-  attributes: { },
+  static_fields: {},
+  attributes: {},
 };
 
 const onClose = jest.fn();
 
-const renderWizard = () => (
+const renderWizard = () =>
   render(
     <InputSetupWizardProvider>
       <InputSetupWizard show input={input} onClose={onClose} />
     </InputSetupWizardProvider>,
-  )
-);
+  );
 
 const useStreamsResult = {
   data: {
@@ -108,59 +104,58 @@ const pipelinesConnectedMock = (response = []) => ({
 
 const useIndexSetsListResult = {
   data: {
-    indexSets:
-     [
-       {
-         id: 'default_id',
-         title: 'Default',
-         description: 'default index set',
-         index_prefix: 'default',
-         shards: 1,
-         replicas: 1,
-         rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
-         rotation_strategy: {
-           type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
-           max_docs_per_index: 20000000,
-         },
-         retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
-         retention_strategy: {
-           type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
-           max_number_of_indices: 2147483647,
-         },
-         index_analyzer: '',
-         index_optimization_max_num_segments: 0,
-         index_optimization_disabled: false,
-         field_type_refresh_interval: 1,
-         writable: true,
-         default: true,
-         can_be_default: true,
-       },
-       {
-         id: 'nox_id',
-         title: 'Nox',
-         description: 'nox index set',
-         index_prefix: 'nox',
-         shards: 1,
-         replicas: 1,
-         rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
-         rotation_strategy: {
-           type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
-           max_docs_per_index: 20000000,
-         },
-         retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
-         retention_strategy: {
-           type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
-           max_number_of_indices: 2147483647,
-         },
-         index_analyzer: '',
-         index_optimization_max_num_segments: 0,
-         index_optimization_disabled: false,
-         field_type_refresh_interval: 1,
-         writable: true,
-         default: false,
-         can_be_default: true,
-       },
-     ],
+    indexSets: [
+      {
+        id: 'default_id',
+        title: 'Default',
+        description: 'default index set',
+        index_prefix: 'default',
+        shards: 1,
+        replicas: 1,
+        rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+        rotation_strategy: {
+          type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+          max_docs_per_index: 20000000,
+        },
+        retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+        retention_strategy: {
+          type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
+          max_number_of_indices: 2147483647,
+        },
+        index_analyzer: '',
+        index_optimization_max_num_segments: 0,
+        index_optimization_disabled: false,
+        field_type_refresh_interval: 1,
+        writable: true,
+        default: true,
+        can_be_default: true,
+      },
+      {
+        id: 'nox_id',
+        title: 'Nox',
+        description: 'nox index set',
+        index_prefix: 'nox',
+        shards: 1,
+        replicas: 1,
+        rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+        rotation_strategy: {
+          type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+          max_docs_per_index: 20000000,
+        },
+        retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+        retention_strategy: {
+          type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
+          max_number_of_indices: 2147483647,
+        },
+        index_analyzer: '',
+        index_optimization_max_num_segments: 0,
+        index_optimization_disabled: false,
+        field_type_refresh_interval: 1,
+        writable: true,
+        default: false,
+        can_be_default: true,
+      },
+    ],
     indexSetsCount: 2,
     indexSetStats: null,
   },
@@ -248,7 +243,9 @@ describe('InputSetupWizard Start Input', () => {
       renderWizard();
       goToStartInputStep();
 
-      expect(await screen.findByText(/Set up and start the Input according to the configuration made./i)).toBeInTheDocument();
+      expect(
+        await screen.findByText(/Set up and start the Input according to the configuration made./i),
+      ).toBeInTheDocument();
     });
 
     it('should start when default stream is selected', async () => {
@@ -283,9 +280,9 @@ describe('InputSetupWizard Start Input', () => {
 
       await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
 
-      await waitFor(() => expect(PipelinesPipelines.routing).toHaveBeenCalledWith(
-        { input_id: 'input-test-id', stream_id: 'streamId1' },
-      ));
+      await waitFor(() =>
+        expect(PipelinesPipelines.routing).toHaveBeenCalledWith({ input_id: 'input-test-id', stream_id: 'streamId1' }),
+      );
 
       expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
       expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
@@ -325,9 +322,7 @@ describe('InputSetupWizard Start Input', () => {
         goToStartInputStep();
         startInput();
 
-        await waitFor(() => expect(Streams.create).toHaveBeenCalledWith(
-          expect.objectContaining(newStreamConfig),
-        ));
+        await waitFor(() => expect(Streams.create).toHaveBeenCalledWith(expect.objectContaining(newStreamConfig)));
       });
 
       it('should start the new stream', async () => {
@@ -345,9 +340,9 @@ describe('InputSetupWizard Start Input', () => {
         goToStartInputStep();
         startInput();
 
-        await waitFor(() => expect(PipelinesPipelines.createFromParser).toHaveBeenCalledWith(
-          expect.objectContaining(newPipelineConfig),
-        ));
+        await waitFor(() =>
+          expect(PipelinesPipelines.createFromParser).toHaveBeenCalledWith(expect.objectContaining(newPipelineConfig)),
+        );
       });
 
       it('create routing for the new stream', async () => {
@@ -356,9 +351,12 @@ describe('InputSetupWizard Start Input', () => {
         goToStartInputStep();
         startInput();
 
-        await waitFor(() => expect(PipelinesPipelines.routing).toHaveBeenCalledWith(
-          { input_id: 'input-test-id', stream_id: 'streamId1' },
-        ));
+        await waitFor(() =>
+          expect(PipelinesPipelines.routing).toHaveBeenCalledWith({
+            input_id: 'input-test-id',
+            stream_id: 'streamId1',
+          }),
+        );
       });
     });
   });

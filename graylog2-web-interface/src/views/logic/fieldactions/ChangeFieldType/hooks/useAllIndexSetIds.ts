@@ -20,38 +20,44 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 
-export type SimpleIndexSet = { id: string, type: string };
+export type SimpleIndexSet = { id: string; type: string };
 type IndexSetsState = Array<SimpleIndexSet>;
 const INITIAL_DATA: IndexSetsState = [];
 
 const url = qualifyUrl('system/indices/index_sets/types/index_sets_with_field_type_change_support');
 
-const fetchAllIndexSetIds = async (streams: Array<string>): Promise<IndexSetsState> => fetch<Array<{index_set_id: string, type: string }>>('POST', url, streams?.length ? streams : undefined).then(
-  (elements) => {
-    const list: Array<SimpleIndexSet> = elements.map((element) => ({
-      id: element.index_set_id,
-      type: element.type,
-    }));
+const fetchAllIndexSetIds = async (streams: Array<string>): Promise<IndexSetsState> =>
+  fetch<Array<{ index_set_id: string; type: string }>>('POST', url, streams?.length ? streams : undefined).then(
+    (elements) => {
+      const list: Array<SimpleIndexSet> = elements.map((element) => ({
+        id: element.index_set_id,
+        type: element.type,
+      }));
 
-    return list;
-  },
-);
-
-const useAllIndexSetIds = (streams: Array<string>): {
-  data: IndexSetsState,
-  isLoading: boolean,
-  refetch: () => void,
-} => {
-  const { data, isLoading, refetch } = useQuery(
-    ['allIndexSetIds', ...streams],
-    () => defaultOnError(fetchAllIndexSetIds(streams), 'Loading index sets with field type change support failed with status', 'Could not load index sets with field type change support'),
+      return list;
+    },
   );
 
-  return ({
+const useAllIndexSetIds = (
+  streams: Array<string>,
+): {
+  data: IndexSetsState;
+  isLoading: boolean;
+  refetch: () => void;
+} => {
+  const { data, isLoading, refetch } = useQuery(['allIndexSetIds', ...streams], () =>
+    defaultOnError(
+      fetchAllIndexSetIds(streams),
+      'Loading index sets with field type change support failed with status',
+      'Could not load index sets with field type change support',
+    ),
+  );
+
+  return {
     data: data ?? INITIAL_DATA,
     isLoading,
     refetch,
-  });
+  };
 };
 
 export default useAllIndexSetIds;

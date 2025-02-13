@@ -28,23 +28,30 @@ import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import SearchPage from './SearchPage';
 
 export type NewDashboardPageState = {
-  view?: View,
+  view?: View;
 };
 
 const NewDashboardPage = () => {
   const location = useLocation<NewDashboardPageState>();
   const searchView = location?.state?.view;
 
-  const viewPromise = useMemo(() => (searchView?.search
-    ? Promise.resolve(UpdateSearchForWidgets(viewTransformer(searchView)))
-    : ViewGenerator({ type: View.Type.Dashboard })),
-  // This should be run only once upon mount on purpose.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  []);
+  const viewPromise = useMemo(
+    () =>
+      searchView?.search
+        ? Promise.resolve(UpdateSearchForWidgets(viewTransformer(searchView)))
+        : ViewGenerator({ type: View.Type.Dashboard }),
+    // This should be run only once upon mount on purpose.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const view = useCreateSearch(viewPromise);
 
-  return <IfPermitted permissions="dashboards:create"><SearchPage view={view} isNew /></IfPermitted>;
+  return (
+    <IfPermitted permissions="dashboards:create">
+      <SearchPage view={view} isNew />
+    </IfPermitted>
+  );
 };
 
 export default NewDashboardPage;

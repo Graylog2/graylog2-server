@@ -35,17 +35,32 @@ const JournalDowntimeWarning = ({ currentStep, onTriggerStep, hideActions }: Mig
   return (
     <>
       <h3>Journal downtime size warning</h3>
-      <p>Please note that during migration data processing  will stop on your Graylog node, this will result in the journal growing in size.</p>
+      <p>
+        Please note that during migration data processing will stop on your Graylog node, this will result in the
+        journal growing in size.
+      </p>
       <p>Therefore you might need to increase your journal volume size.</p>
-      <p>Your current journal size is: <b>{data.journal_size_MB} MB</b> and your current journal throughput is: <b>{data.KBs_per_minute} KB/min</b></p>
-      <p>Your current maximum downtime for reconfiguring Graylog to point to the data node is: <b>{data.max_downtime_duration}</b></p>
+      <p>
+        Your current journal size is: <b>{data.journal_size_MB} MB</b> and your current journal throughput is:{' '}
+        <b>{data.KBs_per_minute} KB/min</b>
+      </p>
+      <p>
+        Your current maximum downtime for reconfiguring Graylog to point to the data node is:{' '}
+        <b>{data.max_downtime_duration}</b>
+      </p>
       {isError && (
-        <MigrationError errorMessage={`There was an error while estimating your journal throughput: ${error?.message}`} />
+        <MigrationError
+          errorMessage={`There was an error while estimating your journal throughput: ${error?.message}`}
+        />
       )}
       <DownsizeWarning bsStyle="warning">
         Please make sure your journal volume size is sufficient before proceeding.
       </DownsizeWarning>
-      <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar
+        hidden={hideActions}
+        nextSteps={currentStep.next_steps}
+        onTriggerStep={onTriggerStep}
+      />
     </>
   );
 };

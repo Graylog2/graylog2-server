@@ -39,25 +39,34 @@ const EventsRefreshControls = () => {
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
 
   const defaultInterval = useDefaultInterval();
-  const defaultRefreshConfig: RefreshConfig = useMemo(() => ({ enabled: true, interval: durationToMS(defaultInterval) }), [defaultInterval]);
+  const defaultRefreshConfig: RefreshConfig = useMemo(
+    () => ({ enabled: true, interval: durationToMS(defaultInterval) }),
+    [defaultInterval],
+  );
 
-  const onSelectInterval = useCallback((interval: string) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_REFRESH_CONTROL_PRESET_SELECTED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_section: 'alerts-page',
-      app_action_value: 'refresh-alerts-control-dropdown',
-      event_details: { interval: interval },
-    });
-  }, [location.pathname, sendTelemetry]);
+  const onSelectInterval = useCallback(
+    (interval: string) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_REFRESH_CONTROL_PRESET_SELECTED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_section: 'alerts-page',
+        app_action_value: 'refresh-alerts-control-dropdown',
+        event_details: { interval: interval },
+      });
+    },
+    [location.pathname, sendTelemetry],
+  );
 
-  const onToggle = useCallback((enabled) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_REFRESH_CONTROL_TOGGLED, {
-      app_pathname: 'alerts',
-      app_section: 'alerts-page',
-      app_action_value: 'refresh-alerts-control-enable',
-      event_details: { enabled },
-    });
-  }, [sendTelemetry]);
+  const onToggle = useCallback(
+    (enabled) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_REFRESH_CONTROL_TOGGLED, {
+        app_pathname: 'alerts',
+        app_section: 'alerts-page',
+        app_action_value: 'refresh-alerts-control-enable',
+        event_details: { enabled },
+      });
+    },
+    [sendTelemetry],
+  );
 
   if (!config) {
     return null;
@@ -67,14 +76,16 @@ const EventsRefreshControls = () => {
 
   return (
     <AutoRefreshProvider onRefresh={refetch} defaultRefreshConfig={defaultRefreshConfig}>
-      <RefreshControls disable={false}
-                       intervalOptions={intervalOptions}
-                       isLoadingMinimumInterval={isLoadingMinimumInterval}
-                       minimumRefreshInterval={minimumRefreshInterval}
-                       defaultInterval={defaultInterval}
-                       humanName="Evets"
-                       onToggle={onToggle}
-                       onSelectInterval={onSelectInterval} />
+      <RefreshControls
+        disable={false}
+        intervalOptions={intervalOptions}
+        isLoadingMinimumInterval={isLoadingMinimumInterval}
+        minimumRefreshInterval={minimumRefreshInterval}
+        defaultInterval={defaultInterval}
+        humanName="Evets"
+        onToggle={onToggle}
+        onSelectInterval={onSelectInterval}
+      />
     </AutoRefreshProvider>
   );
 };

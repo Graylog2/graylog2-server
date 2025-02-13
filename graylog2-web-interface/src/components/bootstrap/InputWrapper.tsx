@@ -21,11 +21,7 @@ type InputWrapperProps = {
   children: React.ReactNode;
 };
 
-const InputWrapper = ({
-  children,
-  className,
-}: InputWrapperProps) => (className
-  ? <div className={className}>{children}</div>
-  : <span>{children}</span>);
+const InputWrapper = ({ children, className }: InputWrapperProps) =>
+  className ? <div className={className}>{children}</div> : <span>{children}</span>;
 
 export default InputWrapper;
