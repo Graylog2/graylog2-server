@@ -24,24 +24,30 @@ import AbsoluteDateInput from 'views/components/searchbar/time-range-filter/time
 import { ModalSubmit } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
 import { isValidDate, toUTCFromTz, adjustFormat } from 'util/DateTime';
-import { DATE_SEPARATOR, extractRangeFromString, timeRangeTitle } from 'components/common/EntityFilters/helpers/timeRange';
+import {
+  DATE_SEPARATOR,
+  extractRangeFromString,
+  timeRangeTitle,
+} from 'components/common/EntityFilters/helpers/timeRange';
 
 import type { Filter } from '../types';
 
 type FormValues = {
-  from: string | undefined,
-  until: string | undefined,
-}
+  from: string | undefined;
+  until: string | undefined;
+};
 
 const Container = styled.div`
   padding: 3px 10px;
   max-width: 250px;
 `;
 
-const Info = styled.p(({ theme }) => css`
-  font-size: ${theme.fonts.size.small};
-  margin: 0 0 10px;
-`);
+const Info = styled.p(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.small};
+    margin: 0 0 10px;
+  `,
+);
 
 const Sections = styled.div`
   margin-bottom: 10px;
@@ -74,18 +80,24 @@ const DateTimeFormat = styled.code`
   padding: 0;
 `;
 
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.small};
-  font-style: italic;
-  padding: 3px 3px 9px;
-  height: 1.5em;
-`);
+const ErrorMessage = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.dark.danger};
+    font-size: ${theme.fonts.size.small};
+    font-style: italic;
+    padding: 3px 3px 9px;
+    height: 1.5em;
+  `,
+);
 
-const DateConfiguration = ({ name: fieldName, label, checkboxLabel }: {
-  name: string,
-  label: string,
-  checkboxLabel: string
+const DateConfiguration = ({
+  name: fieldName,
+  label,
+  checkboxLabel,
+}: {
+  name: string;
+  label: string;
+  checkboxLabel: string;
 }) => {
   const { formatTime } = useUserDateTime();
 
@@ -99,12 +111,11 @@ const DateConfiguration = ({ name: fieldName, label, checkboxLabel }: {
           <div>
             <SectionHeader>
               <StyledLabel htmlFor={`date-input-${name}`}>{label}</StyledLabel>
-              <StyledCheckbox onChange={onChangeAllTime} checked={!value}>{checkboxLabel}</StyledCheckbox>
+              <StyledCheckbox onChange={onChangeAllTime} checked={!value}>
+                {checkboxLabel}
+              </StyledCheckbox>
             </SectionHeader>
-            <AbsoluteDateInput name="from"
-                               value={value}
-                               disabled={value === undefined}
-                               onChange={_onChange} />
+            <AbsoluteDateInput name="from" value={value} disabled={value === undefined} onChange={_onChange} />
             {error && <ErrorMessage>{error}</ErrorMessage>}
           </div>
         );
@@ -119,10 +130,10 @@ const useInitialValues = (filter: Filter | undefined) => {
   if (filter) {
     const [from, until] = extractRangeFromString(filter.value);
 
-    return ({
+    return {
       from: from ? formatTime(from, 'complete') : undefined,
       until: until ? formatTime(until, 'complete') : undefined,
-    });
+    };
   }
 
   return {
@@ -136,9 +147,9 @@ const rangeError = 'The "Until" date must come after the "From" date.';
 
 const validate = (values: FormValues) => {
   let errors: {
-      from?: string,
-      until?: string,
-    } = {};
+    from?: string;
+    until?: string;
+  } = {};
 
   if (values.from && !isValidDate(values.from)) {
     errors = { ...errors, from: formatError };
@@ -160,9 +171,9 @@ const validate = (values: FormValues) => {
 };
 
 type Props = {
-  onSubmit: (filter: { title: string, value: string }) => void,
-  filter: Filter | undefined,
-}
+  onSubmit: (filter: { title: string; value: string }) => void;
+  filter: Filter | undefined;
+};
 
 const DateRangeForm = ({ filter, onSubmit }: Props) => {
   const { userTimezone } = useUserDateTime();
@@ -196,10 +207,12 @@ const DateRangeForm = ({ filter, onSubmit }: Props) => {
               Format: <DateTimeFormat>YYYY-MM-DD [HH:mm:ss[.SSS]]</DateTimeFormat>.<br />
               All timezones using: <b>{userTimezone}</b>.
             </Info>
-            <ModalSubmit submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
-                         bsSize="small"
-                         disabledSubmit={!isValid}
-                         displayCancel={false} />
+            <ModalSubmit
+              submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
+              bsSize="small"
+              disabledSubmit={!isValid}
+              displayCancel={false}
+            />
           </Form>
         )}
       </Formik>

@@ -25,9 +25,9 @@ import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
  */
 
 type Props = {
-  children: React.ReactNode,
-  permissions: string | Array<string>,
-  anyPermissions?: boolean,
+  children: React.ReactNode;
+  permissions: string | Array<string>;
+  anyPermissions?: boolean;
 };
 
 const _checkPermissions = (permissions, anyPermissions, currentUser) => {
@@ -41,24 +41,26 @@ const _checkPermissions = (permissions, anyPermissions, currentUser) => {
 const IfPermitted = ({ children, permissions, anyPermissions = false, ...rest }: Props) => {
   const currentUser = useCurrentUser();
 
-  if ((!permissions || permissions.length === 0) || (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))) {
+  if (
+    !permissions ||
+    permissions.length === 0 ||
+    (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))
+  ) {
     return (
       <>
-        {
-          React.Children.map(children, (child) => {
-            if (React.isValidElement(child)) {
-              const presentProps = (child && child.props) ? Object.keys(child.props) : [];
-              // do not overwrite existing props
-              const filteredRest = Object.entries(rest)
-                .filter((entry) => !presentProps.includes(entry[0]))
-                .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child)) {
+            const presentProps = child && child.props ? Object.keys(child.props) : [];
+            // do not overwrite existing props
+            const filteredRest = Object.entries(rest)
+              .filter((entry) => !presentProps.includes(entry[0]))
+              .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
 
-              return React.cloneElement(child, filteredRest);
-            }
+            return React.cloneElement(child, filteredRest);
+          }
 
-            return child;
-          })
-        }
+          return child;
+        })}
       </>
     );
   }

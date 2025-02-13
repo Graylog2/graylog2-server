@@ -24,10 +24,7 @@ interface IndexRetentionConfigComponentProps extends SystemConfigurationComponen
   config: IndexRetentionConfig;
   jsonSchema: RetentionJsonSchema;
   updateConfig: (update: IndexRetentionConfigProp) => void;
-  useMaxNumberOfIndices: () => [
-    number | undefined,
-    React.Dispatch<React.SetStateAction<number>>
-  ]
+  useMaxNumberOfIndices: () => [number | undefined, React.Dispatch<React.SetStateAction<number>>];
 }
 
 type IndexRetentionSummaryComponentProps = {
@@ -39,7 +36,7 @@ type IndexRetentionConfig = {
   displayName: string;
   configComponent: React.ComponentType<IndexRetentionConfigComponentProps>;
   summaryComponent: React.ComponentType<IndexRetentionSummaryComponentProps>;
-}
+};
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {

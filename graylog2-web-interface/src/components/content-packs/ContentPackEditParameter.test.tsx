@@ -27,26 +27,30 @@ describe('<ContentPackEditParameters />', () => {
   });
 
   it('should render a form for creation', () => {
-    const parameters = [{
-      name: 'A parameter name',
-      title: 'A parameter title',
-      description: 'A parameter descriptions',
-      type: 'string',
-      default_value: 'test',
-    }];
+    const parameters = [
+      {
+        name: 'A parameter name',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
     const wrapper = mount(<ContentPackEditParameter parameters={parameters} />);
 
     expect(wrapper).toExist();
   });
 
   it('should render a form for edition', () => {
-    const parameters = [{
-      name: 'A parameter name',
-      title: 'A parameter title',
-      description: 'A parameter descriptions',
-      type: 'string',
-      default_value: 'test',
-    }];
+    const parameters = [
+      {
+        name: 'A parameter name',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
 
     const parameterToEdit = {
       name: 'A parameter name',
@@ -55,8 +59,7 @@ describe('<ContentPackEditParameters />', () => {
       type: 'string',
       default_value: 'test',
     };
-    const wrapper = mount(<ContentPackEditParameter parameters={parameters}
-                                                    parameterToEdit={parameterToEdit} />);
+    const wrapper = mount(<ContentPackEditParameter parameters={parameters} parameterToEdit={parameterToEdit} />);
 
     expect(wrapper).toExist();
   });
@@ -136,12 +139,16 @@ describe('<ContentPackEditParameters />', () => {
       wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'hans-dampf' } });
       wrapper.find('form').at(0).simulate('submit');
 
-      expect(wrapper.find('span.help-block').at(1).text()).toEqual('The parameter name must only contain A-Z, a-z, 0-9 and _');
+      expect(wrapper.find('span.help-block').at(1).text()).toEqual(
+        'The parameter name must only contain A-Z, a-z, 0-9 and _',
+      );
 
       wrapper.find('input#name').simulate('change', { target: { name: 'name', value: 'dampf' } });
       wrapper.find('form').at(0).simulate('submit');
 
-      expect(wrapper.find('span.help-block').at(1).text()).toEqual('This is used as the parameter reference and must not contain a space.');
+      expect(wrapper.find('span.help-block').at(1).text()).toEqual(
+        'This is used as the parameter reference and must not contain a space.',
+      );
     });
 
     it('should validate the parameter input from type double', () => {
@@ -154,8 +161,9 @@ describe('<ContentPackEditParameters />', () => {
       wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: '1.0' } });
       wrapper.find('form').at(0).simulate('submit');
 
-      expect(wrapper.find('span.help-block').at(4).text())
-        .toEqual('Give a default value if the parameter is not optional.');
+      expect(wrapper.find('span.help-block').at(4).text()).toEqual(
+        'Give a default value if the parameter is not optional.',
+      );
     });
 
     it('should validate the parameter input from type integer', () => {
@@ -168,8 +176,9 @@ describe('<ContentPackEditParameters />', () => {
       wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: '1' } });
       wrapper.find('form').at(0).simulate('submit');
 
-      expect(wrapper.find('span.help-block').at(4).text())
-        .toEqual('Give a default value if the parameter is not optional.');
+      expect(wrapper.find('span.help-block').at(4).text()).toEqual(
+        'Give a default value if the parameter is not optional.',
+      );
     });
 
     it('should validate the parameter input from type boolean', () => {
@@ -177,13 +186,16 @@ describe('<ContentPackEditParameters />', () => {
       wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'test' } });
       wrapper.find('form').at(0).simulate('submit');
 
-      expect(wrapper.find('span.help-block').at(4).text()).toEqual('This is not a boolean value. It must be either true or false.');
+      expect(wrapper.find('span.help-block').at(4).text()).toEqual(
+        'This is not a boolean value. It must be either true or false.',
+      );
 
       wrapper.find('input#default_value').simulate('change', { target: { name: 'default_value', value: 'true' } });
       wrapper.find('form').at(0).simulate('submit');
 
-      expect(wrapper.find('span.help-block').at(4).text())
-        .toEqual('Give a default value if the parameter is not optional.');
+      expect(wrapper.find('span.help-block').at(4).text()).toEqual(
+        'Give a default value if the parameter is not optional.',
+      );
     });
   });
 });

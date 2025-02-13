@@ -43,33 +43,39 @@ type Props = {};
 
 // eslint-disable-next-line no-empty-pattern
 const PasswordFormGroup = ({}: Props) => (
-  <Input id="password-field"
-         label="Password"
-         help={`Passwords must be at least ${PASSWORD_MIN_LENGTH} characters long. We recommend using a strong password.`}
-         labelClassName="col-sm-3"
-         wrapperClassName="col-sm-9">
+  <Input
+    id="password-field"
+    label="Password"
+    help={`Passwords must be at least ${PASSWORD_MIN_LENGTH} characters long. We recommend using a strong password.`}
+    labelClassName="col-sm-3"
+    wrapperClassName="col-sm-9"
+  >
     <Row className="no-bm">
       <Col sm={6}>
-        <FormikInput name="password"
-                     id="password"
-                     maxLength={100}
-                     type="password"
-                     placeholder="Password"
-                     required
-                     formGroupClassName="form-group no-bm"
-                     wrapperClassName="col-xs-12"
-                     minLength={PASSWORD_MIN_LENGTH} />
+        <FormikInput
+          name="password"
+          id="password"
+          maxLength={100}
+          type="password"
+          placeholder="Password"
+          required
+          formGroupClassName="form-group no-bm"
+          wrapperClassName="col-xs-12"
+          minLength={PASSWORD_MIN_LENGTH}
+        />
       </Col>
       <Col sm={6}>
-        <FormikInput name="password_repeat"
-                     id="password_repeat"
-                     maxLength={100}
-                     type="password"
-                     placeholder="Repeat password"
-                     formGroupClassName="form-group no-bm"
-                     required
-                     wrapperClassName="col-xs-12"
-                     minLength={PASSWORD_MIN_LENGTH} />
+        <FormikInput
+          name="password_repeat"
+          id="password_repeat"
+          maxLength={100}
+          type="password"
+          placeholder="Repeat password"
+          formGroupClassName="form-group no-bm"
+          required
+          wrapperClassName="col-xs-12"
+          minLength={PASSWORD_MIN_LENGTH}
+        />
       </Col>
     </Row>
   </Input>

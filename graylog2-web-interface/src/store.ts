@@ -20,19 +20,24 @@ import type { PluggableReducer } from 'graylog-web-plugin';
 import type { RootState } from 'views/types';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 
-const createStore = (reducers: PluggableReducer[], initialState: Partial<RootState>, searchExecutors: SearchExecutors) => {
+const createStore = (
+  reducers: PluggableReducer[],
+  initialState: Partial<RootState>,
+  searchExecutors: SearchExecutors,
+) => {
   const reducer = Object.fromEntries(reducers.map((r) => [r.key, r.reducer]));
 
   return configureStore({
     reducer,
     preloadedState: initialState,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-      serializableCheck: false,
-      immutableCheck: false,
-      thunk: {
-        extraArgument: { searchExecutors },
-      },
-    }),
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: false,
+        immutableCheck: false,
+        thunk: {
+          extraArgument: { searchExecutors },
+        },
+      }),
   });
 };
 

@@ -38,45 +38,68 @@ jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 
 const NOT_ALLOWED_UNIT_FUNCTIONS = ['card', 'count', 'percentage'];
-const ALLOWED_UNIT_FUNCTIONS = ['sum', 'latest', 'avg', 'min', 'max', 'percentage', 'stddev', 'variance', 'sumofsquares', 'percentile'];
-const generateAllowedMetricsWithField = ():Array<MetricFormValues> => ALLOWED_UNIT_FUNCTIONS
-  .map((fn, index) => ({ function: fn, field: `field-allowed-${index}`, name: `metric-name-allowed-${index}` }));
-const generateAllowedMetricsWithoutField = ():Array<MetricFormValues> => ALLOWED_UNIT_FUNCTIONS
-  .map((fn, index) => ({ function: fn, field: null, name: `metric-name-allowed-no-filed-${index}` }));
+const ALLOWED_UNIT_FUNCTIONS = [
+  'sum',
+  'latest',
+  'avg',
+  'min',
+  'max',
+  'percentage',
+  'stddev',
+  'variance',
+  'sumofsquares',
+  'percentile',
+];
+const generateAllowedMetricsWithField = (): Array<MetricFormValues> =>
+  ALLOWED_UNIT_FUNCTIONS.map((fn, index) => ({
+    function: fn,
+    field: `field-allowed-${index}`,
+    name: `metric-name-allowed-${index}`,
+  }));
+const generateAllowedMetricsWithoutField = (): Array<MetricFormValues> =>
+  ALLOWED_UNIT_FUNCTIONS.map((fn, index) => ({
+    function: fn,
+    field: null,
+    name: `metric-name-allowed-no-filed-${index}`,
+  }));
 
-const generateNotAllowedMetricsWithField = ():Array<MetricFormValues> => NOT_ALLOWED_UNIT_FUNCTIONS
-  .map((fn, index) => ({ function: fn, field: `field-not-allowed-${index}`, name: `metric-name-not-allowed-${index}` }));
-const generateNotAllowedMetricsWithoutField = ():Array<MetricFormValues> => NOT_ALLOWED_UNIT_FUNCTIONS
-  .map((fn, index) => ({ function: fn, field: null, name: `metric-name-not-allowed-no-filed-${index}` }));
+const generateNotAllowedMetricsWithField = (): Array<MetricFormValues> =>
+  NOT_ALLOWED_UNIT_FUNCTIONS.map((fn, index) => ({
+    function: fn,
+    field: `field-not-allowed-${index}`,
+    name: `metric-name-not-allowed-${index}`,
+  }));
+const generateNotAllowedMetricsWithoutField = (): Array<MetricFormValues> =>
+  NOT_ALLOWED_UNIT_FUNCTIONS.map((fn, index) => ({
+    function: fn,
+    field: null,
+    name: `metric-name-not-allowed-no-filed-${index}`,
+  }));
 
 const fieldTypes = [
-  FieldTypeMapping.create('field-allowed-0',
-    FieldType.create('number', [Properties.Numeric])),
+  FieldTypeMapping.create('field-allowed-0', FieldType.create('number', [Properties.Numeric])),
 
-  FieldTypeMapping.create('field-allowed-1',
-    FieldType.create('number', [Properties.Numeric])),
+  FieldTypeMapping.create('field-allowed-1', FieldType.create('number', [Properties.Numeric])),
 
-  FieldTypeMapping.create('field-allowed-2',
-    FieldType.create('number', [Properties.FullTextSearch])),
+  FieldTypeMapping.create('field-allowed-2', FieldType.create('number', [Properties.FullTextSearch])),
 
-  FieldTypeMapping.create('field-allowed-3',
-    FieldType.create('number', [Properties.FullTextSearch])),
+  FieldTypeMapping.create('field-allowed-3', FieldType.create('number', [Properties.FullTextSearch])),
 
-  FieldTypeMapping.create('field-not-allowed-0',
-    FieldType.create('number', [Properties.Numeric])),
+  FieldTypeMapping.create('field-not-allowed-0', FieldType.create('number', [Properties.Numeric])),
 
-  FieldTypeMapping.create('field-not-allowed-1',
-    FieldType.create('number', [Properties.FullTextSearch])),
+  FieldTypeMapping.create('field-not-allowed-1', FieldType.create('number', [Properties.FullTextSearch])),
 ];
 
 const SUT = ({ initialValues = {} }: { initialValues: WidgetConfigFormValues }) => (
   <TestStoreProvider>
-    <FieldTypesContext.Provider value={{
-      all: Immutable.List(fieldTypes),
-      queryFields: Immutable.Map({
-        queryId: Immutable.List(fieldTypes),
-      }),
-    }}>
+    <FieldTypesContext.Provider
+      value={{
+        all: Immutable.List(fieldTypes),
+        queryFields: Immutable.Map({
+          queryId: Immutable.List(fieldTypes),
+        }),
+      }}
+    >
       <Formik initialValues={initialValues} onSubmit={() => {}}>
         <Form>
           <MetricsConfiguration />
@@ -94,7 +117,10 @@ describe('MetricsConfiguration', () => {
     asMock(useActiveQueryId).mockReturnValue('queryId');
 
     asMock(useFieldTypes).mockImplementation(() => ({
-      data: fieldTypes, isLoading: false, isFetching: false, refetch: () => {},
+      data: fieldTypes,
+      isLoading: false,
+      isFetching: false,
+      refetch: () => {},
     }));
   });
 

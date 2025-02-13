@@ -26,11 +26,12 @@ import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSe
 import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
 
-const bindSearchParamsFromQueryThunk = (query: { [key: string]: unknown; }) => (_dispatch: AppDispatch, getState: () => RootState) => {
-  const view = selectView(getState());
-  const executionState = selectSearchExecutionState(getState());
-  bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
-};
+const bindSearchParamsFromQueryThunk =
+  (query: { [key: string]: unknown }) => (_dispatch: AppDispatch, getState: () => RootState) => {
+    const view = selectView(getState());
+    const executionState = selectSearchExecutionState(getState());
+    bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
+  };
 
 const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {
   const dispatch = useAppDispatch();

@@ -15,32 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 :local(.popoverWide) {
-    max-width: 500px;
-    min-width: 350px;
+  max-width: 500px;
+  min-width: 350px;
 }
 
 /* styles for table columns */
 :local(.rowTitle) {
-    width: 15%;
+  width: 15%;
 }
 :local(.rowDescription) {
-    max-width: 50%;
-    width: 35%
+  max-width: 50%;
+  width: 35%;
 }
 :local(.rowName) {
-    width: 15%;
+  width: 15%;
 }
 :local(.rowCache) {
-    width: 15%;
+  width: 15%;
 }
 :local(.rowAdapter) {
-    width: 15%;
+  width: 15%;
 }
 :local(.rowActions) {
-    min-width: 100px;
+  min-width: 100px;
 }
 
 :local(overviewTable) {
-    width: 100%;
-    table-layout: fixed;
+  width: 100%;
+  table-layout: fixed;
 }

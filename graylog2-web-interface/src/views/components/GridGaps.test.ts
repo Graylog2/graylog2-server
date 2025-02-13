@@ -18,20 +18,20 @@ import findGaps from './GridGaps';
 
 type Item = {
   start: {
-    x: number,
-    y: number,
-  },
+    x: number;
+    y: number;
+  };
   end: {
-    x: number,
-    y: number
-  }
+    x: number;
+    y: number;
+  };
 };
 
 type Position = {
-  col: number,
-  row: number,
-  width: number,
-  height: number,
+  col: number;
+  row: number;
+  width: number;
+  height: number;
 };
 const convertItem = (item: Item): Position => ({
   col: item.start.x,
@@ -53,10 +53,12 @@ describe('GridGaps', () => {
       },
     ].map(convertItem);
 
-    expect(findGaps(items)).toContainEqual(convertItem({
-      start: { x: 1, y: 0 },
-      end: { x: 3, y: 1 },
-    }));
+    expect(findGaps(items)).toContainEqual(
+      convertItem({
+        start: { x: 1, y: 0 },
+        end: { x: 3, y: 1 },
+      }),
+    );
   });
 
   it('does not find gaps for two items below each other occupying max width', () => {
@@ -108,8 +110,8 @@ describe('GridGaps', () => {
       },
     ].map(convertItem);
 
-    expect(findGaps(items)).toContainEqual(convertItem(
-      {
+    expect(findGaps(items)).toContainEqual(
+      convertItem({
         start: {
           x: 4,
           y: 1,
@@ -118,8 +120,8 @@ describe('GridGaps', () => {
           x: 7,
           y: 5,
         },
-      },
-    ));
+      }),
+    );
   });
 
   it('finds initial gap', () => {
@@ -130,10 +132,12 @@ describe('GridGaps', () => {
       },
     ].map(convertItem);
 
-    expect(findGaps(items)).toContainEqual(convertItem({
-      start: { x: 1, y: 1 },
-      end: { x: 3, y: 2 },
-    }));
+    expect(findGaps(items)).toContainEqual(
+      convertItem({
+        start: { x: 1, y: 1 },
+        end: { x: 3, y: 2 },
+      }),
+    );
   });
 
   it('calculates initial gap correctly', () => {
@@ -160,10 +164,14 @@ describe('GridGaps', () => {
       },
     ].map(convertItem);
 
-    expect(findGaps(items)).toEqual([{
-      start: { x: 1, y: 1 },
-      end: { x: 5, y: 5 },
-    }].map(convertItem));
+    expect(findGaps(items)).toEqual(
+      [
+        {
+          start: { x: 1, y: 1 },
+          end: { x: 5, y: 5 },
+        },
+      ].map(convertItem),
+    );
   });
 
   describe('calculates overlapping gaps correctly', () => {
@@ -193,53 +201,61 @@ describe('GridGaps', () => {
     it('leading gaps', () => {
       const result = findGaps(items);
 
-      expect(result).toContainEqual(convertItem({
-        start: {
-          x: 1,
-          y: 2,
-        },
-        end: {
-          x: 5,
-          y: 6,
-        },
-      }));
+      expect(result).toContainEqual(
+        convertItem({
+          start: {
+            x: 1,
+            y: 2,
+          },
+          end: {
+            x: 5,
+            y: 6,
+          },
+        }),
+      );
 
-      expect(result).toContainEqual(convertItem({
-        start: {
-          x: 1,
-          y: 6,
-        },
-        end: {
-          x: 4,
-          y: 10,
-        },
-      }));
+      expect(result).toContainEqual(
+        convertItem({
+          start: {
+            x: 1,
+            y: 6,
+          },
+          end: {
+            x: 4,
+            y: 10,
+          },
+        }),
+      );
     });
 
     it('trailing gaps', () => {
       const result = findGaps(items);
 
-      expect(result).toContainEqual(convertItem({
-        start: {
-          x: 9,
-          y: 2,
-        },
-        end: {
-          x: 13,
-          y: 6,
-        },
-      }));
+      expect(result).toContainEqual(
+        convertItem({
+          start: {
+            x: 9,
+            y: 2,
+          },
+          end: {
+            x: 13,
+            y: 6,
+          },
+        }),
+      );
 
-      expect(result).toContainEqual(convertItem({
-        start: {
-          x: 8,
-          y: 6,
-        },
-        end: {
-          x: 13,
-          y: 10,
-        },
-      }));
+      expect(result).toContainEqual(
+        convertItem({
+          start: {
+            x: 8,
+            y: 6,
+          },
+          end: {
+            x: 13,
+            y: 10,
+          },
+        }),
+      );
     });
   });
 
@@ -277,10 +293,14 @@ describe('GridGaps', () => {
       },
     ].map(convertItem);
 
-    expect(findGaps(items)).toEqual([{
-      start: { x: 4, y: 1 },
-      end: { x: 7, y: 7 },
-    }].map(convertItem));
+    expect(findGaps(items)).toEqual(
+      [
+        {
+          start: { x: 4, y: 1 },
+          end: { x: 7, y: 7 },
+        },
+      ].map(convertItem),
+    );
   });
 
   it('avoid occupying empty row(s)', () => {
@@ -307,10 +327,14 @@ describe('GridGaps', () => {
       },
     ].map(convertItem);
 
-    expect(findGaps(items)).toEqual([{
-      start: { x: 4, y: 1 },
-      end: { x: 13, y: 4 },
-    }].map(convertItem));
+    expect(findGaps(items)).toEqual(
+      [
+        {
+          start: { x: 4, y: 1 },
+          end: { x: 13, y: 4 },
+        },
+      ].map(convertItem),
+    );
   });
 
   it('should not generate gaps for overlapping widgets', () => {
@@ -341,58 +365,64 @@ describe('GridGaps', () => {
   });
 
   it('should not overlap initial placeholders with other widgets', () => {
-    const items = [{
-      start: {
-        x: 5,
-        y: 1,
+    const items = [
+      {
+        start: {
+          x: 5,
+          y: 1,
+        },
+        end: {
+          x: 13,
+          y: 5,
+        },
       },
-      end: {
-        x: 13,
-        y: 5,
-      },
-    },
 
-    {
-      start: {
-        x: 1,
-        y: 5,
+      {
+        start: {
+          x: 1,
+          y: 5,
+        },
+        end: {
+          x: 13,
+          y: 7,
+        },
       },
-      end: {
-        x: 13,
-        y: 7,
+      {
+        start: {
+          x: 5,
+          y: 7,
+        },
+        end: {
+          x: 13,
+          y: 11,
+        },
       },
-    },
-    {
-      start: {
-        x: 5,
-        y: 7,
-      },
-      end: {
-        x: 13,
-        y: 11,
-      },
-    },
     ].map(convertItem);
 
-    expect(findGaps(items)).toEqual([{
-      start: {
-        x: 1,
-        y: 1,
-      },
-      end: {
-        x: 5,
-        y: 5,
-      },
-    }, {
-      start: {
-        x: 1,
-        y: 7,
-      },
-      end: {
-        x: 5,
-        y: 11,
-      },
-    }].map(convertItem));
+    expect(findGaps(items)).toEqual(
+      [
+        {
+          start: {
+            x: 1,
+            y: 1,
+          },
+          end: {
+            x: 5,
+            y: 5,
+          },
+        },
+        {
+          start: {
+            x: 1,
+            y: 7,
+          },
+          end: {
+            x: 5,
+            y: 11,
+          },
+        },
+      ].map(convertItem),
+    );
   });
 
   it('should not overlap final placeholders with other widgets', () => {
@@ -429,25 +459,30 @@ describe('GridGaps', () => {
       },
     ].map(convertItem);
 
-    expect(findGaps(items)).toEqual([{
-      start: {
-        x: 5,
-        y: 1,
-      },
-      end: {
-        x: 13,
-        y: 5,
-      },
-    }, {
-      start: {
-        x: 5,
-        y: 7,
-      },
-      end: {
-        x: 13,
-        y: 11,
-      },
-    }].map(convertItem));
+    expect(findGaps(items)).toEqual(
+      [
+        {
+          start: {
+            x: 5,
+            y: 1,
+          },
+          end: {
+            x: 13,
+            y: 5,
+          },
+        },
+        {
+          start: {
+            x: 5,
+            y: 7,
+          },
+          end: {
+            x: 13,
+            y: 11,
+          },
+        },
+      ].map(convertItem),
+    );
   });
 
   it('does not generate invalid gaps', () => {
@@ -498,27 +533,31 @@ describe('GridGaps', () => {
 
     expect(result).toHaveLength(2);
 
-    expect(result).toEqual(expect.arrayContaining([
-      {
-        end: {
-          x: 13,
-          y: 7,
-        },
-        start: {
-          x: 9,
-          y: 1,
-        },
-      },
-      {
-        end: {
-          x: 13,
-          y: 9,
-        },
-        start: {
-          x: 4,
-          y: 7,
-        },
-      },
-    ].map(convertItem)));
+    expect(result).toEqual(
+      expect.arrayContaining(
+        [
+          {
+            end: {
+              x: 13,
+              y: 7,
+            },
+            start: {
+              x: 9,
+              y: 1,
+            },
+          },
+          {
+            end: {
+              x: 13,
+              y: 9,
+            },
+            start: {
+              x: 4,
+              y: 7,
+            },
+          },
+        ].map(convertItem),
+      ),
+    );
   });
 });

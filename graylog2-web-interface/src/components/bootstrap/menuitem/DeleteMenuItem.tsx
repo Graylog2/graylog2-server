@@ -20,12 +20,16 @@ import styled, { css } from 'styled-components';
 
 import MenuItem from './MenuItem';
 
-const StyledMenuItem = styled(MenuItem)(({ theme }) => css`
-  color: ${theme.colors.variant.danger};
-`);
+const StyledMenuItem = styled(MenuItem)(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.danger};
+  `,
+);
 
-type Props = React.ComponentProps<typeof MenuItem>
+type Props = React.ComponentProps<typeof MenuItem>;
 
-const DeleteMenuItem = ({ children = 'Delete', ...props }: Props) => <StyledMenuItem {...props}>{children}</StyledMenuItem>;
+const DeleteMenuItem = ({ children = 'Delete', ...props }: Props) => (
+  <StyledMenuItem {...props}>{children}</StyledMenuItem>
+);
 
 export default DeleteMenuItem;

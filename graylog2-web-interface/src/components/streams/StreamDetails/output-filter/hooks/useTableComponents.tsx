@@ -20,9 +20,10 @@ import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/ou
 import FilterActions from 'components/streams/StreamDetails/output-filter/FilterActions';
 
 const useTableElements = (destinationType: string) => {
-  const entityActions = useCallback((listItem: StreamOutputFilterRule) => (
-    <FilterActions filterRule={listItem} destinationType={destinationType} />
-  ), [destinationType]);
+  const entityActions = useCallback(
+    (listItem: StreamOutputFilterRule) => <FilterActions filterRule={listItem} destinationType={destinationType} />,
+    [destinationType],
+  );
 
   return {
     entityActions,

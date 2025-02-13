@@ -24,11 +24,13 @@ import { defaultOnError } from 'util/conditional/onError';
 const useMinimumRefreshInterval = () => {
   const { data, isInitialLoading } = useQuery(
     ['system', 'configuration', 'minimum-refresh-interval'],
-    () => defaultOnError(fetch('GET', qualifyUrl('/system/configuration/minimum_auto_refresh_interval')),
-      'Loading system configuration "minimum_auto_refresh_interval" failed with status',
-      'Could not load configuration option'),
-    {
-    },
+    () =>
+      defaultOnError(
+        fetch('GET', qualifyUrl('/system/configuration/minimum_auto_refresh_interval')),
+        'Loading system configuration "minimum_auto_refresh_interval" failed with status',
+        'Could not load configuration option',
+      ),
+    {},
   );
 
   return { data: data?.value, isInitialLoading };

@@ -16,11 +16,7 @@
  */
 import * as React from 'react';
 
-import {
-  QueryHelper,
-  RelativeTime,
-  PaginatedEntityTable,
-} from 'components/common';
+import { QueryHelper, RelativeTime, PaginatedEntityTable } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
@@ -42,19 +38,14 @@ const customColumnRenderers = {
       ),
     },
     matched_at: {
-      renderCell: (_matched_at: string, eventDefinition) => (
-        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never'
-      ),
+      renderCell: (_matched_at: string, eventDefinition) =>
+        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never',
     },
     scheduling: {
-      renderCell: (_scheduling: string, eventDefinition) => (
-        <SchedulingCell definition={eventDefinition} />
-      ),
+      renderCell: (_scheduling: string, eventDefinition) => <SchedulingCell definition={eventDefinition} />,
     },
     status: {
-      renderCell: (_status: string, eventDefinition) => (
-        <StatusCell eventDefinition={eventDefinition} />
-      ),
+      renderCell: (_status: string, eventDefinition) => <StatusCell eventDefinition={eventDefinition} />,
       staticWidth: 100,
     },
     priority: {
@@ -65,25 +56,26 @@ const customColumnRenderers = {
 
 const bulkSelection = {
   actions: <BulkActions />,
-
 };
 const renderEventDefinitionActions = (listItem: EventDefinition) => (
   <EventDefinitionActions eventDefinition={listItem} />
 );
 
 const EventDefinitionsContainer = () => (
-  <PaginatedEntityTable<EventDefinition> humanName="event definitions"
-                                         columnsOrder={COLUMNS_ORDER}
-                                         additionalAttributes={ADDITIONAL_ATTRIBUTES}
-                                         queryHelpComponent={<QueryHelper entityName="event definition" />}
-                                         tableLayout={DEFAULT_LAYOUT}
-                                         fetchEntities={fetchEventDefinitions}
-                                         entityActions={renderEventDefinitionActions}
-                                         keyFn={keyFn}
-                                         entityAttributesAreCamelCase={false}
-                                         filterValueRenderers={FilterValueRenderers}
-                                         columnRenderers={customColumnRenderers}
-                                         bulkSelection={bulkSelection} />
+  <PaginatedEntityTable<EventDefinition>
+    humanName="event definitions"
+    columnsOrder={COLUMNS_ORDER}
+    additionalAttributes={ADDITIONAL_ATTRIBUTES}
+    queryHelpComponent={<QueryHelper entityName="event definition" />}
+    tableLayout={DEFAULT_LAYOUT}
+    fetchEntities={fetchEventDefinitions}
+    entityActions={renderEventDefinitionActions}
+    keyFn={keyFn}
+    entityAttributesAreCamelCase={false}
+    filterValueRenderers={FilterValueRenderers}
+    columnRenderers={customColumnRenderers}
+    bulkSelection={bulkSelection}
+  />
 );
 
 export default EventDefinitionsContainer;

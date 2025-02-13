@@ -3,31 +3,31 @@
 ```js
 const styles = { position: 'relative', display: 'inline-block' };
 
-<div style={{display: "grid", "gridTemplateColumns": "1fr 1fr 1fr 1fr"}}>
-  <div style={{height: "24px"}}>
+<div style={{ display: 'grid', 'gridTemplateColumns': '1fr 1fr 1fr 1fr' }}>
+  <div style={{ height: '24px' }}>
     <Tooltip placement="right" className="in" id="tooltip-right" style={styles}>
       Tooltip right
     </Tooltip>
   </div>
 
-  <div style={{height: "24px"}}>
+  <div style={{ height: '24px' }}>
     <Tooltip placement="top" className="in" id="tooltip-top" style={styles}>
       Tooltip top
     </Tooltip>
   </div>
 
-  <div style={{height: "24px"}}>
+  <div style={{ height: '24px' }}>
     <Tooltip placement="left" className="in" id="tooltip-left" style={styles}>
       Tooltip left
     </Tooltip>
   </div>
 
-  <div style={{height: "24px"}}>
+  <div style={{ height: '24px' }}>
     <Tooltip placement="bottom" className="in" id="tooltip-bottom" style={styles}>
       Tooltip bottom
     </Tooltip>
   </div>
-</div>
+</div>;
 ```
 
 ### Hover
@@ -61,8 +61,8 @@ const TooltipExample = () => {
         <Button bsStyle="default">Hover Example Right!</Button>
       </OverlayTrigger>
     </ButtonToolbar>
-  )
+  );
 };
 
-<TooltipExample />
+<TooltipExample />;
 ```

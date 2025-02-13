@@ -27,11 +27,13 @@ const setScratchpadVisibility = jest.fn();
 document.execCommand = jest.fn();
 
 const SUT = () => (
-  <ScratchpadContext.Provider value={{
-    isScratchpadVisible: true,
-    localStorageItem: 'gl-scratchpad-jest',
-    setScratchpadVisibility,
-  }}>
+  <ScratchpadContext.Provider
+    value={{
+      isScratchpadVisible: true,
+      localStorageItem: 'gl-scratchpad-jest',
+      setScratchpadVisibility,
+    }}
+  >
     <Scratchpad />
   </ScratchpadContext.Provider>
 );

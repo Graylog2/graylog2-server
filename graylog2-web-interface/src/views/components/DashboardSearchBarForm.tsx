@@ -33,19 +33,21 @@ import useSearchBarSubmit from 'views/components/searchbar/useSearchBarSubmit';
 import { onInitializingTimerange } from './TimerangeForForm';
 
 export type DashboardFormValues = {
-  timerange: TimeRange | undefined | null | NoTimeRangeOverride,
-  queryString: string | undefined | null,
+  timerange: TimeRange | undefined | null | NoTimeRangeOverride;
+  queryString: string | undefined | null;
 };
 
 type Props = {
-  initialValues: DashboardFormValues,
-  limitDuration: number,
-  onSubmit: (values: DashboardFormValues) => Promise<any>,
-  children: ((props: FormikProps<DashboardFormValues>) => React.ReactElement) | React.ReactElement,
-  validateQueryString: (values: DashboardFormValues) => Promise<QueryValidationState>,
+  initialValues: DashboardFormValues;
+  limitDuration: number;
+  onSubmit: (values: DashboardFormValues) => Promise<any>;
+  children: ((props: FormikProps<DashboardFormValues>) => React.ReactElement) | React.ReactElement;
+  validateQueryString: (values: DashboardFormValues) => Promise<QueryValidationState>;
 };
 
-const _isFunction = (children: Props['children']): children is (props: FormikProps<DashboardFormValues>) => React.ReactElement => isFunction(children);
+const _isFunction = (
+  children: Props['children'],
+): children is (props: FormikProps<DashboardFormValues>) => React.ReactElement => isFunction(children);
 
 const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQueryString, children }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
@@ -53,7 +55,8 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
 
   const { timerange, ...rest } = initialValues;
-  const initialTimeRange = timerange && !isNoTimeRangeOverride(timerange) ? onInitializingTimerange(timerange, formatTime) : {} as TimeRange;
+  const initialTimeRange =
+    timerange && !isNoTimeRangeOverride(timerange) ? onInitializingTimerange(timerange, formatTime) : ({} as TimeRange);
   const _initialValues = {
     timerange: initialTimeRange,
     ...rest,
@@ -62,28 +65,38 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
   const { enableReinitialize, onSubmit: _onSubmit } = useSearchBarSubmit(_initialValues, onSubmit);
 
   const handlerContext = useHandlerContext();
-  const _validate = useCallback((values: DashboardFormValues) => validate(
-    values,
-    limitDuration,
-    setFieldWarning,
-    validateQueryString,
-    pluggableSearchBarControls,
-    formatTime,
-    handlerContext,
-    userTimezone,
-  ), [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext, userTimezone]);
+  const _validate = useCallback(
+    (values: DashboardFormValues) =>
+      validate(
+        values,
+        limitDuration,
+        setFieldWarning,
+        validateQueryString,
+        pluggableSearchBarControls,
+        formatTime,
+        handlerContext,
+        userTimezone,
+      ),
+    [
+      limitDuration,
+      setFieldWarning,
+      validateQueryString,
+      pluggableSearchBarControls,
+      formatTime,
+      handlerContext,
+      userTimezone,
+    ],
+  );
 
   return (
-    <Formik<DashboardFormValues> initialValues={_initialValues}
-                                 enableReinitialize={enableReinitialize}
-                                 onSubmit={_onSubmit}
-                                 validate={_validate}
-                                 validateOnMount>
-      {(...args) => (
-        <Form>
-          {_isFunction(children) ? children(...args) : children}
-        </Form>
-      )}
+    <Formik<DashboardFormValues>
+      initialValues={_initialValues}
+      enableReinitialize={enableReinitialize}
+      onSubmit={_onSubmit}
+      validate={_validate}
+      validateOnMount
+    >
+      {(...args) => <Form>{_isFunction(children) ? children(...args) : children}</Form>}
     </Formik>
   );
 };

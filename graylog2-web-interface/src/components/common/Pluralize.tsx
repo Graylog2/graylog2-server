@@ -30,9 +30,12 @@ type PluralizeProps = {
 /**
  * Component that will render a singular or plural text depending on a given value.
  */
-class Pluralize extends React.Component<PluralizeProps, {
-  [key: string]: any;
-}> {
+class Pluralize extends React.Component<
+  PluralizeProps,
+  {
+    [key: string]: any;
+  }
+> {
   render() {
     return <span>{StringUtils.pluralize(this.props.value, this.props.singular, this.props.plural)}</span>;
   }

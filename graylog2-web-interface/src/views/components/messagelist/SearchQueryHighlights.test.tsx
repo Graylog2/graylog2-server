@@ -22,14 +22,12 @@ import type { Message } from 'views/components/messagelist/Types';
 
 import SearchQueryHighlights from './SearchQueryHighlights';
 
-const messageFor = (ranges: { [p: string]: any }) => ({ highlight_ranges: ranges } as Message);
+const messageFor = (ranges: { [p: string]: any }) => ({ highlight_ranges: ranges }) as Message;
 
 const hasBrokenUpText = (text: string) => (_content, node: Element) => {
   const hasText = (currentNode: Element) => currentNode.textContent === text;
   const nodeHasText = hasText(node);
-  const childrenDontHaveText = Array.from(node.children).every(
-    (child) => !hasText(child),
-  );
+  const childrenDontHaveText = Array.from(node.children).every((child) => !hasText(child));
 
   return nodeHasText && childrenDontHaveText;
 };

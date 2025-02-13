@@ -32,18 +32,18 @@ const DEFAULT_VIEWPORT = {
 };
 
 type MapVisualizationProps = {
-  attribution?: string,
-  onRenderComplete?: () => void,
-  markerRadiusSize?: number,
-  markerRadiusIncrementSize?: number,
-  id: string,
-  url?: string,
-  locked?: boolean,
-  viewport?: Viewport,
-  height: number,
-  width: number,
-  onChange: (newViewport: Viewport) => void,
-  data: Array<{ keys: any, name: any, values: { [key: string]: number } }>
+  attribution?: string;
+  onRenderComplete?: () => void;
+  markerRadiusSize?: number;
+  markerRadiusIncrementSize?: number;
+  id: string;
+  url?: string;
+  locked?: boolean;
+  viewport?: Viewport;
+  height: number;
+  width: number;
+  onChange: (newViewport: Viewport) => void;
+  data: Array<{ keys: any; name: any; values: { [key: string]: number } }>;
 };
 
 const _getBucket = (value: number, bucketCount: number, minValue: number, maxValue: number, increment: number) => {
@@ -57,36 +57,46 @@ const _getBucket = (value: number, bucketCount: number, minValue: number, maxVal
 
 // Coordinates are given as "lat,long"
 type MarkerProps = {
-  coordinates: string,
-  value: number,
-  min: number,
-  max: number,
-  radiusSize: number,
-  increment: number,
-  color: chroma.Color,
-  name: JSX.Element,
-  keys: { [s: string]: unknown; } | ArrayLike<unknown>,
+  coordinates: string;
+  value: number;
+  min: number;
+  max: number;
+  radiusSize: number;
+  increment: number;
+  color: chroma.Color;
+  name: JSX.Element;
+  keys: { [s: string]: unknown } | ArrayLike<unknown>;
 };
 
 const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, name, keys }: MarkerProps) => {
   // eslint-disable-next-line no-restricted-globals
-  const formattedCoordinates = coordinates.split(',').map((component) => Number(component)).filter((n) => !isNaN(n));
+  const formattedCoordinates = coordinates
+    .split(',')
+    .map((component) => Number(component))
+    .filter((n) => !isNaN(n));
 
   if (formattedCoordinates.length !== 2) {
     return null;
   }
 
   const radius = _getBucket(value, radiusSize, min, max, increment);
-  const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v as React.ReactNode}</dd>]));
+  const markerKeys = flatten(
+    Object.entries(keys).map(([k, v]) => [
+      <dt key={`dt-${k}-${v}`}>{k}</dt>,
+      <dd key={`dd-${k}-${v}`}>{v as React.ReactNode}</dd>,
+    ]),
+  );
 
   return (
-    <CircleMarker key={`${name}-${coordinates}`}
-                  center={formattedCoordinates as [number, number]}
-                  radius={radius}
-                  color={color.hex()}
-                  fillColor={color.hex()}
-                  weight={2}
-                  opacity={0.8}>
+    <CircleMarker
+      key={`${name}-${coordinates}`}
+      center={formattedCoordinates as [number, number]}
+      radius={radius}
+      color={color.hex()}
+      fillColor={color.hex()}
+      weight={2}
+      opacity={0.8}
+    >
       <Popup>
         <dl>
           <dt>Name</dt>
@@ -94,20 +104,23 @@ const Marker = ({ coordinates, value, min, max, radiusSize, increment, color, na
           {markerKeys}
           <dt>Coordinates:</dt>
           <dd>{coordinates}</dd>
-          {value
-            && (
-              <>
-                <dt>Value:</dt>
-                <dd>{value}</dd>
-              </>
-            )}
+          {value && (
+            <>
+              <dt>Value:</dt>
+              <dd>{value}</dd>
+            </>
+          )}
         </dl>
       </Popup>
     </CircleMarker>
   );
 };
 
-const MapEvents = ({ onViewportChanged }: { onViewportChanged: React.ComponentProps<typeof MapVisualization>['onChange'] }) => {
+const MapEvents = ({
+  onViewportChanged,
+}: {
+  onViewportChanged: React.ComponentProps<typeof MapVisualization>['onChange'];
+}) => {
   const map = useMap();
 
   const _onViewportChanged = () => {
@@ -167,7 +180,19 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
   };
 
   render() {
-    const { data, id, height, width, url, attribution, locked, viewport, onChange, markerRadiusSize, markerRadiusIncrementSize } = this.props;
+    const {
+      data,
+      id,
+      height,
+      width,
+      url,
+      attribution,
+      locked,
+      viewport,
+      onChange,
+      markerRadiusSize,
+      markerRadiusIncrementSize,
+    } = this.props;
 
     const noOfKeys = data.length;
     const chromaScale = chroma.scale('Spectral');
@@ -178,20 +203,20 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
       const max = Math.max(...y);
       const color = chromaScale(idx * (1 / noOfKeys));
 
-      return Object.entries(values)
-        .map(([coord, value], valueIdx) => (
-
-          <Marker key={`${name}-${coord}-${value}`}
-                  coordinates={coord}
-                  value={value}
-                  min={min}
-                  max={max}
-                  radiusSize={markerRadiusSize}
-                  increment={markerRadiusIncrementSize}
-                  color={color}
-                  name={name}
-                  keys={keys[valueIdx]} />
-        ));
+      return Object.entries(values).map(([coord, value], valueIdx) => (
+        <Marker
+          key={`${name}-${coord}-${value}`}
+          coordinates={coord}
+          value={value}
+          min={min}
+          max={max}
+          radiusSize={markerRadiusSize}
+          increment={markerRadiusIncrementSize}
+          color={color}
+          name={name}
+          keys={keys[valueIdx]}
+        />
+      ));
     });
 
     return (
@@ -199,24 +224,26 @@ class MapVisualization extends React.Component<MapVisualizationProps> {
         {(interactive) => (
           <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
             {locked && <div className={style.overlay} style={{ height, width }} />}
-            <MapContainer boundsOptions={{ maxZoom: 19, animate: interactive }}
-                          center={viewport.center}
-                          className={style.map}
-                          closePopupOnClick={interactive}
-                          doubleClickZoom={interactive}
-                          dragging={interactive}
-                          fadeAnimation={interactive}
-                          id={`visualization-${id}`}
-                          key={`visualization-${id}-${width}-${height}`}
-                          markerZoomAnimation={interactive}
-                          scrollWheelZoom={interactive}
-                          style={{ height, width }}
-                          touchZoom={interactive}
-                          trackResize={interactive}
-                          whenReady={this._handleMapReady}
-                          zoom={viewport.zoom}
-                          zoomAnimation={interactive}
-                          zoomControl={interactive}>
+            <MapContainer
+              boundsOptions={{ maxZoom: 19, animate: interactive }}
+              center={viewport.center}
+              className={style.map}
+              closePopupOnClick={interactive}
+              doubleClickZoom={interactive}
+              dragging={interactive}
+              fadeAnimation={interactive}
+              id={`visualization-${id}`}
+              key={`visualization-${id}-${width}-${height}`}
+              markerZoomAnimation={interactive}
+              scrollWheelZoom={interactive}
+              style={{ height, width }}
+              touchZoom={interactive}
+              trackResize={interactive}
+              whenReady={this._handleMapReady}
+              zoom={viewport.zoom}
+              zoomAnimation={interactive}
+              zoomControl={interactive}
+            >
               <MapEvents onViewportChanged={onChange} />
               <TileLayer url={url} attribution={attribution} eventHandlers={{ load: this._handleTilesReady }} />
               {markers}

@@ -25,9 +25,12 @@ type LookupTableFieldValueProviderFormProps = {
   onChange: (...args: any[]) => void;
 };
 
-class LookupTableFieldValueProviderForm extends React.Component<LookupTableFieldValueProviderFormProps, {
-  [key: string]: any;
-}> {
+class LookupTableFieldValueProviderForm extends React.Component<
+  LookupTableFieldValueProviderFormProps,
+  {
+    [key: string]: any;
+  }
+> {
   static type = 'lookup-v1';
 
   static defaultConfig = {
@@ -35,10 +38,7 @@ class LookupTableFieldValueProviderForm extends React.Component<LookupTableField
     key_field: '',
   };
 
-  static requiredFields = [
-    'table_name',
-    'key_field',
-  ];
+  static requiredFields = ['table_name', 'key_field'];
 
   propagateChanges = (key, value) => {
     const { config, onChange } = this.props;
@@ -58,12 +58,14 @@ class LookupTableFieldValueProviderForm extends React.Component<LookupTableField
     const provider = config.providers.find((p) => p.type === LookupTableFieldValueProviderForm.type);
 
     return (
-      <LookupTableFields onTableNameChange={this.handleSelectChange('table_name')}
-                         onKeyChange={this.handleSelectChange('key_field')}
-                         selectedTableName={provider.table_name}
-                         selectedKeyName={provider.key_field}
-                         nameValidation={validation.errors.table_name}
-                         keyValidation={validation.errors.key_field} />
+      <LookupTableFields
+        onTableNameChange={this.handleSelectChange('table_name')}
+        onKeyChange={this.handleSelectChange('key_field')}
+        selectedTableName={provider.table_name}
+        selectedKeyName={provider.key_field}
+        nameValidation={validation.errors.table_name}
+        keyValidation={validation.errors.key_field}
+      />
     );
   }
 }

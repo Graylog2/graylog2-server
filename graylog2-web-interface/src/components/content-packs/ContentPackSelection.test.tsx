@@ -56,10 +56,7 @@ describe('<ContentPackSelection />', () => {
     };
 
     const wrapper = mount(
-      <ContentPackSelection contentPack={contentPack}
-                            edit
-                            entities={entities}
-                            selectedEntities={{}} />,
+      <ContentPackSelection contentPack={contentPack} edit entities={entities} selectedEntities={{}} />,
     );
 
     expect(wrapper).toExist();
@@ -91,14 +88,16 @@ describe('<ContentPackSelection />', () => {
   it('should add a entity if content selection was checked', () => {
     const contentPack = {};
     const entities = {
-      spaceship: [{
-        title: 'breq',
-        type: {
-          name: 'spaceship',
-          version: '1',
+      spaceship: [
+        {
+          title: 'breq',
+          type: {
+            name: 'spaceship',
+            version: '1',
+          },
+          id: 'beef123',
         },
-        id: 'beef123',
-      }],
+      ],
     };
 
     const changeFn = jest.fn((newState) => {
@@ -106,13 +105,18 @@ describe('<ContentPackSelection />', () => {
     });
 
     const wrapper = mount(
-      <ContentPackSelection contentPack={contentPack}
-                            selectedEntities={{}}
-                            onStateChange={changeFn}
-                            entities={entities} />,
+      <ContentPackSelection
+        contentPack={contentPack}
+        selectedEntities={{}}
+        onStateChange={changeFn}
+        entities={entities}
+      />,
     );
 
-    wrapper.find('input[type="checkbox"]').at(0).simulate('change', { target: { checked: true } });
+    wrapper
+      .find('input[type="checkbox"]')
+      .at(0)
+      .simulate('change', { target: { checked: true } });
 
     expect(changeFn.mock.calls.length).toBe(1);
   });
@@ -145,24 +149,26 @@ describe('<ContentPackSelection />', () => {
       });
 
       const wrapper = mount(
-        <ContentPackSelection contentPack={contentPack}
-                              selectedEntities={selectedEntities}
-                              onStateChange={changeFn}
-                              entities={entities} />,
+        <ContentPackSelection
+          contentPack={contentPack}
+          selectedEntities={selectedEntities}
+          onStateChange={changeFn}
+          entities={entities}
+        />,
       );
 
       wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
-      wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: false } });
+      wrapper
+        .find('input[type="checkbox"]')
+        .at(1)
+        .simulate('change', { target: { checked: false } });
 
       expect(changeFn.mock.calls.length).toBe(1);
     });
 
     it('should filter expandableList of content selection', () => {
       const contentPack = {};
-      const wrapper = mount(
-        <ContentPackSelection contentPack={contentPack}
-                              entities={entities} />,
-      );
+      const wrapper = mount(<ContentPackSelection contentPack={contentPack} entities={entities} />);
 
       /*
        * Search for falcon
@@ -185,7 +191,7 @@ describe('<ContentPackSelection />', () => {
       /*
        * reset the search
        */
-      wrapper.find('button[title=\'Reset search\']').simulate('click');
+      wrapper.find("button[title='Reset search']").simulate('click');
       /* Open menu to show all checkboxes */
       wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
 
@@ -221,8 +227,9 @@ describe('<ContentPackSelection />', () => {
 
       expect(wrapper2.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(2);
 
-      const wrapper1 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }}
-                                                   entities={entities} />);
+      const wrapper1 = mount(
+        <ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }} entities={entities} />,
+      );
 
       act(() => {
         touchAllFields(wrapper1);
@@ -233,8 +240,12 @@ describe('<ContentPackSelection />', () => {
 
       expect(wrapper1.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(1);
 
-      const wrapper0 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }}
-                                                   entities={entities} />);
+      const wrapper0 = mount(
+        <ContentPackSelection
+          contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }}
+          entities={entities}
+        />,
+      );
 
       act(() => {
         touchAllFields(wrapper0);
@@ -267,7 +278,9 @@ describe('<ContentPackSelection />', () => {
 
         invalidWrapper.update();
 
-        expect(invalidWrapper.find({ error: 'Must use a URL starting with http or https.' }).find('InputDescription')).toHaveLength(errors);
+        expect(
+          invalidWrapper.find({ error: 'Must use a URL starting with http or https.' }).find('InputDescription'),
+        ).toHaveLength(errors);
       });
     });
   });

@@ -23,10 +23,10 @@ import useStreamDataLakeHasData from 'components/streams/StreamsOverview/hooks/u
 import useIsStreamDataLakeEnabled from 'components/streams/StreamsOverview/hooks/useIsStreamDataLakeEnabled';
 
 type Props = {
-  onDelete: () => void,
-  streamId: string,
-  streamTitle: string,
-  onCancel: () => void,
+  onDelete: () => void;
+  streamId: string;
+  streamTitle: string;
+  onCancel: () => void;
 };
 
 const StreamDeleteModal = ({ onDelete, streamId, streamTitle, onCancel }: Props) => {
@@ -34,14 +34,19 @@ const StreamDeleteModal = ({ onDelete, streamId, streamTitle, onCancel }: Props)
   const streamDataLakeHasData = useStreamDataLakeHasData(streamId, !!DataLakeStreamDeleteWarning);
   const isDataLakeEnable = useIsStreamDataLakeEnabled(streamId, !!DataLakeStreamDeleteWarning);
 
-  const shouldShowWarning = useMemo(() => isDataLakeEnable || streamDataLakeHasData, [isDataLakeEnable, streamDataLakeHasData]);
+  const shouldShowWarning = useMemo(
+    () => isDataLakeEnable || streamDataLakeHasData,
+    [isDataLakeEnable, streamDataLakeHasData],
+  );
 
   return (
-    <ConfirmDialog show
-                   onConfirm={onDelete}
-                   btnConfirmDisabled={shouldShowWarning}
-                   onCancel={onCancel}
-                   title="Delete Stream">
+    <ConfirmDialog
+      show
+      onConfirm={onDelete}
+      btnConfirmDisabled={shouldShowWarning}
+      onCancel={onCancel}
+      title="Delete Stream"
+    >
       {shouldShowWarning ? <DataLakeStreamDeleteWarning /> : `Do you really want to remove stream:  ${streamTitle}?`}
     </ConfirmDialog>
   );

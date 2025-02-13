@@ -31,29 +31,47 @@ const IconWrapper = styled.div`
   align-items: center;
 `;
 
-type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void
+type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void;
 
 type Props<T = undefined> = React.PropsWithChildren<{
-  active?: boolean,
-  className?: string,
-  component?: 'a',
-  'data-tab-id'?: string,
-  disabled?: boolean,
-  divider?: boolean,
-  eventKey?: T,
-  header?: boolean,
-  href?: string,
-  icon?: React.ComponentProps<typeof Icon>['name'],
-  id?: string,
-  onClick?: Callback<T>,
-  onSelect?: Callback<T>,
-  rel?: 'noopener noreferrer',
-  target?: '_blank',
-  title?: string,
-  closeMenuOnClick?: boolean,
+  active?: boolean;
+  className?: string;
+  component?: 'a';
+  'data-tab-id'?: string;
+  disabled?: boolean;
+  divider?: boolean;
+  eventKey?: T;
+  header?: boolean;
+  href?: string;
+  icon?: React.ComponentProps<typeof Icon>['name'];
+  id?: string;
+  onClick?: Callback<T>;
+  onSelect?: Callback<T>;
+  rel?: 'noopener noreferrer';
+  target?: '_blank';
+  title?: string;
+  closeMenuOnClick?: boolean;
 }>;
 
-const CustomMenuItem = <T, >({ children, className, disabled = false, divider = false, eventKey, header = false, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component, closeMenuOnClick }: Props<T>) => {
+const CustomMenuItem = <T,>({
+  children,
+  className,
+  disabled = false,
+  divider = false,
+  eventKey,
+  header = false,
+  href,
+  icon,
+  id,
+  onClick,
+  onSelect,
+  rel,
+  target,
+  title,
+  'data-tab-id': dataTabId,
+  component,
+  closeMenuOnClick,
+}: Props<T>) => {
   const callback = onClick ?? onSelect;
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
 
@@ -62,14 +80,22 @@ const CustomMenuItem = <T, >({ children, className, disabled = false, divider = 
   }
 
   if (header) {
-    return <Menu.Label role="heading" className={className} id={id}>{children}</Menu.Label>;
+    return (
+      <Menu.Label role="heading" className={className} id={id}>
+        {children}
+      </Menu.Label>
+    );
   }
 
   const sharedProps = {
     className,
     'data-tab-id': dataTabId,
     disabled,
-    icon: icon ? <IconWrapper><Icon name={icon} /></IconWrapper> : null,
+    icon: icon ? (
+      <IconWrapper>
+        <Icon name={icon} />
+      </IconWrapper>
+    ) : null,
     id,
     onClick: _onClick,
     title,

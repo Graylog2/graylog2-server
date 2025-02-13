@@ -34,13 +34,13 @@ import type { FormValues as GranteesSelectFormValues } from './GranteesSelector'
 import EntityShareSettings from './EntityShareSettings';
 
 type Props = {
-  description: string,
-  entityId: SharedEntity['id'],
-  entityTitle: SharedEntity['title'],
-  entityType: SharedEntity['type'],
-  entityTypeTitle?: string | null | undefined
-  onClose: () => void,
-  showShareableEntityURL?: boolean
+  description: string;
+  entityId: SharedEntity['id'];
+  entityTitle: SharedEntity['title'];
+  entityType: SharedEntity['type'];
+  entityTypeTitle?: string | null | undefined;
+  onClose: () => void;
+  showShareableEntityURL?: boolean;
 };
 
 const EntityShareModal = ({
@@ -73,7 +73,11 @@ const EntityShareModal = ({
       const selectedGrantee = entityShareState?.availableGrantees.find((grantee) => grantee.id === selectedGranteeId);
 
       // eslint-disable-next-line no-alert
-      if (!window.confirm(`${selectedGrantee.title ? `"${selectedGrantee.title}"` : 'An entity (name not found)'} got selected but was never added as a collaborator. Do you want to continue anyway?`)) {
+      if (
+        !window.confirm(
+          `${selectedGrantee.title ? `"${selectedGrantee.title}"` : 'An entity (name not found)'} got selected but was never added as a collaborator. Do you want to continue anyway?`,
+        )
+      ) {
         setDisableSubmit(false);
 
         return;
@@ -91,22 +95,30 @@ const EntityShareModal = ({
   };
 
   return (
-    <BootstrapModalConfirm confirmButtonDisabled={disableSubmit}
-                           confirmButtonText="Update sharing"
-                           onConfirm={_handleSave}
-                           onCancel={onClose}
-                           showModal
-                           title={<>Sharing {entityTypeTitle ?? entityType}: <i>{entityTitle}</i></>}>
-      {(entityShareState && entityShareState.entity === entityGRN) ? (
-        <EntityShareSettings description={description}
-                             entityGRN={entityGRN}
-                             entityType={entityType}
-                             entityTypeTitle={entityTypeTitle}
-                             entityTitle={entityTitle}
-                             entityShareState={entityShareState}
-                             granteesSelectFormRef={granteesSelectFormRef}
-                             setDisableSubmit={setDisableSubmit}
-                             showShareableEntityURL={showShareableEntityURL} />
+    <BootstrapModalConfirm
+      confirmButtonDisabled={disableSubmit}
+      confirmButtonText="Update sharing"
+      onConfirm={_handleSave}
+      onCancel={onClose}
+      showModal
+      title={
+        <>
+          Sharing {entityTypeTitle ?? entityType}: <i>{entityTitle}</i>
+        </>
+      }
+    >
+      {entityShareState && entityShareState.entity === entityGRN ? (
+        <EntityShareSettings
+          description={description}
+          entityGRN={entityGRN}
+          entityType={entityType}
+          entityTypeTitle={entityTypeTitle}
+          entityTitle={entityTitle}
+          entityShareState={entityShareState}
+          granteesSelectFormRef={granteesSelectFormRef}
+          setDisableSubmit={setDisableSubmit}
+          showShareableEntityURL={showShareableEntityURL}
+        />
       ) : (
         <Spinner />
       )}

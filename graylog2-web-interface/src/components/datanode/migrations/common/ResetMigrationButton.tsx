@@ -42,7 +42,10 @@ const ResetMigrationButton = () => {
       queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
     },
     onError: (error) => {
-      UserNotification.error(`Resetting migration state failed with status: ${error}`, 'Could not reset the migration state.');
+      UserNotification.error(
+        `Resetting migration state failed with status: ${error}`,
+        'Could not reset the migration state.',
+      );
     },
   });
 
@@ -71,10 +74,12 @@ const ResetMigrationButton = () => {
         Reset Migration
       </Button>
       {showDialog && (
-        <ConfirmDialog title="Reset Migration"
-                       show
-                       onConfirm={handleConfirmClick}
-                       onCancel={() => setShowDialog(false)}>
+        <ConfirmDialog
+          title="Reset Migration"
+          show
+          onConfirm={handleConfirmClick}
+          onCancel={() => setShowDialog(false)}
+        >
           Are you sure you want to reset the migration?
         </ConfirmDialog>
       )}
