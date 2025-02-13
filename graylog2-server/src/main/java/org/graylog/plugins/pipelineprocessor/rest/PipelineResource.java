@@ -248,10 +248,6 @@ public class PipelineResource extends RestResource implements PluginRestResource
         return PipelineUtils.update(pipelineService, pipelineRuleParser, id, update, true);
     }
 
-    public PipelineSource forceUpdate(String id, PipelineSource update, boolean checkMutability) throws NotFoundException {
-        return PipelineUtils.update(pipelineService, pipelineRuleParser, id, update, checkMutability);
-    }
-
     public record RoutingRequest(
             @JsonProperty(value = "input_id", required = true) String inputId,
             @JsonProperty(value = "stream_id", required = true) String streamId,
