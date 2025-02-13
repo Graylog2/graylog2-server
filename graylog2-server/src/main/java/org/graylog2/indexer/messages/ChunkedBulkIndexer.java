@@ -16,19 +16,25 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.google.common.collect.Iterables;
 import org.graylog2.indexer.ElasticsearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
+import java.util.function.Supplier;
 
 public class ChunkedBulkIndexer {
     private static final Logger LOG = LoggerFactory.getLogger(ChunkedBulkIndexer.class);
     private static final RetryWait retryWait = new RetryWait(100);
 
+    public record BulkIndexResult(IndexingResults indexingResults, Supplier<String> failureMessage,
+                                  int indexedMessages) {
+    }
     public interface BulkIndex {
-        IndexingResults apply(Chunk chunk) throws ChunkedBulkIndexer.EntityTooLargeException, IOException;
+        BulkIndexResult apply(int indexedSuccessfully, IndexingResults previousResults, List<IndexingRequest> chunk) throws ChunkedBulkIndexer.EntityTooLargeException, IOException;
     }
 
     public IndexingResults index(List<IndexingRequest> messageList, BulkIndex bulkIndex) throws IOException {
@@ -42,7 +48,7 @@ public class ChunkedBulkIndexer {
         int attempt = 0;
         for (; ; ) {
             try {
-                var results = bulkIndex.apply(new Chunk(messageList, offset, chunkSize));
+                var results = bulkIndexChunked(new Chunk(messageList, offset, chunkSize), bulkIndex);
                 accumulatedResults.addResults(results);
                 return accumulatedResults.build();
             } catch (EntityTooLargeException e) {
@@ -62,6 +68,53 @@ public class ChunkedBulkIndexer {
             if (chunkSize == 0) {
                 throw new ElasticsearchException("Bulk index cannot split output batch any further.");
             }
+        }
+    }
+
+    private IndexingResults bulkIndexChunked(Chunk command, BulkIndex bulkIndex) throws ChunkedBulkIndexer.EntityTooLargeException, IOException {
+        final List<IndexingRequest> messageList = command.requests;
+        final int offset = command.offset;
+        final int chunkSize = command.size;
+
+        final IndexingResults.Builder accumulatedResults = IndexingResults.Builder.create();
+        if (messageList.isEmpty()) {
+            return accumulatedResults.build();
+        }
+
+        final Iterable<List<IndexingRequest>> chunks = Iterables.partition(messageList.subList(offset, messageList.size()), chunkSize);
+        int chunkCount = 1;
+        int indexedSuccessfully = 0;
+        for (List<IndexingRequest> chunk : chunks) {
+
+            final var response = bulkIndex.apply(indexedSuccessfully, accumulatedResults.build(), chunk);
+            indexedSuccessfully += chunk.size();
+            final IndexingResults results = response.indexingResults();
+            accumulatedResults.addResults(results);
+
+            logDebugInfo(messageList, offset, chunkSize, chunkCount, response.indexedMessages(), results.errors());
+            logFailures(response.failureMessage(), results.errors().size());
+
+            chunkCount++;
+        }
+
+        return accumulatedResults.build();
+    }
+
+    private void logFailures(Supplier<String> failureMessage, int failureCount) {
+        if (failureCount > 0) {
+            LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason. Error: {}",
+                    failureCount, failureMessage.get());
+        }
+    }
+
+    private void logDebugInfo(List<IndexingRequest> messageList, int offset, int chunkSize, int chunkCount, int indexedMessages, List<IndexingError> failures) {
+        if (LOG.isDebugEnabled()) {
+            String chunkInfo = "";
+            if (chunkSize != messageList.size()) {
+                chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d offset %d)", chunkCount,
+                        (int) Math.ceil((double) messageList.size() / chunkSize), offset);
+            }
+            LOG.debug("Index: Bulk indexed {} messages{}, failures: {}", indexedMessages, chunkInfo, failures.size());
         }
     }
 

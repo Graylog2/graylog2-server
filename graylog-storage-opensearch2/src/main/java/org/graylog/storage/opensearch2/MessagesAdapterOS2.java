@@ -19,7 +19,6 @@ package org.graylog.storage.opensearch2;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Iterables;
 import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkItemResponse;
@@ -45,13 +44,10 @@ import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.messages.SerializationContext;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ResultMessageFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -60,7 +56,6 @@ import java.util.stream.Collectors;
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class MessagesAdapterOS2 implements MessagesAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(MessagesAdapterOS2.class);
     static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
     static final String MAPPER_PARSING_EXCEPTION = "mapper_parsing_exception";
     static final String INDEX_BLOCK_REASON = "blocked by: [TOO_MANY_REQUESTS/12/index read-only / allow delete (api)";
@@ -115,58 +110,10 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
 
     @Override
     public IndexingResults bulkIndex(List<IndexingRequest> messageList) throws IOException {
-        return chunkedBulkIndexer.index(messageList, this::bulkIndexChunked);
+        return chunkedBulkIndexer.index(messageList, this::runBulkRequest);
     }
 
-    private IndexingResults bulkIndexChunked(ChunkedBulkIndexer.Chunk command) throws ChunkedBulkIndexer.EntityTooLargeException {
-        final List<IndexingRequest> messageList = command.requests;
-        final int offset = command.offset;
-        final int chunkSize = command.size;
-
-        final IndexingResults.Builder accumulatedResults = IndexingResults.Builder.create();
-        if (messageList.isEmpty()) {
-            return accumulatedResults.build();
-        }
-
-        final Iterable<List<IndexingRequest>> chunks = Iterables.partition(messageList.subList(offset, messageList.size()), chunkSize);
-        int chunkCount = 1;
-        int indexedSuccessfully = 0;
-        for (List<IndexingRequest> chunk : chunks) {
-
-            final BulkResponse response = runBulkRequest(indexedSuccessfully, accumulatedResults.build(), chunk);
-            indexedSuccessfully += chunk.size();
-            final IndexingResults results = indexingResultsFrom(response, messageList);
-            accumulatedResults.addResults(results);
-
-            logDebugInfo(messageList, offset, chunkSize, chunkCount, response, results.errors());
-            logFailures(response, results.errors().size());
-
-            chunkCount++;
-        }
-
-        return accumulatedResults.build();
-    }
-
-    private void logFailures(BulkResponse result, int failureCount) {
-        if (failureCount > 0) {
-            LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason. Error: {}",
-                    failureCount, result.buildFailureMessage());
-        }
-    }
-
-    private void logDebugInfo(List<IndexingRequest> messageList, int offset, int chunkSize, int chunkCount, BulkResponse result, List<IndexingError> failures) {
-        if (LOG.isDebugEnabled()) {
-            String chunkInfo = "";
-            if (chunkSize != messageList.size()) {
-                chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d offset %d)", chunkCount,
-                        (int) Math.ceil((double) messageList.size() / chunkSize), offset);
-            }
-            LOG.debug("Index: Bulk indexed {} messages{}, failures: {}",
-                    result.getItems().length, chunkInfo, failures.size());
-        }
-    }
-
-    private BulkResponse runBulkRequest(int indexedSuccessfully, IndexingResults previousResults, List<IndexingRequest> chunk) throws ChunkedBulkIndexer.EntityTooLargeException {
+    private ChunkedBulkIndexer.BulkIndexResult runBulkRequest(int indexedSuccessfully, IndexingResults previousResults, List<IndexingRequest> chunk) throws ChunkedBulkIndexer.EntityTooLargeException {
         final BulkRequest bulkRequest = createBulkRequest(chunk);
 
         final BulkResponse result;
@@ -185,7 +132,7 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
             }
             throw new org.graylog2.indexer.ElasticsearchException(e);
         }
-        return result;
+        return new ChunkedBulkIndexer.BulkIndexResult(indexingResultsFrom(result, chunk), result::buildFailureMessage, result.getItems().length);
     }
 
     private ChunkedBulkIndexer.CircuitBreakerException.Durability durabilityFrom(OpenSearchException openSearchException) {
