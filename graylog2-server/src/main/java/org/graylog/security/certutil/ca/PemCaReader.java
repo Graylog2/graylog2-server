@@ -29,7 +29,10 @@ import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.PKCSException;
+import org.graylog.security.certutil.CertutilTruststore;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -42,6 +45,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class PemCaReader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PemCaReader.class);
+
     private static List<Object> readPemObjects(PEMParser pemParser) throws IOException {
         final var results = new ArrayList<>();
         while (true) {
@@ -68,6 +74,7 @@ public class PemCaReader {
             var pemObjects = readPemObjects(pemParser);
             for (var pemObject : pemObjects) {
                 if (pemObject instanceof X509Certificate cert) {
+                    LOG.info("Parsed certificate: {}", CertutilTruststore.certificateInfo(cert));
                     certificates.add(cert);
                 } else if (pemObject instanceof X509CertificateHolder cert) {
                     certificates.add(new JcaX509CertificateConverter().getCertificate(cert));
@@ -101,6 +108,7 @@ public class PemCaReader {
                 throw new CACreationException("No certificate supplied in CA bundle!");
             }
 
+            LOG.info("Certificate bundle contains {} certificates", certificates.size());
             return new CA(certificates, privateKey);
         } catch (PKCSException e) {
             throw new CACreationException("Error while decrypting private key. Wrong password?", e);
