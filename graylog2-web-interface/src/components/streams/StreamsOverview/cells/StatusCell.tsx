@@ -25,12 +25,14 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const StatusLabel = styled(Label)<{ $clickable: boolean }>(({ $clickable }) => css`
-  cursor: ${$clickable ? 'pointer' : 'default'};
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
-`);
+const StatusLabel = styled(Label)<{ $clickable: boolean }>(
+  ({ $clickable }) => css`
+    cursor: ${$clickable ? 'pointer' : 'default'};
+    display: inline-flex;
+    justify-content: center;
+    gap: 4px;
+  `,
+);
 
 const Spacer = styled.div`
   border-left: 1px solid currentColor;
@@ -46,7 +48,7 @@ const _title = (disabled: boolean, disabledChange: boolean, description: string)
 };
 
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 
 const StatusCell = ({ stream }: Props) => {
@@ -75,12 +77,14 @@ const StatusCell = ({ stream }: Props) => {
   }, [sendTelemetry, stream.disabled, stream.id, stream.title]);
 
   return (
-    <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'}
-                 onClick={disableChange ? undefined : toggleStreamStatus}
-                 title={title}
-                 aria-label={title}
-                 role="button"
-                 $clickable={!disableChange}>
+    <StatusLabel
+      bsStyle={stream.disabled ? 'warning' : 'success'}
+      onClick={disableChange ? undefined : toggleStreamStatus}
+      title={title}
+      aria-label={title}
+      role="button"
+      $clickable={!disableChange}
+    >
       {stream.disabled ? 'Paused' : 'Running'}
       {!disableChange && (
         <>

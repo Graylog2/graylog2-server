@@ -32,7 +32,10 @@ type QueryId = string;
 
 const _newPositionsMap = (oldPosition, widgetPositions, widget): Immutable.Map<string, WidgetPosition> => {
   const newWidgetPositions: Immutable.Map<string, WidgetPosition> = oldPosition
-    ? ConcatPositions(Immutable.Map({ [widget.id]: oldPosition.toBuilder().row(1).col(1).build() }), Immutable.Map(widgetPositions))
+    ? ConcatPositions(
+        Immutable.Map({ [widget.id]: oldPosition.toBuilder().row(1).col(1).build() }),
+        Immutable.Map(widgetPositions),
+      )
     : Immutable.Map(widgetPositions);
 
   return newWidgetPositions;
@@ -49,7 +52,12 @@ const _newTitlesMap = (titlesMap, widget, title) => {
   return titlesMap.set(TitleTypes.Widget, newWidgetTitles);
 };
 
-const _addWidgetToDashboard = (widget: Widget, dashboard: View, oldPosition: WidgetPosition, title: string | undefined | null): View => {
+const _addWidgetToDashboard = (
+  widget: Widget,
+  dashboard: View,
+  oldPosition: WidgetPosition,
+  title: string | undefined | null,
+): View => {
   const dashboardQueryId = dashboard.search.queries.first().id;
   const viewState = dashboard.state.get(dashboardQueryId);
   const widgets = viewState.widgets.push(widget);
@@ -60,15 +68,14 @@ const _addWidgetToDashboard = (widget: Widget, dashboard: View, oldPosition: Wid
   const titlesMap = viewState.titles;
   const newTitlesMap = _newTitlesMap(titlesMap, widget, title);
 
-  const newViewState = viewState.toBuilder()
+  const newViewState = viewState
+    .toBuilder()
     .widgets(widgets)
     .titles(newTitlesMap)
     .widgetPositions(newWidgetPositions)
     .build();
 
-  return dashboard.toBuilder()
-    .state(dashboard.state.set(dashboardQueryId, newViewState))
-    .build();
+  return dashboard.toBuilder().state(dashboard.state.set(dashboardQueryId, newViewState)).build();
 };
 
 const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View): View | undefined | null => {
@@ -94,7 +101,8 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .toList()
       .toArray();
 
-    const dashboardWidget = widget.toBuilder()
+    const dashboardWidget = widget
+      .toBuilder()
       .newId()
       .timerange(timerange)
       .query(query)

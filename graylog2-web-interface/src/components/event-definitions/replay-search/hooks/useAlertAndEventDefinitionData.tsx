@@ -25,28 +25,33 @@ import useEventById from 'hooks/useEventById';
 
 const useAlertAndEventDefinitionData = (alertId: string, definitionId?: string) => {
   const { data: eventData, isLoading: isLoadingEvent } = useEventById(alertId);
-  const { data, isLoading: isLoadingEventDefinition } = useEventDefinition(definitionId ?? eventData?.event_definition_id);
+  const { data, isLoading: isLoadingEventDefinition } = useEventDefinition(
+    definitionId ?? eventData?.event_definition_id,
+  );
   const eventDefinition = data?.eventDefinition;
   const aggregations = data?.aggregations;
   const isLoading = (alertId && isLoadingEvent) || (definitionId && isLoadingEventDefinition);
 
   return useMemo<{
-    alertId: string,
-    definitionId: string,
-    definitionTitle: string,
-    eventData: Event,
-    eventDefinition: EventDefinition,
-    aggregations: Array<EventDefinitionAggregation>,
-    isLoading: boolean,
-  }>(() => ({
-    alertId,
-    definitionId: eventDefinition?.id,
-    definitionTitle: eventDefinition?.title,
-    eventData,
-    eventDefinition,
-    aggregations,
-    isLoading,
-  }), [alertId, eventDefinition, eventData, aggregations, isLoading]);
+    alertId: string;
+    definitionId: string;
+    definitionTitle: string;
+    eventData: Event;
+    eventDefinition: EventDefinition;
+    aggregations: Array<EventDefinitionAggregation>;
+    isLoading: boolean;
+  }>(
+    () => ({
+      alertId,
+      definitionId: eventDefinition?.id,
+      definitionTitle: eventDefinition?.title,
+      eventData,
+      eventDefinition,
+      aggregations,
+      isLoading,
+    }),
+    [alertId, eventDefinition, eventData, aggregations, isLoading],
+  );
 };
 
 export default useAlertAndEventDefinitionData;

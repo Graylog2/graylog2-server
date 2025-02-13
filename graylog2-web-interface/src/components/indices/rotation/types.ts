@@ -34,7 +34,7 @@ export type IndexRotationConfig = {
   displayName: string;
   configComponent: React.ComponentType<IndexRotationConfigComponentProps>;
   summaryComponent: React.ComponentType<IndexRotationSummaryComponentProps>;
-}
+};
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {

@@ -34,17 +34,20 @@ let mockUpdate;
 jest.mock('stores/configurations/ConfigurationsStore', () => {
   mockUpdate = jest.fn().mockReturnValue(Promise.resolve());
 
-  return ({
-    ConfigurationsStore: MockStore(['getInitialState', () => ({
-      configuration: {
-        'org.graylog.plugins.sidecar.system.SidecarConfiguration': mockConfig,
-      },
-    })]),
+  return {
+    ConfigurationsStore: MockStore([
+      'getInitialState',
+      () => ({
+        configuration: {
+          'org.graylog.plugins.sidecar.system.SidecarConfiguration': mockConfig,
+        },
+      }),
+    ]),
     ConfigurationsActions: {
       list: jest.fn(() => Promise.resolve()),
       update: mockUpdate,
     },
-  });
+  };
 });
 
 describe('SidecarConfig', () => {
@@ -57,16 +60,25 @@ describe('SidecarConfig', () => {
 
     fireEvent.click(editButton);
 
-    fireEvent.click(await screen.findByRole('checkbox', {
-      name: /override sidecar configuration/i,
-      hidden: true,
-    }));
+    fireEvent.click(
+      await screen.findByRole('checkbox', {
+        name: /override sidecar configuration/i,
+        hidden: true,
+      }),
+    );
 
-    fireEvent.click(await screen.findByRole('button', {
-      name: /update configuration/i,
-      hidden: true,
-    }));
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: /update configuration/i,
+        hidden: true,
+      }),
+    );
 
-    await waitFor(() => { expect(mockUpdate).toHaveBeenCalledWith('org.graylog.plugins.sidecar.system.SidecarConfiguration', expect.objectContaining({ sidecar_configuration_override: true })); });
+    await waitFor(() => {
+      expect(mockUpdate).toHaveBeenCalledWith(
+        'org.graylog.plugins.sidecar.system.SidecarConfiguration',
+        expect.objectContaining({ sidecar_configuration_override: true }),
+      );
+    });
   });
 });

@@ -24,13 +24,21 @@ const DSVHTTPAdapterSummary = ({ dataAdapter }) => {
       <dt>File URL</dt>
       <dd>{config.url}</dd>
       <dt>Separator</dt>
-      <dd><code>{config.separator}</code></dd>
+      <dd>
+        <code>{config.separator}</code>
+      </dd>
       <dt>Line Separator</dt>
-      <dd><code>{config.line_separator}</code></dd>
+      <dd>
+        <code>{config.line_separator}</code>
+      </dd>
       <dt>Quote character</dt>
-      <dd><code>{config.quotechar}</code></dd>
+      <dd>
+        <code>{config.quotechar}</code>
+      </dd>
       <dt>Ignore lines starting with</dt>
-      <dd><code>{config.ignorechar}</code></dd>
+      <dd>
+        <code>{config.ignorechar}</code>
+      </dd>
       <dt>Key column</dt>
       <dd>{config.key_column}</dd>
       <dt>Value column</dt>

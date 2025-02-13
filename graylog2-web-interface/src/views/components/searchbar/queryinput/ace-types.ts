@@ -16,116 +16,110 @@
  */
 
 export type Token = {
-  type: string,
-  value: string,
+  type: string;
+  value: string;
 };
 
 type EventName = 'tokenizerUpdate';
 
 type Tokenizer = {
   bgTokenizer: {
-    currentLine: number,
-    lines: Array<Array<Line>>,
-  }
+    currentLine: number;
+    lines: Array<Array<Line>>;
+  };
 };
 type EventCallback = {
-  tokenizerUpdate: (input: string, tokenizer: Tokenizer) => void,
+  tokenizerUpdate: (input: string, tokenizer: Tokenizer) => void;
 };
 
 export type Session = {
-  curOp: { args: unknown },
-  getLength: () => number,
-  getTokens: (no: number) => Array<Token>,
-  getTokenAt: (no: number, idx: number) => Token | undefined | null,
-  getValue: () => string,
-  on: <T extends EventName>(event: T, cb: EventCallback[T]) => void,
-  bgTokenizer: { lines: Array<Array<Line>> },
+  curOp: { args: unknown };
+  getLength: () => number;
+  getTokens: (no: number) => Array<Token>;
+  getTokenAt: (no: number, idx: number) => Token | undefined | null;
+  getValue: () => string;
+  on: <T extends EventName>(event: T, cb: EventCallback[T]) => void;
+  bgTokenizer: { lines: Array<Array<Line>> };
 };
 
 export type Renderer = {
-  scroller: HTMLElement,
-  emptyMessageNode: HTMLElement | undefined | null,
+  scroller: HTMLElement;
+  emptyMessageNode: HTMLElement | undefined | null;
 };
 
 export type Command = {
-  name: string,
+  name: string;
   bindKey: {
-    win: string,
-    mac: string,
-  },
+    win: string;
+    mac: string;
+  };
 
-  exec: (editor: Editor) => void,
+  exec: (editor: Editor) => void;
 };
 
 export type Commands = {
-  addCommand: (command: Command) => void,
-  removeCommands: (commands: Array<string>) => void,
-  on: (commandName: string, callback: () => void) => void
+  addCommand: (command: Command) => void;
+  removeCommands: (commands: Array<string>) => void;
+  on: (commandName: string, callback: () => void) => void;
 };
 
 export type Popup = {
-  hide: () => void,
+  hide: () => void;
 };
 
 export type Completer = {
-  autoSelect: boolean,
-  popup?: Popup,
-  activated: boolean,
-  insertMatch: () => boolean,
-  detach: () => void,
-  goTo: (direction: string) => void,
+  autoSelect: boolean;
+  popup?: Popup;
+  activated: boolean;
+  insertMatch: () => boolean;
+  detach: () => void;
+  goTo: (direction: string) => void;
   keyboardHandler: {
     commandKeyBinding: {
-      tab: Command,
-    },
-    addCommand: (command: Command) => void
-  }
+      tab: Command;
+    };
+    addCommand: (command: Command) => void;
+  };
 };
 
 export type Editor = {
-  container: HTMLElement | undefined,
-  commands: Commands,
-  completer: Completer,
-  completers: Array<AutoCompleter>,
-  execCommand: (command: string, args?: Record<string, unknown>) => void,
-  focus: () => void,
-  session: Session,
-  renderer: Renderer,
-  setFontSize: (newFontSize: number) => void,
-  getValue: () => string,
-  tabstopManager: unknown,
-  setValue: (newValue: string) => void,
-  isFocused: () => boolean,
+  container: HTMLElement | undefined;
+  commands: Commands;
+  completer: Completer;
+  completers: Array<AutoCompleter>;
+  execCommand: (command: string, args?: Record<string, unknown>) => void;
+  focus: () => void;
+  session: Session;
+  renderer: Renderer;
+  setFontSize: (newFontSize: number) => void;
+  getValue: () => string;
+  tabstopManager: unknown;
+  setValue: (newValue: string) => void;
+  isFocused: () => boolean;
 };
 
 export type CompletionResult = {
-  name?: string,
-  value: string,
-  score: number,
-  meta?: any,
-  caption?: string,
+  name?: string;
+  value: string;
+  score: number;
+  meta?: any;
+  caption?: string;
 };
 
 export type ResultsCallback = (obj: null, results: Array<CompletionResult>) => void;
 
 export type Position = {
-  row: number,
-  column: number,
+  row: number;
+  column: number;
 };
 
 export type Line = {
-  type: string,
-  value: string,
-  index?: number,
-  start?: number,
-}
+  type: string;
+  value: string;
+  index?: number;
+  start?: number;
+};
 
 export interface AutoCompleter {
-  getCompletions(
-    editor: Editor,
-    session: Session,
-    position: Position,
-    prefix: string,
-    callback: ResultsCallback
-  ): void;
+  getCompletions(editor: Editor, session: Session, position: Position, prefix: string, callback: ResultsCallback): void;
 }

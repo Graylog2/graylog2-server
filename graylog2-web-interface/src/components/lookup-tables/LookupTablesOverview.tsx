@@ -17,13 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import {
-  PaginatedList,
-  SearchForm,
-  Spinner,
-  NoSearchResult,
-  NoEntitiesExist,
-} from 'components/common';
+import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
 import { Row, Col, Table } from 'components/bootstrap';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -39,8 +33,11 @@ const ScrollContainer = styled.div`
 `;
 const queryExample = (
   <p>
-    Searching without a field name matches against the <code>title</code> field:<br />
-    <kbd>geoip</kbd> <br />is the same as<br />
+    Searching without a field name matches against the <code>title</code> field:
+    <br />
+    <kbd>geoip</kbd> <br />
+    is the same as
+    <br />
     <kbd>title:geoip</kbd>
   </p>
 );
@@ -49,10 +46,10 @@ const queryHelpComponent = (
 );
 
 type ItemProps = {
-  table: LookupTable,
-  caches: LookupTableCache[],
-  dataAdapters: LookupTableAdapter[],
-  errorStates: { [key: string]: { [key: string]: string } },
+  table: LookupTable;
+  caches: LookupTableCache[];
+  dataAdapters: LookupTableAdapter[];
+  errorStates: { [key: string]: { [key: string]: string } };
 };
 
 const LUTItem = ({ table, caches, dataAdapters, errorStates }: ItemProps) => {
@@ -84,21 +81,18 @@ const LUTItem = ({ table, caches, dataAdapters, errorStates }: ItemProps) => {
     dataAdapter: lookupAdapterError(),
   };
 
-  return (
-    <LUTTableEntry table={table}
-                   cache={cache}
-                   dataAdapter={dataAdapter}
-                   errors={errors} />
-  );
+  return <LUTTableEntry table={table} cache={cache} dataAdapter={dataAdapter} errors={errors} />;
 };
 
 const NoResults = ({ query }: { query: string }) => (
   <tbody>
     <tr>
       <td colSpan={6}>
-        {query
-          ? <NoSearchResult>No tables found with title &quot;{query}&quot;</NoSearchResult>
-          : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
+        {query ? (
+          <NoSearchResult>No tables found with title &quot;{query}&quot;</NoSearchResult>
+        ) : (
+          <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>
+        )}
       </td>
     </tr>
   </tbody>
@@ -111,33 +105,35 @@ const DataRow = ({
   query,
   errorStates,
 }: {
-  tables: LookupTable[],
-  caches: LookupTableCache[],
-  dataAdapters: LookupTableAdapter[],
-  query: string,
-  errorStates: { [key: string]: { [key: string]: string } },
-}) => (tables.length > 0
-  ? (
+  tables: LookupTable[];
+  caches: LookupTableCache[];
+  dataAdapters: LookupTableAdapter[];
+  query: string;
+  errorStates: { [key: string]: { [key: string]: string } };
+}) =>
+  tables.length > 0 ? (
     <>
       {tables.map((table: LookupTable) => (
-        <LUTItem key={`table-item-${table.id}`}
-                 table={table}
-                 caches={caches}
-                 dataAdapters={dataAdapters}
-                 errorStates={errorStates} />
+        <LUTItem
+          key={`table-item-${table.id}`}
+          table={table}
+          caches={caches}
+          dataAdapters={dataAdapters}
+          errorStates={errorStates}
+        />
       ))}
     </>
   ) : (
     <NoResults query={query} />
-  ));
+  );
 
 type Props = {
-  tables: LookupTable[],
-  caches: LookupTableCache[],
-  dataAdapters: LookupTableAdapter[],
-  pagination: PaginationType,
-  errorStates: { [key: string]: { [key: string]: string } },
-  paginationQueryParameter: PaginationQueryParameterResult,
+  tables: LookupTable[];
+  caches: LookupTableCache[];
+  dataAdapters: LookupTableAdapter[];
+  pagination: PaginationType;
+  errorStates: { [key: string]: { [key: string]: string } };
+  paginationQueryParameter: PaginationQueryParameterResult;
 };
 
 const LookupTablesOverview = ({
@@ -160,19 +156,24 @@ const LookupTablesOverview = ({
   React.useEffect(() => {
     const { currentPage, currentPageSize, currentQuery } = localPagination;
 
-    LookupTablesActions.searchPaginated(currentPage, currentPageSize, currentQuery)
-      .then(() => setLoading(false));
+    LookupTablesActions.searchPaginated(currentPage, currentPageSize, currentQuery).then(() => setLoading(false));
   }, [localPagination]);
 
-  const onPageChange = React.useCallback((newPage: number, newPerPage: number) => {
-    setLocalPagination({ ...localPagination, currentPage: newPage, currentPageSize: newPerPage });
-  }, [localPagination]);
+  const onPageChange = React.useCallback(
+    (newPage: number, newPerPage: number) => {
+      setLocalPagination({ ...localPagination, currentPage: newPage, currentPageSize: newPerPage });
+    },
+    [localPagination],
+  );
 
-  const onSearch = React.useCallback((query: string) => {
-    localPagination.resetPage();
-    localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
-    setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: query });
-  }, [localPagination]);
+  const onSearch = React.useCallback(
+    (query: string) => {
+      localPagination.resetPage();
+      localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
+      setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: query });
+    },
+    [localPagination],
+  );
 
   const onReset = React.useCallback(() => {
     localPagination.resetPage();
@@ -186,10 +187,12 @@ const LookupTablesOverview = ({
         <h2 style={{ marginBottom: 16 }}>
           Configured lookup tables <small>{pagination.total} total</small>
         </h2>
-        <PaginatedList activePage={localPagination.currentPage}
-                       pageSize={localPagination.currentPageSize}
-                       onChange={onPageChange}
-                       totalItems={pagination.total}>
+        <PaginatedList
+          activePage={localPagination.currentPage}
+          pageSize={localPagination.currentPageSize}
+          onChange={onPageChange}
+          totalItems={pagination.total}
+        >
           <SearchForm onSearch={onSearch} onReset={onReset} queryHelpComponent={queryHelpComponent} />
           <ScrollContainer>
             <Table condensed hover className={Styles.overviewTable}>
@@ -203,12 +206,16 @@ const LookupTablesOverview = ({
                   <th className={Styles.rowActions}>Actions</th>
                 </tr>
               </thead>
-              {loading ? <Spinner text="Loading data adapters" /> : (
-                <DataRow tables={tables}
-                         caches={caches}
-                         dataAdapters={dataAdapters}
-                         query={localPagination.currentQuery}
-                         errorStates={errorStates} />
+              {loading ? (
+                <Spinner text="Loading data adapters" />
+              ) : (
+                <DataRow
+                  tables={tables}
+                  caches={caches}
+                  dataAdapters={dataAdapters}
+                  query={localPagination.currentQuery}
+                  errorStates={errorStates}
+                />
               )}
             </Table>
           </ScrollContainer>

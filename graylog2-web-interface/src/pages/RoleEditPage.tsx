@@ -30,17 +30,18 @@ import type Role from 'logic/roles/Role';
 
 type Props = {
   params: {
-    roleId: string,
-  },
+    roleId: string;
+  };
 };
 
 const PageTitle = ({ name }: { name: string | undefined | null }) => (
   <>
-    Edit Role {name && (
+    Edit Role{' '}
+    {name && (
       <>
         - <i>{name}</i>
       </>
-  )}
+    )}
   </>
 );
 
@@ -54,20 +55,20 @@ const RoleEditPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`Edit Role ${loadedRole?.name ?? ''}`}>
-      <PageHeader title={<PageTitle name={loadedRole?.name} />}
-                  actions={<RoleActionLinks roleId={roleId} />}
-                  topActions={(
-                    <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-                      <Button bsStyle="info">Roles Overview</Button>
-                    </LinkContainer>
-                  )}
-                  documentationLink={{
-                    title: 'Permissions documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
-        <span>
-          You can assign the role to users.
-        </span>
+      <PageHeader
+        title={<PageTitle name={loadedRole?.name} />}
+        actions={<RoleActionLinks roleId={roleId} />}
+        topActions={
+          <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
+            <Button bsStyle="info">Roles Overview</Button>
+          </LinkContainer>
+        }
+        documentationLink={{
+          title: 'Permissions documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+      >
+        <span>You can assign the role to users.</span>
       </PageHeader>
       <RoleEdit role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>

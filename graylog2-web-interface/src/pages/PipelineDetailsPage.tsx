@@ -37,9 +37,9 @@ const _isNewPipeline = (pipelineId: string) => pipelineId === 'new';
 const PipelineDetailsPage = () => {
   const params = useParams<{ pipelineId: string }>();
   const pipeline = useStore(PipelinesStore, (state) => state.pipelines?.filter((p) => p.id === params.pipelineId)?.[0]);
-  const connections = useStore(PipelineConnectionsStore, (state) => state.connections?.filter(
-    (c) => c.pipeline_ids && c.pipeline_ids.includes(params.pipelineId),
-  ));
+  const connections = useStore(PipelineConnectionsStore, (state) =>
+    state.connections?.filter((c) => c.pipeline_ids && c.pipeline_ids.includes(params.pipelineId)),
+  );
   const [streams, setStreams] = useState();
 
   useEffect(() => {
@@ -101,20 +101,26 @@ const PipelineDetailsPage = () => {
     return <Spinner />;
   }
 
-  const title = _isNewPipeline(params.pipelineId)
-    ? 'New pipeline'
-    : <span>Pipeline <em>{pipeline.title}</em></span>;
+  const title = _isNewPipeline(params.pipelineId) ? (
+    'New pipeline'
+  ) : (
+    <span>
+      Pipeline <em>{pipeline.title}</em>
+    </span>
+  );
 
-  const content = _isNewPipeline(params.pipelineId)
-    ? <NewPipeline onChange={_savePipeline} />
-    : (
-      <Pipeline pipeline={pipeline}
-                connections={connections}
-                streams={streams}
-                onConnectionsChange={_onConnectionsChange}
-                onStagesChange={_onStagesChange}
-                onPipelineChange={_savePipeline} />
-    );
+  const content = _isNewPipeline(params.pipelineId) ? (
+    <NewPipeline onChange={_savePipeline} />
+  ) : (
+    <Pipeline
+      pipeline={pipeline}
+      connections={connections}
+      streams={streams}
+      onConnectionsChange={_onConnectionsChange}
+      onStagesChange={_onStagesChange}
+      onPipelineChange={_savePipeline}
+    />
+  );
 
   const pageTitle = _isNewPipeline(params.pipelineId) ? 'New pipeline' : `Pipeline ${pipeline.title}`;
 
@@ -122,24 +128,24 @@ const PipelineDetailsPage = () => {
     <DocumentTitle title={pageTitle}>
       <div>
         <PipelinesPageNavigation />
-        <PageHeader title={title}
-                    documentationLink={{
-                      title: 'Pipelines documentation',
-                      path: DocsHelper.PAGES.PIPELINES,
-                    }}>
+        <PageHeader
+          title={title}
+          documentationLink={{
+            title: 'Pipelines documentation',
+            path: DocsHelper.PAGES.PIPELINES,
+          }}
+        >
           <span>
             Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
             rules are evaluated and applied. Messages can go through one or more stages.
             <br />
-            After each stage is completed, you can decide if messages matching all or one of the rules continue to
-            the next stage.
+            After each stage is completed, you can decide if messages matching all or one of the rules continue to the
+            next stage.
           </span>
         </PageHeader>
 
         <Row className="content">
-          <Col md={12}>
-            {content}
-          </Col>
+          <Col md={12}>{content}</Col>
         </Row>
       </div>
     </DocumentTitle>

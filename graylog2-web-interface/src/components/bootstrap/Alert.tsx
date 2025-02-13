@@ -23,16 +23,17 @@ import { Alert as MantineAlert } from '@mantine/core';
 import Icon from 'components/common/Icon';
 
 type Props = {
-  bsStyle?: ColorVariant,
-  children: React.ReactNode,
-  className?: string,
-  onDismiss?: () => void,
-  style?: CSSProperties,
-  title?: React.ReactNode,
-  noIcon?: boolean,
-}
+  bsStyle?: ColorVariant;
+  children: React.ReactNode;
+  className?: string;
+  onDismiss?: () => void;
+  style?: CSSProperties;
+  title?: React.ReactNode;
+  noIcon?: boolean;
+};
 
-const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant }>(({ $bsStyle, theme }) => css`
+const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant }>(
+  ({ $bsStyle, theme }) => css`
   margin: ${theme.spacings.md} 0;
   border: 1px solid ${theme.colors.variant.lighter[$bsStyle]};
 
@@ -49,7 +50,8 @@ const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant }>(({ $bsStyle
   .mantine-Alert-closeButton {
     color: ${theme.colors.global.textDefault};
   },
-`);
+`,
+);
 
 const iconNameForType = (bsStyle: ColorVariant) => {
   switch (bsStyle) {
@@ -68,15 +70,17 @@ const Alert = ({ children, bsStyle = 'default', title, style, className, onDismi
   const iconName = iconNameForType(bsStyle);
 
   return (
-    <StyledAlert $bsStyle={bsStyle}
-                 className={className}
-                 color={bsStyle}
-                 style={style}
-                 onClose={onDismiss}
-                 title={title}
-                 icon={noIcon ? null : <Icon name={iconName} />}
-                 closeButtonLabel={displayCloseButton && 'Close alert'}
-                 withCloseButton={displayCloseButton}>
+    <StyledAlert
+      $bsStyle={bsStyle}
+      className={className}
+      color={bsStyle}
+      style={style}
+      onClose={onDismiss}
+      title={title}
+      icon={noIcon ? null : <Icon name={iconName} />}
+      closeButtonLabel={displayCloseButton && 'Close alert'}
+      withCloseButton={displayCloseButton}
+    >
       {children}
     </StyledAlert>
   );

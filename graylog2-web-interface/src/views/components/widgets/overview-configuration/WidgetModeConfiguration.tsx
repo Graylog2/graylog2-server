@@ -22,21 +22,21 @@ import { Input } from 'components/bootstrap';
 
 const DirectionOptions = styled.div`
   display: flex;
-  
+
   .radio {
     padding-top: 6px;
   }
-  
+
   div:first-child {
     margin-right: 5px;
   }
 `;
 
 type Props = {
-  name: string,
-  onChange: (type: string) => void,
-  options: Array<{ label: string, value: string }>,
-}
+  name: string;
+  onChange: (type: string) => void;
+  options: Array<{ label: string; value: string }>;
+};
 
 const WidgetModeConfiguration = ({ name, onChange: onChangeProp, options }: Props) => (
   <Field name={name}>
@@ -47,22 +47,26 @@ const WidgetModeConfiguration = ({ name, onChange: onChangeProp, options }: Prop
       };
 
       return (
-        <Input id="widget-type-configuration"
-               label="Type"
-               error={error}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9">
+        <Input
+          id="widget-type-configuration"
+          label="Type"
+          error={error}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        >
           <DirectionOptions>
             {options.map(({ value: optionValue, label }) => (
-              <Input checked={value === optionValue}
-                     key={optionValue}
-                     formGroupClassName=""
-                     id={name}
-                     label={label}
-                     onBlur={onBlur}
-                     onChange={handleChange}
-                     type="radio"
-                     value={optionValue} />
+              <Input
+                checked={value === optionValue}
+                key={optionValue}
+                formGroupClassName=""
+                id={name}
+                label={label}
+                onBlur={onBlur}
+                onChange={handleChange}
+                type="radio"
+                value={optionValue}
+              />
             ))}
           </DirectionOptions>
         </Input>

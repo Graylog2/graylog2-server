@@ -21,19 +21,21 @@ import Alert from './Alert';
 
 type Padding = 'small';
 
-const StyledAlert = styled(Alert)<{ $padding: Padding }>(({ theme, $padding }) => css`
-  background-color: ${theme.colors.variant.lightest.default};
-  border-color: ${theme.colors.variant.light.default};
-  margin-top: 0;
-  padding: ${$padding === 'small' ? theme.spacings.sm : theme.spacings.md};
+const StyledAlert = styled(Alert)<{ $padding: Padding }>(
+  ({ theme, $padding }) => css`
+    background-color: ${theme.colors.variant.lightest.default};
+    border-color: ${theme.colors.variant.light.default};
+    margin-top: 0;
+    padding: ${$padding === 'small' ? theme.spacings.sm : theme.spacings.md};
 
-  .mantine-Alert-message {
-    color: ${theme.colors.variant.darker.default};
-  }
-`);
+    .mantine-Alert-message {
+      color: ${theme.colors.variant.darker.default};
+    }
+  `,
+);
 
 type Props = Pick<React.ComponentProps<typeof StyledAlert>, 'children' | 'className' | 'style'> & {
-  bsSize?: Padding,
+  bsSize?: Padding;
 };
 // eslint-disable-next-line react/require-default-props
 const Well = (props: Props) => <StyledAlert noIcon $padding={props.bsSize} {...props} />;

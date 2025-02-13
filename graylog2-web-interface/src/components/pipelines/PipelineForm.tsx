@@ -27,11 +27,11 @@ import { FormSubmit } from 'components/common';
 import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
 
 type Props = {
-  pipeline?: PipelineType
-  create?: boolean
-  modal?: boolean
-  save: (pipeline: PipelineType, callback: () => void) => void,
-  onCancel?: () => void,
+  pipeline?: PipelineType;
+  create?: boolean;
+  modal?: boolean;
+  save: (pipeline: PipelineType, callback: () => void) => void;
+  onCancel?: () => void;
 };
 
 const emptyPipeline: PipelineType = {
@@ -44,9 +44,7 @@ const emptyPipeline: PipelineType = {
   modified_at: '',
 };
 
-const PipelineForm = ({
-  pipeline = emptyPipeline, create = false, modal = true, save, onCancel = () => {},
-}: Props) => {
+const PipelineForm = ({ pipeline = emptyPipeline, create = false, modal = true, save, onCancel = () => {} }: Props) => {
   const currentUser = useCurrentUser();
   const [nextPipeline, setNextPipeline] = useState<PipelineType>(cloneDeep(pipeline));
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -81,40 +79,48 @@ const PipelineForm = ({
 
   const content = (
     <fieldset>
-      <Input type="text"
-             id="title"
-             name="title"
-             label="Title"
-             autoFocus
-             required
-             onChange={_onChange}
-             help="Pipeline name."
-             value={nextPipeline.title} />
+      <Input
+        type="text"
+        id="title"
+        name="title"
+        label="Title"
+        autoFocus
+        required
+        onChange={_onChange}
+        help="Pipeline name."
+        value={nextPipeline.title}
+      />
 
-      <Input type="text"
-             id="description"
-             name="description"
-             label="Description"
-             onChange={_onChange}
-             help="Pipeline description."
-             value={nextPipeline.description} />
+      <Input
+        type="text"
+        id="description"
+        name="description"
+        label="Description"
+        onChange={_onChange}
+        help="Pipeline description."
+        value={nextPipeline.description}
+      />
     </fieldset>
   );
 
   if (modal) {
     return (
       <span>
-        <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
-                onClick={_openModal}
-                bsStyle="success">
+        <Button
+          disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
+          onClick={_openModal}
+          bsStyle="success"
+        >
           {create ? 'Add new pipeline' : 'Edit pipeline details'}
         </Button>
-        <BootstrapModalForm show={showModal}
-                            title={`${create ? 'Add new' : 'Edit'} pipeline ${nextPipeline.title}`}
-                            data-telemetry-title={`${create ? 'Add new' : 'Edit'} pipeline`}
-                            onSubmitForm={_handleSubmit}
-                            onCancel={_closeModal}
-                            submitButtonText={create ? 'Add pipeline' : 'Update pipeline'}>
+        <BootstrapModalForm
+          show={showModal}
+          title={`${create ? 'Add new' : 'Edit'} pipeline ${nextPipeline.title}`}
+          data-telemetry-title={`${create ? 'Add new' : 'Edit'} pipeline`}
+          onSubmitForm={_handleSubmit}
+          onCancel={_closeModal}
+          submitButtonText={create ? 'Add pipeline' : 'Update pipeline'}
+        >
           {content}
         </BootstrapModalForm>
       </span>

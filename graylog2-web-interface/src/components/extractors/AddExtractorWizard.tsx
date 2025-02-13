@@ -24,9 +24,12 @@ type AddExtractorWizardProps = {
   inputId?: string;
 };
 
-class AddExtractorWizard extends React.Component<AddExtractorWizardProps, {
-  [key: string]: any;
-}> {
+class AddExtractorWizard extends React.Component<
+  AddExtractorWizardProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     inputId: undefined,
   };
@@ -67,7 +70,12 @@ class AddExtractorWizard extends React.Component<AddExtractorWizardProps, {
             received by this input, or manually select a message giving its ID.
           </p>
           <p>
-            <Button bsStyle="success" bsSize="small" onClick={this._showAddExtractorForm} disabled={this.state.showExtractorForm}>
+            <Button
+              bsStyle="success"
+              bsSize="small"
+              onClick={this._showAddExtractorForm}
+              disabled={this.state.showExtractorForm}
+            >
               Create extractor
             </Button>
           </p>

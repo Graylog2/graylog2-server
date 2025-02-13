@@ -27,20 +27,20 @@ import type { ConfigurationField } from 'components/configurationforms';
 type FormValues = Input['attributes'];
 
 type Props = {
-  globalValue?: boolean,
+  globalValue?: boolean;
   configFields: {
-    [key: string]: ConfigurationField,
-  },
-  nodeValue?: string,
-  titleValue?: string,
-  typeName: string,
-  title: string,
-  includeTitleField: boolean,
-  handleSubmit: (data: any) => void,
-  values?: FormValues,
+    [key: string]: ConfigurationField;
+  };
+  nodeValue?: string;
+  titleValue?: string;
+  typeName: string;
+  title: string;
+  includeTitleField: boolean;
+  handleSubmit: (data: any) => void;
+  values?: FormValues;
   setShowModal: (boolean) => void;
-  submitButtonText: string,
-}
+  submitButtonText: string;
+};
 
 const InputForm = ({
   globalValue,
@@ -54,7 +54,7 @@ const InputForm = ({
   values,
   setShowModal,
   submitButtonText,
-} : Props) => {
+}: Props) => {
   const [global, setGlobal] = useState<boolean>(globalValue ?? false);
   const [node, setNode] = useState<string | undefined>(nodeValue);
   const configFormRef = useRef(null);
@@ -119,16 +119,18 @@ const InputForm = ({
   const formTitleValue = getTitleValue();
 
   return (
-    <ConfigurationForm<FormValues> ref={configFormRef}
-                                   configFields={configFields}
-                                   includeTitleField={includeTitleField}
-                                   title={title}
-                                   values={formValues}
-                                   titleValue={formTitleValue}
-                                   submitButtonText={submitButtonText}
-                                   submitAction={onSubmit}
-                                   typeName={typeName}
-                                   cancelAction={onCancel}>
+    <ConfigurationForm<FormValues>
+      ref={configFormRef}
+      configFields={configFields}
+      includeTitleField={includeTitleField}
+      title={title}
+      values={formValues}
+      titleValue={formTitleValue}
+      submitButtonText={submitButtonText}
+      submitAction={onSubmit}
+      typeName={typeName}
+      cancelAction={onCancel}
+    >
       <HideOnCloud>
         <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />
       </HideOnCloud>

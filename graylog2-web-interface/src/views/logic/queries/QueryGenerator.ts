@@ -33,11 +33,7 @@ export default (
   searchFilters?: SearchFilter[],
 ): Query => {
   // eslint-disable-next-line no-nested-ternary
-  const streamIds = streamId
-    ? streamId instanceof Array
-      ? streamId
-      : [streamId]
-    : null;
+  const streamIds = streamId ? (streamId instanceof Array ? streamId : [streamId]) : null;
   // eslint-disable-next-line no-nested-ternary
   const streamCategories = streamCategory
     ? streamCategory instanceof Array

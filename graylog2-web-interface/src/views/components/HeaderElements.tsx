@@ -25,7 +25,9 @@ const HeaderElements = () => {
     <>
       {headerElements
         // eslint-disable-next-line react/no-array-index-key
-        .map((Component, idx) => <Component key={idx} />)}
+        .map((Component, idx) => (
+          <Component key={idx} />
+        ))}
     </>
   );
 };

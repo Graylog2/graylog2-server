@@ -43,7 +43,8 @@ const conditionsBlockDict: BlockDict[] = [
         description: 'Field value to check for',
       },
     ],
-    description: "Checks if the message has a field and if this field's numeric value is less than or equal to the given fieldValue",
+    description:
+      "Checks if the message has a field and if this field's numeric value is less than or equal to the given fieldValue",
     rule_builder_enabled: true,
     rule_builder_function_group: 'g1',
     rule_builder_title: "Field 'field' less than or equal 'fieldValue'",
@@ -105,12 +106,12 @@ const conditionsBlockDict: BlockDict[] = [
         description: 'Field value to check for',
       },
     ],
-    description: "Checks if the message has a field and if this field's numeric value is greater than or equal to the given fieldValue",
+    description:
+      "Checks if the message has a field and if this field's numeric value is greater than or equal to the given fieldValue",
     rule_builder_enabled: true,
     rule_builder_function_group: 'g1',
     rule_builder_title: "Field 'field' greater than or equal 'fieldValue'",
     rule_builder_name: 'has field greater than or equal',
-
   },
   {
     name: 'has_field_equals',
@@ -319,7 +320,8 @@ const actionsBlockDict: BlockDict[] = [
         optional: false,
         rule_builder_variable: false,
         allow_negatives: true,
-        description: 'The position to start from, negative means count back from the end of the String by this many characters',
+        description:
+          'The position to start from, negative means count back from the end of the String by this many characters',
       },
       {
         type: RuleBuilderTypes.Number,
@@ -328,7 +330,8 @@ const actionsBlockDict: BlockDict[] = [
         optional: true,
         rule_builder_variable: false,
         allow_negatives: true,
-        description: 'The position to end at (exclusive), negative means count back from the end of the String by this many characters, defaults to length of the input string',
+        description:
+          'The position to end at (exclusive), negative means count back from the end of the String by this many characters, defaults to length of the input string',
       },
     ],
     description: 'Extract a substring from a string',
@@ -359,7 +362,7 @@ const actionsBlockDict: BlockDict[] = [
         optional: true,
         rule_builder_variable: false,
         allow_negatives: false,
-        description: "Used when 'value' is null, defaults to \"\"",
+        description: 'Used when \'value\' is null, defaults to ""',
       },
     ],
     description: 'Converts a value to its string representation',
@@ -457,7 +460,8 @@ const actionsBlockDict: BlockDict[] = [
         optional: false,
         rule_builder_variable: false,
         allow_negatives: false,
-        description: 'The format string to use, see http://www.joda.org/joda-time/apidocs/org/joda/time/format/DateTimeFormat.html',
+        description:
+          'The format string to use, see http://www.joda.org/joda-time/apidocs/org/joda/time/format/DateTimeFormat.html',
       },
       {
         type: RuleBuilderTypes.String,
@@ -477,15 +481,17 @@ const actionsBlockDict: BlockDict[] = [
   },
 ];
 
-const buildRuleBlock = (attrs: {
-  functionName?: string,
-  id?: string,
-  params?: {[key:string]: string | number | boolean},
-  outputvariable?: string,
-  negate?: boolean,
-  step_title?: string,
-  errors?: Array<string>
-} = {}) : RuleBlock => {
+const buildRuleBlock = (
+  attrs: {
+    functionName?: string;
+    id?: string;
+    params?: { [key: string]: string | number | boolean };
+    outputvariable?: string;
+    negate?: boolean;
+    step_title?: string;
+    errors?: Array<string>;
+  } = {},
+): RuleBlock => {
   const defaults = {
     functionName: 'to_long',
     id: 'random_id',
@@ -497,7 +503,10 @@ const buildRuleBlock = (attrs: {
   const optionalProperties = ['outputvariable', 'negate', 'errors'];
 
   const block: RuleBlock = {
-    function: functionName, id, params, step_title,
+    function: functionName,
+    id,
+    params,
+    step_title,
   };
 
   optionalProperties.forEach((prop) => {

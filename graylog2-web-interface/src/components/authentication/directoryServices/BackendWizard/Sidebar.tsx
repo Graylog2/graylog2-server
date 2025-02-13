@@ -54,7 +54,7 @@ const StyledPanelGroup = styled(PanelGroup)`
   }
 `;
 type Props = {
-  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
+  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload;
 };
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {
@@ -67,10 +67,12 @@ const Sidebar = ({ prepareSubmitPayload }: Props) => {
   }, [stepsState.activeStepKey]);
 
   return (
-    <StyledPanelGroup accordion
-                      activeKey={activeKey}
-                      id="sidebar-server-response"
-                      onSelect={setActiveKey as SelectCallback}>
+    <StyledPanelGroup
+      accordion
+      activeKey={activeKey}
+      id="sidebar-server-response"
+      onSelect={setActiveKey as SelectCallback}
+    >
       <Panel eventKey={SERVER_CONFIG_KEY}>
         <Panel.Heading>
           <Panel.Title toggle>Server Connection Check</Panel.Title>

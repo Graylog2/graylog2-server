@@ -28,41 +28,43 @@ const StyledIcon = styled(Icon)`
 `;
 
 type WithCancelProps = {
-  displayCancel?: true,
-  disabledCancel?: boolean,
-  onCancel: () => void,
-}
+  displayCancel?: true;
+  disabledCancel?: boolean;
+  onCancel: () => void;
+};
 
 type WithoutCancelProps = {
-  displayCancel?: false
-}
+  displayCancel?: false;
+};
 
 type WithAsyncSubmit = {
-  isAsyncSubmit?: true,
-  submitLoadingText: string,
-  isSubmitting: boolean,
-}
+  isAsyncSubmit?: true;
+  submitLoadingText: string;
+  isSubmitting: boolean;
+};
 
 type WithSyncSubmit = {
-  isAsyncSubmit?: false,
-}
+  isAsyncSubmit?: false;
+};
 
 type Props = {
-  bsSize?: 'large' | 'small' | 'xsmall',
-  centerCol?: React.ReactNode,
-  className?: string,
-  disabledSubmit?: boolean,
-  displayCancel?: boolean,
-  formId?: string,
-  isAsyncSubmit?: boolean,
-  onSubmit?: () => void,
-  submitButtonText: string,
-  submitButtonType?: 'submit' | 'button',
-  submitIcon?: IconName,
-} & (WithCancelProps | WithoutCancelProps) & (WithAsyncSubmit | WithSyncSubmit);
+  bsSize?: 'large' | 'small' | 'xsmall';
+  centerCol?: React.ReactNode;
+  className?: string;
+  disabledSubmit?: boolean;
+  displayCancel?: boolean;
+  formId?: string;
+  isAsyncSubmit?: boolean;
+  onSubmit?: () => void;
+  submitButtonText: string;
+  submitButtonType?: 'submit' | 'button';
+  submitIcon?: IconName;
+} & (WithCancelProps | WithoutCancelProps) &
+  (WithAsyncSubmit | WithSyncSubmit);
 
 // @ts-expect-error
-const isWithCancelProps = (props: Props): props is WithCancelProps => props.displayCancel === undefined || props.displayCancel === true;
+const isWithCancelProps = (props: Props): props is WithCancelProps =>
+  props.displayCancel === undefined || props.displayCancel === true;
 // @ts-expect-error
 const isWithAsyncSubmit = (props: Props): props is WithAsyncSubmit => props.isAsyncSubmit === true;
 
@@ -83,25 +85,29 @@ const FormSubmit = (props: Props) => {
 
   return (
     <ButtonToolbar className={className}>
-      <Button bsStyle="success"
-              bsSize={bsSize}
-              disabled={disabledSubmit || submittingAsync}
-              form={formId}
-              title={submitButtonText}
-              aria-label={submitButtonText}
-              type={submitButtonType}
-              onClick={onSubmit}>
-        {(submitIcon && !submittingAsync) && <StyledIcon name={submitIcon} />}
+      <Button
+        bsStyle="success"
+        bsSize={bsSize}
+        disabled={disabledSubmit || submittingAsync}
+        form={formId}
+        title={submitButtonText}
+        aria-label={submitButtonText}
+        type={submitButtonType}
+        onClick={onSubmit}
+      >
+        {submitIcon && !submittingAsync && <StyledIcon name={submitIcon} />}
         {submittingAsync ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
       {centerCol}
       {isWithCancelProps(props) && (
-        <Button type="button"
-                bsSize={bsSize}
-                onClick={props.onCancel}
-                title="Cancel"
-                aria-label="Cancel"
-                disabled={props.disabledCancel || submittingAsync}>
+        <Button
+          type="button"
+          bsSize={bsSize}
+          onClick={props.onCancel}
+          title="Cancel"
+          aria-label="Cancel"
+          disabled={props.disabledCancel || submittingAsync}
+        >
           Cancel
         </Button>
       )}

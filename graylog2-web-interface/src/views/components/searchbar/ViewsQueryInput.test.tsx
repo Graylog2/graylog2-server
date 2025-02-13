@@ -46,14 +46,16 @@ describe('QueryInput', () => {
 
   const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof ViewsQueryInput>>) => (
     <TestStoreProvider>
-      <ViewsQueryInput value=""
-                       name="search-query"
-                       onChange={() => Promise.resolve('')}
-                       validate={() => Promise.resolve({})}
-                       isValidating={false}
-                       onExecute={() => {}}
-                       completerFactory={() => new Completer()}
-                       {...props} />
+      <ViewsQueryInput
+        value=""
+        name="search-query"
+        onChange={() => Promise.resolve('')}
+        validate={() => Promise.resolve({})}
+        isValidating={false}
+        onExecute={() => {}}
+        completerFactory={() => new Completer()}
+        {...props}
+      />
     </TestStoreProvider>
   );
 
@@ -144,14 +146,16 @@ describe('QueryInput', () => {
   describe('supports custom commands', () => {
     it('adds custom commands to ace', async () => {
       const exec = jest.fn();
-      const commands = [{
-        name: 'TestCommand',
-        bindKey: {
-          mac: 'Ctrl+Enter',
-          win: 'Ctrl+Enter',
+      const commands = [
+        {
+          name: 'TestCommand',
+          bindKey: {
+            mac: 'Ctrl+Enter',
+            win: 'Ctrl+Enter',
+          },
+          exec,
         },
-        exec,
-      }];
+      ];
 
       render(<SimpleQueryInput commands={commands} />);
 
