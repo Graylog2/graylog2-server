@@ -28,9 +28,8 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const EventDefinitionsActions = singletonActions(
-  'core.EventDefinitions',
-  () => Reflux.createActions({
+export const EventDefinitionsActions = singletonActions('core.EventDefinitions', () =>
+  Reflux.createActions({
     listAll: { asyncResult: true },
     listPaginated: { asyncResult: true },
     searchPaginated: { asyncResult: true },
@@ -45,9 +44,8 @@ export const EventDefinitionsActions = singletonActions(
   }),
 );
 
-export const EventDefinitionsStore = singletonStore(
-  'core.EventDefinitions',
-  () => Reflux.createStore({
+export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () =>
+  Reflux.createStore({
     listenables: [EventDefinitionsActions],
     sourceUrl: '/events/definitions',
     all: undefined,
@@ -119,34 +117,41 @@ export const EventDefinitionsStore = singletonStore(
     },
 
     listPaginated({ query = '', page = 1, pageSize = 10 }) {
-      const promise = fetch('GET', this.eventDefinitionsUrl({
-        query: {
-          query: query,
-          page: page,
-          per_page: pageSize,
-        },
-      }));
+      const promise = fetch(
+        'GET',
+        this.eventDefinitionsUrl({
+          query: {
+            query: query,
+            page: page,
+            per_page: pageSize,
+          },
+        }),
+      );
 
-      promise.then((response) => {
-        this.eventDefinitions = response.event_definitions;
-        this.context = response.context;
-        this.query = response.query;
+      promise
+        .then((response) => {
+          this.eventDefinitions = response.event_definitions;
+          this.context = response.context;
+          this.query = response.query;
 
-        this.pagination = {
-          count: response.count,
-          page: response.page,
-          pageSize: response.per_page,
-          total: response.total,
-          grandTotal: response.grand_total,
-        };
+          this.pagination = {
+            count: response.count,
+            page: response.page,
+            pageSize: response.per_page,
+            total: response.total,
+            grandTotal: response.grand_total,
+          };
 
-        this.propagateChanges();
+          this.propagateChanges();
 
-        return response;
-      }).catch((error) => {
-        UserNotification.error(`Fetching event definitions failed with status: ${error}`,
-          'Could not retrieve event definitions');
-      });
+          return response;
+        })
+        .catch((error) => {
+          UserNotification.error(
+            `Fetching event definitions failed with status: ${error}`,
+            'Could not retrieve event definitions',
+          );
+        });
 
       EventDefinitionsActions.listPaginated.promise(promise);
     },
@@ -158,12 +163,7 @@ export const EventDefinitionsStore = singletonStore(
           elements,
           query,
           attributes,
-          pagination: {
-            count,
-            total,
-            page,
-            per_page: perPage,
-          },
+          pagination: { count, total, page, per_page: perPage },
         } = response;
 
         return {
@@ -188,8 +188,10 @@ export const EventDefinitionsStore = singletonStore(
 
       promise.catch((error) => {
         if (error.status === 404) {
-          UserNotification.error(`Unable to find Event Definition with id <${eventDefinitionId}>, please ensure it wasn't deleted.`,
-            'Could not retrieve Event Definition');
+          UserNotification.error(
+            `Unable to find Event Definition with id <${eventDefinitionId}>, please ensure it wasn't deleted.`,
+            'Could not retrieve Event Definition',
+          );
         }
       });
 
@@ -203,8 +205,8 @@ export const EventDefinitionsStore = singletonStore(
     },
 
     extractSchedulerInfo(eventDefinition) {
-    // Removes the internal "_is_scheduled" field from the event definition data. We only use this to pass-through
-    // the flag from the form.
+      // Removes the internal "_is_scheduled" field from the event definition data. We only use this to pass-through
+      // the flag from the form.
       const clonedEventDefinition = cloneDeep(eventDefinition);
       const { _is_scheduled } = pick(clonedEventDefinition.config, ['_is_scheduled']);
 
@@ -215,12 +217,18 @@ export const EventDefinitionsStore = singletonStore(
 
     create(newEventDefinition) {
       const { eventDefinition, isScheduled } = this.extractSchedulerInfo(newEventDefinition);
-      const promise = fetch('POST', this.eventDefinitionsUrl({ query: { schedule: isScheduled } }), this.setAlertFlag(eventDefinition));
+      const promise = fetch(
+        'POST',
+        this.eventDefinitionsUrl({ query: { schedule: isScheduled } }),
+        this.setAlertFlag(eventDefinition),
+      );
 
       promise.then(
         (response) => {
-          UserNotification.success('Event Definition created successfully',
-            `Event Definition "${eventDefinition.title}" was created successfully.`);
+          UserNotification.success(
+            'Event Definition created successfully',
+            `Event Definition "${eventDefinition.title}" was created successfully.`,
+          );
 
           this.refresh();
 
@@ -228,8 +236,10 @@ export const EventDefinitionsStore = singletonStore(
         },
         (error) => {
           if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
-            UserNotification.error(`Creating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-              'Could not save Event Definition');
+            UserNotification.error(
+              `Creating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+              'Could not save Event Definition',
+            );
           }
         },
       );
@@ -242,8 +252,10 @@ export const EventDefinitionsStore = singletonStore(
 
       promise.then(
         (response) => {
-          UserNotification.success('Event Definition duplicated successfully',
-            `Event Definition "${response.title}" was created successfully.`);
+          UserNotification.success(
+            'Event Definition duplicated successfully',
+            `Event Definition "${response.title}" was created successfully.`,
+          );
 
           this.refresh();
 
@@ -251,8 +263,10 @@ export const EventDefinitionsStore = singletonStore(
         },
         (error) => {
           if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
-            UserNotification.error(`Duplicating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-              'Could not duplicate Event Definition');
+            UserNotification.error(
+              `Duplicating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+              'Could not duplicate Event Definition',
+            );
           }
         },
       );
@@ -262,12 +276,18 @@ export const EventDefinitionsStore = singletonStore(
 
     update(eventDefinitionId, updatedEventDefinition) {
       const { eventDefinition, isScheduled } = this.extractSchedulerInfo(updatedEventDefinition);
-      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinitionId], query: { schedule: isScheduled } }), this.setAlertFlag(eventDefinition));
+      const promise = fetch(
+        'PUT',
+        this.eventDefinitionsUrl({ segments: [eventDefinitionId], query: { schedule: isScheduled } }),
+        this.setAlertFlag(eventDefinition),
+      );
 
       promise.then(
         (response) => {
-          UserNotification.success('Event Definition updated successfully',
-            `Event Definition "${eventDefinition.title}" was updated successfully.`);
+          UserNotification.success(
+            'Event Definition updated successfully',
+            `Event Definition "${eventDefinition.title}" was updated successfully.`,
+          );
 
           this.refresh();
 
@@ -275,8 +295,10 @@ export const EventDefinitionsStore = singletonStore(
         },
         (error) => {
           if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
-            UserNotification.error(`Updating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-              'Could not update Event Definition');
+            UserNotification.error(
+              `Updating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+              'Could not update Event Definition',
+            );
           }
         },
       );
@@ -295,8 +317,10 @@ export const EventDefinitionsStore = singletonStore(
 
       promise.then(
         (response) => {
-          UserNotification.success('Event Definition successfully enabled',
-            `Event Definition "${eventDefinition.title}" was successfully enabled.`);
+          UserNotification.success(
+            'Event Definition successfully enabled',
+            `Event Definition "${eventDefinition.title}" was successfully enabled.`,
+          );
 
           this.refresh();
 
@@ -304,8 +328,10 @@ export const EventDefinitionsStore = singletonStore(
         },
         (error) => {
           if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
-            UserNotification.error(`Enabling Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-              'Could not enable Event Definition');
+            UserNotification.error(
+              `Enabling Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+              'Could not enable Event Definition',
+            );
           }
         },
       );
@@ -318,8 +344,10 @@ export const EventDefinitionsStore = singletonStore(
 
       promise.then(
         (response) => {
-          UserNotification.success('Event Definition successfully disabled',
-            `Event Definition "${eventDefinition.title}" was successfully disabled.`);
+          UserNotification.success(
+            'Event Definition successfully disabled',
+            `Event Definition "${eventDefinition.title}" was successfully disabled.`,
+          );
 
           this.refresh();
 
@@ -327,8 +355,10 @@ export const EventDefinitionsStore = singletonStore(
         },
         (error) => {
           if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
-            UserNotification.error(`Disabling Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-              'Could not disable Event Definition');
+            UserNotification.error(
+              `Disabling Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+              'Could not disable Event Definition',
+            );
           }
         },
       );
@@ -337,12 +367,14 @@ export const EventDefinitionsStore = singletonStore(
     },
 
     clearNotificationQueue(eventDefinition) {
-      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'clear-notification-queue'] }));
+      const promise = fetch(
+        'PUT',
+        this.eventDefinitionsUrl({ segments: [eventDefinition.id, 'clear-notification-queue'] }),
+      );
 
       promise.then(
         (response) => {
-          UserNotification.success('Queued notifications cleared.',
-            'Queued notifications were successfully cleared.');
+          UserNotification.success('Queued notifications cleared.', 'Queued notifications were successfully cleared.');
 
           this.refresh();
 
@@ -350,8 +382,10 @@ export const EventDefinitionsStore = singletonStore(
         },
         (error) => {
           if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
-            UserNotification.error(`Clearing queued notifications failed with status: ${error}`,
-              'Could not clear queued notifications');
+            UserNotification.error(
+              `Clearing queued notifications failed with status: ${error}`,
+              'Could not clear queued notifications',
+            );
           }
         },
       );

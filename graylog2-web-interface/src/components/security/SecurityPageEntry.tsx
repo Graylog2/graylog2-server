@@ -25,12 +25,16 @@ const SecurityPageEntry = () => {
 
   if (securityPagePlugins?.length) {
     // eslint-disable-next-line react/no-array-index-key
-    return <>{securityPagePlugins.map((Page, index) => <Page key={index} />)}</>;
+    return (
+      <>
+        {securityPagePlugins.map((Page, index) => (
+          <Page key={index} />
+        ))}
+      </>
+    );
   }
 
-  return (
-    <SecurityPage />
-  );
+  return <SecurityPage />;
 };
 
 export default SecurityPageEntry;

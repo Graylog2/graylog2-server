@@ -30,17 +30,18 @@ import type Role from 'logic/roles/Role';
 
 type Props = {
   params: {
-    roleId: string,
-  },
+    roleId: string;
+  };
 };
 
 const PageTitle = ({ fullName }: { fullName: string | undefined | null }) => (
   <>
-    Role Details {fullName && (
+    Role Details{' '}
+    {fullName && (
       <>
         - <i>{fullName}</i>
       </>
-  )}
+    )}
   </>
 );
 
@@ -54,20 +55,20 @@ const RoleDetailsPage = ({ params }: Props) => {
 
   return (
     <DocumentTitle title={`Role Details ${loadedRole?.name ?? ''}`}>
-      <PageHeader title={<PageTitle fullName={loadedRole?.name} />}
-                  actions={<RoleActionLinks roleId={roleId} />}
-                  documentationLink={{
-                    title: 'Permissions documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}
-                  topActions={(
-                    <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-                      <Button bsStyle="info">Roles Overview</Button>
-                    </LinkContainer>
-                  )}>
-        <span>
-          Overview of details like name, description and assigned users.
-        </span>
+      <PageHeader
+        title={<PageTitle fullName={loadedRole?.name} />}
+        actions={<RoleActionLinks roleId={roleId} />}
+        documentationLink={{
+          title: 'Permissions documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+        topActions={
+          <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
+            <Button bsStyle="info">Roles Overview</Button>
+          </LinkContainer>
+        }
+      >
+        <span>Overview of details like name, description and assigned users.</span>
       </PageHeader>
       <RoleDetails role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>

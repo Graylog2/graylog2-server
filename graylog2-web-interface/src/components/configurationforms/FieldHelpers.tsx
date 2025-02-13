@@ -16,9 +16,11 @@
  */
 import type { ConfigurationField } from 'components/configurationforms/types';
 
-export const hasAttribute = (array: Array<string>, attribute: string): boolean => array.find((e) => e.toLowerCase() === attribute.toLowerCase()) !== undefined;
+export const hasAttribute = (array: Array<string>, attribute: string): boolean =>
+  array.find((e) => e.toLowerCase() === attribute.toLowerCase()) !== undefined;
 
-export const optionableLabel = (field: ConfigurationField): string => (field.is_optional && field.type !== 'boolean' ? ` ${field.human_name} (optional)` : field.human_name);
+export const optionableLabel = (field: ConfigurationField): string =>
+  field.is_optional && field.type !== 'boolean' ? ` ${field.human_name} (optional)` : field.human_name;
 
 export default {
   hasAttribute,

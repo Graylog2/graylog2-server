@@ -24,7 +24,7 @@ import ExternalValueActionsContext, { DEFAULT_EXTERNAL_ACTIONS } from './Externa
 
 const usePluginExternalActions = () => {
   const useExternalActions = usePluginEntities('useExternalActions');
-  const useExternalAction = useMemo<()=>(ExternalValueActionsContextValue)>(() => {
+  const useExternalAction = useMemo<() => ExternalValueActionsContextValue>(() => {
     if (useExternalActions && typeof useExternalActions[0] === 'function') return useExternalActions[0];
 
     return () => DEFAULT_EXTERNAL_ACTIONS;
@@ -39,16 +39,10 @@ type ExternalValueActionsProviderProps = {
   children: React.ReactNode;
 };
 
-const ExternalValueActionsProvider = ({
-  children,
-}: ExternalValueActionsProviderProps) => {
+const ExternalValueActionsProvider = ({ children }: ExternalValueActionsProviderProps) => {
   const contextValue = usePluginExternalActions();
 
-  return (
-    <ExternalValueActionsContext.Provider value={contextValue}>
-      {children}
-    </ExternalValueActionsContext.Provider>
-  );
+  return <ExternalValueActionsContext.Provider value={contextValue}>{children}</ExternalValueActionsContext.Provider>;
 };
 
 export default ExternalValueActionsProvider;

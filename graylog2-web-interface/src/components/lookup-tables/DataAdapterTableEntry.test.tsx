@@ -29,31 +29,33 @@ jest.mock('hooks/useScopePermissions');
 const renderedDataAdapter = (scope: string) => {
   const dataAdapter = createLookupTableAdapter(1, { _scope: scope });
 
-  return render(<table><DataAdapterTableEntry adapter={dataAdapter} error={null} /></table>);
+  return render(
+    <table>
+      <DataAdapterTableEntry adapter={dataAdapter} error={null} />
+    </table>,
+  );
 };
 
 describe('DataAdapterTableEntry', () => {
   beforeAll(() => {
-    asMock(useScopePermissions).mockImplementation(
-      (entity: GenericEntityType) => {
-        if (!entity._scope) {
-          return {
-            loadingScopePermissions: true,
-            scopePermissions: null,
-          };
-        }
-
-        const scopes = {
-          ILLUMINATE: { is_mutable: false },
-          DEFAULT: { is_mutable: true },
-        };
-
+    asMock(useScopePermissions).mockImplementation((entity: GenericEntityType) => {
+      if (!entity._scope) {
         return {
-          loadingScopePermissions: false,
-          scopePermissions: scopes[entity._scope],
+          loadingScopePermissions: true,
+          scopePermissions: null,
         };
-      },
-    );
+      }
+
+      const scopes = {
+        ILLUMINATE: { is_mutable: false },
+        DEFAULT: { is_mutable: true },
+      };
+
+      return {
+        loadingScopePermissions: false,
+        scopePermissions: scopes[entity._scope],
+      };
+    });
   });
 
   it('should show Loading spinner while loading scope permissions', () => {

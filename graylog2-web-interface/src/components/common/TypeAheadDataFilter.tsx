@@ -86,9 +86,12 @@ type TypeAheadDataFilterProps = {
  * **Note** There are a few quirks around this component and it will be
  * refactored soon.
  */
-class TypeAheadDataFilter extends React.Component<TypeAheadDataFilterProps, {
-  [key: string]: any;
-}> {
+class TypeAheadDataFilter extends React.Component<
+  TypeAheadDataFilterProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     id: '',
     data: [],
@@ -133,10 +136,13 @@ class TypeAheadDataFilter extends React.Component<TypeAheadDataFilterProps, {
     const { filters } = this.state;
     const { displayKey } = this.props;
 
-    this.setState({
-      filters: filters.add(suggestion[displayKey]),
-      filterText: '',
-    }, this.filterData);
+    this.setState(
+      {
+        filters: filters.add(suggestion[displayKey]),
+        filterText: '',
+      },
+      this.filterData,
+    );
 
     this.typeAheadInput.clear();
   };
@@ -220,7 +226,13 @@ class TypeAheadDataFilter extends React.Component<TypeAheadDataFilterProps, {
       <li key={`li-${filter}`}>
         <span className="pill label label-default">
           {filterBy}: {filter}
-          <button type="button" className="tag-remove" data-target={filter} onClick={this._onFilterRemoved} aria-label={`Remove filter ${filter}`} />
+          <button
+            type="button"
+            className="tag-remove"
+            data-target={filter}
+            onClick={this._onFilterRemoved}
+            aria-label={`Remove filter ${filter}`}
+          />
         </span>
       </li>
     ));
@@ -228,7 +240,9 @@ class TypeAheadDataFilter extends React.Component<TypeAheadDataFilterProps, {
     let suggestions;
 
     if (filterSuggestionAccessor) {
-      suggestions = filterSuggestions.map((filterSuggestion) => filterSuggestion[filterSuggestionAccessor].toLocaleLowerCase());
+      suggestions = filterSuggestions.map((filterSuggestion) =>
+        filterSuggestion[filterSuggestionAccessor].toLocaleLowerCase(),
+      );
     } else {
       suggestions = filterSuggestions.map((filterSuggestion) => filterSuggestion.toLocaleLowerCase());
     }
@@ -237,25 +251,33 @@ class TypeAheadDataFilter extends React.Component<TypeAheadDataFilterProps, {
 
     return (
       <div className="filter">
-        <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{ display: 'inline-flex', alignItems: 'flex-end' }}>
-          <TypeAheadInput id={id}
-                          ref={(typeAheadInput) => { this.typeAheadInput = typeAheadInput; }}
-                          onSuggestionSelected={this._onFilterAdded}
-                          formGroupClassName=""
-                          suggestionText={`Filter by ${filterBy}: `}
-                          suggestions={suggestions}
-                          label={label}
-                          displayKey={displayKey} />
+        <form
+          className="form-inline"
+          onSubmit={this._onSearchTextChanged}
+          style={{ display: 'inline-flex', alignItems: 'flex-end' }}
+        >
+          <TypeAheadInput
+            id={id}
+            ref={(typeAheadInput) => {
+              this.typeAheadInput = typeAheadInput;
+            }}
+            onSuggestionSelected={this._onFilterAdded}
+            formGroupClassName=""
+            suggestionText={`Filter by ${filterBy}: `}
+            suggestions={suggestions}
+            label={label}
+            displayKey={displayKey}
+          />
           <StyledButton type="submit">Filter</StyledButton>
-          <StyledButton type="button"
-                        onClick={this._resetFilters}
-                        disabled={filters.count() === 0 && filterText === ''}>
+          <StyledButton
+            type="button"
+            onClick={this._resetFilters}
+            disabled={filters.count() === 0 && filterText === ''}
+          >
             Reset
           </StyledButton>
         </form>
-        <ul className="pill-list">
-          {filtersContent}
-        </ul>
+        <ul className="pill-list">{filtersContent}</ul>
       </div>
     );
   }

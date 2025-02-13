@@ -28,14 +28,14 @@ import { IfPermitted, SortableList, Spinner } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 type Processor = {
-  name: string,
-  class_name: string
-}
+  name: string;
+  class_name: string;
+};
 
 type Config = {
-  disabled_processors: Array<string>,
-  processor_order: Array<Processor>,
-}
+  disabled_processors: Array<string>;
+  processor_order: Array<Processor>;
+};
 
 const MessageProcessorsConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
@@ -64,13 +64,15 @@ const MessageProcessorsConfig = () => {
 
   const saveConfig = () => {
     if (!hasNoActiveProcessor()) {
-      ConfigurationsActions.updateMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG, formConfig).then(() => {
-        closeModal();
-      });
+      ConfigurationsActions.updateMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG, formConfig).then(
+        () => {
+          closeModal();
+        },
+      );
     }
   };
 
-  const updateSorting = (newSorting: Array<{id: string, title: string}>) => {
+  const updateSorting = (newSorting: Array<{ id: string; title: string }>) => {
     const processorOrder = newSorting.map((item) => ({ class_name: item.id, name: item.title }));
 
     setFormConfig({ ...formConfig, processor_order: processorOrder });
@@ -82,27 +84,31 @@ const MessageProcessorsConfig = () => {
     if (enabled) {
       setFormConfig({ ...formConfig, disabled_processors: [...disabledProcessors, className] });
     } else {
-      setFormConfig({ ...formConfig, disabled_processors: disabledProcessors.filter((processorName) => processorName !== className) });
+      setFormConfig({
+        ...formConfig,
+        disabled_processors: disabledProcessors.filter((processorName) => processorName !== className),
+      });
     }
   };
 
-  const isProcessorEnabled = (processor: Processor, config: Config) => (
-    config.disabled_processors.filter((p) => p === processor.class_name).length < 1
-  );
+  const isProcessorEnabled = (processor: Processor, config: Config) =>
+    config.disabled_processors.filter((p) => p === processor.class_name).length < 1;
 
-  const summary = () => viewConfig.processor_order.map((processor, idx) => {
-    const status = isProcessorEnabled(processor, viewConfig) ? 'active' : 'disabled';
+  const summary = () =>
+    viewConfig.processor_order.map((processor, idx) => {
+      const status = isProcessorEnabled(processor, viewConfig) ? 'active' : 'disabled';
 
-    return (
-      <tr key={processor.name}>
-        <td>{idx + 1}</td>
-        <td>{processor.name}</td>
-        <td>{status}</td>
-      </tr>
-    );
-  });
+      return (
+        <tr key={processor.name}>
+          <td>{idx + 1}</td>
+          <td>{processor.name}</td>
+          <td>{status}</td>
+        </tr>
+      );
+    });
 
-  const sortableItems = () => formConfig.processor_order.map((processor) => ({ id: processor.class_name, title: processor.name }));
+  const sortableItems = () =>
+    formConfig.processor_order.map((processor) => ({ id: processor.class_name, title: processor.name }));
 
   const statusForm = () => {
     const sortedProcessorOrder = [...formConfig.processor_order].sort((a, b) => naturalSort(a.name, b.name));
@@ -114,16 +120,16 @@ const MessageProcessorsConfig = () => {
         <tr key={processor.name}>
           <td>{processor.name}</td>
           <td>
-            <input type="checkbox"
-                   checked={enabled}
-                   onChange={() => toggleStatus(processor.class_name, enabled)} />
+            <input type="checkbox" checked={enabled} onChange={() => toggleStatus(processor.class_name, enabled)} />
           </td>
         </tr>
       );
     });
   };
 
-  if (!viewConfig) { return <Spinner />; }
+  if (!viewConfig) {
+    return <Spinner />;
+  }
 
   return (
     <div>
@@ -138,46 +144,46 @@ const MessageProcessorsConfig = () => {
             <th>Status</th>
           </tr>
         </thead>
-        <tbody>
-          {summary()}
-        </tbody>
+        <tbody>{summary()}</tbody>
       </Table>
 
       <IfPermitted permissions="clusterconfigentry:edit">
-        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
+        <Button bsStyle="info" bsSize="xs" onClick={openModal}>
+          Edit configuration
+        </Button>
       </IfPermitted>
 
       {showConfigModal && formConfig && (
-      <BootstrapModalForm show
-                          title="Update Message Processors Configuration"
-                          onSubmitForm={saveConfig}
-                          onCancel={closeModal}
-                          submitButtonText="Update configuration">
-        <>
-          <h3>Order</h3>
-          <p>Use drag and drop to change the execution order of the message processors.</p>
-          <SortableList items={sortableItems()} onMoveItem={updateSorting} displayOverlayInPortal />
+        <BootstrapModalForm
+          show
+          title="Update Message Processors Configuration"
+          onSubmitForm={saveConfig}
+          onCancel={closeModal}
+          submitButtonText="Update configuration"
+        >
+          <>
+            <h3>Order</h3>
+            <p>Use drag and drop to change the execution order of the message processors.</p>
+            <SortableList items={sortableItems()} onMoveItem={updateSorting} displayOverlayInPortal />
 
-          <h3>Status</h3>
-          <p>Change the checkboxes to change the status of a message processor.</p>
-          <Table striped bordered condensed className="top-margin">
-            <thead>
-              <tr>
-                <th>Processor</th>
-                <th>Enabled</th>
-              </tr>
-            </thead>
-            <tbody>
-              {statusForm()}
-            </tbody>
-          </Table>
-          {hasNoActiveProcessor() && (
-          <Alert bsStyle="danger" title="Error">
-            No active message processor!
-          </Alert>
-          )}
-        </>
-      </BootstrapModalForm>
+            <h3>Status</h3>
+            <p>Change the checkboxes to change the status of a message processor.</p>
+            <Table striped bordered condensed className="top-margin">
+              <thead>
+                <tr>
+                  <th>Processor</th>
+                  <th>Enabled</th>
+                </tr>
+              </thead>
+              <tbody>{statusForm()}</tbody>
+            </Table>
+            {hasNoActiveProcessor() && (
+              <Alert bsStyle="danger" title="Error">
+                No active message processor!
+              </Alert>
+            )}
+          </>
+        </BootstrapModalForm>
       )}
     </div>
   );

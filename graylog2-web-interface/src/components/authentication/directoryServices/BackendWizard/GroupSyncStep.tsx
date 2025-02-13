@@ -33,14 +33,14 @@ import type { WizardFormValues } from './BackendWizardContext';
 export const STEP_KEY = 'group-synchronization';
 
 export type Props = {
-  formRef: React.Ref<FormikProps<WizardFormValues>>,
-  onSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>,
-  help: { [inputName: string]: React.ReactElement | string | null | undefined },
-  excludedFields: { [inputName: string]: boolean },
-  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
-  roles: Immutable.List<Role>,
-  submitAllError: React.ReactNode | null | undefined,
-  validateOnMount: boolean,
+  formRef: React.Ref<FormikProps<WizardFormValues>>;
+  onSubmitAll: (shouldUpdateGroupSync?: boolean) => Promise<void>;
+  help: { [inputName: string]: React.ReactElement | string | null | undefined };
+  excludedFields: { [inputName: string]: boolean };
+  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload;
+  roles: Immutable.List<Role>;
+  submitAllError: React.ReactNode | null | undefined;
+  validateOnMount: boolean;
 };
 
 const GroupSyncStep = ({
@@ -68,16 +68,18 @@ const GroupSyncStep = ({
           </Col>
         </Row>
         <ButtonToolbar className="pull-right">
-          <Button bsStyle="primary"
-                  onClick={() => {
-                    sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_GROUP_SYNC_SAVE_CLICKED, {
-                      app_pathname: getPathnameWithoutId(pathname),
-                      app_section: 'directory-service',
-                      app_action_value: 'groupsync-save',
-                    });
+          <Button
+            bsStyle="primary"
+            onClick={() => {
+              sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_GROUP_SYNC_SAVE_CLICKED, {
+                app_pathname: getPathnameWithoutId(pathname),
+                app_section: 'directory-service',
+                app_action_value: 'groupsync-save',
+              });
 
-                    onSubmitAll(false);
-                  }}>
+              onSubmitAll(false);
+            }}
+          >
             Finish & Save Service
           </Button>
         </ButtonToolbar>
@@ -86,14 +88,16 @@ const GroupSyncStep = ({
   }
 
   return (
-    <GroupSyncForm formRef={formRef}
-                   help={help}
-                   excludedFields={excludedFields}
-                   onSubmitAll={onSubmitAll}
-                   prepareSubmitPayload={prepareSubmitPayload}
-                   roles={roles}
-                   submitAllError={submitAllError}
-                   validateOnMount={validateOnMount} />
+    <GroupSyncForm
+      formRef={formRef}
+      help={help}
+      excludedFields={excludedFields}
+      onSubmitAll={onSubmitAll}
+      prepareSubmitPayload={prepareSubmitPayload}
+      roles={roles}
+      submitAllError={submitAllError}
+      validateOnMount={validateOnMount}
+    />
   );
 };
 

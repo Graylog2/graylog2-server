@@ -19,7 +19,7 @@ class TypeAheadDataFilterExample extends React.Component {
 
   onDataFiltered(filteredList) {
     this.setState({ filteredList: filteredList });
-  };
+  }
 
   render() {
     const { list, filteredList } = this.state;
@@ -27,14 +27,16 @@ class TypeAheadDataFilterExample extends React.Component {
 
     return (
       <div>
-        <TypeAheadDataFilter id="awesome-filter"
-                             label="Filter list"
-                             data={list}
-                             displayKey="title"
-                             filterBy="tag"
-                             filterSuggestions={suggestions}
-                             searchInKeys={['title', 'description']}
-                             onDataFiltered={this.onDataFiltered} />
+        <TypeAheadDataFilter
+          id="awesome-filter"
+          label="Filter list"
+          data={list}
+          displayKey="title"
+          filterBy="tag"
+          filterSuggestions={suggestions}
+          searchInKeys={['title', 'description']}
+          onDataFiltered={this.onDataFiltered}
+        />
         <div>
           <dl>
             {filteredList.map((item) => [
@@ -48,5 +50,5 @@ class TypeAheadDataFilterExample extends React.Component {
   }
 }
 
-<TypeAheadDataFilterExample />
+<TypeAheadDataFilterExample />;
 ```

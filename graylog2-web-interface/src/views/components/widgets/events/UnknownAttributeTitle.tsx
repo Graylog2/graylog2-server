@@ -25,15 +25,19 @@ const UnknownFieldTitleContainer = styled.div`
   gap: 5px;
 `;
 
-const ErrorIcon = styled(Icon)(({ theme }) => css`
-  color: ${theme.colors.variant.warning};
-`);
+const ErrorIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.warning};
+  `,
+);
 
 const UnknownAttributeTitle = () => (
   <UnknownFieldTitleContainer>
     Unknown
-    <OverlayTrigger overlay="This attribute is currently not available, because it requires a valid license."
-                    placement="bottom">
+    <OverlayTrigger
+      overlay="This attribute is currently not available, because it requires a valid license."
+      placement="bottom"
+    >
       <ErrorIcon name="error" />
     </OverlayTrigger>
   </UnknownFieldTitleContainer>

@@ -31,8 +31,8 @@ import ExtractorsListItem from './ExtractorsListItem';
 import ExtractorsSortModal from './ExtractorSortModal';
 
 type Props = {
-  input: Input,
-  node: NodeInfo,
+  input: Input;
+  node: NodeInfo;
 };
 
 const fetchExtractors = (inputId: string) => {
@@ -48,10 +48,7 @@ const ExtractorsList = ({ input, node }: Props) => {
   }, [input.id]);
 
   const _formatExtractor = (extractor: ExtractorType) => (
-    <ExtractorsListItem key={extractor.id}
-                        extractor={extractor}
-                        inputId={input.id}
-                        nodeId={node.node_id} />
+    <ExtractorsListItem key={extractor.id} extractor={extractor} inputId={input.id} nodeId={node.node_id} />
   );
 
   const _isLoading = () => !extractors;
@@ -87,20 +84,22 @@ const ExtractorsList = ({ input, node }: Props) => {
             <Col md={8}>
               <h2>Configured extractors</h2>
             </Col>
-            <Col md={4}>
-              {sortExtractorsButton}
-            </Col>
+            <Col md={4}>{sortExtractorsButton}</Col>
           </Row>
-          <EntityList bsNoItemsStyle="info"
-                      noItemsText="This input has no configured extractors."
-                      items={formattedExtractors} />
+          <EntityList
+            bsNoItemsStyle="info"
+            noItemsText="This input has no configured extractors."
+            items={formattedExtractors}
+          />
         </Col>
       </Row>
       {showSortModal && (
-        <ExtractorsSortModal input={input}
-                             extractors={extractors}
-                             onClose={() => setShowSortModal(false)}
-                             onSort={() => fetchExtractors(input.id)} />
+        <ExtractorsSortModal
+          input={input}
+          extractors={extractors}
+          onClose={() => setShowSortModal(false)}
+          onSort={() => fetchExtractors(input.id)}
+        />
       )}
     </div>
   );

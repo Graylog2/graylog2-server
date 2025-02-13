@@ -60,11 +60,7 @@ describe('RolesOverview', () => {
 
   it('should display table header', async () => {
     render(<RolesOverview />);
-    const headers = [
-      'Name',
-      'Description',
-      'Actions',
-    ];
+    const headers = ['Name', 'Description', 'Actions'];
 
     // wait until list is displayed
     await screen.findByText('Roles');
@@ -87,7 +83,13 @@ describe('RolesOverview', () => {
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
     fireEvent.change(searchInput, { target: { value: 'name:manager' } });
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'name:manager' }));
+    await waitFor(() =>
+      expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({
+        page: 1,
+        perPage: 10,
+        query: 'name:manager',
+      }),
+    );
   });
 
   it('should reset search', async () => {
@@ -96,11 +98,19 @@ describe('RolesOverview', () => {
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
     fireEvent.change(searchInput, { target: { value: 'name:manager' } });
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'name:manager' }));
+    await waitFor(() =>
+      expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({
+        page: 1,
+        perPage: 10,
+        query: 'name:manager',
+      }),
+    );
 
     const resetSearchButton = await screen.findByRole('button', { name: 'Reset search' });
     fireEvent.click(resetSearchButton);
 
-    await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }));
+    await waitFor(() =>
+      expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }),
+    );
   });
 });

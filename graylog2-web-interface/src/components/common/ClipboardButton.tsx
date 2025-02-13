@@ -27,31 +27,39 @@ import ClipboardContainer from 'components/common/ClipboardContainer';
  */
 
 type Props = {
-  bsSize?: BsSize,
-  bsStyle?: StyleProps,
-  buttonTitle?: string,
-  className?: string,
-  disabled?: boolean,
-  onSuccess?: () => void,
-  text: string,
-  title: React.ReactNode,
-}
+  bsSize?: BsSize;
+  bsStyle?: StyleProps;
+  buttonTitle?: string;
+  className?: string;
+  disabled?: boolean;
+  onSuccess?: () => void;
+  text: string;
+  title: React.ReactNode;
+};
 
 const ClipboardButton = ({
-  bsSize = undefined, bsStyle = undefined, buttonTitle = undefined, className = undefined,
-  disabled = undefined, onSuccess = undefined, text, title,
+  bsSize = undefined,
+  bsStyle = undefined,
+  buttonTitle = undefined,
+  className = undefined,
+  disabled = undefined,
+  onSuccess = undefined,
+  text,
+  title,
 }: Props) => (
   <ClipboardContainer text={text}>
     {({ copy }) => (
-      <Button bsSize={bsSize}
-              bsStyle={bsStyle}
-              className={className}
-              disabled={disabled}
-              title={buttonTitle}
-              onClick={() => {
-                copy();
-                onSuccess?.();
-              }}>
+      <Button
+        bsSize={bsSize}
+        bsStyle={bsStyle}
+        className={className}
+        disabled={disabled}
+        title={buttonTitle}
+        onClick={() => {
+          copy();
+          onSuccess?.();
+        }}
+      >
         {title}
       </Button>
     )}

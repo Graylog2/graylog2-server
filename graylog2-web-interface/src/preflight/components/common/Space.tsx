@@ -18,9 +18,7 @@ import * as React from 'react';
 import type { SpaceProps } from '@mantine/core';
 import { Space as MantineSpace } from '@mantine/core';
 
-type Props = SpaceProps
+type Props = SpaceProps;
 
-const Space = (props: Props) => (
-  <MantineSpace {...props} />
-);
+const Space = (props: Props) => <MantineSpace {...props} />;
 export default Space;

@@ -20,43 +20,45 @@ import styled, { css } from 'styled-components';
 import NumberUtils from 'util/NumberUtils';
 import { Icon } from 'components/common';
 
-const InputIO = styled.span(({ theme }) => css`
-  margin-left: -5px;
+const InputIO = styled.span(
+  ({ theme }) => css`
+    margin-left: -5px;
 
-  .total {
-    color: ${theme.colors.gray[70]};
-  }
+    .total {
+      color: ${theme.colors.gray[70]};
+    }
 
-  .value {
-    font-family: ${theme.fonts.family.monospace};
-  }
+    .value {
+      font-family: ${theme.fonts.family.monospace};
+    }
 
-  .persec {
-    margin-left: 3px;
-  }
+    .persec {
+      margin-left: 3px;
+    }
 
-  .channel-direction {
-    position: relative;
-    left: -1px;
-  }
+    .channel-direction {
+      position: relative;
+      left: -1px;
+    }
 
-  .channel-direction-down {
-    position: relative;
-    top: 1px;
-  }
+    .channel-direction-down {
+      position: relative;
+      top: 1px;
+    }
 
-  .channel-direction-up {
-    position: relative;
-    top: -1px;
-  }
-`);
+    .channel-direction-up {
+      position: relative;
+      top: -1px;
+    }
+  `,
+);
 
 type Props = {
-  writtenBytes1Sec: number,
-  writtenBytesTotal: number,
-  readBytes1Sec: number,
-  readBytesTotal: number,
-}
+  writtenBytes1Sec: number;
+  writtenBytesTotal: number;
+  readBytes1Sec: number;
+  readBytesTotal: number;
+};
 
 const NetworkStats = ({ writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal }: Props) => (
   <InputIO>

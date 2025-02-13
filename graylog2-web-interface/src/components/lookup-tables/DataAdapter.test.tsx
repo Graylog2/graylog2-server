@@ -28,15 +28,20 @@ import DataAdapter from './DataAdapter';
 
 jest.mock('hooks/useScopePermissions');
 
-PluginStore.register(new PluginManifest({}, {
-  lookupTableAdapters: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      type: 'csvfile',
-      displayName: 'CSV File',
-      summaryComponent: CSVFileAdapterSummary,
+      lookupTableAdapters: [
+        {
+          type: 'csvfile',
+          displayName: 'CSV File',
+          summaryComponent: CSVFileAdapterSummary,
+        },
+      ],
     },
-  ],
-}));
+  ),
+);
 
 const renderedDataAdapter = (scope: string) => {
   const dataAdapter = createLookupTableAdapter(1, { _scope: scope });
@@ -46,19 +51,17 @@ const renderedDataAdapter = (scope: string) => {
 
 describe('DataAdapter', () => {
   beforeAll(() => {
-    asMock(useScopePermissions).mockImplementation(
-      (entity: GenericEntityType) => {
-        const scopes = {
-          ILLUMINATE: { is_mutable: false },
-          DEFAULT: { is_mutable: true },
-        };
+    asMock(useScopePermissions).mockImplementation((entity: GenericEntityType) => {
+      const scopes = {
+        ILLUMINATE: { is_mutable: false },
+        DEFAULT: { is_mutable: true },
+      };
 
-        return {
-          loadingScopePermissions: false,
-          scopePermissions: scopes[entity._scope],
-        };
-      },
-    );
+      return {
+        loadingScopePermissions: false,
+        scopePermissions: scopes[entity._scope],
+      };
+    });
   });
 
   it('should show "edit" button', async () => {

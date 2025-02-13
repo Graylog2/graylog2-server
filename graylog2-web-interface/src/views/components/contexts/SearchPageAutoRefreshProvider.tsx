@@ -33,11 +33,7 @@ const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) =>
     }
   }, [dispatch, jobIds]);
 
-  return (
-    <AutoRefreshProvider onRefresh={onRefresh}>
-      {children}
-    </AutoRefreshProvider>
-  );
+  return <AutoRefreshProvider onRefresh={onRefresh}>{children}</AutoRefreshProvider>;
 };
 
 export default SearchPageAutoRefreshProvider;

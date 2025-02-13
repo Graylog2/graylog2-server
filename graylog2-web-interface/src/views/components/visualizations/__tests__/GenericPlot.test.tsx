@@ -31,7 +31,10 @@ import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 jest.mock('components/bootstrap/Popover');
 
 // eslint-disable-next-line global-require
-jest.mock('views/components/visualizations/plotly/AsyncPlot', () => require('views/components/visualizations/plotly/Plot').default);
+jest.mock(
+  'views/components/visualizations/plotly/AsyncPlot',
+  () => require('views/components/visualizations/plotly/Plot').default,
+);
 jest.mock('components/common/ColorPicker', () => 'color-picker');
 
 describe('GenericPlot', () => {
@@ -115,11 +118,17 @@ describe('GenericPlot', () => {
       setColor: jest.fn(),
     };
     const setChartColor = (chart, colors) => ({ marker: { color: colors.get(chart.name) } });
-    const wrapper = mount((
+    const wrapper = mount(
       <ChartColorContext.Provider value={lens}>
-        <GenericPlot chartData={[{ x: 23, name: 'count()' }, { x: 42, name: 'sum(bytes)' }]} setChartColor={setChartColor} />
-      </ChartColorContext.Provider>
-    ));
+        <GenericPlot
+          chartData={[
+            { x: 23, name: 'count()' },
+            { x: 42, name: 'sum(bytes)' },
+          ]}
+          setChartColor={setChartColor}
+        />
+      </ChartColorContext.Provider>,
+    );
 
     const { data: newChartData } = wrapper.find('PlotlyComponent').props() as HTMLAttributes & { data: ChartConfig[] };
 
@@ -129,11 +138,16 @@ describe('GenericPlot', () => {
 
   it('calls render completion callback after plotting', () => {
     const onRenderComplete = jest.fn();
-    const wrapper = mount((
+    const wrapper = mount(
       <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <GenericPlot chartData={[{ x: 23, name: 'count()' }, { x: 42, name: 'sum(bytes)' }]} />
-      </RenderCompletionCallback.Provider>
-    ));
+        <GenericPlot
+          chartData={[
+            { x: 23, name: 'count()' },
+            { x: 42, name: 'sum(bytes)' },
+          ]}
+        />
+      </RenderCompletionCallback.Provider>,
+    );
     const { onAfterPlot } = wrapper.find('PlotlyComponent').props() as HTMLAttributes & PlotParams;
 
     onAfterPlot();

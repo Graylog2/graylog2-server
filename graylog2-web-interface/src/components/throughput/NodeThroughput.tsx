@@ -24,9 +24,9 @@ import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import { useStore } from 'stores/connect';
 
 type Props = {
-  nodeId: string,
-  longFormat?: boolean,
-}
+  nodeId: string;
+  longFormat?: boolean;
+};
 const metricNames = {
   totalIn: 'org.graylog2.throughput.input.1-sec-rate',
   totalOut: 'org.graylog2.throughput.output.1-sec-rate',
@@ -40,7 +40,9 @@ const NodeThroughput = ({ nodeId, longFormat = false }: Props) => {
     Object.keys(metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, metricNames[metricShortName]));
 
     return () => {
-      Object.keys(metricNames).forEach((metricShortName) => MetricsActions.remove(nodeId, metricNames[metricShortName]));
+      Object.keys(metricNames).forEach((metricShortName) =>
+        MetricsActions.remove(nodeId, metricNames[metricShortName]),
+      );
     };
   }, [nodeId]);
 
@@ -54,15 +56,14 @@ const NodeThroughput = ({ nodeId, longFormat = false }: Props) => {
   const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, metricNames);
 
   if (Object.keys(metrics).length === 0) {
-    return (<span>Unable to load throughput.</span>);
+    return <span>Unable to load throughput.</span>;
   }
 
   if (longFormat) {
     return (
       <span>
-        Processing <strong>{numeral(metrics.totalIn).format('0,0')}</strong> incoming and <strong>
-          {numeral(metrics.totalOut).format('0,0')}
-                                                                                          </strong> outgoing msg/s.
+        Processing <strong>{numeral(metrics.totalIn).format('0,0')}</strong> incoming and{' '}
+        <strong>{numeral(metrics.totalOut).format('0,0')}</strong> outgoing msg/s.
       </span>
     );
   }

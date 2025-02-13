@@ -23,8 +23,8 @@ import { Input } from 'components/bootstrap';
 import type { GroupByFormValues, MetricFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 
 type Props = {
-  index: number,
-}
+  index: number;
+};
 
 const directionOptions = [
   { label: 'Ascending', value: 'Ascending' },
@@ -43,14 +43,14 @@ const formatSeries = (metric: MetricFormValues) => {
 const formatGrouping = (grouping: GroupByFormValues) => grouping.fields;
 
 type OptionValue = {
-  type: 'metric' | 'groupBy',
-  field: string,
-  label: string
+  type: 'metric' | 'groupBy';
+  field: string;
+  label: string;
 };
 
 type Option = {
-  label: string,
-  value: number,
+  label: string;
+  value: number;
 };
 
 const Sort = React.memo(({ index }: Props) => {
@@ -60,30 +60,35 @@ const Sort = React.memo(({ index }: Props) => {
   const hasMetrics = otherSorts.find((s) => s.type === 'metric');
   const hasGroupings = otherSorts.find((s) => s.type === 'groupBy');
 
-  const metricsOptions: Array<OptionValue> = hasGroupings ? [] : metrics
-    .filter((metric) => metric.function !== 'latest')
-    .map(formatSeries)
-    .map(({ field, label }) => ({
-      type: 'metric',
-      field,
-      label,
-    }));
-  const rowPivotOptions: Array<OptionValue> = (hasGroupings || hasMetrics) ? [] : groupings
-    .filter((grouping) => (grouping.direction === 'row'))
-    .flatMap(formatGrouping).map((groupBy) => ({
-      type: 'groupBy',
-      field: groupBy,
-      label: groupBy,
-    }));
-  const options = [
-    ...metricsOptions,
-    ...rowPivotOptions,
-  ];
+  const metricsOptions: Array<OptionValue> = hasGroupings
+    ? []
+    : metrics
+        .filter((metric) => metric.function !== 'latest')
+        .map(formatSeries)
+        .map(({ field, label }) => ({
+          type: 'metric',
+          field,
+          label,
+        }));
+  const rowPivotOptions: Array<OptionValue> =
+    hasGroupings || hasMetrics
+      ? []
+      : groupings
+          .filter((grouping) => grouping.direction === 'row')
+          .flatMap(formatGrouping)
+          .map((groupBy) => ({
+            type: 'groupBy',
+            field: groupBy,
+            label: groupBy,
+          }));
+  const options = [...metricsOptions, ...rowPivotOptions];
 
   const numberIndexedOptions: Array<Option> = options.map((option, idx) => ({ label: option.label, value: idx }));
 
   const currentSort = values.sort[index];
-  const optionIndex = options.findIndex((option) => (option.type === currentSort.type && option.field === currentSort.field));
+  const optionIndex = options.findIndex(
+    (option) => option.type === currentSort.type && option.field === currentSort.field,
+  );
   const selectedOption = optionIndex > -1 ? optionIndex : undefined;
   const invalidSort = selectedOption === undefined && 'field' in currentSort;
 
@@ -91,48 +96,50 @@ const Sort = React.memo(({ index }: Props) => {
     <div data-testid={`sort-element-${index}`}>
       <Field name={`sort.${index}.field`}>
         {({ field: { name, onChange }, meta: { error } }) => (
-          <Input id="field-select"
-                 label="Field"
-                 error={error}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <Select options={invalidSort ? [{ label: currentSort.field, value: 0 }] : numberIndexedOptions}
-                    disabled={invalidSort}
-                    allowCreate={invalidSort}
-                    clearable={false}
-                    name={name}
-                    value={invalidSort ? 0 : selectedOption}
-                    placeholder="Specify field/metric to be sorted on"
-                    aria-label="Select field for sorting"
-                    size="small"
-                    menuPortalTarget={document.body}
-                    onChange={(newValue: Option['value']) => {
-                      const option = options[newValue];
-                      setFieldValue(`sort.${index}.type`, option.type);
-                      onChange({ target: { name, value: option.field } });
-                    }} />
+          <Input id="field-select" label="Field" error={error} labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+            <Select
+              options={invalidSort ? [{ label: currentSort.field, value: 0 }] : numberIndexedOptions}
+              disabled={invalidSort}
+              allowCreate={invalidSort}
+              clearable={false}
+              name={name}
+              value={invalidSort ? 0 : selectedOption}
+              placeholder="Specify field/metric to be sorted on"
+              aria-label="Select field for sorting"
+              size="small"
+              menuPortalTarget={document.body}
+              onChange={(newValue: Option['value']) => {
+                const option = options[newValue];
+                setFieldValue(`sort.${index}.type`, option.type);
+                onChange({ target: { name, value: option.field } });
+              }}
+            />
           </Input>
         )}
       </Field>
 
       <Field name={`sort.${index}.direction`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
-          <Input id="direction-select"
-                 label="Direction"
-                 error={error}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <Select options={directionOptions}
-                    disabled={invalidSort}
-                    clearable={false}
-                    name={name}
-                    aria-label="Select direction for sorting"
-                    value={value}
-                    size="small"
-                    menuPortalTarget={document.body}
-                    onChange={(newValue) => {
-                      onChange({ target: { name, value: newValue } });
-                    }} />
+          <Input
+            id="direction-select"
+            label="Direction"
+            error={error}
+            labelClassName="col-sm-3"
+            wrapperClassName="col-sm-9"
+          >
+            <Select
+              options={directionOptions}
+              disabled={invalidSort}
+              clearable={false}
+              name={name}
+              aria-label="Select direction for sorting"
+              value={value}
+              size="small"
+              menuPortalTarget={document.body}
+              onChange={(newValue) => {
+                onChange({ target: { name, value: newValue } });
+              }}
+            />
           </Input>
         )}
       </Field>

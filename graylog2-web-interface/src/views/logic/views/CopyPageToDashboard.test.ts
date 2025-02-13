@@ -25,24 +25,27 @@ import copyPageToDashboard from './CopyPageToDashboard';
 import ValueParameter from '../parameters/ValueParameter';
 import Parameter from '../parameters/Parameter';
 
-jest.useFakeTimers()
-  .setSystemTime(1577836800000); // 2020-01-01 00:00:00.000
+jest.useFakeTimers().setSystemTime(1577836800000); // 2020-01-01 00:00:00.000
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
-jest.mock('bson-objectid', () => jest.fn(() => ({
-  toString: jest.fn(() => 'new-search-id'),
-})));
+jest.mock('bson-objectid', () =>
+  jest.fn(() => ({
+    toString: jest.fn(() => 'new-search-id'),
+  })),
+);
 
 jest.mock('../Widgets', () => ({
   widgetDefinition: () => ({ searchTypes: () => [{ type: 'pivot' }] }),
 }));
 
-jest.mock('../SearchType', () => jest.fn(() => ({
-  type: 'pivot',
-  handler: jest.fn(),
-  defaults: {},
-})));
+jest.mock('../SearchType', () =>
+  jest.fn(() => ({
+    type: 'pivot',
+    handler: jest.fn(),
+    defaults: {},
+  })),
+);
 
 const targetDashboard = View.builder()
   .id('foo')
@@ -68,9 +71,7 @@ describe('copyPageToDashboard', () => {
   it('should copy a page to a dashboard', () => {
     const dashboardViewFixture = View.fromJSON(readFixture('./CopyPageToDashboard.Dashboard-View.fixture.json'));
     const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyPageToDashboard.Dashboard-Search.fixture.json'));
-    const sourceDashboard = dashboardViewFixture.toBuilder()
-      .search(dashboardSearchFixture)
-      .build();
+    const sourceDashboard = dashboardViewFixture.toBuilder().search(dashboardSearchFixture).build();
 
     const queryId = 'f0a1f93c-8400-40de-83ac-94149dbf447c';
 

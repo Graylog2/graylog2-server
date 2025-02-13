@@ -25,11 +25,11 @@ import FilterRulesFields from 'components/streams/StreamDetails/output-filter/Fi
 
 type StreamOutputFilterRuleValues = Partial<StreamOutputFilterRule>;
 type Props = {
-  title: string,
-  filterRule: Partial<StreamOutputFilterRule>,
-  onCancel: () => void,
-  handleSubmit: (values: Partial<StreamOutputFilterRule>) => void,
-  destinationType: string,
+  title: string;
+  filterRule: Partial<StreamOutputFilterRule>;
+  onCancel: () => void;
+  handleSubmit: (values: Partial<StreamOutputFilterRule>) => void;
+  destinationType: string;
 };
 
 const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destinationType }: Props) => {
@@ -49,26 +49,25 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
   };
 
   return (
-    <BootstrapModalWrapper showModal
-                           bsSize="lg"
-                           role="alertdialog"
-                           onHide={onCancel}>
-      <Formik<StreamOutputFilterRuleValues> initialValues={{
-        ...filterRule,
-        destination_type: destinationType,
-        ...(!filterRule?.id && {
-          status: 'enabled',
-          rule: {
-            operator: 'AND',
-            conditions: [],
-            actions: [],
-          },
-        }),
-      }}
-                                            validate={validate}
-                                            validateOnBlur
-                                            validateOnChange
-                                            onSubmit={() => {}}>
+    <BootstrapModalWrapper showModal bsSize="lg" role="alertdialog" onHide={onCancel}>
+      <Formik<StreamOutputFilterRuleValues>
+        initialValues={{
+          ...filterRule,
+          destination_type: destinationType,
+          ...(!filterRule?.id && {
+            status: 'enabled',
+            rule: {
+              operator: 'AND',
+              conditions: [],
+              actions: [],
+            },
+          }),
+        }}
+        validate={validate}
+        validateOnBlur
+        validateOnChange
+        onSubmit={() => {}}
+      >
         {({ isSubmitting, values, isValid, errors, validateForm, setFieldValue }) => {
           const onSubmit = () => {
             validateForm().then((errorsList) => {
@@ -89,38 +88,34 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
                 <Modal.Title>{title}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <FormikInput id="title"
-                             name="title"
-                             label="Title"
-                             help="Rule title"
-                             error={errors.title}
-                             required />
-                <FormikInput id="description"
-                             name="description"
-                             label="Description"
-                             help="Rule description" />
+                <FormikInput id="title" name="title" label="Title" help="Rule title" error={errors.title} required />
+                <FormikInput id="description" name="description" label="Description" help="Rule description" />
                 <Field name="status">
                   {({ field: { name, value }, meta }) => (
-                    <Input id={name}
-                           error={meta?.error}
-                           label="Enabled"
-                           type="checkbox"
-                           onChange={onStatusChange}
-                           checked={value === 'enabled'}
-                           value={value === 'enabled'} />
+                    <Input
+                      id={name}
+                      error={meta?.error}
+                      label="Enabled"
+                      type="checkbox"
+                      onChange={onStatusChange}
+                      checked={value === 'enabled'}
+                      value={value === 'enabled'}
+                    />
                   )}
                 </Field>
                 <label htmlFor="rule_builder">Rule Builder</label>
-                {errors?.rule && (<p className="text-danger">{errors.rule as React.ReactNode}</p>)}
+                {errors?.rule && <p className="text-danger">{errors.rule as React.ReactNode}</p>}
                 <FilterRulesFields type="condition" />
                 <Modal.Footer>
-                  <ModalSubmit isSubmitting={isSubmitting}
-                               isAsyncSubmit
-                               onSubmit={onSubmit}
-                               onCancel={onCancel}
-                               disabledSubmit={!isValid || values?.rule?.errors?.length > 0}
-                               submitButtonText={values?.id ? 'Update' : 'Create'}
-                               submitLoadingText={values?.id ? 'Updating filter' : 'Saving filter'} />
+                  <ModalSubmit
+                    isSubmitting={isSubmitting}
+                    isAsyncSubmit
+                    onSubmit={onSubmit}
+                    onCancel={onCancel}
+                    disabledSubmit={!isValid || values?.rule?.errors?.length > 0}
+                    submitButtonText={values?.id ? 'Update' : 'Create'}
+                    submitLoadingText={values?.id ? 'Updating filter' : 'Saving filter'}
+                  />
                 </Modal.Footer>
               </Modal.Body>
             </>

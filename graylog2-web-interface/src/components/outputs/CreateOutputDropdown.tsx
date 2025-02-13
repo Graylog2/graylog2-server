@@ -21,7 +21,11 @@ import { Button } from 'components/bootstrap';
 import { ConfigurationForm } from 'components/configurationforms';
 import type { RefType } from 'components/configurationforms/ConfigurationForm';
 
-const formatOutputType = (type, typeName) => (<option key={typeName} value={typeName}>{type.name}</option>);
+const formatOutputType = (type, typeName) => (
+  <option key={typeName} value={typeName}>
+    {type.name}
+  </option>
+);
 
 type CreateOutputDropdownProps = {
   getTypeDefinition: (...args: any[]) => void;
@@ -29,9 +33,12 @@ type CreateOutputDropdownProps = {
   onSubmit: (...args: any[]) => void;
 };
 
-class CreateOutputDropdown extends React.Component<CreateOutputDropdownProps, {
-  [key: string]: any;
-}> {
+class CreateOutputDropdown extends React.Component<
+  CreateOutputDropdownProps,
+  {
+    [key: string]: any;
+  }
+> {
   PLACEHOLDER = 'placeholder';
 
   private configurationForm: React.RefObject<RefType<{}>>;
@@ -69,22 +76,34 @@ class CreateOutputDropdown extends React.Component<CreateOutputDropdownProps, {
     return (
       <div>
         <div className="form-inline">
-          <select id="input-type" defaultValue={this.PLACEHOLDER} value={this.state.typeName} onChange={this._onTypeChange} className="form-control">
-            <option value={this.PLACEHOLDER} disabled>Select Output Type</option>
+          <select
+            id="input-type"
+            defaultValue={this.PLACEHOLDER}
+            value={this.state.typeName}
+            onChange={this._onTypeChange}
+            className="form-control"
+          >
+            <option value={this.PLACEHOLDER} disabled>
+              Select Output Type
+            </option>
             {outputTypes}
           </select>
           &nbsp;
-          <Button bsStyle="success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>Launch new output</Button>
+          <Button bsStyle="success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>
+            Launch new output
+          </Button>
         </div>
 
-        <ConfigurationForm ref={this.configurationForm}
-                           key="configuration-form-output"
-                           configFields={this.state.typeDefinition}
-                           title="Create new Output"
-                           titleHelpText="Select a name of your new output that describes it."
-                           typeName={this.state.typeName}
-                           submitButtonText="Create output"
-                           submitAction={this.props.onSubmit} />
+        <ConfigurationForm
+          ref={this.configurationForm}
+          key="configuration-form-output"
+          configFields={this.state.typeDefinition}
+          title="Create new Output"
+          titleHelpText="Select a name of your new output that describes it."
+          typeName={this.state.typeName}
+          submitButtonText="Create output"
+          submitAction={this.props.onSubmit}
+        />
       </div>
     );
   }

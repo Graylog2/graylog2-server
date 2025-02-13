@@ -103,11 +103,10 @@ const UrlWhiteListConfig = () => {
       <h2>URL Whitelist Configuration {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small>}</h2>
       <p>
         When enabled, outgoing HTTP requests from Graylog servers, such as event notifications or HTTP-based data
-        adapter requests, are validated against the whitelists configured here.
-        Because the HTTP requests are made from the Graylog servers, they might be able to reach more sensitive systems
-        than an external user would have access to, including AWS EC2 metadata, which can contain keys and other
-        secrets, Elasticsearch and others.
-        Whitelist administrative access is separate from data adapters and event notification configuration.
+        adapter requests, are validated against the whitelists configured here. Because the HTTP requests are made from
+        the Graylog servers, they might be able to reach more sensitive systems than an external user would have access
+        to, including AWS EC2 metadata, which can contain keys and other secrets, Elasticsearch and others. Whitelist
+        administrative access is separate from data adapters and event notification configuration.
       </p>
       <Table striped bordered condensed className="top-margin">
         <thead>
@@ -118,21 +117,23 @@ const UrlWhiteListConfig = () => {
             <th>Type</th>
           </tr>
         </thead>
-        <tbody>
-          {summary()}
-        </tbody>
+        <tbody>{summary()}</tbody>
       </Table>
       <IfPermitted permissions="urlwhitelist:write">
-        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
+        <Button bsStyle="info" bsSize="xs" onClick={openModal}>
+          Edit configuration
+        </Button>
       </IfPermitted>
       {showConfigModal && (
-        <BootstrapModalForm show
-                            bsSize="lg"
-                            title="Update Whitelist Configuration"
-                            onSubmitForm={saveConfig}
-                            onCancel={closeModal}
-                            submitButtonDisabled={!isValid}
-                            submitButtonText="Update configuration">
+        <BootstrapModalForm
+          show
+          bsSize="lg"
+          title="Update Whitelist Configuration"
+          onSubmitForm={saveConfig}
+          onCancel={closeModal}
+          submitButtonDisabled={!isValid}
+          submitButtonText="Update configuration"
+        >
           <h3>Whitelist URLs</h3>
           <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={update} />
         </BootstrapModalForm>

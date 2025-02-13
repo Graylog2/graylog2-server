@@ -40,13 +40,21 @@ const _pageTitle = (activeBackend: AuthenticationBackend | undefined | null, ret
       return `${pageName} - ${backendTitle}`;
     }
 
-    return <>{pageName} - <i>{backendTitle}</i></>;
+    return (
+      <>
+        {pageName} - <i>{backendTitle}</i>
+      </>
+    );
   }
 
   return pageName;
 };
 
-const useRedirectToAppropriatePage = (finishedLoading: boolean, activeBackend: AuthenticationBackend, backendsTotal: number) => {
+const useRedirectToAppropriatePage = (
+  finishedLoading: boolean,
+  activeBackend: AuthenticationBackend,
+  backendsTotal: number,
+) => {
   const history = useHistory();
 
   useEffect(() => {
@@ -72,21 +80,18 @@ const AuthenticationPage = () => {
   return (
     <DocumentTitle title={_pageTitle(activeBackend, true)}>
       <AuthenticationPageNavigation />
-      <PageHeader title={_pageTitle(activeBackend)}
-                  actions={(
-                    <BackendActionLinks activeBackend={activeBackend}
-                                        finishedLoading={finishedLoading} />
-                  )}
-                  documentationLink={{
-                    title: 'Authentication documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
+      <PageHeader
+        title={_pageTitle(activeBackend)}
+        actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
+        documentationLink={{
+          title: 'Authentication documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+      >
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
       </PageHeader>
 
-      {finishedLoading && activeBackend && (
-        <BackendDetails authenticationBackend={activeBackend} />
-      )}
+      {finishedLoading && activeBackend && <BackendDetails authenticationBackend={activeBackend} />}
     </DocumentTitle>
   );
 };

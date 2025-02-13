@@ -19,7 +19,7 @@ import React from 'react';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
-  dataAdapter: LookupTableAdapter,
+  dataAdapter: LookupTableAdapter;
 };
 
 const CSVFileAdapterSummary = ({ dataAdapter }: Props) => {
@@ -30,9 +30,13 @@ const CSVFileAdapterSummary = ({ dataAdapter }: Props) => {
       <dt>File path</dt>
       <dd>{config.path}</dd>
       <dt>Separator</dt>
-      <dd><code>{config.separator}</code></dd>
+      <dd>
+        <code>{config.separator}</code>
+      </dd>
       <dt>Quote character</dt>
-      <dd><code>{config.quotechar}</code></dd>
+      <dd>
+        <code>{config.quotechar}</code>
+      </dd>
       <dt>Key column</dt>
       <dd>{config.key_column}</dd>
       <dt>Value column</dt>

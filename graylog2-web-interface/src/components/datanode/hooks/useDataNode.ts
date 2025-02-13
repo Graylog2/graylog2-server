@@ -23,11 +23,13 @@ import { defaultOnError } from 'util/conditional/onError';
 
 const fetchDataNode = async (datanodeId: string) => fetch('GET', qualifyUrl(`/datanode/${datanodeId}`));
 
-const useDataNode = (datanodeId: string) : {
-  data: DataNode,
-  refetch: () => void,
-  isInitialLoading: boolean,
-  error: any,
+const useDataNode = (
+  datanodeId: string,
+): {
+  data: DataNode;
+  refetch: () => void;
+  isInitialLoading: boolean;
+  error: any;
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery(
     ['datanode'],
@@ -38,12 +40,12 @@ const useDataNode = (datanodeId: string) : {
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
     error,
-  });
+  };
 };
 
 export default useDataNode;

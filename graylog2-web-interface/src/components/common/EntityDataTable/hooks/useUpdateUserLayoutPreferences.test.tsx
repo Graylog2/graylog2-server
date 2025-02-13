@@ -33,11 +33,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const wrapper = ({ children }) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-  </QueryClientProvider>
-);
+const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
@@ -57,7 +53,13 @@ describe('useUserSearchFilterQuery hook', () => {
 
     result.current.mutate(layoutPreferences);
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), layoutPreferencesJSON));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(
+        'POST',
+        expect.stringContaining('/entitylists/preferences/streams'),
+        layoutPreferencesJSON,
+      ),
+    );
   });
 
   it('should allow partial update of user layout preferences', async () => {
@@ -66,10 +68,12 @@ describe('useUserSearchFilterQuery hook', () => {
 
     result.current.mutate({ perPage: 100 });
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), {
-      displayed_attributes: layoutPreferencesJSON.displayed_attributes,
-      sort: layoutPreferencesJSON.sort,
-      per_page: 100,
-    }));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), {
+        displayed_attributes: layoutPreferencesJSON.displayed_attributes,
+        sort: layoutPreferencesJSON.sort,
+        per_page: 100,
+      }),
+    );
   });
 });

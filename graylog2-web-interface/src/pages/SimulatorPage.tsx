@@ -40,21 +40,21 @@ const SimulatorPage = () => {
   return (
     <DocumentTitle title="Simulate processing">
       <PipelinesPageNavigation />
-      <PageHeader title="Simulate processing"
-                  documentationLink={{
-                    title: 'Pipelines documentation',
-                    path: DocsHelper.PAGES.PIPELINE_RULES,
-                  }}>
+      <PageHeader
+        title="Simulate processing"
+        documentationLink={{
+          title: 'Pipelines documentation',
+          path: DocsHelper.PAGES.PIPELINE_RULES,
+        }}
+      >
         <span>
-          Processing messages can be complex. Use this page to simulate the result of processing an incoming
-          message using your current set of pipelines and rules.
+          Processing messages can be complex. Use this page to simulate the result of processing an incoming message
+          using your current set of pipelines and rules.
         </span>
       </PageHeader>
 
       <Row className="content">
-        <Col md={12}>
-          {content}
-        </Col>
+        <Col md={12}>{content}</Col>
       </Row>
     </DocumentTitle>
   );
