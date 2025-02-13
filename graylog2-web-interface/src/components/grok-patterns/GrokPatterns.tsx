@@ -155,8 +155,8 @@ class GrokPatterns extends React.Component<
   };
 
   confirmedRemove = (pattern) => {
-    // eslint-disable-next-line no-alert
     if (
+      // eslint-disable-next-line no-alert
       window.confirm(
         `Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`,
       )
@@ -198,8 +198,7 @@ class GrokPatterns extends React.Component<
                 style={{ marginRight: 5 }}
                 bsStyle="danger"
                 bsSize="xs"
-                onClick={() => this.confirmedRemove(pattern)}
-              >
+                onClick={() => this.confirmedRemove(pattern)}>
                 Delete
               </Button>
             </IfPermitted>
@@ -236,8 +235,7 @@ class GrokPatterns extends React.Component<
                 />
               </ButtonToolbar>
             </IfPermitted>
-          }
-        >
+          }>
           <span>
             This is a list of grok patterns you can use in your Graylog grok extractors. You can add your own manually
             or import a whole list of patterns from a so called pattern file.

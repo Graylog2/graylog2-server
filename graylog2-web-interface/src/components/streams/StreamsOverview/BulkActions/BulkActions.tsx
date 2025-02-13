@@ -70,8 +70,8 @@ const BulkActions = ({ indexSets }: Props) => {
   );
 
   const onDelete = useCallback(() => {
-    // eslint-disable-next-line no-alert
     if (
+      // eslint-disable-next-line no-alert
       window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}? This action cannot be undone.`)
     ) {
       fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.bulk_delete().url), { entity_ids: selectedEntities })

@@ -72,8 +72,8 @@ const EntityShareModal = ({
     if (selectedGranteeId) {
       const selectedGrantee = entityShareState?.availableGrantees.find((grantee) => grantee.id === selectedGranteeId);
 
-      // eslint-disable-next-line no-alert
       if (
+        // eslint-disable-next-line no-alert
         !window.confirm(
           `${selectedGrantee.title ? `"${selectedGrantee.title}"` : 'An entity (name not found)'} got selected but was never added as a collaborator. Do you want to continue anyway?`,
         )
@@ -105,8 +105,7 @@ const EntityShareModal = ({
         <>
           Sharing {entityTypeTitle ?? entityType}: <i>{entityTitle}</i>
         </>
-      }
-    >
+      }>
       {entityShareState && entityShareState.entity === entityGRN ? (
         <EntityShareSettings
           description={description}

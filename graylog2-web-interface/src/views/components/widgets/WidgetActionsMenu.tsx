@@ -125,8 +125,8 @@ const _onMoveWidgetToPage = async (
   }
 };
 
-// eslint-disable-next-line no-alert
 const defaultOnDeleteWidget = async (_widget: Widget, _view: View, title: string) =>
+  // eslint-disable-next-line no-alert
   window.confirm(`Are you sure you want to remove the widget "${title}"?`);
 
 const _onDelete = (widget: Widget, view: View, title: string) => async (dispatch: AppDispatch) => {

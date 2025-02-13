@@ -23,11 +23,10 @@ const HeaderElements = () => {
 
   return (
     <>
-      {headerElements
+      {headerElements.map((Component, idx) => (
         // eslint-disable-next-line react/no-array-index-key
-        .map((Component, idx) => (
-          <Component key={idx} />
-        ))}
+        <Component key={idx} />
+      ))}
     </>
   );
 };
