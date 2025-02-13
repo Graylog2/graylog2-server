@@ -162,8 +162,7 @@ const MessageList = ({
           showPageSizeSelect={false}
           totalItems={totalMessages}
           pageSize={pageSize}
-          useQueryParameter={false}
-        >
+          useQueryParameter={false}>
           {!pageErrors?.length ? (
             <MessageTable
               activeQueryId={activeQueryId}

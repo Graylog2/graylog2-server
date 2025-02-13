@@ -44,32 +44,28 @@ const HelpMenu = () => (
         component="a"
         rightSection={<Icon name="open_in_new" />}
         href="https://docs.graylog.org/docs"
-        target="_blank"
-      >
+        target="_blank">
         Graylog Documentation
       </Menu.Item>
       <Menu.Item
         component="a"
         rightSection={<Icon name="open_in_new" />}
         href="https://docs.graylog.org/docs/changelog"
-        target="_blank"
-      >
+        target="_blank">
         Graylog changelogs
       </Menu.Item>
       <Menu.Item
         component="a"
         rightSection={<Icon name="open_in_new" />}
         href="https://docs.graylog.org/docs/changelog-graylog"
-        target="_blank"
-      >
+        target="_blank">
         Graylog Operations changelogs
       </Menu.Item>
       <Menu.Item
         component="a"
         rightSection={<Icon name="open_in_new" />}
         href="https://support.graylog.org/portal"
-        target="_blank"
-      >
+        target="_blank">
         Support
       </Menu.Item>
     </Menu.Dropdown>

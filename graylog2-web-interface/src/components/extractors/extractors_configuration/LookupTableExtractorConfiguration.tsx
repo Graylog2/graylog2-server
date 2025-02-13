@@ -111,8 +111,7 @@ class LookupTableExtractorConfiguration extends React.Component<
           label="Lookup Table"
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
-          help={helpMessage}
-        >
+          help={helpMessage}>
           <Row className="row-sm">
             <Col md={11}>
               <Select

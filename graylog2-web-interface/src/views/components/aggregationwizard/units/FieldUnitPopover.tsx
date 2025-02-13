@@ -126,8 +126,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
                 label="Type"
                 error={error}
                 labelClassName="col-sm-3"
-                wrapperClassName="col-sm-9"
-              >
+                wrapperClassName="col-sm-9">
                 <Select
                   id="metric-unit-type-select"
                   onChange={onUnitTypeChange}
@@ -155,8 +154,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
                   }
                   error={error}
                   labelClassName="col-sm-3"
-                  wrapperClassName="col-sm-9"
-                >
+                  wrapperClassName="col-sm-9">
                   <Select
                     id="metric-unit-select"
                     onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}

@@ -274,8 +274,7 @@ class TimeUnitInput extends React.Component<Props, State> {
               name={this.props.unitName}
               pullRight={pullRight}
               title={unitOptions.filter((o) => o.value === unit)[0].label}
-              disabled={!this._isChecked()}
-            >
+              disabled={!this._isChecked()}>
               {options}
             </DropdownButton>
           </StyledInputGroup>

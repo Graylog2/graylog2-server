@@ -90,8 +90,7 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
                   bsSize="xs"
                   onClick={() =>
                     onShowDetails({ name: collectorData?.name, verbose_message: collector.verbose_message })
-                  }
-                >
+                  }>
                   Show more
                 </ShowDetailsLink>
               </td>

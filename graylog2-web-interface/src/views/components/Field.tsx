@@ -40,8 +40,7 @@ const Field = ({ children = null, disabled = false, menuContainer = document.bod
           menuContainer={menuContainer}
           name={name}
           type={type}
-          queryId={queryId}
-        >
+          queryId={queryId}>
           {name} = {type.type}
         </FieldActions>
       ) : (

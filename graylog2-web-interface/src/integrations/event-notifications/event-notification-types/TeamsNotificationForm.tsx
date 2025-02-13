@@ -183,8 +183,7 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
           <Input
             id="notification-time-zone"
             help="Time zone used for timestamps in the notification body."
-            label="Time zone for date/time values"
-          >
+            label="Time zone for date/time values">
             <TimezoneSelect
               className="timezone-select"
               name="time_zone"

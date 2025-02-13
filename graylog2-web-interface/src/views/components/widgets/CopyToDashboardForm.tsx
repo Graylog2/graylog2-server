@@ -120,8 +120,7 @@ const CopyToDashboardForm = ({
               totalItems={paginatedDashboards.pagination.total}
               pageSize={searchParams.pageSize}
               pageSizes={[5, 10, 15]}
-              useQueryParameter={false}
-            >
+              useQueryParameter={false}>
               <div style={{ marginBottom: '5px' }}>
                 <SearchForm onSearch={handleSearch} onReset={handleSearchReset} />
               </div>
@@ -136,8 +135,7 @@ const CopyToDashboardForm = ({
                         onClick={isActiveDashboard ? undefined : () => onSelectDashboard(dashboard.id)}
                         header={dashboard.title}
                         disabled={isActiveDashboard}
-                        key={dashboard.id}
-                      >
+                        key={dashboard.id}>
                         {dashboard.summary}
                       </ListGroupItem>
                     );

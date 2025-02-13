@@ -136,8 +136,7 @@ const ProgressBar = ({ bars = [DEFAULT_BAR], className }: ProgressBarProps) => (
           $animated={animated}
           $bsStyle={bsStyle}
           $striped={striped}
-          value={value}
-        >
+          value={value}>
           {label}
         </Bar>
       );

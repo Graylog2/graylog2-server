@@ -72,8 +72,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
             <ElementsConfigurationActions />
             <SaveOrCancelButtons onCancel={onCancel} />
           </>
-        }
-      >
+        }>
         <div>
           {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
             const aggregationElement = aggregationElementsByKey[elementKey];
@@ -92,8 +91,7 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
                 onCreate={() => onCreate(aggregationElement.key, values, setValues)}
                 elementTitle={aggregationElement.title}
                 sectionTitle={aggregationElement.sectionTitle}
-                key={aggregationElement.key}
-              >
+                key={aggregationElement.key}>
                 <ConfigurationSection config={config} onConfigChange={onConfigChange} />
               </ElementConfigurationSection>
             );

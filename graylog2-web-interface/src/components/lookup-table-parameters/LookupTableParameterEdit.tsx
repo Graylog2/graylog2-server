@@ -82,8 +82,7 @@ const LookupTableParameterEdit = ({
         label="Lookup Table"
         bsStyle={validationState?.lookupTable?.[0]}
         error={validationState?.lookupTable?.[1]}
-        help="Select the lookup table Graylog should use to get the values."
-      >
+        help="Select the lookup table Graylog should use to get the values.">
         <Select
           placeholder="Select lookup table"
           onChange={_handleChange('lookupTable')}

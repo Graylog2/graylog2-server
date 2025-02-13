@@ -159,8 +159,7 @@ const MessageProcessorsConfig = () => {
           title="Update Message Processors Configuration"
           onSubmitForm={saveConfig}
           onCancel={closeModal}
-          submitButtonText="Update configuration"
-        >
+          submitButtonText="Update configuration">
           <>
             <h3>Order</h3>
             <p>Use drag and drop to change the execution order of the message processors.</p>

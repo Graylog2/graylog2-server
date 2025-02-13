@@ -202,8 +202,7 @@ const CollectorConfigurationModal = ({
               );
             }
           }
-        }}
-      >
+        }}>
         <IconTableCell>
           {selected && <Icon name="check" title={`${configName} is selected`} />}
           {partiallySelected && <Icon type="regular" name="radio_button_partial" title={`${configName} is selected`} />}

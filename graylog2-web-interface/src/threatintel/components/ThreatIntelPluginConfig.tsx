@@ -101,8 +101,7 @@ const ThreatIntelPluginConfig = ({ config: initialConfig = defaultConfig, update
         title="Update Threat Intelligence plugin Configuration"
         onSubmitForm={_saveConfig}
         onCancel={_resetConfig}
-        submitButtonText="Update configuration"
-      >
+        submitButtonText="Update configuration">
         <fieldset>
           <Input
             type="checkbox"

@@ -69,8 +69,7 @@ const mockWidgetEditing = () => {
           setWidgetEditing: () => {},
           unsetWidgetFocusing: () => {},
           unsetWidgetEditing: () => {},
-        }}
-      >
+        }}>
         {children}
       </WidgetFocusContext.Provider>
     ),
@@ -98,8 +97,7 @@ describe('Dashboard Search', () => {
             setWidgetEditing: () => {},
             unsetWidgetFocusing: () => {},
             unsetWidgetEditing: () => {},
-          }}
-        >
+          }}>
           {children}
         </WidgetFocusContext.Provider>
       ),

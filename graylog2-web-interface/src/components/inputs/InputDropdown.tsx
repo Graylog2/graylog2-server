@@ -101,8 +101,7 @@ const InputDropdown = ({
           aria-label="server input select"
           value={selectedInput}
           onChange={onSelectedInputChange}
-          placeholder={PLACEHOLDER}
-        >
+          placeholder={PLACEHOLDER}>
           <option value={PLACEHOLDER}>Select an Input</option>
           {inputOptions.toArray()}
         </StyledInputDropdown>

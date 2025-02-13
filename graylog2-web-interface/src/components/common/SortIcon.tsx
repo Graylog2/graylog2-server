@@ -79,8 +79,7 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
       title={title}
       type="button"
       aria-label={title}
-      onClick={handleSortChange}
-    >
+      onClick={handleSortChange}>
       <Icon
         name="sort"
         data-testid="sort-icon-svg"

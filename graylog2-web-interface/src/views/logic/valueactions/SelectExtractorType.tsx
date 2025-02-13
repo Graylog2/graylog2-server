@@ -93,8 +93,7 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
         submitButtonDisabled={!selectedExtractor}
         show
         onCancel={this.props.onClose}
-        onSubmitForm={this._onSubmit}
-      >
+        onSubmitForm={this._onSubmit}>
         <Select
           placeholder="Select extractor type"
           optionRenderer={_renderOption}

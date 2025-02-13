@@ -66,8 +66,7 @@ const StreamsPage = () => {
           <IfPermitted permissions="streams:create">
             <CreateStreamButton bsStyle="success" onCreate={onSave} indexSets={indexSets} />
           </IfPermitted>
-        }
-      >
+        }>
         <span>
           You can route incoming messages into streams by applying rules against them. Messages matching the rules of a
           stream are routed into it. A message can also be routed into multiple streams.

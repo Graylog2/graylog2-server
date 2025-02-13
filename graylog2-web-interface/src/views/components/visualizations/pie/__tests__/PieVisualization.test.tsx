@@ -47,8 +47,7 @@ const SimplePieVisualization = (props: Pick<React.ComponentProps<typeof PieVisua
       value={{
         all: Immutable.List(),
         queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }),
-      }}
-    >
+      }}>
       <PieVisualization
         effectiveTimerange={effectiveTimerange}
         fields={Immutable.List()}

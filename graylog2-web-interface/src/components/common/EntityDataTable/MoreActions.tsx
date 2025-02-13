@@ -29,8 +29,7 @@ const MoreActions = ({ children, disabled = false }: Props) => (
     bsSize="xsmall"
     pullRight
     buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-    disabled={disabled}
-  >
+    disabled={disabled}>
     {children}
   </DropdownButton>
 );

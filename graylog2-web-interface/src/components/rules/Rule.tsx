@@ -75,8 +75,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
                 });
 
                 setShowConfirmSourceCodeEditor(true);
-              }}
-            >
+              }}>
               Use Source Code Editor
             </Button>
           ) : undefined
@@ -84,8 +83,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
         documentationLink={{
           title: 'Pipeline rules documentation',
           path: DocsHelper.PAGES.PIPELINE_RULES,
-        }}
-      >
+        }}>
         <span>
           Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of
           actions. Graylog evaluates the condition against a message and executes the actions if the condition is
@@ -128,8 +126,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
             });
 
             setShowConfirmSourceCodeEditor(false);
-          }}
-        >
+          }}>
           <div>You are about to leave this page and go to the Source Code Editor.</div>
           <div>Make sure you have no unsaved changes.</div>
         </BootstrapModalConfirm>

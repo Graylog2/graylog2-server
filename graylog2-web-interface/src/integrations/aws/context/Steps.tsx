@@ -50,8 +50,7 @@ export const StepsProvider = ({ children }: StepsProviderProps) => {
         setAvailableStep,
         setCurrentStep,
         setEnabledStep,
-      }}
-    >
+      }}>
       {children}
     </StepsContext.Provider>
   );

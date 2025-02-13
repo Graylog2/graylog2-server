@@ -92,8 +92,7 @@ const ModalSubmit = (props: Props) => {
           onClick={props.onCancel}
           title="Cancel"
           aria-label="Cancel"
-          disabled={props.disabledCancel || submittingAsync}
-        >
+          disabled={props.disabledCancel || submittingAsync}>
           Cancel
         </Button>
       )}
@@ -105,8 +104,7 @@ const ModalSubmit = (props: Props) => {
         title={title}
         aria-label={title}
         type={submitButtonType}
-        onClick={onSubmit}
-      >
+        onClick={onSubmit}>
         {submitIcon && !submittingAsync && (
           <>
             <Icon name={submitIcon} />{' '}

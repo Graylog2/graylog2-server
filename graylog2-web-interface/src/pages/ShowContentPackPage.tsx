@@ -157,8 +157,7 @@ const ShowContentPackPage = () => {
                 <Button bsStyle="info">Content Packs</Button>
               </LinkContainer>
             </ButtonToolbar>
-          }
-        >
+          }>
           <span>
             Content packs accelerate the set up process for a specific data source. A content pack can include
             inputs/extractors, streams, and dashboards.
@@ -207,8 +206,7 @@ const ShowContentPackPage = () => {
         showModal={showModal}
         title="Do you really want to uninstall this Content Pack?"
         onConfirm={_uninstallContentPackRev}
-        onCancel={_clearUninstall}
-      >
+        onCancel={_clearUninstall}>
         <ContentPackInstallEntityList uninstall entities={uninstallEntities} />
       </BootstrapModalConfirm>
     </DocumentTitle>

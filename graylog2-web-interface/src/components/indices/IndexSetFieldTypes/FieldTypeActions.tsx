@@ -48,8 +48,7 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) =>
         bsSize="xsmall"
         disabled={fieldType.isReserved}
         title={`Edit field type for ${fieldType.fieldName}`}
-        tabIndex={0}
-      >
+        tabIndex={0}>
         Edit{' '}
         {fieldType.isReserved && (
           <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>

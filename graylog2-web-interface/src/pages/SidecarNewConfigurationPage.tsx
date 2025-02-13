@@ -29,8 +29,7 @@ const SidecarNewConfigurationPage = () => (
       documentationLink={{
         title: 'Sidecar documentation',
         path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-      }}
-    >
+      }}>
       <span>Some words about collector configurations.</span>
     </PageHeader>
     <ConfigurationForm action="create" />

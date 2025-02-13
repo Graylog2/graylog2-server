@@ -41,8 +41,7 @@ const PreferencesSection = ({ user }: Props) => {
               id="timeout-controls"
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9"
-              label="Search autocompletion"
-            >
+              label="Search autocompletion">
               <FormikFormGroup
                 label="Enable autocompletion"
                 name="enableSmartSearch"
@@ -55,8 +54,7 @@ const PreferencesSection = ({ user }: Props) => {
               id="update-unfocused-controls"
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9"
-              label="Update unfocused"
-            >
+              label="Update unfocused">
               <FormikFormGroup
                 label="Update unfocused"
                 name="updateUnfocussed"
@@ -69,8 +67,7 @@ const PreferencesSection = ({ user }: Props) => {
               id="search-sidebar-controls"
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9"
-              label="Search sidebar"
-            >
+              label="Search sidebar">
               <FormikFormGroup
                 label="Is pinned"
                 name="searchSidebarIsPinned"
@@ -84,8 +81,7 @@ const PreferencesSection = ({ user }: Props) => {
               id="dashboard-sidebar-controls"
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9"
-              label="Dashboard sidebar"
-            >
+              label="Dashboard sidebar">
               <FormikFormGroup
                 label="Is pinned"
                 name="dashboardSidebarIsPinned"
@@ -108,8 +104,7 @@ const PreferencesSection = ({ user }: Props) => {
                     bsStyle="success"
                     disabled={isSubmitting || !isValid}
                     title="Update Preferences"
-                    type="submit"
-                  >
+                    type="submit">
                     Update Preferences
                   </Button>
                 </div>

@@ -197,8 +197,7 @@ const DataNodeActions = ({ dataNode, refetch, displayAs = 'dropdown' }: Props) =
           title={DIALOG_TEXT[dialogType].dialogTitle}
           show
           onConfirm={handleConfirm}
-          onCancel={handleClearState}
-        >
+          onCancel={handleClearState}>
           {DIALOG_TEXT[dialogType].dialogBody(dataNode.hostname)}
         </ConfirmDialog>
       )}

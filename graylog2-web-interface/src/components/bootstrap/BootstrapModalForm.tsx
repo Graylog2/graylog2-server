@@ -87,8 +87,7 @@ const BootstrapModalForm = ({
       backdrop={backdrop}
       onHide={onCancel}
       title={_title}
-      {...restProps}
-    >
+      {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>

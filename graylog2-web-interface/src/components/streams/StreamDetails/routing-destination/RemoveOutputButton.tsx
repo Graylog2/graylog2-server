@@ -47,8 +47,7 @@ const RemoveOutputButton = ({ output, streamId }: Props) => {
         show={showConfirmRemove}
         onConfirm={onConfirmRemoveOutput}
         onCancel={() => setShowConfirmRemove(false)}
-        title="Remove Output"
-      >
+        title="Remove Output">
         <p>Do you really want to remove this output from the stream?</p>
       </ConfirmDialog>
     </>

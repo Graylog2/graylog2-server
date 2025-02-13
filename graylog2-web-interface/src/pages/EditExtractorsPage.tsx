@@ -86,8 +86,7 @@ const EditExtractorsPage = () => {
         documentationLink={{
           title: 'Extractors documentation',
           path: DocsHelper.PAGES.EXTRACTORS,
-        }}
-      >
+        }}>
         <span>
           Extractors are applied on every message that is received by an input. Use them to extract and transform any
           text data into fields that allow you easy filtering and analysis later on.

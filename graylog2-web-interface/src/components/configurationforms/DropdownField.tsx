@@ -66,8 +66,7 @@ const DropdownField = ({
       help={field.description}
       onChange={handleChange}
       autoFocus={autoFocus}
-      required={!field.is_optional}
-    >
+      required={!field.is_optional}>
       {options}
     </Input>
   );

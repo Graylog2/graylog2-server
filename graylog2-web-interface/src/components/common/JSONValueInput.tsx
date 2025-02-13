@@ -119,8 +119,7 @@ class JSONValueInput extends React.Component<
             <DropdownButton
               id="input-dropdown-addon"
               bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
-              title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}
-            >
+              title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
               {options}
             </DropdownButton>
           </InputGroup>

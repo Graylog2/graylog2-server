@@ -186,8 +186,7 @@ const PaginatedList = ({
         pageSizes={pageSizes}
         pageSize={pageSize}
         showPageSizeSelect={showPageSizeSelect}
-        totalItems={totalItems}
-      >
+        totalItems={totalItems}>
         {children}
       </ListBasedOnQueryParams>
     );
@@ -203,8 +202,7 @@ const PaginatedList = ({
       pageSize={pageSize}
       showPageSizeSelect={showPageSizeSelect}
       totalItems={totalItems}
-      activePage={activePage}
-    >
+      activePage={activePage}>
       {children}
     </ListWithOwnState>
   );

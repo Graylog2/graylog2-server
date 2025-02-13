@@ -161,16 +161,14 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
     actions.push(
       <LinkContainer
         key={`received-messages-${input.id}`}
-        to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}
-      >
+        to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
         <Button
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
               app_pathname: getPathnameWithoutId(pathname),
               app_action_value: 'show-received-messages',
             });
-          }}
-        >
+          }}>
           Show received messages
         </Button>
       </LinkContainer>,
@@ -195,8 +193,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
                 app_pathname: getPathnameWithoutId(pathname),
                 app_action_value: 'manage-extractors',
               });
-            }}
-          >
+            }}>
             Manage extractors
           </Button>
         </LinkContainer>,
@@ -211,8 +208,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       key={`more-actions-${input.id}`}
       title="More actions"
       id={`more-actions-dropdown-${input.id}`}
-      pullRight
-    >
+      pullRight>
       <IfPermitted permissions={`inputs:edit:${input.id}`}>
         <MenuItem key={`edit-input-${input.id}`} onSelect={editInput} disabled={definition === undefined}>
           Edit input
@@ -226,8 +222,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
                 app_pathname: getPathnameWithoutId(pathname),
                 app_action_value: 'input-diagnosis',
               });
-            }}
-          >
+            }}>
             Input Diagnosis
           </MenuItem>
         </LinkContainer>
@@ -237,8 +232,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
             <MenuItem
               key={`remove-setup-mode-${input.id}`}
               onSelect={exitInputSetupMode}
-              disabled={definition === undefined}
-            >
+              disabled={definition === undefined}>
               Exit Setup mode
             </MenuItem>
           ) : (
@@ -246,8 +240,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
               <MenuItem
                 key={`setup-mode-${input.id}`}
                 onSelect={enterInputSetupMode}
-                disabled={definition === undefined}
-              >
+                disabled={definition === undefined}>
                 Enter Setup mode
               </MenuItem>
             )
@@ -263,8 +256,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
                 app_pathname: getPathnameWithoutId(pathname),
                 app_action_value: 'show-metrics',
               });
-            }}
-          >
+            }}>
             Show metrics
           </MenuItem>
         </LinkContainer>
@@ -275,8 +267,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
           key={`add-static-field-${input.id}`}
           onSelect={() => {
             setShowStaticFieldForm(true);
-          }}
-        >
+          }}>
           Add static field
         </MenuItem>
       </IfPermitted>

@@ -48,8 +48,7 @@ const SidecarsPage = () => {
         documentationLink={{
           title: 'Sidecar documentation',
           path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-        }}
-      >
+        }}>
         <span>
           The Graylog sidecars can reliably forward contents of log files or Windows EventLog from your servers.
           {canCreateSidecarUserTokens &&

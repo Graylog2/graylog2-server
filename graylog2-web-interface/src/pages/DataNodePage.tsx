@@ -97,8 +97,7 @@ const DataNodePage = () => {
                   bsStyle={datanodeDisabled ? 'warning' : 'success'}
                   title={datanode.data_node_status}
                   aria-label={datanode.data_node_status}
-                  role="button"
-                >
+                  role="button">
                   {datanode.data_node_status || 'N/A'}
                 </StatusLabel>
               </dd>

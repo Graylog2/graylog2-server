@@ -134,8 +134,7 @@ const LoginPage = () => {
         <ErrorBoundary
           FallbackComponent={ErrorFallback}
           onError={() => setEnableExternalBackend(false)}
-          onReset={() => setUseFallback(true)}
-        >
+          onReset={() => setUseFallback(true)}>
           <CustomLogin onErrorChange={setLastError} setLoginFormState={setLoginFormState} />
         </ErrorBoundary>
       );

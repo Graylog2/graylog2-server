@@ -62,8 +62,7 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
               connectedPipelines={connectedPipelines}
             />
           </IfPermitted>
-        }
-      >
+        }>
         <Table condensed striped hover>
           <thead>
             <tr>

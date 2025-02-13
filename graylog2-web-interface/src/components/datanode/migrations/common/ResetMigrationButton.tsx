@@ -78,8 +78,7 @@ const ResetMigrationButton = () => {
           title="Reset Migration"
           show
           onConfirm={handleConfirmClick}
-          onCancel={() => setShowDialog(false)}
-        >
+          onCancel={() => setShowDialog(false)}>
           Are you sure you want to reset the migration?
         </ConfirmDialog>
       )}

@@ -198,8 +198,7 @@ export const EditWrapper = ({
       onSubmit={onSubmitEdit}
       onCancel={onCancelEdit}
       displaySubmitActions={!hasOwnSubmitButton}
-      showQueryControls={showQueryControls}
-    >
+      showQueryControls={showQueryControls}>
       <EditComponent
         config={config}
         fields={fields}
@@ -207,8 +206,7 @@ export const EditWrapper = ({
         id={id}
         type={type}
         onCancel={onCancelEdit}
-        onChange={onWidgetConfigChange}
-      >
+        onChange={onWidgetConfigChange}>
         {children}
       </EditComponent>
     </EditWidgetFrame>
@@ -297,8 +295,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
               hideDragHandle={!interactive || isFocused}
               loading={loading}
               editing={editing}
-              onRename={onRenameWidget}
-            >
+              onRename={onRenameWidget}>
               {!editing ? (
                 <WidgetActionsMenu
                   isFocused={isFocused}
@@ -320,8 +317,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
           editing={editing}
           fields={fields}
           id={id}
-          type={widget.type}
-        >
+          type={widget.type}>
           <WidgetErrorBoundary>
             <Visualization
               id={id}

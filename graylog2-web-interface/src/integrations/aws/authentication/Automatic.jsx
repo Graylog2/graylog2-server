@@ -75,8 +75,7 @@ const Automatic = () => (
             <a
               href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html"
               target="_blank"
-              rel="noopener noreferrer"
-            >
+              rel="noopener noreferrer">
               AWS Credential Configuration Documentation <Icon name="open_in_new" />
             </a>
           </SectionNote>

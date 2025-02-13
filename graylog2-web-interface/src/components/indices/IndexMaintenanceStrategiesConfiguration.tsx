@@ -346,8 +346,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
             id="strategy-select"
             error={errors[`${name}_strategy_class`]}
             name={`${name}_strategy_class`}
-            label={label}
-          >
+            label={label}>
             <StyledSelect
               placeholder={selectPlaceholder}
               options={getAvailableSelectOptions()}

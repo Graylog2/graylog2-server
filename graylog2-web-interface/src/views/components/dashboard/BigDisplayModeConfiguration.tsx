@@ -84,8 +84,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
       onSubmitForm={_onSave}
       submitButtonText="Start full screen view"
       title="Configuring Full Screen"
-      show={show}
-    >
+      show={show}>
       <Input
         autoFocus
         id="refresh-interval"
@@ -110,8 +109,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
                 checked={queryTabs.includes(idx)}
                 onChange={(event) =>
                   (event as unknown as CheckboxTarget).target.checked ? addQueryTab(idx) : removeQueryTab(idx)
-                }
-              >
+                }>
                 {title}
               </Checkbox>
             </li>

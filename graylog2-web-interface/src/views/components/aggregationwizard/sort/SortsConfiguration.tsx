@@ -66,8 +66,7 @@ const SortsConfiguration = () => {
               testIdPrefix={`sort-${index}`}
               onRemove={removeSort(index)}
               elementTitle={SortElement.title}
-              ref={ref}
-            >
+              ref={ref}>
               <SortConfiguration index={index} />
             </SortConfigurationContainer>
           )}

@@ -76,8 +76,7 @@ const CheckBoxGroup = ({ groupLabel, checked, onChange, labels }: Props) => {
       padded={false}
       checked={value === CHECKBOX_STATES.Checked}
       indetermined={value === CHECKBOX_STATES.Indeterminate}
-      onChange={groupOnChange}
-    >
+      onChange={groupOnChange}>
       <ExpandableList>
         {Object.entries(checked).map(([key, isChecked]) => (
           <ExpandableListItem

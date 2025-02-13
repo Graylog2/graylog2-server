@@ -123,8 +123,7 @@ const Icon = ({
     $flip={flip}
     $size={size}
     $fill={type === 'solid'}
-    $spin={spin}
-  >
+    $spin={spin}>
     {name}
   </StyledSpan>
 );

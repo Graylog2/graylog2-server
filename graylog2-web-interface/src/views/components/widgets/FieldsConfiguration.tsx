@@ -98,8 +98,7 @@ const FieldsConfiguration = ({
           bsSize="xs"
           onClick={() => {
             setShowSelectedList((cur) => !cur);
-          }}
-        >
+          }}>
           {showSelectedList
             ? `Hide ${selectedFields.length} selected fields`
             : `Show ${selectedFields.length} selected fields`}

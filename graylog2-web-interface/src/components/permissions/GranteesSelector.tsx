@@ -133,8 +133,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
       <Formik
         onSubmit={(data, { resetForm }) => _handelSubmit(data, resetForm)}
         innerRef={formRef}
-        initialValues={{ granteeId: undefined, capabilityId: initialCapabilityId }}
-      >
+        initialValues={{ granteeId: undefined, capabilityId: initialCapabilityId }}>
         {({ isSubmitting, isValid, errors }) => (
           <Form>
             <FormElements>
@@ -156,8 +155,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
                 bsStyle="success"
                 disabled={isSubmitting || !isValid}
                 title="Add Collaborator"
-                type="submit"
-              >
+                type="submit">
                 Add Collaborator
               </SubmitButton>
             </FormElements>

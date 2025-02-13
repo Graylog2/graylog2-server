@@ -170,8 +170,7 @@ class EditConfigurationVariableModal extends React.Component<
           onClick={this.openModal}
           bsStyle={create ? 'success' : 'info'}
           bsSize={create ? 'small' : 'xsmall'}
-          className={create ? 'pull-right' : ''}
-        >
+          className={create ? 'pull-right' : ''}>
           {triggerButtonContent}
         </Button>
         <BootstrapModalForm
@@ -185,8 +184,7 @@ class EditConfigurationVariableModal extends React.Component<
           onSubmitForm={this._save}
           onCancel={this.closeModal}
           submitButtonDisabled={this._hasErrors()}
-          submitButtonText="Save"
-        >
+          submitButtonText="Save">
           <fieldset>
             <Input
               type="text"

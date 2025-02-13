@@ -79,8 +79,7 @@ const Alert = ({ children, bsStyle = 'default', title, style, className, onDismi
       title={title}
       icon={noIcon ? null : <Icon name={iconName} />}
       closeButtonLabel={displayCloseButton && 'Close alert'}
-      withCloseButton={displayCloseButton}
-    >
+      withCloseButton={displayCloseButton}>
       {children}
     </StyledAlert>
   );

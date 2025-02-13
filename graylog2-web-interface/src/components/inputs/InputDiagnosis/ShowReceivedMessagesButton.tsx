@@ -46,16 +46,14 @@ const ShowReceivedMessagesButton = ({ input }: Props) => {
     return (
       <LinkContainer
         key={`received-messages-${input.id}`}
-        to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}
-      >
+        to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
         <Button
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
               app_pathname: getPathnameWithoutId(pathname),
               app_action_value: 'show-received-messages',
             });
-          }}
-        >
+          }}>
           Show received messages
         </Button>
       </LinkContainer>

@@ -78,8 +78,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
         onSubmitForm={this._onDraftSave}
         onCancel={this.close}
         submitButtonText="Update title"
-        bsSize="large"
-      >
+        bsSize="large">
         <Input
           autoFocus
           help="Enter a helpful dashboard page title. It has a maximum length of 40 characters."

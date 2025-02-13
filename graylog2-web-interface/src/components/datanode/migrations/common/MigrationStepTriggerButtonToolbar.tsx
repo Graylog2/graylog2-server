@@ -138,8 +138,7 @@ const MigrationStepTriggerButtonToolbar = ({
           bsStyle={index ? 'default' : 'success'}
           bsSize="small"
           disabled={disabled}
-          onClick={() => handleButtonClick(step)}
-        >
+          onClick={() => handleButtonClick(step)}>
           {MIGRATION_ACTIONS[step]?.label || 'Next'}
         </Button>
       ))}

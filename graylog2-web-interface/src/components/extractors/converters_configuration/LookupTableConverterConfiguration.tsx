@@ -112,8 +112,7 @@ class LookupTableConverterConfiguration extends React.Component<
                 labelClassName="col-md-3"
                 wrapperClassName="col-md-9"
                 required={this.converterEnabled && this.converterEnabled.getChecked()}
-                help={helpMessage}
-              >
+                help={helpMessage}>
                 <Select
                   placeholder="Select a lookup table"
                   clearable={false}

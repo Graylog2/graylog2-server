@@ -78,8 +78,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
             <Icon name="warning" size="2x" />
             <span>We haven&apos;t received a response back from Amazon yet.</span>
           </Notice>
-        }
-      >
+        }>
         <p>
           Hang out for a few moments while we keep checking your AWS stream for logs. Amazon&apos;s servers parse logs
           every 10 minutes, so grab a cup of coffee because this may take some time!
@@ -132,8 +131,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
           We are going to attempt to parse a single log to help you out! If we are unable to, or you would like it
           parsed differently, head on over to <a href="/system/pipelines">Pipeline Rules</a> to set up your own parser!
         </p>
-      }
-    >
+      }>
       <Panel
         bsStyle={bsStyle}
         header={
@@ -143,8 +141,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
               {acknowledgment} looks like <em>{logType}</em> message type.
             </span>
           </Notice>
-        }
-      >
+        }>
         {knownLog
           ? 'Take a look at what we have parsed so far and you can create Pipeline Rules to handle even more!'
           : 'Not to worry, Graylog can still read in these log messages. We have parsed what we could and you can build Pipeline Rules to do the rest!'}

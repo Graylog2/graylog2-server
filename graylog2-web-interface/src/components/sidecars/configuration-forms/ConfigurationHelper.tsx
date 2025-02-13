@@ -75,8 +75,7 @@ class ConfigurationHelper extends React.Component<
                         <a
                           href="https://www.elastic.co/guide/en/beats/filebeat/current/index.html"
                           target="_blank"
-                          rel="noopener noreferrer"
-                        >
+                          rel="noopener noreferrer">
                           Filebeat Reference
                         </a>{' '}
                       </li>
@@ -84,8 +83,7 @@ class ConfigurationHelper extends React.Component<
                         <a
                           href="https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html"
                           target="_blank"
-                          rel="noopener noreferrer"
-                        >
+                          rel="noopener noreferrer">
                           Winlogbeat Reference
                         </a>{' '}
                       </li>
@@ -93,8 +91,7 @@ class ConfigurationHelper extends React.Component<
                         <a
                           href="https://nxlog.co/docs/nxlog-ce/nxlog-reference-manual.html"
                           target="_blank"
-                          rel="noopener noreferrer"
-                        >
+                          rel="noopener noreferrer">
                           NXLog Reference Manual
                         </a>{' '}
                       </li>

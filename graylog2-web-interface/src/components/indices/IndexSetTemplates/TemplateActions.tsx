@@ -69,8 +69,7 @@ const TemplateActions = ({ id, title, built_in, isDefault, isEnabled }: Props) =
           show={showDeleteDialog}
           title={`Deleting "${title}"`}
           onCancel={cancelDelete}
-          onConfirm={handleDelete}
-        >
+          onConfirm={handleDelete}>
           <p>You are about to delete the template: &quot;{title}&quot;. Are you sure?</p>
         </ConfirmDialog>
       )}

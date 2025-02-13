@@ -202,8 +202,7 @@ const ChangeFieldTypeModal = ({
       onCancel={onCancel}
       show={show}
       bsSize="large"
-      submitButtonDisabled={fieldTypeMutationIsLading}
-    >
+      submitButtonDisabled={fieldTypeMutationIsLading}>
       <div>
         {showFieldSelect && (
           <FieldSelect indexSetId={initialSelectedIndexSets[0]} onFieldChange={setModalData} field={fieldName} />

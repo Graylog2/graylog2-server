@@ -133,8 +133,7 @@ const RuleForm = ({ create = false }: Props) => {
           id="rule-source-editor"
           label="Rule source"
           help="Rule source, see quick reference for more information."
-          error={errorMessage}
-        >
+          error={errorMessage}>
           <StyledContainer>
             <SourceCodeEditor
               id={`source${create ? '-create' : '-edit'}`}

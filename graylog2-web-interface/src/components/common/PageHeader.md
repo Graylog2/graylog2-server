@@ -21,8 +21,7 @@ import DocsHelper from 'util/DocsHelper';
   documentationLink={{
     title: 'Alerts documentation',
     path: DocsHelper.PAGES.WELCOME,
-  }}
->
+  }}>
   <span>This is a page description</span>
   <span>This is a support message</span>
 </PageHeader>;

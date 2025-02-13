@@ -179,8 +179,7 @@ const EventsConfig = () => {
           title="Update Events System Configuration"
           onSubmitForm={saveConfig}
           onCancel={closeModal}
-          submitButtonText="Update configuration"
-        >
+          submitButtonText="Update configuration">
           <fieldset>
             <FormGroup controlId="search-timeout-field">
               <TimeUnitInput

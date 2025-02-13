@@ -74,8 +74,7 @@ class AssignOutputDropdown extends React.Component<
             bsStyle="success"
             type="button"
             disabled={selectedOutput === this.PLACEHOLDER}
-            onClick={this._handleClick}
-          >
+            onClick={this._handleClick}>
             Assign existing Output
           </Button>
         </div>

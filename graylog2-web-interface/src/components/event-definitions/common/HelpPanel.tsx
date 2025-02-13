@@ -61,8 +61,7 @@ export const HelpPanel = ({
       </Panel.Heading>
       <ConditionalCollapse
         condition={collapsible}
-        wrapper={(wrapChild) => <Panel.Collapse>{wrapChild}</Panel.Collapse>}
-      >
+        wrapper={(wrapChild) => <Panel.Collapse>{wrapChild}</Panel.Collapse>}>
         <Panel.Body>{children}</Panel.Body>
       </ConditionalCollapse>
     </Panel>

@@ -129,8 +129,7 @@ const InputForm = ({
       submitButtonText={submitButtonText}
       submitAction={onSubmit}
       typeName={typeName}
-      cancelAction={onCancel}
-    >
+      cancelAction={onCancel}>
       <HideOnCloud>
         <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />
       </HideOnCloud>

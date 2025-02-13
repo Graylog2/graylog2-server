@@ -76,8 +76,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props)
               saveRuleSourceCode(rule.source || '');
               await onNavigateAway(rule);
               history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
-            }}
-          >
+            }}>
             Create new Rule from Code
           </Button>
           <Button
@@ -93,8 +92,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props)
               copyToClipboard(rule.source);
               UserNotification.success('Rule source code copied to clipboard!');
               onHide();
-            }}
-          >
+            }}>
             Copy & Close
           </Button>
         </ModalButtonToolbar>

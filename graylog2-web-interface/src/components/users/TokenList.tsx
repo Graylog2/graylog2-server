@@ -141,8 +141,7 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
                     bsSize="xsmall"
                     disabled={deletingToken === token.id}
                     bsStyle="danger"
-                    onClick={deleteToken(token)}
-                  >
+                    onClick={deleteToken(token)}>
                     {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
                   </Button>
                 </Col>

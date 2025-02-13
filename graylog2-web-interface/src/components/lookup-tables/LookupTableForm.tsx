@@ -128,8 +128,7 @@ const LookupTableForm = ({ saved, create = true, table = INIT_TABLE_VALUES }: Pr
         }
 
         return Promise.resolve();
-      }}
-    >
+      }}>
       {({ values, errors, touched, setFieldValue, setFieldTouched, setValues, isSubmitting }) => (
         <Form className="form form-horizontal">
           <fieldset>

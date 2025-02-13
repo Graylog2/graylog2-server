@@ -66,8 +66,7 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
         validate={validate}
         validateOnBlur
         validateOnChange
-        onSubmit={() => {}}
-      >
+        onSubmit={() => {}}>
         {({ isSubmitting, values, isValid, errors, validateForm, setFieldValue }) => {
           const onSubmit = () => {
             validateForm().then((errorsList) => {

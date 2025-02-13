@@ -99,8 +99,7 @@ const FormikInput = ({
             id={name}
             error={error}
             onChange={_handleChange}
-            type={type}
-          >
+            type={type}>
             {children}
           </Input>
         );

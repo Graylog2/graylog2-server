@@ -70,8 +70,7 @@ const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId, refet
           bsSize="xsmall"
           bsStyle="danger"
           title={`Delete search ${search.title}`}
-          tabIndex={0}
-        >
+          tabIndex={0}>
           Delete
         </Button>
       </IfPermitted>

@@ -69,8 +69,7 @@ const FormikFormGroup = ({
     onChange={onChange}
     name={name}
     labelClassName={labelClassName}
-    wrapperClassName={wrapperClassName}
-  >
+    wrapperClassName={wrapperClassName}>
     {children}
   </FormikInput>
 );

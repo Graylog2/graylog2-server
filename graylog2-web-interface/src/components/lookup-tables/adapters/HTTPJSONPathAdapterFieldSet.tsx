@@ -114,8 +114,7 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
           label="HTTP Headers"
           help="The custom HTTP headers to use for the HTTP request. Multiple values must be comma-separated."
           labelClassName="col-sm-3"
-          wrapperClassName="col-sm-9"
-        >
+          wrapperClassName="col-sm-9">
           <KeyValueTable pairs={config.headers || {}} editable onChange={this.onHTTPHeaderUpdate} />
         </Input>
       </fieldset>

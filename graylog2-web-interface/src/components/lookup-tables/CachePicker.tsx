@@ -44,8 +44,7 @@ const CachePicker = ({ caches = [] }: Props) => {
         bsStyle={errorMessage ? 'error' : undefined}
         help={errorMessage || 'Select an existing cache'}
         labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9"
-      >
+        wrapperClassName="col-sm-9">
         <Select
           placeholder="Select a cache"
           clearable={false}

@@ -187,8 +187,7 @@ class EventDefinitionDescription extends React.Component<
                 <Button
                   bsStyle="link"
                   bsSize="xsmall"
-                  onClick={EventDefinitionDescription.clearNotifications(definition)}
-                >
+                  onClick={EventDefinitionDescription.clearNotifications(definition)}>
                   clear
                 </Button>
               )}

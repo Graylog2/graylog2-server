@@ -141,8 +141,7 @@ class KeyValueTable extends React.Component<
               key={`delete-${key}`}
               bsStyle="danger"
               bsSize={this.props.actionsSize}
-              onClick={this._deleteRow(key)}
-            >
+              onClick={this._deleteRow(key)}>
               Delete
             </Button>,
           );
