@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import jakarta.inject.Provider;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.buffers.OutputBuffer;
+import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
@@ -48,6 +49,7 @@ import static org.mockito.Mockito.when;
 class MessageTimestampTest {
     static final int GRACE_PERIOD_DAYS = 10;
     final MessageFactory messageFactory = new TestMessageFactory();
+    ClusterConfigService clusterConfigService;
     ProcessBufferProcessor processBufferProcessor;
     DateTime initialTime;
 
@@ -98,6 +100,26 @@ class MessageTimestampTest {
         assertThat(msg.getTimestamp()).isEqualTo(receiveTime);
     }
 
+    @Test
+    void testEventHandler() {
+        Duration currentGracePeriod = processBufferProcessor.getTimeStampGracePeriod();
+        Duration newGracePeriod = currentGracePeriod.plusDays(1);
+        setClusterConfigValue(newGracePeriod);
+        
+        processBufferProcessor.handleGracePeriodUpdated(getClusterConfigChangedEvent());
+
+        assertThat(processBufferProcessor.getTimeStampGracePeriod()).isEqualTo(newGracePeriod);
+    }
+
+    private void setClusterConfigValue(Duration gracePeriod) {
+        when(clusterConfigService.get(TimeStampConfig.class)).thenReturn(new TimeStampConfig(gracePeriod));
+        when(clusterConfigService.getOrDefault(eq(TimeStampConfig.class), Mockito.any())).thenReturn(new TimeStampConfig(gracePeriod));
+    }
+
+    private ClusterConfigChangedEvent getClusterConfigChangedEvent() {
+        return ClusterConfigChangedEvent.create(DateTime.now(DateTimeZone.UTC), "node-id", TimeStampConfig.class.getName());
+    }
+
     ProcessBufferProcessor createProcessor(Duration gracePeriod) {
         MetricRegistry metricRegistry = new MetricRegistry();
         StreamMetrics streamMetrics = new StreamMetrics(metricRegistry);
@@ -111,9 +133,8 @@ class MessageTimestampTest {
                 Mockito.mock(EventBus.class)
         );
 
-        ClusterConfigService clusterConfigService = Mockito.mock(ClusterConfigService.class);
-        when(clusterConfigService.get(TimeStampConfig.class)).thenReturn(new TimeStampConfig(gracePeriod));
-        when(clusterConfigService.getOrDefault(eq(TimeStampConfig.class), Mockito.any())).thenReturn(new TimeStampConfig(gracePeriod));
+        clusterConfigService = Mockito.mock(ClusterConfigService.class);
+        setClusterConfigValue(gracePeriod);
 
         return new ProcessBufferProcessor(
                 metricRegistry,

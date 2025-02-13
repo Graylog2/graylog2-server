@@ -208,7 +208,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleGracePeriodUpdated(ClusterConfigChangedEvent event) {
-        if (TimeStampConfig.class.getCanonicalName().equals(event.type())) {
+        if (TimeStampConfig.class.getName().equals(event.type())) {
             cachedGracePeriod = null;
         }
     }

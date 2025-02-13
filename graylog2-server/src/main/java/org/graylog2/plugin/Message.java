@@ -507,12 +507,14 @@ public class Message implements Messages, Indexable, Acknowledgeable {
             return;
         }
         final DateTime timeStamp = getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
-        if (Tools.nowUTC().plus(gracePeriod.toMillis()).isBefore(timeStamp)) {
+        final DateTime nowUTC = Tools.nowUTC();
+        final DateTime threshold = nowUTC.plus(gracePeriod.toMillis());
+        if (threshold.isBefore(timeStamp)) {
             DateTime receiveTimeStamp = getReceiveTime();
-            if (receiveTimeStamp != null && Tools.nowUTC().plus(gracePeriod.toMillis()).isAfter(receiveTimeStamp)) {
+            if (receiveTimeStamp != null && threshold.isAfter(receiveTimeStamp)) {
                 updateTimeStamp(timeStamp, receiveTimeStamp);
             } else {
-                updateTimeStamp(timeStamp, Tools.nowUTC());
+                updateTimeStamp(timeStamp, nowUTC);
             }
         }
     }
