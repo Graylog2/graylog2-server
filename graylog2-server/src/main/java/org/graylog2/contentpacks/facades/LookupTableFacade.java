@@ -76,8 +76,8 @@ public class LookupTableFacade implements EntityFacade<LookupTableDto> {
     @VisibleForTesting
     Entity exportNativeEntity(LookupTableDto lookupTableDto, EntityDescriptorIds entityDescriptorIds) {
         final String tableId = entityDescriptorIds.get(EntityDescriptor.create(lookupTableDto.id(), ModelTypes.LOOKUP_TABLE_V1))
-                .orElseGet(() -> entityDescriptorIds.get(EntityDescriptor.create(lookupTableDto.name(), ModelTypes.LOOKUP_TABLE_V1))
-                    .orElseThrow(() -> new ContentPackException("Couldn't find lookup table entity " + lookupTableDto.id())));
+                .or(() -> entityDescriptorIds.get(EntityDescriptor.create(lookupTableDto.name(), ModelTypes.LOOKUP_TABLE_V1)))
+                .orElseThrow(() -> new ContentPackException("Couldn't find lookup table entity " + lookupTableDto.id()));
         final String cacheId = entityDescriptorIds.get(cacheDescriptor(lookupTableDto.cacheId()))
                 .orElseThrow(() -> new ContentPackException("Couldn't find lookup cache entity " + lookupTableDto.cacheId()));
         final String adapterId = entityDescriptorIds.get(adapterDescriptor(lookupTableDto.dataAdapterId()))
