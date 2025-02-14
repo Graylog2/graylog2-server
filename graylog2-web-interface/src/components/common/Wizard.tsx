@@ -196,6 +196,10 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
           background-color: ${theme.colors.global.link};
         }
       }
+      
+      &.disabled > a {
+        color: ${theme.colors.text.disabled};
+      }
 
       > a {
         border-radius: 0;
