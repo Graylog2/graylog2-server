@@ -234,8 +234,8 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
             request.addField(new InlineBinaryField(
                             CK_TLS_CLIENT_CA,
                             "TLS Client Certificate Chain",
-                            "PEM-encoded certificate chain used to authenticate client certificates in " +
-                                    "mutual TLS.",
+                    "PEM-encoded certificate chain used to validate client certificates during mutual TLS " +
+                            "authentication. Clients that fail to provide a trusted certificate will be rejected.",
                             ConfigurationField.Optional.OPTIONAL,
                     true, // TODO: no need to encrypt, but our UI doesn't support unencrypted yet
                     ""
