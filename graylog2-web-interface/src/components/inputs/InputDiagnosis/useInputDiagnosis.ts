@@ -21,7 +21,7 @@ import { useStore } from 'stores/connect';
 import InputStatesStore from 'stores/inputs/InputStatesStore';
 import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 import { MetricsStore, MetricsActions } from 'stores/metrics/MetricsStore';
-import type { InputStateByNode, InputStates } from 'stores/inputs/InputStatesStore';
+import type { InputStateByNode, InputStates, InputState } from 'stores/inputs/InputStatesStore';
 import type { Input } from 'components/messageloaders/Types';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -49,12 +49,7 @@ export type InputNodeStateInfo = {
 
 export type InputNodeStates = {
   states: {
-    'RUNNING'?: InputNodeStateInfo[];
-    'FAILED'?: InputNodeStateInfo[];
-    'STOPPED'?: InputNodeStateInfo[];
-    'STARTING'?: InputNodeStateInfo[];
-    'FAILING'?: InputNodeStateInfo[];
-    'SETUP'?: InputNodeStateInfo[];
+    [key in InputState]?: InputNodeStateInfo[];
   };
   total: number;
 };

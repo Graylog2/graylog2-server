@@ -20,12 +20,13 @@ import styled, { css } from 'styled-components';
 import { DocumentTitle, LinkToNode, PageHeader } from 'components/common';
 import useParams from 'routing/useParams';
 import { Row, Col, DropdownButton, MenuItem } from 'components/bootstrap';
-import type { StreamMessageCount } from 'components/inputs/InputDiagnosis/useInputDiagnosis';
+import type { StreamMessageCount , InputNodeStateInfo, InputNodeStates } from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 import ShowReceivedMessagesButton from 'components/inputs/InputDiagnosis/ShowReceivedMessagesButton';
 import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
 import Routes from 'routing/Routes';
 import { LinkContainer, Link } from 'components/common/router';
+import type { InputState } from 'stores/inputs/InputStatesStore';
 
 const StyledDl = styled.dl`
   margin: 0;
@@ -65,6 +66,69 @@ const InputNodeInfo = styled.div`
   max-width: 500px;
   white-space: break-spaces;
 `;
+
+const NodeListItem = ({ detailedMessage, nodeId }: {
+  detailedMessage: InputNodeStateInfo['detailed_message'],
+  nodeId: InputNodeStateInfo['node_id']
+}) => {
+  if(!detailedMessage && !nodeId) return null;
+
+  if(nodeId) {
+    return (
+      <LinkContainer to={Routes.SYSTEM.NODES.SHOW(nodeId)}>
+        <MenuItem>
+          {nodeId && (
+            <div>
+              <b>Node ID:</b> {nodeId}
+            </div>
+          )}
+          {detailedMessage && (
+            <InputNodeInfo>
+              <b>Message:</b> {detailedMessage}
+            </InputNodeInfo>
+          )}
+        </MenuItem>
+      </LinkContainer>
+    )
+  }
+
+  return (
+    <MenuItem key={detailedMessage}>
+      {detailedMessage && (
+        <InputNodeInfo>
+          <b>Message:</b> {detailedMessage}
+        </InputNodeInfo>
+      )}
+    </MenuItem>
+  )
+}
+
+const StateListItem = ({ inputNodeStates, state } : { inputNodeStates: InputNodeStates, state: InputState }) => {
+  const showNodesList = (nodeState) => {
+    const statesWithShowableInfos = inputNodeStates.states[nodeState].filter(
+      (stateInfo: InputNodeStateInfo) => stateInfo.detailed_message || stateInfo.node_id
+    )
+
+    return statesWithShowableInfos.length > 0;
+  }
+
+  if(showNodesList(state)) return (
+    <DropdownButton
+      title={
+        <dd>
+          {state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}
+        </dd>
+      }
+      bsSize="xs"
+    >
+      {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
+        <NodeListItem key={node_id} detailedMessage={detailed_message} nodeId={node_id} />)
+      )}
+    </DropdownButton>
+  )
+
+  return (<p>{state}: {inputNodeStates.states[state].length}/{inputNodeStates.total}</p>)
+}
 
 const InputDiagnosisPage = () => {
   const { inputId } = useParams();
@@ -148,33 +212,8 @@ const InputDiagnosisPage = () => {
             <Row>
               <Col xs={3}>
                 <dt>Input State</dt>
-                {Object.keys(inputNodeStates.states).map((state) => (
-                  <DropdownButton
-                    title={
-                      <dd key={state}>
-                        {state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}
-                      </dd>
-                    }
-                    key={state}
-                    bsSize="xs"
-                  >
-                    {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
-                      <LinkContainer key={node_id} to={Routes.SYSTEM.NODES.SHOW(node_id)}>
-                        <MenuItem>
-                          {node_id && (
-                            <div>
-                              <b>Node ID:</b> {node_id}
-                            </div>
-                          )}
-                          {detailed_message && (
-                            <InputNodeInfo>
-                              <b>Message:</b> {detailed_message}
-                            </InputNodeInfo>
-                          )}
-                        </MenuItem>
-                      </LinkContainer>
-                    ))}
-                  </DropdownButton>
+                {Object.keys(inputNodeStates.states).map((state: InputState) => (
+                  <StateListItem key={state} state={state} inputNodeStates={inputNodeStates} />
                 ))}
               </Col>
               <Col xs={3}>
@@ -199,7 +238,11 @@ const InputDiagnosisPage = () => {
                   <StyledDl>
                     {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
                       <span key={stream.stream_id}>
-                        <dt><Link to={Routes.stream_view(stream.stream_id)}>{stream.stream_name}</Link></dt>
+                        <dt>
+                          <Link to={`/search?q=gl2_source_input%3A+${input.id}&rangetype=relative&streams=${stream.stream_id}&from=900`}>
+                            {stream.stream_name}
+                          </Link>
+                        </dt>
                         <dd>{stream.count}</dd>
                       </span>
                     ))}
