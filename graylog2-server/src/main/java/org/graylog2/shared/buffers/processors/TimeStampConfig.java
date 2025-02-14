@@ -14,13 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Processor, ProcessorConfig } from "components/configurations/message-processors/Types";
+package org.graylog2.shared.buffers.processors;
 
-const getConfig = (configType, configuration) => configuration?.[configType] ?? null;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-const isProcessorEnabled = (processor: Processor, config: ProcessorConfig) => (
-  config.disabled_processors.filter((p) => p === processor.class_name).length < 1
-);
+import java.time.Duration;
 
-export { getConfig, isProcessorEnabled };
-export default getConfig;
+public record TimeStampConfig(@JsonProperty("grace_period") Duration gracePeriod) {
+    public static final TimeStampConfig THRESHOLD_2DAYS = new TimeStampConfig(Duration.ofDays(2));
+    private static final TimeStampConfig THRESHOLD_DISTANT_FUTURE = new TimeStampConfig(Duration.ofSeconds(1000000000000L));
+
+    public static TimeStampConfig getDefault() {
+        // Off by default
+        return THRESHOLD_DISTANT_FUTURE;
+    }
+}
