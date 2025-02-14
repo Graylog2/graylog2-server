@@ -48,6 +48,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -146,8 +147,8 @@ class InputRoutingServiceTest {
 
         inputRoutingService.handleInputRenamed(new InputRenamedEvent(INPUT_ID, INPUT_NAME, INPUT_NEW_NAME));
 
-        verify(ruleService).save(argThat(ruleDao1 -> ruleDao1.source().contains(INPUT_NEW_NAME)));
-        verify(ruleService, times(1)).save(any());
+        verify(ruleService).save(argThat(ruleDao1 -> ruleDao1.source().contains(INPUT_NEW_NAME)), anyBoolean());
+        verify(ruleService, times(1)).save(any(), anyBoolean());
     }
 
     @Test
