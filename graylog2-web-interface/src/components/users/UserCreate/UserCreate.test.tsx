@@ -63,126 +63,146 @@ describe('<UserCreate />', () => {
     asMock(UsersActions.loadByUsername).mockImplementation(() => Promise.reject(new FetchError('', 404, {})));
   });
 
-  it('should create user', async () => {
-    render(<UserCreate />);
+  it(
+    'should create user',
+    async () => {
+      render(<UserCreate />);
 
-    const usernameInput = await screen.findByLabelText('Username');
-    const firstNameInput = await screen.findByLabelText('First Name');
-    const lastNameInput = await screen.findByLabelText('Last Name');
-    const emailInput = await screen.findByLabelText('E-Mail Address');
-    const timeoutAmountInput = await screen.findByPlaceholderText('Timeout amount');
-    const timezoneSelect = await screen.findByLabelText('Time Zone');
-    const roleSelect = await screen.findByText(/search for roles/i);
-    const passwordInput = await screen.findByPlaceholderText('Password');
-    const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
-    const submitButton = await findSubmitButton();
-    await userEvent.type(usernameInput, 'The username');
+      const usernameInput = await screen.findByLabelText('Username');
+      const firstNameInput = await screen.findByLabelText('First Name');
+      const lastNameInput = await screen.findByLabelText('Last Name');
+      const emailInput = await screen.findByLabelText('E-Mail Address');
+      const timeoutAmountInput = await screen.findByPlaceholderText('Timeout amount');
+      const timezoneSelect = await screen.findByLabelText('Time Zone');
+      const roleSelect = await screen.findByText(/search for roles/i);
+      const passwordInput = await screen.findByPlaceholderText('Password');
+      const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
+      const submitButton = await findSubmitButton();
+      await userEvent.type(usernameInput, 'The username');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(firstNameInput, 'The first name');
-    });
+      // eslint-disable-next-line testing-library/no-unnecessary-act
+      await act(async () => {
+        await userEvent.type(firstNameInput, 'The first name');
+      });
 
-    await userEvent.type(lastNameInput, 'The last name');
-    await userEvent.type(emailInput, 'username@example.org');
-    await userEvent.clear(timeoutAmountInput);
-    await userEvent.type(timeoutAmountInput, '40');
-
-    await act(async () => {
-      await selectEvent.openMenu(timezoneSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(timezoneSelect, 'Berlin');
-    });
-
-    await act(async () => {
-      await selectEvent.openMenu(roleSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(roleSelect, 'Manager');
-    });
-
-    await userEvent.type(passwordInput, 'thepassword');
-    await userEvent.type(passwordRepeatInput, 'thepassword');
-
-    await waitFor(() => expect(submitButton).toBeEnabled());
-    await userEvent.click(submitButton);
-
-    await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
-      username: 'The username',
-      first_name: 'The first name',
-      last_name: 'The last name',
-      timezone: 'Europe/Berlin',
-      roles: ['Reader', 'Manager'],
-      email: 'username@example.org',
-      permissions: [],
-      session_timeout_ms: 144000000,
-      password: 'thepassword',
-    }));
-  }, extendedTimeout);
-
-  it('should trim the username', async () => {
-    render(<UserCreate />);
-
-    const usernameInput = await screen.findByLabelText('Username');
-    const firstNameInput = await screen.findByLabelText('First Name');
-    const lastNameInput = await screen.findByLabelText('Last Name');
-    const emailInput = await screen.findByLabelText('E-Mail Address');
-    const passwordInput = await screen.findByPlaceholderText('Password');
-    const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
-    const submitButton = await findSubmitButton();
-
-    await userEvent.type(usernameInput, '   username   ');
-    await userEvent.type(firstNameInput, 'The first name');
-
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
       await userEvent.type(lastNameInput, 'The last name');
-    });
+      await userEvent.type(emailInput, 'username@example.org');
+      await userEvent.clear(timeoutAmountInput);
+      await userEvent.type(timeoutAmountInput, '40');
 
-    await userEvent.type(emailInput, 'username@example.org');
-    await userEvent.type(passwordInput, 'thepassword');
-    await userEvent.type(passwordRepeatInput, 'thepassword');
+      await act(async () => {
+        await selectEvent.openMenu(timezoneSelect);
+      });
 
-    await waitFor(() => expect(submitButton).toBeEnabled());
-    await userEvent.click(submitButton);
+      await act(async () => {
+        await selectEvent.select(timezoneSelect, 'Berlin');
+      });
 
-    await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
-      username: 'username',
-      first_name: 'The first name',
-      last_name: 'The last name',
-      roles: ['Reader'],
-      email: 'username@example.org',
-      permissions: [],
-      password: 'thepassword',
-    }));
-  }, extendedTimeout);
+      await act(async () => {
+        await selectEvent.openMenu(roleSelect);
+      });
 
-  it('should display warning if username is already taken', async () => {
-    asMock(UsersActions.loadByUsername).mockReturnValue(Promise.resolve(existingUser));
+      await act(async () => {
+        await selectEvent.select(roleSelect, 'Manager');
+      });
 
-    render(<UserCreate />);
+      await userEvent.type(passwordInput, 'thepassword');
+      await userEvent.type(passwordRepeatInput, 'thepassword');
 
-    const usernameInput = await screen.findByLabelText('Username');
+      await waitFor(() => expect(submitButton).toBeEnabled());
+      await userEvent.click(submitButton);
 
-    await userEvent.type(usernameInput, existingUser.username);
+      await waitFor(() =>
+        expect(UsersActions.create).toHaveBeenCalledWith({
+          username: 'The username',
+          first_name: 'The first name',
+          last_name: 'The last name',
+          timezone: 'Europe/Berlin',
+          roles: ['Reader', 'Manager'],
+          email: 'username@example.org',
+          permissions: [],
+          session_timeout_ms: 144000000,
+          password: 'thepassword',
+        }),
+      );
+    },
+    extendedTimeout,
+  );
 
-    await userEvent.tab();
-    await screen.findByText(/Username is already taken/);
-  }, extendedTimeout);
+  it(
+    'should trim the username',
+    async () => {
+      render(<UserCreate />);
 
-  it('should display warning, if password repeat does not match password', async () => {
-    render(<UserCreate />);
+      const usernameInput = await screen.findByLabelText('Username');
+      const firstNameInput = await screen.findByLabelText('First Name');
+      const lastNameInput = await screen.findByLabelText('Last Name');
+      const emailInput = await screen.findByLabelText('E-Mail Address');
+      const passwordInput = await screen.findByPlaceholderText('Password');
+      const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
+      const submitButton = await findSubmitButton();
 
-    const passwordInput = await screen.findByPlaceholderText('Password');
-    const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
+      await userEvent.type(usernameInput, '   username   ');
+      await userEvent.type(firstNameInput, 'The first name');
 
-    await userEvent.type(passwordInput, 'thepassword');
-    await userEvent.type(passwordRepeatInput, 'notthepassword');
-    await userEvent.tab();
+      // eslint-disable-next-line testing-library/no-unnecessary-act
+      await act(async () => {
+        await userEvent.type(lastNameInput, 'The last name');
+      });
 
-    await screen.findByText(/Passwords do not match/);
-  }, extendedTimeout);
+      await userEvent.type(emailInput, 'username@example.org');
+      await userEvent.type(passwordInput, 'thepassword');
+      await userEvent.type(passwordRepeatInput, 'thepassword');
+
+      await waitFor(() => expect(submitButton).toBeEnabled());
+      await userEvent.click(submitButton);
+
+      await waitFor(() =>
+        expect(UsersActions.create).toHaveBeenCalledWith({
+          username: 'username',
+          first_name: 'The first name',
+          last_name: 'The last name',
+          roles: ['Reader'],
+          email: 'username@example.org',
+          permissions: [],
+          password: 'thepassword',
+        }),
+      );
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'should display warning if username is already taken',
+    async () => {
+      asMock(UsersActions.loadByUsername).mockReturnValue(Promise.resolve(existingUser));
+
+      render(<UserCreate />);
+
+      const usernameInput = await screen.findByLabelText('Username');
+
+      await userEvent.type(usernameInput, existingUser.username);
+
+      await userEvent.tab();
+      await screen.findByText(/Username is already taken/);
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'should display warning, if password repeat does not match password',
+    async () => {
+      render(<UserCreate />);
+
+      const passwordInput = await screen.findByPlaceholderText('Password');
+      const passwordRepeatInput = await screen.findByPlaceholderText('Repeat password');
+
+      await userEvent.type(passwordInput, 'thepassword');
+      await userEvent.type(passwordRepeatInput, 'notthepassword');
+      await userEvent.tab();
+
+      await screen.findByText(/Passwords do not match/);
+    },
+    extendedTimeout,
+  );
 });

@@ -21,7 +21,9 @@ export const DEFAULT_LAYOUT = (isEvidenceModal: boolean) => ({
   entityTableId: 'dashboards',
   defaultPageSize: 20,
   defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: isEvidenceModal ? ['title', 'description', 'summary'] : ['title', 'description', 'summary', 'favorite'],
+  defaultDisplayedAttributes: isEvidenceModal
+    ? ['title', 'description', 'summary']
+    : ['title', 'description', 'summary', 'favorite'],
 });
 
 export const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'last_updated_at', 'favorite'];

@@ -36,24 +36,31 @@ const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
 
   const columnRenderers = useColumnRenderers();
-  const _fetchEvents = useCallback((searchParams: SearchParams) => fetchEvents(searchParams, streamId as string), [streamId]);
-  const { entityActions, expandedSections, bulkSelection } = useTableElements({ defaultLayout: eventsTableElements.defaultLayout });
+  const _fetchEvents = useCallback(
+    (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string),
+    [streamId],
+  );
+  const { entityActions, expandedSections, bulkSelection } = useTableElements({
+    defaultLayout: eventsTableElements.defaultLayout,
+  });
 
   return (
-    <PaginatedEntityTable<Event, EventsAdditionalData> humanName="events"
-                                                       columnsOrder={eventsTableElements.columnOrder}
-                                                       queryHelpComponent={<QueryHelper entityName="event" fieldMap={additionalSearchFields} />}
-                                                       entityActions={entityActions}
-                                                       tableLayout={eventsTableElements.defaultLayout}
-                                                       fetchEntities={_fetchEvents}
-                                                       keyFn={keyFn}
-                                                       actionsCellWidth={110}
-                                                       expandedSectionsRenderer={expandedSections}
-                                                       entityAttributesAreCamelCase={false}
-                                                       filterValueRenderers={FilterValueRenderers}
-                                                       columnRenderers={columnRenderers}
-                                                       bulkSelection={bulkSelection}
-                                                       topRightCol={<EventsRefreshControls />} />
+    <PaginatedEntityTable<Event, EventsAdditionalData>
+      humanName="events"
+      columnsOrder={eventsTableElements.columnOrder}
+      queryHelpComponent={<QueryHelper entityName="event" fieldMap={additionalSearchFields} />}
+      entityActions={entityActions}
+      tableLayout={eventsTableElements.defaultLayout}
+      fetchEntities={_fetchEvents}
+      keyFn={keyFn}
+      actionsCellWidth={110}
+      expandedSectionsRenderer={expandedSections}
+      entityAttributesAreCamelCase={false}
+      filterValueRenderers={FilterValueRenderers}
+      columnRenderers={columnRenderers}
+      bulkSelection={bulkSelection}
+      topRightCol={<EventsRefreshControls />}
+    />
   );
 };
 

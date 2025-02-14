@@ -64,7 +64,9 @@ describe('useFieldTypeMutation', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('The field type changed successfully', 'Success!'));
+      await waitFor(() =>
+        expect(UserNotification.success).toHaveBeenCalledWith('The field type changed successfully', 'Success!'),
+      );
     });
 
     it('should display notification on fail', async () => {
@@ -76,9 +78,12 @@ describe('useFieldTypeMutation', () => {
         result.current.putFieldTypeMutation(requestBody).catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Changing the field type failed with status: Error: Error',
-        'Could not change the field type'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Changing the field type failed with status: Error: Error',
+          'Could not change the field type',
+        ),
+      );
     });
   });
 });

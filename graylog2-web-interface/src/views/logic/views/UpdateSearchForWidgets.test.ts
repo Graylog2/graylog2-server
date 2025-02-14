@@ -25,9 +25,11 @@ import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 import Parameter from '../parameters/Parameter';
 import ValueParameter from '../parameters/ValueParameter';
 
-jest.mock('bson-objectid', () => jest.fn(() => ({
-  toString: jest.fn(() => 'new-search-id'),
-})));
+jest.mock('bson-objectid', () =>
+  jest.fn(() => ({
+    toString: jest.fn(() => 'new-search-id'),
+  })),
+);
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
@@ -35,20 +37,20 @@ jest.mock('../Widgets', () => ({
   widgetDefinition: () => ({ searchTypes: () => [{ type: 'pivot' }] }),
 }));
 
-jest.mock('../SearchType', () => jest.fn(() => ({
-  type: 'pivot',
-  handler: jest.fn(),
-  defaults: {},
-})));
+jest.mock('../SearchType', () =>
+  jest.fn(() => ({
+    type: 'pivot',
+    handler: jest.fn(),
+    defaults: {},
+  })),
+);
 
 const searchView = () => {
   const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
   const viewFixture = View.fromJSON(readFixture('./UpdateSearchForWidgets.View.fixture.json'));
   const searchFixture = Search.fromJSON(readFixture('./UpdateSearchForWidgets.Search.fixture.json'));
 
-  return viewFixture.toBuilder()
-    .search(searchFixture)
-    .build();
+  return viewFixture.toBuilder().search(searchFixture).build();
 };
 
 describe('UpdateSearchForWidgets', () => {
@@ -66,10 +68,12 @@ describe('UpdateSearchForWidgets', () => {
     const newView = UpdateSearchForWidgets(searchView());
     const queryIds = newView.search.queries.map((q) => q.id);
 
-    expect(queryIds).toEqual(Immutable.OrderedSet([
-      'f678e6c5-43b1-4200-b5c3-d33eae164dea',
-      '770a516d-3bfd-4a91-89c8-c21cb192fdf1',
-      '85782551-ec81-42ed-b9f7-020a8de93653',
-    ]));
+    expect(queryIds).toEqual(
+      Immutable.OrderedSet([
+        'f678e6c5-43b1-4200-b5c3-d33eae164dea',
+        '770a516d-3bfd-4a91-89c8-c21cb192fdf1',
+        '85782551-ec81-42ed-b9f7-020a8de93653',
+      ]),
+    );
   });
 });

@@ -21,8 +21,8 @@ import moment from 'moment';
 import crossfilter from 'crossfilter';
 
 type Traffic = {
-   [key: string]: number,
-}
+  [key: string]: number;
+};
 
 export const formatTrafficData = (traffic: Traffic) => {
   const ndx = crossfilter(map(traffic, (value, key) => ({ ts: key, bytes: value })));

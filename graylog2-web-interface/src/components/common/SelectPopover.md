@@ -1,14 +1,7 @@
 ```js
 import { Button } from 'components/bootstrap';
 
-const items = [
-  'Black',
-  'Blue',
-  'Green',
-  'Red',
-  'White',
-  'Yellow',
-];
+const items = ['Black', 'Blue', 'Green', 'Red', 'White', 'Yellow'];
 
 class SelectPopoverExample extends React.Component {
   constructor(props) {
@@ -21,7 +14,7 @@ class SelectPopoverExample extends React.Component {
 
   handleItemSelect(item) {
     this.setState({ selectedColor: item[0] });
-  };
+  }
 
   render() {
     const selectedColor = this.state.selectedColor;
@@ -29,14 +22,20 @@ class SelectPopoverExample extends React.Component {
     return (
       <div>
         <div style={{ display: 'inline-block', marginRight: 20 }}>
-          <SelectPopover id="example-popover"
-                         title="Filter by color"
-                         triggerNode={<Button bsStyle="info" bsSize="small">Select color</Button>}
-                         items={items}
-                         selectedItems={selectedColor ? [selectedColor] : []}
-                         onItemSelect={this.handleItemSelect}
-                         displayDataFilter={false}
-                         clearSelectionText="Clear color selection"/>
+          <SelectPopover
+            id="example-popover"
+            title="Filter by color"
+            triggerNode={
+              <Button bsStyle="info" bsSize="small">
+                Select color
+              </Button>
+            }
+            items={items}
+            selectedItems={selectedColor ? [selectedColor] : []}
+            onItemSelect={this.handleItemSelect}
+            displayDataFilter={false}
+            clearSelectionText="Clear color selection"
+          />
         </div>
 
         {selectedColor ? `You have selected ${selectedColor}` : 'Please select a color!'}
@@ -45,7 +44,7 @@ class SelectPopoverExample extends React.Component {
   }
 }
 
-<SelectPopoverExample />
+<SelectPopoverExample />;
 ```
 
 ```js
@@ -82,15 +81,15 @@ class SelectPopoverFormattedExample extends React.Component {
 
   handleItemSelect(item) {
     this.setState({ selectedColors: item });
-  };
+  }
 
   formatItem(item) {
     return (
       <span>
         <Icon name="square" style={{ color: item }} /> {item}
       </span>
-    )
-  };
+    );
+  }
 
   render() {
     const selectedColors = this.state.selectedColors;
@@ -98,15 +97,21 @@ class SelectPopoverFormattedExample extends React.Component {
     return (
       <div>
         <div style={{ display: 'inline-block', marginRight: 20 }}>
-          <SelectPopover id="example-popover-formatted"
-                         title="Filter by color"
-                         triggerNode={<Button bsStyle="info" bsSize="small">Select color</Button>}
-                         items={items}
-                         itemFormatter={this.formatItem}
-                         onItemSelect={this.handleItemSelect}
-                         filterPlaceholder="Filter by color"
-                         multiple={true}
-                         selectedItems={selectedColors} />
+          <SelectPopover
+            id="example-popover-formatted"
+            title="Filter by color"
+            triggerNode={
+              <Button bsStyle="info" bsSize="small">
+                Select color
+              </Button>
+            }
+            items={items}
+            itemFormatter={this.formatItem}
+            onItemSelect={this.handleItemSelect}
+            filterPlaceholder="Filter by color"
+            multiple={true}
+            selectedItems={selectedColors}
+          />
         </div>
 
         {selectedColors.length > 0 ? `You have selected ${selectedColors.join(', ')}` : 'Please select some colors!'}
@@ -115,5 +120,5 @@ class SelectPopoverFormattedExample extends React.Component {
   }
 }
 
-<SelectPopoverFormattedExample />
+<SelectPopoverFormattedExample />;
 ```

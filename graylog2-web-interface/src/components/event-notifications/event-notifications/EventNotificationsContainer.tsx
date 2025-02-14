@@ -19,15 +19,9 @@ import { useMemo, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import {
-  QueryHelper,
-  PaginatedEntityTable,
-} from 'components/common';
+import { QueryHelper, PaginatedEntityTable } from 'components/common';
 import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
-import {
-  DEFAULT_LAYOUT,
-  COLUMNS_ORDER,
-} from 'components/event-notifications/event-notifications/Constants';
+import { DEFAULT_LAYOUT, COLUMNS_ORDER } from 'components/event-notifications/event-notifications/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -44,12 +38,12 @@ import useNotificationTest from '../hooks/useNotificationTest';
 const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventNotification> => ({
   attributes: {
     title: {
-      renderCell: (_title: string, notification) => <NotificationTitle notification={notification} testResults={testResults} />,
+      renderCell: (_title: string, notification) => (
+        <NotificationTitle notification={notification} testResults={testResults} />
+      ),
     },
     type: {
-      renderCell: (_type: string, notification) => (
-        <NotificationConfigTypeCell notification={notification} />
-      ),
+      renderCell: (_type: string, notification) => <NotificationConfigTypeCell notification={notification} />,
     },
   },
 });
@@ -61,34 +55,40 @@ const EventNotificationsContainer = () => {
   const columnRenderers = useMemo(() => customColumnRenderers(testResults), [testResults]);
   const queryClient = useQueryClient();
 
-  const handleTest = useCallback((notification: EventNotification) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_TEST_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-notification',
-      app_action_value: 'notification-test',
-    });
+  const handleTest = useCallback(
+    (notification: EventNotification) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_TEST_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'event-notification',
+        app_action_value: 'notification-test',
+      });
 
-    getNotificationTest(notification);
-    queryClient.invalidateQueries(keyFn());
-  }, [getNotificationTest, pathname, queryClient, sendTelemetry]);
+      getNotificationTest(notification);
+      queryClient.invalidateQueries(keyFn());
+    },
+    [getNotificationTest, pathname, queryClient, sendTelemetry],
+  );
 
-  const renderEvenNotificationActions = useCallback((listItem: EventNotification) => (
-    <EventNotificationActions notification={listItem}
-                              isTestLoading={isLoadingTest}
-                              onTest={handleTest} />
-  ), [handleTest, isLoadingTest]);
+  const renderEvenNotificationActions = useCallback(
+    (listItem: EventNotification) => (
+      <EventNotificationActions notification={listItem} isTestLoading={isLoadingTest} onTest={handleTest} />
+    ),
+    [handleTest, isLoadingTest],
+  );
 
   return (
-    <PaginatedEntityTable<EventNotification> humanName="event notifications"
-                                             columnsOrder={COLUMNS_ORDER}
-                                             queryHelpComponent={<QueryHelper entityName="notification" />}
-                                             entityActions={renderEvenNotificationActions}
-                                             tableLayout={DEFAULT_LAYOUT}
-                                             fetchEntities={fetchEventNotifications}
-                                             keyFn={keyFn}
-                                             bulkSelection={{ actions: <BulkActions /> }}
-                                             entityAttributesAreCamelCase
-                                             columnRenderers={columnRenderers} />
+    <PaginatedEntityTable<EventNotification>
+      humanName="event notifications"
+      columnsOrder={COLUMNS_ORDER}
+      queryHelpComponent={<QueryHelper entityName="notification" />}
+      entityActions={renderEvenNotificationActions}
+      tableLayout={DEFAULT_LAYOUT}
+      fetchEntities={fetchEventNotifications}
+      keyFn={keyFn}
+      bulkSelection={{ actions: <BulkActions /> }}
+      entityAttributesAreCamelCase
+      columnRenderers={columnRenderers}
+    />
   );
 };
 

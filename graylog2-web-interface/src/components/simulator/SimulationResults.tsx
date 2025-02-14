@@ -40,9 +40,12 @@ type SimulationResultsProps = {
   error?: any;
 };
 
-class SimulationResults extends React.Component<SimulationResultsProps, {
-  [key: string]: any;
-}> {
+class SimulationResults extends React.Component<
+  SimulationResultsProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     originalMessage: undefined,
     simulationResults: undefined,
@@ -101,10 +104,7 @@ class SimulationResults extends React.Component<SimulationResultsProps, {
       case VIEW_OPTIONS.SIMULATION_PREVIEW:
         return <SimulationPreview simulationResults={simulationResults} streams={streams} />;
       case VIEW_OPTIONS.SIMULATION_SUMMARY:
-        return (
-          <SimulationChanges originalMessage={originalMessage}
-                             simulationResults={simulationResults} />
-        );
+        return <SimulationChanges originalMessage={originalMessage} simulationResults={simulationResults} />;
       case VIEW_OPTIONS.SIMULATION_TRACE:
         return <SimulationTrace simulationResults={simulationResults} />;
       default:
@@ -126,27 +126,21 @@ class SimulationResults extends React.Component<SimulationResultsProps, {
     };
 
     // eslint-disable-next-line no-nested-ternary
-    const originalMessagePreview = isLoading
-      ? <Spinner />
-      : originalMessage
-        ? (
-          <MessageShow message={originalMessage}
-                       streams={streams} />
-        )
-        : null;
+    const originalMessagePreview = isLoading ? (
+      <Spinner />
+    ) : originalMessage ? (
+      <MessageShow message={originalMessage} streams={streams} />
+    ) : null;
 
-    const errorMessage = error
-      ? (
-        <Alert bsStyle="danger" title="Error simulating message processing">
-          <p>
-            Could not simulate processing of message <em>{originalMessage.id}</em> in stream{' '}
-            <em>{stream.title}</em>.
-            <br />
-            Please try loading the message again, or use another message for the simulation.
-          </p>
-        </Alert>
-      )
-      : null;
+    const errorMessage = error ? (
+      <Alert bsStyle="danger" title="Error simulating message processing">
+        <p>
+          Could not simulate processing of message <em>{originalMessage.id}</em> in stream <em>{stream.title}</em>.
+          <br />
+          Please try loading the message again, or use another message for the simulation.
+        </p>
+      </Alert>
+    ) : null;
 
     return (
       <Row>
@@ -156,17 +150,16 @@ class SimulationResults extends React.Component<SimulationResultsProps, {
         <Col md={6}>
           <h1>Original message</h1>
           <p>This is the original message loaded from Graylog.</p>
-          <div className="message-preview-wrapper">
-            {originalMessagePreview}
-          </div>
+          <div className="message-preview-wrapper">{originalMessagePreview}</div>
         </Col>
         <Col md={6}>
           <div className="pull-right">
-            <DropdownButton id="simulation-view-options"
-                            title="More results"
-                            bsStyle="default"
-                            bsSize="small"
-                            pullRight>
+            <DropdownButton
+              id="simulation-view-options"
+              title="More results"
+              bsStyle="default"
+              bsSize="small"
+              pullRight>
               {this._getViewOptionsMenuItems()}
             </DropdownButton>
           </div>

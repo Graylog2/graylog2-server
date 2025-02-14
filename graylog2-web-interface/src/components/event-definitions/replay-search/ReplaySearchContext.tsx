@@ -22,6 +22,10 @@ type ReplaySearchContextType = {
   alertId: string;
   definitionId: string;
   type: AlertType;
-}
-const ReplaySearchContext = React.createContext<ReplaySearchContextType>({ alertId: undefined, definitionId: undefined, type: undefined });
+};
+const ReplaySearchContext = React.createContext<ReplaySearchContextType>({
+  alertId: undefined,
+  definitionId: undefined,
+  type: undefined,
+});
 export default ReplaySearchContext;

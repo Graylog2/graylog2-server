@@ -39,7 +39,10 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
     listAll: jest.fn(async () => Promise.resolve()),
   },
-  EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [{ id: 'email_notification_id', title: 'Email notification' }] })])),
+  EventNotificationsStore: MockStore([
+    'getInitialState',
+    () => ({ all: [{ id: 'email_notification_id', title: 'Email notification' }] }),
+  ]),
 }));
 
 jest.mock('./hooks/useAlertAndEventDefinitionData');
@@ -47,10 +50,12 @@ jest.mock('./hooks/useAlertAndEventDefinitionData');
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -61,15 +66,16 @@ const mockUseAlertAndEventDefinitionData = ({
   alertId = mockEventData.event.id,
   definitionId = mockEventDefinitionTwoAggregations.id,
   definitionTitle = mockEventDefinitionTwoAggregations.title,
-}) => asMock(useAlertAndEventDefinitionData).mockReturnValue({
-  eventData,
-  eventDefinition,
-  aggregations,
-  alertId,
-  definitionId,
-  definitionTitle,
-  isLoading: false,
-});
+}) =>
+  asMock(useAlertAndEventDefinitionData).mockReturnValue({
+    eventData,
+    eventDefinition,
+    aggregations,
+    alertId,
+    definitionId,
+    definitionTitle,
+    isLoading: false,
+  });
 
 jest.mock('views/logic/slices/highlightSelectors', () => ({
   selectHighlightingRules: jest.fn(),
@@ -78,11 +84,12 @@ jest.mock('views/logic/slices/highlightSelectors', () => ({
 describe('<EventInfoBar />', () => {
   const EventInfoComponent = ({ type }: { type: AlertType }) => (
     <TestStoreProvider>
-      <ReplaySearchContext.Provider value={{
-        type,
-        definitionId: '',
-        alertId: '',
-      }}>
+      <ReplaySearchContext.Provider
+        value={{
+          type,
+          definitionId: '',
+          alertId: '',
+        }}>
         <EventInfoBar />
       </ReplaySearchContext.Provider>
     </TestStoreProvider>
@@ -91,11 +98,10 @@ describe('<EventInfoBar />', () => {
   useViewsPlugin();
 
   beforeAll(() => {
-    asMock(selectHighlightingRules)
-      .mockReturnValue([
-        HighlightingRule.create('count(field1)', 500, 'greater', StaticColor.create('#fff')),
-        HighlightingRule.create('count(field2)', 8000, 'less', StaticColor.create('#000')),
-      ]);
+    asMock(selectHighlightingRules).mockReturnValue([
+      HighlightingRule.create('count(field1)', 500, 'greater', StaticColor.create('#fff')),
+      HighlightingRule.create('count(field2)', 8000, 'less', StaticColor.create('#000')),
+    ]);
   });
 
   beforeEach(() => {

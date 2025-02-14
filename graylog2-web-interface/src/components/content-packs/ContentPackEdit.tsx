@@ -35,9 +35,12 @@ type ContentPackEditProps = {
   edit?: boolean;
 };
 
-class ContentPackEdit extends React.Component<ContentPackEditProps, {
-  [key: string]: any;
-}> {
+class ContentPackEdit extends React.Component<
+  ContentPackEditProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     edit: false,
     contentPack: undefined,
@@ -61,8 +64,7 @@ class ContentPackEdit extends React.Component<ContentPackEditProps, {
   _disableParameters() {
     const content = this.props.contentPack;
     const { selectedEntities } = this.props;
-    const selection = Object.keys(selectedEntities)
-      .reduce((acc, key) => acc + selectedEntities[key].length, 0) > 0;
+    const selection = Object.keys(selectedEntities).reduce((acc, key) => acc + selectedEntities[key].length, 0) > 0;
 
     return !(content.name && content.summary && content.vendor && selection);
   }
@@ -90,9 +92,7 @@ class ContentPackEdit extends React.Component<ContentPackEditProps, {
 
       return newEntityBuilder.build();
     });
-    const newContentPack = this.props.contentPack.toBuilder()
-      .entities(newEntities)
-      .build();
+    const newContentPack = this.props.contentPack.toBuilder().entities(newEntities).build();
 
     this.props.onStateChange({ contentPack: newContentPack });
   }
@@ -100,7 +100,8 @@ class ContentPackEdit extends React.Component<ContentPackEditProps, {
   _stepChanged = (selectedStep) => {
     switch (selectedStep) {
       case 'parameters': {
-        const newContentPack = this.props.contentPack.toBuilder()
+        const newContentPack = this.props.contentPack
+          .toBuilder()
           .entities(this.props.fetchedEntities || [])
           .build();
 
@@ -128,25 +129,26 @@ class ContentPackEdit extends React.Component<ContentPackEditProps, {
 
   render() {
     if (!this.props.contentPack) {
-      return (<Spinner />);
+      return <Spinner />;
     }
 
     const selectionComponent = (
-      <ContentPackSelection contentPack={this.props.contentPack}
-                            selectedEntities={this.props.selectedEntities}
-                            edit={this.props.edit}
-                            onStateChange={this.props.onStateChange}
-                            entities={this.props.entityIndex} />
+      <ContentPackSelection
+        contentPack={this.props.contentPack}
+        selectedEntities={this.props.selectedEntities}
+        edit={this.props.edit}
+        onStateChange={this.props.onStateChange}
+        entities={this.props.entityIndex}
+      />
     );
     const parameterComponent = (
-      <ContentPackParameters contentPack={this.props.contentPack}
-                             onStateChange={this.props.onStateChange}
-                             appliedParameter={this.props.appliedParameter} />
+      <ContentPackParameters
+        contentPack={this.props.contentPack}
+        onStateChange={this.props.onStateChange}
+        appliedParameter={this.props.appliedParameter}
+      />
     );
-    const previewComponent = (
-      <ContentPackPreview contentPack={this.props.contentPack}
-                          onSave={this.props.onSave} />
-    );
+    const previewComponent = <ContentPackPreview contentPack={this.props.contentPack} onSave={this.props.onSave} />;
     const steps = [
       { key: 'selection', title: 'Content Selection', component: selectionComponent },
       { key: 'parameters', title: 'Parameters', component: parameterComponent, disabled: this._disableParameters() },

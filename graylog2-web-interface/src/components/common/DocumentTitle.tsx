@@ -18,9 +18,9 @@ import * as React from 'react';
 import { useEffect } from 'react';
 
 type Props = {
-  title: React.ReactNode,
-  children: React.ReactNode,
-}
+  title: React.ReactNode;
+  children: React.ReactNode;
+};
 
 /**
  * React component that modifies the page `document.title` dynamically. When the component is unmounted, it
@@ -40,7 +40,9 @@ const DocumentTitle = ({ children, title }: Props) => {
   useEffect(() => {
     document.title = `${document.title} - ${title}`;
 
-    return () => { document.title = DEFAULT_TITLE; };
+    return () => {
+      document.title = DEFAULT_TITLE;
+    };
   }, [title]);
 
   return <>{children}</>;

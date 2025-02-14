@@ -28,9 +28,11 @@ jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 
 describe('TimeRangePresetDropdown', () => {
   const openTimeRangePresetSelect = async () => {
-    userEvent.click(await screen.findByRole('button', {
-      name: /open time range preset select/i,
-    }));
+    userEvent.click(
+      await screen.findByRole('button', {
+        name: /open time range preset select/i,
+      }),
+    );
 
     await screen.findByRole('menu');
   };

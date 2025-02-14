@@ -22,18 +22,14 @@ import type { LayoutState } from './SearchPageLayoutContext';
 import SearchPageLayoutContext, { DEFAULT_STATE } from './SearchPageLayoutContext';
 
 type Props = {
-  children: React.ReactNode,
-  value: Partial<LayoutState>,
+  children: React.ReactNode;
+  value: Partial<LayoutState>;
 };
 
 const SearchPageLayoutProvider = ({ children, value }: Props) => {
   const contextValue = useMemo(() => merge({}, DEFAULT_STATE, value), [value]);
 
-  return (
-    <SearchPageLayoutContext.Provider value={contextValue}>
-      {children}
-    </SearchPageLayoutContext.Provider>
-  );
+  return <SearchPageLayoutContext.Provider value={contextValue}>{children}</SearchPageLayoutContext.Provider>;
 };
 
 export default SearchPageLayoutProvider;

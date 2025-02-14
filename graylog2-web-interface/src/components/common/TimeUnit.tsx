@@ -23,10 +23,10 @@ import type { TimeUnit as TimeUnitString } from './types';
  * It can also use 0 as never if `zeroIsNever` is set.
  */
 type Props = {
-  value: number,
-  unit: TimeUnitString,
-  zeroIsNever?: boolean,
-}
+  value: number;
+  unit: TimeUnitString;
+  zeroIsNever?: boolean;
+};
 
 const UNITS = {
   NANOSECONDS: 'nanoseconds',

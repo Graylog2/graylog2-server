@@ -20,22 +20,15 @@ import { LogLevelMetrics } from 'components/loggers';
 import { availableLoglevels } from 'components/loggers/Constants';
 
 type Props = {
-  nodeId: string,
-}
+  nodeId: string;
+};
 
-const LogLevelMetricsOverview = ({ nodeId }:Props) => {
-  const logLevelMetrics = availableLoglevels
-    .map((loglevel) => (
-      <LogLevelMetrics key={`loglevel-metrics-${nodeId}-${loglevel}`}
-                       nodeId={nodeId}
-                       loglevel={loglevel} />
-    ));
+const LogLevelMetricsOverview = ({ nodeId }: Props) => {
+  const logLevelMetrics = availableLoglevels.map((loglevel) => (
+    <LogLevelMetrics key={`loglevel-metrics-${nodeId}-${loglevel}`} nodeId={nodeId} loglevel={loglevel} />
+  ));
 
-  return (
-    <div className="loglevel-metrics">
-      {logLevelMetrics}
-    </div>
-  );
+  return <div className="loglevel-metrics">{logLevelMetrics}</div>;
 };
 
 export default LogLevelMetricsOverview;

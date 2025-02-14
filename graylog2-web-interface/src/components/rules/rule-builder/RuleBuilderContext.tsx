@@ -18,11 +18,8 @@ import * as React from 'react';
 import { useContext } from 'react';
 
 export type RuleBuilderContextType = {
-  useHighlightedOutput: [
-    string,
-    React.Dispatch<React.SetStateAction<string>>
-  ]
-}
+  useHighlightedOutput: [string, React.Dispatch<React.SetStateAction<string>>];
+};
 
 const RuleBuilderContext = React.createContext<RuleBuilderContextType | null>(null);
 
