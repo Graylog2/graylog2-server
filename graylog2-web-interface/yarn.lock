@@ -5992,10 +5992,10 @@ crypt@0.0.2:
   resolved "https://registry.yarnpkg.com/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
   integrity sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=
 
-csp-header@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/csp-header/-/csp-header-6.0.0.tgz#636a7a5ac80278c031600aaa931b9e50fc639383"
-  integrity sha512-36QEB4YiqByFRvpbBJ1sUqdkWZ21vG3pJavt318X9a1jJOBxS2hgtKOM8K5fBZEf8V6yZPbOspvfXdFshM5TuQ==
+csp-header@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/csp-header/-/csp-header-6.0.1.tgz#317583faad1ba7b27a5ac84b09d1af6631ebaa97"
+  integrity sha512-9BZF8JG3t/EcJ9TBjGHGxLryRAFjUL/4QtoM5iH+YKpF+6EMmxoktAv216oW1HeFAPxSKq0+DPF0evOqd2gh1A==
 
 css-box-model@^1.2.0:
   version "1.2.1"
@@ -8165,12 +8165,12 @@ exponential-backoff@^3.1.1:
   integrity sha512-8QxYTVXUkuy7fIIoitQkPwGonB8F3Zj8eEO8Sqg9Zv/bkI7RJAzowee4gr81Hak/dUTpA2Z7VfQgoijjPNlUZA==
 
 express-csp-header@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/express-csp-header/-/express-csp-header-6.0.0.tgz#0068e7cc79dd33ff4537d2b74f424e4ba2fa985f"
-  integrity sha512-ZyaOpgnki8/1RnYDfd+7sryewA9Mo3fA2ZrcxjKfar/gUWYoDUtu5v2VXGju9dEPUjUAiOycpz7BfpU0b/8KGA==
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/express-csp-header/-/express-csp-header-6.0.1.tgz#52227db8d4dcf54a01ad2e8408520978a2fd1a8e"
+  integrity sha512-D+lE0lesyPUC+ny0A8xnRPpB407mXI1UjRZedNMtykelei0UuUkwR/8fdKCakg88h7nfGVj4GiF2S8z57H1B2Q==
   dependencies:
-    csp-header "^6.0.0"
-    psl "1.8.0"
+    csp-header "^6.0.1"
+    psl "1.10.0"
 
 express-formidable@^1.2.0:
   version "1.2.0"
@@ -13830,10 +13830,12 @@ prr@~1.0.1:
   resolved "https://registry.yarnpkg.com/prr/-/prr-1.0.1.tgz#d3fc114ba06995a45ec6893f484ceb1d78f5f476"
   integrity sha1-0/wRS6BplaRexok/SEzrHXj19HY=
 
-psl@1.8.0, psl@^1.1.28, psl@^1.1.33:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/psl/-/psl-1.8.0.tgz#9326f8bcfb013adcc005fdff056acce020e51c24"
-  integrity sha512-RIdOzyoavK+hA18OGGWDqUTsCLhtA7IcZ/6NCs4fFJaHBDab+pDDmDIByWFRQJq2Cd7r1OoQxBGKOaztq+hjIQ==
+psl@1.10.0, psl@^1.1.28, psl@^1.1.33:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/psl/-/psl-1.10.0.tgz#1450f7e16f922c3beeb7bd9db3f312635018fa15"
+  integrity sha512-KSKHEbjAnpUuAUserOq0FxGXCUrzC3WniuSJhvdbs102rL55266ZcHBqLWOsG30spQMlPdpy7icATiAQehg/iA==
+  dependencies:
+    punycode "^2.3.1"
 
 pump@^3.0.0:
   version "3.0.0"
@@ -13847,6 +13849,11 @@ punycode@^2.1.0, punycode@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
+
+punycode@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.3.1.tgz#027422e2faec0b25e1549c3e1bd8309b9133b6e5"
+  integrity sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==
 
 puppeteer-core@24.2.0:
   version "24.2.0"
