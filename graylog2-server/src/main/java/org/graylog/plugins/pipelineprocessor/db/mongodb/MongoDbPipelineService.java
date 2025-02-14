@@ -69,13 +69,15 @@ public class MongoDbPipelineService implements PipelineService {
     }
 
     @Override
-    public PipelineDao save(PipelineDao pipeline) {
+    public PipelineDao save(PipelineDao pipeline, boolean checkMutability) {
         scopedEntityMongoUtils.ensureValidScope(pipeline);
 
         final var pipelineId = pipeline.id();
         final PipelineDao savedPipeline;
         if (pipelineId != null) {
-            scopedEntityMongoUtils.ensureMutability(pipeline);
+            if (checkMutability) {
+                scopedEntityMongoUtils.ensureMutability(pipeline);
+            }
             collection.replaceOne(idEq(pipelineId), pipeline, new ReplaceOptions().upsert(true));
             savedPipeline = pipeline;
         } else {
