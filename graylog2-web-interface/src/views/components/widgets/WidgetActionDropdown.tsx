@@ -22,11 +22,7 @@ import { IconButton } from 'components/common';
 const WidgetActionDropdown = ({ children }: React.PropsWithChildren) => {
   const widgetActionDropdownCaret = <IconButton name="keyboard_arrow_down" title="Open actions dropdown" />;
 
-  return (
-    <ActionDropdown element={widgetActionDropdownCaret}>
-      {children}
-    </ActionDropdown>
-  );
+  return <ActionDropdown element={widgetActionDropdownCaret}>{children}</ActionDropdown>;
 };
 
 export default WidgetActionDropdown;

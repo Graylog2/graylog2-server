@@ -29,31 +29,33 @@ import EventDetails from './EventDetails';
 const usePluggableDashboardActions = (eventId: string) => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.widgets.events.actions');
-  const availableActions = pluggableActions.filter(
-    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
+  const availableActions = pluggableActions.filter((perspective) =>
+    perspective.useCondition ? !!perspective.useCondition() : true,
   );
   const actions = availableActions.map(({ component: PluggableDashboardAction, key }) => (
-    <PluggableDashboardAction key={`event-action-${key}`}
-                              eventId={eventId}
-                              modalRef={() => modalRefs.current[key]} />
+    <PluggableDashboardAction key={`event-action-${key}`} eventId={eventId} modalRef={() => modalRefs.current[key]} />
   ));
 
   const actionModals = availableActions
     .filter(({ modal }) => !!modal)
     .map(({ modal: ActionModal, key }) => (
-      <ActionModal key={`event-action-modal-${key}`}
-                   eventId={eventId}
-                   ref={(r) => { modalRefs.current[key] = r; }} />
+      <ActionModal
+        key={`event-action-modal-${key}`}
+        eventId={eventId}
+        ref={(r) => {
+          modalRefs.current[key] = r;
+        }}
+      />
     ));
 
-  return ({ actions, actionModals });
+  return { actions, actionModals };
 };
 
 type Props = {
-  eventId: string,
-  hasReplayInfo: boolean,
-  eventDefinitionId: string,
-}
+  eventId: string;
+  hasReplayInfo: boolean;
+  eventDefinitionId: string;
+};
 
 const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
   const user = useCurrentUser();
@@ -62,7 +64,7 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(eventId);
 
   const moreActions = [
-    (hasReplayInfo && isPermitted(user.permissions, `eventdefinitions:read:${eventDefinitionId}`)) ? (
+    hasReplayInfo && isPermitted(user.permissions, `eventdefinitions:read:${eventDefinitionId}`) ? (
       <MenuItem href={Routes.ALERTS.replay_search(eventId)} target="_blank" key="replay-search">
         Replay search
       </MenuItem>
@@ -79,16 +81,12 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
             <Menu.Target>
               <IconButton name="more_vert" title="Toggle event actions" />
             </Menu.Target>
-            <Menu.Dropdown>
-              {moreActions}
-            </Menu.Dropdown>
+            <Menu.Dropdown>{moreActions}</Menu.Dropdown>
           </Menu>
         )}
       </ButtonToolbar>
       {showDetailsModal && (
-        <Modal show={showDetailsModal}
-               bsSize="large"
-               onHide={toggleDetailsModal}>
+        <Modal show={showDetailsModal} bsSize="large" onHide={toggleDetailsModal}>
           <Modal.Header closeButton>
             <Modal.Title>Event details</Modal.Title>
           </Modal.Header>
@@ -96,10 +94,12 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
             <EventDetails eventId={eventId} />
           </Modal.Body>
           <Modal.Footer>
-            <ModalSubmit displayCancel={false}
-                         onSubmit={toggleDetailsModal}
-                         submitButtonType="button"
-                         submitButtonText="Close" />
+            <ModalSubmit
+              displayCancel={false}
+              onSubmit={toggleDetailsModal}
+              submitButtonType="button"
+              submitButtonText="Close"
+            />
           </Modal.Footer>
         </Modal>
       )}

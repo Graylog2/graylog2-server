@@ -40,9 +40,9 @@ const ActionButton = styled(Button)`
 `;
 
 type Props = {
-  dataNode: DataNode,
-  displayAs?: 'dropdown'|'buttons',
-  refetch?: () => void,
+  dataNode: DataNode;
+  displayAs?: 'dropdown' | 'buttons';
+  refetch?: () => void;
 };
 
 const DIALOG_TYPES = {
@@ -159,31 +159,54 @@ const DataNodeActions = ({ dataNode, refetch, displayAs = 'dropdown' }: Props) =
           {!isDatanodeRunning && <MenuItem onSelect={handleStartDatanode}>Start</MenuItem>}
           {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
           {isDatanodeRemoved && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>}
-          {(!isDatanodeRemoved || isRemovingDatanode) && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>}
+          {(!isDatanodeRemoved || isRemovingDatanode) && (
+            <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
+          )}
           <MenuItem onSelect={() => setShowLogsDialog(true)}>Show logs</MenuItem>
         </MoreActions>
       )}
       {displayAs === 'buttons' && (
         <>
-          {!isDatanodeRunning && <ActionButton onClick={handleStartDatanode} bsSize="small">Start</ActionButton>}
-          {isDatanodeRunning && <ActionButton onClick={() => handleAction(DIALOG_TYPES.STOP)} bsSize="small">Stop</ActionButton>}
-          {isDatanodeRemoved && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REJOIN)} bsSize="small">Rejoin</ActionButton>}
-          {(!isDatanodeRemoved || isRemovingDatanode) && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REMOVE)} bsSize="small">Remove</ActionButton>}
-          <ActionButton onClick={() => setShowLogsDialog(true)} bsSize="small">Show logs</ActionButton>
+          {!isDatanodeRunning && (
+            <ActionButton onClick={handleStartDatanode} bsSize="small">
+              Start
+            </ActionButton>
+          )}
+          {isDatanodeRunning && (
+            <ActionButton onClick={() => handleAction(DIALOG_TYPES.STOP)} bsSize="small">
+              Stop
+            </ActionButton>
+          )}
+          {isDatanodeRemoved && (
+            <ActionButton onClick={() => handleAction(DIALOG_TYPES.REJOIN)} bsSize="small">
+              Rejoin
+            </ActionButton>
+          )}
+          {(!isDatanodeRemoved || isRemovingDatanode) && (
+            <ActionButton onClick={() => handleAction(DIALOG_TYPES.REMOVE)} bsSize="small">
+              Remove
+            </ActionButton>
+          )}
+          <ActionButton onClick={() => setShowLogsDialog(true)} bsSize="small">
+            Show logs
+          </ActionButton>
         </>
       )}
       {showConfirmDialog && (
-        <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
-                       show
-                       onConfirm={handleConfirm}
-                       onCancel={handleClearState}>
+        <ConfirmDialog
+          title={DIALOG_TEXT[dialogType].dialogTitle}
+          show
+          onConfirm={handleConfirm}
+          onCancel={handleClearState}>
           {DIALOG_TEXT[dialogType].dialogBody(dataNode.hostname)}
         </ConfirmDialog>
       )}
       {showLogsDialog && (
-        <DataNodeLogsDialog show={showLogsDialog}
-                            hostname={dataNode?.hostname}
-                            onHide={() => setShowLogsDialog(false)} />
+        <DataNodeLogsDialog
+          show={showLogsDialog}
+          hostname={dataNode?.hostname}
+          onHide={() => setShowLogsDialog(false)}
+        />
       )}
     </>
   );

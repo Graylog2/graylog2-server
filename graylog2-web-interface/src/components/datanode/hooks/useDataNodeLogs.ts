@@ -20,16 +20,26 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 
-const fetchDataNodeLogsStdout = async (hostname: string) => fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stdout`));
-const fetchDataNodeLogsStderr = async (hostname: string) => fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stderr`));
+const fetchDataNodeLogsStdout = async (hostname: string) =>
+  fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stdout`));
+const fetchDataNodeLogsStderr = async (hostname: string) =>
+  fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stderr`));
 
-const useDataNodeLogs = (hostname: string, enabled: boolean) : {
-  stdout: string[],
-  stderr: string[],
+const useDataNodeLogs = (
+  hostname: string,
+  enabled: boolean,
+): {
+  stdout: string[];
+  stderr: string[];
 } => {
   const { data: stdout } = useQuery(
     ['datanode_stdout_logs'],
-    () => defaultOnError(fetchDataNodeLogsStdout(hostname), 'Loading Data Node stdout logs failed with status', 'Could not load Data Node stdout logs'),
+    () =>
+      defaultOnError(
+        fetchDataNodeLogsStdout(hostname),
+        'Loading Data Node stdout logs failed with status',
+        'Could not load Data Node stdout logs',
+      ),
     {
       enabled,
     },
@@ -37,16 +47,21 @@ const useDataNodeLogs = (hostname: string, enabled: boolean) : {
 
   const { data: stderr } = useQuery(
     ['datanode_stderr_logs'],
-    () => defaultOnError(fetchDataNodeLogsStderr(hostname), 'Loading Data Node stderr logs failed with status', 'Could not load Data Node stderr logs'),
+    () =>
+      defaultOnError(
+        fetchDataNodeLogsStderr(hostname),
+        'Loading Data Node stderr logs failed with status',
+        'Could not load Data Node stderr logs',
+      ),
     {
       enabled,
     },
   );
 
-  return ({
+  return {
     stdout,
     stderr,
-  });
+  };
 };
 
 export default useDataNodeLogs;

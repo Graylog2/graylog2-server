@@ -36,39 +36,46 @@ import type { InputDescription } from 'stores/inputs/InputTypesStore';
 import type { SystemOverview } from 'stores/cluster/types';
 
 type InputState = {
-  detailed_message:string,
-  id:string,
-  message_input:Input
-  started_at:string,
-  state:string,
+  detailed_message: string;
+  id: string;
+  message_input: Input;
+  started_at: string;
+  state: string;
 };
 type Memory = {
-  bytes: number
-  kilobytes: number
-  megabytes: number
-}
+  bytes: number;
+  kilobytes: number;
+  megabytes: number;
+};
 
 type JvmInformation = {
-  free_memory: Memory
-  max_memory: Memory
-  total_memory:Memory
-  used_memory: Memory
-  node_id: string
-  pid: string
-  info: string
-}
+  free_memory: Memory;
+  max_memory: Memory;
+  total_memory: Memory;
+  used_memory: Memory;
+  node_id: string;
+  pid: string;
+  info: string;
+};
 
 type Props = {
-  node: NodeInfo,
-  plugins?: Array<Plugin>
-  inputStates?: Array<InputState>
-  inputDescriptions?: { [type: string]: InputDescription },
-  jvmInformation?: JvmInformation
-  systemOverview: SystemOverview,
-}
+  node: NodeInfo;
+  plugins?: Array<Plugin>;
+  inputStates?: Array<InputState>;
+  inputDescriptions?: { [type: string]: InputDescription };
+  jvmInformation?: JvmInformation;
+  systemOverview: SystemOverview;
+};
 
-const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInformation, systemOverview }: Props) => {
-  const DataWareHouseJournal = PluginStore.exports('dataWarehouse')?.[0]?.DataWarehouseJournal;
+const NodeOverview = ({
+  node,
+  plugins = null,
+  inputStates = null,
+  inputDescriptions = null,
+  jvmInformation = null,
+  systemOverview,
+}: Props) => {
+  const DataLakeJournal = PluginStore.exports('dataLake')?.[0]?.DataLakeJournal;
   const pluginCount = `${plugins?.length || 0} plugins installed`;
 
   const runningInputs = inputStates?.filter((inputState) => inputState.state.toUpperCase() === 'RUNNING');
@@ -94,8 +101,8 @@ const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInform
         <Col md={12}>
           <h2>Buffers</h2>
           <p className="description">
-            Buffers are built to cache small amounts of messages for a very short time
-            (usually milliseconds) on their way through the different processors.
+            Buffers are built to cache small amounts of messages for a very short time (usually milliseconds) on their
+            way through the different processors.
           </p>
           <Row>
             <Col md={4}>
@@ -115,16 +122,15 @@ const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInform
         <Col md={12}>
           <h2>Disk Journal</h2>
           <p className="description">
-            Incoming messages are written to the disk journal to ensure they are kept safe in case of a server
-            failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep
-            up with the message rate or whenever there is a peak in incoming messages. It makes sure that
-            Graylog does not buffer all of those messages in main memory and avoids overly long garbage
-            collection pauses that way.
+            Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure.
+            The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message
+            rate or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of
+            those messages in main memory and avoids overly long garbage collection pauses that way.
           </p>
           <JournalDetails nodeId={node.node_id} />
         </Col>
       </Row>
-      {DataWareHouseJournal && <DataWareHouseJournal nodeId={node.node_id} />}
+      {DataLakeJournal && <DataLakeJournal nodeId={node.node_id} />}
       <Row className="content">
         <Col md={6}>
           <h2>System</h2>
@@ -138,7 +144,9 @@ const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInform
 
       <Row className="content">
         <Col md={12}>
-          <h2>Installed plugins <small>{pluginCount}</small></h2>
+          <h2>
+            Installed plugins <small>{pluginCount}</small>
+          </h2>
           <PluginsDataTable plugins={plugins} />
         </Col>
       </Row>
@@ -148,11 +156,15 @@ const NodeOverview = ({ node, plugins, inputStates, inputDescriptions, jvmInform
           <HideOnCloud>
             <span className="pull-right">
               <LinkContainer to={Routes.node_inputs(node.node_id)}>
-                <Button bsStyle="success" bsSize="small">Manage inputs</Button>
+                <Button bsStyle="success" bsSize="small">
+                  Manage inputs
+                </Button>
               </LinkContainer>
             </span>
           </HideOnCloud>
-          <h2 style={{ marginBottom: 15 }}>Available input types <small>{inputCount}</small></h2>
+          <h2 style={{ marginBottom: 15 }}>
+            Available input types <small>{inputCount}</small>
+          </h2>
           <InputTypesDataTable inputDescriptions={inputDescriptions} />
         </Col>
       </Row>

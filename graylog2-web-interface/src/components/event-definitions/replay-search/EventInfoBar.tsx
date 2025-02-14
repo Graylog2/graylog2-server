@@ -68,10 +68,14 @@ const EventInfoBar = () => {
 
   const currentTypeText = useMemo(() => {
     switch (type) {
-      case 'alert': return 'alert';
-      case 'event': return 'event';
-      case 'event_definition': return 'event definition';
-      default: return assertUnreachable(type, `Invalid replay type: ${type}`);
+      case 'alert':
+        return 'alert';
+      case 'event':
+        return 'event';
+      case 'event_definition':
+        return 'event definition';
+      default:
+        return assertUnreachable(type, `Invalid replay type: ${type}`);
     }
   }, [type]);
 
@@ -79,21 +83,25 @@ const EventInfoBar = () => {
     <FlatContentRow>
       <Header>
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
-          <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />&nbsp;
+          <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />
+          &nbsp;
           {open ? `Hide ${currentTypeText} details` : `Show ${currentTypeText} details`}
         </Button>
       </Header>
       {open && (
-      <Container data-testid="info-container">
-        <Row>
-          {infoAttributes.map(({ title, content, show }) => (show !== false) && (
-            <Item key={title}>
-              <b>{title}: </b>
-              <Value title={title}>{content || <NoAttributeProvided name={title} />}</Value>
-            </Item>
-          ))}
-        </Row>
-      </Container>
+        <Container data-testid="info-container">
+          <Row>
+            {infoAttributes.map(
+              ({ title, content, show }) =>
+                show !== false && (
+                  <Item key={title}>
+                    <b>{title}: </b>
+                    <Value title={title}>{content || <NoAttributeProvided name={title} />}</Value>
+                  </Item>
+                ),
+            )}
+          </Row>
+        </Container>
       )}
     </FlatContentRow>
   );

@@ -52,7 +52,10 @@ const mockSearchParams = {
 
 const mockContextValue = { searchParams: mockSearchParams, refetch: jest.fn(), attributes: [] };
 
-const DashboardActions = ({ contextValue, ...props }: React.ComponentProps<typeof OriginalDashboardActions> & { contextValue?: ContextValue }) => (
+const DashboardActions = ({
+  contextValue,
+  ...props
+}: React.ComponentProps<typeof OriginalDashboardActions> & { contextValue?: ContextValue }) => (
   <TableFetchContext.Provider value={contextValue ?? mockContextValue}>
     <OriginalDashboardActions {...props} />
   </TableFetchContext.Provider>
@@ -113,7 +116,10 @@ describe('DashboardActions', () => {
   });
 
   it('does not display more actions dropdown when user has no permissions for deletion and there are no pluggable actions', async () => {
-    const currentUser = adminUser.toBuilder().permissions(Immutable.List([`view:read:${simpleDashboard.id}`])).build();
+    const currentUser = adminUser
+      .toBuilder()
+      .permissions(Immutable.List([`view:read:${simpleDashboard.id}`]))
+      .build();
     asMock(useCurrentUser).mockReturnValue(currentUser);
 
     render(<DashboardActions dashboard={simpleDashboard} />);
@@ -147,7 +153,9 @@ describe('DashboardActions', () => {
 
       await clickDashboardAction('Delete');
 
-      await waitFor(() => expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })));
+      await waitFor(() =>
+        expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })),
+      );
 
       expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboard);
     });
@@ -161,7 +169,9 @@ describe('DashboardActions', () => {
 
       await clickDashboardAction('Delete');
 
-      await waitFor(() => expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })));
+      await waitFor(() =>
+        expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })),
+      );
 
       expect(contextValue.refetch).toHaveBeenCalled();
     });
@@ -195,7 +205,9 @@ describe('DashboardActions', () => {
 
     it('resorts to default behavior when hook throws error', async () => {
       const error = Error('Boom!');
-      asMock(deletingDashboard).mockImplementation(() => { throw error; });
+      asMock(deletingDashboard).mockImplementation(() => {
+        throw error;
+      });
       asMock(window.confirm).mockReturnValue(true);
 
       render(<DashboardActions dashboard={simpleDashboard} />);
@@ -206,7 +218,9 @@ describe('DashboardActions', () => {
 
       await clickDashboardAction('Delete');
 
-      await waitFor(() => expect(console.trace).toHaveBeenCalledWith('Exception occurred in deletion confirmation hook: ', error));
+      await waitFor(() =>
+        expect(console.trace).toHaveBeenCalledWith('Exception occurred in deletion confirmation hook: ', error),
+      );
       console.trace = oldConsoleTrace;
       /* eslint-enable no-console */
 

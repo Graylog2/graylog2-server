@@ -27,16 +27,18 @@ const formatNewQuery = (oldQuery: string, field: string, value: any) => {
 };
 
 type Args = {
-  queryId: string,
-  field: string,
-  value?: string,
+  queryId: string;
+  field: string;
+  value?: string;
 };
 
-const ExcludeFromQueryHandler = ({ queryId, field, value }: Args) => (dispatch: AppDispatch, getState: () => RootState) => {
-  const oldQuery = selectQueryString(queryId)(getState());
-  const newQuery = formatNewQuery(oldQuery, field, value);
+const ExcludeFromQueryHandler =
+  ({ queryId, field, value }: Args) =>
+  (dispatch: AppDispatch, getState: () => RootState) => {
+    const oldQuery = selectQueryString(queryId)(getState());
+    const newQuery = formatNewQuery(oldQuery, field, value);
 
-  return dispatch(updateQueryString(queryId, newQuery));
-};
+    return dispatch(updateQueryString(queryId, newQuery));
+  };
 
 export default ExcludeFromQueryHandler;

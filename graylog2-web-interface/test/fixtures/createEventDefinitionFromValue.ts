@@ -34,15 +34,9 @@ import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import type { MappedData } from 'views/logic/valueactions/createEventDefinition/types';
 
-export const valuePath = [
-  { http_method: 'GET' },
-  { action: 'index' },
-];
+export const valuePath = [{ http_method: 'GET' }, { action: 'index' }];
 
-export const pivots = [
-  Pivot.createValues(['http_method', 'index']),
-  Pivot.createValues(['resources', 'index']),
-];
+export const pivots = [Pivot.createValues(['http_method', 'index']), Pivot.createValues(['resources', 'index'])];
 
 export const testAggregationWidget = AggregationWidget.builder()
   .id('summary-widget-id')
@@ -66,10 +60,7 @@ export const testWidgetMetricValuePath = [
   { _exist_: 'field5' },
 ];
 
-export const testWidgetValueValuePath = [
-  { field3: 'value3' },
-  { field4: 'value4' },
-];
+export const testWidgetValueValuePath = [{ field3: 'value3' }, { field4: 'value4' }];
 
 export const messageTable = allMessagesTable('allm-widget-id', []);
 
@@ -100,7 +91,9 @@ export const valueParameterJSON = {
 export const valueParameter = ValueParameter.fromJSON(valueParameterJSON);
 export const ltParam = LookupTableParameter.fromJSON(ltParamJSON);
 export const parameters = Immutable.Set([ltParam, valueParameter]);
-export const parameterBindings: ParameterBindings = Immutable.Map([['newParameter3', ParameterBinding.create('newParameter3', 'GET')]]);
+export const parameterBindings: ParameterBindings = Immutable.Map([
+  ['newParameter3', ParameterBinding.create('newParameter3', 'GET')],
+]);
 export const firstSimpleSearchFilter: SearchFilter = {
   type: 'inlineQueryString',
   queryString: 'http_method: GET or http_method: POST',
@@ -122,36 +115,54 @@ export const negationSearchFilter: SearchFilter = {
   queryString: 'action: login',
   negation: true,
 };
-const query = QueryGenerator([], [], 'query-id', {
-  type: 'relative',
-  from: 300,
-
-}, {
-  type: 'elasticsearch',
-  query_string: 'http_method:GET',
-});
+const query = QueryGenerator(
+  [],
+  [],
+  'query-id',
+  {
+    type: 'relative',
+    from: 300,
+  },
+  {
+    type: 'elasticsearch',
+    query_string: 'http_method:GET',
+  },
+);
 export const mockedFilter: Immutable.Map<string, any> = Immutable.Map([
-  ['filters', [
-    Immutable.Map([['type', 'stream'], ['id', 'streamId']]),
-  ]],
+  [
+    'filters',
+    [
+      Immutable.Map([
+        ['type', 'stream'],
+        ['id', 'streamId'],
+      ]),
+    ],
+  ],
 ]);
 
-export const mockedSearchFilters: FiltersType = Immutable.List([{
-  type: 'inlineQueryString',
-  queryString: 'http_method:GET',
-}]);
-const searchOneAggregation = Search.create().toBuilder().id('search-id').queries([
-  query
-    .toBuilder()
-    .filter(mockedFilter)
-    .filters(mockedSearchFilters)
-    .searchTypes(Array(3)
-      .fill({
-        filters: [],
-        type: 'AGGREGATION',
-        typeDefinition: {},
-      }))
-    .build()])
+export const mockedSearchFilters: FiltersType = Immutable.List([
+  {
+    type: 'inlineQueryString',
+    queryString: 'http_method:GET',
+  },
+]);
+const searchOneAggregation = Search.create()
+  .toBuilder()
+  .id('search-id')
+  .queries([
+    query
+      .toBuilder()
+      .filter(mockedFilter)
+      .filters(mockedSearchFilters)
+      .searchTypes(
+        Array(3).fill({
+          filters: [],
+          type: 'AGGREGATION',
+          typeDefinition: {},
+        }),
+      )
+      .build(),
+  ])
   .build();
 export const mockedView = View.create()
   .toBuilder()
@@ -166,9 +177,7 @@ export const mockedView = View.create()
         },
       })
       .widgets([testAggregationWidget])
-      .widgetMapping(Immutable.Map(
-        ['widget-id'].map((item) => [item, Immutable.Set([undefined])]),
-      ))
+      .widgetMapping(Immutable.Map(['widget-id'].map((item) => [item, Immutable.Set([undefined])])))
       .widgetPositions({
         'widget-id': new WidgetPosition(1, 1, 3, 6),
       })
@@ -214,11 +223,7 @@ export const urlConfigWithAgg = {
   agg_field: 'action',
   agg_function: 'count',
   agg_value: 400,
-  group_by: [
-    'action',
-    'action',
-    'http_method',
-  ],
+  group_by: ['action', 'action', 'http_method'],
   loc_query_parameters: [
     {
       binding: undefined,
@@ -235,21 +240,14 @@ export const urlConfigWithAgg = {
   ],
   query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
   search_within_ms: 300000,
-  streams: [
-    'streamId-1',
-    'streamId-2',
-  ],
+  streams: ['streamId-1', 'streamId-2'],
   type: 'aggregation-v1',
 };
 
 export const urlConfigWithFunctionAgg = {
   agg_function: 'count',
   agg_value: 400,
-  group_by: [
-    'action',
-    'action',
-    'http_method',
-  ],
+  group_by: ['action', 'action', 'http_method'],
   loc_query_parameters: [
     {
       binding: undefined,
@@ -266,10 +264,7 @@ export const urlConfigWithFunctionAgg = {
   ],
   query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
   search_within_ms: 300000,
-  streams: [
-    'streamId-1',
-    'streamId-2',
-  ],
+  streams: ['streamId-1', 'streamId-2'],
   type: 'aggregation-v1',
 };
 
@@ -291,10 +286,7 @@ export const urlConfigWithoutAgg = {
   ],
   query: '(http_method:GET) AND ((http_method:GET)) AND (action:show)',
   search_within_ms: 300000,
-  streams: [
-    'streamId-1',
-    'streamId-2',
-  ],
+  streams: ['streamId-1', 'streamId-2'],
   type: 'aggregation-v1',
 };
 

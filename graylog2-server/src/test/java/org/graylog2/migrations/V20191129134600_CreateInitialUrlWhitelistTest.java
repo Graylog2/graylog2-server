@@ -32,7 +32,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
-import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -65,7 +65,7 @@ public class V20191129134600_CreateInitialUrlWhitelistTest {
         when(config.url()).thenReturn("https://www.graylog.com/${key}/test.json/${key}");
         final DataAdapterDto dataAdapterDto = mock(DataAdapterDto.class);
         when(dataAdapterDto.config()).thenReturn(config);
-        when(dataAdapterService.findAll()).thenReturn(Collections.singleton(dataAdapterDto));
+        when(dataAdapterService.streamAll()).thenReturn(Stream.of(dataAdapterDto));
 
         migration.upgrade();
 

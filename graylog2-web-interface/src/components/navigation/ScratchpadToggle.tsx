@@ -24,36 +24,39 @@ import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import NavItemStateIndicator, { hoverIndicatorStyles } from '../common/NavItemStateIndicator';
 
-const Toggle = styled(Button)(({ theme }) => css`
-  padding: 0 15px;
-  background: none;
-  border: 0;
-  min-height: ${NAV_ITEM_HEIGHT};
-  color: ${theme.colors.global.textDefault};
-  
-  &:hover, &:focus {
-    ${hoverIndicatorStyles(theme)}
-    background: transparent;
-    color: ${theme.colors.variant.darker.default};
-  }
-`);
+const Toggle = styled(Button)(
+  ({ theme }) => css`
+    padding: 0 15px;
+    background: none;
+    border: 0;
+    min-height: ${NAV_ITEM_HEIGHT};
+    color: ${theme.colors.global.textDefault};
+
+    &:hover,
+    &:focus {
+      ${hoverIndicatorStyles(theme)}
+      background: transparent;
+      color: ${theme.colors.variant.darker.default};
+    }
+  `,
+);
 
 const ScratchpadToggle = () => {
   const { toggleScratchpadVisibility } = useContext(ScratchpadContext);
 
   return (
     <li role="presentation">
-      <Toggle bsStyle="link"
-              type="button"
-              aria-label="Scratchpad"
-              id="scratchpad-toggle"
-              onClick={toggleScratchpadVisibility}>
+      <Toggle
+        bsStyle="link"
+        type="button"
+        aria-label="Scratchpad"
+        id="scratchpad-toggle"
+        onClick={toggleScratchpadVisibility}>
         <NavItemStateIndicator>
           <Icon name="edit_square" size="lg" title="Scratchpad" />
         </NavItemStateIndicator>
       </Toggle>
     </li>
-
   );
 };
 

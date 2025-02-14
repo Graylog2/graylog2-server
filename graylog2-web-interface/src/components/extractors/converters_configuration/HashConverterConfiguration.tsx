@@ -25,9 +25,12 @@ type HashConverterConfigurationProps = {
   onChange: (...args: any[]) => void;
 };
 
-class HashConverterConfiguration extends React.Component<HashConverterConfigurationProps, {
-  [key: string]: any;
-}> {
+class HashConverterConfiguration extends React.Component<
+  HashConverterConfigurationProps,
+  {
+    [key: string]: any;
+  }
+> {
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
   }
@@ -47,12 +50,14 @@ class HashConverterConfiguration extends React.Component<HashConverterConfigurat
   render() {
     return (
       <div className="xtrc-converter">
-        <Input type="checkbox"
-               id={`enable-${this.props.type}-converter`}
-               label="Build MD5 hash from value"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked
-               onChange={this._toggleConverter} />
+        <Input
+          type="checkbox"
+          id={`enable-${this.props.type}-converter`}
+          label="Build MD5 hash from value"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked
+          onChange={this._toggleConverter}
+        />
       </div>
     );
   }

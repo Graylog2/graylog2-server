@@ -51,29 +51,21 @@ describe('stepHelper', () => {
     });
 
     it('returns undefined if no step data exists', () => {
-      expect(getStepConfigOrData(stepsData as StepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(
-        undefined,
-      );
+      expect(getStepConfigOrData(stepsData as StepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(undefined);
     });
   });
 
   describe('getNextStep', () => {
     it('returns the next step', () => {
-      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY)).toEqual(
-        INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
-      );
+      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY)).toEqual(INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS);
     });
 
     it('returns undefined if there is no next step', () => {
-      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS)).toEqual(
-        undefined,
-      );
+      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS)).toEqual(undefined);
     });
 
     it('returns undefined if active step is not in ordered steps', () => {
-      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(
-        undefined,
-      );
+      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(undefined);
     });
   });
 
@@ -116,7 +108,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(checkIsNextStepDisabled(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY, testStepsData as StepsData)).toBe(true);
+      expect(
+        checkIsNextStepDisabled(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY, testStepsData as StepsData),
+      ).toBe(true);
     });
 
     it('returns false when the next step is not disabled', () => {
@@ -129,7 +123,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(checkIsNextStepDisabled(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY, testStepsData as StepsData)).toBe(false);
+      expect(
+        checkIsNextStepDisabled(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY, testStepsData as StepsData),
+      ).toBe(false);
     });
 
     it('returns true when there is no data for the next step', () => {
@@ -139,7 +135,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(checkIsNextStepDisabled(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY, testStepsData as StepsData)).toBe(true);
+      expect(
+        checkIsNextStepDisabled(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY, testStepsData as StepsData),
+      ).toBe(true);
     });
 
     it('returns true there is no next step', () => {
@@ -152,7 +150,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(checkIsNextStepDisabled(orderedSteps, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, testStepsData as StepsData)).toBe(true);
+      expect(
+        checkIsNextStepDisabled(orderedSteps, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, testStepsData as StepsData),
+      ).toBe(true);
     });
   });
 
@@ -204,7 +204,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(enableNextStep(orderedSteps, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, testStepsData as StepsData)).toEqual(testStepsData);
+      expect(enableNextStep(orderedSteps, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, testStepsData as StepsData)).toEqual(
+        testStepsData,
+      );
     });
 
     it('returns the original steps data when the active step is not in orderedSteps', () => {
@@ -217,7 +219,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(enableNextStep(orderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING, testStepsData as StepsData)).toEqual(testStepsData);
+      expect(enableNextStep(orderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING, testStepsData as StepsData)).toEqual(
+        testStepsData,
+      );
     });
   });
 
@@ -232,7 +236,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, { foo: 'bar' })).toEqual({
+      expect(
+        updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, { foo: 'bar' }),
+      ).toEqual({
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
           foo: 'bar',
@@ -255,7 +261,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' })).toEqual({
+      expect(
+        updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' }),
+      ).toEqual({
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
           foo: 'foo',
@@ -279,7 +287,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' }, true)).toEqual({
+      expect(
+        updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' }, true),
+      ).toEqual({
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
           foo: 'foo',
@@ -302,7 +312,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, {})).toEqual(testStepsData);
+      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, {})).toEqual(
+        testStepsData,
+      );
     });
 
     it('returns updated steps data when no step data existed', () => {
@@ -313,7 +325,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' })).toEqual({
+      expect(
+        updateStepConfigOrData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' }),
+      ).toEqual({
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
           foo: 'foo',
@@ -341,25 +355,35 @@ describe('stepHelper', () => {
     it('returns ordered steps with added step in the middle', () => {
       const testOrderedSteps = [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
 
-      expect(addStepAfter(testOrderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.SELECT_CATEGORY)).toEqual(
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS],
-      );
+      expect(
+        addStepAfter(testOrderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.SELECT_CATEGORY),
+      ).toEqual([
+        INPUT_WIZARD_STEPS.SELECT_CATEGORY,
+        INPUT_WIZARD_STEPS.SETUP_ROUTING,
+        INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
+      ]);
     });
 
     it('returns ordered steps with added step at the end', () => {
       const testOrderedSteps = [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
 
-      expect(addStepAfter(testOrderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS)).toEqual(
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, INPUT_WIZARD_STEPS.SETUP_ROUTING],
-      );
+      expect(
+        addStepAfter(testOrderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS),
+      ).toEqual([
+        INPUT_WIZARD_STEPS.SELECT_CATEGORY,
+        INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
+        INPUT_WIZARD_STEPS.SETUP_ROUTING,
+      ]);
     });
 
     it('returns ordered steps with added step at the end when no step to set after given', () => {
       const testOrderedSteps = [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
 
-      expect(addStepAfter(testOrderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS, INPUT_WIZARD_STEPS.SETUP_ROUTING],
-      );
+      expect(addStepAfter(testOrderedSteps, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual([
+        INPUT_WIZARD_STEPS.SELECT_CATEGORY,
+        INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
+        INPUT_WIZARD_STEPS.SETUP_ROUTING,
+      ]);
     });
 
     it('returns original ordered steps when step to set after is not in the array', () => {

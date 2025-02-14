@@ -34,7 +34,7 @@ const initialTestResult: TestResult = {
   isLoading: false,
 };
 
-type TestResult = { isLoading: false, error?: boolean, message?: string };
+type TestResult = { isLoading: false; error?: boolean; message?: string };
 
 type EventNotificationFormContainerProps = {
   action?: 'create' | 'edit';
@@ -47,9 +47,12 @@ type EventNotificationFormContainerProps = {
   history: any;
 };
 
-class EventNotificationFormContainer extends React.Component<EventNotificationFormContainerProps, {
-  [key: string]: any;
-}> {
+class EventNotificationFormContainer extends React.Component<
+  EventNotificationFormContainerProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     action: 'edit',
     notification: {
@@ -174,7 +177,8 @@ class EventNotificationFormContainer extends React.Component<EventNotificationFo
             testResult.message = 'Validation failed, please correct any errors in the form before continuing.';
             this.setState({ validation: body });
           } else {
-            testResult.message = errorResponse.responseMessage || 'Unknown error, please check your Graylog server logs.';
+            testResult.message =
+              errorResponse.responseMessage || 'Unknown error, please check your Graylog server logs.';
           }
         },
       )
@@ -193,16 +197,18 @@ class EventNotificationFormContainer extends React.Component<EventNotificationFo
         {!embedded && isDirty && (
           <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
         )}
-        <EventNotificationForm action={action}
-                               notification={notification}
-                               validation={validation}
-                               testResult={testResult}
-                               formId={formId}
-                               embedded={embedded}
-                               onChange={this.handleChange}
-                               onCancel={this.handleCancel}
-                               onSubmit={this.handleSubmit}
-                               onTest={this.handleTest} />
+        <EventNotificationForm
+          action={action}
+          notification={notification}
+          validation={validation}
+          testResult={testResult}
+          formId={formId}
+          embedded={embedded}
+          onChange={this.handleChange}
+          onCancel={this.handleCancel}
+          onSubmit={this.handleSubmit}
+          onTest={this.handleTest}
+        />
       </>
     );
   }

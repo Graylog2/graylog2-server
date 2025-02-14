@@ -34,41 +34,49 @@ const urlPrefix = '/startpage';
 const getUrl = (url: string, prefix: string = urlPrefix) => qualifyUrl(`${prefix}/${url}?page=1&per_page=5`);
 
 const mockLastOpened = {
-  lastOpened: [{
-    grn: createGRN('search', '1'),
-    title: 'Title 1',
-  }],
+  lastOpened: [
+    {
+      grn: createGRN('search', '1'),
+      title: 'Title 1',
+    },
+  ],
   page: 1,
 };
 
 const mockFavoriteItems = {
-  favorites: [{
-    grn: createGRN('search', '1'),
-    title: 'Title 1',
-  }],
+  favorites: [
+    {
+      grn: createGRN('search', '1'),
+      title: 'Title 1',
+    },
+  ],
   page: 1,
 };
 
 const mockedRecentActivityResponse = {
-  recentActivity: [{
-    id: '5',
-    activity_type: 'share',
-    item_title: 'Title 5',
-    timestamp: '2022-01-01',
-    item_grn: createGRN('dashboard', '5'),
-  }],
+  recentActivity: [
+    {
+      id: '5',
+      activity_type: 'share',
+      item_title: 'Title 5',
+      timestamp: '2022-01-01',
+      item_grn: createGRN('dashboard', '5'),
+    },
+  ],
   page: 1,
   total: 1,
 };
 
 const mockedRecentActivity = {
-  recentActivity: [{
-    id: '5',
-    activityType: 'share',
-    itemTitle: 'Title 5',
-    timestamp: '2022-01-01',
-    itemGrn: createGRN('dashboard', '5'),
-  }],
+  recentActivity: [
+    {
+      id: '5',
+      activityType: 'share',
+      itemTitle: 'Title 5',
+      timestamp: '2022-01-01',
+      itemGrn: createGRN('dashboard', '5'),
+    },
+  ],
   page: 1,
   total: 1,
 };
@@ -84,7 +92,9 @@ describe('Hooks for welcome page', () => {
 
     it('Test return initial data and take from fetch', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve(mockLastOpened));
-      const { result, waitFor } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
+      const { result, waitFor } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), {
+        wrapper: DefaultQueryClientProvider,
+      });
 
       await waitFor(() => result.current.isFetching);
       await waitFor(() => !result.current.isFetching);
@@ -96,7 +106,9 @@ describe('Hooks for welcome page', () => {
     it('Test trigger notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
+      const { result, waitFor } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), {
+        wrapper: DefaultQueryClientProvider,
+      });
 
       await suppressConsole(async () => {
         await waitFor(() => result.current.isFetching);
@@ -105,7 +117,8 @@ describe('Hooks for welcome page', () => {
 
       expect(UserNotification.error).toHaveBeenCalledWith(
         'Loading last opened items failed with status: Error: Error',
-        'Could not load last opened items');
+        'Could not load last opened items',
+      );
     });
   });
 
@@ -116,7 +129,9 @@ describe('Hooks for welcome page', () => {
 
     it('Test return initial data and take from fetch', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve(mockFavoriteItems));
-      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
+      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), {
+        wrapper: DefaultQueryClientProvider,
+      });
 
       await waitFor(() => result.current.isFetching);
       await waitFor(() => !result.current.isFetching);
@@ -128,7 +143,9 @@ describe('Hooks for welcome page', () => {
     it('Test trigger notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
+      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), {
+        wrapper: DefaultQueryClientProvider,
+      });
 
       await suppressConsole(async () => {
         await waitFor(() => result.current.isFetching);
@@ -137,7 +154,8 @@ describe('Hooks for welcome page', () => {
 
       expect(UserNotification.error).toHaveBeenCalledWith(
         'Loading favorite items failed with status: Error: Error',
-        'Could not load favorite items');
+        'Could not load favorite items',
+      );
     });
   });
 
@@ -148,7 +166,9 @@ describe('Hooks for welcome page', () => {
 
     it('Test return initial data and take from fetch', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve(mockedRecentActivityResponse));
-      const { result, waitFor } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
+      const { result, waitFor } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), {
+        wrapper: DefaultQueryClientProvider,
+      });
 
       await waitFor(() => result.current.isFetching);
       await waitFor(() => !result.current.isFetching);
@@ -160,7 +180,9 @@ describe('Hooks for welcome page', () => {
     it('Test trigger notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
+      const { result, waitFor } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), {
+        wrapper: DefaultQueryClientProvider,
+      });
 
       await suppressConsole(async () => {
         await waitFor(() => result.current.isFetching);
@@ -169,7 +191,8 @@ describe('Hooks for welcome page', () => {
 
       expect(UserNotification.error).toHaveBeenCalledWith(
         'Loading recent activity failed with status: Error: Error',
-        'Could not load recent activity');
+        'Could not load recent activity',
+      );
     });
   });
 });

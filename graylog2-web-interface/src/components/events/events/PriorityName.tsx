@@ -20,8 +20,8 @@ import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnu
 import StringUtils from 'util/StringUtils';
 
 type Props = {
-  priority: number | string,
-}
+  priority: number | string;
+};
 const PriorityName = ({ priority }: Props) => (
   <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>
 );

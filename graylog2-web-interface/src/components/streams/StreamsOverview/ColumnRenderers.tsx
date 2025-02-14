@@ -32,14 +32,18 @@ import PipelinesCell from './cells/PipelinesCell';
 import OutputsCell from './cells/OutputsCell';
 import ArchivingsCell from './cells/ArchivingsCell';
 
-const getStreamDataWarehouseTableElements = PluginStore.exports('dataWarehouse')?.[0]?.getStreamDataWarehouseTableElements;
+const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
 const pipelineRenderer = {
   pipelines: {
     renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
     staticWidth: 100,
   },
 };
-const customColumnRenderers = (indexSets: Array<IndexSet>, isPipelineColumnPermitted: boolean, permissions: Immutable.List<string>): ColumnRenderers<Stream> => ({
+const customColumnRenderers = (
+  indexSets: Array<IndexSet>,
+  isPipelineColumnPermitted: boolean,
+  permissions: Immutable.List<string>,
+): ColumnRenderers<Stream> => ({
   attributes: {
     title: {
       renderCell: (_title: string, stream) => <TitleCell stream={stream} />,
@@ -67,10 +71,10 @@ const customColumnRenderers = (indexSets: Array<IndexSet>, isPipelineColumnPermi
       staticWidth: 100,
     },
     archiving: {
-      renderCell: (_archiving:boolean, stream) => <ArchivingsCell stream={stream} indexSets={indexSets} />,
+      renderCell: (_archiving: boolean, stream) => <ArchivingsCell stream={stream} indexSets={indexSets} />,
       staticWidth: 100,
     },
-    ...(getStreamDataWarehouseTableElements?.(permissions)?.columnRenderer || {}),
+    ...(getStreamDataLakeTableElements?.(permissions)?.columnRenderer || {}),
   },
 });
 

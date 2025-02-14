@@ -30,22 +30,30 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import NumberVisualization from './NumberVisualization';
 
-jest.mock('./AutoFontSizer', () => ({ children }: React.PropsWithChildren<{}>) => children);
+jest.mock(
+  './AutoFontSizer',
+  () =>
+    ({ children }: React.PropsWithChildren<{}>) =>
+      children,
+);
 
-jest.mock('views/components/highlighting/CustomHighlighting', () => ({ children = undefined }: React.PropsWithChildren<{}>) => <div>{children}</div>);
+jest.mock(
+  'views/components/highlighting/CustomHighlighting',
+  () =>
+    ({ children = undefined }: React.PropsWithChildren<{}>) => <div>{children}</div>,
+);
 
 jest.mock('views/components/Value', () => ({ value }: { value: string }) => <div>{value}</div>);
 
 type Data = Record<string, Rows>;
 type SUTProps = {
-
   data?: Data;
 };
 
 describe('NumberVisualization', () => {
   const data: Data = {
-    chart:
-      [{
+    chart: [
+      {
         key: [],
         source: 'leaf',
         values: [
@@ -56,30 +64,33 @@ describe('NumberVisualization', () => {
             value: 2134342,
           },
         ],
-      }],
+      },
+    ],
   };
   const currentView: CurrentViewType = { activeQuery: 'dead-beef' };
   const fields = List([FieldTypeMapping.create('lines_add', FieldTypes.INT())]);
 
   const SimplifiedNumberVisualization = (props: SUTProps = {}) => (
     <TestStoreProvider>
-      <NumberVisualization data={data}
-                           width={200}
-                           height={200}
-                           fields={fields}
-                         // @ts-ignore
-                           currentView={currentView}
-                           onChange={() => {}}
-                           toggleEdit={() => {}}
-                           effectiveTimerange={{
-                             from: '2020-01-10T13:23:42.000Z',
-                             to: '2020-01-10T14:23:42.000Z',
-                             type: 'absolute',
-                           }}
-                           config={AggregationWidgetConfig.builder()
-                             .series([Series.forFunction('count()')])
-                             .build()}
-                           {...props} />
+      <NumberVisualization
+        data={data}
+        width={200}
+        height={200}
+        fields={fields}
+        // @ts-ignore
+        currentView={currentView}
+        onChange={() => {}}
+        toggleEdit={() => {}}
+        effectiveTimerange={{
+          from: '2020-01-10T13:23:42.000Z',
+          to: '2020-01-10T14:23:42.000Z',
+          type: 'absolute',
+        }}
+        config={AggregationWidgetConfig.builder()
+          .series([Series.forFunction('count()')])
+          .build()}
+        {...props}
+      />
     </TestStoreProvider>
   );
 
@@ -94,29 +105,31 @@ describe('NumberVisualization', () => {
   it('calls render completion callback after first render', () => {
     const onRenderComplete = jest.fn();
 
-    mount((
+    mount(
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <SimplifiedNumberVisualization />
-      </RenderCompletionCallback.Provider>
-    ));
+      </RenderCompletionCallback.Provider>,
+    );
 
     expect(onRenderComplete).toHaveBeenCalledTimes(1);
   });
 
   it('renders 0 if value is 0', () => {
     const dataWithZeroValue: { chart: Rows } = {
-      chart: [{
-        key: [],
-        source: 'leaf',
-        values: [
-          {
-            key: ['count()'],
-            rollup: true,
-            source: 'row-leaf',
-            value: 0,
-          },
-        ],
-      }],
+      chart: [
+        {
+          key: [],
+          source: 'leaf',
+          values: [
+            {
+              key: ['count()'],
+              rollup: true,
+              source: 'row-leaf',
+              value: 0,
+            },
+          ],
+        },
+      ],
     };
     const wrapper = mount(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
 
@@ -125,18 +138,20 @@ describe('NumberVisualization', () => {
 
   it('renders N/A if value is null', () => {
     const dataWithZeroValue: Data = {
-      chart: [{
-        key: [],
-        source: 'leaf',
-        values: [
-          {
-            key: ['count()'],
-            rollup: true,
-            source: 'row-leaf',
-            value: null,
-          },
-        ],
-      }],
+      chart: [
+        {
+          key: [],
+          source: 'leaf',
+          values: [
+            {
+              key: ['count()'],
+              rollup: true,
+              source: 'row-leaf',
+              value: null,
+            },
+          ],
+        },
+      ],
     };
     const wrapper = mount(<SimplifiedNumberVisualization data={dataWithZeroValue} />);
 

@@ -23,9 +23,7 @@ import KeyboardShortcutsList from 'components/hotkeys/KeyboardShortcutsList';
 const KeyboardShortcutsPage = () => (
   <DocumentTitle title="Graylog Keyboard Shortcuts">
     <PageHeader title="Graylog Keyboard Shortcuts">
-      <span>
-        A list of all available shortcuts in Graylog
-      </span>
+      <span>A list of all available shortcuts in Graylog</span>
     </PageHeader>
     <Row className="content">
       <Col md={12}>

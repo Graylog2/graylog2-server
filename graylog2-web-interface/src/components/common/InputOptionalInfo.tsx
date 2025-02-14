@@ -17,13 +17,13 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-const StyledSpan = styled.span(({ theme }) => `
+const StyledSpan = styled.span(
+  ({ theme }) => `
   color: ${theme.colors.gray[60]};
   font-weight: normal;
-`);
-
-const InputOptionalInfo = () => (
-  <StyledSpan>(Opt.)</StyledSpan>
+`,
 );
+
+const InputOptionalInfo = () => <StyledSpan>(Opt.)</StyledSpan>;
 
 export default InputOptionalInfo;

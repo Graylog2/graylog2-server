@@ -29,15 +29,15 @@ const fetchEventDefinition = create({
 });
 
 const EventDefinition = ({ value }: { value: string }) => {
-  const { data: eventDefinition, isLoading } = useQuery(['event-definitions', 'batched', value], () => fetchEventDefinition.fetch(value));
+  const { data: eventDefinition, isLoading } = useQuery(['event-definitions', 'batched', value], () =>
+    fetchEventDefinition.fetch(value),
+  );
 
   if (isLoading) {
     return <Spinner />;
   }
 
-  return eventDefinition?.title
-    ? <span>{eventDefinition.title}</span>
-    : <i>Missing Event Definition: {value}</i>;
+  return eventDefinition?.title ? <span>{eventDefinition.title}</span> : <i>Missing Event Definition: {value}</i>;
 };
 
 export default EventDefinition;

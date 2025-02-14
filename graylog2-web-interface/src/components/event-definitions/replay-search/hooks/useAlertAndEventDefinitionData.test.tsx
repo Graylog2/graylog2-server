@@ -95,7 +95,9 @@ describe('useAlertAndEventDefinitionData', () => {
       data: undefined,
     });
 
-    const { result } = renderHook(() => useAlertAndEventDefinitionData(undefined, mockEventDefinitionTwoAggregations.id));
+    const { result } = renderHook(() =>
+      useAlertAndEventDefinitionData(undefined, mockEventDefinitionTwoAggregations.id),
+    );
 
     await expect(result.current).toEqual({
       ...mockedHookData,

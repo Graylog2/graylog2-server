@@ -25,41 +25,41 @@ export type AlertType = 'alert' | 'event' | 'event_definition';
 
 export interface EventDefinitionValidation {
   errors: {
-    config?: unknown,
-    title?: string,
-    event_limit?: string,
-    query_parameters?: string[],
-    search_within_ms?: string[],
-    cron_expression?: string,
-    execute_every_ms?: string[],
-  }
+    config?: unknown;
+    title?: string;
+    event_limit?: string;
+    query_parameters?: string[];
+    search_within_ms?: string[];
+    cron_expression?: string;
+    execute_every_ms?: string[];
+  };
 }
 export interface EventDefinitionType {
-  type: string,
-  displayName: string,
-  sortOrder: number,
-  description: string,
-  defaultConfig: EventDefinition['config'],
+  type: string;
+  displayName: string;
+  sortOrder: number;
+  description: string;
+  defaultConfig: EventDefinition['config'];
   formComponent: React.ComponentType<{
-    eventDefinition: EventDefinition,
+    eventDefinition: EventDefinition;
     entityTypes: {
-      aggregation_functions: Array<{}>
-    },
-    currentUser: User,
-    validation: EventDefinitionValidation,
-    onChange: (name: string, newConfig: EventDefinition['config']) => void,
-    action: string,
-  }>,
+      aggregation_functions: Array<{}>;
+    };
+    currentUser: User;
+    validation: EventDefinitionValidation;
+    onChange: (name: string, newConfig: EventDefinition['config']) => void;
+    action: string;
+  }>;
   summaryComponent: React.ComponentType<{
-    currentUser: User,
-    config: EventDefinition['config'],
-    definitionId?: string,
-  }>
+    currentUser: User;
+    config: EventDefinition['config'];
+    definitionId?: string;
+  }>;
 }
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
-    'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>
-    'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC, key: string }>
+    'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>;
+    'eventDefinitions.components.editSigmaModal'?: Array<{ component: React.FC; key: string }>;
   }
 }

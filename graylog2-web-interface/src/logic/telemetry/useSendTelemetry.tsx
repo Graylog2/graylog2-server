@@ -29,7 +29,9 @@ const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
     return undefined;
   }
 
-  const { router: { routes } } = dataRouterContext;
+  const {
+    router: { routes },
+  } = dataRouterContext;
   const pathname = currentPathname();
   const matches = matchRoutes(routes, pathname);
 
@@ -40,14 +42,14 @@ const useSendTelemetry = () => {
   const { sendTelemetry } = useContext(TelemetryContext);
   const dataRouterContext = useContext(DataRouterContext);
 
-  return useCallback((eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
-    const route = retrieveCurrentRoute(dataRouterContext);
+  return useCallback(
+    (eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
+      const route = retrieveCurrentRoute(dataRouterContext);
 
-    return sendTelemetry(
-      eventType,
-      { app_path_pattern: route, ...event },
-    );
-  }, [dataRouterContext, sendTelemetry]);
+      return sendTelemetry(eventType, { app_path_pattern: route, ...event });
+    },
+    [dataRouterContext, sendTelemetry],
+  );
 };
 
 export default singleton('core.useSendTelemetry', () => useSendTelemetry);

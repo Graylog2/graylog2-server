@@ -34,7 +34,6 @@ const IndicesPageNavigation = () => {
   const navItems = AppConfig.isCloud() ? NAV_ITEMS : [...NAV_ITEMS, ...PREM_ONLY_NAV_ITEMS];
 
   return (
-
     <Row>
       <PageNavigation items={navItems} />
     </Row>

@@ -27,7 +27,8 @@ const hotspots = [
   {
     positionX: '50%',
     positionY: '110px',
-    description: 'Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.',
+    description:
+      'Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.',
   },
   {
     positionX: '60%',

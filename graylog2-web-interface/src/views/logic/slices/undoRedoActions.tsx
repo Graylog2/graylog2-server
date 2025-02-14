@@ -26,15 +26,25 @@ import isEqualForSearch from 'views/stores/isEqualForSearch';
 import type Search from 'views/logic/search/Search';
 
 const isViewSearchEqual = (first: Search, second: Search) => isEqualForSearch(first, second);
-const viewHandler = (state: ViewState, { hasToPushRevision, dispatch, currentView }: {
-  hasToPushRevision: boolean,
-  dispatch: AppDispatch,
-  currentView: View,
-}): Promise<unknown> => dispatch(selectQuery(state.activeQuery)).then(() => {
-  const shouldRecreateSearch = !isViewWidgetsEqualForSearch(state.view, currentView) || !isViewSearchEqual(state.view.search, currentView.search);
+const viewHandler = (
+  state: ViewState,
+  {
+    hasToPushRevision,
+    dispatch,
+    currentView,
+  }: {
+    hasToPushRevision: boolean;
+    dispatch: AppDispatch;
+    currentView: View;
+  },
+): Promise<unknown> =>
+  dispatch(selectQuery(state.activeQuery)).then(() => {
+    const shouldRecreateSearch =
+      !isViewWidgetsEqualForSearch(state.view, currentView) ||
+      !isViewSearchEqual(state.view.search, currentView.search);
 
-  return dispatch(updateView(state.view, shouldRecreateSearch, { hasToPushRevision }));
-});
+    return dispatch(updateView(state.view, shouldRecreateSearch, { hasToPushRevision }));
+  });
 
 export const undo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const rootState = getState();
@@ -46,7 +56,9 @@ export const undo = () => async (dispatch: AppDispatch, getState: () => RootStat
   if (isUndoAvailable) {
     const newRevision = currentRevision - 1;
     const { state } = revisions[newRevision];
-    viewHandler(state, { hasToPushRevision, dispatch, currentView }).then(() => dispatch(setCurrentRevision(newRevision)));
+    viewHandler(state, { hasToPushRevision, dispatch, currentView }).then(() =>
+      dispatch(setCurrentRevision(newRevision)),
+    );
   }
 };
 
@@ -60,6 +72,8 @@ export const redo = () => async (dispatch: AppDispatch, getState: () => RootStat
     const newRevision = currentRevision + 1;
 
     const { state } = revisions[newRevision];
-    viewHandler(state, { dispatch, hasToPushRevision: false, currentView }).then(() => dispatch(setCurrentRevision(newRevision)));
+    viewHandler(state, { dispatch, hasToPushRevision: false, currentView }).then(() =>
+      dispatch(setCurrentRevision(newRevision)),
+    );
   }
 };

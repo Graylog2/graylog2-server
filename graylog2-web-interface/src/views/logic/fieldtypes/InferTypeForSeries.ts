@@ -28,7 +28,10 @@ const constantTypeFunctions = {
   percentage: FieldTypes.PERCENTAGE,
 };
 
-const inferTypeForSeries = (series: Series, types: (FieldTypeMappingsList | Array<FieldTypeMapping>)): FieldTypeMapping => {
+const inferTypeForSeries = (
+  series: Series,
+  types: FieldTypeMappingsList | Array<FieldTypeMapping>,
+): FieldTypeMapping => {
   const definition = parseSeries(series.function);
   const newMapping = (type: FieldType) => FieldTypeMapping.create(series.function, type);
 
@@ -43,7 +46,7 @@ const inferTypeForSeries = (series: Series, types: (FieldTypeMappingsList | Arra
   }
 
   if (typePreservingFunctions.includes(type)) {
-    const mapping = types?.find((t: FieldTypeMapping) => (t.name === field));
+    const mapping = types?.find((t: FieldTypeMapping) => t.name === field);
 
     if (!mapping) {
       return newMapping(FieldType.Unknown);
