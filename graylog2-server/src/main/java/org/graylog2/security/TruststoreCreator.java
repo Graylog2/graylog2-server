@@ -124,26 +124,4 @@ public class TruststoreCreator {
     public KeyStore getTruststore() {
         return this.truststore;
     }
-
-    public KeystoreInformation toKeystoreInformation(final char[] truststorePassword) {
-        return new InMemoryKeystoreInformation(this.truststore, truststorePassword);
-    }
-
-
-    private static X509Certificate findRootCert(KeystoreInformation keystoreInformation,
-                                                final String alias) throws Exception {
-        final KeyStore keystore = keystoreInformation.loadKeystore();
-        final Certificate[] certs = keystore.getCertificateChain(alias);
-
-        return Arrays.stream(certs)
-                .filter(cert -> cert instanceof X509Certificate)
-                .map(cert -> (X509Certificate) cert)
-                .filter(cert -> isRootCaCertificate(cert) || certs.length == 1)
-                .findFirst()
-                .orElseThrow(() -> new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!"));
-    }
-
-    private static boolean isRootCaCertificate(X509Certificate cert) {
-        return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
-    }
 }
