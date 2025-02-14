@@ -24,7 +24,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public interface PipelineService {
-    PipelineDao save(PipelineDao pipeline);
+    default PipelineDao save(PipelineDao pipeline) {
+        return save(pipeline, true);
+    }
+
+    PipelineDao save(PipelineDao pipeline, boolean checkMutability);
 
     PipelineDao load(String id) throws NotFoundException;
 

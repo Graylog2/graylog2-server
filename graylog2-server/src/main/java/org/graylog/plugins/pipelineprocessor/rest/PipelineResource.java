@@ -123,6 +123,11 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CREATE)
     public PipelineSource createFromParser(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
+        checkReservedName(pipelineSource);
+        return forceCreateFromParser(pipelineSource);
+    }
+
+    private PipelineSource forceCreateFromParser(PipelineSource pipelineSource) {
         final Pipeline pipeline;
         try {
             pipeline = pipelineRuleParser.parsePipeline(pipelineSource.id(), pipelineSource.source());
@@ -155,6 +160,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @Path("/parse")
     @NoAuditEvent("only used to parse a pipeline, no changes made in the system")
     public PipelineSource parse(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
+        checkReservedName(pipelineSource);
+
         final Pipeline pipeline;
         try {
             pipeline = pipelineRuleParser.parsePipeline(pipelineSource.id(), pipelineSource.source());
@@ -241,7 +248,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
     public PipelineSource update(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
-        return PipelineUtils.update(pipelineService, pipelineRuleParser, ruleService, id, update);
+        checkReservedName(update);
+        return PipelineUtils.update(pipelineService, pipelineRuleParser, id, update, true);
     }
 
     public record RoutingRequest(
@@ -280,7 +288,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
             pipelineSource = pipelineSource.toBuilder()
                     .source(PipelineUtils.createPipelineString(pipelineSource))
                     .build();
-            update(pipelineDao.id(), pipelineSource);
+            PipelineUtils.update(pipelineService, pipelineRuleParser, pipelineDao.id(), pipelineSource, false);
         } else {
             log.info(f("Routing for input <%s> already exists - skipping", request.inputId()));
         }
@@ -297,7 +305,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .source("pipeline \"" + GL_INPUT_ROUTING_PIPELINE + "\"\nstage 0 match either\nrule \"" + ruleDao.title() + "\"\nend")
                 .stages(stages)
                 .build();
-        final PipelineSource parsedSource = createFromParser(pipelineSource);
+        final PipelineSource parsedSource = forceCreateFromParser(pipelineSource);
         ensurePipelineConnection(parsedSource.id(), DEFAULT_STREAM_ID);
         return parsedSource;
     }
@@ -325,5 +333,11 @@ public class PipelineResource extends RestResource implements PluginRestResource
         checkPermission(PipelineRestPermissions.PIPELINE_DELETE, id);
         pipelineService.load(id);
         pipelineService.delete(id);
+    }
+
+    private void checkReservedName(PipelineSource update) {
+        if (GL_INPUT_ROUTING_PIPELINE.equals(update.title())) {
+            throw new BadRequestException("Pipeline name is reserved and cannot be used.");
+        }
     }
 }

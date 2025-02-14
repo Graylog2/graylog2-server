@@ -24,10 +24,7 @@ type SimulationPreviewProps = {
   streams: any;
 };
 
-const SimulationPreview = ({
-  simulationResults,
-  streams,
-}: SimulationPreviewProps) => {
+const SimulationPreview = ({ simulationResults, streams }: SimulationPreviewProps) => {
   const { messages } = simulationResults;
 
   if (messages.length === 0) {
@@ -42,9 +39,7 @@ const SimulationPreview = ({
   }
 
   const formattedMessages = messages.map((message) => (
-    <MessageShow key={message.id}
-                 message={message}
-                 streams={streams} />
+    <MessageShow key={message.id} message={message} streams={streams} />
   ));
 
   return <div className="message-preview-wrapper">{formattedMessages}</div>;

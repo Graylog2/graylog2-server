@@ -42,28 +42,12 @@ public class PipelineUtils {
     private PipelineUtils() {
     }
 
-    public static PipelineSource forceUpdate(PipelineService pipelineService,
-                                             PipelineRuleParser pipelineRuleParser,
-                                             RuleService ruleService,
-                                             String id,
-                                             PipelineSource update) throws NotFoundException {
-        return update(pipelineService, pipelineRuleParser, ruleService, id, update, true);
-    }
-
     public static PipelineSource update(PipelineService pipelineService,
                                         PipelineRuleParser pipelineRuleParser,
                                         RuleService ruleService,
                                         String id,
-                                        PipelineSource update) throws NotFoundException {
-        return update(pipelineService, pipelineRuleParser, ruleService, id, update, false);
-    }
-
-    private static PipelineSource update(PipelineService pipelineService,
-                                         PipelineRuleParser pipelineRuleParser,
-                                         RuleService ruleService,
-                                         String id,
-                                         PipelineSource update,
-                                         boolean allowSystemRules) throws NotFoundException {
+                                        PipelineSource update,
+                                        boolean checkMutability) throws NotFoundException {
         final PipelineDao dao = pipelineService.load(id);
         final Pipeline pipeline;
         try {
@@ -71,7 +55,7 @@ public class PipelineUtils {
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
-        if (!allowSystemRules) {
+        if (checkMutability) {
             checkSystemRules(ruleService, pipeline);
         }
 
@@ -84,7 +68,7 @@ public class PipelineUtils {
 
         final PipelineDao savedPipeline;
         try {
-            savedPipeline = pipelineService.save(toSave);
+            savedPipeline = pipelineService.save(toSave, checkMutability);
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage(), e);
             throw new BadRequestException(e.getMessage());

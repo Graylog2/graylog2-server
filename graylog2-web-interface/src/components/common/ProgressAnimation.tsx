@@ -35,15 +35,17 @@ const animateDecrease = keyframes`
   }
 `;
 
-const ProgressAnimation = styled.div<{ $animationDuration: number, $increase: boolean }>(({ theme, $animationDuration, $increase }) => css`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  height: 2px;
-  animation: linear ${$increase ? animateIncrease : animateDecrease} ${$animationDuration}ms;
-  background-color: ${theme.colors.global.textDefault};
-  z-index: 2;
-  ${$increase ? 'left: 0;' : 'right: 0;'} 
-`);
+const ProgressAnimation = styled.div<{ $animationDuration: number; $increase: boolean }>(
+  ({ theme, $animationDuration, $increase }) => css`
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    height: 2px;
+    animation: linear ${$increase ? animateIncrease : animateDecrease} ${$animationDuration}ms;
+    background-color: ${theme.colors.global.textDefault};
+    z-index: 2;
+    ${$increase ? 'left: 0;' : 'right: 0;'}
+  `,
+);
 
 export default ProgressAnimation;

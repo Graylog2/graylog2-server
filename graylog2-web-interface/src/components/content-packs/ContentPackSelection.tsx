@@ -32,17 +32,27 @@ const HeaderText = styled.span`
   overflow-wrap: anywhere;
 `;
 
-const HeaderIcon = styled(Icon)(({ theme }) => `
+const HeaderIcon = styled(Icon)(
+  ({ theme }) => `
   padding-top: ${theme.spacings.xxs};
   padding-right: ${theme.spacings.xxs};
-`);
+`,
+);
 
 const _entityItemHeader = (entity) => {
   if (entity instanceof Entity) {
-    return <><HeaderIcon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></>;
+    return (
+      <>
+        <HeaderIcon name="archive" className={style.contentPackEntity} /> <span>{entity.title}</span>
+      </>
+    );
   }
 
-  return <><HeaderIcon name="dns" />{' '}<HeaderText>{entity.title}</HeaderText></>;
+  return (
+    <>
+      <HeaderIcon name="dns" /> <HeaderText>{entity.title}</HeaderText>
+    </>
+  );
 };
 
 type ContentPackSelectionProps = {
@@ -53,9 +63,12 @@ type ContentPackSelectionProps = {
   edit?: boolean;
 };
 
-class ContentPackSelection extends React.Component<ContentPackSelectionProps, {
-  [key: string]: any;
-}> {
+class ContentPackSelection extends React.Component<
+  ContentPackSelectionProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     edit: false,
     onStateChange: () => {},
@@ -128,8 +141,8 @@ class ContentPackSelection extends React.Component<ContentPackSelectionProps, {
       }
     }
 
-    const selectionEmpty = Object.keys(selectedEntities)
-      .reduce((acc, entityGroup) => acc + selectedEntities[entityGroup].length, 0) <= 0;
+    const selectionEmpty =
+      Object.keys(selectedEntities).reduce((acc, entityGroup) => acc + selectedEntities[entityGroup].length, 0) <= 0;
 
     if (selectionEmpty) {
       errors.selection = 'Select at least one entity.';
@@ -143,13 +156,16 @@ class ContentPackSelection extends React.Component<ContentPackSelectionProps, {
   };
 
   _handleTouched = (name) => {
-    this.setState((prevState) => ({
-      touched: {
-        ...prevState.touched,
-        [name]: true,
-        selection: true,
-      },
-    }), this._validate);
+    this.setState(
+      (prevState) => ({
+        touched: {
+          ...prevState.touched,
+          [name]: true,
+          selection: true,
+        },
+      }),
+      this._validate,
+    );
   };
 
   _error = (name) => (this.state.touched[name] ? this.state.errors[name] : undefined);
@@ -159,7 +175,7 @@ class ContentPackSelection extends React.Component<ContentPackSelectionProps, {
     const typeName = entity.type.name;
     const newSelection = cloneDeep(selectedEntities);
 
-    newSelection[typeName] = (newSelection[typeName] || []);
+    newSelection[typeName] = newSelection[typeName] || [];
     const index = newSelection[typeName].findIndex((e) => e.id === entity.id);
 
     if (index < 0) {
@@ -203,8 +219,7 @@ class ContentPackSelection extends React.Component<ContentPackSelectionProps, {
       return false;
     }
 
-    return !(selectedEntities[type].length === entities[type].length
-       || selectedEntities[type].length === 0);
+    return !(selectedEntities[type].length === entities[type].length || selectedEntities[type].length === 0);
   };
 
   _isSelected = (entity) => {
@@ -269,36 +284,39 @@ class ContentPackSelection extends React.Component<ContentPackSelectionProps, {
       .sort((a, b) => naturalSort(a, b))
       .map((entityType) => {
         const group = filteredEntities[entityType];
-        const entities = group.sort((a, b) => naturalSort(a.title, b.title)).map((entity) => {
-          const checked = this._isSelected(entity);
-          const header = _entityItemHeader(entity);
+        const entities = group
+          .sort((a, b) => naturalSort(a.title, b.title))
+          .map((entity) => {
+            const checked = this._isSelected(entity);
+            const header = _entityItemHeader(entity);
 
-          return (
-            <ExpandableListItem onChange={() => this._updateSelectionEntity(entity)}
-                                key={entity.id}
-                                checked={checked}
-                                expandable={false}
-                                padded={false}
-                                header={header} />
-          );
-        });
+            return (
+              <ExpandableListItem
+                onChange={() => this._updateSelectionEntity(entity)}
+                key={entity.id}
+                checked={checked}
+                expandable={false}
+                padded={false}
+                header={header}
+              />
+            );
+          });
 
         if (group.length <= 0) {
           return null;
         }
 
         return (
-          <ExpandableListItem key={entityType}
-                              onChange={() => this._updateSelectionGroup(entityType)}
-                              indetermined={this._isUndetermined(entityType)}
-                              checked={this._isGroupSelected(entityType)}
-                              stayExpanded={isFiltered}
-                              expanded={isFiltered}
-                              padded={false}
-                              header={ContentPackSelection._toDisplayTitle(entityType)}>
-            <ExpandableList>
-              {entities}
-            </ExpandableList>
+          <ExpandableListItem
+            key={entityType}
+            onChange={() => this._updateSelectionGroup(entityType)}
+            indetermined={this._isUndetermined(entityType)}
+            checked={this._isGroupSelected(entityType)}
+            stayExpanded={isFiltered}
+            expanded={isFiltered}
+            padded={false}
+            header={ContentPackSelection._toDisplayTitle(entityType)}>
+            <ExpandableList>{entities}</ExpandableList>
           </ExpandableListItem>
         );
       });
@@ -309,60 +327,75 @@ class ContentPackSelection extends React.Component<ContentPackSelectionProps, {
           <Col smOffset={1} lg={8}>
             <h2>General Information</h2>
             <br />
-            <form className="content-selection-form" id="content-selection-form" onSubmit={(e) => { e.preventDefault(); }}>
+            <form
+              className="content-selection-form"
+              id="content-selection-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+              }}>
               <fieldset>
-                <Input name="name"
-                       id="name"
-                       type="text"
-                       maxLength={250}
-                       value={contentPack.name}
-                       onChange={this._bindValue}
-                       onBlur={() => this._handleTouched('name')}
-                       label="Name"
-                       help="Required. Give a descriptive name for this content pack."
-                       error={this._error('name')}
-                       required />
-                <Input name="summary"
-                       id="summary"
-                       type="text"
-                       maxLength={250}
-                       value={contentPack.summary}
-                       onChange={this._bindValue}
-                       onBlur={() => this._handleTouched('summary')}
-                       label="Summary"
-                       help="Required. Give a short summary of the content pack."
-                       error={this._error('summary')}
-                       required />
-                <Input name="description"
-                       id="description"
-                       type="textarea"
-                       value={contentPack.description}
-                       onChange={this._bindValue}
-                       onBlur={() => this._handleTouched('description')}
-                       rows={6}
-                       label="Description"
-                       help="Give a long description of the content pack in markdown." />
-                <Input name="vendor"
-                       id="vendor"
-                       type="text"
-                       maxLength={250}
-                       value={contentPack.vendor}
-                       onChange={this._bindValue}
-                       onBlur={() => this._handleTouched('vendor')}
-                       label="Vendor"
-                       help="Required. Who did this content pack and how can they be reached, e.g. Name and email."
-                       error={this._error('vendor')}
-                       required />
-                <Input name="url"
-                       id="url"
-                       type="text"
-                       maxLength={250}
-                       value={contentPack.url}
-                       onChange={this._bindValue}
-                       onBlur={() => this._handleTouched('url')}
-                       label="URL"
-                       help="Where can I find the content pack. e.g. github url"
-                       error={this._error('url')} />
+                <Input
+                  name="name"
+                  id="name"
+                  type="text"
+                  maxLength={250}
+                  value={contentPack.name}
+                  onChange={this._bindValue}
+                  onBlur={() => this._handleTouched('name')}
+                  label="Name"
+                  help="Required. Give a descriptive name for this content pack."
+                  error={this._error('name')}
+                  required
+                />
+                <Input
+                  name="summary"
+                  id="summary"
+                  type="text"
+                  maxLength={250}
+                  value={contentPack.summary}
+                  onChange={this._bindValue}
+                  onBlur={() => this._handleTouched('summary')}
+                  label="Summary"
+                  help="Required. Give a short summary of the content pack."
+                  error={this._error('summary')}
+                  required
+                />
+                <Input
+                  name="description"
+                  id="description"
+                  type="textarea"
+                  value={contentPack.description}
+                  onChange={this._bindValue}
+                  onBlur={() => this._handleTouched('description')}
+                  rows={6}
+                  label="Description"
+                  help="Give a long description of the content pack in markdown."
+                />
+                <Input
+                  name="vendor"
+                  id="vendor"
+                  type="text"
+                  maxLength={250}
+                  value={contentPack.vendor}
+                  onChange={this._bindValue}
+                  onBlur={() => this._handleTouched('vendor')}
+                  label="Vendor"
+                  help="Required. Who did this content pack and how can they be reached, e.g. Name and email."
+                  error={this._error('vendor')}
+                  required
+                />
+                <Input
+                  name="url"
+                  id="url"
+                  type="text"
+                  maxLength={250}
+                  value={contentPack.url}
+                  onChange={this._bindValue}
+                  onBlur={() => this._handleTouched('url')}
+                  label="URL"
+                  help="Where can I find the content pack. e.g. github url"
+                  error={this._error('url')}
+                />
               </fieldset>
             </form>
           </Col>
@@ -371,24 +404,23 @@ class ContentPackSelection extends React.Component<ContentPackSelectionProps, {
           <Col smOffset={1} lg={8}>
             <h2>Content Pack selection</h2>
             {edit && (
-            <HelpBlock>You can select between installed entities from the server (<Icon name="dns" />) or
-              entities from the former content pack revision (<Icon name="archive" className={style.contentPackEntity} />).
-            </HelpBlock>
+              <HelpBlock>
+                You can select between installed entities from the server (<Icon name="dns" />) or entities from the
+                former content pack revision (<Icon name="archive" className={style.contentPackEntity} />
+                ).
+              </HelpBlock>
             )}
           </Col>
         </Row>
         <Row>
           <Col smOffset={1} lg={8}>
-            <SearchForm onSearch={this._onSetFilter}
-                        onReset={this._onClearFilter} />
+            <SearchForm onSearch={this._onSetFilter} onReset={this._onClearFilter} />
           </Col>
         </Row>
         <Row>
           <Col smOffset={1} sm={8} lg={8}>
             {touched.selection && errors.selection && <InputDescription error={errors.selection} />}
-            <ExpandableList>
-              {entitiesComponent}
-            </ExpandableList>
+            <ExpandableList>{entitiesComponent}</ExpandableList>
           </Col>
         </Row>
       </div>

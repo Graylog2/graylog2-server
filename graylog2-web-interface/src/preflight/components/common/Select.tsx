@@ -34,8 +34,7 @@ const Select = ({ children, ...otherProps }: SelectProps) => {
   });
 
   return (
-    <MantineSelect {...otherProps}
-                   styles={SelectStyles}>
+    <MantineSelect {...otherProps} styles={SelectStyles}>
       {children}
     </MantineSelect>
   );

@@ -19,54 +19,54 @@ import type { ErrorType } from 'integrations/event-notifications/types';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 export type HttpEventNotificationV2 = EventNotification & {
-  config: HttpNotificationConfigV2,
+  config: HttpNotificationConfigV2;
 };
 
 export type EncryptedValue = {
-  is_set?: boolean,
-  set_value?: string,
-  keep_value?: boolean,
-  delete_value?: boolean
+  is_set?: boolean;
+  set_value?: string;
+  keep_value?: boolean;
+  delete_value?: boolean;
 };
 
 export type HttpNotificationConfigV2 = {
-  type: 'http-notification-v2',
-  url: string,
-  basic_auth?: EncryptedValue,
-  api_key_as_header: boolean,
-  api_key?: string,
-  api_secret?: EncryptedValue,
-  skip_tls_verification: boolean,
-  time_zone?: string,
-  method: string,
-  content_type?: string,
-  body_template?: string,
-  headers?: string,
+  type: 'http-notification-v2';
+  url: string;
+  basic_auth?: EncryptedValue;
+  api_key_as_header: boolean;
+  api_key?: string;
+  api_secret?: EncryptedValue;
+  skip_tls_verification: boolean;
+  time_zone?: string;
+  method: string;
+  content_type?: string;
+  body_template?: string;
+  headers?: string;
 };
 
 export type HttpNotificationValidationV2 = {
-  failed?: boolean,
-  errors?: ErrorType,
-}
+  failed?: boolean;
+  errors?: ErrorType;
+};
 
 export interface EventNotificationTypes {
-  type: string,
-  displayName: string,
+  type: string;
+  displayName: string;
   formComponent: React.ComponentType<{
-    config: EventNotification['config'],
-    validation: { errors: { [key: string]: Array<string> } },
-    onChange: (newConfig: EventNotification['config']) => void,
-    setIsSubmitEnabled: (enabled: boolean) => void,
-  }>,
+    config: EventNotification['config'];
+    validation: { errors: { [key: string]: Array<string> } };
+    onChange: (newConfig: EventNotification['config']) => void;
+    setIsSubmitEnabled: (enabled: boolean) => void;
+  }>;
   summaryComponent: React.ComponentType<{
-    type: string,
-    notification: EventNotification,
-    definitionNotification: EventDefinition['notifications'][number],
-  }>,
+    type: string;
+    notification: EventNotification;
+    definitionNotification: EventDefinition['notifications'][number];
+  }>;
   detailsComponent: React.ComponentType<{
-    notification: EventNotification,
-  }>,
-  defaultConfig: EventNotification['config'],
+    notification: EventNotification;
+  }>;
+  defaultConfig: EventNotification['config'];
 }
 
 declare module 'graylog-web-plugin/plugin' {

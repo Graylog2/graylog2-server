@@ -71,11 +71,9 @@ import commonStyles from '../common/commonStyles.css';
 export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
-  embryonic?: boolean,
-}
-const LOOKUP_PERMISSIONS = [
-  'lookuptables:read',
-];
+  embryonic?: boolean;
+};
+const LOOKUP_PERMISSIONS = ['lookuptables:read'];
 
 const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
   name: name,
@@ -88,27 +86,21 @@ const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => (
 type EventDefinitionConfig = $PropertyType<EventDefinition, 'config'>;
 
 type Props = {
-  currentUser: User,
-  eventDefinition: EventDefinition,
-  onChange: (name: string, config: EventDefinitionConfig) => void,
-  streams: Array<Stream>,
-  validation: EventDefinitionValidation
-}
+  currentUser: User;
+  eventDefinition: EventDefinition;
+  onChange: (name: string, config: EventDefinitionConfig) => void;
+  streams: Array<Stream>;
+  validation: EventDefinitionValidation;
+};
 
-const FilterForm = ({
-  currentUser,
-  eventDefinition,
-  onChange,
-  streams,
-  validation,
-} : Props) => {
+const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validation }: Props) => {
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
   const [currentConfig, setCurrentConfig] = useState(eventDefinition.config);
   const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
   const { userTimezone } = useUserDateTime();
   const { setFieldWarning, warnings } = useContext(FormWarningsContext);
-  const validationState = (warnings?.queryString) as QueryValidationState;
+  const validationState = warnings?.queryString as QueryValidationState;
   const warmTierRanges = indicesInWarmTier(validationState);
 
   const { tables } = useStore(LookupTablesStore);
@@ -131,22 +123,32 @@ const FilterForm = ({
     [currentUser.permissions],
   );
 
-  const streamCategoryOptions = React.useMemo(() => (
-    streams.reduce((acc:{label: string, value: string}[], stream: Stream) => {
-      stream.categories?.forEach((category: string) => {
-        if (!acc.find((option: { value: string }) => option.value === category)) acc.push({ label: category, value: category });
-      });
+  const streamCategoryOptions = React.useMemo(
+    () =>
+      streams
+        .reduce((acc: { label: string; value: string }[], stream: Stream) => {
+          stream.categories?.forEach((category: string) => {
+            if (!acc.find((option: { value: string }) => option.value === category))
+              acc.push({ label: category, value: category });
+          });
 
-      return acc;
-    }, []).sort((a, b) => defaultCompare(a.value, b.value))), [streams]);
+          return acc;
+        }, [])
+        .sort((a, b) => defaultCompare(a.value, b.value)),
+    [streams],
+  );
 
-  const [cronDescription, setCronDescription] = useState<string>(currentConfig.cron_expression ? describeExpression(currentConfig.cron_expression) : '');
+  const [cronDescription, setCronDescription] = useState<string>(
+    currentConfig.cron_expression ? describeExpression(currentConfig.cron_expression) : '',
+  );
 
   const validateQueryString = useCallback(
-    (queryString: ElasticsearchQueryString | string,
+    (
+      queryString: ElasticsearchQueryString | string,
       streamIds: Array<string>,
       timeRange: RelativeTimeRangeWithEnd,
-      timezone: string) => {
+      timezone: string,
+    ) => {
       const request = {
         timeRange: timeRange,
         queryString: queryString,
@@ -160,12 +162,15 @@ const FilterForm = ({
           setFieldWarning('queryString', undefined);
         }
       });
-    }, [setFieldWarning]);
+    },
+    [setFieldWarning],
+  );
 
-  const toTimeRange = (from) => ({
-    type: 'relative',
-    from: from / 1000,
-  } as RelativeTimeRangeWithEnd);
+  const toTimeRange = (from) =>
+    ({
+      type: 'relative',
+      from: from / 1000,
+    }) as RelativeTimeRangeWithEnd;
 
   useEffect(() => {
     if (userCanViewLookupTables()) {
@@ -178,14 +183,16 @@ const FilterForm = ({
       eventDefinition.config.query,
       eventDefinition.config.streams,
       toTimeRange(eventDefinition.config.search_within_ms),
-      userTimezone);
+      userTimezone,
+    );
   }, [
     eventDefinition.config.query,
     eventDefinition.config.streams,
     eventDefinition.config.search_within_ms,
     setFieldWarning,
     userTimezone,
-    validateQueryString]);
+    validateQueryString,
+  ]);
 
   const getUpdatedConfig = (key, value) => {
     const config = cloneDeep(eventDefinition.config);
@@ -200,17 +207,18 @@ const FilterForm = ({
   };
 
   const formatStreamIds = memoize(
-    (streamIds) => streamIds
-      .map((streamId) => streams.find((s) => s.id === streamId) || streamId)
-      .map((streamOrId) => {
-        const stream = (typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId });
+    (streamIds) =>
+      streamIds
+        .map((streamId) => streams.find((s) => s.id === streamId) || streamId)
+        .map((streamOrId) => {
+          const stream = typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId };
 
-        return {
-          label: stream.title,
-          value: stream.id,
-        };
-      })
-      .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label)),
+          return {
+            label: stream.title,
+            value: stream.id,
+          };
+        })
+        .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label)),
     (streamIds) => streamIds.join('-'),
   );
 
@@ -254,27 +262,27 @@ const FilterForm = ({
       .query({ type: 'elasticsearch', query_string: queryString })
       .timerange({ type: 'relative', range: 1000 })
       .filters(searchFilters.toList() as FiltersType)
-      .searchTypes([{
-        id: searchTypeId,
-        type: 'messages',
-        limit: 10,
-        offset: 0,
-        filter: undefined,
-        filters: undefined,
-        name: undefined,
-        query: undefined,
-        timerange: undefined,
-        streams: undefined,
-        stream_categories: undefined,
-        sort: [],
-        decorators: [],
-      }]);
+      .searchTypes([
+        {
+          id: searchTypeId,
+          type: 'messages',
+          limit: 10,
+          offset: 0,
+          filter: undefined,
+          filters: undefined,
+          name: undefined,
+          query: undefined,
+          timerange: undefined,
+          streams: undefined,
+          stream_categories: undefined,
+          sort: [],
+          decorators: [],
+        },
+      ]);
 
     const query = queryBuilder.build();
 
-    const search = Search.create().toBuilder()
-      .queries([query])
-      .build();
+    const search = Search.create().toBuilder().queries([query]).build();
 
     parseSearch(search).then((res) => {
       syncParamsWithQuery(res.undeclared, config);
@@ -410,34 +418,34 @@ const FilterForm = ({
 
     if (!userCanViewLookupTables()) {
       return (
-        <Alert bsStyle="info">
-          This account lacks permission to declare Query Parameters from Lookup Tables.
-        </Alert>
+        <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>
       );
     }
 
     const parameterButtons = queryParameters.map((queryParam) => (
-      <EditQueryParameterModal key={queryParam.name}
-                               queryParameter={LookupTableParameter.fromJSON(queryParam)}
-                               embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
-                               queryParameters={queryParameters}
-                               lookupTables={Object.values(tables || {})}
-                               onChange={onChangeQueryParameters} />
+      <EditQueryParameterModal
+        key={queryParam.name}
+        queryParameter={LookupTableParameter.fromJSON(queryParam)}
+        embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
+        queryParameters={queryParameters}
+        lookupTables={Object.values(tables || {})}
+        onChange={onChangeQueryParameters}
+      />
     ));
 
     if (isEmpty(parameterButtons)) {
       return null;
     }
 
-    const hasEmbryonicParameters = !isEmpty(queryParameters.filter((param : LookupTableParameterJsonEmbryonic) => (param.embryonic)));
+    const hasEmbryonicParameters = !isEmpty(
+      queryParameters.filter((param: LookupTableParameterJsonEmbryonic) => param.embryonic),
+    );
 
     return (
       <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
         <ControlLabel>Query Parameters</ControlLabel>
         <Alert bsStyle={hasEmbryonicParameters ? 'danger' : 'info'}>
-          <ButtonToolbar>
-            {parameterButtons}
-          </ButtonToolbar>
+          <ButtonToolbar>{parameterButtons}</ButtonToolbar>
         </Alert>
         {hasEmbryonicParameters && (
           <HelpBlock>
@@ -455,12 +463,18 @@ const FilterForm = ({
 
     return (
       <FormGroup controlId="filter-stream-categories">
-        <ControlLabel>Stream Categories <small className="text-muted">(Optional)</small></ControlLabel>
-        <MultiSelect id="filter-stream-categories"
-                     matchProp="label"
-                     onChange={(selected) => propagateChange(getUpdatedConfig('stream_categories', selected === '' ? [] : selected.split(',')))}
-                     options={streamCategoryOptions}
-                     value={defaultTo(eventDefinition.config.stream_categories, []).join(',')} />
+        <ControlLabel>
+          Stream Categories <small className="text-muted">(Optional)</small>
+        </ControlLabel>
+        <MultiSelect
+          id="filter-stream-categories"
+          matchProp="label"
+          onChange={(selected) =>
+            propagateChange(getUpdatedConfig('stream_categories', selected === '' ? [] : selected.split(',')))
+          }
+          options={streamCategoryOptions}
+          value={defaultTo(eventDefinition.config.stream_categories, []).join(',')}
+        />
         <HelpBlock>Select stream categories the search should include.</HelpBlock>
       </FormGroup>
     );
@@ -475,7 +489,10 @@ const FilterForm = ({
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
   // Ensure deleted streams are still displayed in select
-  const allStreamIds = union(streams.map((s) => s.id), defaultTo(eventDefinition.config.streams, []));
+  const allStreamIds = union(
+    streams.map((s) => s.id),
+    defaultTo(eventDefinition.config.streams, []),
+  );
   const formattedStreams = formatStreamIds(allStreamIds);
 
   return (
@@ -483,123 +500,146 @@ const FilterForm = ({
       <h2 className={commonStyles.title}>Filter</h2>
       <p>Add information to filter the log messages that are relevant for this Event Definition.</p>
       {onlyFilters || (
-      <Input id="filter-query"
-             name="query"
-             label="Search Query"
-             type="text"
-             help={(
-               <span>
-                 Search query that Messages should match. You can use the same syntax as in the Search page,
-                 including declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
-               </span>
-                 )}
-             value={defaultTo(currentConfig.query, '')}
-             onChange={handleQueryChange} />
+        <Input
+          id="filter-query"
+          name="query"
+          label="Search Query"
+          type="text"
+          help={
+            <span>
+              Search query that Messages should match. You can use the same syntax as in the Search page, including
+              declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
+            </span>
+          }
+          value={defaultTo(currentConfig.query, '')}
+          onChange={handleQueryChange}
+        />
       )}
 
       {onlyFilters || renderQueryParameters()}
 
       {!searchFiltersHidden && (
-      <FormGroup controlId="search-filters">
-        <ControlLabel>Search Filters <small className="text-muted">(Optional)</small></ControlLabel>
-        <div style={{ margin: '16px 0' }}>
-          <SearchFiltersFormControls filters={eventDefinition.config.filters}
-                                     onChange={handleSearchFiltersChange}
-                                     hideFiltersPreview={hideFiltersPreview} />
-        </div>
-      </FormGroup>
+        <FormGroup controlId="search-filters">
+          <ControlLabel>
+            Search Filters <small className="text-muted">(Optional)</small>
+          </ControlLabel>
+          <div style={{ margin: '16px 0' }}>
+            <SearchFiltersFormControls
+              filters={eventDefinition.config.filters}
+              onChange={handleSearchFiltersChange}
+              hideFiltersPreview={hideFiltersPreview}
+            />
+          </div>
+        </FormGroup>
       )}
 
       {onlyFilters || (
-      <>
-        <FormGroup controlId="filter-streams">
-          <ControlLabel>Streams <small className="text-muted">(Optional)</small></ControlLabel>
-          <MultiSelect id="filter-streams"
-                       matchProp="label"
-                       onChange={(selected) => handleStreamsChange(selected === '' ? [] : selected.split(','))}
-                       options={formattedStreams}
-                       value={defaultTo(eventDefinition.config.streams, []).join(',')} />
-          <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
-        </FormGroup>
-        {streamCategorySelector()}
-        {isSearchingWarmTier(warmTierRanges) && (
-        <Alert bsStyle="danger" title="Warm Tier Warning">
-          The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve data from the Warm Tier may cause performance problems.
-          A value for <strong>Search within the last</strong> exceeding the following duration will fall into the Warm Tier: {warmTierTimeStamp()}.
-        </Alert>
-        )}
-        <FormGroup controlId="search-within" validationState={validation.errors.search_within_ms ? 'error' : null}>
-          <TimeUnitInput label="Search within the last"
-                         update={handleTimeRangeChange('search_within_ms')}
-                         value={searchWithinMsDuration}
-                         unit={searchWithinMsUnit}
-                         units={TIME_UNITS}
-                         clearable
-                         required />
-          {validation.errors.search_within_ms && (
-          <HelpBlock>{get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
+        <>
+          <FormGroup controlId="filter-streams">
+            <ControlLabel>
+              Streams <small className="text-muted">(Optional)</small>
+            </ControlLabel>
+            <MultiSelect
+              id="filter-streams"
+              matchProp="label"
+              onChange={(selected) => handleStreamsChange(selected === '' ? [] : selected.split(','))}
+              options={formattedStreams}
+              value={defaultTo(eventDefinition.config.streams, []).join(',')}
+            />
+            <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
+          </FormGroup>
+          {streamCategorySelector()}
+          {isSearchingWarmTier(warmTierRanges) && (
+            <Alert bsStyle="danger" title="Warm Tier Warning">
+              The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve
+              data from the Warm Tier may cause performance problems. A value for{' '}
+              <strong>Search within the last</strong> exceeding the following duration will fall into the Warm Tier:{' '}
+              {warmTierTimeStamp()}.
+            </Alert>
           )}
-        </FormGroup>
-        <Input id="is-cron-checkbox"
-               type="checkbox"
-               name="use_cron_scheduling"
-               label="Use Cron Scheduling"
-               help="Schedule this event with a Quartz cron expression"
-               checked={defaultTo(eventDefinition.config.use_cron_scheduling, false)}
-               onChange={handleUseCronSchedulingChange} />
-        {currentConfig.use_cron_scheduling
-          ? (
+          <FormGroup controlId="search-within" validationState={validation.errors.search_within_ms ? 'error' : null}>
+            <TimeUnitInput
+              label="Search within the last"
+              update={handleTimeRangeChange('search_within_ms')}
+              value={searchWithinMsDuration}
+              unit={searchWithinMsUnit}
+              units={TIME_UNITS}
+              clearable
+              required
+            />
+            {validation.errors.search_within_ms && (
+              <HelpBlock>{get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
+            )}
+          </FormGroup>
+          <Input
+            id="is-cron-checkbox"
+            type="checkbox"
+            name="use_cron_scheduling"
+            label="Use Cron Scheduling"
+            help="Schedule this event with a Quartz cron expression"
+            checked={defaultTo(eventDefinition.config.use_cron_scheduling, false)}
+            onChange={handleUseCronSchedulingChange}
+          />
+          {currentConfig.use_cron_scheduling ? (
             <>
-              <FormGroup controlId="cron-expression" validationState={validation.errors.cron_expression ? 'error' : null}>
-                <Input id="cron-expression"
-                       name="cron_expression"
-                       label="Cron Expression"
-                       type="text"
-                       help={(
-                         <span>
-                           {cronDescription || 'A Quartz cron expression to determine when the event should be run.'}
-                         </span>
-                   )}
-                       value={defaultTo(currentConfig.cron_expression, '')}
-                       onBlur={() => setCronDescription(describeExpression(currentConfig.cron_expression))}
-                       onChange={handleCronExpressionChange} />
+              <FormGroup
+                controlId="cron-expression"
+                validationState={validation.errors.cron_expression ? 'error' : null}>
+                <Input
+                  id="cron-expression"
+                  name="cron_expression"
+                  label="Cron Expression"
+                  type="text"
+                  help={
+                    <span>
+                      {cronDescription || 'A Quartz cron expression to determine when the event should be run.'}
+                    </span>
+                  }
+                  value={defaultTo(currentConfig.cron_expression, '')}
+                  onBlur={() => setCronDescription(describeExpression(currentConfig.cron_expression))}
+                  onChange={handleCronExpressionChange}
+                />
                 {validation.errors.cron_expression && (
-                <HelpBlock>{get(validation, 'errors.cron_expression[0]')}</HelpBlock>
+                  <HelpBlock>{get(validation, 'errors.cron_expression[0]')}</HelpBlock>
                 )}
               </FormGroup>
               <FormGroup>
                 <ControlLabel>Cron Time Zone</ControlLabel>
-                <TimezoneSelect value={defaultTo(currentConfig.cron_timezone, userTimezone)}
-                                name="cron_timezone"
-                                clearable={false}
-                                onChange={handleCronTimezoneChange} />
-
+                <TimezoneSelect
+                  value={defaultTo(currentConfig.cron_timezone, userTimezone)}
+                  name="cron_timezone"
+                  clearable={false}
+                  onChange={handleCronTimezoneChange}
+                />
               </FormGroup>
             </>
-          )
-          : (
+          ) : (
             <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
-              <TimeUnitInput label="Execute search every"
-                             update={handleTimeRangeChange('execute_every_ms')}
-                             value={executeEveryMsDuration}
-                             unit={executeEveryMsUnit}
-                             units={TIME_UNITS}
-                             clearable
-                             required />
+              <TimeUnitInput
+                label="Execute search every"
+                update={handleTimeRangeChange('execute_every_ms')}
+                value={executeEveryMsDuration}
+                unit={executeEveryMsUnit}
+                units={TIME_UNITS}
+                clearable
+                required
+              />
               {validation.errors.execute_every_ms && (
-              <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
+                <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
               )}
             </FormGroup>
           )}
 
-        <Input id="schedule-checkbox"
-               type="checkbox"
-               name="_is_scheduled"
-               label="Enable"
-               help="Should this event definition be executed automatically?"
-               checked={defaultTo(eventDefinition.config._is_scheduled, true)}
-               onChange={handleEnabledChange} />
-      </>
+          <Input
+            id="schedule-checkbox"
+            type="checkbox"
+            name="_is_scheduled"
+            label="Enable"
+            help="Should this event definition be executed automatically?"
+            checked={defaultTo(eventDefinition.config._is_scheduled, true)}
+            onChange={handleEnabledChange}
+          />
+        </>
       )}
     </fieldset>
   );

@@ -126,9 +126,7 @@
           "row_groups": [
             {
               "type": "time",
-              "fields": [
-                "timestamp"
-              ],
+              "fields": ["timestamp"],
               "interval": {
                 "type": "auto",
                 "scaling": 1
@@ -164,9 +162,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source"
-              ],
+              "fields": ["event_source"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -200,9 +196,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source_product"
-              ],
+              "fields": ["event_source_product"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -210,9 +204,7 @@
           "column_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_outcome"
-              ],
+              "fields": ["event_outcome"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -245,9 +237,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "user_name"
-              ],
+              "fields": ["user_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -281,9 +271,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "gim_event_subcategory"
-              ],
+              "fields": ["gim_event_subcategory"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -371,9 +359,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source"
-              ],
+              "fields": ["event_source"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -407,9 +393,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source_product"
-              ],
+              "fields": ["event_source_product"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -470,9 +454,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "alert_signature"
-              ],
+              "fields": ["alert_signature"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -506,9 +488,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source_product"
-              ],
+              "fields": ["event_source_product"],
               "limit": 15,
               "skip_empty_values": false
             }

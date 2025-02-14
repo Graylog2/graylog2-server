@@ -20,67 +20,78 @@ import styled, { css } from 'styled-components';
 import Icon from 'components/common/Icon';
 import type { IconName, RotateProp, IconType, SizeProp } from 'components/common/Icon';
 
-const Wrapper = styled.button<{ disabled: boolean }>(({ theme, disabled }) => css`
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  height: 25px;
-  width: 25px;
-  border: 0;
-  background-color: transparent;
-  cursor: pointer;
-  color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
-  font-size: ${theme.fonts.size.large};
+const Wrapper = styled.button<{ disabled: boolean }>(
+  ({ theme, disabled }) => css`
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 25px;
+    width: 25px;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
+    color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
+    font-size: ${theme.fonts.size.large};
 
-  &:hover {
-    background-color: ${theme.colors.gray[80]};
-  }
+    &:hover {
+      background-color: ${theme.colors.gray[80]};
+    }
 
-  &:active {
-    background-color: ${theme.colors.gray[70]};
-  }
-`);
+    &:active {
+      background-color: ${theme.colors.gray[70]};
+    }
+  `,
+);
 
 type Props = {
-  focusable?: boolean,
-  title: string,
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void,
-  className?: string,
-  name: IconName
-  iconType?: IconType,
-  disabled?: boolean,
-  rotation?: RotateProp,
-  'data-testid'?: string,
-  size?: SizeProp,
+  focusable?: boolean;
+  title: string;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  className?: string;
+  name: IconName;
+  iconType?: IconType;
+  disabled?: boolean;
+  rotation?: RotateProp;
+  'data-testid'?: string;
+  size?: SizeProp;
 };
 
-const handleClick = (onClick: (e: React.MouseEvent<HTMLButtonElement>) => void | undefined, e: React.MouseEvent<HTMLButtonElement>) => {
+const handleClick = (
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void | undefined,
+  e: React.MouseEvent<HTMLButtonElement>,
+) => {
   if (typeof onClick === 'function') {
     onClick(e);
   }
 };
 
-const IconButton = React.forwardRef<HTMLButtonElement, Props>(({
-  title,
-  onClick,
-  focusable = true,
-  className,
-  disabled = false,
-  iconType,
-  'data-testid': dataTestId,
-  ...rest
-}: Props, ref) => (
-  <Wrapper ref={ref}
-           tabIndex={focusable ? 0 : -1}
-           data-testid={dataTestId}
-           title={title}
-           aria-label={title}
-           onClick={(e) => handleClick(onClick, e)}
-           className={className}
-           type="button"
-           disabled={disabled}>
-    <Icon type={iconType} {...rest} />
-  </Wrapper>
-));
+const IconButton = React.forwardRef<HTMLButtonElement, Props>(
+  (
+    {
+      title,
+      onClick,
+      focusable = true,
+      className,
+      disabled = false,
+      iconType,
+      'data-testid': dataTestId,
+      ...rest
+    }: Props,
+    ref,
+  ) => (
+    <Wrapper
+      ref={ref}
+      tabIndex={focusable ? 0 : -1}
+      data-testid={dataTestId}
+      title={title}
+      aria-label={title}
+      onClick={(e) => handleClick(onClick, e)}
+      className={className}
+      type="button"
+      disabled={disabled}>
+      <Icon type={iconType} {...rest} />
+    </Wrapper>
+  ),
+);
 
 export default IconButton;

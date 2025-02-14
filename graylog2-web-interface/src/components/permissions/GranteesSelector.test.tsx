@@ -24,9 +24,11 @@ import GranteesSelector from './GranteesSelector';
 describe('GranteesSelector', () => {
   it('shows validation error', async () => {
     const { getByText, findByText } = render(
-      <GranteesSelector availableGrantees={availableGrantees}
-                        availableCapabilities={availableCapabilities}
-                        onSubmit={() => Promise.resolve(mockEntityShareState)} />,
+      <GranteesSelector
+        availableGrantees={availableGrantees}
+        availableCapabilities={availableCapabilities}
+        onSubmit={() => Promise.resolve(mockEntityShareState)}
+      />,
     );
 
     const submitButton = getByText('Add Collaborator');

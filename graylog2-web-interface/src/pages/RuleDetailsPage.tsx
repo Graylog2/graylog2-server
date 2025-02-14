@@ -62,11 +62,14 @@ const RuleDetailsPage = () => {
     } else {
       PipelinesActions.list();
 
-      RulesActions.get(ruleId).then(() => {}, (error) => {
-        if (error.status === 404) {
-          history.push(Routes.SYSTEM.PIPELINES.RULES);
-        }
-      });
+      RulesActions.get(ruleId).then(
+        () => {},
+        (error) => {
+          if (error.status === 404) {
+            history.push(Routes.SYSTEM.PIPELINES.RULES);
+          }
+        },
+      );
 
       setIsLoading(!(filteredRule && pipelines));
     }

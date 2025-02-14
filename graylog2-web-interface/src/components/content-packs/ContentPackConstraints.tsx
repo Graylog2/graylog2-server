@@ -25,9 +25,12 @@ type ContentPackConstraintsProps = {
   isFulfilled?: boolean;
 };
 
-class ContentPackConstraints extends React.Component<ContentPackConstraintsProps, {
-  [key: string]: any;
-}> {
+class ContentPackConstraints extends React.Component<
+  ContentPackConstraintsProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     constraints: Set(),
     isFulfilled: false,
@@ -74,13 +77,15 @@ class ContentPackConstraints extends React.Component<ContentPackConstraintsProps
         <h2>Constraints</h2>
         <br />
         <br />
-        <DataTable id="content-packs-constraints"
-                   headers={headers}
-                   headerCellFormatter={(header) => <th>{header}</th>}
-                   sortBy={(row) => (row.constraint ? row.constraint.type : row.type)}
-                   dataRowFormatter={this._rowFormatter}
-                   rows={constraints}
-                   filterKeys={[]} />
+        <DataTable
+          id="content-packs-constraints"
+          headers={headers}
+          headerCellFormatter={(header) => <th>{header}</th>}
+          sortBy={(row) => (row.constraint ? row.constraint.type : row.type)}
+          dataRowFormatter={this._rowFormatter}
+          rows={constraints}
+          filterKeys={[]}
+        />
       </div>
     );
   }

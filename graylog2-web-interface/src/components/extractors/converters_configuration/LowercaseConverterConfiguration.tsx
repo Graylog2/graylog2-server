@@ -25,9 +25,12 @@ type LowercaseConverterConfigurationProps = {
   onChange: (...args: any[]) => void;
 };
 
-class LowercaseConverterConfiguration extends React.Component<LowercaseConverterConfigurationProps, {
-  [key: string]: any;
-}> {
+class LowercaseConverterConfiguration extends React.Component<
+  LowercaseConverterConfigurationProps,
+  {
+    [key: string]: any;
+  }
+> {
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
   }
@@ -47,12 +50,14 @@ class LowercaseConverterConfiguration extends React.Component<LowercaseConverter
   render() {
     return (
       <div className="xtrc-converter">
-        <Input type="checkbox"
-               id={`enable-${this.props.type}-converter`}
-               label="Transform value to lowercase"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked
-               onChange={this._toggleConverter} />
+        <Input
+          type="checkbox"
+          id={`enable-${this.props.type}-converter`}
+          label="Transform value to lowercase"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked
+          onChange={this._toggleConverter}
+        />
       </div>
     );
   }

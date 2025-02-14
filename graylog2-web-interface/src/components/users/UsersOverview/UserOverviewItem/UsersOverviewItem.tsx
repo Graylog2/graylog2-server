@@ -26,8 +26,8 @@ import LoggedInCell from './LoggedInCell';
 import StatusCell from './StatusCell';
 
 type Props = {
-  user: UserOverview,
-  isActive: boolean,
+  user: UserOverview;
+  isActive: boolean;
 };
 
 const UsersOverviewItem = ({
@@ -47,13 +47,9 @@ const UsersOverviewItem = ({
   isActive,
 }: Props) => (
   <tr key={username} className={isActive ? 'active' : ''}>
-    <LoggedInCell lastActivity={lastActivity}
-                  sessionActive={sessionActive}
-                  clientAddress={clientAddress} />
+    <LoggedInCell lastActivity={lastActivity} sessionActive={sessionActive} clientAddress={clientAddress} />
     <td className="limited">
-      <Link to={Routes.SYSTEM.USERS.show(id)}>
-        {fullName}
-      </Link>
+      <Link to={Routes.SYSTEM.USERS.show(id)}>{fullName}</Link>
     </td>
     <td className="limited">{username}</td>
     <td className="limited">{email}</td>

@@ -26,7 +26,11 @@ export const emptyComparisonExpressionConfig = () => ({
   },
 });
 
-export const emptyBooleanExpressionConfig = ({ operator = '&&', left = emptyComparisonExpressionConfig(), right = emptyComparisonExpressionConfig() }) => ({
+export const emptyBooleanExpressionConfig = ({
+  operator = '&&',
+  left = emptyComparisonExpressionConfig(),
+  right = emptyComparisonExpressionConfig(),
+}) => ({
   expr: operator,
   left: left,
   right: right,

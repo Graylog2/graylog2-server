@@ -33,17 +33,15 @@ export default async ({
   queryString,
   parameters,
 }: {
-  type: ViewType,
-  streamId?: string | string[],
-  streamCategory?: string | string[],
-  timeRange?: TimeRange,
-  queryString?: ElasticsearchQueryString,
-  parameters?: Array<Parameter>,
-},
-) => {
+  type: ViewType;
+  streamId?: string | string[];
+  streamCategory?: string | string[];
+  timeRange?: TimeRange;
+  queryString?: ElasticsearchQueryString;
+  parameters?: Array<Parameter>;
+}) => {
   const query = QueryGenerator(streamId, streamCategory, undefined, timeRange, queryString);
-  const search = Search.create().toBuilder().queries([query]).parameters(parameters)
-    .build();
+  const search = Search.create().toBuilder().queries([query]).parameters(parameters).build();
   const viewState = await ViewStateGenerator(type, streamId);
 
   const view = View.create()

@@ -17,13 +17,20 @@
 
 import type { InputSetupWizardStep, StepsConfig, StepsData } from 'components/inputs/InputSetupWizard/types';
 
-export const getStepConfigOrData = (configOrData: StepsConfig | StepsData, stepName: InputSetupWizardStep, key?: string) => {
+export const getStepConfigOrData = (
+  configOrData: StepsConfig | StepsData,
+  stepName: InputSetupWizardStep,
+  key?: string,
+) => {
   if (key) return configOrData[stepName] ? configOrData[stepName][key] : undefined;
 
   return configOrData[stepName];
 };
 
-export const getNextStep = (orderedSteps: Array<InputSetupWizardStep>, activeStep: InputSetupWizardStep) : InputSetupWizardStep | undefined => {
+export const getNextStep = (
+  orderedSteps: Array<InputSetupWizardStep>,
+  activeStep: InputSetupWizardStep,
+): InputSetupWizardStep | undefined => {
   const activeStepIndex = orderedSteps.indexOf(activeStep);
 
   if (activeStepIndex < 0) return undefined;
@@ -31,7 +38,12 @@ export const getNextStep = (orderedSteps: Array<InputSetupWizardStep>, activeSte
   return orderedSteps[activeStepIndex + 1];
 };
 
-export const checkIsNextStepDisabled = (orderedSteps: Array<InputSetupWizardStep>, activeStep: InputSetupWizardStep, stepsConfig: StepsConfig, step?: InputSetupWizardStep) => {
+export const checkIsNextStepDisabled = (
+  orderedSteps: Array<InputSetupWizardStep>,
+  activeStep: InputSetupWizardStep,
+  stepsConfig: StepsConfig,
+  step?: InputSetupWizardStep,
+) => {
   const nextStep = step ?? getNextStep(orderedSteps, activeStep);
 
   return !stepsConfig[nextStep]?.enabled;
@@ -55,7 +67,11 @@ export const checkHasPreviousStep = (orderedSteps: Array<InputSetupWizardStep>, 
   return true;
 };
 
-export const addStepAfter = (orderedSteps: Array<InputSetupWizardStep>, step: InputSetupWizardStep, setAfterStep?: InputSetupWizardStep) : Array<InputSetupWizardStep> => {
+export const addStepAfter = (
+  orderedSteps: Array<InputSetupWizardStep>,
+  step: InputSetupWizardStep,
+  setAfterStep?: InputSetupWizardStep,
+): Array<InputSetupWizardStep> => {
   if (!setAfterStep) return [...orderedSteps, step];
 
   const setAfterStepIndex = orderedSteps.indexOf(setAfterStep);
@@ -71,7 +87,12 @@ export const addStepAfter = (orderedSteps: Array<InputSetupWizardStep>, step: In
   return newOrderedSteps;
 };
 
-export const updateStepConfigOrData = (configOrData: StepsConfig | StepsData, stepName: InputSetupWizardStep, data: object = {}, override: boolean = false) : StepsConfig | StepsData => {
+export const updateStepConfigOrData = (
+  configOrData: StepsConfig | StepsData,
+  stepName: InputSetupWizardStep,
+  data: object = {},
+  override: boolean = false,
+): StepsConfig | StepsData => {
   if (!stepName) return {};
 
   if (!configOrData) return { [stepName]: data };
@@ -88,7 +109,7 @@ export const enableNextStep = (
   activeStep: InputSetupWizardStep,
   stepsConfig: StepsConfig,
   step?: InputSetupWizardStep,
-) : StepsConfig => {
+): StepsConfig => {
   const nextStep = step ?? getNextStep(orderedSteps, activeStep);
 
   if (!nextStep) return stepsConfig;
@@ -101,7 +122,7 @@ export const disableNextStep = (
   activeStep: InputSetupWizardStep,
   stepsConfig: StepsConfig,
   step?: InputSetupWizardStep,
-) : StepsConfig => {
+): StepsConfig => {
   const nextStep = step ?? getNextStep(orderedSteps, activeStep);
 
   if (!nextStep) return stepsConfig;

@@ -25,6 +25,5 @@ const ExpandableListExample = () => (
   </ExpandableList>
 );
 
-<ExpandableListExample />
-
+<ExpandableListExample />;
 ```

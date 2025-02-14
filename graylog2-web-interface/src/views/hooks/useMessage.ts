@@ -28,10 +28,19 @@ export const fetchMessage = async (index: string, id: string) => {
   return MessageFormatter.formatResultMessage(message);
 };
 
-const useMessage = (index: string, id: string, enabled = true): { data: Message | undefined, isInitialLoading: boolean } => {
+const useMessage = (
+  index: string,
+  id: string,
+  enabled = true,
+): { data: Message | undefined; isInitialLoading: boolean } => {
   const { data, isInitialLoading } = useQuery({
     queryKey: ['messages', index, id],
-    queryFn: () => defaultOnError(fetchMessage(index, id), 'Loading message information failed with status', 'Could not load message information'),
+    queryFn: () =>
+      defaultOnError(
+        fetchMessage(index, id),
+        'Loading message information failed with status',
+        'Could not load message information',
+      ),
     enabled,
   });
 
