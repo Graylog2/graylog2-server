@@ -66,13 +66,15 @@ public class MongoDbRuleService implements RuleService {
     }
 
     @Override
-    public RuleDao save(RuleDao rule) {
+    public RuleDao save(RuleDao rule, boolean checkMutability) {
         scopedEntityMongoUtils.ensureValidScope(rule);
 
         final var ruleId = rule.id();
         final RuleDao savedRule;
         if (ruleId != null) {
-            scopedEntityMongoUtils.ensureMutability(rule);
+            if (checkMutability) {
+                scopedEntityMongoUtils.ensureMutability(rule);
+            }
             collection.replaceOne(MongoUtils.idEq(ruleId), rule, new ReplaceOptions().upsert(true));
             savedRule = rule;
         } else {

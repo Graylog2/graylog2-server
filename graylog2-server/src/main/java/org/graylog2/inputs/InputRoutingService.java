@@ -159,7 +159,7 @@ public class InputRoutingService {
                     String oldRuleTitle = ruleDao.title();
                     String newRuleTitle = replaceInputName(oldRuleTitle, event.oldInputTitle(), event.newInputTitle());
                     String newSource = ruleDao.source().replace(oldRuleTitle, newRuleTitle);
-                    ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build());
+                    ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build(), false);
                     handleRuleRenamed(oldRuleTitle, newRuleTitle);
                 });
     }
