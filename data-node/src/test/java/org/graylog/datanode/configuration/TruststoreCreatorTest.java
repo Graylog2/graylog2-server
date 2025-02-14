@@ -30,6 +30,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
+import org.graylog2.security.TruststoreCreator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -65,8 +66,8 @@ public class TruststoreCreatorTest {
         final FilesystemKeystoreInformation boot = createKeystore(tempDir.resolve("boot.p12"), "boot", "CN=BOOT", BigInteger.TWO);
 
         final FilesystemKeystoreInformation truststore = TruststoreCreator.newEmpty()
-                .addRootCert("root", root, "root")
-                .addRootCert("boot", boot, "boot")
+                .addFromKeystore( root, "root")
+                .addFromKeystore(boot, "boot")
 
                 .persist(tempDir.resolve("truststore.sec"), "caramba! caramba!".toCharArray());
 
