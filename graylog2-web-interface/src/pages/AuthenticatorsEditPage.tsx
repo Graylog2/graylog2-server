@@ -31,8 +31,7 @@ const AuthenticatorsEditPage = () => (
       documentationLink={{
         title: 'Authenticators documentation',
         path: DocsHelper.PAGES.AUTHENTICATORS,
-      }}
-    >
+      }}>
       <span>Configure the trusted header authentication.</span>
     </PageHeader>
 

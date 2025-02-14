@@ -173,8 +173,7 @@ const CreateEventDefinitionModal = ({
           bsStyle="primary"
           onClick={onContinueConfigurationClick}
           href={eventDefinitionCreationUrl}
-          target="_blank"
-        >
+          target="_blank">
           Continue configuration
         </Button>
       </Modal.Footer>

@@ -268,8 +268,8 @@ class InputThroughput extends React.Component<Props, State> {
               <br />
             </span>
           )}
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           {!isNaN(writtenBytes1Sec) && input.global && (
+            // eslint-disable-next-line jsx-a11y/anchor-is-valid
             <a href="" onClick={this._toggleShowDetails}>
               {showDetails ? 'Hide' : 'Show'} details
             </a>

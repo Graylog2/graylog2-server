@@ -33,8 +33,7 @@ describe('SortConfiguration', () => {
         initialValues={{ sort: [{ id: 'foobar' }] }}
         onSubmit={onSubmit}
         validate={validate}
-        config={config}
-      >
+        config={config}>
         <SortConfiguration index={0} />
       </WidgetConfigForm>,
     );

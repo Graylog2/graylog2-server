@@ -173,8 +173,7 @@ const ProfileForm = ({
         initialValues={initialValues}
         onSubmit={_onSubmit}
         validate={validate}
-        validateOnChange
-      >
+        validateOnChange>
         {({ isSubmitting, isValid, isValidating, values: { customFieldMappings } }) => (
           <Form>
             <FormikInput

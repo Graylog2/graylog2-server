@@ -45,8 +45,7 @@ const SimulatorPage = () => {
         documentationLink={{
           title: 'Pipelines documentation',
           path: DocsHelper.PAGES.PIPELINE_RULES,
-        }}
-      >
+        }}>
         <span>
           Processing messages can be complex. Use this page to simulate the result of processing an incoming message
           using your current set of pipelines and rules.

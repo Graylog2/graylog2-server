@@ -149,8 +149,7 @@ const ViewEventDefinitionPage = () => {
           documentationLink={{
             title: 'Alerts documentation',
             path: DocsHelper.PAGES.ALERTS,
-          }}
-        >
+          }}>
           <span>Event Definitions allow you to create Events from different Conditions and alert on them.</span>
         </PageHeader>
 
@@ -169,8 +168,7 @@ const ViewEventDefinitionPage = () => {
           title="Copy Event Definition"
           show
           onConfirm={() => handleDuplicateEvent()}
-          onCancel={() => setShowDialog(false)}
-        >
+          onCancel={() => setShowDialog(false)}>
           {`Are you sure you want to create a copy of "${eventDefinition.title}"?`}
         </ConfirmDialog>
       )}

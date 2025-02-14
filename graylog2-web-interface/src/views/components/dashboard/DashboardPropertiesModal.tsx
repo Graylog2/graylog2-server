@@ -73,8 +73,7 @@ const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTit
       onCancel={onClose}
       onSubmitForm={_onSave}
       submitButtonText={submitButtonText}
-      bsSize="large"
-    >
+      bsSize="large">
       <>
         <Input
           id="title"

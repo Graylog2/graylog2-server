@@ -56,8 +56,7 @@ const EditOutputButton = ({ output, disabled = false, onUpdate, getTypeDefinitio
         disabled={!isPermitted(currentUser.permissions, 'stream:edit') || disabled}
         bsSize="xsmall"
         onClick={onClick}
-        title="Edit Output"
-      >
+        title="Edit Output">
         <Icon name="edit_square" />
       </Button>
       <ConfigurationForm<Output['configuration']>

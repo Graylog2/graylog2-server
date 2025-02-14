@@ -42,7 +42,8 @@ public class PipelineUtils {
     public static PipelineSource update(PipelineService pipelineService,
                                         PipelineRuleParser pipelineRuleParser,
                                         String id,
-                                        PipelineSource update) throws NotFoundException {
+                                        PipelineSource update,
+                                        boolean checkMutability) throws NotFoundException {
         final PipelineDao dao = pipelineService.load(id);
         final Pipeline pipeline;
         try {
@@ -59,7 +60,7 @@ public class PipelineUtils {
 
         final PipelineDao savedPipeline;
         try {
-            savedPipeline = pipelineService.save(toSave);
+            savedPipeline = pipelineService.save(toSave, checkMutability);
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage(), e);
             throw new BadRequestException(e.getMessage());

@@ -97,8 +97,7 @@ class SystemOverviewDetails extends React.Component<
                 <Button
                   onClick={this._toggleMessageProcessing}
                   bsSize="xsmall"
-                  bsStyle={information.is_processing ? 'danger' : 'success'}
-                >
+                  bsStyle={information.is_processing ? 'danger' : 'success'}>
                   {information.is_processing ? 'Pause' : 'Resume'} processing
                 </Button>
               </span>

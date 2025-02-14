@@ -45,16 +45,14 @@ const SkipHealthCheck = ({ onChange, onSubmit }: SkipHealthCheckProps) => {
             <strong>{formData.awsCloudWatchKinesisStream.value}</strong> stream, then choose your option below to skip
             our automated check.
           </p>
-        }
-      >
+        }>
         <ValidatedInput
           id="awsCloudWatchKinesisInputType"
           type="select"
           fieldData={formData.awsCloudWatchKinesisInputType}
           onChange={onChange}
           label="Choose AWS Input Type"
-          required
-        >
+          required>
           {renderOptions(KINESIS_LOG_TYPES, 'Choose Log Type')}
         </ValidatedInput>
       </StyledFormWrap>

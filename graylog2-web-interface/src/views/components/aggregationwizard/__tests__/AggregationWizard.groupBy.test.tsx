@@ -98,8 +98,7 @@ describe('AggregationWizard', () => {
           onCancel={() => {}}
           fields={Immutable.List([])}
           onChange={() => {}}
-          {...props}
-        >
+          {...props}>
           <span>The Visualization</span>
         </AggregationWizard>
         ,

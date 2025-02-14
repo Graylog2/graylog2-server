@@ -118,15 +118,13 @@ const FilterRulesFields = ({ type }: Props) => {
             <Radio
               name="operator"
               checked={values.rule?.operator === 'AND'}
-              onChange={() => setFieldValue('rule.operator', 'AND')}
-            >
+              onChange={() => setFieldValue('rule.operator', 'AND')}>
               and
             </Radio>
             <Radio
               name="operator"
               checked={values.rule?.operator === 'OR'}
-              onChange={() => setFieldValue('rule.operator', 'OR')}
-            >
+              onChange={() => setFieldValue('rule.operator', 'OR')}>
               or
             </Radio>
           </WhenOperator>
@@ -169,8 +167,7 @@ const FilterRulesFields = ({ type }: Props) => {
             deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
             setBlockToDelete(null);
           }}
-          onCancel={() => setBlockToDelete(null)}
-        >
+          onCancel={() => setBlockToDelete(null)}>
           <>
             Are you sure you want to delete{' '}
             <strong>

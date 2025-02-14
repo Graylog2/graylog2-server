@@ -425,8 +425,7 @@ const RuleBuilder = () => {
                         });
 
                         setRuleSourceCodeToShow(rule);
-                      }}
-                    >
+                      }}>
                       Convert to Source Code
                     </Button>
                   </>
@@ -444,8 +443,7 @@ const RuleBuilder = () => {
               deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
               setBlockToDelete(null);
             }}
-            onCancel={() => setBlockToDelete(null)}
-          >
+            onCancel={() => setBlockToDelete(null)}>
             <>
               Are you sure you want to delete{' '}
               <strong>

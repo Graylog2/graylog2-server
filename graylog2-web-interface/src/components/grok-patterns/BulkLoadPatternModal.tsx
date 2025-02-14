@@ -97,8 +97,7 @@ class BulkLoadPatternModal extends React.Component<
           title="Import Grok patterns from file"
           submitButtonText="Upload"
           onCancel={this._closeModal}
-          onSubmitForm={this._onSubmit}
-        >
+          onSubmitForm={this._onSubmit}>
           <Input
             id="pattern-file"
             type="file"

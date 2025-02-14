@@ -200,8 +200,7 @@ const SaveTimeRangeAsPresetButton = () => {
         title="Save current time range as preset"
         ref={formTarget}
         bsSize="small"
-        onClick={toggleModal}
-      >
+        onClick={toggleModal}>
         Save as preset
       </Button>
     </TimeRangeAddToQuickListForm>

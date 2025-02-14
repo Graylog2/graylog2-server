@@ -109,8 +109,7 @@ class ContentPackParameterList extends React.Component<
                 disabled={parameterApplied}
                 onClick={() => {
                   onDeleteParameter(parameter);
-                }}
-              >
+                }}>
                 Delete
               </Button>
               {this._parameterModal(parameter)}

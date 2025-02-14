@@ -59,8 +59,7 @@ const LogLevelDropdown = ({ nodeId, name, subsystem }: Props) => {
     <MenuItem
       key={`${subsystem}-${nodeId}-${loglevel}`}
       active={subsystem.level === loglevel}
-      onClick={_menuLevelClick(loglevel)}
-    >
+      onClick={_menuLevelClick(loglevel)}>
       {capitalize(loglevel)}
     </MenuItem>
   ));

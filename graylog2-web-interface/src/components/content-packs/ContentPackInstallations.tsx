@@ -82,8 +82,7 @@ class ContentPackInstallations extends React.Component<
                 bsSize="small"
                 onClick={() => {
                   onUninstall(item.content_pack_id, item._id);
-                }}
-              >
+                }}>
                 Uninstall
               </Button>
               <Button bsStyle="info" bsSize="small" onClick={openShowModal}>

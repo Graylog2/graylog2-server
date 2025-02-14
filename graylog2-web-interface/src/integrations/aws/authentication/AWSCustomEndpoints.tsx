@@ -57,8 +57,7 @@ const AWSCustomEndpoints = ({ onChange }: AWSCustomEndpointsProps) => {
     <StyledAdditionalFields
       title="Optional AWS VPC Endpoints"
       visible={isAWSCustomEndpointsVisible}
-      onToggle={handleToggle}
-    >
+      onToggle={handleToggle}>
       <StyledSectionTitle>
         Overrides the default AWS API endpoint URL that Graylog communicates with.
       </StyledSectionTitle>

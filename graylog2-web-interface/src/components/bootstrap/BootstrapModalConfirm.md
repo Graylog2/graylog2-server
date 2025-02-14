@@ -39,8 +39,7 @@ class BootstrapModalConfirmExample extends React.Component {
           showModal={showModal}
           title="Confirm this"
           onConfirm={this.onConfirm}
-          onCancel={this.onCancel}
-        >
+          onCancel={this.onCancel}>
           Are you sure you want to do this?
         </BootstrapModalConfirm>
       </div>

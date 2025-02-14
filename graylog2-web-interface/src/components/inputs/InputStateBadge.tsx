@@ -104,14 +104,12 @@ const InputStateBadge = ({ input }: Props) => {
         placement="bottom"
         overlay={popOverText}
         rootClose
-        title={`Input States for ${input.title}`}
-      >
+        title={`Input States for ${input.title}`}>
         <Label
           bsStyle={_labelClassForState(sorted)}
           title="Click to show details"
           bsSize="xsmall"
-          style={{ cursor: 'pointer' }}
-        >
+          style={{ cursor: 'pointer' }}>
           {_textForState(sorted)}
         </Label>
       </OverlayTrigger>

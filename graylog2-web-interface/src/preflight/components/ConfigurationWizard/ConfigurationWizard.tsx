@@ -132,8 +132,7 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
               <StyledListItem
                 key={configurationStepKey}
                 $isStepSkipped={isStepSkipped}
-                icon={<StepIcon name={iconName} $color={iconColor} size="xl" />}
-              >
+                icon={<StepIcon name={iconName} $color={iconColor} size="xl" />}>
                 {description}
               </StyledListItem>
             );

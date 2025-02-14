@@ -104,8 +104,7 @@ const TimeRangeFilter = ({
       toggleDropdownShow={toggleShow}
       validTypes={validTypes}
       position={position}
-      withinPortal={withinPortal}
-    >
+      withinPortal={withinPortal}>
       <FlexContainer className={className} ref={containerRef}>
         {showDropdownButton && (
           <TimeRangeFilterButtons

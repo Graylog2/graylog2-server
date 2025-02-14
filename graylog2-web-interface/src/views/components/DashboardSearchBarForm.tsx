@@ -94,8 +94,7 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
       enableReinitialize={enableReinitialize}
       onSubmit={_onSubmit}
       validate={_validate}
-      validateOnMount
-    >
+      validateOnMount>
       {(...args) => <Form>{_isFunction(children) ? children(...args) : children}</Form>}
     </Formik>
   );

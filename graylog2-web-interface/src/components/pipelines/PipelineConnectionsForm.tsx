@@ -96,8 +96,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
       <Button
         disabled={!isPermitted(currentUser.permissions, 'pipeline_connection:edit')}
         onClick={_openModal}
-        bsStyle="info"
-      >
+        bsStyle="info">
         <span>Edit connections</span>
       </Button>
       <BootstrapModalForm
@@ -110,8 +109,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
         data-telemetry-title="Edit connections for pipeline"
         onSubmitForm={_save}
         onCancel={_closeModal}
-        submitButtonText="Update connections"
-      >
+        submitButtonText="Update connections">
         <fieldset>
           <FormGroup id="streamsConnections">
             <ControlLabel>Streams</ControlLabel>

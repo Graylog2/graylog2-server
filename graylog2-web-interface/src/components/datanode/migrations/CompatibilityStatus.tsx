@@ -69,13 +69,11 @@ const CompatibilityStatus = ({ hostname, opensearchVersion, nodeInfo }: Props) =
           onSelect={handleSelect}
           id="nodes"
           data-testid="nodes"
-          activeKey={activeAccordion}
-        >
+          activeKey={activeAccordion}>
           {nodes.map((node) => (
             <AccordionItem
               key={`${node.node_version}${node.indices.length}`}
-              name={`Node: ${hostname}, Version: ${node.node_version}, ${node.indices.length} indices`}
-            >
+              name={`Node: ${hostname}, Version: ${node.node_version}, ${node.indices.length} indices`}>
               <Table striped bordered condensed>
                 <thead>
                   <tr>

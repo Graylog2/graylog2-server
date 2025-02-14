@@ -58,8 +58,7 @@ const ClipboardButton = ({
         onClick={() => {
           copy();
           onSuccess?.();
-        }}
-      >
+        }}>
         {title}
       </Button>
     )}

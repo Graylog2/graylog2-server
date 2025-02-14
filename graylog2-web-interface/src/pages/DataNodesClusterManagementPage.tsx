@@ -51,8 +51,7 @@ const DataNodesClusterManagementPage = () => (
       documentationLink={{
         title: 'Data Nodes documentation',
         path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-      }}
-    >
+      }}>
       <span>
         Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index
         and search through all the messages in your Graylog message database.

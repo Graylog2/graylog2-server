@@ -123,8 +123,7 @@ const PaginatedDataTable = ({
       activePage={page}
       onChange={_onPageChange}
       showPageSizeSelect
-      useQueryParameter={false}
-    >
+      useQueryParameter={false}>
       <DataTable
         {...rest}
         useResponsiveTable={useResponsiveTable}

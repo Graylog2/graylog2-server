@@ -48,8 +48,7 @@ const PasswordFormGroup = ({}: Props) => (
     label="Password"
     help={`Passwords must be at least ${PASSWORD_MIN_LENGTH} characters long. We recommend using a strong password.`}
     labelClassName="col-sm-3"
-    wrapperClassName="col-sm-9"
-  >
+    wrapperClassName="col-sm-9">
     <Row className="no-bm">
       <Col sm={6}>
         <FormikInput

@@ -47,8 +47,7 @@ describe('AggregationWizard', () => {
             id="widget-id"
             type="AGGREGATION"
             fields={Immutable.List([])}
-            {...props}
-          >
+            {...props}>
             <div>The Visualization</div>
           </AggregationWizard>
         </FieldTypesContext.Provider>

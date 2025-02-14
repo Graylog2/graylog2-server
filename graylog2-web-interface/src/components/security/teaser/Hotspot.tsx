@@ -96,8 +96,7 @@ const Hotspot = ({ children, positionX, positionY, index }: TooltipProps) => {
             onMouseOut={hidePopover}
             onFocus={showPopover}
             onBlur={hidePopover}
-            ref={target}
-          >
+            ref={target}>
             {index + 1}
           </HotspotTrigger>
         </Popover.Target>

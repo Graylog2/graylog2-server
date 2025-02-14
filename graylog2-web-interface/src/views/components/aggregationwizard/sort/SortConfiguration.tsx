@@ -125,8 +125,7 @@ const Sort = React.memo(({ index }: Props) => {
             label="Direction"
             error={error}
             labelClassName="col-sm-3"
-            wrapperClassName="col-sm-9"
-          >
+            wrapperClassName="col-sm-9">
             <Select
               options={directionOptions}
               disabled={invalidSort}

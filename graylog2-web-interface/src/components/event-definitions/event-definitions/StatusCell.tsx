@@ -83,8 +83,7 @@ const StatusCell = ({ eventDefinition }: Props) => {
         title={title}
         aria-label={title}
         role="button"
-        $clickable={!disableChange}
-      >
+        $clickable={!disableChange}>
         {description}
         {!disableChange && (
           <>
@@ -98,8 +97,7 @@ const StatusCell = ({ eventDefinition }: Props) => {
           showModal
           title="Disable event definition"
           onConfirm={handleConfirmDisable}
-          onCancel={() => setShowConfirmDisableModal(false)}
-        >
+          onCancel={() => setShowConfirmDisableModal(false)}>
           {`Do you really want to disable event definition '${eventDefinition.title}'?`}
         </BootstrapModalConfirm>
       )}

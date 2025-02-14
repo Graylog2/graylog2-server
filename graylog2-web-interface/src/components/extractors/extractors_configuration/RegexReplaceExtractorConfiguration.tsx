@@ -101,8 +101,7 @@ class RegexReplaceExtractorConfiguration extends React.Component<
         <a
           target="_blank"
           href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)"
-          rel="noreferrer"
-        >
+          rel="noreferrer">
           Matcher
         </a>{' '}
         API documentation for the possible options.

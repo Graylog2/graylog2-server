@@ -88,8 +88,7 @@ const SortConfiguration = ({
             id="sort-configuration-direction"
             label="Direction"
             labelClassName="col-sm-3"
-            wrapperClassName="col-sm-9"
-          >
+            wrapperClassName="col-sm-9">
             <Select
               id="sort-configuration-direction-select"
               placeholder="Select a direction"

@@ -77,8 +77,7 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
         documentationLink={{
           title: 'Authentication documentation',
           path: DocsHelper.PAGES.USERS_ROLES,
-        }}
-      >
+        }}>
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
       </PageHeader>
       <BackendDetails authenticationBackend={authBackend} />

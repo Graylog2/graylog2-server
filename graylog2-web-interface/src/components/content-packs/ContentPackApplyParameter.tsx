@@ -68,8 +68,7 @@ class ContentPackApplyParameter extends React.Component<
           bsSize="small"
           onClick={() => {
             this._parameterClear(paramMap.configKey);
-          }}
-        >
+          }}>
           Clear
         </Button>
       </td>
@@ -171,8 +170,7 @@ class ContentPackApplyParameter extends React.Component<
                 value={this.state.config_key}
                 onChange={this._bindValue}
                 label="Config Key"
-                required
-              >
+                required>
                 {configOptions}
               </Input>
             </Col>
@@ -184,8 +182,7 @@ class ContentPackApplyParameter extends React.Component<
                 value={this.state.parameter}
                 onChange={this._bindValue}
                 label="Parameter"
-                required
-              >
+                required>
                 {parameterOptions}
               </Input>
             </Col>

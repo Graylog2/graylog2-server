@@ -111,8 +111,7 @@ const UltimatePagination = createUltimatePagination({
           onClick={onClick}
           title={title}
           aria-label={title}
-          className="pagination-control"
-        >
+          className="pagination-control">
           <Icon name="more_horiz" />
         </BootstrapPagination.Ellipsis>
       );
@@ -126,8 +125,7 @@ const UltimatePagination = createUltimatePagination({
           onClick={onClick}
           title={title}
           aria-label={title}
-          className="pagination-control"
-        >
+          className="pagination-control">
           <Icon name="keyboard_double_arrow_left" />
         </BootstrapPagination.First>
       );
@@ -141,8 +139,7 @@ const UltimatePagination = createUltimatePagination({
           onClick={onClick}
           title={title}
           aria-label={title}
-          className="pagination-control"
-        >
+          className="pagination-control">
           <Icon name="chevron_left" />
         </BootstrapPagination.Prev>
       );
@@ -156,8 +153,7 @@ const UltimatePagination = createUltimatePagination({
           onClick={onClick}
           title={title}
           aria-label={title}
-          className="pagination-control"
-        >
+          className="pagination-control">
           <Icon name="chevron_right" />
         </BootstrapPagination.Next>
       );
@@ -171,8 +167,7 @@ const UltimatePagination = createUltimatePagination({
           onClick={onClick}
           title={title}
           aria-label={title}
-          className="pagination-control"
-        >
+          className="pagination-control">
           <Icon name="keyboard_double_arrow_right" />
         </BootstrapPagination.Last>
       );

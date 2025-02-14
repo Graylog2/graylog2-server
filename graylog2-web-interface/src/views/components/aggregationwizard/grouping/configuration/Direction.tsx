@@ -40,8 +40,7 @@ const Direction = ({ groupingIndex }: Props) => (
         label="Direction"
         error={error}
         labelClassName="col-sm-3"
-        wrapperClassName="col-sm-7"
-      >
+        wrapperClassName="col-sm-7">
         <DirectionOptions>
           <Input
             checked={value === 'row'}

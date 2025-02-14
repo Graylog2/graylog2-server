@@ -141,8 +141,7 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
                 name="conditionType"
                 value={conditionTypes.FILTER}
                 checked={conditionType === conditionTypes.FILTER}
-                onChange={handleTypeChange}
-              >
+                onChange={handleTypeChange}>
                 Filter has results
               </Radio>
               <Radio
@@ -150,8 +149,7 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
                 name="conditionType"
                 value={conditionTypes.AGGREGATION}
                 checked={conditionType === conditionTypes.AGGREGATION}
-                onChange={handleTypeChange}
-              >
+                onChange={handleTypeChange}>
                 Aggregation of results reaches a threshold
               </Radio>
             </FormGroup>

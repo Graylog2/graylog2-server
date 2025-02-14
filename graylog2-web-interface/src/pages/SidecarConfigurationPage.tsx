@@ -31,8 +31,7 @@ const SidecarConfigurationPage = () => (
       documentationLink={{
         title: 'Sidecar documentation',
         path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-      }}
-    >
+      }}>
       <span>
         The Collector Sidecar runs next to your favourite log collector and configures it for you. Here you can manage
         the Sidecar configurations.

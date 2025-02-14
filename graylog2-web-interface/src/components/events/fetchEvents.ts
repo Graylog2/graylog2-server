@@ -38,6 +38,7 @@ type FiltersResult = {
     priority?: Array<string>;
     aggregation_timerange?: { from?: string; to?: string; type: string; range?: number };
     key?: Array<string>;
+    id?: Array<string>;
   };
   timerange?: TimeRange;
 };
@@ -76,6 +77,10 @@ const parseFilters = (filters: UrlQueryFilters) => {
 
   if (filters.get('priority')?.length > 0) {
     result.filter.priority = filters.get('priority');
+  }
+
+  if (filters.get('id')?.length > 0) {
+    result.filter.id = filters.get('id');
   }
 
   result.filter.alerts = parseTypeFilter(filters?.get('alert')?.[0]);

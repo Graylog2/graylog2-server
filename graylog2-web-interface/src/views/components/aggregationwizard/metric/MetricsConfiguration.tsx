@@ -48,8 +48,7 @@ const MetricsConfiguration = () => {
             <ElementConfigurationContainer
               key={`metrics-${index}`}
               onRemove={removeMetric(index)}
-              elementTitle={MetricElement.title}
-            >
+              elementTitle={MetricElement.title}>
               <MetricConfiguration index={index} />
             </ElementConfigurationContainer>
           ))}

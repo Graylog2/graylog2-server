@@ -30,8 +30,7 @@ const FieldGroup = ({ onSelect, selected, group, text, title }: Props) => (
     role="button"
     style={{ fontWeight: selected ? 'bold' : 'normal' }}
     tabIndex={0}
-    title={title}
-  >
+    title={title}>
     {text}
   </a>
 );

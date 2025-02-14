@@ -150,8 +150,7 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
           activePage={localPagination.currentPage}
           pageSize={localPagination.currentPageSize}
           onChange={onPageChange}
-          totalItems={pagination.total}
-        >
+          totalItems={pagination.total}>
           <SearchForm onSearch={onSearch} onReset={onReset} queryHelpComponent={queryHelpComponent} />
           <ScrollContainer>
             <Table condensed hover className={Styles.overviewTable}>

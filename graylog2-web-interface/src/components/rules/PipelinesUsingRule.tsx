@@ -45,8 +45,7 @@ const PipelinesUsingRule = ({ create }: PipelinesUsingRuleProps) => {
     <Input
       id="used-in-pipelines"
       label="Used in pipelines"
-      help="Pipelines that use this rule in one or more of their stages."
-    >
+      help="Pipelines that use this rule in one or more of their stages.">
       <div className="form-control-static">
         {usedInPipelines.length === 0 ? (
           'This rule is not being used in any pipelines.'

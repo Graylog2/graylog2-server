@@ -226,8 +226,7 @@ class ExpandableListItem extends React.Component<Props, State> {
               role="button"
               tabIndex={0}
               onClick={this._toggleExpand}
-              title={`${expanded ? 'Shrink' : 'Expand'} list item`}
-            >
+              title={`${expanded ? 'Shrink' : 'Expand'} list item`}>
               <IconContainer>
                 <Icon name={expanded ? 'expand_circle_up' : 'expand_circle_down'} />
               </IconContainer>

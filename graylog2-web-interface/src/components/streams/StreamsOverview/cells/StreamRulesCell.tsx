@@ -43,8 +43,7 @@ const StreamRulesCell = ({ stream }: Props) => {
       $disabled={stream.rules.length === 0}
       onClick={toggleRulesSection}
       ref={buttonRef}
-      title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}
-    >
+      title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}>
       {stream.rules.length}
     </StreamCountBadge>
   );

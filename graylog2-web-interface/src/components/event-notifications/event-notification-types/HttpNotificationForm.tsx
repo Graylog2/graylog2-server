@@ -145,8 +145,7 @@ class HttpNotificationForm extends React.Component<
           id="skip_tls_verification"
           name="skip_tls_verification"
           onChange={this.handleChange}
-          checked={config.skip_tls_verification}
-        >
+          checked={config.skip_tls_verification}>
           Skip TLS verification
         </Checkbox>
         <Row>
@@ -159,8 +158,7 @@ class HttpNotificationForm extends React.Component<
                   type="button"
                   onClick={() => {
                     this.resetSecret('basic_auth');
-                  }}
-                >
+                  }}>
                   Reset Secret
                 </StyledButton>
               </>
@@ -183,8 +181,7 @@ class HttpNotificationForm extends React.Component<
                       type="button"
                       onClick={() => {
                         this.undoResetSecret('basic_auth');
-                      }}
-                    >
+                      }}>
                       Undo Reset
                     </Button>
                   ) : undefined
@@ -221,8 +218,7 @@ class HttpNotificationForm extends React.Component<
                   type="button"
                   onClick={() => {
                     this.resetSecret('api_secret');
-                  }}
-                >
+                  }}>
                   Reset Secret
                 </StyledButton>
               </>
@@ -246,8 +242,7 @@ class HttpNotificationForm extends React.Component<
                       type="button"
                       onClick={() => {
                         this.undoResetSecret('api_secret');
-                      }}
-                    >
+                      }}>
                       Undo Reset
                     </Button>
                   ) : undefined
@@ -258,8 +253,7 @@ class HttpNotificationForm extends React.Component<
               id="api_key_as_header"
               name="api_key_as_header"
               onChange={this.handleChange}
-              checked={config.api_key_as_header}
-            >
+              checked={config.api_key_as_header}>
               Send API Key/Secret as Header
             </Checkbox>
           </Col>

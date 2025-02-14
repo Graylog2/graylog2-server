@@ -250,8 +250,7 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
               bsStyle="link"
               bsSize="small"
               onClick={_onClickHourToggle}
-              title="Toggle between beginning and end of day"
-            >
+              title="Toggle between beginning and end of day">
               <Icon name={hourIcon.current} />
             </StyledButton>
           </StyledInputAddon>

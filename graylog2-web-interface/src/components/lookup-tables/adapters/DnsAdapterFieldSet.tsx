@@ -90,8 +90,7 @@ class DnsAdapterFieldSet extends React.Component<
           autoFocus
           help="Select the type of DNS lookup to perform."
           labelClassName="col-sm-3"
-          wrapperClassName="col-sm-9"
-        >
+          wrapperClassName="col-sm-9">
           <Select
             placeholder="Select the type of DNS lookup"
             clearable={false}

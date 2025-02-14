@@ -188,9 +188,9 @@ const ConfigurationForm = ({
 
     nextFormData.collector_id = nextId;
 
-    // eslint-disable-next-line no-alert
     if (
       !nextFormData.template ||
+      // eslint-disable-next-line no-alert
       window.confirm('Do you want to use the default template for the selected Configuration?')
     ) {
       _onTemplateChange(defaultTemplate);

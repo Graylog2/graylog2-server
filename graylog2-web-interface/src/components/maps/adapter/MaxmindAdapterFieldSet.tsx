@@ -115,8 +115,7 @@ const MaxmindAdapterFieldSet = ({
         autoFocus
         help="Select the type of the database file"
         labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9"
-      >
+        wrapperClassName="col-sm-9">
         <Select
           placeholder="Select the type of database file"
           clearable={false}

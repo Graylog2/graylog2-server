@@ -95,8 +95,7 @@ const HoverForHelp = ({
     placement={placement}
     overlay={<StyledPopover id={id}>{children}</StyledPopover>}
     title={title}
-    testId={testId}
-  >
+    testId={testId}>
     <StyledIcon
       className={`${className} ${pullRight ? 'pull-right' : ''}`}
       name={iconName(type)}

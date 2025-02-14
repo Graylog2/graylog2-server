@@ -113,8 +113,7 @@ class SidecarRow extends React.Component<
                 `gl2_source_collector:${sidecar.node_id}`,
                 'absolute',
                 recentMessagesTimeRange(),
-              )}
-            >
+              )}>
               <Button bsSize="xsmall" bsStyle="info">
                 Show messages
               </Button>

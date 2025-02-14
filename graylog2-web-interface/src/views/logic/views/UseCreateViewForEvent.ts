@@ -131,8 +131,8 @@ export const WidgetsGenerator = async ({ streams, streamCategories, aggregations
   const byStreamCategory = matchesDecoratorStreamCategories(streamCategories);
   const streamDecorators = decorators?.length ? decorators.filter(byStreamId) : [];
   const streamCategoryDecorators = decorators?.length ? decorators.filter(byStreamCategory) : [];
-  // eslint-disable-next-line no-nested-ternary
   const allDecorators =
+    // eslint-disable-next-line no-nested-ternary
     streamDecorators.length && streamCategoryDecorators.length
       ? [...streamDecorators, ...streamCategoryDecorators]
       : streamDecorators.length

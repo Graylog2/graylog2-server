@@ -304,8 +304,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
           onSubmit={handleSubmit}
           enableReinitialize
           validate={(values) => validate(values, selectedRetentionSegment === 'legacy')}
-          validateOnChange
-        >
+          validateOnChange>
           {({ isSubmitting, isValid, isValidating, setFieldValue, values }) => (
             <IndexRetentionProvider>
               <Form>

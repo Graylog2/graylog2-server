@@ -67,8 +67,7 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
       submitButtonDisabled={!selectedTab}
       submitButtonText={`${keepCopy ? 'Copy' : 'Move'} widget`}
       onSubmitForm={submit}
-      title="Choose Target Page"
-    >
+      title="Choose Target Page">
       {renderResult}
       <Input
         type="checkbox"

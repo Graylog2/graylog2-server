@@ -60,8 +60,7 @@ const UserDetailsPage = ({ params }: Props) => {
         documentationLink={{
           title: 'Permissions documentation',
           path: DocsHelper.PAGES.USERS_ROLES,
-        }}
-      >
+        }}>
         <span>Overview of details like profile information, settings, teams and roles.</span>
       </PageHeader>
 

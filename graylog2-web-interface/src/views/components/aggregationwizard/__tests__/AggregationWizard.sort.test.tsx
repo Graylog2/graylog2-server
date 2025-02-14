@@ -101,8 +101,7 @@ const renderSUT = (props = {}) =>
           id="widget-id"
           type="AGGREGATION"
           fields={Immutable.List([])}
-          {...props}
-        >
+          {...props}>
           <span>The Visualization</span>
         </AggregationWizard>
       </FieldTypesContext.Provider>

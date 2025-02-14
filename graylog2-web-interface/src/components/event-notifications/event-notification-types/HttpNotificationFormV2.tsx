@@ -229,8 +229,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
           id="skip_tls_verification"
           name="skip_tls_verification"
           onChange={this.handleChange}
-          checked={config.skip_tls_verification}
-        >
+          checked={config.skip_tls_verification}>
           Skip TLS verification
         </Checkbox>
         <Row>
@@ -243,8 +242,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                   type="button"
                   onClick={() => {
                     this.resetSecret('basic_auth');
-                  }}
-                >
+                  }}>
                   Reset Secret
                 </StyledButton>
               </>
@@ -267,8 +265,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                       type="button"
                       onClick={() => {
                         this.undoResetSecret('basic_auth');
-                      }}
-                    >
+                      }}>
                       Undo Reset
                     </Button>
                   ) : undefined
@@ -297,8 +294,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
               id="api_key_as_header"
               name="api_key_as_header"
               onChange={this.handleChange}
-              checked={config.api_key_as_header}
-            >
+              checked={config.api_key_as_header}>
               Send API Key/Secret as Header
             </Checkbox>
           </Col>
@@ -311,8 +307,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                   type="button"
                   onClick={() => {
                     this.resetSecret('api_secret');
-                  }}
-                >
+                  }}>
                   Reset Secret
                 </StyledButton>
               </>
@@ -336,8 +331,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
                       type="button"
                       onClick={() => {
                         this.undoResetSecret('api_secret');
-                      }}
-                    >
+                      }}>
                       Undo Reset
                     </Button>
                   ) : undefined
@@ -386,8 +380,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
             <Input
               help="HTTP content type used for POST/PUT notifications"
               id="notification-content-type"
-              label="Content Type"
-            >
+              label="Content Type">
               <Select
                 id="content-type"
                 name="content-type"
@@ -404,8 +397,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
             <Input
               id="notification-time-zone"
               help="Time zone used for timestamps in the notification body"
-              label={<>Time zone for date/time values</>}
-            >
+              label={<>Time zone for date/time values</>}>
               <TimezoneSelect
                 className="timezone-select"
                 name="time_zone"
@@ -422,8 +414,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
             {config.method !== 'GET' && (
               <FormGroup
                 controlId="notification-body-template"
-                validationState={validation.errors.body_template ? 'error' : null}
-              >
+                validationState={validation.errors.body_template ? 'error' : null}>
                 <ControlLabel>Body Template</ControlLabel>
                 <SourceCodeEditor
                   id="notification-body-template"

@@ -212,8 +212,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
       onSubmitForm={onSubmit}
       onCancel={onCancel}
       show={show}
-      bsSize="large"
-    >
+      bsSize="large">
       {!indexSets ? (
         <Spinner />
       ) : (

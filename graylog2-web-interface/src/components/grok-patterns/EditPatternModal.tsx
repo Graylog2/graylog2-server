@@ -189,8 +189,7 @@ class EditPatternModal extends React.Component<
           bsSize="large"
           onSubmitForm={this._save}
           onCancel={this._closeModal}
-          submitButtonText={`${create ? 'Create' : 'Update'} pattern`}
-        >
+          submitButtonText={`${create ? 'Create' : 'Update'} pattern`}>
           <fieldset>
             <Input
               type="text"

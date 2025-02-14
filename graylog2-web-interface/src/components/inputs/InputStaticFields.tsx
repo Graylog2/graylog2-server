@@ -43,8 +43,7 @@ class InputStaticFields extends React.Component<
       bsStyle="link"
       bsSize="xsmall"
       style={{ verticalAlign: 'baseline' }}
-      onClick={this._deleteStaticField(fieldName)}
-    >
+      onClick={this._deleteStaticField(fieldName)}>
       <Icon name="remove" />
     </Button>
   );

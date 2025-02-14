@@ -88,8 +88,7 @@ const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
       value={node}
       help="On which node should this input start"
       onChange={_onChangeNode}
-      required
-    >
+      required>
       <option key="placeholder" value="">
         Select Node
       </option>

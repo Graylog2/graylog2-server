@@ -65,8 +65,7 @@ export const ApiProvider = ({ children }: ApiProviderProps) => {
         clearLogData,
         availableGroups,
         setGroups,
-      }}
-    >
+      }}>
       {children}
     </ApiContext.Provider>
   );

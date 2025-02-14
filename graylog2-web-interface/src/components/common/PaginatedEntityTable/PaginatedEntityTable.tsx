@@ -167,8 +167,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
             onReset={onSearchReset}
             query={query}
             placeholder={searchPlaceholder ?? `Search for ${humanName}`}
-            queryHelpComponent={queryHelpComponent}
-          >
+            queryHelpComponent={queryHelpComponent}>
             <div style={{ marginBottom: 5 }}>
               <EntityFilters
                 attributes={attributes}

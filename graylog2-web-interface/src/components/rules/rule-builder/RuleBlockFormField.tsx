@@ -135,8 +135,7 @@ const RuleBlockFormField = ({
         required={!param.optional}
         buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
         help={param.description}
-        {...field}
-      >
+        {...field}>
         <>
           <option key="placeholder" value="">
             Select output from list
@@ -144,8 +143,7 @@ const RuleBlockFormField = ({
           {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
             <option
               key={`option-${variableName}`}
-              value={variableName}
-            >{`Output from step ${stepOrder + 1} (${variableName})`}</option>
+              value={variableName}>{`Output from step ${stepOrder + 1} (${variableName})`}</option>
           ))}
         </>
       </FormikFormGroup>
@@ -210,8 +208,7 @@ const RuleBlockFormField = ({
             required={!param.optional}
             help={!filteredOutputVariableList().length && param.optional ? typeNotFoundErrorMessage : param.description}
             error={!filteredOutputVariableList().length && !param.optional ? typeNotFoundErrorMessage : undefined}
-            {...field}
-          >
+            {...field}>
             <>
               <option key="placeholder" value="">
                 Select output from list
@@ -219,8 +216,7 @@ const RuleBlockFormField = ({
               {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
                 <option
                   key={`option-${variableName}`}
-                  value={variableName}
-                >{`Output from step ${stepOrder + 1} (${variableName})`}</option>
+                  value={variableName}>{`Output from step ${stepOrder + 1} (${variableName})`}</option>
               ))}
             </>
           </FormikFormGroup>

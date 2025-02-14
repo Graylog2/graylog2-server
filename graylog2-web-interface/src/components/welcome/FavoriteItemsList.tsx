@@ -59,8 +59,7 @@ const FavoriteItemsList = () => {
       totalItems={total}
       pageSize={pagination.per_page}
       showPageSizeSelect={false}
-      hideFirstAndLastPageLinks
-    >
+      hideFirstAndLastPageLinks>
       <ListGroup>
         {favorites.map(({ grn, title }) => (
           <EntityItem key={grn} grn={grn} title={title} />

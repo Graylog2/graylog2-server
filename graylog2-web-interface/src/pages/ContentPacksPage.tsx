@@ -100,8 +100,7 @@ const ContentPacksPage = () => {
                 <Button bsStyle="success">Create a content pack</Button>
               </LinkContainer>
             </ButtonToolbar>
-          }
-        >
+          }>
           <span>
             Content Packs accelerate the set up process for a specific data source. A Content Pack can include
             inputs/extractors, streams, and dashboards.

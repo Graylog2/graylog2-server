@@ -119,8 +119,7 @@ const FilterRulesList = ({
             streamId={streamId}
           />
         </IfPermitted>
-      }
-    >
+      }>
       <Alert bsStyle="default">
         Messages which meet the criteria of the following filter rule(s) will not be routed to the{' '}
         {destinationType === 'indexer' ? 'Index Set' : 'Data Lake'}.
@@ -130,8 +129,7 @@ const FilterRulesList = ({
         pageSize={DEFAULT_PAGE_SIZES[0]}
         onChange={onPaginationChange}
         useQueryParameter={false}
-        showPageSizeSelect={false}
-      >
+        showPageSizeSelect={false}>
         <DataTable
           id="filter-list"
           className="striped"

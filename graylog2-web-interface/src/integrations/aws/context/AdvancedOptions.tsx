@@ -34,8 +34,7 @@ export const AdvancedOptionsProvider = ({ children }: AdvancedOptionsProviderPro
         isAWSCustomEndpointsVisible,
         setAdvancedOptionsVisibility,
         setAWSCustomEndpointsVisibility,
-      }}
-    >
+      }}>
       {children}
     </AdvancedOptionsContext.Provider>
   );

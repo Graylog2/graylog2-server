@@ -160,8 +160,7 @@ const RuleBlockDisplay = ({
     <StyledRow
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={!isDropdownOpen ? () => setShowActions(false) : undefined}
-      $hovered={showActions}
-    >
+      $hovered={showActions}>
       <Col xs={9} md={10}>
         <Row>
           <Col xs={10} md={9}>
@@ -174,8 +173,7 @@ const RuleBlockDisplay = ({
                   onClick={(e) => {
                     e.target.blur();
                     onNegate();
-                  }}
-                >
+                  }}>
                   Not
                 </NegationButton>
               )}
@@ -196,8 +194,7 @@ const RuleBlockDisplay = ({
               <Label
                 bsStyle="primary"
                 onMouseEnter={() => setHighlightedOutput(block.outputvariable)}
-                onMouseLeave={() => setHighlightedOutput(undefined)}
-              >
+                onMouseLeave={() => setHighlightedOutput(undefined)}>
                 {`$${block.outputvariable}`}
               </Label>
               {returnTypeLabel && <TypeLabel bsStyle="default">{returnTypeLabel}</TypeLabel>}
@@ -220,15 +217,13 @@ const RuleBlockDisplay = ({
               buttonTitle={MORE_ACTIONS_HOVER_TITLE}
               bsSize="xsmall"
               onToggle={handleDropdownToggle}
-              dropdownZIndex={1500}
-            >
+              dropdownZIndex={1500}>
               <MenuItem onClick={onEdit}>Edit</MenuItem>
               <MenuItem
                 onClick={() => {
                   onDuplicate();
                   handleDropdownToggle();
-                }}
-              >
+                }}>
                 Duplicate
               </MenuItem>
               <MenuItem divider />

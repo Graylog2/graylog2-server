@@ -122,8 +122,7 @@ class ReactGridContainerExampleLocked extends React.Component {
           columns={columns}
           rowHeight={100}
           locked={locked}
-          isResizable={isResizable}
-        >
+          isResizable={isResizable}>
           {this.widgetDiv(1)}
           {this.widgetDiv(2)}
           {this.widgetDiv(3)}

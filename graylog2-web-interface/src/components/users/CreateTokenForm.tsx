@@ -63,8 +63,7 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
         id="create-token"
         disabled={disableForm || tokenName === '' || creatingToken}
         type="submit"
-        bsStyle="primary"
-      >
+        bsStyle="primary">
         {creatingToken ? <Spinner text="Creating..." /> : 'Create Token'}
       </Button>
     </StyledForm>

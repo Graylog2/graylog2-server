@@ -187,8 +187,7 @@ const NavItem = ({
       onClick={!disabled ? onClick : undefined}
       title={title}
       $sidebarIsPinned={sidebarIsPinned}
-      $disabled={disabled}
-    >
+      $disabled={disabled}>
       <IconWrap $isLink={isLink} $isSelected={isSelected} $sidebarIsPinned={sidebarIsPinned} $disabled={disabled}>
         <Icon name={icon} type="regular" />
       </IconWrap>

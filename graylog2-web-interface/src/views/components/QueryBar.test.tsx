@@ -114,8 +114,7 @@ describe('QueryBar', () => {
           setDashboardPage: setDashboard,
           unsetDashboardPage: jest.fn(),
           dashboardPage: undefined,
-        }}
-      >
+        }}>
         <QueryBar />
       </DashboardPageContext.Provider>,
     );

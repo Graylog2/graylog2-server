@@ -71,8 +71,7 @@ const UserEditPage = ({ params }: Props) => {
         documentationLink={{
           title: 'Permissions documentation',
           path: DocsHelper.PAGES.USERS_ROLES,
-        }}
-      >
+        }}>
         <span>You can change the user details and password here and assign roles and teams.</span>
       </PageHeader>
       <UserEdit user={userToEdit} />

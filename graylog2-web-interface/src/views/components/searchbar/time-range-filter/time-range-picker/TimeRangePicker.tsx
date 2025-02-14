@@ -224,16 +224,14 @@ const TimeRangePicker = ({
       withinPortal={withinPortal}
       withArrow
       width={735}
-      zIndex={1060}
-    >
+      zIndex={1060}>
       <Popover.Target>{children}</Popover.Target>
       <Popover.Dropdown title={title}>
         <Formik<TimeRangePickerFormValues>
           initialValues={initialValues}
           validate={_validateTimeRange}
           onSubmit={onSubmit}
-          validateOnMount
-        >
+          validateOnMount>
           {({ isValid, submitForm, isValidating }) => (
             <KeyCapture
               shortcuts={[
@@ -249,8 +247,7 @@ const TimeRangePicker = ({
                   scope: 'general',
                   options: { displayInOverview: false },
                 },
-              ]}
-            >
+              ]}>
               <NestedForm>
                 <Row>
                   <Col md={12}>

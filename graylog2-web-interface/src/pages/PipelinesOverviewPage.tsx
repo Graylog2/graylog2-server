@@ -32,8 +32,7 @@ const PipelinesOverviewPage = () => (
       documentationLink={{
         title: 'Pipelines documentation',
         path: DocsHelper.PAGES.PIPELINES,
-      }}
-    >
+      }}>
       <span>
         Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules
         are evaluated and applied. Messages can go through one or more stages.

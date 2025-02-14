@@ -204,8 +204,7 @@ const ReactGridContainer = ({
       // While CSS transform improves the paint performance,
       // it currently results in bug when using `react-sticky-el` inside a grid item.
       useCSSTransforms={false}
-      draggableHandle={locked ? '' : draggableHandle}
-    >
+      draggableHandle={locked ? '' : draggableHandle}>
       {children}
     </StyledWidthProvidedGridLayout>
   );

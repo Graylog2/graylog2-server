@@ -125,8 +125,7 @@ class MetricsComponent extends React.Component<Props, State> {
             query={filter}
             onSearch={this.onFilterChange}
             queryWidth={300}
-            placeholder="Type a metric name to filter&hellip;"
-          >
+            placeholder="Type a metric name to filter&hellip;">
             <MetricsListContainer>
               <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId} />
             </MetricsListContainer>

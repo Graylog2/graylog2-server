@@ -174,8 +174,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
             help="Select the page the user sees right after log in. Only entities are selectable which the user has permissions for."
             labelClassName="col-sm-3"
             wrapperClassName="col-sm-9"
-            error={meta?.error}
-          >
+            error={meta?.error}>
             <>
               <Container>
                 <TypeSelect

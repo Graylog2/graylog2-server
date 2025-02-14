@@ -57,8 +57,7 @@ describe('RuleForm', () => {
           onChangeSource: () => {},
           setRawMessageToSimulate: () => {},
           setRuleSimulationResult: () => {},
-        }}
-      >
+        }}>
         <RuleForm create={false} />
       </PipelineRulesContext.Provider>,
     );
@@ -116,8 +115,7 @@ describe('RuleForm', () => {
               setRawMessageToSimulate,
               setRuleSimulationResult: () => {},
               simulateRule: () => {},
-            }}
-          >
+            }}>
             {children}
           </PipelineRulesContext.Provider>
         );

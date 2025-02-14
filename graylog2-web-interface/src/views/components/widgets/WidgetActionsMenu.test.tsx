@@ -127,8 +127,7 @@ describe('<WidgetActionsMenu />', () => {
             unsetWidgetFocusing,
             unsetWidgetEditing,
             focusedWidget,
-          }}
-        >
+          }}>
           <WidgetContext.Provider value={propsWidget}>
             <WidgetActionsMenu
               isFocused={false}

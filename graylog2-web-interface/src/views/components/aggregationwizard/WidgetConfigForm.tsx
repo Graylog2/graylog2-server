@@ -151,8 +151,7 @@ const WidgetConfigForm = ({ children, onSubmit, initialValues, validate, config 
       innerRef={formRef}
       validateOnChange
       validateOnMount
-      onSubmit={onSubmit}
-    >
+      onSubmit={onSubmit}>
       {(...args) => (
         <StyledForm className="form form-horizontal">
           <PropagateDisableSubmissionState

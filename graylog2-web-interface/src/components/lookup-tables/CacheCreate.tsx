@@ -93,8 +93,7 @@ const CacheCreate = ({ saved, types, validate, validationErrors }: Props) => {
             autoFocus
             help="The type of cache to configure."
             labelClassName="col-sm-3"
-            wrapperClassName="col-sm-9"
-          >
+            wrapperClassName="col-sm-9">
             <Select
               placeholder="Select Cache Type"
               clearable={false}

@@ -66,8 +66,7 @@ const ClientCertForm = ({ onCancel }: Props) => {
               lifetimeUnit: 'days',
             } as ClientCertFormValues
           }
-          onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}
-        >
+          onSubmit={(formValues: ClientCertFormValues) => onSubmit(formValues)}>
           {({ isSubmitting, values, setFieldValue }) => (
             <Form>
               <Modal.Body>

@@ -130,8 +130,7 @@ const Tooltip = ({
     positionTop={positionTop}
     positionLeft={positionLeft}
     arrowOffsetTop={arrowOffsetTop}
-    arrowOffsetLeft={arrowOffsetLeft}
-  >
+    arrowOffsetLeft={arrowOffsetLeft}>
     {children}
   </StyledTooltip>
 );

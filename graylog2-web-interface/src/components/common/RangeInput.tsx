@@ -83,8 +83,7 @@ const RangeInput = ({ id, label, help, error, bsStyle, labelClassName, wrapperCl
     help={help}
     bsStyle={bsStyle}
     error={error}
-    label={label}
-  >
+    label={label}>
     <StyledSlider renderTrack={Track} renderThumb={Thumb} className={error} {...otherProps} />
   </Input>
 );
