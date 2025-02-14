@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.messages;
 
-import com.google.common.collect.Iterables;
 import org.graylog2.indexer.ElasticsearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +45,10 @@ public class ChunkedBulkIndexer {
         int offset = 0;
         IndexingResults.Builder accumulatedResults = IndexingResults.Builder.create();
         int attempt = 0;
+        boolean allowResettingChunkSize = false;
         for (; ; ) {
             try {
-                var results = bulkIndexChunked(new Chunk(messageList, offset, chunkSize), bulkIndex);
+                var results = bulkIndexChunked(new Chunk(messageList, offset, chunkSize), allowResettingChunkSize, bulkIndex);
                 accumulatedResults.addResults(results);
                 return accumulatedResults.build();
             } catch (EntityTooLargeException e) {
@@ -62,6 +62,7 @@ public class ChunkedBulkIndexer {
                 accumulatedResults.addResults(e.previousResults);
 
                 if (retryForever && chunkSize == 1) {
+                    allowResettingChunkSize = true;
                     retryWait.waitBeforeRetrying(attempt++);
                 }
             }
@@ -71,25 +72,33 @@ public class ChunkedBulkIndexer {
         }
     }
 
-    private IndexingResults bulkIndexChunked(Chunk command, BulkIndex bulkIndex) throws ChunkedBulkIndexer.EntityTooLargeException, IOException {
+    private IndexingResults bulkIndexChunked(Chunk command, boolean allowResettingChunkSize, BulkIndex bulkIndex) throws ChunkedBulkIndexer.EntityTooLargeException, IOException {
         final List<IndexingRequest> messageList = command.requests;
         final int offset = command.offset;
-        final int chunkSize = command.size;
+        int chunkSize = command.size;
 
         final IndexingResults.Builder accumulatedResults = IndexingResults.Builder.create();
         if (messageList.isEmpty()) {
             return accumulatedResults.build();
         }
 
-        final Iterable<List<IndexingRequest>> chunks = Iterables.partition(messageList.subList(offset, messageList.size()), chunkSize);
+        final var remainingMessages = messageList.subList(offset, messageList.size());
+
+        final var partitioner = new DynamicSizeListPartitioner<>(remainingMessages);
+
         int chunkCount = 1;
         int indexedSuccessfully = 0;
-        for (List<IndexingRequest> chunk : chunks) {
-
+        while (partitioner.hasNext()) {
+            final var chunk = partitioner.nextPartition(chunkSize);
             final var response = bulkIndex.apply(indexedSuccessfully, accumulatedResults.build(), chunk);
             indexedSuccessfully += chunk.size();
             final IndexingResults results = response.indexingResults();
             accumulatedResults.addResults(results);
+
+            if (allowResettingChunkSize) {
+                LOG.warn("Indexing successful again - resetting chunk size!");
+                chunkSize = command.requests().size();
+            }
 
             logDebugInfo(messageList, offset, chunkSize, chunkCount, response.indexedMessages(), results.errors());
             logFailures(response.failureMessage(), results.errors().size());
@@ -118,17 +127,7 @@ public class ChunkedBulkIndexer {
         }
     }
 
-    public static class Chunk {
-        public final List<IndexingRequest> requests;
-        public final int offset;
-        public final int size;
-
-        Chunk(List<IndexingRequest> requests, int offset, int size) {
-            this.requests = requests;
-            this.offset = offset;
-            this.size = size;
-        }
-    }
+    public record Chunk(List<IndexingRequest> requests, int offset, int size) {}
 
     public static class EntityTooLargeException extends Exception {
         public final int indexedSuccessfully;
