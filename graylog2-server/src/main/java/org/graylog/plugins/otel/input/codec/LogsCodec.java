@@ -79,7 +79,7 @@ public class LogsCodec {
 
         message.addField(prefixed("trace_id"), Hex.encodeHexString(logRecord.getTraceId().toByteArray()));
         message.addField(prefixed("span_id"), Hex.encodeHexString(logRecord.getSpanId().toByteArray()));
-        message.addField(prefixed("trace_flags"), logRecord.getFlags());
+        message.addField(prefixed("flags"), logRecord.getFlags());
         message.addField(prefixed("severity_text"), logRecord.getSeverityText());
         message.addField(prefixed("severity_number"), logRecord.getSeverityNumberValue());
 
