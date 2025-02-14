@@ -177,7 +177,7 @@ public class InputRoutingService {
         try {
             PipelineDao pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
             String pipelineSource = pipelineDao.source().replace(oldTitle, newTitle);
-            pipelineService.save(pipelineDao.toBuilder().source(pipelineSource).build());
+            pipelineService.save(pipelineDao.toBuilder().source(pipelineSource).build(), false);
         } catch (NotFoundException e) {
             log.warn("Unable to load pipeline {}", GL_INPUT_ROUTING_PIPELINE, e);
         }
