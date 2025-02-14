@@ -36,12 +36,8 @@ const rule = HighlightingRule.builder()
   .value('noob')
   .build();
 
-const ruleWithValueFalse = rule.toBuilder()
-  .value(false)
-  .build();
-const ruleWithValueZero = rule.toBuilder()
-  .value(0)
-  .build();
+const ruleWithValueFalse = rule.toBuilder().value(false).build();
+const ruleWithValueZero = rule.toBuilder().value(0).build();
 
 describe('HighlightForm', () => {
   const fieldTypes: FieldTypes = {
@@ -106,7 +102,14 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(rule.field, rule.value, rule.condition, expect.objectContaining({ type: 'static', color: expect.any(String) })));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        rule.field,
+        rule.value,
+        rule.condition,
+        expect.objectContaining({ type: 'static', color: expect.any(String) }),
+      ),
+    );
   });
 
   it('creates a new gradient when type is selected', async () => {
@@ -121,7 +124,14 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(rule.field, rule.value, rule.condition, expect.objectContaining({ gradient: 'Viridis' })));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        rule.field,
+        rule.value,
+        rule.condition,
+        expect.objectContaining({ gradient: 'Viridis' }),
+      ),
+    );
   });
 
   it('should be able to click submit when has value 0 with type number', async () => {
@@ -129,7 +139,14 @@ describe('HighlightForm', () => {
     render(<SUT rule={ruleWithValueZero} onSubmit={onSubmit} />);
 
     await triggerSaveButtonClick();
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(ruleWithValueZero.field, '0', ruleWithValueZero.condition, ruleWithValueZero.color));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        ruleWithValueZero.field,
+        '0',
+        ruleWithValueZero.condition,
+        ruleWithValueZero.color,
+      ),
+    );
   });
 
   it('should be able to click submit when has value false with type boolean', async () => {
@@ -138,6 +155,13 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(ruleWithValueFalse.field, 'false', ruleWithValueFalse.condition, ruleWithValueFalse.color));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        ruleWithValueFalse.field,
+        'false',
+        ruleWithValueFalse.condition,
+        ruleWithValueFalse.color,
+      ),
+    );
   });
 });

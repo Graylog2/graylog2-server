@@ -19,23 +19,23 @@ import styled from 'styled-components';
 import { Row } from 'components/bootstrap';
 
 const StyledIndexSetDetailsRow = styled(Row)`
-dl {
-  margin-bottom: 0;
+  dl {
+    margin-bottom: 0;
 
-  dt {
-    float: left;
-    width: 190px;
-    overflow: hidden;
-    clear: left;
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+    dt {
+      float: left;
+      width: 190px;
+      overflow: hidden;
+      clear: left;
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
-  dd {
-    margin-left: 180px;
+    dd {
+      margin-left: 180px;
+    }
   }
-}
 `;
 
 export default StyledIndexSetDetailsRow;

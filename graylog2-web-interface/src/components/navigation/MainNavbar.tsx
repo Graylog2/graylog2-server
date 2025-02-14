@@ -33,27 +33,22 @@ import { navigation as securityNavigation } from 'components/security/bindings';
 import NavigationLink from './NavigationLink';
 
 const LAST_POSITION = 'last';
-const requiredFeatureFlagIsEnabled = (requiredFeatureFlag: undefined | string) => (requiredFeatureFlag ? AppConfig.isFeatureEnabled(requiredFeatureFlag) : true);
+const requiredFeatureFlagIsEnabled = (requiredFeatureFlag: undefined | string) =>
+  requiredFeatureFlag ? AppConfig.isFeatureEnabled(requiredFeatureFlag) : true;
 
 type PluginRouteProps = {
   navigationItem: {
     path: string;
     description: string;
     requiredFeatureFlag?: string;
-    BadgeComponent?: React.ComponentType<{ text: string }>
-    permissions?: string | Array<string>
-  },
-  topLevel?: boolean
-}
+    BadgeComponent?: React.ComponentType<{ text: string }>;
+    permissions?: string | Array<string>;
+  };
+  topLevel?: boolean;
+};
 
 const PluginRoute = ({
-  navigationItem: {
-    description,
-    path,
-    permissions,
-    requiredFeatureFlag,
-    BadgeComponent,
-  },
+  navigationItem: { description, path, permissions, requiredFeatureFlag, BadgeComponent },
   topLevel = false,
 }: PluginRouteProps) => {
   const currentUser = useCurrentUser();
@@ -64,25 +59,22 @@ const PluginRoute = ({
   }
 
   return (
-    <NavigationLink key={description}
-                    description={BadgeComponent ? <BadgeComponent text={description} /> : description}
-                    path={path}
-                    topLevel={topLevel} />
+    <NavigationLink
+      key={description}
+      description={BadgeComponent ? <BadgeComponent text={description} /> : description}
+      path={path}
+      topLevel={topLevel}
+    />
   );
 };
 
 type PluginNavDropdownProps = {
-  navigationItem: PluginNavigation,
-  pathname: string
-}
+  navigationItem: PluginNavigation;
+  pathname: string;
+};
 
 const PluginNavDropdown = ({
-  navigationItem: {
-    children,
-    description,
-    BadgeComponent,
-    requiredFeatureFlag,
-  },
+  navigationItem: { children, description, BadgeComponent, requiredFeatureFlag },
   pathname,
 }: PluginNavDropdownProps) => {
   const currentUser = useCurrentUser();
@@ -91,57 +83,64 @@ const PluginNavDropdown = ({
     return null;
   }
 
-  const activeChild = children.filter(({ path, end }) => (path && isActiveRoute(pathname, path, end)));
+  const activeChild = children.filter(({ path, end }) => path && isActiveRoute(pathname, path, end));
   const title = activeChild.length > 0 ? `${description} / ${activeChild[0].description}` : description;
-  const isEmpty = !children.some((child) => (
-    isPermitted(currentUser.permissions, child.permissions) && requiredFeatureFlagIsEnabled(child.requiredFeatureFlag)),
+  const isEmpty = !children.some(
+    (child) =>
+      isPermitted(currentUser.permissions, child.permissions) &&
+      requiredFeatureFlagIsEnabled(child.requiredFeatureFlag),
   );
 
   if (isEmpty) {
     return null;
   }
 
-  const renderBadge = children.some((child) => isPermitted(currentUser.permissions, child.permissions) && child?.BadgeComponent);
+  const renderBadge = children.some(
+    (child) => isPermitted(currentUser.permissions, child.permissions) && child?.BadgeComponent,
+  );
 
   return (
-    <NavDropdown key={title}
-                 title={title}
-                 badge={renderBadge ? BadgeComponent : null}
-                 inactiveTitle={description}>
-      {children.map((childNavigationItem) => <PluginRoute navigationItem={childNavigationItem} key={childNavigationItem.description} />)}
+    <NavDropdown key={title} title={title} badge={renderBadge ? BadgeComponent : null} inactiveTitle={description}>
+      {children.map((childNavigationItem) => (
+        <PluginRoute navigationItem={childNavigationItem} key={childNavigationItem.description} />
+      ))}
     </NavDropdown>
   );
 };
 
-const _existingDropdownItemIndex = (existingNavigationItems: Array<PluginNavigation>, newNavigationItem: PluginNavigation) => {
+const _existingDropdownItemIndex = (
+  existingNavigationItems: Array<PluginNavigation>,
+  newNavigationItem: PluginNavigation,
+) => {
   if (!newNavigationItem.children) {
     return -1;
   }
 
-  return existingNavigationItems.findIndex(({ description, perspective, children }) => newNavigationItem.description === description && newNavigationItem.perspective === perspective && children);
+  return existingNavigationItems.findIndex(
+    ({ description, perspective, children }) =>
+      newNavigationItem.description === description && newNavigationItem.perspective === perspective && children,
+  );
 };
 
-const mergeDuplicateDropdowns = (navigationItems: Array<PluginNavigation>): Array<PluginNavigation> => navigationItems.reduce((result, current) => {
-  const existingDropdownItemIndex = _existingDropdownItemIndex(result, current);
+const mergeDuplicateDropdowns = (navigationItems: Array<PluginNavigation>): Array<PluginNavigation> =>
+  navigationItems.reduce((result, current) => {
+    const existingDropdownItemIndex = _existingDropdownItemIndex(result, current);
 
-  if (existingDropdownItemIndex >= 0) {
-    const existingDropdownItem = result[existingDropdownItemIndex];
-    const newDropdownItem = {
-      ...current,
-      ...existingDropdownItem,
-      children: [
-        ...existingDropdownItem.children,
-        ...current.children,
-      ],
-    };
-    const newResult = [...result];
-    newResult[existingDropdownItemIndex] = newDropdownItem;
+    if (existingDropdownItemIndex >= 0) {
+      const existingDropdownItem = result[existingDropdownItemIndex];
+      const newDropdownItem = {
+        ...current,
+        ...existingDropdownItem,
+        children: [...existingDropdownItem.children, ...current.children],
+      };
+      const newResult = [...result];
+      newResult[existingDropdownItemIndex] = newDropdownItem;
 
-    return newResult;
-  }
+      return newResult;
+    }
 
-  return [...result, current];
-}, []);
+    return [...result, current];
+  }, []);
 
 const pluginMenuItemExists = (navigationItems: Array<PluginNavigation>, description: string) => {
   if (!navigationItems?.length) {
@@ -158,17 +157,18 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
   return menuItem && Object.keys(menuItem).includes('useIsValidLicense') ? menuItem.useIsValidLicense() : true;
 };
 
-const sortItemsByPosition = <T extends { position: typeof LAST_POSITION | undefined }>(navigationItems: Array<T>) => navigationItems.sort((route1, route2) => {
-  if (route1.position === LAST_POSITION) {
-    return 1;
-  }
+const sortItemsByPosition = <T extends { position: typeof LAST_POSITION | undefined }>(navigationItems: Array<T>) =>
+  navigationItems.sort((route1, route2) => {
+    if (route1.position === LAST_POSITION) {
+      return 1;
+    }
 
-  if (route2.position === LAST_POSITION) {
-    return -1;
-  }
+    if (route2.position === LAST_POSITION) {
+      return -1;
+    }
 
-  return 0;
-});
+    return 0;
+  });
 
 const useNavigationItems = () => {
   const { permissions } = useCurrentUser();
@@ -194,7 +194,10 @@ const useNavigationItems = () => {
       // no security plugin menu, so we will add one
       if (!securityMenuIsMissing) {
         // remove the existing security menu item
-        navigationItems.splice(navigationItems.findIndex((item) => item.description === SECURITY_ROUTE_DESCRIPTION), 1);
+        navigationItems.splice(
+          navigationItems.findIndex((item) => item.description === SECURITY_ROUTE_DESCRIPTION),
+          1,
+        );
       }
 
       navigationItems.push(securityNavigation);
@@ -214,17 +217,11 @@ const MainNavbar = ({ pathname }: { pathname: string }) => {
       {navigationItems.map((navigationItem) => {
         if (navigationItem.children) {
           return (
-            <PluginNavDropdown navigationItem={navigationItem}
-                               pathname={pathname}
-                               key={navigationItem.description} />
+            <PluginNavDropdown navigationItem={navigationItem} pathname={pathname} key={navigationItem.description} />
           );
         }
 
-        return (
-          <PluginRoute navigationItem={navigationItem}
-                       key={navigationItem.description}
-                       topLevel />
-        );
+        return <PluginRoute navigationItem={navigationItem} key={navigationItem.description} topLevel />;
       })}
     </Nav>
   );

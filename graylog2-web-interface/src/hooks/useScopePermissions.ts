@@ -24,15 +24,15 @@ import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { onError } from 'util/conditional/onError';
 
 type ScopeParams = {
-  is_mutable: boolean,
-}
+  is_mutable: boolean;
+};
 
 type ScopeName = 'DEFAULT' | 'ILLUMINATE';
 
 type EntityScopeRecord = Record<ScopeName, ScopeParams>;
 
 type EntityScopeType = {
-  entity_scopes: EntityScopeRecord,
+  entity_scopes: EntityScopeRecord;
 };
 
 function fetchScopePermissions() {

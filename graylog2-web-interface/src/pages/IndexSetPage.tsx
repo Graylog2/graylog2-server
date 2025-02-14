@@ -46,15 +46,20 @@ const ElasticsearchUnavailableInformation = () => (
   <Row className="content">
     <Col md={8} mdOffset={2}>
       <div className="top-margin">
-        <Panel bsStyle="danger"
-               header={<span><Icon name="warning" /> Indices overview unavailable</span>}>
+        <Panel
+          bsStyle="danger"
+          header={
+            <span>
+              <Icon name="warning" /> Indices overview unavailable
+            </span>
+          }>
           <p>
-            We could not get the indices overview information. This usually means there was a problem
-            connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from Graylog</strong>.
+            We could not get the indices overview information. This usually means there was a problem connecting to
+            Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from Graylog</strong>.
           </p>
           <p>
-            Graylog will continue storing your messages in its journal, but you will not be able to search on them
-            until Elasticsearch is reachable again.
+            Graylog will continue storing your messages in its journal, but you will not be able to search on them until
+            Elasticsearch is reachable again.
           </p>
         </Panel>
       </div>
@@ -64,19 +69,19 @@ const ElasticsearchUnavailableInformation = () => (
 
 type Props = {
   params: {
-    indexSetId?: string,
-  },
-  indexSet?: IndexSet,
-  indexerOverview?: IndexerOverview,
-  indexerOverviewError?: string,
+    indexSetId?: string;
+  };
+  indexSet?: IndexSet;
+  indexerOverview?: IndexerOverview;
+  indexerOverviewError?: string;
   indexDetails: {
-    closedIndices?: Indices,
-    indices?: Indices,
-  },
+    closedIndices?: Indices;
+    indices?: Indices;
+  };
 };
 
 type State = {
-  timerId?: NodeJS.Timeout,
+  timerId?: NodeJS.Timeout;
 };
 
 class IndexSetPage extends React.Component<Props, State> {
@@ -99,7 +104,9 @@ class IndexSetPage extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { params: { indexSetId } } = this.props;
+    const {
+      params: { indexSetId },
+    } = this.props;
     IndexSetsActions.get(indexSetId);
     IndicesActions.list(indexSetId);
 
@@ -119,7 +126,9 @@ class IndexSetPage extends React.Component<Props, State> {
   }
 
   _totalIndexCount = () => {
-    const { indexerOverview: { indices = [] } } = this.props;
+    const {
+      indexerOverview: { indices = [] },
+    } = this.props;
 
     return indices.length;
   };
@@ -135,23 +144,30 @@ class IndexSetPage extends React.Component<Props, State> {
       return <Spinner />;
     }
 
-    const { indexSet, indexerOverview, indexerOverviewError, params: { indexSetId }, indexDetails: { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices } } = this.props;
+    const {
+      indexSet,
+      indexerOverview,
+      indexerOverviewError,
+      params: { indexSetId },
+      indexDetails: { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices },
+    } = this.props;
 
     const pageHeader = indexSet && (
-      <PageHeader title={`Index Set: ${indexSet.title}`}
-                  documentationLink={{
-                    title: 'Index model documentation',
-                    path: DocsHelper.PAGES.INDEX_MODEL,
-                  }}
-                  actions={(
-                    <ButtonToolbar>
-                      <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
-                        <Button bsStyle="info">Edit Index Set</Button>
-                      </LinkContainer>
-                      <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
-                      <IndicesConfigurationDropdown indexSetId={indexSetId} />
-                    </ButtonToolbar>
-                  )}>
+      <PageHeader
+        title={`Index Set: ${indexSet.title}`}
+        documentationLink={{
+          title: 'Index model documentation',
+          path: DocsHelper.PAGES.INDEX_MODEL,
+        }}
+        actions={
+          <ButtonToolbar>
+            <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
+              <Button bsStyle="info">Edit Index Set</Button>
+            </LinkContainer>
+            <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
+            <IndicesConfigurationDropdown indexSetId={indexSetId} />
+          </ButtonToolbar>
+        }>
         <span>
           This is an overview of all indices (message stores) in this index set Graylog is currently taking in account
           for searches and analysis.
@@ -177,9 +193,8 @@ class IndexSetPage extends React.Component<Props, State> {
       indicesInfo = (
         <span>
           <Alert bsStyle="success" style={{ marginTop: '10' }}>
-            {this._totalIndexCount()} indices with a total of{' '}
-            {numeral(indexerOverview.counts.events).format('0,0')} messages under management,
-            current write-active index is <i>{deflectorInfo.current_target}</i>.
+            {this._totalIndexCount()} indices with a total of {numeral(indexerOverview.counts.events).format('0,0')}{' '}
+            messages under management, current write-active index is <i>{deflectorInfo.current_target}</i>.
           </Alert>
           <HideOnCloud>
             <IndexerClusterHealthSummary health={indexerOverview.indexer_cluster.health} />
@@ -188,9 +203,7 @@ class IndexSetPage extends React.Component<Props, State> {
       );
 
       indicesOverview = (
-        <IndicesOverview indices={indexerOverview.indices}
-                         indexDetails={indexDetailsIndices}
-                         indexSetId={indexSetId} />
+        <IndicesOverview indices={indexerOverview.indices} indexDetails={indexDetailsIndices} indexSetId={indexSetId} />
       );
     } else {
       indicesInfo = <Spinner />;
@@ -210,9 +223,7 @@ class IndexSetPage extends React.Component<Props, State> {
           </Row>
 
           <Row className="content">
-            <Col md={12}>
-              {indicesInfo}
-            </Col>
+            <Col md={12}>{indicesInfo}</Col>
           </Row>
 
           {indicesOverview}

@@ -34,21 +34,23 @@ const ShowNodePage = () => {
   const { clusterOverview } = useStore(ClusterOverviewStore);
   const { pluginList, isLoading: isLoadingPlugins } = usePluginList(nodeId);
   const { data: jvmInformation } = useQuery(['jvm', nodeId], () => ClusterOverviewStore.jvm(nodeId));
-  const { data: inputStates } = useQuery(['inputs', 'states', nodeId], () => InputStatesStore.list().then((inputStates) => {
-    // We only want the input states for the current node
-    const inputIds = Object.keys(inputStates);
-    const filteredInputStates = [];
+  const { data: inputStates } = useQuery(['inputs', 'states', nodeId], () =>
+    InputStatesStore.list().then((inputStates) => {
+      // We only want the input states for the current node
+      const inputIds = Object.keys(inputStates);
+      const filteredInputStates = [];
 
-    inputIds.forEach((inputId) => {
-      const inputObject = inputStates[inputId][nodeId];
+      inputIds.forEach((inputId) => {
+        const inputObject = inputStates[inputId][nodeId];
 
-      if (inputObject) {
-        filteredInputStates.push(inputObject);
-      }
-    });
+        if (inputObject) {
+          filteredInputStates.push(inputObject);
+        }
+      });
 
-    return filteredInputStates;
-  }));
+      return filteredInputStates;
+    }),
+  );
 
   const systemOverview = clusterOverview?.[nodeId];
   const node = nodes?.[nodeId];
@@ -58,23 +60,36 @@ const ShowNodePage = () => {
     return <Spinner />;
   }
 
-  const title = <span>Node {node.short_node_id} / {node.hostname}</span>;
+  const title = (
+    <span>
+      Node {node.short_node_id} / {node.hostname}
+    </span>
+  );
 
   return (
     <DocumentTitle title={`Node ${node.short_node_id} / ${node.hostname}`}>
       <div>
         <PageHeader title={title} actions={<NodeMaintenanceDropdown node={node} />}>
           <span>
-            This page shows details of a Graylog server node that is active and reachable in your cluster.<br />
-            {node.is_leader ? <span>This is the leader node.</span> : <span>This is <em>not</em> the leader node.</span>}
+            This page shows details of a Graylog server node that is active and reachable in your cluster.
+            <br />
+            {node.is_leader ? (
+              <span>This is the leader node.</span>
+            ) : (
+              <span>
+                This is <em>not</em> the leader node.
+              </span>
+            )}
           </span>
         </PageHeader>
-        <NodeOverview node={node}
-                      systemOverview={systemOverview}
-                      jvmInformation={jvmInformation}
-                      plugins={pluginList.plugins}
-                      inputStates={inputStates}
-                      inputDescriptions={inputDescriptions} />
+        <NodeOverview
+          node={node}
+          systemOverview={systemOverview}
+          jvmInformation={jvmInformation}
+          plugins={pluginList.plugins}
+          inputStates={inputStates}
+          inputDescriptions={inputDescriptions}
+        />
       </div>
     </DocumentTitle>
   );

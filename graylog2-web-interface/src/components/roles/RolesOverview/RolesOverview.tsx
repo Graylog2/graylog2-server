@@ -42,10 +42,12 @@ const Header = styled.div`
   align-items: center;
 `;
 
-const LoadingSpinner = styled(Spinner)(({ theme }) => `
+const LoadingSpinner = styled(Spinner)(
+  ({ theme }) => `
   margin-left: 10px;
   font-size: ${theme.fonts.size.h3};
-`);
+`,
+);
 
 const StyledPaginatedList = styled(PaginatedList)`
   .pagination {
@@ -71,10 +73,11 @@ const _loadRoles = (pagination, setLoading, setPaginatedRoles) => {
   });
 };
 
-const _updateListOnRoleDelete = (pagination, setLoading, setPaginatedRoles, callback: () => void) => AuthzRolesActions.delete.completed.listen(() => {
-  _loadRoles(pagination, setLoading, setPaginatedRoles);
-  callback();
-});
+const _updateListOnRoleDelete = (pagination, setLoading, setPaginatedRoles, callback: () => void) =>
+  AuthzRolesActions.delete.completed.listen(() => {
+    _loadRoles(pagination, setLoading, setPaginatedRoles);
+    callback();
+  });
 
 const getUseTeamMembersHook = () => {
   const defaultHook = () => ({ loading: false, users: [] });
@@ -93,22 +96,28 @@ const RolesOverview = () => {
   const teamMembersByRole = useTeamMembersByRole();
 
   useEffect(() => _loadRoles({ page, perPage, query }, setLoading, setPaginatedRoles), [page, perPage, query]);
-  useEffect(() => _updateListOnRoleDelete({ page, perPage, query }, setLoading, setPaginatedRoles, resetPage), [page, perPage, query, resetPage]);
+  useEffect(
+    () => _updateListOnRoleDelete({ page, perPage, query }, setLoading, setPaginatedRoles, resetPage),
+    [page, perPage, query, resetPage],
+  );
 
   const handleSearch = (newQuery) => {
     resetPage();
     setQuery(newQuery);
   };
 
-  const _rolesOverviewItem = useCallback((role) => {
-    const { id: roleId } = role;
-    const roleUsers = paginatedRoles?.context.users[roleId];
-    const users = teamMembersByRole.users[roleId]
-      ? [...teamMembersByRole.users[roleId], ...roleUsers]
-      : paginatedRoles?.context?.users[roleId];
+  const _rolesOverviewItem = useCallback(
+    (role) => {
+      const { id: roleId } = role;
+      const roleUsers = paginatedRoles?.context.users[roleId];
+      const users = teamMembersByRole.users[roleId]
+        ? [...teamMembersByRole.users[roleId], ...roleUsers]
+        : paginatedRoles?.context?.users[roleId];
 
-    return <RolesOverviewItem role={role} users={users} />;
-  }, [teamMembersByRole, paginatedRoles?.context]);
+      return <RolesOverviewItem role={role} users={users} />;
+    },
+    [teamMembersByRole, paginatedRoles?.context],
+  );
 
   if (!paginatedRoles) {
     return <Spinner />;
@@ -124,22 +133,22 @@ const RolesOverview = () => {
             <h2>Roles</h2>
             {loading && <LoadingSpinner text="" delay={0} />}
           </Header>
-          <p className="description">
-            Found {paginatedRoles.pagination.total} roles on the system.
-          </p>
+          <p className="description">Found {paginatedRoles.pagination.total} roles on the system.</p>
           <StyledPaginatedList totalItems={paginatedRoles.pagination.total}>
-            <DataTable id="roles-overview"
-                       className="table-hover"
-                       rowClassName="no-bm"
-                       headers={TABLE_HEADERS}
-                       headerCellFormatter={_headerCellFormatter}
-                       sortByKey="name"
-                       rows={roles.toJS()}
-                       noDataText={<NoSearchResult>No roles have been found.</NoSearchResult>}
-                       customFilter={searchFilter}
-                       dataRowFormatter={_rolesOverviewItem}
-                       filterKeys={[]}
-                       filterLabel="Filter Roles" />
+            <DataTable
+              id="roles-overview"
+              className="table-hover"
+              rowClassName="no-bm"
+              headers={TABLE_HEADERS}
+              headerCellFormatter={_headerCellFormatter}
+              sortByKey="name"
+              rows={roles.toJS()}
+              noDataText={<NoSearchResult>No roles have been found.</NoSearchResult>}
+              customFilter={searchFilter}
+              dataRowFormatter={_rolesOverviewItem}
+              filterKeys={[]}
+              filterLabel="Filter Roles"
+            />
           </StyledPaginatedList>
         </Col>
       </Row>

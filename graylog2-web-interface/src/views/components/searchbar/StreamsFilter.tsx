@@ -28,18 +28,15 @@ const Container = styled.div`
 `;
 
 type Props = {
-  disabled?: boolean,
-  value?: Array<string>,
-  streams: Array<{ key: string, value: string }>,
-  onChange: (newStreamIds: Array<string>) => void,
-  multi?: boolean,
-  clearable?: boolean
+  disabled?: boolean;
+  value?: Array<string>;
+  streams: Array<{ key: string; value: string }>;
+  onChange: (newStreamIds: Array<string>) => void;
+  multi?: boolean;
+  clearable?: boolean;
 };
 
-const StreamsFilter = ({
-  disabled = false, value = [], streams, onChange, multi = true,
-  clearable = true,
-}: Props) => {
+const StreamsFilter = ({ disabled = false, value = [], streams, onChange, multi = true, clearable = true }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const selectedStreams = value.join(',');
   const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
@@ -60,16 +57,18 @@ const StreamsFilter = ({
 
   return (
     <Container data-testid="streams-filter" title={placeholder}>
-      <Select placeholder={placeholder}
-              disabled={disabled}
-              clearable={clearable}
-              aria-label={placeholder}
-              displayKey="key"
-              inputId="streams-filter"
-              onChange={handleChange}
-              options={options}
-              multi={multi}
-              value={selectedStreams} />
+      <Select
+        placeholder={placeholder}
+        disabled={disabled}
+        clearable={clearable}
+        aria-label={placeholder}
+        displayKey="key"
+        inputId="streams-filter"
+        onChange={handleChange}
+        options={options}
+        multi={multi}
+        value={selectedStreams}
+      />
     </Container>
   );
 };

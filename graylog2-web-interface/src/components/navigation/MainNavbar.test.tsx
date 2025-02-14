@@ -73,30 +73,28 @@ describe('MainNavbar', () => {
             description: 'Feature flag dropdown test',
             path: '/',
             children: [
-              { path: '/newpluginroute', description: 'New dropdown route', requiredFeatureFlag: 'enable_dropdown_nav_item' },
+              {
+                path: '/newpluginroute',
+                description: 'New dropdown route',
+                requiredFeatureFlag: 'enable_dropdown_nav_item',
+              },
             ],
           },
           {
             description: 'Merged dropdown test',
             path: '/',
-            children: [
-              { path: '/another-route', description: 'Menu item for general perspective' },
-            ],
+            children: [{ path: '/another-route', description: 'Menu item for general perspective' }],
           },
           {
             description: 'Merged dropdown test',
             path: '/',
-            children: [
-              { path: '/just-another-route', description: 'Merged item for general perspective' },
-            ],
+            children: [{ path: '/just-another-route', description: 'Merged item for general perspective' }],
           },
           {
             description: 'Merged dropdown test',
             path: '/',
             perspective: examplePerspective.id,
-            children: [
-              { path: '/another-route', description: 'Menu item for specific perspective' },
-            ],
+            children: [{ path: '/another-route', description: 'Menu item for specific perspective' }],
           },
         ],
       } as PluginExports,
@@ -126,9 +124,7 @@ describe('MainNavbar', () => {
     });
 
     it('does not contain navigation elements from plugins where permissions are missing', () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List([]))
-        .build());
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
 
       render(<SUT />);
 
@@ -149,9 +145,12 @@ describe('MainNavbar', () => {
     });
 
     it('contains restricted navigation elements from plugins if permissions are present', async () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List(['archive:read']))
-        .build());
+      asMock(useCurrentUser).mockReturnValue(
+        adminUser
+          .toBuilder()
+          .permissions(Immutable.List(['archive:read']))
+          .build(),
+      );
 
       render(<SUT />);
 
@@ -159,9 +158,7 @@ describe('MainNavbar', () => {
     });
 
     it('does not render dropdown contributed by plugin if permissions for all elements are missing', () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List([]))
-        .build());
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
 
       render(<SUT />);
 
@@ -169,9 +166,12 @@ describe('MainNavbar', () => {
     });
 
     it('renders dropdown contributed by plugin if permissions are sufficient', async () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
-        .build());
+      asMock(useCurrentUser).mockReturnValue(
+        adminUser
+          .toBuilder()
+          .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
+          .build(),
+      );
 
       render(<SUT />);
 
@@ -192,9 +192,12 @@ describe('MainNavbar', () => {
     });
 
     it('sets dropdown title based on match', async () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
-        .build());
+      asMock(useCurrentUser).mockReturnValue(
+        adminUser
+          .toBuilder()
+          .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
+          .build(),
+      );
 
       render(<SUT pathname="/somethingelse" />);
 
@@ -223,9 +226,7 @@ describe('MainNavbar', () => {
 
   describe('uses correct permissions:', () => {
     it('should not show `Enterprise` item if user is lacking permissions', () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List())
-        .build());
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List()).build());
 
       render(<SUT />);
 
@@ -233,9 +234,12 @@ describe('MainNavbar', () => {
     });
 
     it('should show `Enterprise` item if user has permission to read license', async () => {
-      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-        .permissions(Immutable.List(['licenseinfos:read']))
-        .build());
+      asMock(useCurrentUser).mockReturnValue(
+        adminUser
+          .toBuilder()
+          .permissions(Immutable.List(['licenseinfos:read']))
+          .build(),
+      );
 
       render(<SUT />);
 

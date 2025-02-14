@@ -27,8 +27,7 @@ const list = [
 
 describe('SortableList', () => {
   it('should list items', async () => {
-    render(<SortableList items={list}
-                         onMoveItem={() => {}} />);
+    render(<SortableList items={list} onMoveItem={() => {}} />);
 
     await screen.findByText('Item 1');
     await screen.findByText('Item 2');
@@ -47,11 +46,17 @@ describe('SortableList', () => {
     fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
     await screen.findByText(/You have dropped the item/i);
 
-    await waitFor(() => expect(onMoveItemStub).toHaveBeenCalledWith([
-      { id: 'item-2', title: 'Item 2' },
-      { id: 'item-1', title: 'Item 1' },
-      { id: 'item-3', title: 'Item 3' },
-    ], 0, 1));
+    await waitFor(() =>
+      expect(onMoveItemStub).toHaveBeenCalledWith(
+        [
+          { id: 'item-2', title: 'Item 2' },
+          { id: 'item-1', title: 'Item 1' },
+          { id: 'item-3', title: 'Item 3' },
+        ],
+        0,
+        1,
+      ),
+    );
   });
 
   it('should render list items with custom content', () => {
@@ -67,9 +72,15 @@ describe('SortableList', () => {
       </div>
     );
 
-    render(<SortableList items={list}
-                         onMoveItem={() => {}}
-                         customListItemRender={({ item, ref, className, dragHandleProps, draggableProps }) => customListItemRender(item, ref, className, dragHandleProps, draggableProps)} />);
+    render(
+      <SortableList
+        items={list}
+        onMoveItem={() => {}}
+        customListItemRender={({ item, ref, className, dragHandleProps, draggableProps }) =>
+          customListItemRender(item, ref, className, dragHandleProps, draggableProps)
+        }
+      />,
+    );
 
     list.forEach((item) => expect(screen.getByText(`Id: ${item.id}`)).toBeInTheDocument());
   });

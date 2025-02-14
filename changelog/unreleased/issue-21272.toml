@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed poor performance of CIDR data adapter lookups."
+
+issues = ["21272"]
+pulls = ["21474", "graylog-plugin-enterprise#9628"]

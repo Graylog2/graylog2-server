@@ -22,7 +22,14 @@ import type { ValueRenderer, ValueRendererProps } from './ValueRenderer';
 const pipelineFromDecorators = (decorators: Array<ValueRenderer>): ValueRenderer => {
   const Component: ValueRenderer = ({ value, ...rest }: ValueRendererProps) => (
     <>
-      {decorators.reduce<React.ReactElement>((prev, Cur) => <Cur {...rest} value={value}>{prev}</Cur>, null)}
+      {decorators.reduce<React.ReactElement>(
+        (prev, Cur) => (
+          <Cur {...rest} value={value}>
+            {prev}
+          </Cur>
+        ),
+        null,
+      )}
     </>
   );
 

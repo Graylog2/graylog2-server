@@ -41,20 +41,24 @@ const _validateCache = (adapter) => {
   LookupTableCachesActions.validate(adapter);
 };
 
-type LUTCachesPageProps = ParamsContext & PaginationProps & {
-  cache?: any;
-  validationErrors?: any;
-  types?: any;
-  caches?: any[];
-  history: any;
-  location: any;
-  pagination: any;
-  action?: string;
-};
+type LUTCachesPageProps = ParamsContext &
+  PaginationProps & {
+    cache?: any;
+    validationErrors?: any;
+    types?: any;
+    caches?: any[];
+    history: any;
+    location: any;
+    pagination: any;
+    action?: string;
+  };
 
-class LUTCachesPage extends React.Component<LUTCachesPageProps, {
-  [key: string]: any;
-}> {
+class LUTCachesPage extends React.Component<
+  LUTCachesPageProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     cache: null,
     validationErrors: {},
@@ -68,8 +72,12 @@ class LUTCachesPage extends React.Component<LUTCachesPageProps, {
   }
 
   componentDidUpdate(prevProps) {
-    const { location: { pathname } } = this.props;
-    const { location: { pathname: prevPathname } } = prevProps;
+    const {
+      location: { pathname },
+    } = this.props;
+    const {
+      location: { pathname: prevPathname },
+    } = prevProps;
 
     if (pathname !== prevPathname) {
       this._loadData(this.props);
@@ -95,15 +103,7 @@ class LUTCachesPage extends React.Component<LUTCachesPageProps, {
   };
 
   render() {
-    const {
-      action,
-      cache,
-      validationErrors,
-      types,
-      caches,
-      pagination,
-      history,
-    } = this.props;
+    const { action, cache, validationErrors, types, caches, pagination, history } = this.props;
     let content;
     const isShowing = action === 'show';
     const isEditing = action === 'edit';
@@ -115,13 +115,15 @@ class LUTCachesPage extends React.Component<LUTCachesPageProps, {
         content = (
           <Row className="content">
             <Col lg={12}>
-              <CacheForm cache={cache}
-                         type={cache.config.type}
-                         title="Data Cache"
-                         create={false}
-                         saved={() => _saved(history)}
-                         validate={_validateCache}
-                         validationErrors={validationErrors} />
+              <CacheForm
+                cache={cache}
+                type={cache.config.type}
+                title="Data Cache"
+                create={false}
+                saved={() => _saved(history)}
+                validate={_validateCache}
+                validationErrors={validationErrors}
+              />
             </Col>
           </Row>
         );
@@ -133,30 +135,32 @@ class LUTCachesPage extends React.Component<LUTCachesPageProps, {
         content = <Spinner text="Loading data cache types" />;
       } else {
         content = (
-          <CacheCreate types={types}
-                       saved={() => _saved(history)}
-                       validate={_validateCache}
-                       validationErrors={validationErrors} />
+          <CacheCreate
+            types={types}
+            saved={() => _saved(history)}
+            validate={_validateCache}
+            validationErrors={validationErrors}
+          />
         );
       }
     } else if (!caches) {
       content = <Spinner text="Loading caches" />;
     } else {
-      content = (
-        <CachesOverview caches={caches}
-                        pagination={pagination} />
-      );
+      content = <CachesOverview caches={caches} pagination={pagination} />;
     }
 
     return (
       <DocumentTitle title="Lookup Tables - Caches">
         <LUTPageNavigation />
-        <PageHeader title="Caches for Lookup Tables"
-                    actions={(
-                      <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
-                        <Button bsStyle="success" style={{ marginLeft: 5 }}>Create cache</Button>
-                      </LinkContainer>
-                    )}>
+        <PageHeader
+          title="Caches for Lookup Tables"
+          actions={
+            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
+              <Button bsStyle="success" style={{ marginLeft: 5 }}>
+                Create cache
+              </Button>
+            </LinkContainer>
+          }>
           <span>Caches provide the actual values for lookup tables</span>
         </PageHeader>
         {content}

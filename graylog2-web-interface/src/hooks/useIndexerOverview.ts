@@ -23,34 +23,39 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { IndexerOverview } from 'stores/indexers/IndexerOverviewStore';
 
-const fetchIndexerOverview = (indexSetId: string) => fetch('GET', qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url));
+const fetchIndexerOverview = (indexSetId: string) =>
+  fetch('GET', qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url));
 
-const useIndexerOverview = (indexSetId: string): {
-  data: IndexerOverview,
-  refetch: () => void,
-  isLoading: boolean,
-  error: FetchError,
-  isSuccess: boolean,
+const useIndexerOverview = (
+  indexSetId: string,
+): {
+  data: IndexerOverview;
+  refetch: () => void;
+  isLoading: boolean;
+  error: FetchError;
+  isSuccess: boolean;
 } => {
   const { data, refetch, isLoading, error, isSuccess } = useQuery<IndexerOverview, FetchError>(
     ['indexerOverview', indexSetId, 'stats'],
     () => fetchIndexerOverview(indexSetId),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading indexer overview for index set failed with status: ${errorThrown}`,
-          'Could not load indexer overview.');
+        UserNotification.error(
+          `Loading indexer overview for index set failed with status: ${errorThrown}`,
+          'Could not load indexer overview.',
+        );
       },
       notifyOnChangeProps: ['data', 'error'],
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isLoading,
     error,
     isSuccess,
-  });
+  };
 };
 
 export default useIndexerOverview;

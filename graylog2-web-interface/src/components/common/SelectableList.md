@@ -19,18 +19,20 @@ class SelectableListExample extends React.Component {
 
   onChange(nextSelectedOptions) {
     this.setState({ selectedOptions: nextSelectedOptions });
-  };
+  }
 
   render() {
     const { options, selectedOptions } = this.state;
     return (
-      <SelectableList selectedOptionsType="object"
-                      options={options}
-                      onChange={this.onChange}
-                      selectedOptions={selectedOptions} />
+      <SelectableList
+        selectedOptionsType="object"
+        options={options}
+        onChange={this.onChange}
+        selectedOptions={selectedOptions}
+      />
     );
   }
 }
 
-<SelectableListExample />
+<SelectableListExample />;
 ```

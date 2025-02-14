@@ -17,8 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 
-import useAlertAndEventDefinitionData
-  from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
+import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
@@ -34,69 +33,81 @@ import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import Center from 'components/common/Center';
 
 type ReplaySearchProps = {
-  alertId: string,
-  definitionId: string,
-  eventDefinition: EventDefinition,
-  event: Event,
-  aggregations: EventDefinitionAggregation[],
-  replayEventDefinition: boolean,
-  searchPageLayout: Partial<LayoutState>,
-  forceSidebarPinned: boolean,
-}
+  alertId: string;
+  definitionId: string;
+  eventDefinition: EventDefinition;
+  event: Event;
+  aggregations: EventDefinitionAggregation[];
+  replayEventDefinition: boolean;
+  searchPageLayout: Partial<LayoutState>;
+  forceSidebarPinned: boolean;
+};
 
 const defaultSearchPageLayout = {};
 
 const ReplaySearch = ({
-  alertId, definitionId, eventDefinition, aggregations, event: eventData, replayEventDefinition, searchPageLayout, forceSidebarPinned,
+  alertId,
+  definitionId,
+  eventDefinition,
+  aggregations,
+  event: eventData,
+  replayEventDefinition,
+  searchPageLayout,
+  forceSidebarPinned,
 }: ReplaySearchProps) => {
   const _view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
   const view = useCreateSearch(_view);
-  const _searchPageLayout = useMemo(() => ({
-    ...searchPageLayout,
-    infoBar: { component: EventInfoBar },
-  }), [searchPageLayout]);
-  const replaySearchContext = useMemo(() => ({
-    alertId,
-    definitionId,
-    // eslint-disable-next-line no-nested-ternary
-    type: replayEventDefinition ? 'event_definition' : eventData?.alert ? 'alert' : 'event',
-  } as const), [alertId, definitionId, eventData?.alert, replayEventDefinition]);
+  const _searchPageLayout = useMemo(
+    () => ({
+      ...searchPageLayout,
+      infoBar: { component: EventInfoBar },
+    }),
+    [searchPageLayout],
+  );
+  const replaySearchContext = useMemo(
+    () =>
+      ({
+        alertId,
+        definitionId,
+        // eslint-disable-next-line no-nested-ternary
+        type: replayEventDefinition ? 'event_definition' : eventData?.alert ? 'alert' : 'event',
+      }) as const,
+    [alertId, definitionId, eventData?.alert, replayEventDefinition],
+  );
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
       <SearchPageLayoutProvider value={_searchPageLayout}>
-        <SearchPage view={view}
-                    isNew
-                    forceSideBarPinned={forceSidebarPinned} />
+        <SearchPage view={view} isNew forceSideBarPinned={forceSidebarPinned} />
       </SearchPageLayoutProvider>
     </ReplaySearchContext.Provider>
   );
 };
 
 type Props = {
-  alertId: string,
-  definitionId: string,
-  replayEventDefinition?: boolean,
-  searchPageLayout?: Partial<LayoutState>,
-  forceSidebarPinned?: boolean,
-}
+  alertId: string;
+  definitionId: string;
+  replayEventDefinition?: boolean;
+  searchPageLayout?: Partial<LayoutState>;
+  forceSidebarPinned?: boolean;
+};
 
-const canReplayEvent = (event: Event, eventDefinition: EventDefinition) => {
+const canReplayEvent = (eventDefinition: EventDefinition) => {
   const systemEvent = isSystemEventDefinition(eventDefinition);
 
   if (systemEvent) {
     return 'Event is a system event, these have no query/stream/time range attached.';
   }
 
-  if (!event?.replay_info) {
-    return 'Event is missing replay information.';
-  }
-
   return true;
 };
 
 const LoadingBarrier = ({
-  alertId, definitionId, replayEventDefinition = false, searchPageLayout = defaultSearchPageLayout, forceSidebarPinned = false,
+  alertId,
+  definitionId,
+  replayEventDefinition = false,
+  searchPageLayout = defaultSearchPageLayout,
+  forceSidebarPinned = false,
 }: Props) => {
   const { eventDefinition, aggregations, eventData, isLoading } = useAlertAndEventDefinitionData(alertId, definitionId);
 
@@ -104,20 +115,22 @@ const LoadingBarrier = ({
     return <Spinner />;
   }
 
-  const canReplay = canReplayEvent(eventData, eventDefinition);
+  const canReplay = canReplayEvent(eventDefinition);
 
-  return canReplay === true
-    ? (
-      <ReplaySearch alertId={alertId}
-                    definitionId={definitionId}
-                    eventDefinition={eventDefinition}
-                    aggregations={aggregations}
-                    event={eventData}
-                    searchPageLayout={searchPageLayout}
-                    replayEventDefinition={replayEventDefinition}
-                    forceSidebarPinned={forceSidebarPinned} />
-    )
-    : <Center>Cannot replay this event: {canReplay} Please select a different one.</Center>;
+  return canReplay === true ? (
+    <ReplaySearch
+      alertId={alertId}
+      definitionId={definitionId}
+      eventDefinition={eventDefinition}
+      aggregations={aggregations}
+      event={eventData}
+      searchPageLayout={searchPageLayout}
+      replayEventDefinition={replayEventDefinition}
+      forceSidebarPinned={forceSidebarPinned}
+    />
+  ) : (
+    <Center>Cannot replay this event: {canReplay} Please select a different one.</Center>
+  );
 };
 
 export default LoadingBarrier;

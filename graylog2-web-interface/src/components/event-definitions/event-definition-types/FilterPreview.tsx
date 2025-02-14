@@ -30,23 +30,29 @@ type FilterPreviewProps = {
 };
 
 type Message = {
-  index: string,
+  index: string;
   message: {
-    timestamp: string,
-    _id: string,
-    message: string,
-  },
+    timestamp: string;
+    _id: string;
+    message: string;
+  };
+};
 
-}
+const Messages = ({ messages }: { messages: Array<Message> }) =>
+  messages.map(({ index, message }) => (
+    <tr key={`${index}-${message._id}`}>
+      <td>{message.timestamp}</td>
+      <td>{message.message}</td>
+    </tr>
+  ));
 
-const Messages = ({ messages }: { messages: Array<Message> }) => messages.map(({ index, message }) => (
-  <tr key={`${index}-${message._id}`}>
-    <td>{message.timestamp}</td>
-    <td>{message.message}</td>
-  </tr>
-));
-
-const SearchResult = ({ searchResult, isFetchingData }: { isFetchingData: boolean, searchResult: { messages?: Array<Message> }}) => {
+const SearchResult = ({
+  searchResult,
+  isFetchingData,
+}: {
+  isFetchingData: boolean;
+  searchResult: { messages?: Array<Message> };
+}) => {
   if (isFetchingData) return <Spinner text="Loading filter preview..." />;
 
   if (!searchResult.messages || searchResult.messages.length === 0) {
@@ -68,27 +74,33 @@ const SearchResult = ({ searchResult, isFetchingData }: { isFetchingData: boolea
   );
 };
 
-const FilterPreview = ({ searchResult = {}, displayPreview = false, errors = [], isFetchingData = false }: FilterPreviewProps) => {
+const FilterPreview = ({
+  searchResult = {},
+  displayPreview = false,
+  errors = [],
+  isFetchingData = false,
+}: FilterPreviewProps) => {
   const hasError = errors?.length > 0;
 
   return (
     <>
-      <HelpPanel collapsible
-                 defaultExpanded={!displayPreview}
-                 title="How many Events will Filter & Aggregation create?">
+      <HelpPanel
+        collapsible
+        defaultExpanded={!displayPreview}
+        title="How many Events will Filter & Aggregation create?">
         <p>
           The Filter & Aggregation Condition will generate different number of Events, depending on how it is
           configured:
         </p>
         <ul>
-          <li><b>Filter:</b>&emsp;One Event per message matching the filter</li>
           <li>
-            <b>Aggregation without groups:</b>&emsp;One Event every time the aggregation result satisfies
-            the condition
+            <b>Filter:</b>&emsp;One Event per message matching the filter
           </li>
           <li>
-            <b>Aggregation with groups:</b>&emsp;One Event per group whose aggregation result satisfies
-            the condition
+            <b>Aggregation without groups:</b>&emsp;One Event every time the aggregation result satisfies the condition
+          </li>
+          <li>
+            <b>Aggregation with groups:</b>&emsp;One Event per group whose aggregation result satisfies the condition
           </li>
         </ul>
       </HelpPanel>
@@ -99,7 +111,11 @@ const FilterPreview = ({ searchResult = {}, displayPreview = false, errors = [],
             <Panel.Title>Filter Preview</Panel.Title>
           </Panel.Heading>
           <Panel.Body>
-            {hasError ? <p>{errors[0].description}</p> : <SearchResult isFetchingData={isFetchingData} searchResult={searchResult} />}
+            {hasError ? (
+              <p>{errors[0].description}</p>
+            ) : (
+              <SearchResult isFetchingData={isFetchingData} searchResult={searchResult} />
+            )}
           </Panel.Body>
         </Panel>
       )}
