@@ -95,7 +95,7 @@ public class ChunkedBulkIndexer {
             final IndexingResults results = response.indexingResults();
             accumulatedResults.addResults(results);
 
-            if (allowResettingChunkSize) {
+            if (allowResettingChunkSize && chunkSize != command.requests().size()) {
                 LOG.warn("Indexing successful again - resetting chunk size!");
                 chunkSize = command.requests().size();
             }

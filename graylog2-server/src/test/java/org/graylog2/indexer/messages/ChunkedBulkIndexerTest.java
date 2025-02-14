@@ -58,12 +58,13 @@ class ChunkedBulkIndexerTest {
 
             @Override
             public ChunkedBulkIndexer.BulkIndexResult apply(int indexedSuccessfully, IndexingResults previousResults, List<IndexingRequest> chunk) throws ChunkedBulkIndexer.EntityTooLargeException, IOException {
-                if (chunk.size() > 1) {
-                    throw circuitBreakerException();
+                final var cbe = new ChunkedBulkIndexer.CircuitBreakerException(indexedSuccessfully, previousResults, ChunkedBulkIndexer.CircuitBreakerException.Durability.Transient);
+                if (attempt < 5 && chunk.size() > 1) {
+                    throw cbe;
                 } else {
                     attempt += 1;
                     if (attempt < 5) {
-                        throw circuitBreakerException();
+                        throw cbe;
                     }
                     return success(chunk);
                 }
