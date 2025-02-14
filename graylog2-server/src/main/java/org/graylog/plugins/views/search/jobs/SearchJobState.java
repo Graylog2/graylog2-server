@@ -30,7 +30,6 @@ import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -48,6 +47,7 @@ public abstract class SearchJobState implements MongoEntity {
     public static final String ERRORS_FIELD = "error_message";
 
     @JsonUnwrapped
+    @Id
     public abstract SearchJobIdentifier identifier();
 
     @JsonProperty(STATUS_FIELD)
@@ -144,8 +144,6 @@ public abstract class SearchJobState implements MongoEntity {
     }
 
     @Override
-    @ObjectId
-    @Id
     @JsonIgnore
     public String id() {
         return identifier().id();

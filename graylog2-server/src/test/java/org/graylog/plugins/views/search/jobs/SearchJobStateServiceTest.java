@@ -57,18 +57,18 @@ public class SearchJobStateServiceTest {
     @Test
     public void testSaveAndGet() {
         final SearchJobState toBeSaved = SearchJobState.builder()
-                .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .identifier(new SearchJobIdentifier("777fd86ae6db8b71a8e10000", "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
                 .result(noResult())
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
-        final SearchJobState saved = toTest.create(toBeSaved);
-        final Optional<SearchJobState> retrieved = toTest.get(saved.id());
+        toTest.create(toBeSaved);
+        final Optional<SearchJobState> retrieved = toTest.get("777fd86ae6db8b71a8e10000");
         assertTrue(retrieved.isPresent());
         assertEquals(toBeSaved.toBuilder()
-                .identifier(new SearchJobIdentifier(saved.id(), "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .identifier(new SearchJobIdentifier("777fd86ae6db8b71a8e10000", "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
                 .build(), retrieved.get());
     }
 

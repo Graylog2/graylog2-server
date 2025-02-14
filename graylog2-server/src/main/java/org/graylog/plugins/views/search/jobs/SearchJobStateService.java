@@ -94,9 +94,6 @@ public class SearchJobStateService {
     }
 
     public SearchJobState create(final SearchJobState searchJobState) {
-//        if (searchJobState.identifier().id() != null) {
-//            throw new IllegalStateException("ID should be null for a call to create a new SearchJobState");
-//        } //TODO: check mismatch between IDs in Mongo and inmemory cache
         final InsertOneResult insertOneResult = this.collection.insertOne(searchJobState);
         return get(MongoUtils.insertedIdAsString(insertOneResult)).orElseThrow(() -> new IllegalStateException("Unable to retrieve saved search job state!"));
     }
