@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -32,6 +33,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.Set;
 
 @AutoValue
@@ -114,10 +116,16 @@ public abstract class SearchJobState implements MongoEntity {
         }
     }
 
-    public static SearchJobState createNewJob(final SearchJobIdentifier searchJobIdentifier) {
+    public static SearchJobState createNewJob(final SearchJobIdentifier searchJobIdentifier,
+                                              final Query query) {
         return SearchJobState.builder()
                 .identifier(searchJobIdentifier)
-                .result(null)
+                .result(QueryResult.builder()
+                        .state(QueryResult.State.INCOMPLETE)
+                        .searchTypes(Map.of())
+                        .query(query)
+                        .errors(Set.of())
+                        .build())
                 .status(SearchJobStatus.RUNNING)
                 .progress(0)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
