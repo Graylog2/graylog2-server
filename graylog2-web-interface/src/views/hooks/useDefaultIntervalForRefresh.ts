@@ -32,9 +32,7 @@ const useDefaultIntervalForRefresh = () => {
   if (durationToMS(defaultAutoRefreshInterval) < minimumIntervalInMS) {
     const availableIntervals = Object.entries(autoRefreshTimerangeOptions)
       .filter(([interval]) => durationToMS(interval) >= minimumIntervalInMS)
-      .sort(([interval1], [interval2]) => (
-        durationToMS(interval1) > durationToMS(interval2) ? 1 : -1
-      ));
+      .sort(([interval1], [interval2]) => (durationToMS(interval1) > durationToMS(interval2) ? 1 : -1));
 
     return availableIntervals.length ? availableIntervals[0][0] : null;
   }

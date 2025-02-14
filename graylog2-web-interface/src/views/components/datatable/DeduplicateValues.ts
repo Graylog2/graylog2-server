@@ -35,8 +35,7 @@ export default (rows: Rows, rowFieldNames: Array<string>) => {
       if (duplicateKeys[key] === value) {
         delete reducedItem[key];
       } else {
-        entries.slice(entryIdx + 1)
-          .forEach((entry) => delete duplicateKeys[entry[0]]);
+        entries.slice(entryIdx + 1).forEach((entry) => delete duplicateKeys[entry[0]]);
 
         duplicateKeys[key] = value;
       }

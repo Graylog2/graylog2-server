@@ -34,8 +34,12 @@ describe('QueryTitleEditModal', () => {
   it('shows after triggering open action', async () => {
     let modalRef;
     const { queryByText } = render(
-      <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
-                           onTitleChange={() => Promise.resolve(Immutable.Map())} />,
+      <QueryTitleEditModal
+        ref={(ref) => {
+          modalRef = ref;
+        }}
+        onTitleChange={() => Promise.resolve(Immutable.Map())}
+      />,
     );
 
     // Modal should not be visible initially
@@ -50,8 +54,12 @@ describe('QueryTitleEditModal', () => {
   it('has correct initial input value', () => {
     let modalRef;
     const { getByDisplayValue } = render(
-      <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
-                           onTitleChange={() => Promise.resolve(Immutable.Map())} />,
+      <QueryTitleEditModal
+        ref={(ref) => {
+          modalRef = ref;
+        }}
+        onTitleChange={() => Promise.resolve(Immutable.Map())}
+      />,
     );
 
     openModal(modalRef);
@@ -63,8 +71,12 @@ describe('QueryTitleEditModal', () => {
     let modalRef;
     const onTitleChangeFn = jest.fn();
     const { getByDisplayValue, getByRole, queryByText } = render(
-      <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
-                           onTitleChange={onTitleChangeFn} />,
+      <QueryTitleEditModal
+        ref={(ref) => {
+          modalRef = ref;
+        }}
+        onTitleChange={onTitleChangeFn}
+      />,
     );
 
     openModal(modalRef);
@@ -87,8 +99,12 @@ describe('QueryTitleEditModal', () => {
     let modalRef;
     const onTitleChangeFn = jest.fn();
     const { getByText, queryByText, findByText } = render(
-      <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
-                           onTitleChange={onTitleChangeFn} />,
+      <QueryTitleEditModal
+        ref={(ref) => {
+          modalRef = ref;
+        }}
+        onTitleChange={onTitleChangeFn}
+      />,
     );
 
     openModal(modalRef);

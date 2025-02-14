@@ -23,14 +23,15 @@ import connect from 'stores/connect';
 import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
 
 type SystemJobsComponentProps = {
-  jobs?: Record<string, {
-    jobs?: any[];
-  }>;
+  jobs?: Record<
+    string,
+    {
+      jobs?: any[];
+    }
+  >;
 };
 
-const SystemJobsComponent = ({
-  jobs,
-}: SystemJobsComponentProps) => {
+const SystemJobsComponent = ({ jobs }: SystemJobsComponentProps) => {
   useEffect(() => {
     SystemJobsActions.list();
     const interval = setInterval(SystemJobsActions.list, 2000);
@@ -53,8 +54,8 @@ const SystemJobsComponent = ({
       <Col md={12}>
         <h2>System jobs</h2>
         <p className="description">
-          A system job is a long-running task a graylog-server node executes for maintenance reasons. Some jobs
-          provide progress information or can be stopped.
+          A system job is a long-running task a graylog-server node executes for maintenance reasons. Some jobs provide
+          progress information or can be stopped.
         </p>
 
         <SystemJobsList jobs={jobList} />
@@ -63,6 +64,6 @@ const SystemJobsComponent = ({
   );
 };
 
-export default connect(SystemJobsComponent,
-  { systemJobsStore: SystemJobsStore },
-  ({ systemJobsStore }) => ({ jobs: (systemJobsStore as any).jobs }));
+export default connect(SystemJobsComponent, { systemJobsStore: SystemJobsStore }, ({ systemJobsStore }) => ({
+  jobs: (systemJobsStore as any).jobs,
+}));

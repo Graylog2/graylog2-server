@@ -25,25 +25,30 @@ import BackendConfigDetailsLDAP from './directoryServices/ldap/BackendConfigDeta
 import BackendCreateAD from './directoryServices/activeDirectory/BackendCreate';
 import BackendEditAD from './directoryServices/activeDirectory/BackendEdit';
 
-PluginStore.register(new PluginManifest({}, {
-  'authentication.services': [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      name: 'ldap',
-      displayName: 'LDAP',
-      createComponent: BackendCreateLDAP,
-      editComponent: BackendEditLDAP,
-      configDetailsComponent: BackendConfigDetailsLDAP,
-      configToJson: ConfigParser.toJson,
-      configFromJson: ConfigParser.fromJson,
+      'authentication.services': [
+        {
+          name: 'ldap',
+          displayName: 'LDAP',
+          createComponent: BackendCreateLDAP,
+          editComponent: BackendEditLDAP,
+          configDetailsComponent: BackendConfigDetailsLDAP,
+          configToJson: ConfigParser.toJson,
+          configFromJson: ConfigParser.fromJson,
+        },
+        {
+          name: 'active-directory',
+          displayName: 'Active Directory',
+          createComponent: BackendCreateAD,
+          editComponent: BackendEditAD,
+          configDetailsComponent: BackendConfigDetailsAD,
+          configToJson: ConfigParser.toJson,
+          configFromJson: ConfigParser.fromJson,
+        },
+      ],
     },
-    {
-      name: 'active-directory',
-      displayName: 'Active Directory',
-      createComponent: BackendCreateAD,
-      editComponent: BackendEditAD,
-      configDetailsComponent: BackendConfigDetailsAD,
-      configToJson: ConfigParser.toJson,
-      configFromJson: ConfigParser.fromJson,
-    },
-  ],
-}));
+  ),
+);

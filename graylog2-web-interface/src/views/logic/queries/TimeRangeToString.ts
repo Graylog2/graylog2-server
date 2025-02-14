@@ -60,9 +60,12 @@ const TimeRangeToString = (timerange?: TimeRange, localizer?: (string) => string
   const { type } = timerange || {};
 
   switch (type) {
-    case 'relative': return relativeTimeRangeToString(timerange as RelativeTimeRange);
-    case 'absolute': return absoluteTimeRangeToString(timerange as AbsoluteTimeRange, localizer);
-    case 'keyword': return keywordTimeRangeToString(timerange as KeywordTimeRange);
+    case 'relative':
+      return relativeTimeRangeToString(timerange as RelativeTimeRange);
+    case 'absolute':
+      return absoluteTimeRangeToString(timerange as AbsoluteTimeRange, localizer);
+    case 'keyword':
+      return keywordTimeRangeToString(timerange as KeywordTimeRange);
 
     default: {
       return '';

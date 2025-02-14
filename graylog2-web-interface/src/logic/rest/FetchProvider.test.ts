@@ -137,9 +137,11 @@ describe('FetchProvider', () => {
     ['POST with text', 'POST' as const, 'test3', 'uuid-beef-feed'],
     ['POST without content', 'POST' as const, 'test4', null],
     ['DELETE without content and status 204', 'DELETE' as const, 'test5', null],
-  ])('should receive a %s', async (_text, method, url, expectedResponse) => fetch(method, `${baseUrl}/${url}`).then((response) => {
-    expect(response).toStrictEqual(expectedResponse);
-  }));
+  ])('should receive a %s', async (_text, method, url, expectedResponse) =>
+    fetch(method, `${baseUrl}/${url}`).then((response) => {
+      expect(response).toStrictEqual(expectedResponse);
+    }),
+  );
 
   it('sets correct accept header', async () => {
     const result = await fetchFile('POST', `${baseUrl}/failIfWrongAcceptHeader`, {}, 'text/csv');
@@ -151,7 +153,9 @@ describe('FetchProvider', () => {
     const error = await fetch('GET', `${baseUrl}/simulatesSessionExpiration`).catch((e) => e);
 
     expect(error.name).toEqual('FetchError');
-    expect(error.message).toEqual('There was an error fetching a resource: Unauthorized. Additional information: Not available');
+    expect(error.message).toEqual(
+      'There was an error fetching a resource: Unauthorized. Additional information: Not available',
+    );
 
     expect(mockLogout).toHaveBeenCalled();
   });
@@ -166,40 +170,43 @@ describe('FetchProvider', () => {
   });
 
   it('extracts the error message from a failed request', async () => {
-    await expect(fetch('POST', `${baseUrl}/errorWithMessage`))
-      .rejects
-      .toThrow('There was an error fetching a resource: Internal Server Error. Additional information: The dungeon collapses. You die!');
+    await expect(fetch('POST', `${baseUrl}/errorWithMessage`)).rejects.toThrow(
+      'There was an error fetching a resource: Internal Server Error. Additional information: The dungeon collapses. You die!',
+    );
   });
 
   it('handles error properly when endpoint is not reachable', async () => {
     const error = await fetch('POST', 'http://localhost:12223/').catch((e) => e);
 
     expect(error.status).toEqual(undefined);
-    expect(error.message).toEqual('There was an error fetching a resource: undefined. Additional information: Not available');
+    expect(error.message).toEqual(
+      'There was an error fetching a resource: undefined. Additional information: Not available',
+    );
   });
 
   it('reports 403 by default', async () => {
-    const promise = new Builder('GET', `${baseUrl}/simulatesUnauthorized`)
-      .json()
-      .build();
+    const promise = new Builder('GET', `${baseUrl}/simulatesUnauthorized`).json().build();
     const error = await promise.catch((e) => e);
 
     expect(error.status).toEqual(403);
-    expect(error.message).toEqual('There was an error fetching a resource: Forbidden. Additional information: Not available');
+    expect(error.message).toEqual(
+      'There was an error fetching a resource: Forbidden. Additional information: Not available',
+    );
 
-    expect(ErrorsActions.report).toHaveBeenCalledWith(expect.objectContaining({
-      type: 'UnauthorizedError',
-    }));
+    expect(ErrorsActions.report).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'UnauthorizedError',
+      }),
+    );
   });
 
   it('allows ignoring 403', async () => {
-    const promise = new Builder('GET', `${baseUrl}/simulatesUnauthorized`)
-      .json()
-      .ignoreUnauthorized()
-      .build();
+    const promise = new Builder('GET', `${baseUrl}/simulatesUnauthorized`).json().ignoreUnauthorized().build();
     const error = await promise.catch((e) => e);
 
-    expect(error.message).toEqual('There was an error fetching a resource: Forbidden. Additional information: Not available');
+    expect(error.message).toEqual(
+      'There was an error fetching a resource: Forbidden. Additional information: Not available',
+    );
 
     expect(ErrorsActions.report).not.toHaveBeenCalled();
   });

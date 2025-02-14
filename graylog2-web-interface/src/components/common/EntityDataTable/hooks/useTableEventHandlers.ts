@@ -30,57 +30,69 @@ const useTableEventHandlers = ({
   setQuery,
   appSection,
 }: {
-  updateTableLayout: (preferences: TableLayoutPreferences) => void,
-  paginationQueryParameter: PaginationQueryParameterResult,
-  setQuery: (query: string) => void,
-  appSection: string
+  updateTableLayout: (preferences: TableLayoutPreferences) => void;
+  paginationQueryParameter: PaginationQueryParameterResult;
+  setQuery: (query: string) => void;
+  appSection: string;
 }) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.PAGE_SIZE_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: appSection,
-      app_action_value: 'page-size-select',
-      page_size: newPageSize,
-    });
+  const onPageSizeChange = useCallback(
+    (newPageSize: number) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.PAGE_SIZE_CHANGED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: appSection,
+        app_action_value: 'page-size-select',
+        page_size: newPageSize,
+      });
 
-    paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
-    updateTableLayout({ perPage: newPageSize });
-  }, [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
+      paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
+      updateTableLayout({ perPage: newPageSize });
+    },
+    [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout],
+  );
 
-  const onSearch = useCallback((newQuery: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(newQuery);
-  }, [paginationQueryParameter, setQuery]);
+  const onSearch = useCallback(
+    (newQuery: string) => {
+      paginationQueryParameter.resetPage();
+      setQuery(newQuery);
+    },
+    [paginationQueryParameter, setQuery],
+  );
 
   const onSearchReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
 
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: appSection,
-      app_action_value: 'columns-select',
-      columns: displayedAttributes,
-    });
+  const onColumnsChange = useCallback(
+    (displayedAttributes: Array<string>) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: appSection,
+        app_action_value: 'columns-select',
+        columns: displayedAttributes,
+      });
 
-    updateTableLayout({ displayedAttributes });
-  }, [appSection, pathname, sendTelemetry, updateTableLayout]);
+      updateTableLayout({ displayedAttributes });
+    },
+    [appSection, pathname, sendTelemetry, updateTableLayout],
+  );
 
-  const onSortChange = useCallback((newSort: Sort) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SORT_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: appSection,
-      app_action_value: 'sort-select',
-      sort: newSort,
-    });
+  const onSortChange = useCallback(
+    (newSort: Sort) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SORT_CHANGED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: appSection,
+        app_action_value: 'sort-select',
+        sort: newSort,
+      });
 
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
+      paginationQueryParameter.resetPage();
+      updateTableLayout({ sort: newSort });
+    },
+    [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout],
+  );
 
   return {
     onPageSizeChange,

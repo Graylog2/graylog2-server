@@ -27,9 +27,12 @@ type GrokPatternInputProps = {
   className?: string;
 };
 
-class GrokPatternInput extends React.Component<GrokPatternInputProps, {
-  [key: string]: any;
-}> {
+class GrokPatternInput extends React.Component<
+  GrokPatternInputProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     pattern: '',
     patterns: [],
@@ -63,15 +66,19 @@ class GrokPatternInput extends React.Component<GrokPatternInputProps, {
     return (
       <Row className={className}>
         <Col sm={8}>
-          <Input ref={(node) => { this.patternInput = node; }}
-                 type="textarea"
-                 id="pattern-input"
-                 label="Pattern"
-                 help="The pattern which will match the log line e.g: '%{IP:client}' or '.*?'"
-                 rows={9}
-                 onChange={this._onPatternChange}
-                 value={pattern}
-                 required />
+          <Input
+            ref={(node) => {
+              this.patternInput = node;
+            }}
+            type="textarea"
+            id="pattern-input"
+            label="Pattern"
+            help="The pattern which will match the log line e.g: '%{IP:client}' or '.*?'"
+            rows={9}
+            onChange={this._onPatternChange}
+            value={pattern}
+            required
+          />
         </Col>
         <Col sm={4}>
           <GrokPatternFilter addToPattern={this._addToPattern} patterns={patterns} />

@@ -21,10 +21,10 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import { setIsNew, setIsDirty } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 
-const _extractErrorMessage = (error: FetchError) => ((error
-    && error.additional
-    && error.additional.body
-    && error.additional.body.message) ? error.additional.body.message : error);
+const _extractErrorMessage = (error: FetchError) =>
+  error && error.additional && error.additional.body && error.additional.body.message
+    ? error.additional.body.message
+    : error;
 
 export default (view: View) => async (dispatch: AppDispatch) => {
   try {

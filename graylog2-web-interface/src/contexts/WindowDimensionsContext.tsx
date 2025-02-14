@@ -19,9 +19,9 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 
 type WindowDimensions = {
-  height: number,
-  width: number,
-}
+  height: number;
+  width: number;
+};
 
 const WindowDimensionsContext = React.createContext<WindowDimensions | undefined>(undefined);
 

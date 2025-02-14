@@ -26,9 +26,12 @@ type LoggingSubsystemProps = {
   subsystem: any;
 };
 
-class LoggingSubsystem extends React.Component<LoggingSubsystemProps, {
-  [key: string]: any;
-}> {
+class LoggingSubsystem extends React.Component<
+  LoggingSubsystemProps,
+  {
+    [key: string]: any;
+  }
+> {
   render() {
     return (
       <div className="subsystem-row">

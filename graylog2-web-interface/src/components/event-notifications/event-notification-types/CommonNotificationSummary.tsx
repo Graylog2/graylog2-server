@@ -27,9 +27,12 @@ type CommonNotificationSummaryProps = React.PropsWithChildren<{
   definitionNotification?: any;
 }>;
 
-class CommonNotificationSummary extends React.Component<CommonNotificationSummaryProps, {
-  [key: string]: any;
-}> {
+class CommonNotificationSummary extends React.Component<
+  CommonNotificationSummaryProps,
+  {
+    [key: string]: any;
+  }
+> {
   state = {
     displayDetails: false,
   };
@@ -51,19 +54,20 @@ class CommonNotificationSummary extends React.Component<CommonNotificationSummar
           <dd>{type}</dd>
           <dd>
             <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={this.toggleDisplayDetails}>
-              <Icon name={`arrow_${displayDetails ? 'drop_down' : 'right'}`} />&nbsp;
+              <Icon name={`arrow_${displayDetails ? 'drop_down' : 'right'}`} />
+              &nbsp;
               {displayDetails ? 'Less details' : 'More details'}
             </Button>
             {displayDetails && (
-            <Table condensed hover className={styles.fixedTable}>
-              <tbody>
-                <tr>
-                  <td>Description</td>
-                  <td>{notification.description || 'No description given'}</td>
-                </tr>
-                {children}
-              </tbody>
-            </Table>
+              <Table condensed hover className={styles.fixedTable}>
+                <tbody>
+                  <tr>
+                    <td>Description</td>
+                    <td>{notification.description || 'No description given'}</td>
+                  </tr>
+                  {children}
+                </tbody>
+              </Table>
             )}
           </dd>
         </dl>

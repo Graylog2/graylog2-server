@@ -22,72 +22,95 @@ import { Spinner, Icon } from 'components/common';
 import type { ProcessingSteps } from 'components/inputs/InputSetupWizard/steps/StartInputStep';
 
 type Props = {
-  stepName: ProcessingSteps,
-  isLoading: boolean,
-  isSuccess: boolean,
-  name?: string,
-  isError: boolean,
-  errorMessage?: FetchError,
-}
+  stepName: ProcessingSteps;
+  isLoading: boolean;
+  isSuccess: boolean;
+  name?: string;
+  isError: boolean;
+  errorMessage?: FetchError;
+};
 
-const SuccessIcon = styled(Icon)(({ theme }) => css`
-  color: ${theme.colors.variant.success}
-`);
+const SuccessIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.success};
+  `,
+);
 
-const ErrorIcon = styled(Icon)(({ theme }) => css`
-  color: ${theme.colors.variant.danger}
-`);
+const ErrorIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.danger};
+  `,
+);
 
-const ProgressMessage = ({ stepName, isLoading, isSuccess, isError, name = undefined, errorMessage = undefined } : Props) => {
-  const loadingText: {[key in ProcessingSteps]: (entityName?: string) => string} = {
-    createStream: (entityName) => `Creating Stream${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
-    startStream: (entityName) => `Starting Stream${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
-    createPipeline: (entityName) => `Creating Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
+const ProgressMessage = ({
+  stepName,
+  isLoading,
+  isSuccess,
+  isError,
+  name = undefined,
+  errorMessage = undefined,
+}: Props) => {
+  const loadingText: { [key in ProcessingSteps]: (entityName?: string) => string } = {
+    createStream: (entityName) => `Creating Stream${entityName !== undefined ? ` "${entityName}"` : ''}...`,
+    startStream: (entityName) => `Starting Stream${entityName !== undefined ? ` "${entityName}"` : ''}...`,
+    createPipeline: (entityName) => `Creating Pipeline${entityName !== undefined ? ` "${entityName}"` : ''}...`,
     setupRouting: (_) => 'Setting up routing...',
     result: (_) => '',
-    deleteStream: (entityName) => `Deleting Stream${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
-    deletePipeline: (entityName) => `Deleting Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''}...`,
+    deleteStream: (entityName) => `Deleting Stream${entityName !== undefined ? ` "${entityName}"` : ''}...`,
+    deletePipeline: (entityName) => `Deleting Pipeline${entityName !== undefined ? ` "${entityName}"` : ''}...`,
     deleteRouting: (_) => 'Removing routing...',
   };
 
-  const errorText: {[key in ProcessingSteps]: (name?: string) => string} = {
-    createStream: (entityName) => `Creating Stream${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
-    startStream: (entityName) => `Starting Stream${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
-    createPipeline: (entityName) => `Creating Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
+  const errorText: { [key in ProcessingSteps]: (name?: string) => string } = {
+    createStream: (entityName) => `Creating Stream${entityName !== undefined ? ` "${entityName}"` : ''} failed!`,
+    startStream: (entityName) => `Starting Stream${entityName !== undefined ? ` "${entityName}"` : ''} failed!`,
+    createPipeline: (entityName) => `Creating Pipeline${entityName !== undefined ? ` "${entityName}"` : ''} failed!`,
     setupRouting: (_) => 'Setting up routing failed!',
     result: (_) => 'Starting the Input has failed. Please roll it back to clean it up.',
-    deleteStream: (entityName) => `Deleting Stream${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
-    deletePipeline: (entityName) => `Deleting Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''} failed!`,
+    deleteStream: (entityName) => `Deleting Stream${entityName !== undefined ? ` "${entityName}"` : ''} failed!`,
+    deletePipeline: (entityName) => `Deleting Pipeline${entityName !== undefined ? ` "${entityName}"` : ''} failed!`,
     deleteRouting: (_) => 'Removing routing failed!',
   };
 
-  const successText: {[key in ProcessingSteps]: (entityName?: string) => string} = {
-    createStream: (entityName) => `Stream${entityName !== undefined ? (` "${entityName}"`) : ''} created!`,
-    startStream: (entityName) => `Stream${entityName !== undefined ? (` "${entityName}"`) : ''} started!`,
-    createPipeline: (entityName) => `Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''} created!`,
+  const successText: { [key in ProcessingSteps]: (entityName?: string) => string } = {
+    createStream: (entityName) => `Stream${entityName !== undefined ? ` "${entityName}"` : ''} created!`,
+    startStream: (entityName) => `Stream${entityName !== undefined ? ` "${entityName}"` : ''} started!`,
+    createPipeline: (entityName) => `Pipeline${entityName !== undefined ? ` "${entityName}"` : ''} created!`,
     setupRouting: (_) => 'Routing set up!',
     result: (_) => 'Input started sucessfully!',
-    deleteStream: (entityName) => `Stream${entityName !== undefined ? (` "${entityName}"`) : ''} deleted!`,
-    deletePipeline: (entityName) => `Pipeline${entityName !== undefined ? (` "${entityName}"`) : ''} deleted!`,
+    deleteStream: (entityName) => `Stream${entityName !== undefined ? ` "${entityName}"` : ''} deleted!`,
+    deletePipeline: (entityName) => `Pipeline${entityName !== undefined ? ` "${entityName}"` : ''} deleted!`,
     deleteRouting: (_) => 'Routing removed!',
   };
 
   if (isLoading) {
-    return <p><Spinner text={loadingText[stepName](name)} /></p>;
+    return (
+      <p>
+        <Spinner text={loadingText[stepName](name)} />
+      </p>
+    );
   }
 
   if (isError) {
     return (
       <>
-        <p><ErrorIcon name="close" title={errorText[stepName](name)} /> {errorText[stepName](name)}</p>
-        {errorMessage && (<p><strong>Details:</strong> {errorMessage.message}</p>)}
+        <p>
+          <ErrorIcon name="close" title={errorText[stepName](name)} /> {errorText[stepName](name)}
+        </p>
+        {errorMessage && (
+          <p>
+            <strong>Details:</strong> {errorMessage.message}
+          </p>
+        )}
       </>
     );
   }
 
   if (isSuccess) {
     return (
-      <p><SuccessIcon name="check" title={successText[stepName](name)} /> {successText[stepName](name)}</p>
+      <p>
+        <SuccessIcon name="check" title={successText[stepName](name)} /> {successText[stepName](name)}
+      </p>
     );
   }
 

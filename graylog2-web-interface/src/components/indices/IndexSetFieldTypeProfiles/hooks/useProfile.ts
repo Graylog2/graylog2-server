@@ -44,27 +44,34 @@ const fetchIndexSetFieldTypeProfile = async (id: string) => {
   }));
 };
 
-const useProfile = (id: string): {
-  data: IndexSetFieldTypeProfile,
-  isFetched: boolean,
-  isFetching: boolean,
-  refetch: () => void,
+const useProfile = (
+  id: string,
+): {
+  data: IndexSetFieldTypeProfile;
+  isFetched: boolean;
+  isFetching: boolean;
+  refetch: () => void;
 } => {
   const { data, isFetched, isFetching, refetch } = useQuery(
     ['indexSetFieldTypeProfile', id],
-    () => defaultOnError(fetchIndexSetFieldTypeProfile(id), 'Loading index field type profile failed with status', 'Could not load index field type profile'),
+    () =>
+      defaultOnError(
+        fetchIndexSetFieldTypeProfile(id),
+        'Loading index field type profile failed with status',
+        'Could not load index field type profile',
+      ),
     {
       keepPreviousData: true,
       enabled: !!id,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     isFetched,
     isFetching,
     refetch,
-  });
+  };
 };
 
 export default useProfile;

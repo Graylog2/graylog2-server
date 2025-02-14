@@ -43,8 +43,12 @@ const CSVFileAdapterDocumentation = () => {
       <Alert style={{ marginBottom: 10 }} bsStyle="info" title="CSV file requirements">
         <ul className="no-padding">
           <li>The first line in the CSV file needs to be a list of field/column names</li>
-          <li>The file uses <strong>utf-8</strong> encoding</li>
-          <li>The file is readable by <strong>every</strong> Graylog server node</li>
+          <li>
+            The file uses <strong>utf-8</strong> encoding
+          </li>
+          <li>
+            The file is readable by <strong>every</strong> Graylog server node
+          </li>
         </ul>
       </Alert>
 
@@ -54,9 +58,12 @@ const CSVFileAdapterDocumentation = () => {
 
       <h5 style={{ marginBottom: 10 }}>Configuration</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>,</code><br />
-        Quote character: <code>"</code><br />
-        Key column: <code>ipaddr</code><br />
+        Separator: <code>,</code>
+        <br />
+        Quote character: <code>"</code>
+        <br />
+        Key column: <code>ipaddr</code>
+        <br />
         Value column: <code>hostname</code>
       </p>
 
@@ -67,9 +74,12 @@ const CSVFileAdapterDocumentation = () => {
 
       <h5 style={{ marginBottom: 10 }}>Configuration</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>;</code><br />
-        Quote character: <code>'</code><br />
-        Key column: <code>ipaddr</code><br />
+        Separator: <code>;</code>
+        <br />
+        Quote character: <code>'</code>
+        <br />
+        Key column: <code>ipaddr</code>
+        <br />
         Value column: <code>hostname</code>
       </p>
 
@@ -78,23 +88,31 @@ const CSVFileAdapterDocumentation = () => {
 
       <h3 style={{ marginBottom: 10 }}>CIDR Lookups</h3>
       <p style={{ marginBottom: 10, padding: 0 }}>
-        If this data adapter will be used to lookup IP address keys against CIDR addresses<br />
-        then it should be marked as a CIDR lookup. For example:<br />
+        If this data adapter will be used to lookup IP address keys against CIDR addresses
+        <br />
+        then it should be marked as a CIDR lookup. For example:
+        <br />
       </p>
 
       <h5 style={{ marginBottom: 10 }}>Configuration</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>,</code><br />
-        Quote character: <code>"</code><br />
-        Key column: <code>cidr</code><br />
-        Value column: <code>subnet</code><br />
+        Separator: <code>,</code>
+        <br />
+        Quote character: <code>"</code>
+        <br />
+        Key column: <code>cidr</code>
+        <br />
+        Value column: <code>subnet</code>
+        <br />
         CIDR lookup: <code>true</code>
       </p>
 
       <h5 style={{ marginBottom: 10 }}>CSV File</h5>
       <pre>{csvFile3}</pre>
 
-      <p>Given this CSV file and configuration looking up the key 192.168.101.64 would return 'IT Department subnet'.</p>
+      <p>
+        Given this CSV file and configuration looking up the key 192.168.101.64 would return 'IT Department subnet'.
+      </p>
     </div>
   );
 };

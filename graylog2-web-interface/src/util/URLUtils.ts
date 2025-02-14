@@ -125,11 +125,10 @@ const URLUtils = {
     }
 
     const rawPathPrefix = AppConfig.gl2AppPathPrefix();
-    const pathPrefix = rawPathPrefix?.length > 1 && rawPathPrefix.endsWith('/')
-      ? rawPathPrefix.slice(0, -1)
-      : rawPathPrefix;
+    const pathPrefix =
+      rawPathPrefix?.length > 1 && rawPathPrefix.endsWith('/') ? rawPathPrefix.slice(0, -1) : rawPathPrefix;
 
-    const pathPrefixLength = (!pathPrefix || pathPrefix === '' || pathPrefix === '/') ? 0 : pathPrefix.length;
+    const pathPrefixLength = !pathPrefix || pathPrefix === '' || pathPrefix === '/' ? 0 : pathPrefix.length;
 
     return path.slice(pathPrefixLength);
   },

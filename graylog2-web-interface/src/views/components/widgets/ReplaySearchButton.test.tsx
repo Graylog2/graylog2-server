@@ -23,9 +23,9 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import ReplaySearchButton from './ReplaySearchButton';
 
 type OptionalOverrides = {
-  streams?: Array<string>,
-  query?: ElasticsearchQueryString,
-  timerange?: TimeRange,
+  streams?: Array<string>;
+  query?: ElasticsearchQueryString;
+  timerange?: TimeRange;
 };
 
 describe('ReplaySearchButton', () => {
@@ -37,9 +37,7 @@ describe('ReplaySearchButton', () => {
 
   describe('generates link', () => {
     const renderWithContext = async ({ query, timerange, streams }: OptionalOverrides = {}) => {
-      render(<ReplaySearchButton queryString={query?.query_string}
-                                 timerange={timerange}
-                                 streams={streams} />);
+      render(<ReplaySearchButton queryString={query?.query_string} timerange={timerange} streams={streams} />);
 
       return asElement(await screen.findByRole('link', { name: /replay search/i }), HTMLAnchorElement);
     };
@@ -66,7 +64,9 @@ describe('ReplaySearchButton', () => {
         },
       });
 
-      expect(button.href).toContain('rangetype=absolute&from=2020-01-10T13%3A23%3A42.000Z&to=2020-01-10T14%3A23%3A42.000Z');
+      expect(button.href).toContain(
+        'rangetype=absolute&from=2020-01-10T13%3A23%3A42.000Z&to=2020-01-10T14%3A23%3A42.000Z',
+      );
     });
 
     it('including streams', async () => {

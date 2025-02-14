@@ -32,9 +32,11 @@ import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 import AggregationConditions from '../AggregationConditions';
 import Notifications from '../Notifications';
 
-const AlertTimestamp = styled(Timestamp)(({ theme }) => css`
-  color: ${theme.colors.variant.darker.warning};
-`);
+const AlertTimestamp = styled(Timestamp)(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.darker.warning};
+  `,
+);
 
 const useAttributeComponents = () => {
   const { alertId, definitionId, type } = useReplaySearchContext();
@@ -44,14 +46,13 @@ const useAttributeComponents = () => {
     const isEventDefinition = type === 'event_definition';
 
     if (!eventDefinition) {
-      return [
-        { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
-      ];
+      return [{ title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition }];
     }
 
     const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
-    const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
+    const isEDUpdatedAfterEvent =
+      !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
 
     return [
       { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
@@ -61,8 +62,8 @@ const useAttributeComponents = () => {
           <>
             <AlertTimestamp dateTime={eventDefinition.updated_at} />
             <HoverForHelp displayLeftMargin iconSize="xs">
-              Event definition <i>{eventDefinition.title}</i> was edited after this event happened.
-              Some of aggregations widgets might not be representative for this event.
+              Event definition <i>{eventDefinition.title}</i> was edited after this event happened. Some of aggregations
+              widgets might not be representative for this event.
             </HoverForHelp>
           </>
         ),
@@ -71,8 +72,7 @@ const useAttributeComponents = () => {
       {
         title: 'Event definition',
         content: (
-          <Link target="_blank"
-                to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>
+          <Link target="_blank" to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>
             {eventDefinition.title}
           </Link>
         ),
@@ -82,8 +82,16 @@ const useAttributeComponents = () => {
         title: 'Priority',
         content: upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name),
       },
-      { title: 'Execute search every', content: executeEvery?.duration && executeEvery?.unit && `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}` },
-      { title: 'Search within', content: searchWithin?.duration && searchWithin?.unit && `${searchWithin.duration} ${searchWithin.unit.toLowerCase()}` },
+      {
+        title: 'Execute search every',
+        content:
+          executeEvery?.duration && executeEvery?.unit && `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}`,
+      },
+      {
+        title: 'Search within',
+        content:
+          searchWithin?.duration && searchWithin?.unit && `${searchWithin.duration} ${searchWithin.unit.toLowerCase()}`,
+      },
       { title: 'Description', content: eventDefinition.description },
       {
         title: 'Notifications',

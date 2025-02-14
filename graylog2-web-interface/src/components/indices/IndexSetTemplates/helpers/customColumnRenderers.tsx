@@ -25,16 +25,11 @@ const customColumnRenderers: ColumnRenderers<IndexSetTemplate> = {
   attributes: {
     title: {
       renderCell: (title: string, template: IndexSetTemplate) => (
-        <TitleCell title={title}
-                   id={template.id}
-                   isDefault={template.default}
-                   isEnabled={template.enabled} />
+        <TitleCell title={title} id={template.id} isDefault={template.default} isEnabled={template.enabled} />
       ),
     },
     built_in: {
-      renderCell: (built_in: boolean, _template) => (
-        <BuiltInCell builtIn={built_in} />
-      ),
+      renderCell: (built_in: boolean, _template) => <BuiltInCell builtIn={built_in} />,
     },
   },
 };

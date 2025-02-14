@@ -38,26 +38,24 @@ describe('HasOwnership', () => {
   const otherGrn = createGRN(otherType, otherId);
   const otherGrnPermission = `entity:own:${otherGrn}`;
 
-  const DisabledComponent = ({ disabled }: { disabled: boolean}) => (disabled
-    ? <span>disabled</span>
-    : <span>enabled</span>);
+  const DisabledComponent = ({ disabled }: { disabled: boolean }) =>
+    disabled ? <span>disabled</span> : <span>enabled</span>;
 
   type Props = {
-    id: string,
-    type: string,
-    hideChildren?: boolean,
+    id: string;
+    type: string;
+    hideChildren?: boolean;
   };
 
   const SimpleHasOwnership = ({ hideChildren = false, id: _id, type: _type }: Props) => (
     <HasOwnership hideChildren={hideChildren} id={_id} type={_type}>
-      {({ disabled }) => (
-        <DisabledComponent disabled={disabled} />
-      )}
+      {({ disabled }) => <DisabledComponent disabled={disabled} />}
     </HasOwnership>
   );
 
   it('should render children enabled if user has ownership', () => {
-    const user = adminUser.toBuilder()
+    const user = adminUser
+      .toBuilder()
       .grnPermissions(Immutable.List([grnPermission]))
       .permissions(Immutable.List())
       .build();
@@ -70,7 +68,8 @@ describe('HasOwnership', () => {
   });
 
   it('should render children disabled if user has empty ownership and is not admin', () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List(Immutable.List()))
       .permissions(Immutable.List())
       .build();
@@ -81,7 +80,8 @@ describe('HasOwnership', () => {
   });
 
   it('should render children disabled if user has wrong ownership and is not admin', () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List([otherGrnPermission]))
       .permissions(Immutable.List())
       .build();
@@ -93,7 +93,8 @@ describe('HasOwnership', () => {
   });
 
   it('should render children disabled if user has wrong ownership and is reader', () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List([otherGrnPermission]))
       .permissions(Immutable.List([`streams:read:${id}`]))
       .build();
@@ -104,7 +105,8 @@ describe('HasOwnership', () => {
   });
 
   it('should render children disabled if user has no ownership and is reader', () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List([]))
       .permissions(Immutable.List([`streams:read:${id}`]))
       .build();
@@ -115,7 +117,8 @@ describe('HasOwnership', () => {
   });
 
   it('should render children enabled if user has empty ownership and is admin', () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List([]))
       .permissions(Immutable.List(['*']))
       .build();
@@ -126,7 +129,8 @@ describe('HasOwnership', () => {
   });
 
   it('should render children enabled if user has wrong ownership and is admin', () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List([otherGrnPermission]))
       .permissions(Immutable.List(['*']))
       .build();
@@ -137,7 +141,8 @@ describe('HasOwnership', () => {
   });
 
   it('should hide children when configured', () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List([otherGrnPermission]))
       .permissions(Immutable.List([]))
       .build();

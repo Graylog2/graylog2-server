@@ -24,13 +24,13 @@ import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
 
 type InternalState = {
-  interpolation: InterpolationMode,
-  axisType: AxisType,
+  interpolation: InterpolationMode;
+  axisType: AxisType;
 };
 
 export type LineVisualizationConfigJSON = {
-  interpolation: InterpolationMode,
-  axis_type?: AxisType,
+  interpolation: InterpolationMode;
+  axis_type?: AxisType;
 };
 
 export default class LineVisualizationConfig extends VisualizationConfig implements XYVisualization {
@@ -54,7 +54,10 @@ export default class LineVisualizationConfig extends VisualizationConfig impleme
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(interpolation: InternalState['interpolation'], axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
+  static create(
+    interpolation: InternalState['interpolation'],
+    axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE,
+  ) {
     return new LineVisualizationConfig(interpolation, axisType);
   }
 
@@ -93,7 +96,7 @@ class Builder {
   }
 
   axisType(value: InternalState['axisType']) {
-    return new Builder((this.value.set('axisType', value)));
+    return new Builder(this.value.set('axisType', value));
   }
 
   build() {
