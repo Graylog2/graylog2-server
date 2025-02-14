@@ -127,9 +127,11 @@ class CaPersistenceService {
                 String pem = new String(bytes, StandardCharsets.UTF_8);
                 // Test, if upload is PEM file, must contain at least a certificate
                 if (pem.contains("-----BEGIN CERTIFICATE")) {
+                    LOG.info("Received PEM certificate bundle");
                     var ca = PemCaReader.readCA(pem, password);
                     keyStore.setKeyEntry(CA_KEY_ALIAS, ca.privateKey(), providedPassword, ca.certificates().toArray(new Certificate[0]));
                 } else {
+                    LOG.info("Received java keystore bundle");
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
                     keyStore.load(bais, providedPassword);
                 }
