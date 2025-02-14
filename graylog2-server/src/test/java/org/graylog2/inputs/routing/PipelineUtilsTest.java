@@ -45,6 +45,7 @@ import java.util.Objects;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -86,14 +87,14 @@ public class PipelineUtilsTest {
         try (final MockedStatic<PipelineSource> pipelineSourceMockedStatic = mockStatic(PipelineSource.class)) {
             pipelineSourceMockedStatic.when(() -> PipelineSource.fromDao(any(), any())).thenReturn(pipelineSource);
 
-            PipelineUtils.update(pipelineService, parser, ruleService, pipelineId, pipelineSource);
+            PipelineUtils.update(pipelineService, parser, ruleService, pipelineId, pipelineSource, true);
 
             verify(pipelineService).save(argThat(dao -> {
                 assertThat(dao.title()).isEqualTo(pipelineSource.title());
                 assertThat(dao.description()).isEqualTo(pipelineSource.description());
                 assertThat(dao.source()).isEqualTo(pipelineSource.source());
                 return true;
-            }));
+            }), anyBoolean());
         }
     }
 
@@ -107,7 +108,7 @@ public class PipelineUtilsTest {
 
         try (final MockedStatic<PipelineSource> pipelineSourceMockedStatic = mockStatic(PipelineSource.class)) {
             pipelineSourceMockedStatic.when(() -> PipelineSource.fromDao(any(), any())).thenReturn(pipelineSource);
-            PipelineUtils.update(pipelineService, parser, ruleService, pipelineId, pipelineSource);
+            PipelineUtils.update(pipelineService, parser, ruleService, pipelineId, pipelineSource, true);
         }
     }
 
