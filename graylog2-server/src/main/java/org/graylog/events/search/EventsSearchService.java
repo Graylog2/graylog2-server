@@ -98,6 +98,12 @@ public class EventsSearchService {
                     .collect(joiningQueriesWithOR));
         }
 
+        if (!parameters.filter().id().isEmpty()) {
+            filterBuilder.add(parameters.filter().id().stream()
+                    .map(idFilter -> EventDto.FIELD_ID + ":" + quote(idFilter))
+                    .collect(joiningQueriesWithOR));
+        }
+
         switch (parameters.filter().alerts()) {
             case INCLUDE:
                 // Nothing to do
