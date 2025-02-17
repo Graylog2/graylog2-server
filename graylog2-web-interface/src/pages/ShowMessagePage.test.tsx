@@ -29,6 +29,8 @@ import StreamsContext from 'contexts/StreamsContext';
 
 import ShowMessagePage from './ShowMessagePage';
 import { message, event, input } from './ShowMessagePage.fixtures';
+import FetchError from 'logic/errors/FetchError';
+import suppressConsole from 'helpers/suppressConsole';
 
 jest.mock('views/components/messagelist/MessageDetail', () => (props) => <span>{JSON.stringify(props, null, 2)}</span>);
 
@@ -159,5 +161,18 @@ describe('ShowMessagePage', () => {
     await screen.findByText(/Deprecated field/);
 
     expect(InputsActions.get).not.toHaveBeenCalled();
+  });
+
+  it('renders explanation when fetching of message fails because index does not exist', async () => {
+    asMock(Messages.search).mockRejectedValue(
+      new FetchError('Not found.', 404, 'Index not found for query: graylog_5. Try recalculating your index ranges.'),
+    );
+
+    await suppressConsole(async () => {
+      render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+      await screen.findByText(/The index or message specified was not found./i);
+      await screen.findAllByText(/Try recalculating your index ranges./i);
+    });
   });
 });
