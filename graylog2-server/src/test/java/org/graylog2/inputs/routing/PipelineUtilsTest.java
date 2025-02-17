@@ -67,9 +67,7 @@ public class PipelineUtilsTest {
 
     @Test
     public void createPipelineString() throws IOException {
-        final String pipelineSourceFixture = IOUtils.toString(Objects.requireNonNull(getClass().getClassLoader()
-                .getResourceAsStream("org/graylog2/inputs/routing/InputRoutingPipelineSource1.json")), StandardCharsets.UTF_8);
-        final PipelineSource pipelineSource = objectMapper.readValue(pipelineSourceFixture, PipelineSource.class);
+        final PipelineSource pipelineSource = loadFixture("org/graylog2/inputs/routing/InputRoutingPipelineSource1.json");
 
         String result = PipelineUtils.createPipelineString(pipelineSource);
 
