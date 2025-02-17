@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class InputDiagnosisMetricsTest {
 
+    private static final int ADDITIONAL_UPDATES = 10;
     private static final String INPUT_FAILURE_1 = "input.failure1";
     private static final String INPUT_FAILURE_2 = "input.failure2";
     public static final long SIZE_FOR_15_MINUTES = 180;
@@ -49,7 +50,7 @@ class InputDiagnosisMetricsTest {
 
     @Test
     void testMetricsIncludesOnlyTheLast15Updates() {
-        for (int i = 0; i < SIZE_FOR_15_MINUTES + 1; i++) {
+        for (int i = 0; i < SIZE_FOR_15_MINUTES + ADDITIONAL_UPDATES; i++) {
             underTest.incCount(INPUT_FAILURE_1);
             underTest.incCount(INPUT_FAILURE_1);
             underTest.incCount(INPUT_FAILURE_2);
@@ -61,7 +62,7 @@ class InputDiagnosisMetricsTest {
 
     @Test
     void testMetricsIncludesOnlyTheLast15UpdatesIfNoConstantCounterIncrease() {
-        for (int i = 0; i < SIZE_FOR_15_MINUTES; i++) {
+        for (int i = 0; i < SIZE_FOR_15_MINUTES + ADDITIONAL_UPDATES; i++) {
             if (i % 2 == 0) {
                 underTest.incCount(INPUT_FAILURE_1);
             }
