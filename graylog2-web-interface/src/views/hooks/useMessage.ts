@@ -33,7 +33,7 @@ const useMessage = (
   index: string,
   id: string,
   enabled = true,
-): { data: Message | undefined; isInitialLoading: boolean; error: FetchError; isError: boolean } => {
+): { data: Message | undefined; isInitialLoading: boolean; error?: FetchError; isError?: boolean } => {
   const { data, isInitialLoading, error, isError } = useQuery({
     queryKey: ['messages', index, id],
     retry: (count, e: FetchError) => {
