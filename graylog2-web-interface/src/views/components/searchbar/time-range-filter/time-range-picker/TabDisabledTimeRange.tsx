@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 const Wrapper = styled.div`
   padding: 12px 6px;
-  
+
   h5 {
     font-weight: bold;
     margin: 0 0 6px;

@@ -23,9 +23,7 @@ type AWSInputConfigurationProps = {
   url?: string;
 };
 
-const AWSInputConfiguration = ({
-  url = Routes.INTEGRATIONS.AWS.CLOUDWATCH.index,
-}: AWSInputConfigurationProps) => {
+const AWSInputConfiguration = ({ url = Routes.INTEGRATIONS.AWS.CLOUDWATCH.index }: AWSInputConfigurationProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {

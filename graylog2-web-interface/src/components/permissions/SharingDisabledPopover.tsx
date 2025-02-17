@@ -19,8 +19,8 @@ import * as React from 'react';
 import HoverForHelp from 'components/common/HoverForHelp';
 
 type Props = {
-  type: string,
-  description?: string,
+  type: string;
+  description?: string;
 };
 
 const SharingDisabledPopover = ({ type, description }: Props) => {

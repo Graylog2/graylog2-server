@@ -53,14 +53,16 @@ describe('qualifyUrl', () => {
   });
 
   describe('currentPathnameWithoutPrefix', () => {
-    const setLocation = (pathname: string) => Object.defineProperty(window, 'location', {
-      value: {
-        pathname,
-      },
-      writable: true,
-    });
+    const setLocation = (pathname: string) =>
+      Object.defineProperty(window, 'location', {
+        value: {
+          pathname,
+        },
+        writable: true,
+      });
 
-    const mockPathPrefix = (pathPrefix: string | undefined | null) => asMock(AppConfig.gl2AppPathPrefix).mockReturnValue(pathPrefix);
+    const mockPathPrefix = (pathPrefix: string | undefined | null) =>
+      asMock(AppConfig.gl2AppPathPrefix).mockReturnValue(pathPrefix);
 
     it('returns current path when prefix is undefined/null/empty/single slash', () => {
       const pathname = '/welcome';

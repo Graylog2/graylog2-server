@@ -20,17 +20,13 @@ import { useMemo } from 'react';
 import MetaDataContext from 'components/common/EntityDataTable/contexts/MetaDataContext';
 
 type Props<M> = React.PropsWithChildren<{
-  meta: M
+  meta: M;
 }>;
 
-const MetaDataProvider = <Meta = unknown>({ children, meta }: Props<Meta>) => {
+const MetaDataProvider = <Meta = unknown,>({ children, meta }: Props<Meta>) => {
   const contextValue = useMemo(() => ({ meta }), [meta]);
 
-  return (
-    <MetaDataContext.Provider value={contextValue}>
-      {children}
-    </MetaDataContext.Provider>
-  );
+  return <MetaDataContext.Provider value={contextValue}>{children}</MetaDataContext.Provider>;
 };
 
 export default MetaDataProvider;

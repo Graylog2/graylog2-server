@@ -36,9 +36,7 @@ import TeamsNotificationV2Summary from './event-notifications/event-notification
 import TeamsNotificationV2Details from './event-notifications/event-notification-details/TeamsNotificationV2Details';
 
 const bindings = {
-  routes: [
-    { path: Routes.unqualified.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp },
-  ],
+  routes: [{ path: Routes.unqualified.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp }],
   inputConfiguration: [
     {
       type: 'org.graylog.integrations.aws.inputs.AWSInput',

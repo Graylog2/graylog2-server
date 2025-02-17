@@ -19,44 +19,57 @@ import * as React from 'react';
 import FormikInput from './FormikInput';
 
 type Props = React.PropsWithChildren<{
-  autoComplete?: string,
-  buttonAfter?: React.ReactElement | string,
-  children?: React.ReactElement,
-  disabled?: boolean,
-  label: React.ReactElement | string,
-  name: string,
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  labelClassName?: string,
-  wrapperClassName?: string,
-  formGroupClassName?: string,
-  type?: string,
-  error?: React.ReactElement | string,
-  placeholder?: string
-  help?: React.ReactElement | string,
-  min?: number,
-  max?: number,
-  minLength?: number,
-  maxLength?: number,
-  required?: boolean,
-  bsSize?: 'large' | 'small' | 'xsmall',
-  validate?: (arg: any) => string | undefined,
-  rows?: number,
-  autoFocus?: boolean,
+  autoComplete?: string;
+  buttonAfter?: React.ReactElement | string;
+  children?: React.ReactElement;
+  disabled?: boolean;
+  label: React.ReactElement | string;
+  name: string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  labelClassName?: string;
+  wrapperClassName?: string;
+  formGroupClassName?: string;
+  type?: string;
+  error?: React.ReactElement | string;
+  placeholder?: string;
+  help?: React.ReactElement | string;
+  min?: number;
+  max?: number;
+  minLength?: number;
+  maxLength?: number;
+  required?: boolean;
+  bsSize?: 'large' | 'small' | 'xsmall';
+  validate?: (arg: any) => string | undefined;
+  rows?: number;
+  autoFocus?: boolean;
 }>;
 
 /** Displays the FormikInput with a specific layout */
-const FormikFormGroup = ({ children, disabled = false, required = false, validate = () => undefined, autoFocus = false, labelClassName = 'col-sm-3', wrapperClassName = 'col-sm-9', label, name, onChange, ...rest }: Props) => (
-  <FormikInput {...rest}
-               disabled={disabled}
-               required={required}
-               validate={validate}
-               autoFocus={autoFocus}
-               label={label}
-               id={name}
-               onChange={onChange}
-               name={name}
-               labelClassName={labelClassName}
-               wrapperClassName={wrapperClassName}>
+const FormikFormGroup = ({
+  children,
+  disabled = false,
+  required = false,
+  validate = () => undefined,
+  autoFocus = false,
+  labelClassName = 'col-sm-3',
+  wrapperClassName = 'col-sm-9',
+  label,
+  name,
+  onChange,
+  ...rest
+}: Props) => (
+  <FormikInput
+    {...rest}
+    disabled={disabled}
+    required={required}
+    validate={validate}
+    autoFocus={autoFocus}
+    label={label}
+    id={name}
+    onChange={onChange}
+    name={name}
+    labelClassName={labelClassName}
+    wrapperClassName={wrapperClassName}>
     {children}
   </FormikInput>
 );

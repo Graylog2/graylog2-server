@@ -55,7 +55,9 @@ describe('NotificationBadge', () => {
     render(<NotificationBadge />);
 
     jest.advanceTimersByTime(3000);
-    await waitFor(() => { expect(NotificationsActions.list).toHaveBeenCalled(); });
+    await waitFor(() => {
+      expect(NotificationsActions.list).toHaveBeenCalled();
+    });
   });
 
   it('renders nothing when there are no notifications', () => {

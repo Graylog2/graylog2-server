@@ -36,24 +36,20 @@ import type { SearchExecutionResult } from 'views/types';
 import SearchPageAutoRefreshProvider from 'views/components/contexts/SearchPageAutoRefreshProvider';
 
 type Props = React.PropsWithChildren<{
-  isNew: boolean,
-  view: Promise<View>,
-  loadNewView?: (history: HistoryFunction) => unknown,
-  loadView?: (history: HistoryFunction, viewId: string) => unknown,
-  executionState?: SearchExecutionState,
-  searchResult?: SearchExecutionResult,
-  forceSideBarPinned?: boolean,
-  skipNoStreamsCheck?: boolean,
+  isNew: boolean;
+  view: Promise<View>;
+  loadNewView?: (history: HistoryFunction) => unknown;
+  loadView?: (history: HistoryFunction, viewId: string) => unknown;
+  executionState?: SearchExecutionState;
+  searchResult?: SearchExecutionResult;
+  forceSideBarPinned?: boolean;
+  skipNoStreamsCheck?: boolean;
 }>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   const title = useViewTitle();
 
-  return (
-    <DocumentTitle title={title}>
-      {children}
-    </DocumentTitle>
-  );
+  return <DocumentTitle title={title}>{children}</DocumentTitle>;
 };
 
 const SearchPage = ({
@@ -84,26 +80,31 @@ const SearchPage = ({
 
   const { view, executionState } = result;
 
-  return view
-    ? (
-      <PluggableStoreProvider view={view} executionState={executionState} isNew={isNew} initialQuery={initialQuery} result={searchResult}>
-        <SearchPageTitle>
-          <DashboardPageContextProvider>
-            <NewViewLoaderContext.Provider value={loadNewView}>
-              <ViewLoaderContext.Provider value={loadView}>
-                <SearchPageAutoRefreshProvider>
-                  {children}
-                  <IfUserHasAccessToAnyStream skipNoStreamsCheck={skipNoStreamsCheck}>
-                    <Search forceSideBarPinned={forceSideBarPinned} />
-                  </IfUserHasAccessToAnyStream>
-                </SearchPageAutoRefreshProvider>
-              </ViewLoaderContext.Provider>
-            </NewViewLoaderContext.Provider>
-          </DashboardPageContextProvider>
-        </SearchPageTitle>
-      </PluggableStoreProvider>
-    )
-    : <Spinner />;
+  return view ? (
+    <PluggableStoreProvider
+      view={view}
+      executionState={executionState}
+      isNew={isNew}
+      initialQuery={initialQuery}
+      result={searchResult}>
+      <SearchPageTitle>
+        <DashboardPageContextProvider>
+          <NewViewLoaderContext.Provider value={loadNewView}>
+            <ViewLoaderContext.Provider value={loadView}>
+              <SearchPageAutoRefreshProvider>
+                {children}
+                <IfUserHasAccessToAnyStream skipNoStreamsCheck={skipNoStreamsCheck}>
+                  <Search forceSideBarPinned={forceSideBarPinned} />
+                </IfUserHasAccessToAnyStream>
+              </SearchPageAutoRefreshProvider>
+            </ViewLoaderContext.Provider>
+          </NewViewLoaderContext.Provider>
+        </DashboardPageContextProvider>
+      </SearchPageTitle>
+    </PluggableStoreProvider>
+  ) : (
+    <Spinner />
+  );
 };
 
 export default React.memo(SearchPage);

@@ -20,9 +20,9 @@ import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import { singleton } from 'logic/singleton';
 
 export type ContextValue = {
-  searchParams: SearchParams,
-  refetch: () => void,
-  attributes: Array<Attribute>,
+  searchParams: SearchParams;
+  refetch: () => void;
+  attributes: Array<Attribute>;
 };
 
 const TableFetchContext = React.createContext<ContextValue | undefined>(undefined);

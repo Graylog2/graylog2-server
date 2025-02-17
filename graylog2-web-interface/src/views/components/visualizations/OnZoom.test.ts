@@ -35,20 +35,30 @@ describe('OnZoom', () => {
   it('sets the global override timerange if called from a dashboard', async () => {
     const view = defaultView.toBuilder().type(View.Type.Dashboard).build();
 
-    const dispatch = mockDispatch({ view: { view }, searchExecution: { executionState: SearchExecutionState.empty() } } as RootState);
+    const dispatch = mockDispatch({
+      view: { view },
+      searchExecution: { executionState: SearchExecutionState.empty() },
+    } as RootState);
     dispatch(OnZoom('2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', 'Europe/Berlin'));
 
-    expect(dispatch).toHaveBeenCalledWith(updateGlobalOverride(GlobalOverride.create({
-      from: '2020-01-10T12:23:42.000+00:00',
-      to: '2020-01-10T13:23:42.000+00:00',
-      type: 'absolute',
-    })));
+    expect(dispatch).toHaveBeenCalledWith(
+      updateGlobalOverride(
+        GlobalOverride.create({
+          from: '2020-01-10T12:23:42.000+00:00',
+          to: '2020-01-10T13:23:42.000+00:00',
+          type: 'absolute',
+        }),
+      ),
+    );
   });
 
   it('sets the query timerange if called from a dashboard', async () => {
     const view = defaultView.toBuilder().type(View.Type.Search).build();
 
-    const dispatch = mockDispatch({ view: { view, activeQuery: 'query1' }, searchExecution: { executionState: SearchExecutionState.empty() } } as RootState);
+    const dispatch = mockDispatch({
+      view: { view, activeQuery: 'query1' },
+      searchExecution: { executionState: SearchExecutionState.empty() },
+    } as RootState);
     dispatch(OnZoom('2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', 'Europe/Berlin'));
 
     expect(setTimerange).toHaveBeenCalledWith('query1', {

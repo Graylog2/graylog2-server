@@ -27,7 +27,8 @@ const hotspots = [
   {
     positionX: '50%',
     positionY: '120px',
-    description: 'Get a top-level view of your high, medium, and low alert counts with trending information to know if this is a normal day at the office . . . or not.',
+    description:
+      'Get a top-level view of your high, medium, and low alert counts with trending information to know if this is a normal day at the office . . . or not.',
   },
   {
     positionX: '40%',
@@ -47,7 +48,8 @@ const hotspots = [
   {
     positionX: '80%',
     positionY: '1730px',
-    description: 'Message counts by event source give you a daily view of regular patterns in data, spikes outside the norm will trigger investigations as to why.',
+    description:
+      'Message counts by event source give you a daily view of regular patterns in data, spikes outside the norm will trigger investigations as to why.',
   },
 ];
 

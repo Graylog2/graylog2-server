@@ -20,8 +20,8 @@ import { singleton } from 'logic/singleton';
 import { DAYS } from 'components/common/Graph/types';
 
 export type GraphDaysContextType = {
-  graphDays: number,
-  setGraphDays: (days: number) => void,
+  graphDays: number;
+  setGraphDays: (days: number) => void;
 };
 
 const defaultContext = {

@@ -38,9 +38,7 @@ describe('parse', () => {
               notes: '',
               method: 'POST' as const,
               nickname: 'bulkUpdatePatternsFromTextFile',
-              produces: [
-                'application/json' as const,
-              ],
+              produces: ['application/json' as const],
               type: 'any',
               parameters: [
                 {
@@ -49,11 +47,7 @@ describe('parse', () => {
                   description: 'Strategy to apply when importing.',
                   type: 'string',
                   required: false,
-                  enum: [
-                    'ABORT_ON_CONFLICT',
-                    'REPLACE_ON_CONFLICT',
-                    'DROP_ALL_EXISTING',
-                  ],
+                  enum: ['ABORT_ON_CONFLICT', 'REPLACE_ON_CONFLICT', 'DROP_ALL_EXISTING'],
                 },
               ],
               responseMessages: [],

@@ -24,9 +24,9 @@ import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
 type Props = {
   input: InputType;
   setShowModal: (boolean) => void;
-}
+};
 
-const StaticFieldForm = ({ input, setShowModal } : Props) => {
+const StaticFieldForm = ({ input, setShowModal }: Props) => {
   const [fieldName, setFieldName] = useState<string>('');
   const [fieldValue, setFieldValue] = useState<string>('');
 
@@ -47,30 +47,42 @@ const StaticFieldForm = ({ input, setShowModal } : Props) => {
   };
 
   return (
-    <BootstrapModalForm show
-                        title="Add static field"
-                        submitButtonText="Add field"
-                        onCancel={() => { setShowModal(false); }}
-                        onSubmitForm={addStaticField}>
-      <p>Define a static field that is added to every message that comes in via this input. The field is not
-        overwritten If the message already has that key. Key must only contain alphanumeric characters or
-        underscores and not be a reserved field.
+    <BootstrapModalForm
+      show
+      title="Add static field"
+      submitButtonText="Add field"
+      onCancel={() => {
+        setShowModal(false);
+      }}
+      onSubmitForm={addStaticField}>
+      <p>
+        Define a static field that is added to every message that comes in via this input. The field is not overwritten
+        If the message already has that key. Key must only contain alphanumeric characters or underscores and not be a
+        reserved field.
       </p>
-      <Input type="text"
-             value={fieldName}
-             onChange={(event) => { handleFieldChange('name', event); }}
-             id="field-name"
-             label="Field name"
-             required
-             pattern="[A-Za-z0-9_]*"
-             title="Should consist only of alphanumeric characters and underscores."
-             autoFocus />
-      <Input value={fieldValue}
-             onChange={(event) => { handleFieldChange('value', event); }}
-             type="text"
-             id="field-value"
-             label="Field value"
-             required />
+      <Input
+        type="text"
+        value={fieldName}
+        onChange={(event) => {
+          handleFieldChange('name', event);
+        }}
+        id="field-name"
+        label="Field name"
+        required
+        pattern="[A-Za-z0-9_]*"
+        title="Should consist only of alphanumeric characters and underscores."
+        autoFocus
+      />
+      <Input
+        value={fieldValue}
+        onChange={(event) => {
+          handleFieldChange('value', event);
+        }}
+        type="text"
+        id="field-value"
+        label="Field value"
+        required
+      />
     </BootstrapModalForm>
   );
 };

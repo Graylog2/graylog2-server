@@ -29,7 +29,9 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 
 import java.util.Collection;
@@ -52,22 +54,30 @@ public class MongoDbPipelineService implements PipelineService {
     private final MongoCollection<PipelineDao> collection;
     private final ClusterEventBus clusterBus;
     private final MongoUtils<PipelineDao> mongoUtils;
+    private final ScopedEntityMongoUtils<PipelineDao> scopedEntityMongoUtils;
 
     @Inject
     public MongoDbPipelineService(MongoCollections mongoCollections,
+                                  EntityScopeService entityScopeService,
                                   ClusterEventBus clusterBus) {
         this.collection = mongoCollections.collection(COLLECTION, PipelineDao.class);
         this.clusterBus = clusterBus;
         this.mongoUtils = mongoCollections.utils(collection);
+        this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
 
         collection.createIndex(Indexes.ascending("title"), new IndexOptions().unique(true));
     }
 
     @Override
-    public PipelineDao save(PipelineDao pipeline) {
+    public PipelineDao save(PipelineDao pipeline, boolean checkMutability) {
+        scopedEntityMongoUtils.ensureValidScope(pipeline);
+
         final var pipelineId = pipeline.id();
         final PipelineDao savedPipeline;
         if (pipelineId != null) {
+            if (checkMutability) {
+                scopedEntityMongoUtils.ensureMutability(pipeline);
+            }
             collection.replaceOne(idEq(pipelineId), pipeline, new ReplaceOptions().upsert(true));
             savedPipeline = pipeline;
         } else {
@@ -108,7 +118,7 @@ public class MongoDbPipelineService implements PipelineService {
 
     @Override
     public void delete(String id) {
-        collection.deleteOne(idEq(id));
+        scopedEntityMongoUtils.deleteById(id);
         clusterBus.post(PipelinesChangedEvent.deletedPipelineId(id));
     }
 

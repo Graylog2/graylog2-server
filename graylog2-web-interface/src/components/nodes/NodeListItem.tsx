@@ -30,18 +30,23 @@ type NodeListItemProps = {
   systemOverview?: any;
 };
 
-class NodeListItem extends React.Component<NodeListItemProps, {
-  [key: string]: any;
-}> {
+class NodeListItem extends React.Component<
+  NodeListItemProps,
+  {
+    [key: string]: any;
+  }
+> {
   render() {
     const { node } = this.props;
     const title = <LinkToNode nodeId={node.node_id} />;
 
     if (!this.props.systemOverview) {
       return (
-        <EntityListItem key={`entry-list-${node.node_id}`}
-                        title={title}
-                        description="System information is currently unavailable." />
+        <EntityListItem
+          key={`entry-list-${node.node_id}`}
+          title={title}
+          description="System information is currently unavailable."
+        />
       );
     }
 
@@ -61,12 +66,14 @@ class NodeListItem extends React.Component<NodeListItemProps, {
     );
 
     return (
-      <EntityListItem key={`entry-list-${node.node_id}`}
-                      title={title}
-                      titleSuffix={nodeThroughput}
-                      description={journalState}
-                      actions={actions}
-                      contentRow={additionalContent} />
+      <EntityListItem
+        key={`entry-list-${node.node_id}`}
+        title={title}
+        titleSuffix={nodeThroughput}
+        description={journalState}
+        actions={actions}
+        contentRow={additionalContent}
+      />
     );
   }
 }

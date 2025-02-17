@@ -33,23 +33,24 @@ import URLWhiteListFormModal from './URLWhiteListFormModal';
 jest.mock('hooks/useCurrentUser');
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
-  ConfigurationsStore: MockStore(['getInitialState', jest.fn(() => ({
-    configuration: {
-      'org.graylog2.system.urlwhitelist.UrlWhitelist': {
-        entries: [],
-        disabled: false,
+  ConfigurationsStore: MockStore([
+    'getInitialState',
+    jest.fn(() => ({
+      configuration: {
+        'org.graylog2.system.urlwhitelist.UrlWhitelist': {
+          entries: [],
+          disabled: false,
+        },
       },
-    },
-  }))]),
+    })),
+  ]),
   ConfigurationsActions: {
     listWhiteListConfig: MockAction(),
   },
 }));
 
 describe('<URLWhiteListFormModal>', () => {
-  const renderSUT = () => render(
-    <URLWhiteListFormModal newUrlEntry="http://graylog.com" urlType="literal" />,
-  );
+  const renderSUT = () => render(<URLWhiteListFormModal newUrlEntry="http://graylog.com" urlType="literal" />);
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
