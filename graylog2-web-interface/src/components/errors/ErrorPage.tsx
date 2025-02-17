@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
@@ -30,35 +29,43 @@ const generateStyles = () => css<{ backgroundImage: string }>`
   }
 `;
 
-const ErrorMessage = styled.div(({ theme }) => css`
-  margin-left: auto;
-  margin-right: auto;
-  text-align: left;
+const ErrorMessage = styled.div(
+  ({ theme }) => css`
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
 
-  dt {
-    font-size: ${theme.fonts.size.body};
-    font-weight: normal;
-    overflow: auto;
-  }
+    dt {
+      font-size: ${theme.fonts.size.body};
+      font-weight: normal;
+      overflow: auto;
+    }
 
-  p {
-    font-size: inherit;
-  }
-`);
+    p {
+      font-size: inherit;
+    }
+  `,
+);
 
 type Props = {
-  backgroundImage?: string,
-  children?: React.ReactNode,
-  displayPageLayout: boolean,
-  description: React.ReactNode,
-  title: string,
+  backgroundImage?: string;
+  children?: React.ReactNode;
+  displayPageLayout?: boolean;
+  description: React.ReactNode;
+  title: string;
 };
 
 const ErrorPageStyles = createGlobalStyle`
     ${generateStyles()}
 `;
 
-const ErrorPage = ({ children, title, description, backgroundImage, displayPageLayout }: Props) => {
+const ErrorPage = ({
+  children,
+  title,
+  description,
+  backgroundImage = NotFoundBackgroundImage,
+  displayPageLayout = true,
+}: Props) => {
   const PageLayoutComponent = displayPageLayout ? PageContentLayout : React.Fragment;
 
   return (
@@ -67,29 +74,11 @@ const ErrorPage = ({ children, title, description, backgroundImage, displayPageL
         <ErrorPageStyles backgroundImage={backgroundImage} />
         <ErrorJumbotron title={title}>
           {description}
-          {children && (
-          <ErrorMessage>
-            {children}
-          </ErrorMessage>
-          )}
+          {children && <ErrorMessage>{children}</ErrorMessage>}
         </ErrorJumbotron>
       </PageLayoutComponent>
     </DocumentTitle>
   );
-};
-
-ErrorPage.propTypes = {
-  children: PropTypes.node,
-  description: PropTypes.node.isRequired,
-  displayPageLayout: PropTypes.bool,
-  title: PropTypes.string.isRequired,
-  backgroundImage: PropTypes.string,
-};
-
-ErrorPage.defaultProps = {
-  children: undefined,
-  displayPageLayout: true,
-  backgroundImage: NotFoundBackgroundImage,
 };
 
 export default ErrorPage;

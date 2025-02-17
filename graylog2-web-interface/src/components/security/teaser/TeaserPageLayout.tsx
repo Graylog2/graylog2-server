@@ -48,7 +48,7 @@ const BoldText = styled.h1`
   color: ${({ theme }) => theme.colors.variant.danger};
 `;
 
-const Col = styled.div<{ $width?: string, $align?: string, $justify?: string }>`
+const Col = styled.div<{ $width?: string; $align?: string; $justify?: string }>`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacings.md};
@@ -56,12 +56,17 @@ const Col = styled.div<{ $width?: string, $align?: string, $justify?: string }>`
   align-items: ${({ $align }) => $align || 'flex-start'};
 `;
 
-const Row = styled.div<{ $justify?: string, $fullWidth?: boolean }>`
+const Row = styled.div<{ $justify?: string; $fullWidth?: boolean }>`
   display: flex;
   flex-direction: row;
-  ${({ $justify }) => (
-    $justify ? css`justify-content: ${$justify};` : css`gap: ${({ theme }) => theme.spacings.md};`
-  )}
+  ${({ $justify }) =>
+    $justify
+      ? css`
+          justify-content: ${$justify};
+        `
+      : css`
+          gap: ${({ theme }) => theme.spacings.md};
+        `}
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'auto')};
 `;
 
@@ -115,16 +120,14 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
         </ContentArea>
       </Container>
       {showModal && (
-        <ConfirmDialog show
-                       title="Security Demo"
-                       onConfirm={() => setShowModal(false)}
-                       btnConfirmText="Close">
+        <ConfirmDialog show title="Security Demo" onConfirm={() => setShowModal(false)} btnConfirmText="Close">
           <Col>
             <h2 className="text-danger">OVERVIEW</h2>
             <p>
-              Graylog Security is designed to revolutionize cybersecurity for IT teams, offering the combined capabilities of SIEM,
-              Security Analytics, Incident Investigation, and Anomaly Detection. By using our platform, you can work more efficiently,
-              tackling critical tasks quicker, and mitigating risk caused by malicious actors and credential-based attacks.
+              Graylog Security is designed to revolutionize cybersecurity for IT teams, offering the combined
+              capabilities of SIEM, Security Analytics, Incident Investigation, and Anomaly Detection. By using our
+              platform, you can work more efficiently, tackling critical tasks quicker, and mitigating risk caused by
+              malicious actors and credential-based attacks.
             </p>
             <Row $justify="space-between" $fullWidth>
               <Col>

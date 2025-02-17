@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { createGRN } from 'logic/permissions/GRN';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -23,13 +22,13 @@ import useCurrentUser from 'hooks/useCurrentUser';
 type ChildFun = (props: { disabled: boolean }) => React.ReactElement;
 
 type Props = {
-  children: React.ReactNode | ChildFun,
-  id: string,
-  type: string,
-  hideChildren: boolean,
+  children: React.ReactNode | ChildFun;
+  id?: string;
+  type: string;
+  hideChildren?: boolean;
 };
 
-const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
+const HasOwnership = ({ children, id, type, hideChildren = false }: Props) => {
   const currentUser = useCurrentUser();
   const entity = createGRN(type, id);
   const ownership = `entity:own:${entity}`;
@@ -53,25 +52,6 @@ const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
   }
 
   return null;
-};
-
-HasOwnership.propTypes = {
-  /** Children to render if user has ownership of the entity */
-  children: PropTypes.oneOfType([
-    PropTypes.node,
-    PropTypes.func,
-  ]).isRequired,
-  /** The id string which shows entity */
-  id: PropTypes.string,
-  /** The type of the entity e.g dashboard, stream */
-  type: PropTypes.string.isRequired,
-  /** Will add disabled=true as a prop to the child in stead of not rendering it */
-  hideChildren: PropTypes.bool,
-};
-
-HasOwnership.defaultProps = {
-  hideChildren: false,
-  id: undefined,
 };
 
 export default HasOwnership;

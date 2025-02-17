@@ -14,7 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const noUnusedVarsOptions = { argsIgnorePattern: '^_' };
+const ignorePattern = '^(_|ignored)';
+const noUnusedVarsOptions = {
+  argsIgnorePattern: ignorePattern,
+  caughtErrorsIgnorePattern: ignorePattern,
+};
 
 module.exports = {
   parser: '@babel/eslint-parser',
@@ -79,6 +83,7 @@ module.exports = {
     'plugin:import/react',
     'plugin:jest-formatting/strict',
     'plugin:graylog/recommended',
+    'prettier',
   ],
   plugins: [
     'import',
@@ -89,13 +94,18 @@ module.exports = {
   rules: {
     'arrow-body-style': ['error', 'as-needed'],
     camelcase: 'off',
-    'function-paren-newline': 'off',
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
     'import/order': ['error', {
       groups: ['builtin', 'external', 'internal', ['sibling', 'index'], 'parent'],
+      pathGroups: [{
+        pattern: '@graylog/*-api',
+        group: 'external',
+        position: 'after',
+      }],
       'newlines-between': 'always',
+      pathGroupsExcludedImportTypes: ['builtin'],
     }],
     'sort-imports': 'off', // disabled in favor of 'import/order'
     'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
@@ -121,22 +131,18 @@ module.exports = {
       }],
     }],
     'no-underscore-dangle': 'off',
-    'object-curly-newline': ['error', { multiline: true, consistent: true }],
     'object-shorthand': ['error', 'methods'],
     'react/destructuring-assignment': 'off',
     'react/forbid-prop-types': 'off',
     'react/function-component-definition': 'off',
-    'react/jsx-closing-bracket-location': ['warn', 'after-props'],
-    'react/jsx-curly-spacing': ['warn', { when: 'never', children: true }],
     'react/jsx-filename-extension': [1, { extensions: ['.jsx', '.tsx'] }],
-    'react/jsx-first-prop-new-line': ['warn', 'never'],
-    'react/jsx-indent-props': ['error', 'first'],
     'react/jsx-no-useless-fragment': ['error', { allowExpressions: true }],
-    'react/jsx-one-expression-per-line': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
+    'react/prop-types': ['off'],
     'react/static-property-placement': 'off',
+    'react/require-default-props': ['warn', { functions: 'defaultArguments' }],
 
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',
@@ -160,13 +166,13 @@ module.exports = {
       },
       {
         blankLine: 'always',
-        prev: ['block', 'multiline-block-like', 'cjs-export', 'class', 'multiline-expression'],
+        prev: ['block', 'cjs-export', 'class'],
         next: '*',
       },
       {
         blankLine: 'always',
         prev: '*',
-        next: ['block', 'multiline-block-like', 'class', 'multiline-expression', 'return'],
+        next: ['block', 'class', 'return'],
       },
     ],
   },

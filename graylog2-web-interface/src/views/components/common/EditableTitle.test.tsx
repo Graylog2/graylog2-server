@@ -24,11 +24,11 @@ describe('EditableTitle', () => {
   it('stops submit event propagation', () => {
     const onSubmit = jest.fn((e) => e.persist());
 
-    render((
+    render(
       <div onSubmit={onSubmit}>
         <EditableTitle value="Current title" onChange={jest.fn()} />
-      </div>
-    ));
+      </div>,
+    );
 
     const currentTitle = screen.getByText('Current title');
     fireEvent.dblClick(currentTitle);

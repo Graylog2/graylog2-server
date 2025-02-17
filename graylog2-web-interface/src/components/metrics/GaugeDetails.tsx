@@ -14,24 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 
 import type { GaugeMetric } from 'stores/metrics/MetricsStore';
 
 type Props = {
-  metric: GaugeMetric,
-}
+  metric: GaugeMetric;
+};
 const GaugeDetails = ({ metric: { metric: gauge } }: Props) => (
   <dl className="metric-def metric-gauge">
     <dt>Value:</dt>
-    <dd><span className="number-format">{numeral(gauge.value).format('0,0')}</span></dd>
+    <dd>
+      <span className="number-format">{numeral(gauge.value).format('0,0')}</span>
+    </dd>
   </dl>
 );
-
-GaugeDetails.propTypes = {
-  metric: PropTypes.object.isRequired,
-};
 
 export default GaugeDetails;

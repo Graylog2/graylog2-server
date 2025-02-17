@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Field } from 'formik';
 
@@ -25,18 +24,20 @@ import AbsoluteDatePicker from './AbsoluteDatePicker';
 import AbsoluteTimeInput from './AbsoluteTimeInput';
 
 type Props = {
-  startDate?: Date,
-  range: 'to' | 'from',
-  timeRange: AbsoluteTimeRange,
+  startDate?: Date;
+  range: 'to' | 'from';
+  timeRange: AbsoluteTimeRange;
 };
 
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.small};
-  font-style: italic;
-  padding: 3px 3px 9px;
-  height: 1.5em;
-`);
+const ErrorMessage = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.dark.danger};
+    font-size: ${theme.fonts.size.small};
+    font-style: italic;
+    padding: 3px 3px 9px;
+    height: 1.5em;
+  `,
+);
 
 const AbsoluteCalendar = ({ startDate, timeRange, range }: Props) => (
   <Field name={`timeRangeTabs.absolute.${range}`}>
@@ -46,13 +47,9 @@ const AbsoluteCalendar = ({ startDate, timeRange, range }: Props) => (
 
       return (
         <>
-          <AbsoluteDatePicker onChange={_onChange}
-                              startDate={startDate}
-                              dateTime={dateTime} />
+          <AbsoluteDatePicker onChange={_onChange} startDate={startDate} dateTime={dateTime} />
 
-          <AbsoluteTimeInput onChange={_onChange}
-                             range={range}
-                             dateTime={dateTime} />
+          <AbsoluteTimeInput onChange={_onChange} range={range} dateTime={dateTime} />
 
           <ErrorMessage>{error}</ErrorMessage>
         </>
@@ -60,15 +57,5 @@ const AbsoluteCalendar = ({ startDate, timeRange, range }: Props) => (
     }}
   </Field>
 );
-
-AbsoluteCalendar.propTypes = {
-  timeRange: PropTypes.shape({ from: PropTypes.string, to: PropTypes.string }).isRequired,
-  startDate: PropTypes.instanceOf(Date),
-  range: PropTypes.oneOf(['to', 'from']).isRequired,
-};
-
-AbsoluteCalendar.defaultProps = {
-  startDate: undefined,
-};
 
 export default AbsoluteCalendar;

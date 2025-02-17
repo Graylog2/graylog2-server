@@ -51,26 +51,32 @@ import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import useParameters from 'views/hooks/useParameters';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import useViewTitle from 'views/hooks/useViewTitle';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
-const GridContainer = styled.div<{ $interactive: boolean }>(({ $interactive }) => ($interactive ? css`
-    display: flex;
-    overflow: auto;
-    height: 100%;
+const GridContainer = styled.div<{ $interactive: boolean }>(({ $interactive }) =>
+  $interactive
+    ? css`
+        display: flex;
+        overflow: auto;
+        height: 100%;
 
-    > *:nth-child(2) {
-      flex-grow: 1;
-    }
-` : css`
-    flex: 1;
-`));
+        > *:nth-child(2) {
+          flex-grow: 1;
+        }
+      `
+    : css`
+        flex: 1;
+      `,
+);
 
 const SearchArea = styled(PageContentLayout)(() => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return css`
-    ${focusedWidget?.id && css`
+    ${focusedWidget?.id &&
+    css`
       .page-content-grid {
         display: flex;
         flex-direction: column;
@@ -80,14 +86,15 @@ const SearchArea = styled(PageContentLayout)(() => {
         /* overflow auto is required to display the message table widget height correctly */
         overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
-`}
-`;
+    `}
+  `;
 });
 
-const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results'>) => {
+const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results' | 'title'>) => {
   const results = useAppSelector(selectCurrentQueryResults);
+  const title = useViewTitle();
 
-  return <Sidebar results={results} {...props} />;
+  return <Sidebar results={results} title={title} {...props} />;
 };
 
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -95,19 +102,18 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
   const { config: searchesClusterConfig } = useSearchConfiguration();
   const { parameters, parameterBindings } = useParameters();
   const currentUser = useCurrentUser();
-  const contextValue = useMemo(() => ({
-    view,
-    analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,
-    currentUser,
-    parameters,
-    parameterBindings,
-  }), [currentUser, parameterBindings, parameters, searchesClusterConfig?.analysis_disabled_fields, view]);
-
-  return (
-    <AdditionalContext.Provider value={contextValue}>
-      {children}
-    </AdditionalContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      view,
+      analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,
+      currentUser,
+      parameters,
+      parameterBindings,
+    }),
+    [currentUser, parameterBindings, parameters, searchesClusterConfig?.analysis_disabled_fields, view],
   );
+
+  return <AdditionalContext.Provider value={contextValue}>{children}</AdditionalContext.Provider>;
 };
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
@@ -127,15 +133,21 @@ const useOnWindowUnload = () => {
 };
 
 type Props = {
-  forceSideBarPinned?: boolean,
+  forceSideBarPinned?: boolean;
 };
 
-const Search = ({ forceSideBarPinned }: Props) => {
+const Search = ({ forceSideBarPinned = false }: Props) => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
-  const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar } = useSearchPageLayout();
+  const {
+    sidebar: { isShown: showSidebar },
+    searchAreaContainer,
+    infoBar,
+    synchronizeUrl = true,
+  } = useSearchPageLayout();
   const InfoBar = infoBar?.component;
   const SearchAreaContainer = searchAreaContainer?.component;
+  const SynchronizationComponent = synchronizeUrl ? SynchronizeUrl : React.Fragment;
 
   useEffect(() => {
     refreshSearch();
@@ -149,7 +161,7 @@ const Search = ({ forceSideBarPinned }: Props) => {
 
   return (
     <>
-      <SynchronizeUrl />
+      <SynchronizationComponent />
       <ExternalValueActionsProvider>
         <SearchExplainContextProvider>
           <WidgetFocusProvider>
@@ -184,18 +196,14 @@ const Search = ({ forceSideBarPinned }: Props) => {
                                   <IfInteractive>
                                     <HeaderElements />
                                     {InfoBar && <InfoBar />}
-                                    <IfDashboard>
-                                      {!editingWidget && <DashboardSearchBar />}
-                                    </IfDashboard>
+                                    <IfDashboard>{!editingWidget && <DashboardSearchBar />}</IfDashboard>
                                     <IfSearch>
                                       <SearchBar />
                                     </IfSearch>
 
                                     <QueryBarElements />
 
-                                    <IfDashboard>
-                                      {!focusingWidget && <QueryBar />}
-                                    </IfDashboard>
+                                    <IfDashboard>{!focusingWidget && <QueryBar />}</IfDashboard>
                                   </IfInteractive>
                                   <HighlightMessageInQuery>
                                     <SearchResult />
@@ -216,10 +224,6 @@ const Search = ({ forceSideBarPinned }: Props) => {
       </ExternalValueActionsProvider>
     </>
   );
-};
-
-Search.defaultProps = {
-  forceSideBarPinned: false,
 };
 
 export default Search;

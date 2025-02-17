@@ -46,22 +46,30 @@ const StyledPanelGroup = styled(PanelGroup)`
   }
 `;
 
-const PanelToggle = styled(Panel.Toggle)<{ clickable: boolean }>(({ clickable = true }) => css`
-  cursor: ${clickable ? 'pointer' : 'none'};
-  pointer-events: ${clickable ? 'auto' : 'none'};
-`);
+const PanelToggle: React.ComponentType<React.ComponentProps<typeof Panel.Toggle> & { $clickable: boolean }> = styled(
+  Panel.Toggle,
+)(
+  ({ $clickable = true }) => css`
+    cursor: ${$clickable ? 'pointer' : 'none'};
+    pointer-events: ${$clickable ? 'auto' : 'none'};
+  `,
+);
 
-const PanelBody = styled(Panel.Body)<{ editable: boolean }>(({ editable = false }) => css`
-  cursor: ${editable ? 'inherit' : 'none'};
-  pointer-events: ${editable ? 'inherit' : 'none'};
-  background-color: ${editable ? 'inherit' : (props) => props.theme.colors.global.navigationBoxShadow};
-`);
+const PanelBody: React.ComponentType<React.ComponentProps<typeof Panel.Body> & { $editable: boolean }> = styled(
+  Panel.Body,
+)(
+  ({ $editable = false }) => css`
+    cursor: ${$editable ? 'inherit' : 'none'};
+    pointer-events: ${$editable ? 'inherit' : 'none'};
+    background-color: ${$editable ? 'inherit' : (props) => props.theme.colors.global.navigationBoxShadow};
+  `,
+);
 
 type Props = {
-  currentStep: MigrationState,
-  sortedMigrationSteps: MigrationStateItem[],
-  renderStepComponent: (step: MigrationStateItem, hideActions: boolean) => JSX.Element
-}
+  currentStep: MigrationState;
+  sortedMigrationSteps: MigrationStateItem[];
+  renderStepComponent: (step: MigrationStateItem, hideActions: boolean) => JSX.Element;
+};
 
 const MigrationStepsPanel = ({ currentStep, sortedMigrationSteps, renderStepComponent }: Props) => {
   const { state: activeStep } = currentStep;
@@ -78,10 +86,10 @@ const MigrationStepsPanel = ({ currentStep, sortedMigrationSteps, renderStepComp
           <Panel key={migrationStep} eventKey={migrationStep} collapsible={false}>
             <Panel.Heading>
               <Panel.Title>
-                <PanelToggle tabIndex={index} clickable={isPreviousStep ? 1 : 0}>{`${index + 1}. ${description}`}</PanelToggle>
+                <PanelToggle tabIndex={index} $clickable={isPreviousStep}>{`${index + 1}. ${description}`}</PanelToggle>
               </Panel.Title>
             </Panel.Heading>
-            <PanelBody collapsible={!isCurrentStep} editable={isCurrentStep ? 1 : 0}>
+            <PanelBody collapsible={!isCurrentStep} $editable={isCurrentStep}>
               <MigrationError errorMessage={currentStep.error_message} />
               {renderStepComponent(migrationStep, !isCurrentStep)}
             </PanelBody>

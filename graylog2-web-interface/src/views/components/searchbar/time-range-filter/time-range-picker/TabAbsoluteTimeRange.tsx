@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import moment from 'moment';
 import { useFormikContext } from 'formik';
@@ -29,8 +28,8 @@ import AbsoluteTimestamp from './AbsoluteTimestamp';
 import type { TimeRangePickerFormValues } from './TimeRangePicker';
 
 type Props = {
-  disabled: boolean,
-  limitDuration: number,
+  disabled?: boolean;
+  limitDuration?: number;
 };
 
 const AbsoluteWrapper = styled.div`
@@ -44,7 +43,7 @@ const RangeWrapper = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
-  
+
   .DayPicker-wrapper {
     padding-bottom: 0;
   }
@@ -60,7 +59,7 @@ const IconWrap = styled.div`
 
 const StyledAccordion = styled(Accordion)`
   width: 100%;
-  
+
   .panel-body {
     display: flex;
   }
@@ -74,8 +73,10 @@ const FlexWrap = styled.div`
   display: flex;
 `;
 
-const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
-  const { values: { timeRangeTabs } } = useFormikContext<TimeRangePickerFormValues>();
+const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) => {
+  const {
+    values: { timeRangeTabs },
+  } = useFormikContext<TimeRangePickerFormValues>();
   const activeTabTimeRange = timeRangeTabs.absolute;
 
   const { toUserTimezone } = useUserDateTime();
@@ -89,18 +90,15 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
 
   return (
     <AbsoluteWrapper>
-      <StyledAccordion defaultActiveKey="calendar"
-                       onSelect={handleSelect}
-                       id="absolute-time-ranges"
-                       data-testid="absolute-time-ranges"
-                       activeKey={activeAccordion}>
-
+      <StyledAccordion
+        defaultActiveKey="calendar"
+        onSelect={handleSelect}
+        id="absolute-time-ranges"
+        data-testid="absolute-time-ranges"
+        activeKey={activeAccordion}>
         <AccordionItem name="Calendar">
           <RangeWrapper>
-            <AbsoluteCalendar startDate={fromStartDate}
-                              timeRange={activeTabTimeRange}
-                              range="from" />
-
+            <AbsoluteCalendar startDate={fromStartDate} timeRange={activeTabTimeRange} range="from" />
           </RangeWrapper>
 
           <IconWrap>
@@ -108,20 +106,18 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
           </IconWrap>
 
           <RangeWrapper>
-            <AbsoluteCalendar startDate={toStartDate}
-                              timeRange={activeTabTimeRange}
-                              range="to" />
+            <AbsoluteCalendar startDate={toStartDate} timeRange={activeTabTimeRange} range="to" />
           </RangeWrapper>
         </AccordionItem>
 
         <AccordionItem name="Timestamp">
           <TimestampContent>
-            <p>Date should be formatted as <code>YYYY-MM-DD [HH:mm:ss[.SSS]]</code>.</p>
+            <p>
+              Date should be formatted as <code>YYYY-MM-DD [HH:mm:ss[.SSS]]</code>.
+            </p>
             <FlexWrap>
               <RangeWrapper>
-                <AbsoluteTimestamp disabled={disabled}
-                                   timeRange={activeTabTimeRange}
-                                   range="from" />
+                <AbsoluteTimestamp disabled={disabled} timeRange={activeTabTimeRange} range="from" />
               </RangeWrapper>
 
               <IconWrap>
@@ -129,9 +125,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
               </IconWrap>
 
               <RangeWrapper>
-                <AbsoluteTimestamp disabled={disabled}
-                                   timeRange={activeTabTimeRange}
-                                   range="to" />
+                <AbsoluteTimestamp disabled={disabled} timeRange={activeTabTimeRange} range="to" />
               </RangeWrapper>
             </FlexWrap>
           </TimestampContent>
@@ -139,16 +133,6 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
       </StyledAccordion>
     </AbsoluteWrapper>
   );
-};
-
-TabAbsoluteTimeRange.propTypes = {
-  disabled: PropTypes.bool,
-  limitDuration: PropTypes.number,
-};
-
-TabAbsoluteTimeRange.defaultProps = {
-  disabled: false,
-  limitDuration: 0,
 };
 
 export default TabAbsoluteTimeRange;

@@ -16,12 +16,14 @@
  */
 package org.graylog2.database.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
+import com.mongodb.ErrorCategory;
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
@@ -32,9 +34,8 @@ import org.bson.BsonValue;
 import org.bson.codecs.EncoderContext;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.MongoEntity;
-import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
-import org.mongojack.InitializationRequiredForTransformation;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -51,16 +52,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class MongoUtils<T extends MongoEntity> {
     private final MongoCollection<T> collection;
-    private final ObjectMapper objectMapper;
-    private final CustomJacksonCodecRegistry codecRegistry;
 
-    public MongoUtils(MongoCollection<T> delegate, ObjectMapper objectMapper) {
+    public MongoUtils(MongoCollection<T> delegate) {
         this.collection = delegate;
-        this.objectMapper = objectMapper;
-
-        codecRegistry = new CustomJacksonCodecRegistry(
-                objectMapper,
-                collection.getCodecRegistry());
     }
 
     /**
@@ -167,6 +161,16 @@ public class MongoUtils<T extends MongoEntity> {
     }
 
     /**
+     * Checks if the given {@link MongoException} represents a duplicate key error by checking its error code.
+     *
+     * @param e Exception that has been thrown by a MongoDB operation
+     * @return true if the exception represents a duplicate key error, false otherwise
+     */
+    public static boolean isDuplicateKeyError(MongoException e) {
+        return ErrorCategory.fromErrorCode(e.getCode()) == ErrorCategory.DUPLICATE_KEY;
+    }
+
+    /**
      * Convenience method to look up a single document by its ID.
      *
      * @param id the document's id.
@@ -237,22 +241,26 @@ public class MongoUtils<T extends MongoEntity> {
     }
 
     /**
-     * Utility method to help moving away from the deprecated MongoJack Bson objects, like
-     * {@link org.mongojack.DBQuery.Query}. These objects require initialization before they can be used as regular
-     * {@link org.bson.conversions.Bson} objects with the MongoDB driver.
+     * Saves an entity by either inserting or replacing the document.
      * <p>
-     * The {@link org.mongojack.JacksonMongoCollection} would usually take care of that, but because we cannot use it,
-     * and instead use a regular {@link org.mongojack.MongoCollection}, we have to use this method.
+     * This method exists to avoid the repeated implementation of this functionality during migration from the old
+     * MongoJack API.
+     * <p>
+     * <b> For new code, prefer implementing a separate "create" and "update" path instead.</b>
      *
-     * @deprecated This method is only meant as an interim solution. Rewrite your deprecated MongoJack objects so that
-     * you don't have to use it.
+     * @param entity Entity to be saved, with the #id() property optionally set.
+     * @return Saved entity with the #id() property guaranteed to be present.
      */
-    @Deprecated
-    public void initializeLegacyMongoJackBsonObject(InitializationRequiredForTransformation mongoJackBsonObject) {
-        mongoJackBsonObject.initialize(
-                objectMapper,
-                objectMapper.constructType(collection.getDocumentClass()),
-                codecRegistry);
+    public T save(BuildableMongoEntity<T, ?> entity) {
+        // going through the builder is a bit more work but avoids an unsafe cast to T
+        final var orig = entity.toBuilder().build();
+        final var id = orig.id();
+        if (id == null) {
+            final var insertedId = insertedIdAsString(collection.insertOne(orig));
+            return entity.toBuilder().id(insertedId).build();
+        } else {
+            collection.replaceOne(idEq(id), orig, new ReplaceOptions().upsert(true));
+            return orig;
+        }
     }
-
 }

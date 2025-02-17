@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Field, useField } from 'formik';
 import { useQuery } from '@tanstack/react-query';
@@ -35,10 +34,12 @@ const Headline = styled.h3`
   margin-bottom: 5px;
 `;
 
-const KeywordInput = styled(FormControl)(({ theme }) => css`
-  min-height: 34px;
-  font-size: ${theme.fonts.size.large};
-`);
+const KeywordInput = styled(FormControl)(
+  ({ theme }) => css`
+    min-height: 34px;
+    font-size: ${theme.fonts.size.large};
+  `,
+);
 
 const EffectiveTimeRangeTable = styled.table`
   margin-bottom: 5px;
@@ -48,12 +49,12 @@ const EffectiveTimeRangeTable = styled.table`
   }
 `;
 
-const debouncedTestNaturalDate = debounceWithPromise((
-  keyword: string,
-  userTZ: string,
-) => ToolsStore.testNaturalDate(keyword, userTZ), 350);
+const debouncedTestNaturalDate = debounceWithPromise(
+  (keyword: string, userTZ: string) => ToolsStore.testNaturalDate(keyword, userTZ),
+  350,
+);
 
-const TimePreview = ({ dateTime, isLoading }: { dateTime: string, isLoading: boolean }) => {
+const TimePreview = ({ dateTime, isLoading }: { dateTime: string; isLoading: boolean }) => {
   if (!dateTime || isLoading) {
     return <>{EMPTY_RANGE}</>;
   }
@@ -62,16 +63,24 @@ const TimePreview = ({ dateTime, isLoading }: { dateTime: string, isLoading: boo
 };
 
 const useKeywordPreview = (keyword: string, userTZ: string) => {
-  const { data, isFetching } = useQuery(['time-range', 'validation', 'keyword', keyword], () => debouncedTestNaturalDate(keyword, userTZ), {
-    retry: 0,
-    enabled: !!trim(keyword),
-  });
+  const { data, isFetching } = useQuery(
+    ['time-range', 'validation', 'keyword', keyword],
+    () => debouncedTestNaturalDate(keyword, userTZ),
+    {
+      retry: 0,
+      enabled: !!trim(keyword),
+    },
+  );
 
   return { data, isFetching };
 };
 
 const KeywordTimeRangePreview = () => {
-  const [{ value: { keyword } }] = useField('timeRangeTabs.keyword');
+  const [
+    {
+      value: { keyword },
+    },
+  ] = useField('timeRangeTabs.keyword');
   const { userTimezone } = useUserDateTime();
   const { data, isFetching } = useKeywordPreview(keyword, userTimezone);
 
@@ -96,28 +105,31 @@ const KeywordTimeRangePreview = () => {
 };
 
 type Props = {
-  disabled: boolean,
+  disabled?: boolean;
 };
 
-const TabKeywordTimeRange = ({ disabled }: Props) => (
+const TabKeywordTimeRange = ({ disabled = false }: Props) => (
   <Row className="no-bm">
     <Col sm={5}>
       <Headline>Time range:</Headline>
       <Field name="timeRangeTabs.keyword.keyword">
         {({ field: { name, value, onChange }, meta: { error } }) => (
-          <FormGroup controlId="form-inline-keyword"
-                     style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
-                     validationState={error ? 'error' : null}>
-            <KeywordInput type="text"
-                          className="input-sm mousetrap"
-                          name={name}
-                          disabled={disabled}
-                          placeholder="Last week"
-                          title="Keyword input"
-                          aria-label="Keyword input"
-                          onChange={onChange}
-                          required
-                          value={value} />
+          <FormGroup
+            controlId="form-inline-keyword"
+            style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
+            validationState={error ? 'error' : null}>
+            <KeywordInput
+              type="text"
+              className="input-sm mousetrap"
+              name={name}
+              disabled={disabled}
+              placeholder="Last week"
+              title="Keyword input"
+              aria-label="Keyword input"
+              onChange={onChange}
+              required
+              value={value}
+            />
             <InputDescription error={error} help="Specify the time frame for the search in natural language." />
           </FormGroup>
         )}
@@ -130,30 +142,36 @@ const TabKeywordTimeRange = ({ disabled }: Props) => (
     <Col sm={7}>
       <Panel>
         <Panel.Body>
-          <p><code>last month</code> searches between one month ago and now</p>
+          <p>
+            <code>last month</code> searches between one month ago and now
+          </p>
 
-          <p><code>4 hours ago</code> searches between four hours ago and now</p>
+          <p>
+            <code>4 hours ago</code> searches between four hours ago and now
+          </p>
 
-          <p><code>1st of april to 2 days ago</code> searches between 1st of April and 2 days ago</p>
+          <p>
+            <code>1st of april to 2 days ago</code> searches between 1st of April and 2 days ago
+          </p>
 
-          <p><code>yesterday midnight +0200 to today midnight +0200</code> searches between yesterday midnight and today midnight in timezone +0200 - will be 22:00 in UTC</p>
+          <p>
+            <code>yesterday midnight +0200 to today midnight +0200</code> searches between yesterday midnight and today
+            midnight in timezone +0200 - will be 22:00 in UTC
+          </p>
 
-          <p>Please consult the <DocumentationLink page={DocsHelper.PAGES.TIME_FRAME_SELECTOR}
-                                                   title="Keyword Time Range Documentation"
-                                                   text="documentation" /> for more details.
+          <p>
+            Please consult the{' '}
+            <DocumentationLink
+              page={DocsHelper.PAGES.TIME_FRAME_SELECTOR}
+              title="Keyword Time Range Documentation"
+              text="documentation"
+            />{' '}
+            for more details.
           </p>
         </Panel.Body>
       </Panel>
     </Col>
   </Row>
 );
-
-TabKeywordTimeRange.propTypes = {
-  disabled: PropTypes.bool,
-};
-
-TabKeywordTimeRange.defaultProps = {
-  disabled: false,
-};
 
 export default TabKeywordTimeRange;

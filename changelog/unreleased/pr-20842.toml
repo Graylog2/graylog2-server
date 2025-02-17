@@ -1,0 +1,5 @@
+type = "c"
+message = "Replace datanode insecure_startup configuration with selfsigned_startup, providing full selfsigned SSL setup"
+
+issues = ["18911"]
+pulls = ["20842"]

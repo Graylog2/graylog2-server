@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import moment from 'moment';
 import { useFormikContext } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -41,8 +40,10 @@ const DATA_TIERING_HOT_WARM_DEFAULTS = {
 
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
-const dataTieringFormValuesWithDefaults = (values: DataTieringFormValues, pluginStore) : DataTieringFormValues => {
-  const dataTieringPlugin = pluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
+const dataTieringFormValuesWithDefaults = (values: DataTieringFormValues, pluginStore): DataTieringFormValues => {
+  const dataTieringPlugin = pluginStore
+    .exports('dataTiering')
+    .find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
@@ -56,7 +57,7 @@ const dataTieringFormValuesWithDefaults = (values: DataTieringFormValues, plugin
   return hotOnlyDefaults;
 };
 
-export const prepareDataTieringInitialValues = (config: DataTieringConfig, pluginStore) : DataTieringFormValues => {
+export const prepareDataTieringInitialValues = (config: DataTieringConfig, pluginStore): DataTieringFormValues => {
   let formValues = { ...config };
 
   dayFields.forEach((field) => {
@@ -69,8 +70,10 @@ export const prepareDataTieringInitialValues = (config: DataTieringConfig, plugi
   return dataTieringFormValuesWithDefaults(formValues as unknown as DataTieringFormValues, pluginStore);
 };
 
-export const prepareDataTieringConfig = (formValues: DataTieringFormValues, pluginStore) : DataTieringConfig => {
-  const dataTieringPlugin = pluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
+export const prepareDataTieringConfig = (formValues: DataTieringFormValues, pluginStore): DataTieringConfig => {
+  const dataTieringPlugin = pluginStore
+    .exports('dataTiering')
+    .find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
   let config = dataTieringFormValuesWithDefaults(formValues, pluginStore);
@@ -91,13 +94,21 @@ export const prepareDataTieringConfig = (formValues: DataTieringFormValues, plug
 };
 
 type DataTiering = {
-  data_tiering: DataTieringFormValues
-}
+  data_tiering: DataTieringFormValues;
+};
 
-type FormValues<T extends string | undefined> = T extends undefined ? DataTiering : T extends string ? { [Key in T]: DataTiering } : never
+type FormValues<T extends string | undefined> = T extends undefined
+  ? DataTiering
+  : T extends string
+    ? { [Key in T]: DataTiering }
+    : never;
 
-const DataTieringConfiguration = <ValuesPrefix extends string | undefined, >({ valuesPrefix } : { valuesPrefix?: ValuesPrefix }) => {
-  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === 'hot_warm'));
+const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
+  valuesPrefix,
+}: {
+  valuesPrefix?: ValuesPrefix;
+}) => {
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => plugin.type === 'hot_warm');
 
   const { values } = useFormikContext<FormValues<ValuesPrefix>>();
 
@@ -149,44 +160,42 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined, >({ v
 
   return (
     <>
-      <FormikInput type="number"
-                   id="data-tiering-index-lifetime-max"
-                   label="Max. days in storage"
-                   name={fieldName('index_lifetime_max')}
-                   min={0}
-                   help="After how many days your data should be deleted."
-                   validate={validateMaxDaysInStorage}
-                   required />
-      <FormikInput type="number"
-                   id="data-tiering-index-lifetime-min"
-                   label="Min. days in storage"
-                   name={fieldName('index_lifetime_min')}
-                   min={0}
-                   max={formValue('index_lifetime_max')}
-                   validate={validateMinDaysInStorage}
-                   help="How many days at minumum your data should be stored."
-                   required />
+      <FormikInput
+        type="number"
+        id="data-tiering-index-lifetime-max"
+        label="Max. days in storage"
+        name={fieldName('index_lifetime_max')}
+        min={0}
+        help="After how many days your data should be deleted."
+        validate={validateMaxDaysInStorage}
+        required
+      />
+      <FormikInput
+        type="number"
+        id="data-tiering-index-lifetime-min"
+        label="Min. days in storage"
+        name={fieldName('index_lifetime_min')}
+        min={0}
+        max={formValue('index_lifetime_max')}
+        validate={validateMinDaysInStorage}
+        help="How many days at minumum your data should be stored."
+        required
+      />
 
       {dataTieringPlugin && (
         <>
-          <FormikInput type="checkbox"
-                       id="data_tiering-archive-before-deletion"
-                       label="Archive before deletion"
-                       name={fieldName('archive_before_deletion')}
-                       help="Archive this index before it is deleted?" />
+          <FormikInput
+            type="checkbox"
+            id="data_tiering-archive-before-deletion"
+            label="Archive before deletion"
+            name={fieldName('archive_before_deletion')}
+            help="Archive this index before it is deleted?"
+          />
           <dataTieringPlugin.TiersConfigurationFields valuesPrefix={valuesPrefix} />
         </>
       )}
     </>
   );
-};
-
-DataTieringConfiguration.propTypes = {
-  valuesPrefix: PropTypes.string,
-};
-
-DataTieringConfiguration.defaultProps = {
-  valuesPrefix: undefined,
 };
 
 export default DataTieringConfiguration;

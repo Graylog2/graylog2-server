@@ -42,6 +42,7 @@ import org.graylog.storage.errors.ResponseError;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
+import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,8 +185,7 @@ public class OpenSearchClient {
     }
 
     private OpenSearchException exceptionFrom(Exception e, String errorMessage) {
-        if (e instanceof OpenSearchException) {
-            final OpenSearchException openSearchException = (OpenSearchException) e;
+        if (e instanceof OpenSearchException openSearchException) {
             if (isIndexNotFoundException(openSearchException)) {
                 throw IndexNotFoundException.create(errorMessage + openSearchException.getResourceId(), openSearchException.getIndex().getName());
             }
@@ -201,6 +201,9 @@ public class OpenSearchClient {
             }
             if (isBatchSizeTooLargeException(openSearchException)) {
                 throw new BatchSizeTooLargeException(openSearchException.getMessage());
+            }
+            if (isMapperParsingExceptionException(openSearchException)) {
+                throw new MapperParsingException(openSearchException.getMessage());
             }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
             throw new BatchSizeTooLargeException(e.getMessage());
@@ -229,6 +232,10 @@ public class OpenSearchClient {
 
     private boolean isIndexNotFoundException(OpenSearchException openSearchException) {
         return openSearchException.getMessage().contains("index_not_found_exception");
+    }
+
+    private boolean isMapperParsingExceptionException(OpenSearchException openSearchException) {
+        return openSearchException.getMessage().contains("mapper_parsing_exception");
     }
 
     private boolean isBatchSizeTooLargeException(OpenSearchException openSearchException) {

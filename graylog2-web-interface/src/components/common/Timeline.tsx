@@ -19,24 +19,18 @@ import * as React from 'react';
 import { Timeline as MantineTimeline } from '@mantine/core';
 
 type Props = React.PropsWithChildren<{
-  active: number,
-  bulletSize: number,
-  className?: string,
-  color: string,
-}>
+  active: number;
+  bulletSize: number;
+  className?: string;
+  color: string;
+}>;
 
 const Timeline = ({ children, bulletSize, color, active, className }: Props) => (
-  <MantineTimeline bulletSize={bulletSize}
-                   color={color}
-                   className={className}
-                   active={active}>{children}
+  <MantineTimeline bulletSize={bulletSize} color={color} className={className} active={active}>
+    {children}
   </MantineTimeline>
 );
 
 Timeline.Item = MantineTimeline.Item;
-
-Timeline.defaultProps = {
-  className: undefined,
-};
 
 export default Timeline;

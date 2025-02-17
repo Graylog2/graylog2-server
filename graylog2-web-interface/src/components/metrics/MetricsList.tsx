@@ -14,66 +14,61 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Metric } from 'components/metrics';
 import type { Metric as MetricType } from 'stores/metrics/MetricsStore';
 
-const MetricListWrap = styled.ul(({ theme }) => css`
-  padding: 0;
+const MetricListWrap = styled.ul(
+  ({ theme }) => css`
+    padding: 0;
 
-  li {
-    margin-bottom: 5px;
+    li {
+      margin-bottom: 5px;
 
-    .prefix {
-      color: ${theme.colors.gray[70]};
-    }
+      .prefix {
+        color: ${theme.colors.gray[70]};
+      }
 
-    .name {
-      font-size: ${theme.fonts.size.body};
-      font-family: ${theme.fonts.family.monospace};
-      word-break: break-all;
+      .name {
+        font-size: ${theme.fonts.size.body};
+        font-family: ${theme.fonts.family.monospace};
+        word-break: break-all;
 
-      .open:hover {
-        text-decoration: none;
+        .open:hover {
+          text-decoration: none;
+        }
+      }
+
+      .metric {
+        margin-left: 10px;
+        padding: 10px;
+
+        h3 {
+          margin-bottom: 5px;
+        }
       }
     }
 
-    .metric {
-      margin-left: 10px;
-      padding: 10px;
-
-      h3 {
-        margin-bottom: 5px;
-      }
+    dl {
+      margin-top: 0;
+      margin-bottom: 0;
     }
-  }
-
-  dl {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-`);
+  `,
+);
 
 export type MetricInfo = {
-  type: string,
-  full_name: string,
-}
+  type: string;
+  full_name: string;
+};
 type Props = {
-  namespace: string,
-  nodeId: string,
-  names: Array<MetricType>,
-}
+  namespace: string;
+  nodeId: string;
+  names: Array<MetricType>;
+};
 
 class MetricsList extends React.Component<Props> {
-  static propTypes = {
-    names: PropTypes.arrayOf(PropTypes.object).isRequired,
-    namespace: PropTypes.string.isRequired,
-    nodeId: PropTypes.string.isRequired,
-  };
-
   _formatMetric = (metric: MetricType) => {
     const { namespace, nodeId } = this.props;
 
@@ -92,7 +87,11 @@ class MetricsList extends React.Component<Props> {
 
     return (
       <MetricListWrap>
-        {metrics.length > 0 ? metrics : <li>No metrics match the given filter. Please ensure you use a valid regular expression</li>}
+        {metrics.length > 0 ? (
+          metrics
+        ) : (
+          <li>No metrics match the given filter. Please ensure you use a valid regular expression</li>
+        )}
       </MetricListWrap>
     );
   }

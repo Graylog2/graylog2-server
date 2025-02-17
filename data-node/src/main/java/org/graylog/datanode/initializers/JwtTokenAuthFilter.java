@@ -19,8 +19,7 @@ package org.graylog.datanode.initializers;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.Keys;
-import jakarta.inject.Named;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -28,12 +27,12 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import org.graylog2.security.JwtSecret;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -45,10 +44,11 @@ public class JwtTokenAuthFilter implements ContainerRequestFilter {
     private static final String AUTHENTICATION_SCHEME = "Bearer";
     public static final String REQUIRED_SUBJECT = "admin";
     public static final String REQUIRED_ISSUER = "graylog";
-    private final String signingKey;
+    private final JwtSecret jwtSecret;
 
-    public JwtTokenAuthFilter(@Named("password_secret") final String signingKey) {
-        this.signingKey = signingKey;
+    @Inject
+    public JwtTokenAuthFilter(JwtSecret jwtSecret) {
+        this.jwtSecret = jwtSecret;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class JwtTokenAuthFilter implements ContainerRequestFilter {
     }
 
     void verifyToken(String token) throws TokenVerificationException {
-        final SecretKey key = Keys.hmacShaKeyFor(this.signingKey.getBytes(StandardCharsets.UTF_8));
+        final SecretKey key = this.jwtSecret.getSigningKey();
         final JwtParser parser = Jwts.parser()
                 .verifyWith(key)
                 .requireSubject(REQUIRED_SUBJECT)

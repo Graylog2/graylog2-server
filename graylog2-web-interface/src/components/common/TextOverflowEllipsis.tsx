@@ -24,9 +24,9 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  className?: string,
-  children: string,
-  titleOverride?: string,
+  className?: string;
+  children: string;
+  titleOverride?: string;
 };
 
 /**
@@ -38,10 +38,5 @@ const TextOverflowEllipsis = ({ children, titleOverride, className }: Props) => 
     {children}
   </Wrapper>
 );
-
-TextOverflowEllipsis.defaultProps = {
-  className: undefined,
-  titleOverride: undefined,
-};
 
 export default TextOverflowEllipsis;

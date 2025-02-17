@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
@@ -35,30 +34,26 @@ const HeaderIcon = styled(Icon)`
 `;
 
 type Props = {
-  featureName: string,
-  wrapperClassName: string | null | undefined,
+  featureName: string;
+  wrapperClassName?: string | null | undefined;
 };
 
-const EnterprisePluginNotFound = ({ featureName, wrapperClassName }: Props) => (
+const EnterprisePluginNotFound = ({ featureName, wrapperClassName = 'no-bm' }: Props) => (
   <Panel bsStyle="info" className={wrapperClassName}>
     <Panel.Heading>
       <Header>
-        <HeaderIcon name="enterprise" />Enterprise Feature
+        <HeaderIcon name="enterprise" />
+        Enterprise Feature
       </Header>
     </Panel.Heading>
     <Panel.Body>
-      To use the <b>{featureName}</b> functionality you need the <a href="https://www.graylog.org/products/enterprise" rel="noopener noreferrer" target="_blank">Graylog Enterprise license</a> and the <DocumentationLink page={DocsHelper.PAGES.ENTERPRISE_SETUP} text="Graylog Enterprise plugin" />.
+      To use the <b>{featureName}</b> functionality you need the{' '}
+      <a href="https://www.graylog.org/products/enterprise" rel="noopener noreferrer" target="_blank">
+        Graylog Enterprise license
+      </a>{' '}
+      and the <DocumentationLink page={DocsHelper.PAGES.ENTERPRISE_SETUP} text="Graylog Enterprise plugin" />.
     </Panel.Body>
   </Panel>
 );
-
-EnterprisePluginNotFound.propTypes = {
-  featureName: PropTypes.string.isRequired,
-  wrapperClassName: PropTypes.string,
-};
-
-EnterprisePluginNotFound.defaultProps = {
-  wrapperClassName: 'no-bm',
-};
 
 export default EnterprisePluginNotFound;

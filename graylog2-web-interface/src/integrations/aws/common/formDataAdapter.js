@@ -32,13 +32,15 @@ export const toAWSRequest = (formData, options) => {
   } = formData;
 
   return {
-    ...awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret ? {
-      aws_access_key_id: awsCloudWatchAwsKey?.value,
-      aws_secret_access_key: awsCloudWatchAwsSecret?.value,
-    } : {
-      aws_access_key_id: key,
-      aws_secret_access_key: secret,
-    },
+    ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
+      ? {
+          aws_access_key_id: awsCloudWatchAwsKey?.value,
+          aws_secret_access_key: awsCloudWatchAwsSecret?.value,
+        }
+      : {
+          aws_access_key_id: key,
+          aws_secret_access_key: secret,
+        }),
     assume_role_arn: awsCloudWatchAssumeARN?.value,
     cloudwatch_endpoint: awsEndpointCloudWatch?.value,
     dynamodb_endpoint: awsEndpointDynamoDB?.value,
@@ -70,13 +72,15 @@ export const toGenericInputCreateRequest = ({
   type: 'org.graylog.integrations.aws.inputs.AWSInput',
   title: awsCloudWatchName.value,
   configuration: {
-    ...awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret ? {
-      aws_access_key: awsCloudWatchAwsKey?.value,
-      aws_secret_key: awsCloudWatchAwsSecret?.value,
-    } : {
-      aws_access_key: key,
-      aws_secret_key: secret,
-    },
+    ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
+      ? {
+          aws_access_key: awsCloudWatchAwsKey?.value,
+          aws_secret_key: awsCloudWatchAwsSecret?.value,
+        }
+      : {
+          aws_access_key: key,
+          aws_secret_key: secret,
+        }),
     aws_message_type: awsCloudWatchKinesisInputType.value,
     throttling_allowed: !!awsCloudWatchThrottleEnabled.value,
     aws_flow_log_prefix: !!awsCloudWatchAddFlowLogPrefix.value,

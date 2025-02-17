@@ -19,7 +19,6 @@ module.exports = [
   '@mantine/core',
   '@tanstack/react-query',
   'chroma-js',
-  'create-react-class',
   'formik',
   'jquery',
   'leaflet',

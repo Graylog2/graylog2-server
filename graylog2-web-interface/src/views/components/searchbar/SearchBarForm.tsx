@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
 import isFunction from 'lodash/isFunction';
@@ -33,69 +32,76 @@ import useSearchBarSubmit from 'views/components/searchbar/useSearchBarSubmit';
 
 type FormRenderer = (props: FormikProps<SearchBarFormValues>) => React.ReactNode;
 type Props = {
-  children: FormRenderer | React.ReactNode,
-  initialValues: SearchBarFormValues,
-  limitDuration: number,
-  onSubmit: (values: SearchBarFormValues) => Promise<any>,
-  validateOnMount?: boolean,
-  formRef?: React.Ref<FormikProps<SearchBarFormValues>>,
-  validateQueryString: (values: SearchBarFormValues) => Promise<QueryValidationState>,
-}
+  children: FormRenderer | React.ReactNode;
+  initialValues: SearchBarFormValues;
+  limitDuration: number;
+  onSubmit: (values: SearchBarFormValues) => Promise<any>;
+  validateOnMount?: boolean;
+  formRef?: React.Ref<FormikProps<SearchBarFormValues>>;
+  validateQueryString: (values: SearchBarFormValues) => Promise<QueryValidationState>;
+};
 
 const _isFunction = (children: Props['children']): children is FormRenderer => isFunction(children);
 
-const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, validateOnMount, formRef, validateQueryString }: Props) => {
+const SearchBarForm = ({
+  initialValues,
+  limitDuration,
+  onSubmit,
+  children,
+  validateOnMount = true,
+  formRef,
+  validateQueryString,
+}: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const { setFieldWarning } = useContext(FormWarningsContext);
   const _initialValues = useMemo(() => {
     const { timerange, ...rest } = initialValues;
 
-    return ({
+    return {
       ...rest,
       timerange: onInitializingTimerange(timerange, formatTime),
-    });
+    };
   }, [formatTime, initialValues]);
 
   const { enableReinitialize, onSubmit: _onSubmit } = useSearchBarSubmit(_initialValues, onSubmit);
 
   const handlerContext = useHandlerContext();
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values,
-    limitDuration,
-    setFieldWarning,
-    validateQueryString,
-    pluggableSearchBarControls,
-    formatTime,
-    handlerContext,
-    userTimezone,
-  ), [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext, userTimezone]);
+  const _validate = useCallback(
+    (values: SearchBarFormValues) =>
+      validate(
+        values,
+        limitDuration,
+        setFieldWarning,
+        validateQueryString,
+        pluggableSearchBarControls,
+        formatTime,
+        handlerContext,
+        userTimezone,
+      ),
+    [
+      limitDuration,
+      setFieldWarning,
+      validateQueryString,
+      pluggableSearchBarControls,
+      formatTime,
+      handlerContext,
+      userTimezone,
+    ],
+  );
 
   return (
-    <Formik<SearchBarFormValues> initialValues={_initialValues}
-                                 enableReinitialize={enableReinitialize}
-                                 onSubmit={_onSubmit}
-                                 innerRef={formRef}
-                                 validate={_validate}
-                                 validateOnBlur={false}
-                                 validateOnMount={validateOnMount}>
-      {(...args) => (
-        <Form>
-          {_isFunction(children) ? children(...args) : children}
-        </Form>
-      )}
+    <Formik<SearchBarFormValues>
+      initialValues={_initialValues}
+      enableReinitialize={enableReinitialize}
+      onSubmit={_onSubmit}
+      innerRef={formRef}
+      validate={_validate}
+      validateOnBlur={false}
+      validateOnMount={validateOnMount}>
+      {(...args) => <Form>{_isFunction(children) ? children(...args) : children}</Form>}
     </Formik>
   );
-};
-
-SearchBarForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  limitDuration: PropTypes.number.isRequired,
-  validateOnMount: PropTypes.bool,
-};
-
-SearchBarForm.defaultProps = {
-  validateOnMount: true,
-  formRef: undefined,
 };
 
 export default SearchBarForm;

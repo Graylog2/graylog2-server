@@ -59,8 +59,11 @@ const useCleanupQueryParams = ({ uriParams, query, navigate }) => {
   useEffect(() => {
     if (uriParams?.page === undefined) {
       const baseURI = _clearURI(query);
+      const newQuery = baseURI.toString();
 
-      navigate(baseURI.toString(), { replace: true });
+      if (query !== newQuery) {
+        navigate(newQuery, { replace: true });
+      }
     }
   }, [query, navigate, uriParams?.page]);
 };
@@ -71,9 +74,12 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
   const navigate = useNavigate();
   const [dashboardPage, setDashboardPage] = useState<string | undefined>();
   const params = useQuery();
-  const uriParams = useMemo(() => ({
-    page: params.page,
-  }), [params]);
+  const uriParams = useMemo(
+    () => ({
+      page: params.page,
+    }),
+    [params],
+  );
 
   useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage });
   useCleanupQueryParams({ uriParams, query, navigate });
@@ -88,18 +94,14 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
     const setDashboardPageParam = (nextPage: string) => updatePageParams(nextPage);
     const unSetDashboardPageParam = () => updatePageParams(undefined);
 
-    return ({
+    return {
       setDashboardPage: setDashboardPageParam,
       unsetDashboardPage: unSetDashboardPageParam,
       dashboardPage: dashboardPage,
-    });
+    };
   }, [dashboardPage, navigate, query]);
 
-  return (
-    <DashboardPageContext.Provider value={dashboardPageContextValue}>
-      {children}
-    </DashboardPageContext.Provider>
-  );
+  return <DashboardPageContext.Provider value={dashboardPageContextValue}>{children}</DashboardPageContext.Provider>;
 };
 
 export default DashboardPageContextProvider;

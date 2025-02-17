@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -28,11 +27,14 @@ import Routes from 'routing/Routes';
 import StyledIndexSetDetailsRow from './StyledIndexSetDetailsRow';
 
 type Props = {
-  indexSet: IndexSet,
+  indexSet: IndexSet;
 };
 
 const IndexSetDetails = ({ indexSet }: Props) => {
-  const { data: { name: profileName }, isFetching } = useProfile(indexSet.field_type_profile);
+  const {
+    data: { name: profileName },
+    isFetching,
+  } = useProfile(indexSet.field_type_profile);
 
   return (
     <StyledIndexSetDetailsRow>
@@ -50,16 +52,15 @@ const IndexSetDetails = ({ indexSet }: Props) => {
           <dd>{indexSet.field_type_refresh_interval / 1000.0} seconds</dd>
           <dt>Field type profile:</dt>
           {!isFetching && (
-          <dd>
-            {indexSet.field_type_profile
-              ? (
-                <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(indexSet.field_type_profile)}
-                      target="_blank">
+            <dd>
+              {indexSet.field_type_profile ? (
+                <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(indexSet.field_type_profile)} target="_blank">
                   {profileName}
                 </Link>
-              )
-              : <i>Not set</i>}
-          </dd>
+              ) : (
+                <i>Not set</i>
+              )}
+            </dd>
           )}
         </dl>
       </Col>
@@ -71,5 +72,4 @@ const IndexSetDetails = ({ indexSet }: Props) => {
   );
 };
 
-IndexSetDetails.propTypes = { indexSet: PropTypes.object.isRequired };
 export default IndexSetDetails;

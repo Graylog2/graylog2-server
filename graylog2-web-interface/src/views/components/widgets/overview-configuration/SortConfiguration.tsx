@@ -29,26 +29,36 @@ const Container = styled.div`
 `;
 
 type Props = {
-  columnTitle?: (column: string) => string,
-  columns: Array<string>,
-  directionTitle?: (direction: string) => string,
-  directions: Array<string>,
-  name: string,
-}
+  columnTitle?: (column: string) => string;
+  columns: Array<string>;
+  directionTitle?: (direction: string) => string;
+  directions: Array<string>;
+  name: string;
+};
 
-const SortConfiguration = ({ name: attributeName, directions, columns, columnTitle, directionTitle }: Props) => {
+const SortConfiguration = ({
+  name: attributeName,
+  directions,
+  columns,
+  columnTitle = (column: string) => column,
+  directionTitle = (direction: string) => direction,
+}: Props) => {
   const { values } = useFormikContext();
-  const columnOptions = useMemo(() => (
-    columns
-      .map((col) => ({ value: col, label: columnTitle(col) }))
-      .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2))
-  ), [columnTitle, columns]);
+  const columnOptions = useMemo(
+    () =>
+      columns
+        .map((col) => ({ value: col, label: columnTitle(col) }))
+        .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2)),
+    [columnTitle, columns],
+  );
 
-  const directionOptions = useMemo(() => (
-    directions
-      .map((col) => ({ value: col, label: directionTitle(col) }))
-      .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2))
-  ), [directionTitle, directions]);
+  const directionOptions = useMemo(
+    () =>
+      directions
+        .map((col) => ({ value: col, label: directionTitle(col) }))
+        .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2)),
+    [directionTitle, directions],
+  );
 
   const isUnknownColumn = values[attributeName].field && !columns.includes(values[attributeName].field);
 
@@ -56,48 +66,45 @@ const SortConfiguration = ({ name: attributeName, directions, columns, columnTit
     <Container>
       <Field name={`${attributeName}.field`}>
         {({ field: { value, onChange, name } }) => (
-          <Input id="sort-configuration-column"
-                 label="Column"
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <Select id="sort-configuration-column-select"
-                    placeholder="Select a column"
-                    options={columnOptions}
-                    matchProp="label"
-                    menuPortalTarget={document.body}
-                    clearable={false}
-                    size="small"
-                    onChange={(newColumn) => onChange({ target: { value: newColumn, name } })}
-                    value={isUnknownColumn ? 'Unknown' : value} />
+          <Input id="sort-configuration-column" label="Column" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+            <Select
+              id="sort-configuration-column-select"
+              placeholder="Select a column"
+              options={columnOptions}
+              matchProp="label"
+              menuPortalTarget={document.body}
+              clearable={false}
+              size="small"
+              onChange={(newColumn) => onChange({ target: { value: newColumn, name } })}
+              value={isUnknownColumn ? 'Unknown' : value}
+            />
           </Input>
         )}
       </Field>
 
       <Field name={`${attributeName}.direction`}>
         {({ field: { value, onChange, name } }) => (
-          <Input id="sort-configuration-direction"
-                 label="Direction"
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <Select id="sort-configuration-direction-select"
-                    placeholder="Select a direction"
-                    options={directionOptions}
-                    menuPortalTarget={document.body}
-                    matchProp="label"
-                    clearable={false}
-                    size="small"
-                    onChange={(newDirection) => onChange({ target: { value: newDirection, name } })}
-                    value={value} />
+          <Input
+            id="sort-configuration-direction"
+            label="Direction"
+            labelClassName="col-sm-3"
+            wrapperClassName="col-sm-9">
+            <Select
+              id="sort-configuration-direction-select"
+              placeholder="Select a direction"
+              options={directionOptions}
+              menuPortalTarget={document.body}
+              matchProp="label"
+              clearable={false}
+              size="small"
+              onChange={(newDirection) => onChange({ target: { value: newDirection, name } })}
+              value={value}
+            />
           </Input>
         )}
       </Field>
     </Container>
   );
-};
-
-SortConfiguration.defaultProps = {
-  columnTitle: (column: string) => column,
-  directionTitle: (direction: string) => direction,
 };
 
 export default SortConfiguration;

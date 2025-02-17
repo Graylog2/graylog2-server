@@ -24,26 +24,28 @@ import type { CustomListItemRender, ListItemType, CustomContentRender } from './
 import ListItem from './ListItem';
 
 type Props<ItemType extends ListItemType> = {
-  alignItemContent?: 'flex-start' | 'center'
-  className?: string,
-  customListItemRender?: CustomListItemRender<ItemType>,
-  customContentRender?: CustomContentRender<ItemType>,
-  disableDragging?: boolean,
-  displayOverlayInPortal: boolean,
-  index: number,
-  item: ItemType,
+  alignItemContent?: 'flex-start' | 'center';
+  className?: string;
+  customListItemRender?: CustomListItemRender<ItemType>;
+  customContentRender?: CustomContentRender<ItemType>;
+  disableDragging?: boolean;
+  displayOverlayInPortal: boolean;
+  index: number;
+  item: ItemType;
 };
 
-const StyledListItem = styled(ListItem)<{ $isDragging: boolean }>(({ $isDragging }) => css`
-  box-shadow: ${$isDragging ? 'rgba(0, 0, 0, 0.24) 0px 3px 8px' : 'none'};
-`);
+const StyledListItem = styled(ListItem)<{ $isDragging: boolean }>(
+  ({ $isDragging }) => css`
+    box-shadow: ${$isDragging ? 'rgba(0, 0, 0, 0.24) 0px 3px 8px' : 'none'};
+  `,
+);
 
 const SortableListItem = <ItemType extends ListItemType>({
   alignItemContent,
   className,
   customContentRender,
   customListItemRender,
-  disableDragging,
+  disableDragging = false,
   displayOverlayInPortal,
   index,
   item,
@@ -51,33 +53,25 @@ const SortableListItem = <ItemType extends ListItemType>({
   <Draggable draggableId={item.id} index={index}>
     {({ draggableProps, dragHandleProps, innerRef }, { isDragging }) => {
       const listItem = (
-        <StyledListItem alignItemContent={alignItemContent}
-                        item={item}
-                        index={index}
-                        className={className}
-                        ref={innerRef}
-                        customContentRender={customContentRender}
-                        customListItemRender={customListItemRender}
-                        disableDragging={disableDragging}
-                        displayOverlayInPortal={displayOverlayInPortal}
-                        draggableProps={draggableProps}
-                        dragHandleProps={dragHandleProps}
-                        $isDragging={isDragging} />
+        <StyledListItem
+          alignItemContent={alignItemContent}
+          item={item}
+          index={index}
+          className={className}
+          ref={innerRef}
+          customContentRender={customContentRender}
+          customListItemRender={customListItemRender}
+          disableDragging={disableDragging}
+          displayOverlayInPortal={displayOverlayInPortal}
+          draggableProps={draggableProps}
+          dragHandleProps={dragHandleProps}
+          $isDragging={isDragging}
+        />
       );
 
-      return (displayOverlayInPortal && isDragging)
-        ? <Portal>{listItem}</Portal>
-        : listItem;
+      return displayOverlayInPortal && isDragging ? <Portal>{listItem}</Portal> : listItem;
     }}
   </Draggable>
-  );
-
-SortableListItem.defaultProps = {
-  alignItemContent: undefined,
-  className: undefined,
-  customContentRender: undefined,
-  customListItemRender: undefined,
-  disableDragging: false,
-};
+);
 
 export default SortableListItem;

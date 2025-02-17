@@ -70,4 +70,6 @@ public interface MigrationActions {
     void stopDatanodes();
 
     void finishRemoteReindexMigration();
+
+    boolean isRemoteReindexMigrationEnabled();
 }

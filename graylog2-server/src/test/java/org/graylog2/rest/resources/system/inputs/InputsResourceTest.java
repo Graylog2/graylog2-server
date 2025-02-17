@@ -17,8 +17,11 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import jakarta.annotation.Nullable;
+import jakarta.ws.rs.BadRequestException;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.inputs.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -30,9 +33,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import jakarta.ws.rs.BadRequestException;
-
 import java.net.URI;
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,13 +56,9 @@ class InputsResourceTest {
     Configuration configuration;
 
     @Mock
-    InputCreateRequest inputCreateRequest;
-
-    @Mock
     MessageInput messageInput;
 
     InputsResource inputsResource;
-
 
     @BeforeEach
     public void setUp() {
@@ -70,32 +68,29 @@ class InputsResourceTest {
     @Test
     public void testCreateNotGlobalInputInCloud() {
         when(configuration.isCloud()).thenReturn(true);
-        when(inputCreateRequest.global()).thenReturn(false);
 
-        assertThatThrownBy(() -> inputsResource.create(inputCreateRequest)).isInstanceOf(BadRequestException.class)
+        assertThatThrownBy(() -> inputsResource.create(getCR(false))).isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Only global inputs");
     }
 
     @Test
     public void testCreateNotCloudCompatibleInputInCloud() throws Exception {
         when(configuration.isCloud()).thenReturn(true);
-        when(inputCreateRequest.global()).thenReturn(true);
         when(messageInput.isCloudCompatible()).thenReturn(false);
         when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
 
-        assertThatThrownBy(() -> inputsResource.create(inputCreateRequest)).isInstanceOf(BadRequestException.class)
+        assertThatThrownBy(() -> inputsResource.create(getCR(true))).isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("not allowed in the cloud environment");
     }
 
     @Test
     public void testCreateCloudCompatibleInputInCloud() throws Exception {
         when(configuration.isCloud()).thenReturn(true);
-        when(inputCreateRequest.global()).thenReturn(true);
         when(messageInput.isCloudCompatible()).thenReturn(true);
         when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
         when(inputService.save(any())).thenReturn("id");
 
-        assertThat(inputsResource.create(inputCreateRequest).getStatus()).isEqualTo(201);
+        assertThat(inputsResource.create(getCR(true)).getStatus()).isEqualTo(201);
     }
 
     @Test
@@ -104,7 +99,16 @@ class InputsResourceTest {
         when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
         when(inputService.save(any())).thenReturn("id");
 
-        assertThat(inputsResource.create(inputCreateRequest).getStatus()).isEqualTo(201);
+        assertThat(inputsResource.create(getCR(true)).getStatus()).isEqualTo(201);
+    }
+
+    private InputCreateRequest getCR(boolean global) {
+        return InputCreateRequest.builder()
+                .global(global)
+                .title("myTitle")
+                .configuration(new HashMap<>())
+                .type("myType")
+                .build();
     }
 
     static class InputsTestResource extends InputsResource {
@@ -114,7 +118,7 @@ class InputsResourceTest {
         public InputsTestResource(InputService inputService,
                                   MessageInputFactory messageInputFactory,
                                   Configuration config) {
-            super(inputService, messageInputFactory, config);
+            super(inputService, mock(InputDiagnosticService.class), messageInputFactory, config, mock(ClusterEventBus.class));
             configuration = mock(HttpConfiguration.class);
             this.user = mock(User.class);
             lenient().when(user.getName()).thenReturn("foo");

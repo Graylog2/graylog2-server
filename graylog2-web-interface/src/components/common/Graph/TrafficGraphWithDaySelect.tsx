@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
 
@@ -32,41 +31,45 @@ import type { Traffic } from 'components/common/Graph/types';
 import { DAYS } from 'components/common/Graph/types';
 import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
 
-const StyledH3 = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
+const StyledH3 = styled.h3(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
-const Wrapper = styled.div(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
+const Wrapper = styled.div(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.xs};
 
-  .control-label {
-    padding-top: 0;
-  }
-
-  .graph-days-select {
-    display: flex;
-    align-items: baseline;
-
-    select {
-      padding-top: ${theme.spacings.xxs};
+    .control-label {
+      padding-top: 0;
     }
-  }
-`);
+
+    .graph-days-select {
+      display: flex;
+      align-items: baseline;
+
+      select {
+        padding-top: ${theme.spacings.xxs};
+      }
+    }
+  `,
+);
 
 type Props = {
-  traffic: Traffic,
-  trafficLimit?: number,
-  title?: string,
+  traffic: Traffic;
+  trafficLimit?: number;
+  title?: string;
 };
 
-const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title } : Props) => {
+const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title }: Props) => {
   const { graphDays, setGraphDays } = useGraphDays();
   const { graphWidth, graphContainerRef } = useGraphWidth();
   const { pathname } = useLocation();
 
   const sendTelemetry = useSendTelemetry();
 
-  const onGraphDaysChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
+  const onGraphDaysChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     event.preventDefault();
     const newDays = Number(event.target.value);
 
@@ -86,46 +89,42 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title } : Props) => 
   if (traffic) {
     const bytesOut = reduce(traffic, (result, value) => result + value);
 
-    sumOutput = <small>Last {graphDays} days: {NumberUtils.formatBytes(bytesOut)}</small>;
+    sumOutput = (
+      <small>
+        Last {graphDays} days: {NumberUtils.formatBytes(bytesOut)}
+      </small>
+    );
 
     const unixTraffic = formatTrafficData(traffic);
 
-    trafficGraph = (
-      <TrafficGraph traffic={unixTraffic}
-                    trafficLimit={trafficLimit}
-                    width={graphWidth} />
-    );
+    trafficGraph = <TrafficGraph traffic={unixTraffic} trafficLimit={trafficLimit} width={graphWidth} />;
   }
 
   return (
     <>
       <Wrapper className="form-inline graph-days pull-right">
-        <Input id="graph-days"
-               type="select"
-               bsSize="small"
-               label="Days"
-               value={graphDays}
-               onChange={onGraphDaysChange}
-               formGroupClassName="graph-days-select">
-          {DAYS.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
+        <Input
+          id="graph-days"
+          type="select"
+          bsSize="small"
+          label="Days"
+          value={graphDays}
+          onChange={onGraphDaysChange}
+          formGroupClassName="graph-days-select">
+          {DAYS.map((size) => (
+            <option key={`option-${size}`} value={size}>
+              {size}
+            </option>
+          ))}
         </Input>
       </Wrapper>
 
-      <StyledH3 ref={graphContainerRef}>{title ?? 'Outgoing traffic'} {sumOutput}</StyledH3>
+      <StyledH3 ref={graphContainerRef}>
+        {title ?? 'Outgoing traffic'} {sumOutput}
+      </StyledH3>
       {trafficGraph}
     </>
   );
-};
-
-TrafficGraphWithDaySelect.propTypes = {
-  traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
-  trafficLimit: PropTypes.number,
-  title: PropTypes.string,
-};
-
-TrafficGraphWithDaySelect.defaultProps = {
-  trafficLimit: undefined,
-  title: undefined,
 };
 
 export default TrafficGraphWithDaySelect;

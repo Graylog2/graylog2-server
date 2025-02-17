@@ -16,13 +16,29 @@
  */
 package org.graylog2.database.utils;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoClientException;
+import com.mongodb.MongoException;
+import com.mongodb.MongoWriteException;
+import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcernResult;
+import com.mongodb.WriteError;
 import com.mongodb.client.MongoCollection;
+import org.bson.BsonDocument;
+import org.bson.BsonString;
 import org.bson.RawBsonDocument;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +46,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mongojack.Id;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -179,5 +197,121 @@ class MongoUtilsTest {
         assertThatThrownBy(() -> utils.getOrCreate(new DTO(null, "test")))
                 .hasMessageContaining("entity ID cannot be null")
                 .isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    void testIsDuplicateKeyError() {
+        final var clientException = new MongoClientException("Something went wrong!");
+        final var madeUpServerException = new MongoWriteException(
+                new WriteError(12345,
+                        "E12345 some error that I just made up",
+                        new BsonDocument()),
+                new ServerAddress(), Collections.emptySet());
+        final var dupKeyException = new MongoWriteException(
+                new WriteError(11000,
+                        "E11000 duplicate key error collection: graylog.example index: action_id_1 dup key: { foo_id: \"bar\" }",
+                        new BsonDocument()),
+                new ServerAddress(), Collections.emptySet());
+        final var legacyDupKeyException = new DuplicateKeyException(
+                new BsonDocument("err", new BsonString("E11000 duplicate key error collection: graylog.example index: action_id_1 dup key: { foo_id: \"bar\" }")),
+                new ServerAddress(), WriteConcernResult.acknowledged(0, false, null));
+
+        assertThat(MongoUtils.isDuplicateKeyError(clientException)).isFalse();
+        assertThat(MongoUtils.isDuplicateKeyError(madeUpServerException)).isFalse();
+        assertThat(MongoUtils.isDuplicateKeyError(dupKeyException)).isTrue();
+        assertThat(MongoUtils.isDuplicateKeyError(legacyDupKeyException)).isTrue();
+    }
+
+    @Test
+    void testReproduceDuplicateKeyError(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
+        final DBCollection legacyCollection = mongoDBTestService.mongoConnection().getDatabase()
+                .getCollection("test");
+
+        final var dto = new DTO(new ObjectId().toHexString(), "test");
+        final var document = new BasicDBObject(Map.of("_id", new ObjectId(dto.id()), "name", "test"));
+
+        collection.insertOne(dto);
+
+        assertThatThrownBy(() -> collection.insertOne(dto))
+                .isInstanceOfSatisfying(MongoException.class, e ->
+                        assertThat(MongoUtils.isDuplicateKeyError(e)).isTrue());
+
+        assertThatThrownBy(() -> legacyCollection.insert(document))
+                .isInstanceOf(DuplicateKeyException.class)
+                .isInstanceOfSatisfying(MongoException.class, e ->
+                        assertThat(MongoUtils.isDuplicateKeyError(e)).isTrue());
+    }
+
+    @AutoValue
+    @JsonDeserialize(builder = AutoValueDTO.Builder.class)
+    public static abstract class AutoValueDTO implements BuildableMongoEntity<AutoValueDTO, AutoValueDTO.Builder> {
+        @JsonProperty("name")
+        public abstract String name();
+
+        @Override
+        public abstract Builder toBuilder();
+
+        public static AutoValueDTO.Builder builder() {
+            return Builder.create();
+        }
+
+        @AutoValue.Builder
+        public abstract static class Builder implements BuildableMongoEntity.Builder<AutoValueDTO, Builder> {
+            @JsonCreator
+            public static Builder create() {
+                return new AutoValue_MongoUtilsTest_AutoValueDTO.Builder();
+            }
+
+            @JsonProperty("name")
+            public abstract Builder name(String name);
+
+            public abstract AutoValueDTO build();
+        }
+    }
+
+    @Test
+    void testSaveAutoValueDTOWithoutId() {
+        final var coll = mongoCollections.collection("autovalue-test", AutoValueDTO.class);
+        final var util = mongoCollections.utils(coll);
+
+        final var orig = AutoValueDTO.builder().name("test").build();
+        assertThat(orig.id()).isNull();
+
+        final var saved = util.save(orig);
+        final var generatedId = saved.id();
+        assertThat(saved)
+                .isEqualTo(orig.toBuilder().id(generatedId).build())
+                .isEqualTo(util.getById(generatedId).orElse(null));
+    }
+
+    @Test
+    void testSaveAutoValueDTOWithExistingId() {
+        final var coll = mongoCollections.collection("autovalue-test", AutoValueDTO.class);
+        final var util = mongoCollections.utils(coll);
+
+        final var existing = util.save(AutoValueDTO.builder().name("test").build());
+        final var existingId = existing.id();
+        assertThat(existingId).isNotNull();
+
+        final var orig = existing.toBuilder().name("new name").build();
+        final var saved = util.save(orig);
+
+        assertThat(saved)
+                .isEqualTo(orig)
+                .isEqualTo(util.getById(existingId).orElse(null));
+    }
+
+    @Test
+    void testSaveAutoValueDTOWithNewId() {
+        final var coll = mongoCollections.collection("autovalue-test", AutoValueDTO.class);
+        final var util = mongoCollections.utils(coll);
+
+        final var orig = AutoValueDTO.builder().id(new ObjectId().toHexString()).name("test").build();
+        assertThat(util.getById(orig.id())).isEmpty();
+
+        final var saved = util.save(orig);
+        assertThat(saved)
+                .isEqualTo(orig)
+                .isEqualTo(util.getById(orig.id()).orElse(null));
     }
 }

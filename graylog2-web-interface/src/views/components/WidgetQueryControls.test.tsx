@@ -34,7 +34,7 @@ jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mo
 
 jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/searchbar/queryinput/BasicQueryInput');
-
+jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/hooks/useGlobalOverride');
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
@@ -63,32 +63,33 @@ describe('WidgetQueryControls', () => {
   };
 
   const emptyGlobalOverride = GlobalOverride.empty();
-  const globalOverrideWithQuery = GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: 'source:foo' });
-  const globalOverrideWithTimeRange = GlobalOverride.create({ type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' });
+  const globalOverrideWithQuery = GlobalOverride.create(undefined, {
+    type: 'elasticsearch',
+    query_string: 'source:foo',
+  });
+  const globalOverrideWithTimeRange = GlobalOverride.create({
+    type: 'absolute',
+    from: '2020-01-01T10:00:00.850Z',
+    to: '2020-01-02T10:00:00.000Z',
+  });
   const globalOverrideWithQueryAndTimeRange = GlobalOverride.create(
     { type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' },
     { type: 'elasticsearch', query_string: 'source:foo' },
   );
-  const widget = Widget.builder()
-    .id('deadbeef')
-    .type('dummy')
-    .config({})
-    .build();
+  const widget = Widget.builder().id('deadbeef').type('dummy').config({}).build();
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <TestStoreProvider>
-      <WidgetContext.Provider value={widget}>
-        {children}
-      </WidgetContext.Provider>
+      <WidgetContext.Provider value={widget}>{children}</WidgetContext.Provider>
     </TestStoreProvider>
   );
 
-  const renderSUT = (props = {}) => render(
-    <Wrapper>
-      <WidgetQueryControls {...defaultProps}
-                           {...props} />
-    </Wrapper>,
-  );
+  const renderSUT = (props = {}) =>
+    render(
+      <Wrapper>
+        <WidgetQueryControls {...defaultProps} {...props} />
+      </Wrapper>,
+    );
 
   describe('displays if global override is set', () => {
     const resetTimeRangeButtonTitle = /reset global override/i;
@@ -122,7 +123,9 @@ describe('WidgetQueryControls', () => {
     });
 
     it('does not show global override query indicator if global override query is an object with an empty query string', async () => {
-      asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: '' }));
+      asMock(useGlobalOverride).mockReturnValue(
+        GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: '' }),
+      );
       renderSUT();
 
       expect(screen.queryByRole('button', { name: resetQueryButtonTitle })).toBeNull();

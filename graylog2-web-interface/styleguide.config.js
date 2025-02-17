@@ -35,7 +35,6 @@ module.exports = {
     'regenerator-runtime/runtime',
     'bootstrap/less/bootstrap.less',
     'toastr/toastr.less',
-    'stylesheets/typeahead.less',
     './fetch-mock',
   ],
   sections: [
@@ -111,5 +110,10 @@ module.exports = {
     module: webpackConfig.module,
     resolve: merge.smart({ modules: ['node_modules'] }, webpackConfig.resolve),
     resolveLoader: webpackConfig.resolveLoader,
+    devServer: {
+      client: {
+        overlay: false,
+      },
+    },
   },
 };

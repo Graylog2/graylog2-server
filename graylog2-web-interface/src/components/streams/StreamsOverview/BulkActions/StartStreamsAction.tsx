@@ -20,16 +20,16 @@ import * as React from 'react';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import MenuItem from 'components/bootstrap/MenuItem';
+import { MenuItem } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type Props = {
-  descriptor: string,
-  handleFailures: (failures: Array<{ entity_id: string }>, actionPastTense: string) => void,
-  onSelect?: () => void,
-  refetchStreams: () => void,
-}
+  descriptor: string;
+  handleFailures: (failures: Array<{ entity_id: string }>, actionPastTense: string) => void;
+  onSelect?: () => void;
+  refetchStreams: () => void;
+};
 
 const StartStreamsActions = ({ handleFailures, refetchStreams, descriptor, onSelect }: Props) => {
   const { selectedEntities } = useSelectedEntities();
@@ -38,11 +38,8 @@ const StartStreamsActions = ({ handleFailures, refetchStreams, descriptor, onSel
       onSelect();
     }
 
-    fetch(
-      'POST',
-      qualifyUrl(ApiRoutes.StreamsApiController.bulk_resume().url),
-      { entity_ids: selectedEntities },
-    ).then(({ failures }) => handleFailures(failures, 'started'))
+    fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.bulk_resume().url), { entity_ids: selectedEntities })
+      .then(({ failures }) => handleFailures(failures, 'started'))
       .catch((error) => {
         UserNotification.error(`An error occurred while starting streams. ${error}`);
       })
@@ -51,13 +48,7 @@ const StartStreamsActions = ({ handleFailures, refetchStreams, descriptor, onSel
       });
   }, [handleFailures, onSelect, refetchStreams, selectedEntities]);
 
-  return (
-    <MenuItem onSelect={onStartStreams}>Start {descriptor}</MenuItem>
-  );
-};
-
-StartStreamsActions.defaultProps = {
-  onSelect: undefined,
+  return <MenuItem onSelect={onStartStreams}>Start {descriptor}</MenuItem>;
 };
 
 export default StartStreamsActions;

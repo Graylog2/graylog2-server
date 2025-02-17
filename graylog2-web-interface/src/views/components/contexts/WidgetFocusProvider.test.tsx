@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { useLocation } from 'react-router-dom';
 
-import useLocation from 'routing/useLocation';
 import { asMock } from 'helpers/mocking';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import type { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
@@ -50,11 +50,8 @@ const emptyLocation = {
   key: '',
 };
 
-const ShowFocusedWidget = ({ focusedWidget }: WidgetFocusContextType) => (focusedWidget ? (
-  <span>Focused widget: {JSON.stringify(focusedWidget)}</span>
-) : (
-  <span>No focused widget</span>
-));
+const ShowFocusedWidget = ({ focusedWidget }: WidgetFocusContextType) =>
+  focusedWidget ? <span>Focused widget: {JSON.stringify(focusedWidget)}</span> : <span>No focused widget</span>;
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
@@ -77,9 +74,7 @@ describe('WidgetFocusProvider', () => {
     return render(
       <TestStoreProvider view={view}>
         <WidgetFocusProvider>
-          <WidgetFocusContext.Consumer>
-            {consume}
-          </WidgetFocusContext.Consumer>
+          <WidgetFocusContext.Consumer>{consume}</WidgetFocusContext.Consumer>
         </WidgetFocusProvider>
       </TestStoreProvider>,
     );

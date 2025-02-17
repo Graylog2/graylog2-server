@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
@@ -39,7 +38,7 @@ const EffectiveTimeRangeTable = styled.table`
 `;
 
 type Props = {
-  results: QueryResult,
+  results: QueryResult;
 };
 
 const SearchResultOverview = ({ results }: Props) => {
@@ -52,7 +51,7 @@ const SearchResultOverview = ({ results }: Props) => {
 
   const { timestamp, duration, effectiveTimerange, searchTypes } = results;
   const total = searchTypes && Object.values(searchTypes)?.[0]?.total;
-  const isVariesPerWidget = (viewType === View.Type.Dashboard && !globalOverrideTimeRange);
+  const isVariesPerWidget = viewType === View.Type.Dashboard && !globalOverrideTimeRange;
 
   return (
     <>
@@ -61,33 +60,36 @@ const SearchResultOverview = ({ results }: Props) => {
         {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />
       </p>
       <EffectiveTimeRange>
-        Effective time range<br />
-        {isVariesPerWidget ? <i>Varies per widget</i>
-          : (
-            <EffectiveTimeRangeTable>
-              <tbody>
-                <tr>
-                  <td>From</td>
-                  <td aria-label="Effective time range from"><Timestamp dateTime={effectiveTimerange.from} format="complete" /></td>
-                </tr>
-                <tr>
-                  <td>To</td>
-                  <td aria-label="Effective time range to"><Timestamp dateTime={effectiveTimerange.to} format="complete" /></td>
-                </tr>
-              </tbody>
-            </EffectiveTimeRangeTable>
-          )}
+        Effective time range
+        <br />
+        {isVariesPerWidget ? (
+          <i>Varies per widget</i>
+        ) : (
+          <EffectiveTimeRangeTable>
+            <tbody>
+              <tr>
+                <td>From</td>
+                <td aria-label="Effective time range from">
+                  <Timestamp dateTime={effectiveTimerange.from} format="complete" />
+                </td>
+              </tr>
+              <tr>
+                <td>To</td>
+                <td aria-label="Effective time range to">
+                  <Timestamp dateTime={effectiveTimerange.to} format="complete" />
+                </td>
+              </tr>
+            </tbody>
+          </EffectiveTimeRangeTable>
+        )}
       </EffectiveTimeRange>
       <p>
-        Total results<br />
+        Total results
+        <br />
         {isVariesPerWidget ? <i>Varies per widget</i> : numeral(total).format('0,0')}
       </p>
     </>
   );
-};
-
-SearchResultOverview.propTypes = {
-  results: PropTypes.object.isRequired,
 };
 
 export default SearchResultOverview;

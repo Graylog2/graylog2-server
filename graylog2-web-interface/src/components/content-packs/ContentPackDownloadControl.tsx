@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -25,13 +24,13 @@ import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 type Props = {
-  contentPackId: string,
-  revision: number,
-  show: boolean,
-  onHide: () => void,
-}
+  contentPackId: string;
+  revision: number;
+  show?: boolean;
+  onHide?: () => void;
+};
 
-const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }: Props) => {
+const ContentPackDownloadControl = ({ contentPackId, revision, show = false, onHide = () => {} }: Props) => {
   const [showDownloadModal, setShowDownloadModal] = useState(show);
 
   const getDownloadUrl = () => qualifyUrl(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url);
@@ -45,9 +44,7 @@ const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }: P
   const modalTitle = 'Download Content Pack';
 
   return (
-    <BootstrapModalWrapper showModal={showDownloadModal}
-                           onHide={closeModal}
-                           bsSize="large">
+    <BootstrapModalWrapper showModal={showDownloadModal} onHide={closeModal} bsSize="large">
       <Modal.Header closeButton>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
@@ -55,7 +52,7 @@ const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }: P
         <p>{infoText}</p>
         <p>
           <a href={getDownloadUrl()} target="_blank" rel="noopener noreferrer">
-            <Icon name="download" />{' '}Download
+            <Icon name="download" /> Download
           </a>
         </p>
       </Modal.Body>
@@ -64,19 +61,6 @@ const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }: P
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
-};
-
-ContentPackDownloadControl.propTypes = {
-  contentPackId: PropTypes.string.isRequired,
-  revision: PropTypes.number.isRequired,
-  show: PropTypes.bool,
-  onHide: PropTypes.func,
-};
-
-ContentPackDownloadControl.defaultProps = {
-  show: false,
-  onHide: () => {
-  },
 };
 
 export default ContentPackDownloadControl;

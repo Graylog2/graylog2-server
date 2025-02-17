@@ -23,87 +23,116 @@ import Icon from './Icon';
 
 import { Button } from '../bootstrap';
 
-const Container = styled.div<{ $collapsible: boolean, $opened: boolean}>(({ $collapsible, $opened, theme }) => css`
-  background-color: ${theme.colors.section.filled.background};
-  border: 1px solid ${theme.colors.section.filled.border};
-  border-radius: 10px;
-  padding: ${($collapsible && !$opened) ? 0 : theme.spacings.md};
-  margin-bottom: ${theme.spacings.xxs};
-`);
+const Container = styled.div<{ $collapsible: boolean; $opened: boolean }>(
+  ({ $collapsible, $opened, theme }) => css`
+    background-color: ${theme.colors.section.filled.background};
+    border: 1px solid ${theme.colors.section.filled.border};
+    border-radius: 10px;
+    padding: ${$collapsible && !$opened ? 0 : theme.spacings.md};
+    margin-bottom: ${theme.spacings.xxs};
+  `,
+);
 
-const Header = styled.div<{ $collapsible: boolean, $opened: boolean}>(({ $collapsible, $opened, theme }) => css`
-  display: flex;
-  justify-content: space-between;
-  gap: ${theme.spacings.xs};
-  align-items: center;
-  border-radius: 10px;
-  padding: ${($collapsible && !$opened) ? theme.spacings.md : 0};
-  flex-wrap: wrap;
+const Header = styled.div<{ $collapsible: boolean; $opened: boolean }>(
+  ({ $collapsible, $opened, theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    gap: ${theme.spacings.xs};
+    align-items: center;
+    border-radius: 10px;
+    padding: ${$collapsible && !$opened ? theme.spacings.md : 0};
+    flex-wrap: wrap;
 
     &:hover {
-    background-color: ${($collapsible && !$opened) ? theme.colors.table.row.backgroundHover : 'initial'};
-  }
-`);
+      background-color: ${$collapsible && !$opened ? theme.colors.table.row.backgroundHover : 'initial'};
+    }
+  `,
+);
 
-const FlexWrapper = styled.div(({ theme }) => css`
-  display: flex;
-  justify-content: flex-start;
-  gap: ${theme.spacings.sm};
-  align-items: center;
-`);
+const FlexWrapper = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: flex-start;
+    gap: ${theme.spacings.sm};
+    align-items: center;
+  `,
+);
 
 type Props = React.PropsWithChildren<{
-  title: React.ReactNode,
-  actions?: React.ReactNode,
-  headerLeftSection?: React.ReactNode,
-  collapsible?: boolean,
-  defaultClosed?: boolean,
-  disableCollapseButton?: boolean,
-}>
+  title: string;
+  header?: React.ReactNode;
+  actions?: React.ReactNode;
+  headerLeftSection?: React.ReactNode;
+  collapsible?: boolean;
+  onCollapse?: (opened?: boolean) => void;
+  defaultClosed?: boolean;
+  disableCollapseButton?: boolean;
+}>;
 
 /**
  * Simple section component. Currently only a "filled" version exists.
  */
-const Section = ({ title, actions, headerLeftSection, collapsible, defaultClosed, disableCollapseButton, children }: Props) => {
+const Section = ({
+  title,
+  header = null,
+  actions = null,
+  headerLeftSection = null,
+  collapsible = false,
+  defaultClosed = false,
+  onCollapse = () => {},
+  disableCollapseButton = false,
+  children = null,
+}: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
-  const onHeaderClick = () => (!disableCollapseButton && toggle());
+
+  const onToggle = () => {
+    toggle();
+    onCollapse(opened);
+  };
+
+  const onHeaderClick = () => !disableCollapseButton && onToggle();
 
   return (
     <Container $opened={opened} $collapsible={collapsible}>
       <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
         <FlexWrapper>
-          <h2>{title}</h2>
-          {headerLeftSection && <FlexWrapper onClick={(e) => { e.stopPropagation(); }}>{headerLeftSection}</FlexWrapper>}
+          <h2>{header ?? title}</h2>
+          {headerLeftSection && (
+            <FlexWrapper
+              onClick={(e) => {
+                e.stopPropagation();
+              }}>
+              {headerLeftSection}
+            </FlexWrapper>
+          )}
         </FlexWrapper>
         <FlexWrapper>
-          {actions && <div>{actions}</div>}
+          {actions && (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+              }}>
+              {actions}
+            </div>
+          )}
           {collapsible && (
-          <Button bsSize="sm"
-                  bsStyle={opened ? 'primary' : 'default'}
-                  onClick={toggle}
-                  data-testid="collapseButton"
-                  disabled={disableCollapseButton}>
-            <Icon size="sm" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-          </Button>
+            <Button
+              bsSize="sm"
+              bsStyle={opened ? 'primary' : 'default'}
+              onClick={toggle}
+              data-testid="collapseButton"
+              title={`Toggle ${title.toLowerCase()} section`}
+              disabled={disableCollapseButton}>
+              <Icon size="sm" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+            </Button>
           )}
         </FlexWrapper>
       </Header>
       {!collapsible && children}
-      {collapsible && (
-      <Collapse in={opened}>
-        {children}
-      </Collapse>
-      )}
+      {collapsible && <Collapse in={opened}>{children}</Collapse>}
     </Container>
   );
-};
-
-Section.defaultProps = {
-  actions: undefined,
-  headerLeftSection: undefined,
-  collapsible: false,
-  defaultClosed: false,
-  disableCollapseButton: false,
 };
 
 export default Section;

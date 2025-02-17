@@ -20,13 +20,15 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 
-const RefContainer = styled.span(({ theme }) => css`
-  display: block;
+const RefContainer = styled.span(
+  ({ theme }) => css`
+    display: block;
 
-  &:not(:last-child) {
-    border-bottom: 1px solid ${theme.colors.table.row.divider};
-  }
-`);
+    &:not(:last-child) {
+      border-bottom: 1px solid ${theme.colors.table.row.divider};
+    }
+  `,
+);
 
 const variantStyles = css<{ bsStyle: string }>(({ bsStyle, theme }) => {
   if (!bsStyle) {
@@ -65,109 +67,102 @@ const variantStyles = css<{ bsStyle: string }>(({ bsStyle, theme }) => {
         }
       }
     }
-`;
+  `;
 });
 
-const StyledListGroupItem = styled(BootstrapListGroupItem)(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 0;
-  padding: 5px 10px;
-
-  .list-group-item-heading {
-    font-size: ${theme.fonts.size.h5};
-  }
-
-  .list-group-item-text {
-    margin-bottom: 5px;
-  }
-
-  a&,
-  button& {
-    color: ${theme.colors.global.textDefault};
+const StyledListGroupItem = styled(BootstrapListGroupItem)(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    border: 0;
+    padding: 5px 10px;
 
     .list-group-item-heading {
-      color: ${theme.colors.variant.darkest.default};
+      font-size: ${theme.fonts.size.h5};
     }
 
-    &:hover:not(.disabled),
-    &:focus:not(.disabled) {
-      background-color: ${theme.colors.variant.lightest.default};
+    .list-group-item-text {
+      margin-bottom: 5px;
+    }
 
-      &.active {
-        color: ${theme.colors.variant.darkest.default};
-        background-color: ${theme.colors.variant.lightest.default};
-        border-color: ${theme.colors.variant.lightest.default};
-      }
+    a&,
+    button& {
+      color: ${theme.colors.global.textDefault};
 
       .list-group-item-heading {
-        color: ${theme.utils.readableColor(theme.colors.variant.lightest.default)};
+        color: ${theme.colors.variant.darkest.default};
+      }
+
+      &:hover:not(.disabled),
+      &:focus:not(.disabled) {
+        background-color: ${theme.colors.variant.lightest.default};
+
+        &.active {
+          color: ${theme.colors.variant.darkest.default};
+          background-color: ${theme.colors.variant.lightest.default};
+          border-color: ${theme.colors.variant.lightest.default};
+        }
+
+        .list-group-item-heading {
+          color: ${theme.utils.readableColor(theme.colors.variant.lightest.default)};
+        }
       }
     }
-  }
 
-  &.disabled,
-  &.disabled:hover,
-  &.disabled:focus {
-    color: ${theme.colors.variant.default};
-    background-color: ${theme.colors.variant.lightest.default};
-
-    .list-group-item-heading {
-      color: inherit;
-    }
-
-    .list-group-item-text {
+    &.disabled,
+    &.disabled:hover,
+    &.disabled:focus {
       color: ${theme.colors.variant.default};
-    }
-  }
+      background-color: ${theme.colors.variant.lightest.default};
 
-  &.active,
-  &.active:hover,
-  &.active:focus {
-    color: ${theme.colors.variant.darker.default};
-    background-color: ${theme.colors.variant.lightest.info};
-    border-color: ${theme.colors.variant.lightest.info};
-    z-index: auto;
+      .list-group-item-heading {
+        color: inherit;
+      }
 
-    .list-group-item-heading,
-    .list-group-item-heading > small,
-    .list-group-item-heading > .small {
-      color: inherit;
+      .list-group-item-text {
+        color: ${theme.colors.variant.default};
+      }
     }
 
-    .list-group-item-text {
-      color: ${theme.colors.variant.light.primary};
-    }
-  }
+    &.active,
+    &.active:hover,
+    &.active:focus {
+      color: ${theme.colors.variant.darker.default};
+      background-color: ${theme.colors.variant.lightest.info};
+      border-color: ${theme.colors.variant.lightest.info};
+      z-index: auto;
 
-  ${variantStyles}
-`);
+      .list-group-item-heading,
+      .list-group-item-heading > small,
+      .list-group-item-heading > .small {
+        color: inherit;
+      }
+
+      .list-group-item-text {
+        color: ${theme.colors.variant.light.primary};
+      }
+    }
+
+    ${variantStyles}
+  `,
+);
 
 type Props = React.PropsWithChildren<{
-  active?: boolean
-  bsStyle?: string,
-  className?: string,
-  containerProps?: object,
-  disabled?: boolean,
-  header?: React.ReactNode,
-  href?: string,
-  onClick?:() => void
-}>
+  id?: string;
+  active?: boolean;
+  bsStyle?: string;
+  className?: string;
+  containerProps?: object;
+  disabled?: boolean;
+  header?: React.ReactNode;
+  href?: string;
+  onClick?: () => void;
+  onKeyDown?: React.ComponentProps<typeof StyledListGroupItem>['onKeyDown'];
+}>;
 
-const ListGroupItem = forwardRef<HTMLElement, Props>(({ containerProps, ...rest }, ref) => (
+const ListGroupItem = forwardRef<HTMLElement, Props>(({ containerProps = {}, ...rest }, ref) => (
   <RefContainer ref={ref} {...containerProps}>
     <StyledListGroupItem {...rest} />
   </RefContainer>
 ));
-
-ListGroupItem.defaultProps = {
-  active: undefined,
-  bsStyle: undefined,
-  className: undefined,
-  containerProps: {},
-  disabled: undefined,
-  header: undefined,
-  href: undefined,
-  onClick: undefined,
-};
 
 export default ListGroupItem;

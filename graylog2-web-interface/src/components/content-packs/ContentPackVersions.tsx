@@ -14,64 +14,60 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { DataTable } from 'components/common';
 import ContentPackVersionItem from 'components/content-packs/components/ContentPackVersionItem';
-import type { ContentPackVersionsType, ContentPackInstallation } from 'components/content-packs/Types';
+import type { ContentPackInstallation } from 'components/content-packs/Types';
 
 import './ContentPackVersions.css';
+import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 
 type Props = {
-  contentPackRevisions: ContentPackVersionsType,
-  onDeletePack: (id: string) => void,
-  onChange: (id: string) => void,
-  onInstall: (id: string, contentPackRev: string, parameters: unknown) => void,
+  contentPackRevisions: ContentPackRevisions;
+  onDeletePack?: (id: string) => void;
+  onChange?: (id: string) => void;
+  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void;
 };
 
-const headerFormatter = (header) => {
+const headerFormatter = (header: React.ReactNode) => {
   if (header === 'Action') {
-    return (<th className="text-right">{header}</th>);
+    return <th className="text-right">{header}</th>;
   }
 
-  return (<th>{header}</th>);
+  return <th>{header}</th>;
 };
 
-const ContentPackVersions = ({ onDeletePack, contentPackRevisions, onInstall, onChange }: Props) => {
+const ContentPackVersions = ({
+  onDeletePack = () => {},
+  contentPackRevisions,
+  onInstall = () => {},
+  onChange = () => {},
+}: Props) => {
   const { contentPacks } = contentPackRevisions;
   const headers = ['Select', 'Revision', 'Action'];
   const rowFormatter = (item: ContentPackInstallation) => (
-    <ContentPackVersionItem pack={item}
-                            contentPackRevisions={contentPackRevisions}
-                            onDeletePack={onDeletePack}
-                            onChange={onChange}
-                            onInstall={onInstall} />
+    <ContentPackVersionItem
+      pack={item}
+      contentPackRevisions={contentPackRevisions}
+      onDeletePack={onDeletePack}
+      onChange={onChange}
+      onInstall={onInstall}
+    />
   );
 
   return (
-    <DataTable id="content-packs-versions"
-               headers={headers}
-               headerCellFormatter={headerFormatter}
-               useNumericSort
-               sortBy={(c) => c.rev.toString()}
-               dataRowFormatter={rowFormatter}
-               rows={contentPacks}
-               filterKeys={[]} />
+    <DataTable
+      id="content-packs-versions"
+      headers={headers}
+      headerCellFormatter={headerFormatter}
+      useNumericSort
+      sortBy={(c) => c.rev.toString()}
+      dataRowFormatter={rowFormatter}
+      rows={contentPacks}
+      filterKeys={[]}
+    />
   );
-};
-
-ContentPackVersions.propTypes = {
-  contentPackRevisions: PropTypes.object.isRequired,
-  onChange: PropTypes.func,
-  onDeletePack: PropTypes.func,
-  onInstall: PropTypes.func,
-};
-
-ContentPackVersions.defaultProps = {
-  onChange: () => {},
-  onDeletePack: () => {},
-  onInstall: () => {},
 };
 
 export default ContentPackVersions;

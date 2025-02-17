@@ -21,11 +21,16 @@ import { Markdown, Icon } from 'components/common';
 
 import PreviewModal from './PreviewModal';
 
-const Container = styled.div<{ $height?: number, $noBackground?: boolean, $noBorder?: boolean }>`
+const Container = styled.div<{ $height?: number; $noBackground?: boolean; $noBorder?: boolean }>`
   position: relative;
   padding: 8px 0;
-  background-color: ${({ theme, $noBackground }) => ($noBackground ? 'transparent' : theme.colors.global.contentBackground)};
-  ${({ $noBorder }) => (!$noBorder && css`border: 1px solid ${({ theme }) => theme.colors.input.border};`)}
+  background-color: ${({ theme, $noBackground }) =>
+    $noBackground ? 'transparent' : theme.colors.global.contentBackground};
+  ${({ $noBorder }) =>
+    !$noBorder &&
+    css`
+      border: 1px solid ${({ theme }) => theme.colors.input.border};
+    `}
   border-radius: 4px;
   flex-grow: 1;
   overflow: hidden;
@@ -56,7 +61,12 @@ const MarkdownStyles = styled.div`
   container-type: inline-size;
 
   & > div {
-    & > h1, & > h2, & > h3, & > h4, & > h5, & > h6 {
+    & > h1,
+    & > h2,
+    & > h3,
+    & > h4,
+    & > h5,
+    & > h6 {
       margin-bottom: 8px;
       font-family: ${({ theme }) => theme.fonts.family.body};
     }
@@ -67,7 +77,8 @@ const MarkdownStyles = styled.div`
       border-bottom: 1px solid ${({ theme }) => theme.colors.brand.tertiary};
     }
 
-    & ul, & ol {
+    & ul,
+    & ol {
       padding-left: 1.5rem;
       margin: 8px 0;
 
@@ -90,7 +101,8 @@ const MarkdownStyles = styled.div`
       border-spacing: 0;
       margin: 8px 0;
 
-      & th, & td {
+      & th,
+      & td {
         border: 1px solid ${({ theme }) => theme.colors.input.border};
         padding: 4px 8px;
       }
@@ -107,25 +119,20 @@ type Props = {
   noBorder?: boolean;
 };
 
-function Preview({ value, height, show, withFullView, noBackground, noBorder }: Props) {
+function Preview({ value, height = 100, show, withFullView = false, noBackground = false, noBorder = false }: Props) {
   const [fullView, setFullView] = React.useState<boolean>(false);
 
-  return show && (
-    <Container $height={height} $noBackground={noBackground} $noBorder={noBorder}>
-      <MarkdownStyles>
-        <Markdown text={value} />
-      </MarkdownStyles>
-      {withFullView && <ExpandIcon name="expand" onClick={() => setFullView(true)} />}
-      <PreviewModal value={value} show={fullView} onClose={() => setFullView(false)} />
-    </Container>
+  return (
+    show && (
+      <Container $height={height} $noBackground={noBackground} $noBorder={noBorder}>
+        <MarkdownStyles>
+          <Markdown text={value} />
+        </MarkdownStyles>
+        {withFullView && <ExpandIcon name="expand_content" size="sm" onClick={() => setFullView(true)} />}
+        <PreviewModal value={value} show={fullView} onClose={() => setFullView(false)} />
+      </Container>
+    )
   );
 }
-
-Preview.defaultProps = {
-  withFullView: false,
-  noBackground: false,
-  noBorder: false,
-  height: undefined,
-};
 
 export default Preview;

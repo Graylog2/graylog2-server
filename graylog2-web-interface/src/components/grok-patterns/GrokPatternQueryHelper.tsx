@@ -24,8 +24,10 @@ const fieldMap = {
 
 const queryExample = (
   <p>
-    Find grok patterns containing COMMON in the pattern:<br />
-    <kbd>pattern:COMMON</kbd><br />
+    Find grok patterns containing COMMON in the pattern:
+    <br />
+    <kbd>pattern:COMMON</kbd>
+    <br />
   </p>
 );
 const GrokPatternQueryHelper = () => (

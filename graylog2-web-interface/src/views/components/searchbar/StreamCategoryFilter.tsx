@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Select from 'components/common/Select';
@@ -27,13 +26,13 @@ const Container = styled.div`
 `;
 
 type Props = {
-  disabled: boolean,
-  value: Array<string>,
-  streamCategories: Array<{ key: string, value: string }>,
-  onChange: (newStreamCategories: Array<string>) => void,
+  disabled?: boolean;
+  value?: Array<string>;
+  streamCategories: Array<{ key: string; value: string }>;
+  onChange: (newStreamCategories: Array<string>) => void;
 };
 
-const StreamCategoryFilter = ({ disabled, value, streamCategories, onChange }: Props) => {
+const StreamCategoryFilter = ({ disabled = false, value = [], streamCategories, onChange }: Props) => {
   const selectedCategories = value.join(',');
   const placeholder = 'Select stream categories the search should include.';
   const options = streamCategories.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
@@ -46,34 +45,18 @@ const StreamCategoryFilter = ({ disabled, value, streamCategories, onChange }: P
 
   return (
     <Container data-testid="stream-category-filter" title={placeholder}>
-      <Select placeholder={placeholder}
-              disabled={disabled}
-              inputProps={{ 'aria-label': placeholder }}
-              displayKey="key"
-              inputId="stream-categories-filter"
-              onChange={handleChange}
-              options={options}
-              multi
-              value={selectedCategories} />
+      <Select
+        placeholder={placeholder}
+        disabled={disabled}
+        displayKey="key"
+        inputId="stream-categories-filter"
+        onChange={handleChange}
+        options={options}
+        multi
+        value={selectedCategories}
+      />
     </Container>
   );
-};
-
-StreamCategoryFilter.propTypes = {
-  disabled: PropTypes.bool,
-  value: PropTypes.arrayOf(PropTypes.string),
-  streamCategories: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-    }),
-  ).isRequired,
-  onChange: PropTypes.func.isRequired,
-};
-
-StreamCategoryFilter.defaultProps = {
-  disabled: false,
-  value: [],
 };
 
 export default StreamCategoryFilter;

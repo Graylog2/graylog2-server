@@ -31,10 +31,15 @@ import { createViewWithWidgets } from 'fixtures/searches';
 import WidgetGrid from './WidgetGrid';
 
 jest.mock('./widgets/Widget', () => () => 'widget');
-// eslint-disable-next-line react/prop-types
+
 jest.mock('components/common/ReactGridContainer', () => ({ children }) => <span>{children}</span>);
 
-jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
+jest.mock(
+  'views/components/contexts/WidgetFieldTypesContextProvider',
+  () =>
+    ({ children }) =>
+      children,
+);
 
 const fieldTypes: FieldTypes = {
   all: Immutable.List(),
@@ -42,13 +47,11 @@ const fieldTypes: FieldTypes = {
 };
 const SimpleWidgetGrid = ({ view }: { view?: View }) => (
   <TestStoreProvider view={view}>
-    <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid /></FieldTypesContext.Provider>
+    <FieldTypesContext.Provider value={fieldTypes}>
+      <WidgetGrid />
+    </FieldTypesContext.Provider>
   </TestStoreProvider>
 );
-
-SimpleWidgetGrid.defaultProps = {
-  view: undefined,
-};
 
 describe('<WidgetGrid />', () => {
   useViewsPlugin();

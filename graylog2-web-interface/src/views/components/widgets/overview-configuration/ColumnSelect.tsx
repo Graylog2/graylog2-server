@@ -22,36 +22,36 @@ import Select from 'components/common/Select';
 import type { SelectRef } from 'components/common/Select/Select';
 
 type Props = {
-  ariaLabel?: string,
-  autoFocus?: boolean,
-  allowCreate?: boolean,
-  className?: string,
-  clearable?: boolean,
-  columns: Array<string>,
-  excludedColumns?: Array<string>,
-  id: string,
-  menuPortalTarget?: HTMLElement,
-  name: string,
-  onChange: (columnName: string) => void,
-  onMenuClose?: () => void,
-  openMenuOnFocus?: boolean,
-  persistSelection?: boolean,
-  placeholder?: string,
-  selectRef?: SelectRef,
-  value: string | undefined,
-  columnTitle: (column: string) => string,
-}
+  ariaLabel?: string;
+  autoFocus?: boolean;
+  allowCreate?: boolean;
+  className?: string;
+  clearable?: boolean;
+  columns: Array<string>;
+  excludedColumns?: Array<string>;
+  id: string;
+  menuPortalTarget?: HTMLElement;
+  name: string;
+  onChange: (columnName: string) => void;
+  onMenuClose?: () => void;
+  openMenuOnFocus?: boolean;
+  persistSelection?: boolean;
+  placeholder?: string;
+  selectRef?: SelectRef;
+  value: string | undefined;
+  columnTitle: (column: string) => string;
+};
 
 const ColumnSelect = ({
   ariaLabel,
   autoFocus,
-  allowCreate,
+  allowCreate = false,
   className,
-  clearable,
+  clearable = false,
   columns,
   columnTitle,
   id,
-  excludedColumns,
+  excludedColumns = [],
   menuPortalTarget,
   name,
   onChange,
@@ -62,48 +62,39 @@ const ColumnSelect = ({
   selectRef,
   value,
 }: Props) => {
-  const columnOptions = useMemo(() => columns
-    .filter((column) => !excludedColumns.includes(column))
-    .map((column) => ({
-      value: column,
-      label: columnTitle(column),
-    })).sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2)),
-  [columnTitle, columns, excludedColumns]);
+  const columnOptions = useMemo(
+    () =>
+      columns
+        .filter((column) => !excludedColumns.includes(column))
+        .map((column) => ({
+          value: column,
+          label: columnTitle(column),
+        }))
+        .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2)),
+    [columnTitle, columns, excludedColumns],
+  );
 
   return (
-    <Select options={columnOptions}
-            inputId={`select-${id}`}
-            forwardedRef={selectRef}
-            allowCreate={allowCreate}
-            className={className}
-            onMenuClose={onMenuClose}
-            openMenuOnFocus={openMenuOnFocus}
-            persistSelection={persistSelection}
-            clearable={clearable}
-            placeholder={placeholder}
-            name={name}
-            size="small"
-            value={value}
-            aria-label={ariaLabel}
-            autoFocus={autoFocus}
-            menuPortalTarget={menuPortalTarget}
-            onChange={onChange} />
+    <Select
+      options={columnOptions}
+      inputId={`select-${id}`}
+      forwardedRef={selectRef}
+      allowCreate={allowCreate}
+      className={className}
+      onMenuClose={onMenuClose}
+      openMenuOnFocus={openMenuOnFocus}
+      persistSelection={persistSelection}
+      clearable={clearable}
+      placeholder={placeholder}
+      name={name}
+      size="small"
+      value={value}
+      aria-label={ariaLabel}
+      autoFocus={autoFocus}
+      menuPortalTarget={menuPortalTarget}
+      onChange={onChange}
+    />
   );
-};
-
-ColumnSelect.defaultProps = {
-  allowCreate: false,
-  ariaLabel: undefined,
-  autoFocus: undefined,
-  className: undefined,
-  clearable: false,
-  excludedColumns: [],
-  onMenuClose: undefined,
-  openMenuOnFocus: undefined,
-  persistSelection: undefined,
-  placeholder: undefined,
-  selectRef: undefined,
-  menuPortalTarget: undefined,
 };
 
 export default ColumnSelect;

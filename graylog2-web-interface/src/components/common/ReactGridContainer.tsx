@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css, useTheme } from 'styled-components';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import type { ItemCallback } from 'react-grid-layout';
@@ -29,36 +28,35 @@ import { layoutToPositions, positionsToLayout } from 'views/logic/widgets/normal
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
-const WidthProvidedGridLayout = (props: React.ComponentProps<typeof WidthAdjustedReactGridLayout> & { children: React.ReactNode }) => {
-  const { width } = props;
+const WidthProvidedGridLayout = ({
+  width,
+  ...props
+}: React.ComponentProps<typeof WidthAdjustedReactGridLayout> & { children: React.ReactNode }) =>
+  width ? <Responsive width={width} {...props} /> : <WidthAdjustedReactGridLayout width={width} {...props} />;
 
-  return width ? <Responsive {...props} /> : <WidthAdjustedReactGridLayout {...props} />;
-};
-
-WidthProvidedGridLayout.propTypes = { width: PropTypes.number };
-WidthProvidedGridLayout.defaultProps = { width: undefined };
-
-const StyledWidthProvidedGridLayout = styled(WidthProvidedGridLayout)(({ theme }) => css`
-  &.locked {
-    .widget-drag-handle {
-      display: none;
+const StyledWidthProvidedGridLayout = styled(WidthProvidedGridLayout)(
+  ({ theme }) => css`
+    &.locked {
+      .widget-drag-handle {
+        display: none;
+      }
     }
-  }
 
-  &.unlocked {
-    .react-draggable {
-      cursor: move;
+    &.unlocked {
+      .react-draggable {
+        cursor: move;
+      }
     }
-  }
 
-  .react-grid-item.react-grid-placeholder {
-    background: ${theme.colors.variant.info};
-  }
+    .react-grid-item.react-grid-placeholder {
+      background: ${theme.colors.variant.info};
+    }
 
-  .actions {
-    cursor: default;
-  }
-`);
+    .actions {
+      cursor: default;
+    }
+  `,
+);
 
 const COLUMN_WIDTH = 175;
 const ROW_HEIGHT = 100;
@@ -96,11 +94,11 @@ const _gridClass = (locked: boolean, isResizable: boolean, draggableHandle: stri
 };
 
 export type Position = {
-  id: string,
-  col: number,
-  row: number,
-  height: number,
-  width: number
+  id: string;
+  col: number;
+  row: number;
+  height: number;
+  width: number;
 };
 
 const _onLayoutChange = (newLayout: Layout, callback: ((newPositions: Position[]) => void) | undefined) => {
@@ -114,28 +112,28 @@ const _onLayoutChange = (newLayout: Layout, callback: ((newPositions: Position[]
 };
 
 type Props = {
-  children: React.ReactNode,
-  className?: string,
+  children: React.ReactNode;
+  className?: string;
   columns?: {
-    xxl: number,
-    xl: number,
-    lg: number,
-    md: number,
-    sm: number,
-    xs: number,
-  },
-  draggableHandle?: string,
-  isResizable?: boolean,
-  locked?: boolean,
-  measureBeforeMount?: boolean,
-  onPositionsChange: (newPositions: Array<WidgetPositionJSON>) => void,
-  onSyncLayout?: (newPositions: Array<WidgetPositionJSON>) => void,
-  positions: { [widgetId: string]: WidgetPosition },
-  rowHeight?: number,
-  width?: number,
-}
+    xxl: number;
+    xl: number;
+    lg: number;
+    md: number;
+    sm: number;
+    xs: number;
+  };
+  draggableHandle?: string;
+  isResizable?: boolean;
+  locked?: boolean;
+  measureBeforeMount?: boolean;
+  onPositionsChange: (newPositions: Array<WidgetPositionJSON>) => void;
+  onSyncLayout?: (newPositions: Array<WidgetPositionJSON>) => void;
+  positions: { [widgetId: string]: WidgetPosition };
+  rowHeight?: number;
+  width?: number;
+};
 
-export type LayoutItem = { i: string, x: number, y: number, h: number, w: number };
+export type LayoutItem = { i: string; x: number; y: number; h: number; w: number };
 export type Layout = Array<LayoutItem>;
 
 const removeGaps = (_layout: Layout) => {
@@ -159,20 +157,23 @@ const removeGaps = (_layout: Layout) => {
 const ReactGridContainer = ({
   children,
   className,
-  columns,
+  columns = COLUMNS,
   draggableHandle,
-  isResizable,
-  locked,
-  measureBeforeMount,
+  isResizable = true,
+  locked = false,
+  measureBeforeMount = false,
   onPositionsChange,
   onSyncLayout: _onSyncLayout,
   positions,
-  rowHeight,
+  rowHeight = ROW_HEIGHT,
   width,
 }: Props) => {
   const theme = useTheme();
   const cellMargin = theme.spacings.px.xs;
-  const onLayoutChange = useCallback<ItemCallback>((layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
+  const onLayoutChange = useCallback<ItemCallback>(
+    (layout) => _onLayoutChange(layout, onPositionsChange),
+    [onPositionsChange],
+  );
   const onSyncLayout = useCallback((layout: Layout) => _onLayoutChange(layout, _onSyncLayout), [_onSyncLayout]);
   const gridClass = _gridClass(locked, isResizable, draggableHandle, className);
   const layout = useMemo(() => positionsToLayout(positions), [positions]);
@@ -180,132 +181,33 @@ const ReactGridContainer = ({
   // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
   // https://github.com/STRML/react-grid-layout/issues/371
   return (
-    <StyledWidthProvidedGridLayout className={gridClass}
-                                   width={width}
-                                   breakpoints={BREAKPOINTS}
-                                   cols={columns}
-                                   layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
-                                   rowHeight={rowHeight}
-                                   containerPadding={[0, 0]}
-                                   margin={[cellMargin, cellMargin]}
-                                   isResizable={!locked && isResizable}
-                                   isDraggable={!locked}
-                                   measureBeforeMount={measureBeforeMount}
+    <StyledWidthProvidedGridLayout
+      className={gridClass}
+      width={width}
+      breakpoints={BREAKPOINTS}
+      cols={columns}
+      layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
+      rowHeight={rowHeight}
+      containerPadding={[0, 0]}
+      margin={[cellMargin, cellMargin]}
+      isResizable={!locked && isResizable}
+      isDraggable={!locked}
+      measureBeforeMount={measureBeforeMount}
       // Do not allow dragging from elements inside a `.actions` css class. This is
       // meant to avoid calling `onDragStop` callbacks when clicking on an action button.
-                                   draggableCancel=".actions"
-                                   onDragStart={removeGaps}
-                                   onDragStop={onLayoutChange}
-                                   onResizeStart={removeGaps}
-                                   onResizeStop={onLayoutChange}
-                                   onLayoutChange={onSyncLayout}
+      draggableCancel=".actions"
+      onDragStart={removeGaps}
+      onDragStop={onLayoutChange}
+      onResizeStart={removeGaps}
+      onResizeStop={onLayoutChange}
+      onLayoutChange={onSyncLayout}
       // While CSS transform improves the paint performance,
       // it currently results in bug when using `react-sticky-el` inside a grid item.
-                                   useCSSTransforms={false}
-                                   draggableHandle={locked ? '' : draggableHandle}>
+      useCSSTransforms={false}
+      draggableHandle={locked ? '' : draggableHandle}>
       {children}
     </StyledWidthProvidedGridLayout>
   );
-};
-
-ReactGridContainer.propTypes = {
-  /**
-   * Array of children, each one being one element in the grid. Each
-   * children's outermost element must have a `key` prop set to the `id`
-   * specified in the position object. If you don't set that `key` to the
-   * right value, the positioning will be wrong.
-   */
-  children: PropTypes.node.isRequired,
-  /**
-   * The className prop is necessary to style the component with styled-components `styled()` function.
-   */
-  className: PropTypes.string,
-  /**
-   * Function that will be called when positions change. The function
-   * receives the new positions in the format:
-   *
-   * ```
-   * [
-   *   { id: widgetId, col: column, row: row, height: height, width: width },
-   *   // E.g.
-   *   { id: '2', col: 2, row: 0, height: 1, width: 4 },
-   * ]
-   * ```
-   */
-  onPositionsChange: PropTypes.func.isRequired,
-  /**
-   * Object of positions in this format:
-   * ```
-   * {
-   *  id: { col: column, row: row, height: height, width: width },
-   *  // E.g.
-   *  '2': { col: 2, row: 0, height: 1, width: 4 },
-   * }
-   * ```
-   *
-   * **Important** All positions and sizes are specified in grid coordinates,
-   * not in pixels.
-   */
-  positions: PropTypes.object.isRequired,
-  /**
-   * Specifies if the grid is locked or not. A user cannot move or
-   * resize grid elements if this is set to true.
-   */
-  locked: PropTypes.bool,
-  /**
-   * Specifies if the grid elements can be resized or not **only when the
-   * grid is unlocked**.
-   */
-  isResizable: PropTypes.bool,
-  /** Height in pixels of a row. */
-  rowHeight: PropTypes.number,
-  /**
-   * Specifies the number of columns the grid will have for different
-   * screen sizes. E.g.
-   * ```
-   * {
-   *   xxl: 6,
-   *   xl: 5,
-   *   lg: 4,
-   *   md: 3,
-   *   sm: 2,
-   *   xs: 1,
-   * }
-   * ```
-   *
-   * Each column is by default 350 pixels wide.
-   */
-  columns: PropTypes.object,
-  /**
-   * Specifies whether (and which css class) a drag handle should be used.
-   *
-   * If this prop is not specified, the whole widget can be used for dragging when the grid is unlocked.
-   *
-   * If this prop is defined, the css class specified will define which item can be used for dragging if unlocked.
-   *
-   */
-  draggableHandle: PropTypes.string,
-  /**
-   * Specifies whether the grid is measured before mounting the grid component. Otherwise the grid is initialized with
-   * a width of 1280 before it is being resized.
-   *
-   * See: https://github.com/STRML/react-grid-layout/blob/0.14.3/lib/components/WidthProvider.jsx#L20-L21
-   *
-   */
-  measureBeforeMount: PropTypes.bool,
-  width: PropTypes.number,
-};
-
-ReactGridContainer.defaultProps = {
-  className: undefined,
-  columns: COLUMNS,
-  isResizable: true,
-  locked: false,
-  measureBeforeMount: false,
-  rowHeight: ROW_HEIGHT,
-  draggableHandle: undefined,
-  width: undefined,
-  onSyncLayout: undefined,
 };
 
 export default ReactGridContainer;

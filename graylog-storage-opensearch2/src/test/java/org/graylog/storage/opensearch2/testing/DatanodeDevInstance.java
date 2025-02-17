@@ -33,13 +33,11 @@ public class DatanodeDevInstance extends OpenSearchInstance {
     public static final SearchServer DATANODE_VERSION = SearchServer.DATANODE_DEV;
     private final String mongoDBUri;
     private final String passwordSecret;
-    private final String rootPasswordSha2;
 
-    public DatanodeDevInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
+    public DatanodeDevInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
         super(version, hostname, network, heapSize, featureFlags, env);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
-        this.rootPasswordSha2 = rootPasswordSha2;
     }
 
     @Override
@@ -65,7 +63,6 @@ public class DatanodeDevInstance extends OpenSearchInstance {
         return builder
                 .nodeName(hostname)
                 .passwordSecret(passwordSecret)
-                .rootPasswordSha2(rootPasswordSha2)
                 .network(network)
                 .mongoDbUri(mongoDBUri)
                 .restPort(8999)

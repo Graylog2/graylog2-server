@@ -16,55 +16,60 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
+import { defaultOnError } from 'util/conditional/onError';
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-export const fetchEventDefinitions = (searchParams: SearchParams) => EventDefinitionsStore.searchPaginated(
-  searchParams.page,
-  searchParams.pageSize,
-  searchParams.query,
-  { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
-).then(({ elements, pagination, attributes }) => ({
-  list: elements,
-  pagination,
-  attributes,
-}));
+export const fetchEventDefinitions = (searchParams: SearchParams) =>
+  EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
+    sort: searchParams?.sort.attributeId,
+    order: searchParams?.sort.direction,
+  }).then(({ elements, pagination, attributes }) => ({
+    list: elements,
+    pagination,
+    attributes,
+  }));
 
 export const keyFn = (searchParams: SearchParams) => ['eventDefinition', 'overview', searchParams];
 
-const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
-  data: {
-    list: Array<EventDefinition>,
-    pagination: { total: number }
-    attributes: Array<{ id: string, title: string, sortable: boolean }>
-  } | undefined,
-  refetch: () => void,
-  isInitialLoading: boolean,
+type EventDefinitionResult = {
+  list: Array<EventDefinition>;
+  pagination: { total: number };
+  attributes: Array<{ id: string; title: string; sortable: boolean }>;
+};
+
+const useEventDefinitions = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
+  data: EventDefinitionResult | undefined;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery<EventDefinitionResult>(
     keyFn(searchParams),
-    () => fetchEventDefinitions(searchParams),
+    () =>
+      defaultOnError(
+        fetchEventDefinitions(searchParams),
+        'Loading Event Definitions failed with status',
+        'Could not load Event definition',
+      ),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Event Definitions failed with status: ${errorThrown}`,
-          'Could not load Event definition');
-      },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useEventDefinitions;

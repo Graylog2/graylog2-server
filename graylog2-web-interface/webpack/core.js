@@ -160,7 +160,11 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
         new webpack.DefinePlugin({
           DEVELOPMENT: true,
         }),
-        new ForkTsCheckerWebpackPlugin(),
+        new ForkTsCheckerWebpackPlugin({
+          typescript: {
+            memoryLimit: 4096,
+          },
+        }),
       ],
     });
   }

@@ -16,50 +16,56 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { IndexSet, IndexSetsResponseType, IndexSetsStats } from 'stores/indices/IndexSetsStore';
+import { defaultOnError } from 'util/conditional/onError';
 
 type State = {
-  indexSetsCount: number,
-  indexSets: Array<IndexSet>,
-  indexSetStats: IndexSetsStats | null,
-}
-const getUrl = (stats:boolean) => qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
-const fetchIndexSetsList = (stats:boolean): Promise<State> => fetch('GET', getUrl(stats)).then((response: IndexSetsResponseType) => ({
-  indexSetsCount: response.total,
-  indexSets: response.index_sets,
-  indexSetStats: response.stats,
-}));
+  indexSetsCount: number;
+  indexSets: Array<IndexSet>;
+  indexSetStats: IndexSetsStats | null;
+};
+const getUrl = (stats: boolean) => qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
+const fetchIndexSetsList = (stats: boolean): Promise<State> =>
+  fetch('GET', getUrl(stats)).then((response: IndexSetsResponseType) => ({
+    indexSetsCount: response.total,
+    indexSets: response.index_sets,
+    indexSetStats: response.stats,
+  }));
 
 const initialData: State = { indexSets: [], indexSetsCount: null, indexSetStats: null };
 
-const useIndexSetsList = (stats: boolean = false) : {
-  data: State,
-  refetch: () => void,
-  isSuccess: boolean,
-  isInitialLoading: boolean,
+const useIndexSetsList = (
+  stats: boolean = false,
+  refetchInterval: number | false = false,
+): {
+  data: State;
+  refetch: () => void;
+  isSuccess: boolean;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading, isSuccess } = useQuery<State>(
     ['IndexSetsList', stats],
-    () => fetchIndexSetsList(stats),
+    () =>
+      defaultOnError(
+        fetchIndexSetsList(stats),
+        'Loading index sets with list failed with status',
+        'Could not load index sets list',
+      ),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index sets with list failed with status: ${errorThrown}`,
-          'Could not load index sets list');
-      },
       keepPreviousData: true,
+      refetchInterval,
     },
   );
 
-  return ({
+  return {
     data: data ?? initialData,
     refetch,
     isSuccess,
     isInitialLoading,
-  });
+  };
 };
 
 export default useIndexSetsList;

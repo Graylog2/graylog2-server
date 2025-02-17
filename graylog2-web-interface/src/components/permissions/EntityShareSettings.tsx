@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 import type { FormikProps } from 'formik';
@@ -35,15 +34,15 @@ import ValidationError from './ValidationError';
 import ShareableEntityURL from './ShareableEntityURL';
 
 type Props = {
-  entityGRN: GRN,
-  description: string,
-  entityType: $PropertyType<SharedEntity, 'type'>,
-  entityTitle: $PropertyType<SharedEntity, 'title'>,
-  entityShareState: EntityShareState,
-  setDisableSubmit: (boolean) => void,
-  granteesSelectFormRef: React.Ref<FormikProps<GranteesSelectFormValues>>,
-  showShareableEntityURL?: boolean,
-  entityTypeTitle?: string | null | undefined,
+  entityGRN: GRN;
+  description: string;
+  entityType: $PropertyType<SharedEntity, 'type'>;
+  entityTitle: $PropertyType<SharedEntity, 'title'>;
+  entityShareState: EntityShareState;
+  setDisableSubmit: (boolean) => void;
+  granteesSelectFormRef: React.Ref<FormikProps<GranteesSelectFormValues>>;
+  showShareableEntityURL?: boolean;
+  entityTypeTitle?: string | null | undefined;
 };
 
 const Section = styled.div`
@@ -80,7 +79,7 @@ const EntityShareSettings = ({
   entityTitle,
   setDisableSubmit,
   granteesSelectFormRef,
-  showShareableEntityURL,
+  showShareableEntityURL = true,
   entityTypeTitle,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
@@ -116,60 +115,44 @@ const EntityShareSettings = ({
   return (
     <>
       <Section>
-        <GranteesSelectorHeadline>
-          Add Collaborator
-        </GranteesSelectorHeadline>
-        <p>
-          {description}
-        </p>
-        <GranteesSelector availableGrantees={filteredGrantees}
-                          availableCapabilities={availableCapabilities}
-                          onSubmit={_handleSelection}
-                          formRef={granteesSelectFormRef} />
+        <GranteesSelectorHeadline>Add Collaborator</GranteesSelectorHeadline>
+        <p>{description}</p>
+        <GranteesSelector
+          availableGrantees={filteredGrantees}
+          availableCapabilities={availableCapabilities}
+          onSubmit={_handleSelection}
+          formRef={granteesSelectFormRef}
+        />
       </Section>
       <Section>
-        <GranteesList activeShares={activeShares}
-                      availableCapabilities={availableCapabilities}
-                      entityType={entityType}
-                      entityTypeTitle={entityTypeTitle}
-                      onDelete={_handleDeletion}
-                      onCapabilityChange={_handleSelection}
-                      selectedGrantees={selectedGrantees}
-                      title="Collaborators" />
+        <GranteesList
+          activeShares={activeShares}
+          availableCapabilities={availableCapabilities}
+          entityType={entityType}
+          entityTypeTitle={entityTypeTitle}
+          onDelete={_handleDeletion}
+          onCapabilityChange={_handleSelection}
+          selectedGrantees={selectedGrantees}
+          title="Collaborators"
+        />
       </Section>
       {validationResults?.failed && (
         <Section>
-          <ValidationError validationResult={validationResults}
-                           availableGrantees={availableGrantees} />
+          <ValidationError validationResult={validationResults} availableGrantees={availableGrantees} />
         </Section>
       )}
       {missingDependencies?.size > 0 && (
         <Section>
-          <DependenciesWarning missingDependencies={missingDependencies}
-                               availableGrantees={availableGrantees} />
+          <DependenciesWarning missingDependencies={missingDependencies} availableGrantees={availableGrantees} />
         </Section>
       )}
       {showShareableEntityURL && (
-      <Section>
-        <ShareableEntityURL entityGRN={entityGRN} />
-      </Section>
+        <Section>
+          <ShareableEntityURL entityGRN={entityGRN} />
+        </Section>
       )}
     </>
   );
-};
-
-EntityShareSettings.propTypes = {
-  description: PropTypes.string.isRequired,
-  entityGRN: PropTypes.string.isRequired,
-  entityShareState: PropTypes.object.isRequired,
-  setDisableSubmit: PropTypes.func.isRequired,
-  showShareableEntityURL: PropTypes.bool,
-  entityTypeTitle: PropTypes.string,
-};
-
-EntityShareSettings.defaultProps = {
-  showShareableEntityURL: true,
-  entityTypeTitle: undefined,
 };
 
 export default EntityShareSettings;

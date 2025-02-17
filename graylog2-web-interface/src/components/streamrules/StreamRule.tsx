@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
 
@@ -37,17 +36,17 @@ const ActionButtonsWrap = styled.span`
 `;
 
 type Props = {
-  matchData: {
-    matches: boolean,
-    rules: { [id: string]: false },
-  },
-  stream: Stream,
-  onDelete: (ruleId: string) => void,
-  onSubmit: (ruleId: string, data: unknown) => void,
-  streamRule: StreamRuleTypeDefinition
-}
+  matchData?: {
+    matches: boolean;
+    rules: { [id: string]: false };
+  };
+  stream: Stream;
+  onDelete?: (ruleId: string) => void;
+  onSubmit?: (ruleId: string, data: unknown) => void;
+  streamRule: StreamRuleTypeDefinition;
+};
 
-const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props) => {
+const StreamRule = ({ matchData, stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
   const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const { inputs } = useStore(StreamRulesInputsStore);
@@ -56,12 +55,12 @@ const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props
     StreamRulesInputsActions.list();
   }, []);
 
-  const _onEdit = (event) => {
+  const _onEdit = (event: React.MouseEvent) => {
     event.preventDefault();
     setShowStreamRuleForm(true);
   };
 
-  const _onDelete = (event) => {
+  const _onDelete = (event: React.MouseEvent) => {
     event.preventDefault();
 
     /* TODO: Replace with custom confirmation dialog */
@@ -77,26 +76,21 @@ const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props
     }
   };
 
-  const _onSubmit = (streamRuleId, data) => StreamRulesStore.update(stream.id, streamRuleId, data, () => {
-    if (onSubmit) {
-      onSubmit(streamRuleId, data);
-    }
+  const _onSubmit = (streamRuleId: string, data: StreamRuleTypeDefinition) =>
+    StreamRulesStore.update(stream.id, streamRuleId, data, () => {
+      if (onSubmit) {
+        onSubmit(streamRuleId, data);
+      }
 
-    UserNotification.success('Stream rule has been successfully updated.', 'Success');
-  });
+      UserNotification.success('Stream rule has been successfully updated.', 'Success');
+    });
 
   const _formatActionItems = () => (
     <ActionButtonsWrap>
-      <Button bsStyle="link"
-              bsSize="xsmall"
-              onClick={_onDelete}
-              title="Delete stream rule">
+      <Button bsStyle="link" bsSize="xsmall" onClick={_onDelete} title="Delete stream rule">
         <Icon name="delete" type="regular" />
       </Button>
-      <Button bsStyle="link"
-              bsSize="xsmall"
-              onClick={_onEdit}
-              title="Edit stream rule">
+      <Button bsStyle="link" bsSize="xsmall" onClick={_onEdit} title="Edit stream rule">
         <Icon name="edit_square" />
       </Button>
     </ActionButtonsWrap>
@@ -104,7 +98,7 @@ const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props
 
   const matchDataStyle = () => (matchData.rules[streamRule.id] ? 'success' : 'danger');
   const actionItems = isPermitted(permissions, [`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
-  const description = streamRule.description ? <small>{' '}({streamRule.description})</small> : null;
+  const description = streamRule.description ? <small> ({streamRule.description})</small> : null;
   const listGroupStyle = !isEmpty(matchData) ? matchDataStyle() : null;
 
   return (
@@ -112,33 +106,18 @@ const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props
       {actionItems}
       <HumanReadableStreamRule streamRule={streamRule} inputs={inputs} />
       {showStreamRuleForm && (
-        <StreamRuleModal initialValues={streamRule}
-                         onClose={() => setShowStreamRuleForm(false)}
-                         title="Edit Stream Rule"
-                         submitButtonText="Update Rule"
-                         submitLoadingText="Updating Rule..."
-                         onSubmit={_onSubmit} />
+        <StreamRuleModal
+          initialValues={streamRule}
+          onClose={() => setShowStreamRuleForm(false)}
+          title="Edit Stream Rule"
+          submitButtonText="Update Rule"
+          submitLoadingText="Updating Rule..."
+          onSubmit={_onSubmit}
+        />
       )}
       {description}
     </ListGroupItem>
   );
-};
-
-StreamRule.propTypes = {
-  matchData: PropTypes.shape({
-    matches: PropTypes.bool,
-    rules: PropTypes.object,
-  }),
-  onDelete: PropTypes.func,
-  onSubmit: PropTypes.func,
-  stream: PropTypes.object.isRequired,
-  streamRule: PropTypes.object.isRequired,
-};
-
-StreamRule.defaultProps = {
-  matchData: {},
-  onSubmit: () => {},
-  onDelete: () => {},
 };
 
 export default StreamRule;
