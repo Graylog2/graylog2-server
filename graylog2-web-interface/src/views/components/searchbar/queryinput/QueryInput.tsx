@@ -297,7 +297,7 @@ const QueryInput = React.forwardRef<Editor, Props>(
         // The following will disable the mentioned hotkeys.
         {
           name: 'Do nothing',
-          bindKey: { win: 'Ctrl-Space|Ctrl-Shift-Space', mac: 'Ctrl-Space|Ctrl-Shift-Space' },
+          bindKey: { win: 'Ctrl-Shift-Space', mac: 'Ctrl-Space|Ctrl-Shift-Space' },
           exec: () => {},
         },
       ],
