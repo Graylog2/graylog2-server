@@ -25,34 +25,34 @@ import MessageProcessorsConfig from './MessageProcessorsConfig';
 const mockTimestampConfig = {
   processor_order: [
     {
-      name: "AWS Instance Name Lookup",
-      class_name: "org.graylog.aws.processors.instancelookup.AWSInstanceNameLookupProcessor"
+      name: 'AWS Instance Name Lookup',
+      class_name: 'org.graylog.aws.processors.instancelookup.AWSInstanceNameLookupProcessor',
     },
     {
-      name: "Illuminate Processor",
-      class_name: "org.graylog.plugins.illuminate.processing.IlluminateMessageProcessor"
+      name: 'Illuminate Processor',
+      class_name: 'org.graylog.plugins.illuminate.processing.IlluminateMessageProcessor',
     },
     {
-      name: "GeoIP Resolver",
-      class_name: "org.graylog.plugins.map.geoip.processor.GeoIpProcessor"
+      name: 'GeoIP Resolver',
+      class_name: 'org.graylog.plugins.map.geoip.processor.GeoIpProcessor',
     },
     {
-      name: "Message Filter Chain",
-      class_name: "org.graylog2.messageprocessors.MessageFilterChainProcessor"
+      name: 'Message Filter Chain',
+      class_name: 'org.graylog2.messageprocessors.MessageFilterChainProcessor',
     },
     {
-      name: "Stream Rule Processor",
-      class_name: "org.graylog2.messageprocessors.StreamMatcherFilterProcessor"
+      name: 'Stream Rule Processor',
+      class_name: 'org.graylog2.messageprocessors.StreamMatcherFilterProcessor',
     },
     {
-      name: "Pipeline Processor",
-      class_name: "org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter"
-    }
+      name: 'Pipeline Processor',
+      class_name: 'org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter',
+    },
   ],
   disabled_processors: [],
-}
+};
 const mockMessageProcessingConfig = {
-  grace_period: "PT48H",
+  grace_period: 'PT48H',
 };
 
 let mockUpdate;
@@ -62,20 +62,23 @@ jest.mock('stores/configurations/ConfigurationsStore', () => {
   mockUpdate = jest.fn().mockReturnValue(Promise.resolve());
   mockUpdateMessageProcessorsConfig = jest.fn().mockReturnValue(Promise.resolve());
 
-  return ({
-    ConfigurationsStore: MockStore(['getInitialState', () => ({
-      configuration: {
-        'org.graylog2.shared.buffers.processors.TimeStampConfig': mockTimestampConfig,
-        'org.graylog2.messageprocessors.MessageProcessorsConfig': mockMessageProcessingConfig,
-      },
-    })]),
+  return {
+    ConfigurationsStore: MockStore([
+      'getInitialState',
+      () => ({
+        configuration: {
+          'org.graylog2.shared.buffers.processors.TimeStampConfig': mockTimestampConfig,
+          'org.graylog2.messageprocessors.MessageProcessorsConfig': mockMessageProcessingConfig,
+        },
+      }),
+    ]),
     ConfigurationsActions: {
       list: jest.fn(() => Promise.resolve()),
       update: mockUpdate,
       updateMessageProcessorsConfig: mockUpdateMessageProcessorsConfig,
       listMessageProcessorsConfig: jest.fn(),
     },
-  });
+  };
 });
 
 describe('MessageProcessorsConfig', () => {
@@ -90,7 +93,7 @@ describe('MessageProcessorsConfig', () => {
     render(<MessageProcessorsConfig />);
 
     await screen.findAllByText(/future timestamp normalization:/i);
-    await screen.findByRole('cell', { name: /aws instance name lookup/i});
+    await screen.findByRole('cell', { name: /aws instance name lookup/i });
 
     const editButton = await screen.findByRole('button', { name: /edit configuration/i });
 
@@ -98,7 +101,7 @@ describe('MessageProcessorsConfig', () => {
 
     await screen.findByRole('heading', {
       name: /update message processors configuration/i,
-      hidden: true
+      hidden: true,
     });
   });
- });
+});

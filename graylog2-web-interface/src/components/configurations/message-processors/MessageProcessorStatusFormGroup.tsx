@@ -24,7 +24,9 @@ import { isProcessorEnabled } from 'components/configurations/helpers';
 const toggleProcessorStatus = (className: string, enabled: boolean, values: FormConfig) => {
   const disabledProcessors = values.disabled_processors;
 
-  return enabled ? [...disabledProcessors, className] : disabledProcessors.filter((processorName) => processorName !== className);
+  return enabled
+    ? [...disabledProcessors, className]
+    : disabledProcessors.filter((processorName) => processorName !== className);
 };
 
 const MessageProcessorStatusFormGroup = () => {
@@ -39,14 +41,17 @@ const MessageProcessorStatusFormGroup = () => {
         <td>{processor.name}</td>
         {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
         <td>
-            <input type="checkbox"
-              checked={enabled}
-              onChange={() => setFieldValue('disabled_processors', toggleProcessorStatus(processor.class_name, enabled, formValues))} />
+          <input
+            type="checkbox"
+            checked={enabled}
+            onChange={() =>
+              setFieldValue('disabled_processors', toggleProcessorStatus(processor.class_name, enabled, formValues))
+            }
+          />
         </td>
       </tr>
     );
   });
 };
-
 
 export default MessageProcessorStatusFormGroup;
