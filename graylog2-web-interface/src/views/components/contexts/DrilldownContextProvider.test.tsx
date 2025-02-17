@@ -21,12 +21,13 @@ import { mount } from 'wrappedEnzyme';
 import { asMock } from 'helpers/mocking';
 import View from 'views/logic/views/View';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import type { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import useViewType from 'views/hooks/useViewType';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import type { QueryString } from 'views/logic/queries/types';
 
 import DrilldownContextProvider from './DrilldownContextProvider';
 import DrilldownContext from './DrilldownContext';
@@ -36,7 +37,7 @@ jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/hooks/useGlobalOverride');
 
 describe('DrilldownContextProvider', () => {
-  const Consumer = (_props: { streams: Array<string>; timerange: TimeRange; query: ElasticsearchQueryString }) => null;
+  const Consumer = (_props: { streams: Array<string>; timerange: TimeRange; query: QueryString }) => null;
 
   const TestComponent = () => {
     const { streams, timerange, query } = useContext(DrilldownContext);
