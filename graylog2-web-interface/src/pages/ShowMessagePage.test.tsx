@@ -67,7 +67,12 @@ const SimpleShowMessagePage = ({ index, messageId, streams = [] }: SimpleShowMes
 
 describe('ShowMessagePage', () => {
   const isLocalNode = jest.fn();
-  const messageHookReturnValue = (data: Message) => ({ data, isInitialLoading: false });
+  const messageHookReturnValue = (data: Message) => ({
+    data,
+    isInitialLoading: false,
+    error: undefined,
+    isError: false,
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
