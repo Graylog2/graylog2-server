@@ -38,15 +38,18 @@ const MessageProcessorsConfig = () => {
   useEffect(() => {
     Promise.all([
       ConfigurationsActions.listMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG),
-      ConfigurationsActions.list(ConfigurationType.GLOBAL_PROCESSING_RULE_CONFIG)
+      ConfigurationsActions.list(ConfigurationType.GLOBAL_PROCESSING_RULE_CONFIG),
     ]).then(() => {
       const processorConfig = getConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG, configuration);
       const globalConfig = getConfig(ConfigurationType.GLOBAL_PROCESSING_RULE_CONFIG, configuration);
-      const config = { ...processorConfig, ...globalConfig, enableFutureTimestampNormalization: !!globalConfig?.grace_period }
-      setViewConfig(config)
+      const config = {
+        ...processorConfig,
+        ...globalConfig,
+        enableFutureTimestampNormalization: !!globalConfig?.grace_period,
+      };
+      setViewConfig(config);
       setFormConfig(config);
     });
-
   }, [configuration]);
 
   const openModal = () => {
@@ -58,26 +61,25 @@ const MessageProcessorsConfig = () => {
     setFormConfig(viewConfig);
   };
 
+  const isProcessorEnabled = (processor: Processor, config: ProcessorConfig) =>
+    config.disabled_processors.filter((p) => p === processor.class_name).length < 1;
 
+  const summary = () =>
+    viewConfig?.processor_order?.map((processor, idx) => {
+      const status = isProcessorEnabled(processor, viewConfig) ? 'active' : 'disabled';
 
-  const isProcessorEnabled = (processor: Processor, config: ProcessorConfig) => (
-    config.disabled_processors.filter((p) => p === processor.class_name).length < 1
-  );
+      return (
+        <tr key={processor.name}>
+          <td>{idx + 1}</td>
+          <td>{processor.name}</td>
+          <td>{status}</td>
+        </tr>
+      );
+    });
 
-  const summary = () => viewConfig?.processor_order?.map((processor, idx) => {
-    const status = isProcessorEnabled(processor, viewConfig) ? 'active' : 'disabled';
-
-    return (
-      <tr key={processor.name}>
-        <td>{idx + 1}</td>
-        <td>{processor.name}</td>
-        <td>{status}</td>
-      </tr>
-    );
-  });
-
-
-  if (!viewConfig) { return <Spinner />; }
+  if (!viewConfig) {
+    return <Spinner />;
+  }
 
   return (
     <div>
@@ -93,18 +95,15 @@ const MessageProcessorsConfig = () => {
             <th>Status</th>
           </tr>
         </thead>
-        <tbody>
-          {summary()}
-        </tbody>
+        <tbody>{summary()}</tbody>
       </Table>
 
       <IfPermitted permissions="clusterconfigentry:edit">
-        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
+        <Button bsStyle="info" bsSize="xs" onClick={openModal}>
+          Edit configuration
+        </Button>
       </IfPermitted>
-      {showConfigModal && (
-        <ProcessingConfigModalForm closeModal={closeModal}
-                                   formConfig={formConfig} />
-      )}
+      {showConfigModal && <ProcessingConfigModalForm closeModal={closeModal} formConfig={formConfig} />}
     </div>
   );
 };

@@ -18,30 +18,37 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 type Props = {
-  gracePeriod: string,
+  gracePeriod: string;
 };
 
-const Wrapper = styled.div(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
-  overflow: auto;
-`);
+const Wrapper = styled.div(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.md};
+    overflow: auto;
+  `,
+);
 
-const StyledDefList = styled.dl.attrs({ className: 'deflist' })(({ theme }) => css`
-  &&.deflist {
-    dd {
-      padding-left: ${theme.spacings.md};
-      display: table-cell;
+const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
+  ({ theme }) => css`
+    &&.deflist {
+      dd {
+        padding-left: ${theme.spacings.md};
+        display: table-cell;
+      }
     }
-  }
-`);
+  `,
+);
 
 const GlobalProcessingView = ({ gracePeriod }: Props) => (
   <Wrapper>
     <h2>Global Processing Rules Configuration</h2>
-    <p>Global Processing Rules are applied after receipt by an Input, and before processing rules applied by Message Processors.</p>
+    <p>
+      Global Processing Rules are applied after receipt by an Input, and before processing rules applied by Message
+      Processors.
+    </p>
     <StyledDefList>
       <dt>Future Timestamp Normalization:</dt>
-      <dd>{gracePeriod ? 'Enabled': 'Disabled'}</dd>
+      <dd>{gracePeriod ? 'Enabled' : 'Disabled'}</dd>
       <dt>Grace Period:</dt>
       <dd>{gracePeriod}</dd>
     </StyledDefList>
