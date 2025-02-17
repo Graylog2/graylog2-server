@@ -520,8 +520,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     private void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
-        addField(FIELD_TIMESTAMP, newTimeStamp);
-        addField(FIELD_GL2_ORIGINAL_TIMESTAMP, oldTimeStamp);
+        addField(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(newTimeStamp.withZone(UTC)));
+        addField(FIELD_GL2_ORIGINAL_TIMESTAMP, buildElasticSearchTimeFormat(oldTimeStamp.withZone(UTC)));
     }
 
     private DateTime convertToDateTime(@Nonnull Object value) {
