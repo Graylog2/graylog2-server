@@ -167,7 +167,7 @@
         <retrofit.version>2.11.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>2.0.2</shiro.version>
-        <snakeyaml.version>2.3</snakeyaml.version>
+        <snakeyaml.version>2.4</snakeyaml.version>
         <snappy-java.version>1.1.10.7</snappy-java.version>
         <oshi.version>6.6.6</oshi.version>
         <siv-mode.version>1.6.0</siv-mode.version>
@@ -196,7 +196,7 @@
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.11.4</junit-jupiter.version>
         <mockito.version>5.15.2</mockito.version>
-        <restassured.version>5.5.0</restassured.version>
+        <restassured.version>5.5.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.20.4</testcontainers.version>
         <testcontainers.opensearch.version>2.1.2</testcontainers.opensearch.version>
@@ -629,7 +629,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.6.6</version>
+                    <version>4.9.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>

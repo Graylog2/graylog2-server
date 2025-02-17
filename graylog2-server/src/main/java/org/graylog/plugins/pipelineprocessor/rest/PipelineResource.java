@@ -245,7 +245,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                                  @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
         checkReservedName(update);
-        return PipelineUtils.update(pipelineService, pipelineRuleParser, id, update);
+        return PipelineUtils.update(pipelineService, pipelineRuleParser, id, update, true);
     }
 
     public record RoutingRequest(
@@ -284,7 +284,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
             pipelineSource = pipelineSource.toBuilder()
                     .source(PipelineUtils.createPipelineString(pipelineSource))
                     .build();
-            update(pipelineDao.id(), pipelineSource);
+            PipelineUtils.update(pipelineService, pipelineRuleParser, pipelineDao.id(), pipelineSource, false);
         } else {
             log.info(f("Routing for input <%s> already exists - skipping", request.inputId()));
         }

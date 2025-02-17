@@ -14,20 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.messages;
-
-public record IndexingError(Indexable message, String index, Error error) implements IndexingResult {
-    public enum Type {
-        IndexBlocked,
-        MappingError,
-        Unknown,
-        DataTooLarge
-    }
-
-    public static IndexingError create(Indexable message, String index, Type errorType, String errorMessage) {
-        return new IndexingError(message, index, new Error(errorType, errorMessage));
-    }
-
-    public record Error(Type type, String errorMessage) {
-    }
-}
+export type Processor = {
+  name: string;
+  class_name: string;
+};
+export type ProcessorConfig = {
+  disabled_processors: Array<string>;
+  processor_order: Array<Processor>;
+};
+export type GlobalProcessingConfig = {
+  enableFutureTimestampNormalization?: boolean;
+  grace_period?: string;
+};
+export type FormConfig = ProcessorConfig & GlobalProcessingConfig;
