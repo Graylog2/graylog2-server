@@ -28,23 +28,29 @@ jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: () => 'https://example.org/',
 }));
 
-jest.mock('preflight/hooks/useServerAvailability', () => jest.fn(() => ({
-  data: false,
-})));
+jest.mock('preflight/hooks/useServerAvailability', () =>
+  jest.fn(() => ({
+    data: false,
+  })),
+);
 
-jest.mock('preflight/hooks/useDataNodes', () => jest.fn(() => ({
-  data: [],
-  isFetching: false,
-  isInitialLoading: false,
-  error: undefined,
-})));
+jest.mock('preflight/hooks/useDataNodes', () =>
+  jest.fn(() => ({
+    data: [],
+    isFetching: false,
+    isInitialLoading: false,
+    error: undefined,
+  })),
+);
 
-jest.mock('preflight/hooks/useDataNodesCA', () => jest.fn(() => ({
-  data: undefined,
-  isInitialLoading: false,
-  isFetching: false,
-  error: undefined,
-})));
+jest.mock('preflight/hooks/useDataNodesCA', () =>
+  jest.fn(() => ({
+    data: undefined,
+    isInitialLoading: false,
+    isFetching: false,
+    error: undefined,
+  })),
+);
 
 jest.mock('preflight/util/UserNotification', () => ({
   error: jest.fn(),
@@ -77,6 +83,8 @@ describe('App', () => {
   it('should render', async () => {
     renderPreflight(<App />);
 
-    await screen.findByText(/It looks like you are starting Graylog for the first time and have not configured a data node./);
+    await screen.findByText(
+      /It looks like you are starting Graylog for the first time and have not configured a data node./,
+    );
   });
 });

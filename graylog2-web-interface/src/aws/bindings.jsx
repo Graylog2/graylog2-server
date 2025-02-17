@@ -20,14 +20,16 @@ import AppConfig from 'util/AppConfig';
 import AwsPluginConfiguration from './components/AWSPluginConfiguration';
 import { PLUGIN_CONFIG_CLASS_NAME } from './Constants';
 
-const bindings = AppConfig.isCloud() ? {} : {
-  systemConfigurations: [
-    {
-      component: AwsPluginConfiguration,
-      displayName: 'Aws',
-      configType: PLUGIN_CONFIG_CLASS_NAME,
-    },
-  ],
-};
+const bindings = AppConfig.isCloud()
+  ? {}
+  : {
+      systemConfigurations: [
+        {
+          component: AwsPluginConfiguration,
+          displayName: 'Aws',
+          configType: PLUGIN_CONFIG_CLASS_NAME,
+        },
+      ],
+    };
 
 export default bindings;

@@ -23,16 +23,18 @@ import type { EventListItem } from 'views/components/widgets/events/types';
 import RowActions from 'views/components/widgets/events/EventsList/RowActions';
 import useEventAttributes from 'views/components/widgets/events/hooks/useEventAttributes';
 
-const Td = styled.td(({ theme }) => css`
-  && {
-    border-color: ${theme.colors.table.row.divider};
-  }
-`);
+const Td = styled.td(
+  ({ theme }) => css`
+    && {
+      border-color: ${theme.colors.table.row.divider};
+    }
+  `,
+);
 
 type Props = {
-  event: EventListItem,
-  fields: Immutable.OrderedSet<string>,
-}
+  event: EventListItem;
+  fields: Immutable.OrderedSet<string>;
+};
 
 const EventsTableRow = ({ event, fields }: Props) => {
   const eventAttributes = useEventAttributes();
@@ -41,19 +43,18 @@ const EventsTableRow = ({ event, fields }: Props) => {
     <tr key={event.id}>
       {fields.toArray().map((field) => {
         const value = event[field];
-        const columnRenderer = (val: string) => eventAttributes.find(
-          ({ attribute }) => attribute === field,
-        )?.displayValue?.(val) ?? val;
+        const columnRenderer = (val: string) =>
+          eventAttributes.find(({ attribute }) => attribute === field)?.displayValue?.(val) ?? val;
 
-        return (
-          <Td key={field}>
-            {columnRenderer(value)}
-          </Td>
-        );
+        return <Td key={field}>{columnRenderer(value)}</Td>;
       })}
       <IfInteractive>
         <Td>
-          <RowActions eventId={event.id} eventDefinitionId={event.event_definition_id} hasReplayInfo={!!event.replay_info} />
+          <RowActions
+            eventId={event.id}
+            eventDefinitionId={event.event_definition_id}
+            hasReplayInfo={!!event.replay_info}
+          />
         </Td>
       </IfInteractive>
     </tr>

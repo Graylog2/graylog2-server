@@ -27,8 +27,7 @@ export const commonEventAttributes: Array<Attribute> = [
     sortable: true,
     searchable: false,
     filterable: true,
-    filter_options: Object.keys(EventDefinitionPriorityEnum.properties)
-      .map((num) => ({ value: num, title: num })),
+    filter_options: Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
   },
   {
     id: 'timestamp',
@@ -108,13 +107,13 @@ export const eventsTableSpecificAttributes: Array<Attribute> = [
     type: 'BOOLEAN',
     sortable: true,
     filterable: true,
-    filter_options: [{ value: 'false', title: 'Event' }, { value: 'true', title: 'Alert' }],
+    filter_options: [
+      { value: 'false', title: 'Event' },
+      { value: 'true', title: 'Alert' },
+    ],
   },
 ];
-export const additionalAttributes: Array<Attribute> = [
-  ...eventsTableSpecificAttributes,
-  ...detailsAttributes,
-];
+export const additionalAttributes: Array<Attribute> = [...eventsTableSpecificAttributes, ...detailsAttributes];
 
 export const eventsTableElements = {
   defaultLayout: {

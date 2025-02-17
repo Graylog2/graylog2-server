@@ -29,24 +29,20 @@ type MessageFieldProps = {
   value: any;
 };
 
-const MessageField = ({
-  message,
-  value,
-  fieldName,
-  customFieldActions,
-  renderForDisplay,
-}: MessageFieldProps) => {
+const MessageField = ({ message, value, fieldName, customFieldActions, renderForDisplay }: MessageFieldProps) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
 
   return (
     <span>
       <dt key={`${fieldName}Title`}>{fieldName}</dt>
-      <MessageFieldDescription key={`${fieldName}Description`}
-                               message={message}
-                               fieldName={fieldName}
-                               fieldValue={innerValue}
-                               renderForDisplay={renderForDisplay}
-                               customFieldActions={customFieldActions} />
+      <MessageFieldDescription
+        key={`${fieldName}Description`}
+        message={message}
+        fieldName={fieldName}
+        fieldValue={innerValue}
+        renderForDisplay={renderForDisplay}
+        customFieldActions={customFieldActions}
+      />
     </span>
   );
 };

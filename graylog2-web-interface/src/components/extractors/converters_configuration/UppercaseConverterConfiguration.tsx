@@ -25,9 +25,12 @@ type UppercaseConverterConfigurationProps = {
   onChange: (...args: any[]) => void;
 };
 
-class UppercaseConverterConfiguration extends React.Component<UppercaseConverterConfigurationProps, {
-  [key: string]: any;
-}> {
+class UppercaseConverterConfiguration extends React.Component<
+  UppercaseConverterConfigurationProps,
+  {
+    [key: string]: any;
+  }
+> {
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
   }
@@ -47,12 +50,14 @@ class UppercaseConverterConfiguration extends React.Component<UppercaseConverter
   render() {
     return (
       <div className="xtrc-converter">
-        <Input type="checkbox"
-               id={`enable-${this.props.type}-converter`}
-               label="Transform value to uppercase"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked
-               onChange={this._toggleConverter} />
+        <Input
+          type="checkbox"
+          id={`enable-${this.props.type}-converter`}
+          label="Transform value to uppercase"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked
+          onChange={this._toggleConverter}
+        />
       </div>
     );
   }

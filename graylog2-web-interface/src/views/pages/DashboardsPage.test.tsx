@@ -43,7 +43,8 @@ describe('DashboardsPage', () => {
     render(
       <DefaultQueryParamProvider>
         <DashboardsPage />
-      </DefaultQueryParamProvider>);
+      </DefaultQueryParamProvider>,
+    );
 
     await screen.findByRole('heading', { name: /dashboards/i });
     await screen.findByText('No dashboards have been found.');

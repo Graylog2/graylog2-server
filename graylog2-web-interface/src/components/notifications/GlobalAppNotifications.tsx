@@ -38,7 +38,7 @@ const GlobalAppNotifications = () => {
     })
     .filter((component) => !!component);
 
-  return (<>{globalNotifications}</>);
+  return <>{globalNotifications}</>;
 };
 
 export default GlobalAppNotifications;

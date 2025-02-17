@@ -22,9 +22,7 @@ import type { Event } from 'components/events/events/types';
 const useEventBulkAction = (events: Array<Event>) => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(events, true);
 
-  const actions = useMemo(() => [
-    pluggableActions,
-  ].filter(Boolean), [pluggableActions]);
+  const actions = useMemo(() => [pluggableActions].filter(Boolean), [pluggableActions]);
 
   return { actions, pluggableActionModals };
 };

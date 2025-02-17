@@ -19,7 +19,7 @@ import * as React from 'react';
 import { Alert } from 'components/bootstrap';
 
 type Props = {
-  sectionName: string,
+  sectionName: string;
 };
 
 const DestinationPermissionAlert = ({ sectionName }: Props) => (

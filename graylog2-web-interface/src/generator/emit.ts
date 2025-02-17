@@ -45,52 +45,66 @@ const emitNumberOrString = (type: string) => {
   }
 };
 
-const emitIndexerSignature = (additionalProperties: Type) => (additionalProperties ? [ts.factory.createIndexSignature(
-  [readonlyModifier],
-  [ts.factory.createParameterDeclaration(
-    undefined,
-    undefined,
-    ts.factory.createIdentifier('_key'),
-    undefined,
-    ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-    undefined,
-  )],
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  emitType(additionalProperties),
-)] : []);
+const emitIndexerSignature = (additionalProperties: Type) =>
+  additionalProperties
+    ? [
+        ts.factory.createIndexSignature(
+          [readonlyModifier],
+          [
+            ts.factory.createParameterDeclaration(
+              undefined,
+              undefined,
+              ts.factory.createIdentifier('_key'),
+              undefined,
+              ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              undefined,
+            ),
+          ],
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          emitType(additionalProperties),
+        ),
+      ]
+    : [];
 
 // ===== Models ===== //
 const isOptional = (propDef: Type) => 'optional' in propDef && propDef.optional;
-const emitProps = (properties: Record<string, Type>) => Object.entries(properties)
-  .map(([propName, propDef]) => ts.factory.createPropertySignature(
-    [readonlyModifier],
-    quotePropNameIfNeeded(propName),
-    isOptional(propDef) ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    emitType(propDef),
-  ));
+const emitProps = (properties: Record<string, Type>) =>
+  Object.entries(properties).map(([propName, propDef]) =>
+    ts.factory.createPropertySignature(
+      [readonlyModifier],
+      quotePropNameIfNeeded(propName),
+      isOptional(propDef) ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      emitType(propDef),
+    ),
+  );
 
-const bannedModels = [...Object.keys(typeMappings), 'DateTime', 'DateTimeZone', 'Chronology', 'String>', 'LocalDateTime', 'TemporalUnit'];
+const bannedModels = [
+  ...Object.keys(typeMappings),
+  'DateTime',
+  'DateTimeZone',
+  'Chronology',
+  'String>',
+  'LocalDateTime',
+  'TemporalUnit',
+];
 const isNotBannedModel = ([name]: [string, Model]) => !bannedModels.includes(name);
 
 const cleanName = (name: string) => name.replace(/>/g, '');
 
-const emitModel = ([name, definition]: [string, Model]) => (definition.type === 'type_literal'
-  ? ts.factory.createInterfaceDeclaration(
-    undefined,
-    cleanName(name),
-    undefined,
-    undefined,
-    [...emitProps(definition.properties), ...emitIndexerSignature(definition.additionalProperties)],
-  )
-  : ts.factory.createTypeAliasDeclaration(
-    undefined,
-    ts.factory.createIdentifier(name),
-    undefined,
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    emitType(definition),
-  )
-);
+const emitModel = ([name, definition]: [string, Model]) =>
+  definition.type === 'type_literal'
+    ? ts.factory.createInterfaceDeclaration(undefined, cleanName(name), undefined, undefined, [
+        ...emitProps(definition.properties),
+        ...emitIndexerSignature(definition.additionalProperties),
+      ])
+    : ts.factory.createTypeAliasDeclaration(
+        undefined,
+        ts.factory.createIdentifier(name),
+        undefined,
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        emitType(definition),
+      );
 
 // ==== APIs/Operations ==== //
 // === Types === //
@@ -117,132 +131,144 @@ const emitTemplateString = (path: string) => {
   const spans = chunks.flatMap(([variable, text], index) => {
     const isLastChunk = index === chunks.length - 1;
     const identifier = ts.factory.createIdentifier(extractVariable(variable));
-    const literalText = text as string || '';
-    const literal = isLastChunk ? ts.factory.createTemplateTail(literalText) : ts.factory.createTemplateMiddle(literalText);
+    const literalText = (text as string) || '';
+    const literal = isLastChunk
+      ? ts.factory.createTemplateTail(literalText)
+      : ts.factory.createTemplateMiddle(literalText);
 
     return ts.factory.createTemplateSpan(identifier, literal);
   });
 
-  return ts.factory.createTemplateExpression(
-    head,
-    spans,
-  );
+  return ts.factory.createTemplateExpression(head, spans);
 };
 
-const cleanVariableName = (name: string) => name.replace(/-(\w?)/g, (substr) => (substr[1] ? substr[1].toUpperCase() : ''));
+const cleanVariableName = (name: string) =>
+  name.replace(/-(\w?)/g, (substr) => (substr[1] ? substr[1].toUpperCase() : ''));
 
-const isArrayType = (type: Type): boolean => type.type === 'array' || (type.type === 'type_reference' && type.name.endsWith('Array'));
+const isArrayType = (type: Type): boolean =>
+  type.type === 'array' || (type.type === 'type_reference' && type.name.endsWith('Array'));
 
 const emitFormDataAssignments = ({ name, type }: Parameter) => {
   if (isArrayType(type)) {
-    return ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-      ts.factory.createPropertyAccessExpression(
-        ts.factory.createIdentifier(name),
-        ts.factory.createIdentifier('forEach'),
-      ),
-      undefined,
-      [ts.factory.createArrowFunction(
-        undefined,
-        undefined,
-        [ts.factory.createParameterDeclaration(
-          undefined,
-          undefined,
-          ts.factory.createIdentifier('f'),
-          undefined,
-          undefined,
-          undefined,
-        )],
-        undefined,
-        ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-        ts.factory.createCallExpression(
-          ts.factory.createPropertyAccessExpression(
-            ts.factory.createIdentifier('formData'),
-            ts.factory.createIdentifier('append'),
-          ),
-          undefined,
-          [
-            ts.factory.createStringLiteral(name),
-            ts.factory.createIdentifier('f'),
-          ],
+    return ts.factory.createExpressionStatement(
+      ts.factory.createCallExpression(
+        ts.factory.createPropertyAccessExpression(
+          ts.factory.createIdentifier(name),
+          ts.factory.createIdentifier('forEach'),
         ),
-      )],
-    ));
+        undefined,
+        [
+          ts.factory.createArrowFunction(
+            undefined,
+            undefined,
+            [
+              ts.factory.createParameterDeclaration(
+                undefined,
+                undefined,
+                ts.factory.createIdentifier('f'),
+                undefined,
+                undefined,
+                undefined,
+              ),
+            ],
+            undefined,
+            ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+            ts.factory.createCallExpression(
+              ts.factory.createPropertyAccessExpression(
+                ts.factory.createIdentifier('formData'),
+                ts.factory.createIdentifier('append'),
+              ),
+              undefined,
+              [ts.factory.createStringLiteral(name), ts.factory.createIdentifier('f')],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  return ts.factory.createExpressionStatement(ts.factory.createCallExpression(
-    ts.factory.createPropertyAccessExpression(
-      ts.factory.createIdentifier('formData'),
-      ts.factory.createIdentifier('append'),
+  return ts.factory.createExpressionStatement(
+    ts.factory.createCallExpression(
+      ts.factory.createPropertyAccessExpression(
+        ts.factory.createIdentifier('formData'),
+        ts.factory.createIdentifier('append'),
+      ),
+      undefined,
+      [ts.factory.createStringLiteral(name), ts.factory.createIdentifier(name)],
     ),
-    undefined,
-    [
-      ts.factory.createStringLiteral(name),
-      ts.factory.createIdentifier(name),
-    ],
-  ));
+  );
 };
 
-const emitBlock = (method: string, path: any, bodyParameter: Parameter, queryParameter: Parameter[], rawProduces: string[], formDataParameters: Parameter[]) => {
+const emitBlock = (
+  method: string,
+  path: any,
+  bodyParameter: Parameter,
+  queryParameter: Parameter[],
+  rawProduces: string[],
+  formDataParameters: Parameter[],
+) => {
   const produces = rawProduces || [];
   const queryParameters = ts.factory.createObjectLiteralExpression(
-    queryParameter.map((q) => ts.factory.createPropertyAssignment(
-      emitString(q.name),
-      ts.factory.createIdentifier(cleanVariableName(q.name)),
-    )),
+    queryParameter.map((q) =>
+      ts.factory.createPropertyAssignment(emitString(q.name), ts.factory.createIdentifier(cleanVariableName(q.name))),
+    ),
   );
 
   const formDataAssignments = formDataParameters.map(emitFormDataAssignments);
 
-  const formDataStatements = formDataParameters.length > 0 ? [
-    ts.factory.createVariableStatement(
-      undefined,
-      ts.factory.createVariableDeclarationList(
-        [ts.factory.createVariableDeclaration(
-          ts.factory.createIdentifier('formData'),
-          undefined,
-          undefined,
-          ts.factory.createNewExpression(
-            ts.factory.createIdentifier('FormData'),
+  const formDataStatements =
+    formDataParameters.length > 0
+      ? [
+          ts.factory.createVariableStatement(
             undefined,
-            [],
+            ts.factory.createVariableDeclarationList(
+              [
+                ts.factory.createVariableDeclaration(
+                  ts.factory.createIdentifier('formData'),
+                  undefined,
+                  undefined,
+                  ts.factory.createNewExpression(ts.factory.createIdentifier('FormData'), undefined, []),
+                ),
+              ],
+              ts.NodeFlags.Const,
+            ),
           ),
-        )],
-        ts.NodeFlags.Const,
-      ),
-    ),
-    ...formDataAssignments,
-  ] : [];
+          ...formDataAssignments,
+        ]
+      : [];
 
   const headers = ts.factory.createObjectLiteralExpression(
-    [ts.factory.createPropertyAssignment(
-      emitString('Accept'),
-      ts.factory.createArrayLiteralExpression(produces.map((contentType) => emitString(contentType)), produces.length > 1),
-    )],
+    [
+      ts.factory.createPropertyAssignment(
+        emitString('Accept'),
+        ts.factory.createArrayLiteralExpression(
+          produces.map((contentType) => emitString(contentType)),
+          produces.length > 1,
+        ),
+      ),
+    ],
     true,
   );
 
-  // eslint-disable-next-line no-nested-ternary
-  const body = formDataParameters.length > 0
-    ? ts.factory.createIdentifier('formData')
-    : bodyParameter
-      ? ts.factory.createIdentifier(bodyParameter.name)
-      : ts.factory.createNull();
+  const body =
+    // eslint-disable-next-line no-nested-ternary
+    formDataParameters.length > 0
+      ? ts.factory.createIdentifier('formData')
+      : bodyParameter
+        ? ts.factory.createIdentifier(bodyParameter.name)
+        : ts.factory.createNull();
 
   return ts.factory.createBlock(
     [
       ...formDataStatements,
       ts.factory.createReturnStatement(
-        ts.factory.createCallExpression(
-          ts.factory.createIdentifier(REQUEST_FUNCTION_NAME),
-          undefined,
-          [
-            emitString(method),
-            emitTemplateString(path),
-            body,
-            queryParameters,
-            headers,
-          ],
-        ),
+        ts.factory.createCallExpression(ts.factory.createIdentifier(REQUEST_FUNCTION_NAME), undefined, [
+          emitString(method),
+          emitTemplateString(path),
+          body,
+          queryParameters,
+          headers,
+        ]),
       ),
     ],
     true,
@@ -265,7 +291,8 @@ const emitInitializer = (type: Type, defaultValue: string) => {
   }
 };
 
-const sortByOptionality = (parameter1: Parameter, parameter2: Parameter) => Number(parameter2.required) - Number(parameter1.required);
+const sortByOptionality = (parameter1: Parameter, parameter2: Parameter) =>
+  Number(parameter2.required) - Number(parameter1.required);
 
 const cleanParameterName = (name: string) => name.replace(/\s/g, '');
 
@@ -277,14 +304,15 @@ function emitEnumType({ options, name }: EnumType) {
 }
 
 function emitTypeLiteral(type: TypeLiteral): ReturnType<typeof ts.factory.createTypeLiteralNode> {
-  const properties = Object.entries(type.properties ?? [])
-    .map(([propName, propType]) => ts.factory.createPropertySignature(
+  const properties = Object.entries(type.properties ?? []).map(([propName, propType]) =>
+    ts.factory.createPropertySignature(
       [readonlyModifier],
       quotePropNameIfNeeded(propName),
       undefined,
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       emitType(propType),
-    ));
+    ),
+  );
 
   const additionalProperties = emitIndexerSignature(type.additionalProperties);
 
@@ -295,7 +323,8 @@ const assertUnreachable = (ignored: never, message: string): never => {
   throw new Error(`${message}: ${ignored}`);
 };
 
-type TypeResult = ReturnType<typeof ts.factory.createArrayTypeNode>
+type TypeResult =
+  | ReturnType<typeof ts.factory.createArrayTypeNode>
   | ReturnType<typeof emitEnumType>
   | ReturnType<typeof emitTypeLiteral>
   | ReturnType<typeof ts.factory.createTypeReferenceNode>
@@ -318,21 +347,17 @@ function emitType(type: Type): TypeResult {
   return undefined;
 }
 
-const emitFunctionParameter = ({
-  name,
-  required,
-  type,
-  defaultValue,
-}: Parameter) => ts.factory.createParameterDeclaration(
-  undefined,
-  undefined,
-  cleanVariableName(cleanParameterName(name)),
-  (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-  emitType(type),
-  defaultValue ? emitInitializer(type, defaultValue) : undefined,
-);
+const emitFunctionParameter = ({ name, required, type, defaultValue }: Parameter) =>
+  ts.factory.createParameterDeclaration(
+    undefined,
+    undefined,
+    cleanVariableName(cleanParameterName(name)),
+    required || defaultValue ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+    emitType(type),
+    defaultValue ? emitInitializer(type, defaultValue) : undefined,
+  );
 
-const firstNonEmpty = (...strings: string[]) => strings.find((s) => (s !== undefined && s.trim() !== ''));
+const firstNonEmpty = (...strings: string[]) => strings.find((s) => s !== undefined && s.trim() !== '');
 
 const deriveNameFromParameters = (functionName: string, parameters: Parameter[]) => {
   const joinedParameters = parameters.map(({ name }) => cleanParameterName(name)).join('And');
@@ -345,27 +370,36 @@ const bannedFunctionNames = {
   export: 'export_',
 };
 
-const unbanFunctionname = (nickname: string): string => (Object.keys(bannedFunctionNames).includes(nickname) ? bannedFunctionNames[nickname] : nickname);
+const unbanFunctionname = (nickname: string): string =>
+  Object.keys(bannedFunctionNames).includes(nickname) ? bannedFunctionNames[nickname] : nickname;
 
-const emitRoute = ({
-  nickname,
-  parameters: rawParameters = [],
-  method,
-  type,
-  path: operationPath,
-  summary,
-  produces,
-}: Operation, path: string, assignedNames: Array<string>) => {
+const emitRoute = (
+  { nickname, parameters: rawParameters = [], method, type, path: operationPath, summary, produces }: Operation,
+  path: string,
+  assignedNames: Array<string>,
+) => {
   const parameters = rawParameters.map((parameter) => ({ ...parameter, name: cleanParameterName(parameter.name) }));
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
   const bodyParameter = parameters.filter((parameter) => parameter.paramType === 'body');
   const formDataParameters = parameters.filter((parameter) => parameter.paramType === 'formdata');
 
-  const jsDoc = ts.factory.createJSDocComment(summary,
+  const jsDoc = ts.factory.createJSDocComment(
+    summary,
     ts.factory.createNodeArray(
-      parameters.filter((p) => p.description)
-        .map((p) => ts.factory.createJSDocParameterTag(undefined, ts.factory.createIdentifier(p.name), undefined, undefined, undefined, p.description)),
-    ));
+      parameters
+        .filter((p) => p.description)
+        .map((p) =>
+          ts.factory.createJSDocParameterTag(
+            undefined,
+            ts.factory.createIdentifier(p.name),
+            undefined,
+            undefined,
+            undefined,
+            p.description,
+          ),
+        ),
+    ),
+  );
 
   const unbannedNickname = unbanFunctionname(nickname);
 
@@ -384,8 +418,16 @@ const emitRoute = ({
         undefined,
         parameters.sort(sortByOptionality).map(emitFunctionParameter),
         emitPromiseResultType(emitType(type)),
-        emitBlock(method, firstNonEmpty(operationPath, path) || '/', bodyParameter[0], queryParameters, produces, formDataParameters),
-      )],
+        emitBlock(
+          method,
+          firstNonEmpty(operationPath, path) || '/',
+          bodyParameter[0],
+          queryParameters,
+          produces,
+          formDataParameters,
+        ),
+      ),
+    ],
   };
 };
 
@@ -393,7 +435,8 @@ type RouteNodes = ReturnType<typeof emitRoute>;
 
 const emitRoutes = (api: Route, alreadyAssigned: Array<string>) => {
   const { operations, path } = api;
-  const createRouteWithDefaultPath = (operation: Operation, assignedNames: Array<string>) => emitRoute(operation, path, assignedNames);
+  const createRouteWithDefaultPath = (operation: Operation, assignedNames: Array<string>) =>
+    emitRoute(operation, path, assignedNames);
 
   return operations.reduce((prev: Array<RouteNodes>, cur: Operation) => {
     const assigned = [...alreadyAssigned, ...prev.map(({ name }) => name)];
@@ -427,12 +470,16 @@ const cleanIdentifier = (name: string) => name.replace(/[/-]/g, '');
 
 function emitSummary(apis: Array<Api>) {
   const packageIndexFile = ts.createSourceFile('index.ts', '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
-  const reexports = ts.factory.createNodeArray(apis.map(({ name }) => ts.factory.createExportDeclaration(
-    undefined,
-    false,
-    ts.factory.createNamespaceExport(ts.factory.createIdentifier(cleanIdentifier(name))),
-    emitString(`./${name}`),
-  )));
+  const reexports = ts.factory.createNodeArray(
+    apis.map(({ name }) =>
+      ts.factory.createExportDeclaration(
+        undefined,
+        false,
+        ts.factory.createNamespaceExport(ts.factory.createIdentifier(cleanIdentifier(name))),
+        emitString(`./${name}`),
+      ),
+    ),
+  );
 
   return printer.printList(ts.ListFormat.MultiLine, reexports, packageIndexFile);
 }
@@ -443,28 +490,31 @@ const referencedTypes = (type: Type): Array<string> => {
   }
 
   switch (type.type) {
-    case 'type_reference': return [type.name];
-    case 'type_literal': return type.properties
-      ? [
-        ...Object.values(type.properties).flatMap(referencedTypes),
-        ...referencedTypes(type.additionalProperties),
-      ]
-      : [];
-    case 'enum': return [];
-    case 'array': return referencedTypes(type.items);
-    default: assertUnreachable(type, 'Missing type.');
+    case 'type_reference':
+      return [type.name];
+    case 'type_literal':
+      return type.properties
+        ? [...Object.values(type.properties).flatMap(referencedTypes), ...referencedTypes(type.additionalProperties)]
+        : [];
+    case 'enum':
+      return [];
+    case 'array':
+      return referencedTypes(type.items);
+    default:
+      assertUnreachable(type, 'Missing type.');
   }
 
   return [];
 };
 
-const isPrimitiveType = (typeName: string) => ['string', 'unknown', 'boolean', 'void', 'number', 'any'].includes(typeName);
+const isPrimitiveType = (typeName: string) =>
+  ['string', 'unknown', 'boolean', 'void', 'number', 'any'].includes(typeName);
 
 const usedModels = ({ models, routes }: Api) => {
-  const typesFromModels = Object.values(models)
-    .flatMap(referencedTypes);
+  const typesFromModels = Object.values(models).flatMap(referencedTypes);
 
-  const routeModels = routes.flatMap((route) => route.operations)
+  const routeModels = routes
+    .flatMap((route) => route.operations)
     .flatMap((operation) => [
       ...operation.parameters.flatMap((parameter) => referencedTypes(parameter.type)),
       ...referencedTypes(operation.type),

@@ -18,8 +18,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 type Props = {
-  children: React.ReactNode,
-  className?: string,
+  children: React.ReactNode;
+  className?: string;
 };
 
 const Container = styled.div`

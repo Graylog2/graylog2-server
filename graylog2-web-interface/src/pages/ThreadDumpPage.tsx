@@ -42,19 +42,19 @@ const ThreadDumpPage = () => {
   return (
     <DocumentTitle title={`Thread dump of node ${node.short_node_id} / ${node.hostname}`}>
       <div>
-        <PageHeader title={(
-          <span>
-            Thread dump of node {node.short_node_id} / {node.hostname}
-            &nbsp;
-            <small>Taken at <Timestamp dateTime={new Date()} /></small>
-          </span>
-        )} />
+        <PageHeader
+          title={
+            <span>
+              Thread dump of node {node.short_node_id} / {node.hostname}
+              &nbsp;
+              <small>
+                Taken at <Timestamp dateTime={new Date()} />
+              </small>
+            </span>
+          }
+        />
         <Row className="content">
-          <Col md={12}>
-            {threadDump
-              ? <pre className="threaddump">{threadDump}</pre>
-              : <Spinner />}
-          </Col>
+          <Col md={12}>{threadDump ? <pre className="threaddump">{threadDump}</pre> : <Spinner />}</Col>
         </Row>
       </div>
     </DocumentTitle>

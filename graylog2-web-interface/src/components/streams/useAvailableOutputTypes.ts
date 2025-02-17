@@ -27,11 +27,11 @@ export const KEY_PREFIX = ['outputs', 'types'];
 export const keyFn = () => [...KEY_PREFIX];
 
 export type AvailableOutputRequestedConfiguration = {
-  [key: string]: ConfigurationField,
+  [key: string]: ConfigurationField;
 };
 export type AvailableOutputSummary = {
   human_name: string;
-  requested_configuration: AvailableOutputRequestedConfiguration,
+  requested_configuration: AvailableOutputRequestedConfiguration;
   link_to_docs: string;
   name: string;
   type: string;
@@ -49,28 +49,31 @@ export const fetchOutputsTypes = () => {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useAvailableOutputTypes = ({ enabled }: Options = { enabled: true }): {
-  data: AvailableOutputTypes,
-  refetch: () => void,
-  isInitialLoading: boolean,
+const useAvailableOutputTypes = (
+  { enabled }: Options = { enabled: true },
+): {
+  data: AvailableOutputTypes;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     keyFn(),
-    () => defaultOnError(fetchOutputsTypes(), 'Loading stream outputs failed with status', 'Could not load stream outputs'),
+    () =>
+      defaultOnError(fetchOutputsTypes(), 'Loading stream outputs failed with status', 'Could not load stream outputs'),
     {
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useAvailableOutputTypes;
