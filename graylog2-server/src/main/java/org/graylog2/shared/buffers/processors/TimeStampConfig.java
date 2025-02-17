@@ -14,20 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.messages;
+package org.graylog2.shared.buffers.processors;
 
-public record IndexingError(Indexable message, String index, Error error) implements IndexingResult {
-    public enum Type {
-        IndexBlocked,
-        MappingError,
-        Unknown,
-        DataTooLarge
-    }
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static IndexingError create(Indexable message, String index, Type errorType, String errorMessage) {
-        return new IndexingError(message, index, new Error(errorType, errorMessage));
-    }
+import java.time.Duration;
 
-    public record Error(Type type, String errorMessage) {
+public record TimeStampConfig(@JsonProperty("grace_period") Duration gracePeriod) {
+    public static final TimeStampConfig THRESHOLD_2DAYS = new TimeStampConfig(Duration.ofDays(2));
+    private static final TimeStampConfig THRESHOLD_DISTANT_FUTURE = new TimeStampConfig(Duration.ofSeconds(1000000000000L));
+
+    public static TimeStampConfig getDefault() {
+        // Off by default
+        return THRESHOLD_DISTANT_FUTURE;
     }
 }

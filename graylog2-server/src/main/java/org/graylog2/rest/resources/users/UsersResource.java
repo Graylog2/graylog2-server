@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.users;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -721,8 +722,7 @@ public class UsersResource extends RestResource {
         final User user = loadUserById(userId);
         final String username = user.getName();
 
-        if (!isPermitted(USERS_TOKENCREATE, username) ||
-                isExternalUserDenied(user)) {
+        if (!isAccessAllowed(user)) {
             throw new ForbiddenException("Not allowed to create tokens for user " + username);
         }
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
@@ -757,9 +757,30 @@ public class UsersResource extends RestResource {
         }
     }
 
-    private boolean isExternalUserDenied(User user) {
-        return user.isExternalUser()
-                && !clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).allowAccessTokenForExternalUsers();
+    @VisibleForTesting
+    boolean isAccessAllowed(User user) {
+        final boolean permitted = isPermitted(USERS_TOKENCREATE, user.getName());
+        final boolean isAdmin = isAdmin(user);
+        if (isAdmin) {
+            return permitted;
+        }
+        final boolean externalAllowed = isExternalUserAllowed(user);
+        final boolean adminAllowed = isAllowedAsNoAdmin(user);
+
+        return permitted && externalAllowed && adminAllowed;
+    }
+
+    private boolean isAdmin(User user) {
+        final String adminRoleId = roleService.getAdminRoleObjectId();
+        return user.getRoleIds().contains(adminRoleId);
+    }
+
+    private boolean isAllowedAsNoAdmin(User user) {
+        return isAdmin(user) || !clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).restrictAccessTokenToAdmins();
+    }
+
+    private boolean isExternalUserAllowed(User user) {
+        return !user.isExternalUser() || clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).allowAccessTokenForExternalUsers();
     }
 
     private User loadUserById(String userId) {
