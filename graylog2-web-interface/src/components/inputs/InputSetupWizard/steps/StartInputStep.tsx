@@ -20,6 +20,10 @@ import styled, { css } from 'styled-components';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import Routes from 'routing/Routes';
 import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
@@ -77,8 +81,11 @@ export type ProcessingSteps =
   | 'result';
 
 const StartInputStep = () => {
-  const navigateTo = useNavigate();
+  const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
+  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const { goToPreviousStep, orderedSteps, activeStep, wizardData, stepsConfig } = useInputSetupWizard();
+  const navigateTo = useNavigate();
   const { stepsData } = useInputSetupWizardSteps();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
@@ -164,6 +171,15 @@ const StartInputStep = () => {
 
   const setupInput = async () => {
     const routingStepData = getStepConfigOrData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+
+    sendTelemetry(
+      TELEMETRY_EVENT_TYPE.INPUT_SETUP_WIZARD.START_INPUT,
+      {
+        app_pathname: telemetryPathName,
+        app_action_value: 'click-input-setup-wizard-start-input',
+        chosen_routing_option: routingStepData?.streamType ?? 'UNKNOWN',
+      });
+
     const { input } = wizardData;
     const inputId = input?.id;
 
