@@ -18,13 +18,13 @@ import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
+import { Messages } from '@graylog/server-api';
+
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { Stream } from 'views/stores/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
-import useMessage from 'views/hooks/useMessage';
-import type { Message } from 'views/components/messagelist/Types';
 import StreamsContext from 'contexts/StreamsContext';
 
 import ShowMessagePage from './ShowMessagePage';
@@ -40,7 +40,9 @@ jest.mock('stores/nodes/NodesStore', () => ({
   NodesStore: MockStore(['getInitialState', () => ({ nodes: {} })]),
 }));
 
-jest.mock('views/hooks/useMessage');
+jest.mock('@graylog/server-api', () => ({
+  Messages: { search: jest.fn() },
+}));
 
 jest.mock('stores/inputs/InputsStore', () => ({
   InputsActions: {
@@ -67,18 +69,12 @@ const SimpleShowMessagePage = ({ index, messageId, streams = [] }: SimpleShowMes
 
 describe('ShowMessagePage', () => {
   const isLocalNode = jest.fn();
-  const messageHookReturnValue = (data: Message) => ({
-    data,
-    isInitialLoading: false,
-    error: undefined,
-    isError: false,
-  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useFieldTypes).mockReturnValue({ data: [], refetch: () => {} });
     asMock(isLocalNode).mockResolvedValue(true);
-    asMock(useMessage).mockReturnValue(messageHookReturnValue(message));
+    asMock(Messages.search).mockResolvedValue(message);
   });
 
   const testForwarderPlugin = new PluginManifest(
@@ -116,12 +112,15 @@ describe('ShowMessagePage', () => {
   it('retrieves field types only for user-accessible streams', async () => {
     const messageWithMultipleStreams = {
       ...message,
-      fields: {
-        ...message.fields,
-        streams: ['000000000000000000000001', 'deadbeef'],
+      message: {
+        ...message.message,
+        fields: {
+          ...message.message.fields,
+          streams: ['000000000000000000000001', 'deadbeef'],
+        },
       },
     };
-    asMock(useMessage).mockReturnValue(messageHookReturnValue(messageWithMultipleStreams));
+    asMock(Messages.search).mockResolvedValue(messageWithMultipleStreams);
     mockGetInput.mockImplementation(() => Promise.resolve(input));
 
     render(
@@ -142,7 +141,7 @@ describe('ShowMessagePage', () => {
   });
 
   it('renders for generic event', async () => {
-    asMock(useMessage).mockReturnValue(messageHookReturnValue(event));
+    asMock(Messages.search).mockResolvedValue(event);
     mockGetInput.mockImplementation(() => Promise.resolve());
 
     render(<SimpleShowMessagePage index="gl-events_0" messageId="01DFZQ64CMGV30NT7DW2P7HQX2" />);
