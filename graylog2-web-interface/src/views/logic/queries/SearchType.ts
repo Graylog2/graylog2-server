@@ -36,7 +36,7 @@ type Interval = AutoInterval | TimeUnitInterval;
 
 type SearchTypePivot = {
   type: string;
-  field: string;
+  fields: Array<string>;
   limit?: number;
   interval?: Interval;
 };
