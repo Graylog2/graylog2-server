@@ -41,6 +41,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
+import org.graylog2.shared.SuppressForbidden;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -200,6 +201,7 @@ class MongoUtilsTest {
     }
 
     @Test
+    @SuppressForbidden("Using a DuplicateKeyException in our own code is discouraged, but the legacy driver might still throw it.")
     void testIsDuplicateKeyError() {
         final var clientException = new MongoClientException("Something went wrong!");
         final var madeUpServerException = new MongoWriteException(
@@ -223,7 +225,9 @@ class MongoUtilsTest {
     }
 
     @Test
-    void testReproduceDuplicateKeyError(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
+    @SuppressForbidden("Using a DuplicateKeyException in our own code is discouraged, but the legacy driver might still throw it.")
+    void testReproduceDuplicateKeyError(MongoDBTestService mongoDBTestService) {
+        @SuppressWarnings("deprecation")
         final DBCollection legacyCollection = mongoDBTestService.mongoConnection().getDatabase()
                 .getCollection("test");
 

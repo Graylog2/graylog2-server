@@ -639,14 +639,23 @@
                         <artifactId>maven-pmd-plugin</artifactId>
                         <configuration>
                             <targetJdk>${maven.compiler.target}</targetJdk>
-                            <failOnViolation>false</failOnViolation>
+                            <failurePriority>1</failurePriority>
+                            <printFailingErrors>true</printFailingErrors>
+                            <linkXRef>false</linkXRef>
                             <excludeRoots>
                                 <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
                                 <excludeRoot>${project.build.directory}/generated-test-sources</excludeRoot>
                             </excludeRoots>
+                            <rulesets>
+                                <ruleset>/rulesets/java/maven-pmd-plugin-default.xml</ruleset>
+                                <ruleset>../config/pmd-rules.xml</ruleset>
+                            </rulesets>
                         </configuration>
                         <executions>
                             <execution>
+                                <phase>
+                                    validate
+                                </phase>
                                 <goals>
                                     <goal>check</goal>
                                 </goals>
