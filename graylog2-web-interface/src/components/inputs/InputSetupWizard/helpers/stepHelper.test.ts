@@ -18,13 +18,7 @@
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import type { StepsData } from 'components/inputs/InputSetupWizard/types';
 
-import {
-  getStepData,
-  getNextStep,
-  checkHasNextStep,
-  checkHasPreviousStep,
-  updateStepData,
-} from './stepHelper';
+import { getStepData, getNextStep, checkHasNextStep, checkHasPreviousStep, updateStepData } from './stepHelper';
 
 const stepsData = {
   [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
@@ -48,9 +42,7 @@ describe('stepHelper', () => {
     });
 
     it('returns undefined if no step data exists', () => {
-      expect(getStepData(stepsData as StepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(
-        undefined,
-      );
+      expect(getStepData(stepsData as StepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(undefined);
     });
   });
 
@@ -154,7 +146,9 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' }, true)).toEqual({
+      expect(
+        updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' }, true),
+      ).toEqual({
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
           foo: 'foo',
