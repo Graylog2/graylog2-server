@@ -23,6 +23,7 @@ import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioningPeriodical
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
+import org.graylog2.inputs.diagnosis.InputDiagnosisMetricsPeriodical;
 import org.graylog2.periodical.ClusterHealthCheckThread;
 import org.graylog2.periodical.ContentPackLoaderPeriodical;
 import org.graylog2.periodical.DataNodeHousekeepingPeriodical;
@@ -66,5 +67,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(TelemetryClusterInfoPeriodical.class);
         periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
         periodicalBinder.addBinding().to(DataNodeHousekeepingPeriodical.class);
+        periodicalBinder.addBinding().to(InputDiagnosisMetricsPeriodical.class);
     }
 }
