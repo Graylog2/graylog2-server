@@ -22,7 +22,7 @@ import { Streams } from '@graylog/server-api';
 import type FetchError from 'logic/errors/FetchError';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 
-export type StreamConnectedPipelines = Array<Pick<PipelineType, 'id' | 'title'>>
+export type StreamConnectedPipelines = Array<Pick<PipelineType, 'id' | 'title'>>;
 
 const pipelines = create({
   fetcher: async (streamIds: Array<string>) => Streams.getConnectedPipelinesForStreams({ stream_ids: streamIds }),
@@ -30,12 +30,15 @@ const pipelines = create({
   scheduler: windowScheduler(10),
 });
 
-const usePipelinesConnectedStream = (streamId: string, enabled: boolean = true): {
-  data: StreamConnectedPipelines,
-  refetch: () => void,
-  isInitialLoading: boolean,
-  error: FetchError,
-  isError: boolean,
+const usePipelinesConnectedStream = (
+  streamId: string,
+  enabled: boolean = true,
+): {
+  data: StreamConnectedPipelines;
+  refetch: () => void;
+  isInitialLoading: boolean;
+  error: FetchError;
+  isError: boolean;
 } => {
   const { data, refetch, isInitialLoading, error, isError } = useQuery<StreamConnectedPipelines, FetchError>(
     ['stream', 'pipelines', streamId],
@@ -46,13 +49,13 @@ const usePipelinesConnectedStream = (streamId: string, enabled: boolean = true):
     },
   );
 
-  return ({
+  return {
     data: data ?? [],
     refetch,
     isInitialLoading,
     error,
     isError,
-  });
+  };
 };
 
 export default usePipelinesConnectedStream;

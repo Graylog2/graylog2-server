@@ -29,15 +29,17 @@ import useStreamOutputRuleMutation from 'components/streams/hooks/useStreamOutpu
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-type Props ={
-  filterRule: Partial<StreamOutputFilterRule>,
-  streamId: string,
-  destinationType: string,
+type Props = {
+  filterRule: Partial<StreamOutputFilterRule>;
+  streamId: string;
+  destinationType: string;
 };
 
-const StyledButton = styled(Button)(({ theme }) => css`
-  margin: 0 ${theme.spacings.xxs};
-`);
+const StyledButton = styled(Button)(
+  ({ theme }) => css`
+    margin: 0 ${theme.spacings.xxs};
+  `,
+);
 
 const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) => {
   const [showForm, setShowForm] = useState(false);
@@ -50,9 +52,14 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
   const onClick = () => {
     setShowForm(true);
 
-    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS[`STREAM_ITEM_DATA_ROUTING_${upperCase(camelCase(destinationType))}_FILTER_${isNew ? 'CREATE_OPENED' : 'UPDATE_OPENED'}`], {
-      app_pathname: 'streams',
-    });
+    sendTelemetry(
+      TELEMETRY_EVENT_TYPE.STREAMS[
+        `STREAM_ITEM_DATA_ROUTING_${upperCase(camelCase(destinationType))}_FILTER_${isNew ? 'CREATE_OPENED' : 'UPDATE_OPENED'}`
+      ],
+      {
+        app_pathname: 'streams',
+      },
+    );
   };
 
   const handleSubmit = (filterOutputRule: Partial<StreamOutputFilterRule>) => {
@@ -68,18 +75,23 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
 
   return (
     <>
-      <StyledButton bsStyle={isNew ? 'default' : 'default'}
-                    bsSize={isNew ? 'sm' : 'xs'}
-                    onClick={onClick}
-                    title="Edit">
-        {isNew ? (<><Icon name="add" size="sm" /> Create rule</>) : (<Icon name="edit_square" />)}
+      <StyledButton bsStyle={isNew ? 'default' : 'default'} bsSize={isNew ? 'sm' : 'xs'} onClick={onClick} title="Edit">
+        {isNew ? (
+          <>
+            <Icon name="add" size="sm" /> Create rule
+          </>
+        ) : (
+          <Icon name="edit_square" />
+        )}
       </StyledButton>
       {showForm && (
-        <FilterRuleForm title={title}
-                        filterRule={filterRule}
-                        destinationType={destinationType}
-                        onCancel={() => setShowForm(false)}
-                        handleSubmit={handleSubmit} />
+        <FilterRuleForm
+          title={title}
+          filterRule={filterRule}
+          destinationType={destinationType}
+          onCancel={() => setShowForm(false)}
+          handleSubmit={handleSubmit}
+        />
       )}
     </>
   );

@@ -17,15 +17,13 @@
 package org.graylog.plugins.pipelineprocessor.db.memory;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.Map;
@@ -69,6 +67,11 @@ public class InMemoryRuleService implements RuleService {
         clusterBus.post(RulesChangedEvent.updatedRuleId(toSave.id()));
 
         return toSave;
+    }
+
+    @Override
+    public RuleDao save(RuleDao rule, boolean checkMutability) {
+        return save(rule);
     }
 
     @Override

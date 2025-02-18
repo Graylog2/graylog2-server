@@ -31,7 +31,7 @@ export const createLinkAndDownload = (href: string, fileName: string) => {
   a.remove();
 };
 
-export const downloadBLOB = (contents: BlobPart, metadata: { fileName: string, contentType: string }) => {
+export const downloadBLOB = (contents: BlobPart, metadata: { fileName: string; contentType: string }) => {
   // create blob from contents and meta data
   const blob = new Blob([contents], { type: metadata.contentType });
 
@@ -44,10 +44,24 @@ const errorHandler = (errorThrown: Error) => {
   UserNotification.error(`Downloading failed with status: ${errorThrown}`, 'Unable to download');
 };
 
-export const fetchTextFile = async <Body>(method: string, url: string, body: Body | undefined, mimeType: string, fileName: string) => fetchFile(method, url, body, mimeType)
-  .then((result: string) => downloadBLOB(result, { fileName, contentType: mimeType }))
-  .catch(errorHandler);
+export const fetchTextFile = async <Body>(
+  method: string,
+  url: string,
+  body: Body | undefined,
+  mimeType: string,
+  fileName: string,
+) =>
+  fetchFile(method, url, body, mimeType)
+    .then((result: string) => downloadBLOB(result, { fileName, contentType: mimeType }))
+    .catch(errorHandler);
 
-export const fetchBinaryFile = async <Body>(method: string, url: string, body: Body | undefined, mimeType: string, fileName: string) => fetchBlobFile(method, url, body, mimeType)
-  .then((result: Blob) => downloadBLOB(result, { fileName, contentType: mimeType }))
-  .catch(errorHandler);
+export const fetchBinaryFile = async <Body>(
+  method: string,
+  url: string,
+  body: Body | undefined,
+  mimeType: string,
+  fileName: string,
+) =>
+  fetchBlobFile(method, url, body, mimeType)
+    .then((result: Blob) => downloadBLOB(result, { fileName, contentType: mimeType }))
+    .catch(errorHandler);

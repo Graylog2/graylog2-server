@@ -26,11 +26,8 @@ describe('MessageConfigGenerator', () => {
 
   it('generates basic search type from message widget with a default sort', () => {
     const widget: MessagesWidget = MessagesWidget.builder()
-      .config(
-        MessagesWidgetConfig.builder()
-          .decorators([])
-          .build(),
-      ).build();
+      .config(MessagesWidgetConfig.builder().decorators([]).build())
+      .build();
 
     const result = MessageConfigGenerator(widget);
 
@@ -43,21 +40,20 @@ describe('MessageConfigGenerator', () => {
       { id: 'decorator2', type: 'something else', config: {}, stream: null, order: 1 },
     ];
     const widget: MessagesWidget = MessagesWidget.builder()
-      .config(
-        MessagesWidgetConfig.builder()
-          .decorators(decorators)
-          .build(),
-      ).build();
+      .config(MessagesWidgetConfig.builder().decorators(decorators).build())
+      .build();
 
     const result = MessageConfigGenerator(widget);
 
-    expect(result).toEqual([{
-      decorators: [
-        { id: 'decorator1', type: 'something', config: {}, stream: null, order: 0 },
-        { id: 'decorator2', type: 'something else', config: {}, stream: null, order: 1 },
-      ],
-      sort: defaultSort,
-      type: 'messages',
-    }]);
+    expect(result).toEqual([
+      {
+        decorators: [
+          { id: 'decorator1', type: 'something', config: {}, stream: null, order: 0 },
+          { id: 'decorator2', type: 'something else', config: {}, stream: null, order: 1 },
+        ],
+        sort: defaultSort,
+        type: 'messages',
+      },
+    ]);
   });
 });

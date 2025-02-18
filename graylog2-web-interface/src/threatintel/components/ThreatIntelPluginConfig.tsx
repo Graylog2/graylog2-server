@@ -25,8 +25,8 @@ import type { SystemConfigurationComponentProps } from 'views/types';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 type Config = {
-  tor_enabled: boolean,
-  spamhaus_enabled: boolean,
+  tor_enabled: boolean;
+  spamhaus_enabled: boolean;
 };
 type Props = SystemConfigurationComponentProps<Config>;
 
@@ -80,9 +80,7 @@ const ThreatIntelPluginConfig = ({ config: initialConfig = defaultConfig, update
     <div>
       <h3>Threat Intelligence Lookup Configuration</h3>
 
-      <p>
-        Configuration for threat intelligence lookup plugin.
-      </p>
+      <p>Configuration for threat intelligence lookup plugin.</p>
 
       <dl className="deflist">
         <dt>Tor exit nodes:</dt>
@@ -93,30 +91,37 @@ const ThreatIntelPluginConfig = ({ config: initialConfig = defaultConfig, update
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
-        <Button bsStyle="info" bsSize="xs" onClick={_openModal}>Edit configuration</Button>
+        <Button bsStyle="info" bsSize="xs" onClick={_openModal}>
+          Edit configuration
+        </Button>
       </IfPermitted>
 
-      <BootstrapModalForm show={showModal}
-                          title="Update Threat Intelligence plugin Configuration"
-                          onSubmitForm={_saveConfig}
-                          onCancel={_resetConfig}
-                          submitButtonText="Update configuration">
+      <BootstrapModalForm
+        show={showModal}
+        title="Update Threat Intelligence plugin Configuration"
+        onSubmitForm={_saveConfig}
+        onCancel={_resetConfig}
+        submitButtonText="Update configuration">
         <fieldset>
-          <Input type="checkbox"
-                 id="tor-checkbox"
-                 label="Allow Tor exit node lookups?"
-                 help="Enable to include Tor exit node lookup in global pipeline function, disabling also stops refreshing the data."
-                 name="tor_enabled"
-                 checked={config.tor_enabled}
-                 onChange={_onCheckboxClick} />
+          <Input
+            type="checkbox"
+            id="tor-checkbox"
+            label="Allow Tor exit node lookups?"
+            help="Enable to include Tor exit node lookup in global pipeline function, disabling also stops refreshing the data."
+            name="tor_enabled"
+            checked={config.tor_enabled}
+            onChange={_onCheckboxClick}
+          />
 
-          <Input type="checkbox"
-                 id="spamhaus-checkbox"
-                 label="Allow Spamhaus DROP/EDROP lookups?"
-                 help="Enable to include Spamhaus lookup in global pipeline function, disabling also stops refreshing the data."
-                 name="spamhaus_enabled"
-                 checked={config.spamhaus_enabled}
-                 onChange={_onCheckboxClick} />
+          <Input
+            type="checkbox"
+            id="spamhaus-checkbox"
+            label="Allow Spamhaus DROP/EDROP lookups?"
+            help="Enable to include Spamhaus lookup in global pipeline function, disabling also stops refreshing the data."
+            name="spamhaus_enabled"
+            checked={config.spamhaus_enabled}
+            onChange={_onCheckboxClick}
+          />
         </fieldset>
       </BootstrapModalForm>
     </div>

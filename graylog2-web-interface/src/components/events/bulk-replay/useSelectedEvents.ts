@@ -18,21 +18,21 @@ import { useCallback, useReducer } from 'react';
 
 import assertUnreachable from 'logic/assertUnreachable';
 
-type ResolutionState = { id: string, status: 'OPEN' | 'DONE' };
+type ResolutionState = { id: string; status: 'OPEN' | 'DONE' };
 
 type Action = {
-  type: 'remove' | 'done' | 'select',
-  id: string,
-}
+  type: 'remove' | 'done' | 'select';
+  id: string;
+};
 type State = {
-  selectedId: string,
-  eventIds: Array<ResolutionState>,
-}
+  selectedId: string;
+  eventIds: Array<ResolutionState>;
+};
 
 const pickNextId = (eventIds: Array<ResolutionState>) => eventIds.find((event) => event.status === 'OPEN')?.id;
 
 const createInitialState = (_eventIds: Array<string>) => {
-  const eventIds = _eventIds.map((id) => ({ id, status: 'OPEN' } as const));
+  const eventIds = _eventIds.map((id) => ({ id, status: 'OPEN' }) as const);
   const selectedId = pickNextId(eventIds);
 
   return {
@@ -44,9 +44,7 @@ const createInitialState = (_eventIds: Array<string>) => {
 const reducer = (state: State, action: Action) => {
   if (action.type === 'remove') {
     const eventIds = state.eventIds.filter((event) => event.id !== action.id);
-    const selectedId = state.selectedId === action.id
-      ? pickNextId(eventIds)
-      : state.selectedId;
+    const selectedId = state.selectedId === action.id ? pickNextId(eventIds) : state.selectedId;
 
     return {
       selectedId,
@@ -55,12 +53,10 @@ const reducer = (state: State, action: Action) => {
   }
 
   if (action.type === 'done') {
-    const eventIds = state.eventIds.map((event) => (event.id === action.id
-      ? { id: action.id, status: 'DONE' } as const
-      : event));
-    const selectedId = state.selectedId === action.id
-      ? pickNextId(eventIds)
-      : state.selectedId;
+    const eventIds = state.eventIds.map((event) =>
+      event.id === action.id ? ({ id: action.id, status: 'DONE' } as const) : event,
+    );
+    const selectedId = state.selectedId === action.id ? pickNextId(eventIds) : state.selectedId;
 
     return {
       selectedId,

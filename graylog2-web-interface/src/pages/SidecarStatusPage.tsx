@@ -31,9 +31,12 @@ type SidecarStatusPageProps = {
   history: any;
 };
 
-class SidecarStatusPage extends React.Component<SidecarStatusPageProps, {
-  [key: string]: any;
-}> {
+class SidecarStatusPage extends React.Component<
+  SidecarStatusPageProps,
+  {
+    [key: string]: any;
+  }
+> {
   constructor(props) {
     super(props);
 
@@ -78,20 +81,27 @@ class SidecarStatusPage extends React.Component<SidecarStatusPageProps, {
     const isLoading = !sidecar || !collectors;
 
     if (isLoading) {
-      return <DocumentTitle title="Sidecar status"><Spinner /></DocumentTitle>;
+      return (
+        <DocumentTitle title="Sidecar status">
+          <Spinner />
+        </DocumentTitle>
+      );
     }
 
     return (
       <DocumentTitle title={`Sidecar ${sidecar.node_name} status`}>
         <SidecarsPageNavigation />
-        <PageHeader title={<span>Sidecar <em>{sidecar.node_name} status</em></span>}
-                    documentationLink={{
-                      title: 'Sidecars documentation',
-                      path: DocsHelper.PAGES.COLLECTOR_STATUS,
-                    }}>
-          <span>
-            A status overview of the Graylog Sidecar.
-          </span>
+        <PageHeader
+          title={
+            <span>
+              Sidecar <em>{sidecar.node_name} status</em>
+            </span>
+          }
+          documentationLink={{
+            title: 'Sidecars documentation',
+            path: DocsHelper.PAGES.COLLECTOR_STATUS,
+          }}>
+          <span>A status overview of the Graylog Sidecar.</span>
         </PageHeader>
 
         <SidecarStatus sidecar={sidecar} collectors={collectors} />

@@ -19,14 +19,21 @@ import omit from 'lodash/omit';
 import type { Attribute, Attributes } from 'stores/PaginationTypes';
 
 export const profile1JSON = {
-  custom_field_mappings: [{ field: 'http_method', type: 'string' }, { field: 'user_ip', type: 'ip' }],
+  custom_field_mappings: [
+    { field: 'http_method', type: 'string' },
+    { field: 'user_ip', type: 'ip' },
+  ],
   name: 'Profile 1',
   index_set_ids: [],
   description: 'Description 1',
   id: '111',
 };
 export const profile2JSON = {
-  custom_field_mappings: [{ field: 'user_name', type: 'string' }, { field: 'logged_in', type: 'bool' }, { field: 'sum', type: 'int' }],
+  custom_field_mappings: [
+    { field: 'user_name', type: 'string' },
+    { field: 'logged_in', type: 'bool' },
+    { field: 'sum', type: 'int' },
+  ],
   name: 'Profile 2',
   description: 'Description 2',
   index_set_ids: [],
@@ -34,7 +41,10 @@ export const profile2JSON = {
 };
 
 export const profile1 = {
-  customFieldMappings: [{ field: 'http_method', type: 'string' }, { field: 'user_ip', type: 'ip' }],
+  customFieldMappings: [
+    { field: 'http_method', type: 'string' },
+    { field: 'user_ip', type: 'ip' },
+  ],
   name: 'Profile 1',
   description: 'Description 1',
   indexSetIds: [],

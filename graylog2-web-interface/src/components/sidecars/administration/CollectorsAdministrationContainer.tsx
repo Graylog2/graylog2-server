@@ -23,10 +23,16 @@ import isEmpty from 'lodash/isEmpty';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Spinner } from 'components/common';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import { CollectorConfigurationsActions, CollectorConfigurationsStore } from 'stores/sidecars/CollectorConfigurationsStore';
+import {
+  CollectorConfigurationsActions,
+  CollectorConfigurationsStore,
+} from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
-import { SidecarsAdministrationActions, SidecarsAdministrationStore } from 'stores/sidecars/SidecarsAdministrationStore';
+import {
+  SidecarsAdministrationActions,
+  SidecarsAdministrationStore,
+} from 'stores/sidecars/SidecarsAdministrationStore';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import { useStore } from 'stores/connect';
 import type { SidecarCollectorPairType, Configuration } from 'components/sidecars/types';
@@ -34,9 +40,9 @@ import type { SidecarCollectorPairType, Configuration } from 'components/sidecar
 import CollectorsAdministration, { PAGE_SIZES } from './CollectorsAdministration';
 
 type Props = {
-  nodeId?: string,
-  paginationQueryParameter: PaginationQueryParameterResult,
-}
+  nodeId?: string;
+  paginationQueryParameter: PaginationQueryParameterResult;
+};
 
 const CollectorsAdministrationContainer = (props: Props) => {
   const collectors = useStore(CollectorsStore);
@@ -100,7 +106,11 @@ const CollectorsAdministrationContainer = (props: Props) => {
     SidecarsAdministrationActions.list({ query, filters, pageSize, page: 1 }).finally(callback);
   };
 
-  const handleConfigurationChange = (selectedSidecars: SidecarCollectorPairType[], selectedConfigurations: Configuration[], doneCallback: () => void) => {
+  const handleConfigurationChange = (
+    selectedSidecars: SidecarCollectorPairType[],
+    selectedConfigurations: Configuration[],
+    doneCallback: () => void,
+  ) => {
     SidecarsActions.assignConfigurations(selectedSidecars, selectedConfigurations).then((response) => {
       doneCallback();
       const { query, filters } = sidecars;
@@ -112,7 +122,11 @@ const CollectorsAdministrationContainer = (props: Props) => {
     });
   };
 
-  const handleProcessAction = (action: string, selectedCollectors: { [sidecarId: string]: string[] }, doneCallback: () => void) => {
+  const handleProcessAction = (
+    action: string,
+    selectedCollectors: { [sidecarId: string]: string[] },
+    doneCallback: () => void,
+  ) => {
     SidecarsAdministrationActions.setAction(action, selectedCollectors).then((response) => {
       doneCallback();
 
@@ -145,17 +159,19 @@ const CollectorsAdministrationContainer = (props: Props) => {
     });
 
   return (
-    <CollectorsAdministration sidecarCollectorPairs={sidecarCollectors}
-                              collectors={collectors.collectors}
-                              configurations={configurations.configurations}
-                              pagination={sidecars.pagination}
-                              query={sidecars.query}
-                              filters={sidecars.filters}
-                              onPageChange={handlePageChange}
-                              onFilter={handleFilter}
-                              onQueryChange={handleQueryChange}
-                              onConfigurationChange={handleConfigurationChange}
-                              onProcessAction={handleProcessAction} />
+    <CollectorsAdministration
+      sidecarCollectorPairs={sidecarCollectors}
+      collectors={collectors.collectors}
+      configurations={configurations.configurations}
+      pagination={sidecars.pagination}
+      query={sidecars.query}
+      filters={sidecars.filters}
+      onPageChange={handlePageChange}
+      onFilter={handleFilter}
+      onQueryChange={handleQueryChange}
+      onConfigurationChange={handleConfigurationChange}
+      onProcessAction={handleProcessAction}
+    />
   );
 };
 

@@ -25,15 +25,15 @@ import type { QueryJson } from '../queries/Query';
 
 type SearchId = string;
 type InternalState = {
-  id: SearchId,
-  queries: Immutable.Set<Query>,
-  parameters: Immutable.Set<Parameter>,
+  id: SearchId;
+  queries: Immutable.Set<Query>;
+  parameters: Immutable.Set<Parameter>;
 };
 
 export type SearchJson = {
-  id: SearchId,
-  queries: Array<QueryJson>,
-  parameters: Array<ParameterJson>,
+  id: SearchId;
+  queries: Array<QueryJson>;
+  parameters: Array<ParameterJson>;
 };
 
 export type QuerySet = Immutable.Set<Query>;
@@ -41,17 +41,13 @@ export type QuerySet = Immutable.Set<Query>;
 export default class Search {
   _value: InternalState;
 
-  constructor(id: SearchId, queries: (Array<Query> | QuerySet), parameters: Array<Parameter>) {
+  constructor(id: SearchId, queries: Array<Query> | QuerySet, parameters: Array<Parameter>) {
     this._value = { id, queries: Immutable.OrderedSet(queries), parameters: Immutable.Set(parameters) };
   }
 
   static create(): Search {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .newId()
-      .queries([])
-      .parameters([])
-      .build();
+    return new Builder().newId().queries([]).parameters([]).build();
   }
 
   get id(): SearchId {
@@ -67,8 +63,7 @@ export default class Search {
   }
 
   get requiredParameters(): Immutable.Set<Parameter> {
-    return this.parameters
-      .filter((p) => (!p.defaultValue && (!p.optional && p.needsBinding))).toSet();
+    return this.parameters.filter((p) => !p.defaultValue && !p.optional && p.needsBinding).toSet();
   }
 
   toBuilder(): Builder {
@@ -93,7 +88,11 @@ export default class Search {
 
     const queries = value.queries.map((q) => Query.fromJSON(q));
 
-    return new Search(id, queries, parameters.map((p) => Parameter.fromJSON(p)));
+    return new Search(
+      id,
+      queries,
+      parameters.map((p) => Parameter.fromJSON(p)),
+    );
   }
 
   static builder(): Builder {
@@ -117,7 +116,7 @@ class Builder {
     return this.id(new ObjectID().toString());
   }
 
-  queries(value: (Array<Query> | QuerySet)): Builder {
+  queries(value: Array<Query> | QuerySet): Builder {
     return new Builder(this.value.set('queries', value));
   }
 

@@ -14,15 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Well as BootstrapWell } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+package org.graylog.plugins.pipelineprocessor.db;
 
-const Well = styled(BootstrapWell)(({ theme }) => css`
-  background-color: ${theme.colors.variant.lightest.default};
-  border-color: ${theme.colors.variant.light.default};
-  color: ${theme.colors.variant.darker.default};
-`);
+import org.graylog2.database.entities.EntityScope;
 
-/** @component */
-export default Well;
+public class SystemPipelineScope extends EntityScope {
+    public static final String NAME = "GRAYLOG_SYSTEM_PIPELINE_SCOPE";
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public boolean isMutable() {
+        return false;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return false;
+    }
+}

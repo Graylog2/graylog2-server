@@ -29,29 +29,31 @@ jest.mock('hooks/useScopePermissions');
 const renderedCTE = (scope: string) => {
   const cache = createLookupTableCache(1, { _scope: scope });
 
-  return render(<table><CacheTableEntry cache={cache} /></table>);
+  return render(
+    <table>
+      <CacheTableEntry cache={cache} />
+    </table>,
+  );
 };
 
 describe('CacheTableEntry', () => {
   beforeAll(() => {
-    asMock(useScopePermissions).mockImplementation(
-      (entity: GenericEntityType) => {
-        const scopes = {
-          ILLUMINATE: { is_mutable: false },
-          DEFAULT: { is_mutable: true },
-        };
+    asMock(useScopePermissions).mockImplementation((entity: GenericEntityType) => {
+      const scopes = {
+        ILLUMINATE: { is_mutable: false },
+        DEFAULT: { is_mutable: true },
+      };
 
-        return {
-          loadingScopePermissions: !entity._scope,
-          scopePermissions: scopes[entity?._scope || 'DEFAULT'],
-          checkPermissions: (inEntity: Partial<GenericEntityType>) => {
-            const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
+      return {
+        loadingScopePermissions: !entity._scope,
+        scopePermissions: scopes[entity?._scope || 'DEFAULT'],
+        checkPermissions: (inEntity: Partial<GenericEntityType>) => {
+          const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
 
-            return scopes[entityScope].is_mutable;
-          },
-        };
-      },
-    );
+          return scopes[entityScope].is_mutable;
+        },
+      };
+    });
   });
 
   it('should show Loading spinner while loading scope permissions', () => {

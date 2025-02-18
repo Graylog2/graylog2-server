@@ -30,7 +30,11 @@ const ShowViewPage = ({ children }: React.PropsWithChildren<{}>) => {
 
   const view = useFetchView(viewId);
 
-  return <SearchPage view={view} isNew={false}>{children}</SearchPage>;
+  return (
+    <SearchPage view={view} isNew={false}>
+      {children}
+    </SearchPage>
+  );
 };
 
 export default ShowViewPage;

@@ -25,11 +25,19 @@ const StyledCountBadge = styled(CountBadge)`
   cursor: pointer;
 `;
 
-const CustomFieldMappingsCell = ({ customFieldTypes, profile }: { customFieldTypes : Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile }) => {
+const CustomFieldMappingsCell = ({
+  customFieldTypes,
+  profile,
+}: {
+  customFieldTypes: Array<CustomFieldMapping>;
+  profile: IndexSetFieldTypeProfile;
+}) => {
   const { toggleSection } = useExpandedSections();
 
   return (
-    <StyledCountBadge onClick={() => toggleSection(profile.id, 'customFieldMapping')}>{customFieldTypes.length}</StyledCountBadge>
+    <StyledCountBadge onClick={() => toggleSection(profile.id, 'customFieldMapping')}>
+      {customFieldTypes.length}
+    </StyledCountBadge>
   );
 };
 

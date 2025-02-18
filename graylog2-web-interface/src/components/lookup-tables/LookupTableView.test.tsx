@@ -18,11 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import {
-  createLookupTable,
-  createLookupTableCache,
-  createLookupTableAdapter,
-} from 'fixtures/lookupTables';
+import { createLookupTable, createLookupTableCache, createLookupTableAdapter } from 'fixtures/lookupTables';
 import { asMock } from 'helpers/mocking';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
@@ -41,24 +37,22 @@ const renderedLUT = (scope: string) => {
 
 describe('LookupTableView', () => {
   beforeAll(() => {
-    asMock(useScopePermissions).mockImplementation(
-      (entity: GenericEntityType) => {
-        const scopes = {
-          ILLUMINATE: { is_mutable: false },
-          DEFAULT: { is_mutable: true },
-        };
+    asMock(useScopePermissions).mockImplementation((entity: GenericEntityType) => {
+      const scopes = {
+        ILLUMINATE: { is_mutable: false },
+        DEFAULT: { is_mutable: true },
+      };
 
-        return {
-          loadingScopePermissions: false,
-          scopePermissions: scopes[entity?._scope || 'DEFAULT'],
-          checkPermissions: (inEntity: Partial<GenericEntityType>) => {
-            const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
+      return {
+        loadingScopePermissions: false,
+        scopePermissions: scopes[entity?._scope || 'DEFAULT'],
+        checkPermissions: (inEntity: Partial<GenericEntityType>) => {
+          const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
 
-            return scopes[entityScope].is_mutable;
-          },
-        };
-      },
-    );
+          return scopes[entityScope].is_mutable;
+        },
+      };
+    });
   });
 
   it('should show "edit" button', () => {
@@ -82,7 +76,10 @@ describe('LookupTableView', () => {
 
     render(<LookupTableView table={table} cache={cache} dataAdapter={dataAdapter} />);
 
-    await userEvent.type(await screen.findByPlaceholderText('Insert key that should be looked up'), nonWordCharactersKey);
+    await userEvent.type(
+      await screen.findByPlaceholderText('Insert key that should be looked up'),
+      nonWordCharactersKey,
+    );
 
     expect(await screen.findByRole('button', { name: /look up/i })).toBeEnabled();
   });
