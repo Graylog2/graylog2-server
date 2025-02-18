@@ -596,12 +596,13 @@
                         </goals>
                         <configuration>
                             <url>
-                                https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.version}/repository-s3-${opensearch.version}.zip
+                                https://graylog2public.s3.us-east-1.amazonaws.com/data-node/repository-s3-${opensearch.version}.zip
+                                <!-- https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.version}/repository-s3-${opensearch.version}.zip -->
                             </url>
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                0da51e6d9eb170ffb21fd643dd50b6534d88c3c79cb20f5f4133c6edee3c5f5ad609aa20d5a771e4a67f8c76db771e5116aa3d18477274a2f2902dbfe5b8fe3e
+                                2a03e035be127ce7e8255729d6c9f79668329decf3ea0f83c44130834bd489595432da83bac2245c6a17da6ee529fb5efba2b1ccbaee1dbaa4f93def4bd860fe
                             </sha512>
                         </configuration>
                     </execution>
