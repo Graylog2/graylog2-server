@@ -19,6 +19,7 @@ package org.graylog2.plugin;
 import com.codahale.metrics.Meter;
 import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -519,6 +520,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         }
     }
 
+    @VisibleForTesting
     public void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
         addTimestampField(FIELD_TIMESTAMP, newTimeStamp);
         addTimestampField(FIELD_GL2_ORIGINAL_TIMESTAMP, oldTimeStamp);
@@ -600,7 +602,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         addField(key, value, false);
     }
 
-    public void addTimestampField(final String key, final DateTime value) {
+    private void addTimestampField(final String key, final DateTime value) {
         addField(key, buildElasticSearchTimeFormat(value.withZone(UTC)), false);
     }
 
