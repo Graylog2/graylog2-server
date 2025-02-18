@@ -18,6 +18,8 @@ package org.graylog2.rest.resources.system.inputs;
 
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.BadRequestException;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
@@ -121,7 +123,7 @@ class InputsResourceTest {
                                   MessageInputFactory messageInputFactory,
                                   Configuration config) {
             super(inputService, mock(InputDiagnosticService.class), mock(StreamService.class), mock(StreamRuleService.class),
-                    messageInputFactory, config, mock(ClusterEventBus.class));
+                    mock(PipelineService.class), mock(PipelineStreamConnectionsService.class), messageInputFactory, config, mock(ClusterEventBus.class));
             configuration = mock(HttpConfiguration.class);
             this.user = mock(User.class);
             lenient().when(user.getName()).thenReturn("foo");

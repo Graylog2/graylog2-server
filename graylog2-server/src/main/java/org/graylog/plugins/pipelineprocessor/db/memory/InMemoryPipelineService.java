@@ -92,6 +92,11 @@ public class InMemoryPipelineService implements PipelineService {
     }
 
     @Override
+    public Collection<PipelineDao> loadByInputId(String inputId) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
     public Collection<PipelineDao> loadAll() {
         return ImmutableSet.copyOf(store.values());
     }

@@ -41,6 +41,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.regex;
+import static org.graylog.plugins.pipelineprocessor.db.PipelineDao.FIELD_SOURCE;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
@@ -104,6 +106,16 @@ public class MongoDbPipelineService implements PipelineService {
             throw new NotFoundException("No pipeline with name " + name);
         }
         return pipeline;
+    }
+
+    @Override
+    public Collection<PipelineDao> loadByInputId(String inputId) {
+        try {
+            return collection.find(regex(FIELD_SOURCE, inputId)).into(new LinkedHashSet<>());
+        } catch (MongoException e) {
+            log.error("Unable to load pipelines", e);
+            return Collections.emptySet();
+        }
     }
 
     @Override

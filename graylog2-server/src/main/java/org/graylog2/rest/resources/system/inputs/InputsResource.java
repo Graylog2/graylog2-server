@@ -42,6 +42,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.Configuration;
@@ -95,6 +96,7 @@ public class InputsResource extends AbstractInputsResource {
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final PipelineService pipelineService;
+    private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final MessageInputFactory messageInputFactory;
     private final Configuration config;
     private final ClusterEventBus clusterEventBus;
@@ -105,6 +107,7 @@ public class InputsResource extends AbstractInputsResource {
                           StreamService streamService,
                           StreamRuleService streamRuleService,
                           PipelineService pipelineService,
+                          PipelineStreamConnectionsService pipelineStreamConnectionsService,
                           MessageInputFactory messageInputFactory,
                           Configuration config,
                           ClusterEventBus clusterEventBus) {
@@ -114,6 +117,7 @@ public class InputsResource extends AbstractInputsResource {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.pipelineService = pipelineService;
+        this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
         this.messageInputFactory = messageInputFactory;
         this.config = config;
         this.clusterEventBus = clusterEventBus;
@@ -173,14 +177,16 @@ public class InputsResource extends AbstractInputsResource {
         checkPermission(RestPermissions.STREAMS_READ);
         checkPermission(PipelineRestPermissions.PIPELINE_READ);
 
-
         return new InputReferences(inputId,
                 streamRuleService.loadForInput(inputId).stream()
                         .map(StreamRule::getStreamId)
                         .distinct()
                         .map(streamId -> new InputReference(streamId, streamService.streamTitleFromCache(streamId)))
-                        .collect(Collectors.toList()),
-                null);
+                        .toList(),
+                pipelineService.loadByInputId(inputId).stream()
+                        .filter(pipelineDao -> !pipelineStreamConnectionsService.loadByPipelineId(pipelineDao.id()).isEmpty())
+                        .map(pipelineDao -> new InputReference(pipelineDao.id(), pipelineDao.title()))
+                        .toList());
     }
 
     @GET

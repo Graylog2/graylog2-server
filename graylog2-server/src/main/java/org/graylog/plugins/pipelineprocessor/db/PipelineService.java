@@ -34,6 +34,8 @@ public interface PipelineService {
 
     PipelineDao loadByName(String name) throws NotFoundException;
 
+    Collection<PipelineDao> loadByInputId(String inputId);
+
     Collection<PipelineDao> loadAll();
 
     void delete(String id);
