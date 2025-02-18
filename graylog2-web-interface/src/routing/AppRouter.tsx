@@ -44,6 +44,7 @@ import {
   EditContentPackPage,
   EditExtractorsPage,
   EnterprisePage,
+  EntityGroupsPage,
   EventDefinitionsPage,
   EventNotificationsPage,
   EventsPage,
@@ -366,6 +367,7 @@ const AppRouter = () => {
             },
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId'), element: <SidecarEditCollectorPage /> },
+            { path: RoutePaths.SYSTEM.ENTITYGROUPS.OVERVIEW, element: <EntityGroupsPage /> },
             { path: RoutePaths.KEYBOARD_SHORTCUTS, element: <KeyboardShortcutsPage /> },
             {
               path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
