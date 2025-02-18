@@ -201,7 +201,7 @@ public class MongoIndexSetService implements IndexSetService {
         }
         int removedEntries;
         try {
-            removedEntries = scopedEntityMongoUtils.deleteById(id) ? 1 : 0;
+            removedEntries = scopedEntityMongoUtils.deleteById(id, true) ? 1 : 0;
         } catch (IllegalArgumentException e) {
             return 0;
         }
