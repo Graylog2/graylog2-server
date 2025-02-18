@@ -48,6 +48,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -99,19 +100,22 @@ public class PipelineResource extends RestResource implements PluginRestResource
     private final PipelineRuleParser pipelineRuleParser;
     private final PipelineStreamConnectionsService connectionsService;
     private final InputRoutingService inputRoutingService;
+    private final RuleService ruleService;
 
     @Inject
     public PipelineResource(PipelineService pipelineService,
                             PaginatedPipelineService paginatedPipelineService,
                             PipelineRuleParser pipelineRuleParser,
                             PipelineStreamConnectionsService connectionsService,
-                            InputRoutingService inputRoutingService) {
+                            InputRoutingService inputRoutingService,
+                            RuleService ruleService) {
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.paginatedPipelineService = paginatedPipelineService;
         this.searchQueryParser = new SearchQueryParser(PipelineDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.connectionsService = connectionsService;
         this.inputRoutingService = inputRoutingService;
+        this.ruleService = ruleService;
     }
 
     @ApiOperation(value = "Create a processing pipeline from source")
@@ -245,7 +249,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                                  @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
         checkReservedName(update);
-        return PipelineUtils.update(pipelineService, pipelineRuleParser, id, update);
+        return PipelineUtils.update(pipelineService, pipelineRuleParser, ruleService, id, update, true);
     }
 
     public record RoutingRequest(
@@ -284,7 +288,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
             pipelineSource = pipelineSource.toBuilder()
                     .source(PipelineUtils.createPipelineString(pipelineSource))
                     .build();
-            update(pipelineDao.id(), pipelineSource);
+            PipelineUtils.update(pipelineService, pipelineRuleParser, ruleService, pipelineDao.id(), pipelineSource, false);
         } else {
             log.info(f("Routing for input <%s> already exists - skipping", request.inputId()));
         }
