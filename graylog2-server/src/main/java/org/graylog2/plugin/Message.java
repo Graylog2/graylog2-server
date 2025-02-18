@@ -520,8 +520,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     private void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
-        addField(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(newTimeStamp.withZone(UTC)));
-        addField(FIELD_GL2_ORIGINAL_TIMESTAMP, buildElasticSearchTimeFormat(oldTimeStamp.withZone(UTC)));
+        addTimestampField(FIELD_TIMESTAMP, newTimeStamp);
+        addTimestampField(FIELD_GL2_ORIGINAL_TIMESTAMP, newTimeStamp);
     }
 
     private DateTime convertToDateTime(@Nonnull Object value) {
@@ -598,6 +598,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     public void addField(final String key, final Object value) {
         addField(key, value, false);
+    }
+
+    public void addTimestampField(final String key, final DateTime value) {
+        addField(key, buildElasticSearchTimeFormat(value.withZone(UTC)), false);
     }
 
     private void addRequiredField(final String key, final Object value) {
@@ -909,7 +913,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public void setReceiveTime(DateTime receiveTime) {
         if (receiveTime != null) {
             this.receiveTime = receiveTime;
-            addField(FIELD_GL2_RECEIVE_TIMESTAMP, buildElasticSearchTimeFormat(receiveTime.withZone(UTC)));
+            addTimestampField(FIELD_GL2_RECEIVE_TIMESTAMP, receiveTime);
         }
     }
 
@@ -928,7 +932,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public void setProcessingTime(DateTime processingTime) {
         if (processingTime != null) {
             this.processingTime = processingTime;
-            addField(FIELD_GL2_PROCESSING_TIMESTAMP, buildElasticSearchTimeFormat(processingTime.withZone(UTC)));
+            addTimestampField(FIELD_GL2_PROCESSING_TIMESTAMP, processingTime);
             if (getReceiveTime() != null) {
                 final long duration = processingTime.getMillis() - getReceiveTime().getMillis();
                 addField(FIELD_GL2_PROCESSING_DURATION_MS, Ints.saturatedCast(duration));
