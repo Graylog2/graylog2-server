@@ -14,11 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.plugins.pipelineprocessor.db;
 
-export { default as InputSetupWizard } from './InputSetupWizard';
-export * from './steps/components/StepWrapper';
-export * from './types';
-export { INPUT_SETUP_MODE_FEATURE_FLAG, DEFAULT_ORDERED_STEPS } from './constants';
-export * from './helpers/stepHelper';
-export { default as useInputSetupWizard } from './hooks/useInputSetupWizard';
-export { default as useInputSetupWizardSteps } from './hooks/useInputSetupWizardSteps';
+import org.graylog2.database.entities.EntityScope;
+
+public class SystemPipelineRuleScope extends EntityScope {
+    public static final String NAME = "GRAYLOG_SYSTEM_PIPELINE_RULE_SCOPE";
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public boolean isMutable() {
+        return false;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
+    }
+}
