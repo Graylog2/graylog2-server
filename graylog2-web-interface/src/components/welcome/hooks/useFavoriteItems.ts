@@ -32,15 +32,22 @@ const fetchFavoriteItems = async ({ page }: RequestQuery): Promise<PaginatedFavo
   return fetch('GET', qualifyUrl(url));
 };
 
-const useFavoriteItems = (pagination: RequestQuery): { data: PaginatedFavoriteItems, isFetching: boolean } => useQuery(
-  [FAVORITE_ITEMS_QUERY_KEY, pagination],
-  () => defaultOnError(fetchFavoriteItems(pagination), 'Loading favorite items failed with status', 'Could not load favorite items'),
-  {
-    retry: 0,
-    initialData: {
-      favorites: [],
-      ...DEFAULT_PAGINATION,
+const useFavoriteItems = (pagination: RequestQuery): { data: PaginatedFavoriteItems; isFetching: boolean } =>
+  useQuery(
+    [FAVORITE_ITEMS_QUERY_KEY, pagination],
+    () =>
+      defaultOnError(
+        fetchFavoriteItems(pagination),
+        'Loading favorite items failed with status',
+        'Could not load favorite items',
+      ),
+    {
+      retry: 0,
+      initialData: {
+        favorites: [],
+        ...DEFAULT_PAGINATION,
+      },
     },
-  });
+  );
 
 export default useFavoriteItems;

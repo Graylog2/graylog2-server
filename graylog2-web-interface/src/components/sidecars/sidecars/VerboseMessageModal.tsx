@@ -34,27 +34,24 @@ type VerboseMessageModalProps = {
   collectorVerbose: string;
 };
 
-const VerboseMessageModal = ({
-  showModal,
-  onHide,
-  collectorName,
-  collectorVerbose,
-}: VerboseMessageModalProps) => (
-  <BootstrapModalWrapper showModal={showModal}
-                         onHide={onHide}
-                         bsSize="large">
+const VerboseMessageModal = ({ showModal, onHide, collectorName, collectorVerbose }: VerboseMessageModalProps) => (
+  <BootstrapModalWrapper showModal={showModal} onHide={onHide} bsSize="large">
     <Modal.Header closeButton>
-      <Modal.Title><span>Error Details for <em>{collectorName}</em></span></Modal.Title>
+      <Modal.Title>
+        <span>
+          Error Details for <em>{collectorName}</em>
+        </span>
+      </Modal.Title>
     </Modal.Header>
     <Modal.Body>
       <pre>
-        <VerboseMessage>
-          {collectorVerbose || '<no messages>'}
-        </VerboseMessage>
+        <VerboseMessage>{collectorVerbose || '<no messages>'}</VerboseMessage>
       </pre>
     </Modal.Body>
     <Modal.Footer>
-      <Button type="button" onClick={onHide}>Close</Button>
+      <Button type="button" onClick={onHide}>
+        Close
+      </Button>
     </Modal.Footer>
   </BootstrapModalWrapper>
 );

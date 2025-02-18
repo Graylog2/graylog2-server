@@ -28,16 +28,20 @@ const useSendEventActionTelemetry = () => {
   const { pathname } = useLocation();
   const { activePerspective } = useActivePerspective();
 
-  return useCallback((actionName: string, fromBulk: boolean, eventDetails: {[key: string]: unknown } = {}) => sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_AND_EVENTS.ACTION_RAN, {
-    app_pathname: getPathnameWithoutId(pathname),
-    app_section: 'alerts-and-events',
-    event_details: {
-      actionName,
-      fromBulk: !!fromBulk,
-      perspectiveId: activePerspective.id,
-      ...eventDetails,
-    },
-  }), [activePerspective.id, pathname, sendTelemetry]);
+  return useCallback(
+    (actionName: string, fromBulk: boolean, eventDetails: { [key: string]: unknown } = {}) =>
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_AND_EVENTS.ACTION_RAN, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'alerts-and-events',
+        event_details: {
+          actionName,
+          fromBulk: !!fromBulk,
+          perspectiveId: activePerspective.id,
+          ...eventDetails,
+        },
+      }),
+    [activePerspective.id, pathname, sendTelemetry],
+  );
 };
 
 export default useSendEventActionTelemetry;

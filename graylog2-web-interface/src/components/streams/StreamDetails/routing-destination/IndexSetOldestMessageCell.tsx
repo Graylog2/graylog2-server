@@ -23,8 +23,6 @@ type Props = {
   index?: IndexSummary;
 };
 
-const IndexSetOldestMessageCell = ({ index = null }: Props) => (
-  <Timestamp dateTime={index?.range?.begin} />
-);
+const IndexSetOldestMessageCell = ({ index = null }: Props) => <Timestamp dateTime={index?.range?.begin} />;
 
 export default IndexSetOldestMessageCell;

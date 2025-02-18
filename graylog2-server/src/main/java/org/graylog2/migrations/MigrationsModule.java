@@ -72,5 +72,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V202404170856_UpdateIndexSetTemplates.class);
         addMigration(V20240927120300_DataNodeMigrationIndexSet.class);
         addMigration(V20241212102900_IndexSetScopeMigration.class);
+        addMigration(V20250206105400_TokenManagementConfiguration.class);
     }
 }

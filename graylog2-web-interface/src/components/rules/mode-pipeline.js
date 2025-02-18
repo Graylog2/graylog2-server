@@ -25,13 +25,16 @@ export class PipelineHighlightRules extends ace.require('ace/mode/text_highlight
 
     const builtinConstants = 'and|or|not|during';
 
-    const keywordMapper = this.createKeywordMapper({
-      'variable.language': 'stage',
-      'support.type': '$message',
-      'support.function': builtinFunctions,
-      keyword: keywords,
-      'constant.language': builtinConstants,
-    }, 'identifier');
+    const keywordMapper = this.createKeywordMapper(
+      {
+        'variable.language': 'stage',
+        'support.type': '$message',
+        'support.function': builtinFunctions,
+        keyword: keywords,
+        'constant.language': builtinConstants,
+      },
+      'identifier',
+    );
 
     this.$rules = {
       start: [
@@ -82,7 +85,8 @@ export class PipelineHighlightRules extends ace.require('ace/mode/text_highlight
           token: 'comment', // closing comment
           regex: '\\*\\/',
           next: 'start',
-        }, {
+        },
+        {
           defaultToken: 'comment',
         },
       ],

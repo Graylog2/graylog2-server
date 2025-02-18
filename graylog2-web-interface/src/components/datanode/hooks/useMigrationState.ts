@@ -25,9 +25,11 @@ import { onError } from 'util/conditional/onError';
 
 export const MIGRATION_STATE_QUERY_KEY = ['migration-state'];
 
-const useMigrationState = (refetchInterval : number | false = false) : {
-  currentStep: MigrationState,
-  isLoading: boolean,
+const useMigrationState = (
+  refetchInterval: number | false = false,
+): {
+  currentStep: MigrationState;
+  isLoading: boolean;
 } => {
   const { data, isLoading } = useQuery<MigrationState, Error>(
     MIGRATION_STATE_QUERY_KEY,

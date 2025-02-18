@@ -28,7 +28,7 @@ import OutputsList from 'components/streams/StreamDetails/routing-destination/Ou
 import DestinationSwitch from 'components/streams/StreamDetails/routing-destination/DestinationSwitch';
 
 type Props = {
-  stream: Stream
+  stream: Stream;
 };
 
 const DestinationOutputs = ({ stream }: Props) => {
@@ -59,31 +59,38 @@ const DestinationOutputs = ({ stream }: Props) => {
     .sort((output1, output2) => output1.title.localeCompare(output2.title));
 
   return (
-    <Section title="Outputs"
-             collapsible
-             defaultClosed
-             disableCollapseButton={!hasAssignedOutput}
-             headerLeftSection={(
-               <>
-                 <DestinationSwitch aria-label="Toggle Output"
-                                    name="toggle-indexset"
-                                    checked={hasAssignedOutput}
-                                    disabled
-                                    onChange={(e) => e.preventDefault()}
-                                    label={title} />
-                 <SectionCountLabel>OUTPUTS {data.outputs.length}</SectionCountLabel>
-               </>
-             )}
-             actions={(
-               <AddOutputButton stream={stream}
-                                availableOutputTypes={availableOutputTypes.types}
-                                assignableOutputs={assignableOutputs}
-                                getTypeDefinition={getTypeDefinition} />
-            )}>
-      <OutputsList streamId={stream.id}
-                   outputs={data.outputs}
-                   isLoadingOutputTypes={isLoadingOutputTypes}
-                   getTypeDefinition={getTypeDefinition} />
+    <Section
+      title="Outputs"
+      collapsible
+      defaultClosed
+      disableCollapseButton={!hasAssignedOutput}
+      headerLeftSection={
+        <>
+          <DestinationSwitch
+            aria-label="Toggle Output"
+            name="toggle-indexset"
+            checked={hasAssignedOutput}
+            disabled
+            onChange={(e) => e.preventDefault()}
+            label={title}
+          />
+          <SectionCountLabel>OUTPUTS {data.outputs.length}</SectionCountLabel>
+        </>
+      }
+      actions={
+        <AddOutputButton
+          stream={stream}
+          availableOutputTypes={availableOutputTypes.types}
+          assignableOutputs={assignableOutputs}
+          getTypeDefinition={getTypeDefinition}
+        />
+      }>
+      <OutputsList
+        streamId={stream.id}
+        outputs={data.outputs}
+        isLoadingOutputTypes={isLoadingOutputTypes}
+        getTypeDefinition={getTypeDefinition}
+      />
     </Section>
   );
 };

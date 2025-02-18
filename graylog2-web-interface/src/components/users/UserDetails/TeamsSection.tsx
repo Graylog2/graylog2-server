@@ -22,7 +22,7 @@ import { EnterprisePluginNotFound } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
-  user: User,
+  user: User;
 };
 
 const TeamsSection = ({ user }: Props) => {
@@ -32,7 +32,11 @@ const TeamsSection = ({ user }: Props) => {
 
   return (
     <SectionComponent title="Teams">
-      {UserTeamsAssignment ? <UserTeamsAssignment user={user} readOnly /> : <EnterprisePluginNotFound featureName="teams" />}
+      {UserTeamsAssignment ? (
+        <UserTeamsAssignment user={user} readOnly />
+      ) : (
+        <EnterprisePluginNotFound featureName="teams" />
+      )}
     </SectionComponent>
   );
 };

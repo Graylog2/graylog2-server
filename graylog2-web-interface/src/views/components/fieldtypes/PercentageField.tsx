@@ -21,8 +21,8 @@ import styled from 'styled-components';
 import { formatPercentage } from 'util/NumberFormatting';
 
 type Props = {
-  value: number,
-}
+  value: number;
+};
 
 const NumberCell = styled.span`
   float: right;

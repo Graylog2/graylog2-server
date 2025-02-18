@@ -30,7 +30,8 @@ import EventDefinitionReplaySearchPage, { onErrorHandler } from 'views/pages/Eve
 import useEventDefinition from 'hooks/useEventDefinition';
 import {
   mockedMappedAggregation,
-  mockEventDefinitionTwoAggregations, mockEventData,
+  mockEventDefinitionTwoAggregations,
+  mockEventData,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
 import type { Stream } from 'logic/streams/types';
@@ -53,16 +54,18 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
     listAll: jest.fn(async () => Promise.resolve()),
   },
-  EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [] })])),
+  EventNotificationsStore: MockStore(['getInitialState', () => ({ all: [] })]),
 }));
 
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -78,7 +81,11 @@ describe('EventDefinitionReplaySearchPage', () => {
   beforeEach(() => {
     asMock(useParams).mockReturnValue({ definitionId: mockEventDefinitionTwoAggregations.id });
     asMock(UseCreateViewForEvent).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
+    asMock(useProcessHooksForView).mockReturnValue({
+      status: 'loaded',
+      view: mockView,
+      executionState: SearchExecutionState.empty(),
+    });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
 
     asMock(useEventDefinition).mockImplementation(() => ({
@@ -102,13 +109,17 @@ describe('EventDefinitionReplaySearchPage', () => {
 
     render(<SimpleReplaySearchPage />);
 
-    await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinitionTwoAggregations.id, {
-      onErrorHandler,
-    }));
+    await waitFor(() =>
+      expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinitionTwoAggregations.id, {
+        onErrorHandler,
+      }),
+    );
 
     await waitFor(() => {
       expect(UseCreateViewForEvent).toHaveBeenCalledWith({
-        eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation, eventData: mockEventData.event,
+        eventDefinition: mockEventDefinitionTwoAggregations,
+        aggregations: mockedMappedAggregation,
+        eventData: mockEventData.event,
       });
     });
   });

@@ -18,13 +18,9 @@ import * as React from 'react';
 import type { GridProps } from '@mantine/core';
 import { Grid as MantineGrid } from '@mantine/core';
 
-type Props = GridProps
+type Props = GridProps;
 
-const Grid = ({ children, ...props }: Props) => (
-  <MantineGrid {...props}>
-    {children}
-  </MantineGrid>
-);
+const Grid = ({ children, ...props }: Props) => <MantineGrid {...props}>{children}</MantineGrid>;
 
 Grid.Col = MantineGrid.Col;
 export default Grid;

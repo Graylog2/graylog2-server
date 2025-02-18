@@ -21,20 +21,22 @@ import styled, { css } from 'styled-components';
 import type Grantee from 'logic/permissions/Grantee';
 import { Icon } from 'components/common';
 
-const Container = styled.div(({ theme }) => css`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+const Container = styled.div(
+  ({ theme }) => css`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-  height: 30px;
-  width: 30px;
+    height: 30px;
+    width: 30px;
 
-  border-radius: 50%;
-  background-color: ${theme.colors.gray[80]};
-`);
+    border-radius: 50%;
+    background-color: ${theme.colors.gray[80]};
+  `,
+);
 
 type Props = {
-  type: $PropertyType<Grantee, 'type'>,
+  type: $PropertyType<Grantee, 'type'>;
 };
 
 const _iconName = (type) => {

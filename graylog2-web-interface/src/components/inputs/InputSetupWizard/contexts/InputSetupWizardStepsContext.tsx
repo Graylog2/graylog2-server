@@ -21,8 +21,8 @@ import { singleton } from 'logic/singleton';
 import type { StepsData } from 'components/inputs/InputSetupWizard/types';
 
 type InputSetupWizardStepsContextType = {
-  stepsData: StepsData,
-  setStepsData: (stepsData: StepsData) => void,
+  stepsData: StepsData;
+  setStepsData: (stepsData: StepsData) => void;
 };
 
 const InputSetupWizardStepsContext = React.createContext<InputSetupWizardStepsContextType | undefined>(undefined);

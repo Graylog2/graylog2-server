@@ -33,13 +33,14 @@ const url = URLUtils.qualifyUrl('/events/search');
 
 type FiltersResult = {
   filter: {
-    alerts?: string,
-    event_definitions?: Array<string>,
-    priority?: Array<string>,
-    aggregation_timerange?: { from?: string, to?: string, type: string, range?: number },
-    key?: Array<string>,
-  },
-  timerange?: TimeRange,
+    alerts?: string;
+    event_definitions?: Array<string>;
+    priority?: Array<string>;
+    aggregation_timerange?: { from?: string; to?: string; type: string; range?: number };
+    key?: Array<string>;
+    id?: Array<string>;
+  };
+  timerange?: TimeRange;
 };
 
 export const parseTypeFilter = (alert: string) => {
@@ -78,6 +79,10 @@ const parseFilters = (filters: UrlQueryFilters) => {
     result.filter.priority = filters.get('priority');
   }
 
+  if (filters.get('id')?.length > 0) {
+    result.filter.id = filters.get('id');
+  }
+
   result.filter.alerts = parseTypeFilter(filters?.get('alert')?.[0]);
 
   return result;
@@ -93,20 +98,24 @@ const getConcatenatedQuery = (query: string, streamId: string) => {
 
 export const keyFn = (searchParams: SearchParams) => ['events', 'search', searchParams];
 
-const fetchEvents = (searchParams: SearchParams, streamId: string): Promise<PaginatedResponse<Event, EventsAdditionalData>> => fetch('POST', url, {
-  query: getConcatenatedQuery(searchParams.query, streamId),
-  page: searchParams.page,
-  per_page: searchParams.pageSize,
-  sort_by: searchParams.sort.attributeId,
-  sort_direction: searchParams.sort.direction,
-  ...parseFilters(searchParams.filters),
-}).then(({ events, total_events, parameters, context }) => ({
-  attributes: additionalAttributes,
-  list: events.map(({ event }) => event),
-  pagination: { total: total_events, page: parameters.page, per_page: parameters.per_page, count: events.length },
-  meta: {
-    context,
-  },
-}));
+const fetchEvents = (
+  searchParams: SearchParams,
+  streamId: string,
+): Promise<PaginatedResponse<Event, EventsAdditionalData>> =>
+  fetch('POST', url, {
+    query: getConcatenatedQuery(searchParams.query, streamId),
+    page: searchParams.page,
+    per_page: searchParams.pageSize,
+    sort_by: searchParams.sort.attributeId,
+    sort_direction: searchParams.sort.direction,
+    ...parseFilters(searchParams.filters),
+  }).then(({ events, total_events, parameters, context }) => ({
+    attributes: additionalAttributes,
+    list: events.map(({ event }) => event),
+    pagination: { total: total_events, page: parameters.page, per_page: parameters.per_page, count: events.length },
+    meta: {
+      context,
+    },
+  }));
 
 export default fetchEvents;

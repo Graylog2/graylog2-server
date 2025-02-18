@@ -17,6 +17,8 @@
 package org.graylog2.database.entities;
 
 import org.graylog2.indexer.indexset.SystemIndexSetScope;
+import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
+import org.graylog.plugins.pipelineprocessor.db.SystemPipelineScope;
 import org.graylog2.plugin.PluginModule;
 
 public class ScopedEntitiesModule extends PluginModule {
@@ -25,6 +27,8 @@ public class ScopedEntitiesModule extends PluginModule {
 
         addEntityScope(DefaultEntityScope.class);
         addEntityScope(SystemIndexSetScope.class);
+        addEntityScope(SystemPipelineRuleScope.class);
+        addEntityScope(SystemPipelineScope.class);
 
         addSystemRestResource(EntityScopeResource.class);
     }

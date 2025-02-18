@@ -31,7 +31,14 @@ import { setTitle } from 'views/logic/slices/titlesActions';
 
 import QueryTabs from './QueryTabs';
 
-const onRemovePage = async (dashboardId: string, queryId: string, activeQueryId: string, queries: Immutable.OrderedSet<string>, widgetIds: Immutable.Map<string, Immutable.List<string>>, dispatch: AppDispatch) => {
+const onRemovePage = async (
+  dashboardId: string,
+  queryId: string,
+  activeQueryId: string,
+  queries: Immutable.OrderedSet<string>,
+  widgetIds: Immutable.Map<string, Immutable.List<string>>,
+  dispatch: AppDispatch,
+) => {
   if (queries.size === 1) {
     return Promise.resolve();
   }
@@ -53,36 +60,37 @@ const QueryBar = () => {
   const widgetIds = useWidgetIds();
   const dispatch = useAppDispatch();
 
-  const onSelectPage = useCallback((pageId: string) => {
-    if (pageId === 'new') {
-      dispatch(createQuery()).then((newPageId) => setDashboardPage(newPageId));
-    } else {
-      setDashboardPage(pageId);
-      dispatch(selectQuery(pageId));
-    }
-  }, [dispatch, setDashboardPage]);
+  const onSelectPage = useCallback(
+    (pageId: string) => {
+      if (pageId === 'new') {
+        dispatch(createQuery()).then((newPageId) => setDashboardPage(newPageId));
+      } else {
+        setDashboardPage(pageId);
+        dispatch(selectQuery(pageId));
+      }
+    },
+    [dispatch, setDashboardPage],
+  );
 
   const removePage = useCallback(
-    (queryId: string) => onRemovePage(
-      dashboardId,
-      queryId,
-      activeQueryId,
-      queries,
-      widgetIds,
-      dispatch,
-    ),
+    (queryId: string) => onRemovePage(dashboardId, queryId, activeQueryId, queries, widgetIds, dispatch),
     [dashboardId, activeQueryId, queries, widgetIds, dispatch],
   );
 
-  const _onTitleChange = useCallback((queryId: string, newTitle: string) => dispatch(setTitle(queryId, 'tab', 'title', newTitle)), [dispatch]);
+  const _onTitleChange = useCallback(
+    (queryId: string, newTitle: string) => dispatch(setTitle(queryId, 'tab', 'title', newTitle)),
+    [dispatch],
+  );
 
   return (
-    <QueryTabs queries={queries}
-               titles={queryTitles}
-               dashboardId={dashboardId}
-               onSelect={onSelectPage}
-               onTitleChange={_onTitleChange}
-               onRemove={removePage} />
+    <QueryTabs
+      queries={queries}
+      titles={queryTitles}
+      dashboardId={dashboardId}
+      onSelect={onSelectPage}
+      onTitleChange={_onTitleChange}
+      onRemove={removePage}
+    />
   );
 };
 

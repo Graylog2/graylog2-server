@@ -29,11 +29,7 @@ import NumberField from './NumberField';
 
 describe('<NumberField>', () => {
   const SUT = (props: Partial<React.ComponentProps<typeof NumberField>>) => (
-    <NumberField field={numberField}
-                 onChange={() => {}}
-                 title="example_number_field"
-                 typeName="number"
-                 {...props} />
+    <NumberField field={numberField} onChange={() => {}} title="example_number_field" typeName="number" {...props} />
   );
 
   beforeEach(() => {
@@ -41,9 +37,7 @@ describe('<NumberField>', () => {
   });
 
   it('should render an empty field', () => {
-    render(
-      <SUT />,
-    );
+    render(<SUT />);
 
     const fieldLabel = screen.getByText(numberField.human_name, { exact: false });
     const optionalMarker = screen.getByText(/(optional)/);

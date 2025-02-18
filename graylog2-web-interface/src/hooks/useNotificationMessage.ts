@@ -25,7 +25,11 @@ const useNotificationMessage = (notification: NotificationType) => {
   const { messages } = useStore(NotificationsStore);
 
   useEffect(() => {
-    NotificationsActions.getHtmlMessage(notification.type, notification.key, NotificationsFactory.getValuesForNotification(notification));
+    NotificationsActions.getHtmlMessage(
+      notification.type,
+      notification.key,
+      NotificationsFactory.getValuesForNotification(notification),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

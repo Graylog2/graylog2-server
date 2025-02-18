@@ -17,13 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {
-  DataTable,
-  IfPermitted,
-  PageHeader,
-  PaginatedList,
-  SearchForm,
-} from 'components/common';
+import { DataTable, IfPermitted, PageHeader, PaginatedList, SearchForm } from 'components/common';
 import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
@@ -71,9 +65,12 @@ type GrokPatternsProps = {
   sendTelemetry?: (...args: any[]) => void;
 };
 
-class GrokPatterns extends React.Component<GrokPatternsProps, {
-  [key: string]: any;
-}> {
+class GrokPatterns extends React.Component<
+  GrokPatternsProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     sendTelemetry: () => {},
   };
@@ -103,21 +100,26 @@ class GrokPatterns extends React.Component<GrokPatternsProps, {
     }
   }
 
-  loadData = (callback?, page = this.props.paginationQueryParameter.page, perPage = this.props.paginationQueryParameter.pageSize) => {
-    const { pagination: { query } } = this.state;
+  loadData = (
+    callback?,
+    page = this.props.paginationQueryParameter.page,
+    perPage = this.props.paginationQueryParameter.pageSize,
+  ) => {
+    const {
+      pagination: { query },
+    } = this.state;
 
-    this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query)
-      .then(({ patterns, pagination }) => {
-        if (callback) {
-          callback();
-        }
+    this.loadPromise = GrokPatternsStore.searchPaginated(page, perPage, query).then(({ patterns, pagination }) => {
+      if (callback) {
+        callback();
+      }
 
-        if (!this.loadPromise?.isCancelled()) {
-          this.loadPromise = undefined;
+      if (!this.loadPromise?.isCancelled()) {
+        this.loadPromise = undefined;
 
-          this.setState({ patterns, pagination });
-        }
-      });
+        this.setState({ patterns, pagination });
+      }
+    });
   };
 
   validPatternName = (name) => {
@@ -153,8 +155,12 @@ class GrokPatterns extends React.Component<GrokPatternsProps, {
   };
 
   confirmedRemove = (pattern) => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm(`Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`)) {
+    if (
+      // eslint-disable-next-line no-alert
+      window.confirm(
+        `Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`,
+      )
+    ) {
       GrokPatternsStore.deletePattern(pattern, () => {
         this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.DELETED, {
           app_pathname: 'grokpatterns',
@@ -177,19 +183,22 @@ class GrokPatterns extends React.Component<GrokPatternsProps, {
         <td>
           <ButtonToolbar>
             <IfPermitted permissions="inputs:edit">
-              <EditPatternModal id={pattern.id}
-                                name={pattern.name}
-                                pattern={pattern.pattern}
-                                testPattern={testPattern}
-                                patterns={patterns}
-                                create={false}
-                                reload={this.loadData}
-                                savePattern={this.savePattern}
-                                validPatternName={this.validPatternName} />
-              <Button style={{ marginRight: 5 }}
-                      bsStyle="danger"
-                      bsSize="xs"
-                      onClick={() => this.confirmedRemove(pattern)}>
+              <EditPatternModal
+                id={pattern.id}
+                name={pattern.name}
+                pattern={pattern.pattern}
+                testPattern={testPattern}
+                patterns={patterns}
+                create={false}
+                reload={this.loadData}
+                savePattern={this.savePattern}
+                validPatternName={this.validPatternName}
+              />
+              <Button
+                style={{ marginRight: 5 }}
+                bsStyle="danger"
+                bsSize="xs"
+                onClick={() => this.confirmedRemove(pattern)}>
                 Delete
               </Button>
             </IfPermitted>
@@ -203,32 +212,33 @@ class GrokPatterns extends React.Component<GrokPatternsProps, {
     const headers = ['Name', 'Pattern', 'Actions'];
     const { pagination, patterns } = this.state;
 
-    const queryHelperComponent = (
-      <GrokPatternQueryHelper />
-    );
+    const queryHelperComponent = <GrokPatternQueryHelper />;
 
     return (
       <div>
-        <PageHeader title="Grok patterns"
-                    actions={(
-                      <IfPermitted permissions="inputs:edit">
-                        <ButtonToolbar>
-                          <BulkLoadPatternModal onSuccess={this.loadData} />
-                          <EditPatternModal id=""
-                                            name=""
-                                            pattern=""
-                                            patterns={patterns}
-                                            create
-                                            testPattern={testPattern}
-                                            reload={this.loadData}
-                                            savePattern={this.savePattern}
-                                            validPatternName={this.validPatternName} />
-                        </ButtonToolbar>
-                      </IfPermitted>
-                    )}>
+        <PageHeader
+          title="Grok patterns"
+          actions={
+            <IfPermitted permissions="inputs:edit">
+              <ButtonToolbar>
+                <BulkLoadPatternModal onSuccess={this.loadData} />
+                <EditPatternModal
+                  id=""
+                  name=""
+                  pattern=""
+                  patterns={patterns}
+                  create
+                  testPattern={testPattern}
+                  reload={this.loadData}
+                  savePattern={this.savePattern}
+                  validPatternName={this.validPatternName}
+                />
+              </ButtonToolbar>
+            </IfPermitted>
+          }>
           <span>
-            This is a list of grok patterns you can use in your Graylog grok extractors. You can add
-            your own manually or import a whole list of patterns from a so called pattern file.
+            This is a list of grok patterns you can use in your Graylog grok extractors. You can add your own manually
+            or import a whole list of patterns from a so called pattern file.
           </span>
         </PageHeader>
 
@@ -237,24 +247,27 @@ class GrokPatterns extends React.Component<GrokPatternsProps, {
             <IfPermitted permissions="inputs:read">
               <Row className="row-sm">
                 <Col md={8}>
-                  <SearchForm onSearch={this._onSearch}
-                              onReset={this._onReset}
-                              queryHelpComponent={queryHelperComponent}
-                              useLoadingState />
+                  <SearchForm
+                    onSearch={this._onSearch}
+                    onReset={this._onReset}
+                    queryHelpComponent={queryHelperComponent}
+                    useLoadingState
+                  />
                 </Col>
               </Row>
               <Row>
                 <Col md={12}>
-                  <PaginatedList onChange={this._onPageChange}
-                                 totalItems={pagination.total}>
-                    <GrokPatternsList id="grok-pattern-list"
-                                      className="table-striped table-hover"
-                                      headers={headers}
-                                      headerCellFormatter={_headerCellFormatter}
-                                      sortByKey="name"
-                                      rows={patterns}
-                                      noDataText="No grok patterns have been found."
-                                      dataRowFormatter={this._patternFormatter} />
+                  <PaginatedList onChange={this._onPageChange} totalItems={pagination.total}>
+                    <GrokPatternsList
+                      id="grok-pattern-list"
+                      className="table-striped table-hover"
+                      headers={headers}
+                      headerCellFormatter={_headerCellFormatter}
+                      sortByKey="name"
+                      rows={patterns}
+                      noDataText="No grok patterns have been found."
+                      dataRowFormatter={this._patternFormatter}
+                    />
                   </PaginatedList>
                 </Col>
               </Row>

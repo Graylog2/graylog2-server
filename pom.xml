@@ -89,7 +89,7 @@
         <!-- Dependencies -->
         <opensearch.shaded.version>2.15.0-1</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
-        <amqp-client.version>5.24.0</amqp-client.version>
+        <amqp-client.version>5.25.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -100,11 +100,10 @@
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.30.4</aws-java-sdk-2.version>
-        <aws-kinesis-client.version>2.6.0</aws-kinesis-client.version>
+        <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.2.0</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
         <bouncycastle.version>1.80</bouncycastle.version>
-        <byte-buddy.version>1.16.1</byte-buddy.version>
         <caffeine.version>3.2.0</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.179</classgraph.version>
@@ -130,7 +129,7 @@
         <hamcrest.version>3.0</hamcrest.version>
         <hibernate-validator.version>8.0.2.Final</hibernate-validator.version>
         <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.17.2</jackson.version>
+        <jackson.version>2.18.2</jackson.version>
         <jadconfig.version>0.15.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
@@ -143,7 +142,7 @@
         <jdot.version>1.0</jdot.version>
         <jersey.version>3.1.10</jersey.version>
         <jmte.version>7.0.3</jmte.version>
-        <joda-time.version>2.13.0</joda-time.version>
+        <joda-time.version>2.13.1</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-org.version>20250107</json-org.version>
         <json-path.version>2.9.0</json-path.version>
@@ -153,10 +152,10 @@
         <lucene.version>9.12.0</lucene.version>
         <metrics.version>4.2.30</metrics.version>
         <mongodb-driver.version>5.3.1</mongodb-driver.version>
-        <mongojack.version>4.11.0</mongojack.version>
+        <mongojack.version>5.0.2</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.117.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.69.Final</netty-tcnative-boringssl-static.version>
+        <netty.version>4.1.118.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.70.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.32.0</opentelemetry.version>
@@ -168,7 +167,7 @@
         <retrofit.version>2.11.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>2.0.2</shiro.version>
-        <snakeyaml.version>2.3</snakeyaml.version>
+        <snakeyaml.version>2.4</snakeyaml.version>
         <snappy-java.version>1.1.10.7</snappy-java.version>
         <oshi.version>6.6.6</oshi.version>
         <siv-mode.version>1.6.0</siv-mode.version>
@@ -180,7 +179,7 @@
         <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.6-9</zstd.version>
+        <zstd.version>1.5.6-10</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.6</jjwt.version>
@@ -192,12 +191,12 @@
         <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.2</awaitility.version>
-        <equalsverifier.version>3.18.2</equalsverifier.version>
+        <equalsverifier.version>3.19.1</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.11.4</junit-jupiter.version>
         <mockito.version>5.15.2</mockito.version>
-        <restassured.version>5.5.0</restassured.version>
+        <restassured.version>5.5.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.20.4</testcontainers.version>
         <testcontainers.opensearch.version>2.1.2</testcontainers.opensearch.version>
@@ -323,6 +322,14 @@
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
+            </dependency>
+            <!-- Manage json-smart to version >= 2.5.2 to address CVE-2024-57699. json-smart is only used as a
+                 transitive dependency (e.g. for json-path), so when updating the version here, check if we still need
+                 to manage the version ourselves. -->
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>2.5.2</version>
             </dependency>
             <dependency>
                 <groupId>org.ow2.asm</groupId>
@@ -505,16 +512,6 @@
                 <version>${hamcrest.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy</artifactId>
-                <version>${byte-buddy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy-agent</artifactId>
-                <version>${byte-buddy.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
                 <version>${awaitility.version}</version>
@@ -632,7 +629,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.6.6</version>
+                    <version>4.9.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -730,6 +727,10 @@
                                         <exclude>javax.inject:*</exclude>
                                         <exclude>javax.ws.rs:javax.*</exclude>
                                         <exclude>com.fasterxml.jackson.jaxrs:*</exclude>
+                                        <!-- Ban bouncycastle jdk15on dependencies. We are using jdk18on equivalents instead. -->
+                                        <exclude>org.bouncycastle:bcprov-jdk15on</exclude>
+                                        <exclude>org.bouncycastle:bcpkix-jdk15on</exclude>
+                                        <exclude>org.bouncycastle:bcutil-jdk15on</exclude>
                                     </excludes>
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>

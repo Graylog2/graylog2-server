@@ -23,19 +23,19 @@ import GenericPlot from 'views/components/visualizations/GenericPlot';
 import AppConfig from 'util/AppConfig';
 
 type Props = {
-  traffic: { [key: string]: number },
-  width: number,
+  traffic: { [key: string]: number };
+  width: number;
   trafficLimit?: number;
 };
 
 const GraphWrapper = styled.div<{
-  $width: number,
-}>(({
-  $width,
-}) => css`
-  height: 200px;
-  width: ${$width}px
-`);
+  $width: number;
+}>(
+  ({ $width }) => css`
+    height: 200px;
+    width: ${$width}px;
+  `,
+);
 
 const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
   const theme = useTheme();
@@ -85,11 +85,13 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
     ],
   };
 
-  const chartData = [{
-    type: 'bar',
-    x: Object.keys(traffic),
-    y: Object.values(traffic),
-  }];
+  const chartData = [
+    {
+      type: 'bar',
+      x: Object.keys(traffic),
+      y: Object.values(traffic),
+    },
+  ];
 
   const layout: Partial<PlotLayout> = {
     showlegend: false,
@@ -133,7 +135,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
         },
         active: 1,
         type: 'buttons',
-        visible: trafficLimit && (range < trafficLimit),
+        visible: trafficLimit && range < trafficLimit,
         xanchor: 'right',
         yanchor: 'top',
         x: 1,
@@ -148,8 +150,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
 
   return (
     <GraphWrapper $width={width}>
-      <GenericPlot chartData={chartData}
-                   layout={trafficLayout} />
+      <GenericPlot chartData={chartData} layout={trafficLayout} />
     </GraphWrapper>
   );
 };

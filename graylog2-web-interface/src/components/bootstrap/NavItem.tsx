@@ -22,9 +22,7 @@ import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
 
 const NavItem = ({ children, ...props }: React.ComponentProps<typeof NavItem>) => (
   <BootstrapNavItem {...props}>
-    <NavItemStateIndicator>
-      {children}
-    </NavItemStateIndicator>
+    <NavItemStateIndicator>{children}</NavItemStateIndicator>
   </BootstrapNavItem>
 );
 

@@ -27,36 +27,47 @@ import Tooltip from 'components/common/Tooltip';
  */
 
 type Props = {
-  children: (props: { copy: () => void }) => JSX.Element,
-  text: string,
-}
+  children: (props: { copy: () => void }) => JSX.Element;
+  text: string;
+};
 
 type Args = {
-  copied: boolean,
-  copy: () => void,
-}
+  copied: boolean;
+  copy: () => void;
+};
 
 type CopyProps = {
-  value: string,
-  timeout: number,
-  children: (args: Args) => React.ReactElement,
+  value: string;
+  timeout: number;
+  children: (args: Args) => React.ReactElement;
 };
 
 const Copy = ({ children, value, timeout }: CopyProps) => {
   const [copied, setCopied] = useState(false);
   const { start } = useTimeout(() => setCopied(false), timeout);
-  const copy = useCallback(() => copyToClipboard(value).then(() => { setCopied(true); start(); }), [start, value]);
+  const copy = useCallback(
+    () =>
+      copyToClipboard(value).then(() => {
+        setCopied(true);
+        start();
+      }),
+    [start, value],
+  );
 
   return children({ copied, copy });
 };
 
 const ClipboardContainer = ({ children, text }: Props) => (
   <Copy value={text} timeout={2000}>
-    {({ copied, copy }) => (copied ? (
-      <Tooltip label="Copied!" withArrow position="top" opened>
-        {children({ copy })}
-      </Tooltip>
-    ) : children({ copy }))}
+    {({ copied, copy }) =>
+      copied ? (
+        <Tooltip label="Copied!" withArrow position="top" opened>
+          {children({ copy })}
+        </Tooltip>
+      ) : (
+        children({ copy })
+      )
+    }
   </Copy>
 );
 

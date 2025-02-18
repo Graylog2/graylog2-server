@@ -46,9 +46,12 @@ type SidecarListProps = {
   toggleShowInactive: (...args: any[]) => void;
 };
 
-class SidecarList extends React.Component<SidecarListProps, {
-  [key: string]: any;
-}> {
+class SidecarList extends React.Component<
+  SidecarListProps,
+  {
+    [key: string]: any;
+  }
+> {
   formatSidecarList = (sidecars: React.ReactElement[]) => {
     const { onSortChange, sort } = this.props;
     const sidecarCollection = {
@@ -67,26 +70,30 @@ class SidecarList extends React.Component<SidecarListProps, {
             {Object.keys(sidecarCollection).map((sidecar) => (
               <th key={sidecar}>
                 {sidecarCollection[sidecar]}
-                <StyledSortIcon activeDirection={sort.field === sidecar ? sort.order : null} onChange={onSortChange(sidecar)} ascId="asc" descId="desc" />
+                <StyledSortIcon
+                  activeDirection={sort.field === sidecar ? sort.order : null}
+                  onChange={onSortChange(sidecar)}
+                  ascId="asc"
+                  descId="desc"
+                />
               </th>
             ))}
             <th className={style.actions}>&nbsp;</th>
           </tr>
         </thead>
-        <tbody>
-          {sidecars}
-        </tbody>
+        <tbody>{sidecars}</tbody>
       </Table>
     );
   };
 
   formatNoMatchingListAlert = () => {
     const { onlyActive } = this.props;
-    const showInactiveHint = (onlyActive ? ' and/or click on "Include inactive sidecars"' : null);
+    const showInactiveHint = onlyActive ? ' and/or click on "Include inactive sidecars"' : null;
 
     return (
       <NoSearchResult>
-        <Icon name="info" />&nbsp;There are no sidecars matching the search criteria. Try adjusting your search filter{showInactiveHint}.
+        <Icon name="info" />
+        &nbsp;There are no sidecars matching the search criteria. Try adjusting your search filter{showInactiveHint}.
       </NoSearchResult>
     );
   };
@@ -98,40 +105,28 @@ class SidecarList extends React.Component<SidecarListProps, {
       return this.formatNoMatchingListAlert();
     }
 
-    return (
-      <NoEntitiesExist>
-        There are no sidecars configured.
-      </NoEntitiesExist>
-    );
+    return <NoEntitiesExist>There are no sidecars configured.</NoEntitiesExist>;
   };
 
   render() {
     const { sidecars, onlyActive, pagination, query, onQueryChange, onPageChange, toggleShowInactive } = this.props;
     const sidecarRows = sidecars.map((sidecar) => <SidecarRow key={sidecar.node_id} sidecar={sidecar} />);
-    const showOrHideInactive = (onlyActive ? 'Include' : 'Hide');
-    const sidecarList = (sidecarRows.length > 0 ? this.formatSidecarList(sidecarRows) : this.renderEmptyList());
+    const showOrHideInactive = onlyActive ? 'Include' : 'Hide';
+    const sidecarList = sidecarRows.length > 0 ? this.formatSidecarList(sidecarRows) : this.renderEmptyList();
 
     return (
       <div>
         <div className={style.sidecarsFilter}>
-          <SidecarSearchForm query={query}
-                             onSearch={onQueryChange}
-                             onReset={onQueryChange}>
-            <Button bsStyle="primary"
-                    onClick={toggleShowInactive}
-                    className={style.inactiveSidecarsButton}>
+          <SidecarSearchForm query={query} onSearch={onQueryChange} onReset={onQueryChange}>
+            <Button bsStyle="primary" onClick={toggleShowInactive} className={style.inactiveSidecarsButton}>
               {showOrHideInactive} inactive sidecars
             </Button>
           </SidecarSearchForm>
         </div>
 
-        <PaginatedList pageSizes={PAGE_SIZES}
-                       totalItems={pagination.total}
-                       onChange={onPageChange}>
+        <PaginatedList pageSizes={PAGE_SIZES} totalItems={pagination.total} onChange={onPageChange}>
           <Row>
-            <Col md={12}>
-              {sidecarList}
-            </Col>
+            <Col md={12}>{sidecarList}</Col>
           </Row>
         </PaginatedList>
       </div>

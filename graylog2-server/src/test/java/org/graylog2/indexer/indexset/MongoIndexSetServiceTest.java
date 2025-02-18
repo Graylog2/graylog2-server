@@ -18,6 +18,7 @@ package org.graylog2.indexer.indexset;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.Subscribe;
+import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -48,7 +49,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mongojack.DBQuery;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -177,11 +177,11 @@ public class MongoIndexSetServiceTest {
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void findOne() {
-        final Optional<IndexSetConfig> config3 = indexSetService.findOne(DBQuery.is("title", "Test 2"));
+        final Optional<IndexSetConfig> config3 = indexSetService.findOne(Filters.eq("title", "Test 2"));
         assertThat(config3).isPresent();
         assertThat(config3.get().id()).isEqualTo("57f3d721a43c2d59cb750002");
 
-        final Optional<IndexSetConfig> config4 = indexSetService.findOne(DBQuery.is("title", "__yolo"));
+        final Optional<IndexSetConfig> config4 = indexSetService.findOne(Filters.eq("title", "__yolo"));
         assertThat(config4).isNotPresent();
     }
 

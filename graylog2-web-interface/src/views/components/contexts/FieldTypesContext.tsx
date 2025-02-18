@@ -22,8 +22,8 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type FieldTypeMappingsList = List<FieldTypeMapping>;
 export type FieldTypes = {
-  all: FieldTypeMappingsList,
-  queryFields: Map<string, FieldTypeMappingsList>,
+  all: FieldTypeMappingsList;
+  queryFields: Map<string, FieldTypeMappingsList>;
 };
 
 const FieldTypesContext = React.createContext<FieldTypes | undefined>(undefined);
