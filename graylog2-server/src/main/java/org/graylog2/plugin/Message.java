@@ -519,7 +519,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         }
     }
 
-    private void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
+    public void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
         addTimestampField(FIELD_TIMESTAMP, newTimeStamp);
         addTimestampField(FIELD_GL2_ORIGINAL_TIMESTAMP, oldTimeStamp);
     }
