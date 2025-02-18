@@ -20,11 +20,32 @@ import jakarta.ws.rs.ForbiddenException;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.SearchJobDTO;
+import org.graylog2.shared.utilities.StringUtils;
 
 import java.util.Optional;
 
 public interface SearchJobService {
 
     SearchJob create(Search search, String owner, Integer cancelAfterSeconds);
-    Optional<SearchJob> load(String id, SearchUser searchUser) throws ForbiddenException;
+
+    Optional<SearchJobDTO> load(String id, SearchUser searchUser) throws ForbiddenException;
+
+    default boolean cancel(final String id, final SearchUser searchUser) throws ForbiddenException {
+        final SearchJob searchJob = getFromCache(id);
+        if (searchJob == null) {
+            return false;
+        } else if (hasPermissionToAccessJob(searchUser, searchJob.getOwner())) {
+            searchJob.cancel();
+            return true;
+        } else {
+            throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
+        }
+    }
+
+    SearchJob getFromCache(final String id);
+
+    default boolean hasPermissionToAccessJob(final SearchUser searchUser, final String jobOwner) {
+        return jobOwner.equals(searchUser.username()) || searchUser.isAdmin();
+    }
 }

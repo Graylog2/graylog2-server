@@ -21,6 +21,7 @@ import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,6 @@ public class InMemorySearchJobServiceTest {
 
     private SearchJobService toTest;
 
-
     @BeforeEach
     public void setup() throws Exception {
         toTest = new InMemorySearchJobService(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"));
@@ -43,10 +43,10 @@ public class InMemorySearchJobServiceTest {
     @Test
     public void testUsersCanLoadTheirOwnJobs() {
         final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette", NO_CANCELLATION);
-        final Optional<SearchJob> retrievedJob = toTest.load(jannettesJob.getId(), searchUser("Jannette"));
+        final Optional<SearchJobDTO> retrievedJob = toTest.load(jannettesJob.getId(), searchUser("Jannette"));
         Assertions.assertThat(retrievedJob)
                 .isPresent()
-                .hasValue(jannettesJob);
+                .hasValue(SearchJobDTO.fromSearchJob(jannettesJob));
     }
 
     @Test
@@ -59,15 +59,15 @@ public class InMemorySearchJobServiceTest {
     @Test
     public void testAdminCanLoadJobOfDifferentUser() {
         final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette", NO_CANCELLATION);
-        final Optional<SearchJob> retrievedJob = toTest.load(jannettesJob.getId(), adminUser("Clara"));
+        final Optional<SearchJobDTO> retrievedJob = toTest.load(jannettesJob.getId(), adminUser("Clara"));
         Assertions.assertThat(retrievedJob)
                 .isPresent()
-                .hasValue(jannettesJob);
+                .hasValue(SearchJobDTO.fromSearchJob(jannettesJob));
     }
 
     @Test
     public void testReturnsEmptyOptionalWhenTryingToLoadNonExistingJob() {
-        final Optional<SearchJob> retrievedJob = toTest.load("Guadalajara!", null);
+        final Optional<SearchJobDTO> retrievedJob = toTest.load("Guadalajara!", null);
         Assertions.assertThat(retrievedJob)
                 .isEmpty();
     }
