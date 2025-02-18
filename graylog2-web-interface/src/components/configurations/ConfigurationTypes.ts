@@ -24,6 +24,7 @@ enum ConfigurationType {
   PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig',
   USER_CONFIG = 'org.graylog2.users.UserConfiguration',
   CERTIFICATE_RENEWAL_POLICY_CONFIG = 'org.graylog2.plugin.certificates.RenewalPolicy',
+  GLOBAL_PROCESSING_RULE_CONFIG = 'org.graylog2.shared.buffers.processors.TimeStampConfig',
 }
 export default ConfigurationType;
 export { ConfigurationType };

@@ -196,6 +196,10 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{ $style?: 'stepper' }>(
           background-color: ${theme.colors.global.link};
         }
       }
+      
+      &.disabled > a {
+        color: ${theme.colors.text.disabled};
+      }
 
       > a {
         border-radius: 0;
@@ -273,14 +277,14 @@ export type StepType = {
 export type StepsType = Array<StepType>;
 type Props = {
   steps: StepsType;
-  activeStep: StepKey | null | undefined;
+  activeStep?: StepKey | null | undefined;
   onStepChange: (StepKey) => void;
-  children: React.ReactNode;
-  horizontal: boolean;
-  justified: boolean;
-  containerClassName: string;
-  hidePreviousNextButtons: boolean;
-  style: 'stepper' | undefined;
+  children?: React.ReactNode;
+  horizontal?: boolean;
+  justified?: boolean;
+  containerClassName?: string;
+  hidePreviousNextButtons?: boolean;
+  style?: 'stepper' | undefined;
 };
 
 type State = {
@@ -297,7 +301,6 @@ class Wizard extends React.Component<Props, State> {
   static defaultProps = {
     children: undefined,
     activeStep: undefined,
-    onStepChange: () => {},
     horizontal: false,
     justified: false,
     containerClassName: 'content',
