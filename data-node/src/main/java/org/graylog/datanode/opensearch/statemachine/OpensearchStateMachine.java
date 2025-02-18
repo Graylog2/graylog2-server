@@ -16,19 +16,14 @@
  */
 package org.graylog.datanode.opensearch.statemachine;
 
-import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 import org.graylog.datanode.opensearch.OpensearchProcess;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracerAggregator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog.datanode.process.statemachine.ProcessStateMachine;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 
 import java.util.Set;
 
-public class OpensearchStateMachine extends StateMachine<OpensearchState, OpensearchEvent> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchStateMachine.class);
+public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState, OpensearchEvent> {
 
     /**
      * How many times can the OS rest api call fail before we switch to the failed state
@@ -37,14 +32,13 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
     public static final int MAX_REST_STARTUP_FAILURES = 5;
     public static final int MAX_REBOOT_FAILURES = 3;
 
-    StateMachineTracerAggregator tracerAggregator = new StateMachineTracerAggregator();
-
-    public OpensearchStateMachine(OpensearchState initialState, StateMachineConfig<OpensearchState, OpensearchEvent> config) {
-        super(initialState, config);
-        setTrace(tracerAggregator);
+    public OpensearchStateMachine(OpensearchState initialState,
+                                  StateMachineConfig<OpensearchState, OpensearchEvent> config,
+                                  Set<StateMachineTracer<OpensearchState, OpensearchEvent>> tracer) {
+        super(initialState, config, tracer);
     }
 
-    public static OpensearchStateMachine createNew(OpensearchProcess process, Set<StateMachineTracer> tracer) {
+    public static OpensearchStateMachine createNew(OpensearchProcess process, Set<StateMachineTracer<OpensearchState, OpensearchEvent>> tracer) {
         final FailuresCounter restFailureCounter = FailuresCounter.oneBased(MAX_REST_TEMPORARY_FAILURES);
         final FailuresCounter startupFailuresCounter = FailuresCounter.oneBased(MAX_REST_STARTUP_FAILURES);
         final FailuresCounter rebootCounter = FailuresCounter.oneBased(MAX_REBOOT_FAILURES);
@@ -130,29 +124,12 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION, process::reset)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 
-        OpensearchStateMachine stateMachine = new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config);
-        tracer.forEach(t -> {
-            t.setStateMachine(stateMachine);
-            stateMachine.getTracerAggregator().addTracer(t);
-        });
-        return stateMachine;
-    }
-
-    public StateMachineTracerAggregator getTracerAggregator() {
-        return tracerAggregator;
-    }
-
-    private void fire(OpensearchEvent trigger, OpensearchEvent errorEvent) {
-        try {
-            super.fire(trigger);
-        } catch (Exception e) {
-            LOG.error("Failed to fire event " + trigger, e);
-            super.fire(errorEvent);
-        }
+        return new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config, tracer);
     }
 
     @Override
-    public void fire(OpensearchEvent trigger) {
-        fire(trigger, OpensearchEvent.HEALTH_CHECK_FAILED);
+    protected OpensearchEvent getErrorEvent() {
+        return OpensearchEvent.HEALTH_CHECK_FAILED;
     }
+
 }
