@@ -7,9 +7,9 @@
 
     <description>Custom Graylog-specific rules</description>
 
-    <!-- When used in a catch clause, the de.thetaphi:forbiddenapis plugin won't cache usage of the forbidden class,
-         therefore, we have this additional PMD rule to prevent usages. -->
-    <rule name="CatchingDuplicateKeyException"
+    <!-- When used in a catch clause, the de.thetaphi:forbiddenapis plugin won't catch usages of the forbidden class.
+         Therefore, we have this additional PMD rule to prevent usages. -->
+    <rule name="CatchingMongoDBDuplicateKeyException"
           language="java"
           message="Catching a com.mongodb.DuplicateKeyException is prohibited because it will not cover all duplicate key errors. Use org.graylog2.database.utils.MongoUtil#isDuplicateKeyError(MongoException) instead."
           class="net.sourceforge.pmd.lang.rule.xpath.XPathRule" >
