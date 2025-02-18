@@ -185,7 +185,7 @@ public class UserResourceGenerateTokenAccessTest {
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(isPermitted);
         if (!isAdmin) {
             when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                    .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), confAllowExternal, confDenyNonAdmins));
+                    .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), confAllowExternal, confDenyNonAdmins, Duration.ofDays(30)));
         }
     }
 }

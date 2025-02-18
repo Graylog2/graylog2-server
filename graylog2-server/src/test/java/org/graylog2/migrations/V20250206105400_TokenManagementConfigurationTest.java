@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 public class V20250206105400_TokenManagementConfigurationTest {
     //We prepare some existing config with explicitly updated values, so we can safely check they're not touched by the migration:
-    private final UserConfiguration existingConfig = UserConfiguration.create(true, Duration.of(10, ChronoUnit.HOURS), true, false);
+    private final UserConfiguration existingConfig = UserConfiguration.create(true, Duration.of(10, ChronoUnit.HOURS), true, false, Duration.ofDays(7));
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -92,7 +92,8 @@ public class V20250206105400_TokenManagementConfigurationTest {
         final UserConfiguration updated = UserConfiguration.create(existingConfig.enableGlobalSessionTimeout(),
                 existingConfig.globalSessionTimeoutInterval(),
                 UserConfiguration.DEFAULT_VALUES_FOR_UPGRADE.allowAccessTokenForExternalUsers(),
-                UserConfiguration.DEFAULT_VALUES_FOR_UPGRADE.restrictAccessTokenToAdmins());
+                UserConfiguration.DEFAULT_VALUES_FOR_UPGRADE.restrictAccessTokenToAdmins(),
+                UserConfiguration.DEFAULT_VALUES_FOR_UPGRADE.defaultTTLForNewTokens());
 
         testee.upgrade();
 
