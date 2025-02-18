@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode.filesystem.index.indexreader;
 
+import org.apache.lucene.util.Version;
+
 public record ShardStats(java.nio.file.Path path, int documentsCount,
-                         org.graylog.shaded.opensearch2.org.apache.lucene.util.Version minSegmentLuceneVersion) {
+                         Version minSegmentLuceneVersion) {
 }
