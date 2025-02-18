@@ -20,6 +20,7 @@ import isDeepEqual from 'stores/isDeepEqual';
 import generateId from 'logic/generateId';
 import type { FiltersType, SearchFilter } from 'views/types';
 import type { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
+import type { QueryString, ElasticsearchQueryString } from 'views/logic/queries/types';
 
 import type { SearchType } from './SearchType';
 
@@ -46,11 +47,6 @@ export type QueryJson = {
   filter?: { [key: string]: unknown };
   filters?: Array<SearchFilter>;
   search_types: SearchTypeList;
-};
-
-export type ElasticsearchQueryString = {
-  type: 'elasticsearch';
-  query_string: string;
 };
 
 export const createElasticsearchQueryString = (query = ''): ElasticsearchQueryString => ({
@@ -141,8 +137,6 @@ export const filtersToStreamCategorySet = (filter: FilterType | null | undefined
 
   return filters.map(filtersToStreamCategorySet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
 };
-
-export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
 

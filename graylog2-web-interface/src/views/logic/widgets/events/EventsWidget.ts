@@ -20,7 +20,8 @@ import Widget from 'views/logic/widgets/Widget';
 import type { WidgetState } from 'views/logic/widgets/Widget';
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
-import type { TimeRange, QueryString } from 'views/logic/queries/Query';
+import type { QueryString } from 'views/logic/queries/types';
+import type { TimeRange } from 'views/logic/queries/Query';
 import type { FiltersType } from 'views/types';
 
 import EventsWidgetConfig from './EventsWidgetConfig';
