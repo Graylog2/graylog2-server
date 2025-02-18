@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.InMemorySearchJobService;
-import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
@@ -35,7 +34,6 @@ import org.graylog.plugins.views.search.engine.normalization.PluggableSearchNorm
 import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidation;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.jobs.SearchJobStateService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
@@ -62,7 +60,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -103,7 +100,7 @@ public class SearchResourceExecutionTest {
 
     @BeforeEach
     public void setUp() {
-        this.searchJobService = new InMemorySearchJobService(nodeId, mock(SearchJobStateService.class), mock(SearchDbService.class));
+        this.searchJobService = new InMemorySearchJobService(nodeId);
         final SearchExecutor searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,

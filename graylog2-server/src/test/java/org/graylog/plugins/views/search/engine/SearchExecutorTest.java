@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.db.InMemorySearchJobService;
-import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
@@ -35,7 +34,6 @@ import org.graylog.plugins.views.search.engine.normalization.DecorateQueryString
 import org.graylog.plugins.views.search.engine.normalization.PluggableSearchNormalization;
 import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidation;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.jobs.SearchJobStateService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
@@ -65,7 +63,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,7 +90,7 @@ public class SearchExecutorTest {
     @BeforeEach
     void setUp() {
         doReturn("The-best-node").when(nodeId).getNodeId();
-        final SearchJobService searchJobService = new InMemorySearchJobService(nodeId, mock(SearchJobStateService.class), mock(SearchDbService.class));
+        final SearchJobService searchJobService = new InMemorySearchJobService(nodeId);
         this.searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,

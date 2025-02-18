@@ -20,7 +20,6 @@ import jakarta.ws.rs.ForbiddenException;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.jobs.SearchJobStateService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
@@ -31,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 
 import static org.graylog.plugins.views.search.SearchJob.NO_CANCELLATION;
-import static org.mockito.Mockito.mock;
 
 public class InMemorySearchJobServiceTest {
 
@@ -39,7 +37,7 @@ public class InMemorySearchJobServiceTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        toTest = new InMemorySearchJobService(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), mock(SearchJobStateService.class), mock(SearchDbService.class));
+        toTest = new InMemorySearchJobService(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"));
     }
 
     @Test
