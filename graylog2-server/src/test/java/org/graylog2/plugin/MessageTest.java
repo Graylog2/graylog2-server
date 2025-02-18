@@ -772,15 +772,7 @@ public class MessageTest {
     @Test
     public void testNullDateGetsReplacesWithCurrentDate() {
         final Message message = new Message("message", "source", null);
-
         assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
-
-        assertThat(message.processingErrors()).satisfies(e -> {
-            assertThat(e).hasSize(1);
-            assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
-            assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
-            assertThat(e.get(0).getDetails()).startsWith("<null> value provided");
-        });
     }
 
     @Test

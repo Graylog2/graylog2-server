@@ -42,6 +42,10 @@
         "type" : "date",
         "format" : "uuuu-MM-dd HH:mm:ss.SSS"
       },
+      "gl2_original_timestamp" : {
+        "type" : "date",
+        "format" : "uuuu-MM-dd HH:mm:ss.SSS"
+      },
       "gl2_processing_timestamp" : {
         "type" : "date",
         "format" : "uuuu-MM-dd HH:mm:ss.SSS"
