@@ -23,8 +23,8 @@ import type { Props as XYPlotProps } from 'views/components/visualizations/XYPlo
 import XYPlot from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import Query from 'views/logic/queries/Query';
-import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
+import Query, { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import { ALL_MESSAGES_TIMERANGE, DEFAULT_TIMERANGE } from 'views/Constants';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
@@ -44,7 +44,12 @@ jest.mock('views/logic/slices/viewSlice', () => ({
   setTimerange: jest.fn(() => async () => {}),
 }));
 
-const defaultCurrentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });
+const defaultCurrentQuery = Query.fromJSON({
+  id: 'dummyquery',
+  query: createElasticsearchQueryString(),
+  timerange: DEFAULT_TIMERANGE,
+  search_types: [],
+});
 
 describe('XYPlot', () => {
   const timestampPivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } });
