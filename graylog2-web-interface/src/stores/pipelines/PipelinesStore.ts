@@ -26,17 +26,16 @@ import PaginationURL from 'util/PaginationURL';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type PipelinesActionsType = {
-  delete: (id: string) => Promise<unknown>,
-  list: () => Promise<unknown>,
-  listPaginated: (pagination: Pagination) => Promise<PaginatedPipelines>,
-  get: (id: string) => Promise<unknown>,
-  save: (pipeline: PipelineType) => Promise<unknown>,
-  update: (pipeline: PipelineType) => Promise<unknown>,
-  parse: () => Promise<unknown>,
-}
-export const PipelinesActions = singletonActions(
-  'core.Pipelines',
-  () => Reflux.createActions<PipelinesActionsType>({
+  delete: (id: string) => Promise<unknown>;
+  list: () => Promise<unknown>;
+  listPaginated: (pagination: Pagination) => Promise<PaginatedPipelines>;
+  get: (id: string) => Promise<unknown>;
+  save: (pipeline: PipelineType) => Promise<unknown>;
+  update: (pipeline: PipelineType) => Promise<unknown>;
+  parse: () => Promise<unknown>;
+};
+export const PipelinesActions = singletonActions('core.Pipelines', () =>
+  Reflux.createActions<PipelinesActionsType>({
     delete: { asyncResult: true },
     list: { asyncResult: true },
     listPaginated: { asyncResult: true },
@@ -48,45 +47,46 @@ export const PipelinesActions = singletonActions(
 );
 
 type ParseError = {
-    line: number;
-    position_in_line: number;
-    type: string;
-}
+  line: number;
+  position_in_line: number;
+  type: string;
+};
 
 export type PipelineType = {
-  id: string,
-  title: string,
-  description: string,
-  source: string,
-  created_at: string,
-  modified_at: string,
-  stages: Array<StageType>,
-  errors?: Array<ParseError>,
+  id: string;
+  title: string;
+  description: string;
+  source: string;
+  created_at: string;
+  modified_at: string;
+  stages: Array<StageType>;
+  errors?: Array<ParseError>;
 };
 
 export type StageType = {
-  stage: number,
-  match: 'ALL' | 'EITHER' | 'PASS',
-  rules: Array<string>,
+  stage: number;
+  match: 'ALL' | 'EITHER' | 'PASS';
+  rules: Array<string>;
 };
 
 export type PaginatedPipelineResponse = PaginatedListJSON & {
-  pipelines: Array<PipelineType>,
+  pipelines: Array<PipelineType>;
 };
 
 export type PaginatedPipelines = PaginatedList<PipelineType>;
 
 const listFailCallback = (error: Error) => {
-  UserNotification.error(`Fetching pipelines failed with status: ${error.message}`,
-    'Could not retrieve processing pipelines');
+  UserNotification.error(
+    `Fetching pipelines failed with status: ${error.message}`,
+    'Could not retrieve processing pipelines',
+  );
 };
 
 type StoreState = {
-  pipelines: Array<PipelineType>,
-}
-export const PipelinesStore = singletonStore(
-  'core.Pipelines',
-  () => Reflux.createStore<StoreState>({
+  pipelines: Array<PipelineType>;
+};
+export const PipelinesStore = singletonStore('core.Pipelines', () =>
+  Reflux.createStore<StoreState>({
     listenables: [PipelinesActions],
     pipelines: undefined,
 
@@ -119,11 +119,7 @@ export const PipelinesStore = singletonStore(
       }, listFailCallback);
     },
 
-    listPaginated({
-      page,
-      perPage,
-      query,
-    }: Pagination): Promise<PaginatedPipelines> {
+    listPaginated({ page, perPage, query }: Pagination): Promise<PaginatedPipelines> {
       const url = PaginationURL(ApiRoutes.PipelinesController.paginatedList().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedPipelineResponse) => ({
@@ -145,8 +141,10 @@ export const PipelinesStore = singletonStore(
 
     get(pipelineId) {
       const failCallback = (error) => {
-        UserNotification.error(`Fetching pipeline failed with status: ${error.message}`,
-          `Could not retrieve processing pipeline "${pipelineId}"`);
+        UserNotification.error(
+          `Fetching pipeline failed with status: ${error.message}`,
+          `Could not retrieve processing pipeline "${pipelineId}"`,
+        );
       };
 
       const url = qualifyUrl(ApiRoutes.PipelinesController.get(pipelineId).url);
@@ -157,8 +155,10 @@ export const PipelinesStore = singletonStore(
 
     save(pipelineSource) {
       const failCallback = (error) => {
-        UserNotification.error(`Saving pipeline failed with status: ${error.message}`,
-          'Could not save processing pipeline');
+        UserNotification.error(
+          `Saving pipeline failed with status: ${error.message}`,
+          'Could not save processing pipeline',
+        );
       };
 
       const url = qualifyUrl(ApiRoutes.PipelinesController.create().url);
@@ -169,21 +169,20 @@ export const PipelinesStore = singletonStore(
       };
       const promise = fetch('POST', url, pipeline);
 
-      promise.then(
-        (response) => {
-          this._updatePipelinesState(response);
-          UserNotification.success(`Pipeline "${pipeline.title}" created successfully`);
-        },
-        failCallback,
-      );
+      promise.then((response) => {
+        this._updatePipelinesState(response);
+        UserNotification.success(`Pipeline "${pipeline.title}" created successfully`);
+      }, failCallback);
 
       PipelinesActions.save.promise(promise);
     },
 
     update(pipelineSource) {
       const failCallback = (error) => {
-        UserNotification.error(`Updating pipeline failed with status: ${error.message}`,
-          'Could not update processing pipeline');
+        UserNotification.error(
+          `Updating pipeline failed with status: ${error.message}`,
+          'Could not update processing pipeline',
+        );
       };
 
       const url = qualifyUrl(ApiRoutes.PipelinesController.update(pipelineSource.id).url);
@@ -195,20 +194,19 @@ export const PipelinesStore = singletonStore(
       };
       const promise = fetch('PUT', url, pipeline);
 
-      promise.then(
-        (response) => {
-          this._updatePipelinesState(response);
-          UserNotification.success(`Pipeline "${pipeline.title}" updated successfully`);
-        },
-        failCallback,
-      );
+      promise.then((response) => {
+        this._updatePipelinesState(response);
+        UserNotification.success(`Pipeline "${pipeline.title}" updated successfully`);
+      }, failCallback);
 
       PipelinesActions.update.promise(promise);
     },
     delete(pipelineId) {
       const failCallback = (error) => {
-        UserNotification.error(`Deleting pipeline failed with status: ${error.message}`,
-          `Could not delete processing pipeline "${pipelineId}"`);
+        UserNotification.error(
+          `Deleting pipeline failed with status: ${error.message}`,
+          `Could not delete processing pipeline "${pipelineId}"`,
+        );
       };
 
       const url = qualifyUrl(ApiRoutes.PipelinesController.delete(pipelineId).url);
@@ -235,11 +233,11 @@ export const PipelinesStore = singletonStore(
 
       return fetch('POST', url, pipeline).then(
         () => {
-        // call to clear the errors, the parsing was successful
+          // call to clear the errors, the parsing was successful
           callback([]);
         },
         (error) => {
-        // a Bad Request indicates a parse error, set all the returned errors in the editor
+          // a Bad Request indicates a parse error, set all the returned errors in the editor
           if (error.status === 400) {
             callback(error.additional.body);
           }

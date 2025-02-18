@@ -23,31 +23,37 @@ import { Input } from 'components/bootstrap';
 import type { FieldComponentProps } from '../VisualizationConfigurationOptions';
 
 type Props = FieldComponentProps & {
-  field: NumericFieldType,
+  field: NumericFieldType;
 };
 
-const createEvent = (name: string, value: number) => (({
-  target: { name, value },
-}) as React.ChangeEvent<any>);
+const createEvent = (name: string, value: number) =>
+  ({
+    target: { name, value },
+  }) as React.ChangeEvent<any>;
 
 const NumericField = ({ onChange, value, error, name, title, field }: Props) => {
-  const _onChange = useCallback((e: React.ChangeEvent<any>) => {
-    onChange(createEvent(e.target.name, Number.parseFloat(e.target.value)));
-  }, [onChange]);
+  const _onChange = useCallback(
+    (e: React.ChangeEvent<any>) => {
+      onChange(createEvent(e.target.name, Number.parseFloat(e.target.value)));
+    },
+    [onChange],
+  );
 
   return (
-    <Input id={`${name}-input`}
-           bsSize="small"
-           type="number"
-           name={name}
-           onChange={_onChange}
-           value={value ?? ''}
-           label={title}
-           error={error}
-           placeholder={field.description}
-           step={field.step}
-           labelClassName="col-sm-3"
-           wrapperClassName="col-sm-9" />
+    <Input
+      id={`${name}-input`}
+      bsSize="small"
+      type="number"
+      name={name}
+      onChange={_onChange}
+      value={value ?? ''}
+      label={title}
+      error={error}
+      placeholder={field.description}
+      step={field.step}
+      labelClassName="col-sm-3"
+      wrapperClassName="col-sm-9"
+    />
   );
 };
 

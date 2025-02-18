@@ -18,23 +18,23 @@ import * as React from 'react';
 import type * as Immutable from 'immutable';
 import { Field } from 'formik';
 
-import FilterSelect
-  from 'views/components/widgets/overview-configuration/filters/FilterSelect';
+import FilterSelect from 'views/components/widgets/overview-configuration/filters/FilterSelect';
 
 import SelectedFiltersList from './SelectedFiltersList';
 import type { FilterComponents, Filter } from './types';
 
 type Props = {
-  columnTitle: (column: string) => string,
-  filterComponents: FilterComponents,
-  name: string
-}
+  columnTitle: (column: string) => string;
+  filterComponents: FilterComponents;
+  name: string;
+};
 
 const FiltersConfiguration = ({ filterComponents, columnTitle, name }: Props) => (
   <div>
     <Field name={name}>
       {({ field: { value: values, onChange } }) => {
-        const changeField = (filtersValue: Immutable.OrderedSet<Filter>) => onChange({ target: { value: filtersValue, name } });
+        const changeField = (filtersValue: Immutable.OrderedSet<Filter>) =>
+          onChange({ target: { value: filtersValue, name } });
 
         const onCreate = (column: string, value: string) => {
           const filterList = values.toList();
@@ -80,15 +80,19 @@ const FiltersConfiguration = ({ filterComponents, columnTitle, name }: Props) =>
 
         return (
           <>
-            <SelectedFiltersList selectedFilters={values}
-                                 columnTitle={columnTitle}
-                                 onDelete={onDelete}
-                                 onEdit={onEdit}
-                                 filterComponents={filterComponents} />
-            <FilterSelect selectedFilters={values}
-                          filterComponents={filterComponents}
-                          columnTitle={columnTitle}
-                          onCreate={onCreate} />
+            <SelectedFiltersList
+              selectedFilters={values}
+              columnTitle={columnTitle}
+              onDelete={onDelete}
+              onEdit={onEdit}
+              filterComponents={filterComponents}
+            />
+            <FilterSelect
+              selectedFilters={values}
+              filterComponents={filterComponents}
+              columnTitle={columnTitle}
+              onCreate={onCreate}
+            />
           </>
         );
       }}

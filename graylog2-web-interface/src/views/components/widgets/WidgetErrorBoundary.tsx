@@ -19,11 +19,11 @@ import * as React from 'react';
 import ErrorWidget from './ErrorWidget';
 
 type State = {
-  error?: Error,
+  error?: Error;
 };
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement;
 } & { [key: string]: any };
 
 export default class WidgetErrorBoundary extends React.Component<Props, State> {
@@ -41,8 +41,13 @@ export default class WidgetErrorBoundary extends React.Component<Props, State> {
     const { children, ...rest } = this.props;
     const childrenWithProps = React.cloneElement(children, rest);
 
-    return error
-      ? <ErrorWidget title="While rendering this widget, the following error occurred:" errors={[{ description: error.toString() }]} />
-      : childrenWithProps;
+    return error ? (
+      <ErrorWidget
+        title="While rendering this widget, the following error occurred:"
+        errors={[{ description: error.toString() }]}
+      />
+    ) : (
+      childrenWithProps
+    );
   }
 }

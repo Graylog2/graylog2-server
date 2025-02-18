@@ -24,13 +24,16 @@ import ApiRoutes from 'routing/ApiRoutes';
 type VersionCheckType = {
   satisfied: boolean;
   errorMessage?: string;
-}
+};
 
 export const fetchSearchVersionCheck = async ({ queryKey }) => {
-  const [/* queryName */, { distribution, version }] = queryKey;
+  const [, /* queryName */ { distribution, version }] = queryKey;
 
   try {
-    const data = await fetch('GET', qualifyUrl(ApiRoutes.SystemSearchVersionApiController.satisfiesVersion(distribution, version).url));
+    const data = await fetch(
+      'GET',
+      qualifyUrl(ApiRoutes.SystemSearchVersionApiController.satisfiesVersion(distribution, version).url),
+    );
 
     return data;
   } catch (e) {

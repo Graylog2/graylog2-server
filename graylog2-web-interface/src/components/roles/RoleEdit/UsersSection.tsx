@@ -34,7 +34,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import UsersSelector from './UsersSelector';
 
 type Props = {
-  role: Role,
+  role: Role;
 };
 
 const Container = styled.div`
@@ -49,16 +49,18 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  const _onLoad = useCallback((pagination) => {
-    setLoading(true);
+  const _onLoad = useCallback(
+    (pagination) => {
+      setLoading(true);
 
-    return AuthzRolesDomain.loadUsersForRole(id, name, pagination)
-      .then((paginatedRoles) => {
+      return AuthzRolesDomain.loadUsersForRole(id, name, pagination).then((paginatedRoles) => {
         setLoading(false);
 
         return paginatedRoles;
       });
-  }, [id, name]);
+    },
+    [id, name],
+  );
 
   const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.ROLES.USER_ASSIGNED, {
@@ -67,13 +69,13 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
       app_action_value: 'assign-user',
     });
 
-    return AuthzRolesDomain.addMembers(id,
-      newUsers.map((u) => u.username).toSet()).then(() => _onLoad(DEFAULT_PAGINATION)
-      .then((result) => {
+    return AuthzRolesDomain.addMembers(id, newUsers.map((u) => u.username).toSet()).then(() =>
+      _onLoad(DEFAULT_PAGINATION).then((result) => {
         setPaginatedUsers(result);
 
         return result;
-      }));
+      }),
+    );
   };
 
   const _onUnassignUser = (user) => {
@@ -83,8 +85,10 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
       app_action_value: 'unassign-user',
     });
 
-    if ((role.name === 'Reader' || role.name === 'Admin')
-      && (!user.roles.includes('Reader') || !user.roles.includes('Admin'))) {
+    if (
+      (role.name === 'Reader' || role.name === 'Admin') &&
+      (!user.roles.includes('Reader') || !user.roles.includes('Admin'))
+    ) {
       setErrors(`User '${user.name}' needs at least a Reader or Admin role.`);
       _onLoad(DEFAULT_PAGINATION).then(setPaginatedUsers);
 
@@ -104,15 +108,15 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
       <Container>
         <UsersSelector onSubmit={_onAssignUser} role={role} />
       </Container>
-      <ErrorAlert onClose={setErrors}>
-        {errors}
-      </ErrorAlert>
+      <ErrorAlert onClose={setErrors}>{errors}</ErrorAlert>
       <h3>Selected Users</h3>
       <Container>
-        <PaginatedItemOverview noDataText="No selected users have been found."
-                               onLoad={_onLoad}
-                               overrideList={paginatedUsers}
-                               onDeleteItem={_onUnassignUser} />
+        <PaginatedItemOverview
+          noDataText="No selected users have been found."
+          onLoad={_onLoad}
+          overrideList={paginatedUsers}
+          onDeleteItem={_onUnassignUser}
+        />
       </Container>
     </SectionComponent>
   );

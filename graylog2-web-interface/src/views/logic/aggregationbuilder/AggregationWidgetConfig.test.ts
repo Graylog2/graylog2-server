@@ -20,10 +20,7 @@ import SortConfig from './SortConfig';
 
 describe('AggregationWidgetConfig', () => {
   it('do not enable rollups if no column pivots are present (was default in the past)', () => {
-    const config = AggregationWidgetConfig.builder()
-      .columnPivots([])
-      .rollup(false)
-      .build();
+    const config = AggregationWidgetConfig.builder().columnPivots([]).rollup(false).build();
 
     expect(config.rollup).toEqual(false);
   });

@@ -23,13 +23,18 @@ import UserNotification from 'util/UserNotification';
 import type { MigrationState, MigrationStepRequest } from 'components/datanode/Types';
 
 const useTriggerMigrationState = (): {
-  onTriggerNextState: (step: MigrationStepRequest) => Promise<MigrationState>,
-  isLoadingNextMigrationState: boolean,
-  isError: boolean,
-  error: Error,
+  onTriggerNextState: (step: MigrationStepRequest) => Promise<MigrationState>;
+  isLoadingNextMigrationState: boolean;
+  isError: boolean;
+  error: Error;
 } => {
   const queryClient = useQueryClient();
-  const { mutateAsync: onTriggerNextState, isLoading: isLoadingNextMigrationState, error, isError } = useMutation(Migration.trigger, {
+  const {
+    mutateAsync: onTriggerNextState,
+    isLoading: isLoadingNextMigrationState,
+    error,
+    isError,
+  } = useMutation(Migration.trigger, {
     onSuccess: () => {
       queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
     },

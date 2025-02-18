@@ -1,35 +1,35 @@
 :local(.decoratorBox) {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 :local(.addDecoratorButtonContainer) {
-    margin-top: 5px;
-    margin-bottom: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 :local(.addDecoratorSelect) {
-    margin-right: 5px;
-    width: 100%;
+  margin-right: 5px;
+  width: 100%;
 }
 
 :local(.helpLink) {
-    font-size: 1rem; /* theme.fonts.size.body */
-    padding-top: 0px;
-    padding-right: 0px;
-    float: right;
+  font-size: 1rem; /* theme.fonts.size.body */
+  padding-top: 0px;
+  padding-right: 0px;
+  float: right;
 }
 
 :local(.helpPopover) {
-    font-size: 1rem; /* theme.fonts.size.body */
+  font-size: 1rem; /* theme.fonts.size.body */
 }
 
 :local(.decoratorListContainer) {
-    display: inline-block;
-    overflow: visible;
-    width: 100%;
+  display: inline-block;
+  overflow: visible;
+  width: 100%;
 }
 
 :local(.noDecoratorsAlert) {
-    margin-top: 2em;
+  margin-top: 2em;
 }

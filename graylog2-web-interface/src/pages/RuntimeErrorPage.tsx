@@ -36,9 +36,9 @@ const description = (
 );
 
 type Props = {
-  error: Error,
-  componentStack: string,
-}
+  error: Error;
+  componentStack: string;
+};
 
 const RuntimeErrorPage = ({ error, componentStack }: Props) => {
   const [showDetails, setShowDetails] = useState(AppConfig.gl2DevMode());
@@ -66,10 +66,12 @@ const RuntimeErrorPage = ({ error, componentStack }: Props) => {
         <dt>
           <pre className="content" id="render-error">
             <div className="pull-right">
-              <ClipboardButton title={<Icon name="content_copy" />}
-                               bsSize="sm"
-                               text={`${error.message}\n${errorDetails}`}
-                               buttonTitle="Copy error details to clipboard" />
+              <ClipboardButton
+                title={<Icon name="content_copy" />}
+                bsSize="sm"
+                text={`${error.message}\n${errorDetails}`}
+                buttonTitle="Copy error details to clipboard"
+              />
             </div>
             {error.message}
             {showDetails && errorDetails}

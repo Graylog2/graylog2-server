@@ -8,14 +8,12 @@ const PanelClickExample = () => {
 
   return (
     <Panel onClick={handleClick}>
-      <Panel.Body>
-        Basic panel example
-      </Panel.Body>
+      <Panel.Body>Basic panel example</Panel.Body>
     </Panel>
-  )
+  );
 };
 
-<PanelClickExample />
+<PanelClickExample />;
 ```
 
 ### Panel w/ Header
@@ -52,9 +50,12 @@ const PanelClickExample = () => {
 ```js
 <Panel>
   <Panel.Body>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, expedita eveniet, exercitationem, iure corporis quae inventore excepturi saepe laudantium consequatur facere labore reiciendis recusandae adipisci alias explicabo?
-    <br/>
-    Quidem, consectetur sunt.Enim placeat amet cum eum quidem autem accusamus quam modi temporibus mollitia dolores iste aliquam tenetur officia, laboriosam totam, ratione velit! Architecto reiciendis quod aliquid impedit obcaecati exercitationem quis amet!
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, expedita eveniet, exercitationem, iure corporis quae
+    inventore excepturi saepe laudantium consequatur facere labore reiciendis recusandae adipisci alias explicabo?
+    <br />
+    Quidem, consectetur sunt.Enim placeat amet cum eum quidem autem accusamus quam modi temporibus mollitia dolores iste
+    aliquam tenetur officia, laboriosam totam, ratione velit! Architecto reiciendis quod aliquid impedit obcaecati
+    exercitationem quis amet!
   </Panel.Body>
 </Panel>
 ```
@@ -66,13 +67,12 @@ const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Default'];
 
 styles.map((style, i) => {
   return (
-    <Panel bsStyle={style.toLowerCase()}
-           key={`button-${style}-${i}`}>
+    <Panel bsStyle={style.toLowerCase()} key={`button-${style}-${i}`}>
       <Panel.Heading>{`${style} Heading`}</Panel.Heading>
       <Panel.Body>Panel content</Panel.Body>
     </Panel>
-  )
-})
+  );
+});
 ```
 
 ### Collapsible Panel
@@ -86,22 +86,18 @@ const PanelCollapseExample = () => {
   return (
     <div>
       <p>
-        <Button onClick={() => setExpanded(!expanded)}>
-          Click to {expanded ? 'Close' : 'Open'}
-        </Button>
+        <Button onClick={() => setExpanded(!expanded)}>Click to {expanded ? 'Close' : 'Open'}</Button>
       </p>
 
       <Panel expanded={expanded}>
         <Panel.Collapse>
           <Panel.Body>
-            Anim pariatur cliche reprehenderit, enim eiusmod high life
-            accusamus terry richardson ad squid. Nihil anim keffiyeh
-            helvetica, craft beer labore wes anderson cred nesciunt sapiente
-            ea proident.
+            Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim
+            keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
           </Panel.Body>
         </Panel.Collapse>
       </Panel>
-     </div>
+    </div>
   );
 };
 
@@ -112,16 +108,12 @@ const PanelCollapseExample = () => {
 
   <Panel id="collapsible-panel-example-2" defaultExpanded>
     <Panel.Heading>
-      <Panel.Title toggle>
-        Title that functions as a collapse toggle
-      </Panel.Title>
+      <Panel.Title toggle>Title that functions as a collapse toggle</Panel.Title>
     </Panel.Heading>
     <Panel.Collapse>
       <Panel.Body>
-        Anim pariatur cliche reprehenderit, enim eiusmod high life
-        accusamus terry richardson ad squid. Nihil anim keffiyeh
-        helvetica, craft beer labore wes anderson cred nesciunt sapiente
-        ea proident.
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim
+        keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
       </Panel.Body>
     </Panel.Collapse>
   </Panel>
@@ -135,14 +127,12 @@ const PanelCollapseExample = () => {
     </Panel.Heading>
     <Panel.Collapse>
       <Panel.Body>
-        Anim pariatur cliche reprehenderit, enim eiusmod high life
-        accusamus terry richardson ad squid. Nihil anim keffiyeh
-        helvetica, craft beer labore wes anderson cred nesciunt sapiente
-        ea proident.
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim
+        keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
       </Panel.Body>
     </Panel.Collapse>
   </Panel>
-</>
+</>;
 ```
 
 ## Deprecated Examples
@@ -155,37 +145,34 @@ const DeprecatedPanelClickExample = () => {
     alert('You have clicked on me');
   }
 
-  return (
-    <Panel onClick={handleClick}>Click me Example</Panel>
-  )
+  return <Panel onClick={handleClick}>Click me Example</Panel>;
 };
 
-<DeprecatedPanelClickExample />
+<DeprecatedPanelClickExample />;
 ```
 
 ### Deprecated Panel w/ Header
 
 ```js
-<Panel header="Panel heading without a title">
-  Panel content
-</Panel>
+<Panel header="Panel heading without a title">Panel content</Panel>
 ```
 
 ### Deprecated Panel w/ Footer
 
 ```js
-<Panel footer="Panel footer">
-  Panel content
-</Panel>
+<Panel footer="Panel footer">Panel content</Panel>
 ```
 
 ### Deprecated Panel w/ longer content
 
 ```js
 <Panel bsStyle="info">
-  Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, expedita eveniet, exercitationem, iure corporis quae inventore excepturi saepe laudantium consequatur facere labore reiciendis recusandae adipisci alias explicabo?
-  <br/>
-  Quidem, consectetur sunt.Enim placeat amet cum eum quidem autem accusamus quam modi temporibus mollitia dolores iste aliquam tenetur officia, laboriosam totam, ratione velit! Architecto reiciendis quod aliquid impedit obcaecati exercitationem quis amet!
+  Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, expedita eveniet, exercitationem, iure corporis quae
+  inventore excepturi saepe laudantium consequatur facere labore reiciendis recusandae adipisci alias explicabo?
+  <br />
+  Quidem, consectetur sunt.Enim placeat amet cum eum quidem autem accusamus quam modi temporibus mollitia dolores iste
+  aliquam tenetur officia, laboriosam totam, ratione velit! Architecto reiciendis quod aliquid impedit obcaecati
+  exercitationem quis amet!
 </Panel>
 ```
 
@@ -196,13 +183,11 @@ const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Default'];
 
 styles.map((style, i) => {
   return (
-    <Panel bsStyle={style.toLowerCase()}
-           key={`button-${style}-${i}`}
-           header={`${style} Heading`}>
+    <Panel bsStyle={style.toLowerCase()} key={`button-${style}-${i}`} header={`${style} Heading`}>
       Lorem ipsum dolor sit amet consectetur adipisicing elit.
     </Panel>
-  )
-})
+  );
+});
 ```
 
 ### Deprecated Collapsible Panel
@@ -211,32 +196,28 @@ styles.map((style, i) => {
 import { Button } from 'components/bootstrap';
 
 const DeprecatedPanelCollapseExample = () => {
-   const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(false);
 
   return (
     <div>
       <p>
-        <Button onClick={() => setExpanded(!expanded)}>
-          Click to Toggle
-        </Button>
+        <Button onClick={() => setExpanded(!expanded)}>Click to Toggle</Button>
       </p>
 
       <Panel collapsible expanded={expanded}>
-        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid.
-        Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim
+        keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
       </Panel>
     </div>
-  )
+  );
 };
 
 <>
   <DeprecatedPanelCollapseExample />
 
-  <Panel collapsible
-         defaultExpanded
-         title="Click to Toggle">
-    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid.
-    Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+  <Panel collapsible defaultExpanded title="Click to Toggle">
+    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh
+    helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
   </Panel>
-</>
+</>;
 ```

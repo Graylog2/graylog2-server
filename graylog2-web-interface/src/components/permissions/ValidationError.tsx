@@ -38,13 +38,13 @@ const List = styled.ul`
 `;
 
 type Props = {
-  validationResult: ValidationResult,
-  availableGrantees: GranteesList,
+  validationResult: ValidationResult;
+  availableGrantees: GranteesList;
 };
 
 const ValidationError = ({ validationResult, availableGrantees }: Props) => {
-  const pastOwners = validationResult.errorContext.selectedGranteeCapabilities.map(
-    (grn) => availableGrantees.find((grantee) => grantee.id === grn),
+  const pastOwners = validationResult.errorContext.selectedGranteeCapabilities.map((grn) =>
+    availableGrantees.find((grantee) => grantee.id === grn),
   );
 
   return (
@@ -52,12 +52,14 @@ const ValidationError = ({ validationResult, availableGrantees }: Props) => {
       <List>
         <li>
           Removing the following owners will leave the entity ownerless: <br />
-          {pastOwners.map((owner, key) => (
-            <span key={owner?.id}>
-              {capitalize(owner?.type)} <i>{owner?.title}</i>
-              {key !== pastOwners.size - 1 && ', '}
-            </span>
-          )).toArray()}
+          {pastOwners
+            .map((owner, key) => (
+              <span key={owner?.id}>
+                {capitalize(owner?.type)} <i>{owner?.title}</i>
+                {key !== pastOwners.size - 1 && ', '}
+              </span>
+            ))
+            .toArray()}
         </li>
       </List>
     </Container>

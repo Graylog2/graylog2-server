@@ -22,10 +22,10 @@ import type { SharedEntityType } from 'logic/permissions/types';
 import Grantee from './Grantee';
 
 type InternalState = {
-  id: $PropertyType<SharedEntityType, 'id'>,
-  owners: Immutable.List<Grantee>,
-  title: $PropertyType<SharedEntityType, 'title'>,
-  type: $PropertyType<SharedEntityType, 'type'>,
+  id: $PropertyType<SharedEntityType, 'id'>;
+  owners: Immutable.List<Grantee>;
+  title: $PropertyType<SharedEntityType, 'title'>;
+  type: $PropertyType<SharedEntityType, 'type'>;
 };
 
 export default class SharedEntity {
@@ -73,13 +73,7 @@ export default class SharedEntity {
     const { id, owners, title, type } = value;
     const formattedOwners = Immutable.fromJS(owners.map((o) => Grantee.fromJSON(o)));
 
-    return SharedEntity
-      .builder()
-      .id(id)
-      .owners(formattedOwners)
-      .title(title)
-      .type(type)
-      .build();
+    return SharedEntity.builder().id(id).owners(formattedOwners).title(title).type(type).build();
   }
 
   static builder(): Builder {

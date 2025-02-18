@@ -29,9 +29,9 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
-  nodeId: string,
-  subsystems: {},
-}
+  nodeId: string;
+  subsystems: {};
+};
 const metric_name = 'org.apache.logging.log4j.core.Appender.all';
 
 const NodeLoggers = ({ nodeId, subsystems }: Props) => {
@@ -44,7 +44,9 @@ const NodeLoggers = ({ nodeId, subsystems }: Props) => {
   useEffect(() => {
     MetricsActions.add(nodeId, metric_name);
 
-    return () => { MetricsActions.remove(nodeId, metric_name); };
+    return () => {
+      MetricsActions.remove(nodeId, metric_name);
+    };
   }, [nodeId]);
 
   const _formattedThroughput = useMemo(() => {
@@ -57,13 +59,14 @@ const NodeLoggers = ({ nodeId, subsystems }: Props) => {
     return 'n/a';
   }, [metrics, nodeId]);
 
-  const subsystemKeys = Object.keys(subsystems)
-    .map((subsystem) => (
-      <LoggingSubsystem name={subsystem}
-                        nodeId={nodeId}
-                        key={`logging-subsystem-${nodeId}-${subsystem}`}
-                        subsystem={subsystems[subsystem]} />
-    ));
+  const subsystemKeys = Object.keys(subsystems).map((subsystem) => (
+    <LoggingSubsystem
+      name={subsystem}
+      nodeId={nodeId}
+      key={`logging-subsystem-${nodeId}-${subsystem}`}
+      subsystem={subsystems[subsystem]}
+    />
+  ));
 
   const logLevelMetrics = <LogLevelMetricsOverview nodeId={nodeId} />;
 
@@ -73,21 +76,21 @@ const NodeLoggers = ({ nodeId, subsystems }: Props) => {
         <IfPermitted permissions="loggers:read">
           <div style={{ marginBottom: '20' }}>
             <div className="pull-right">
-              <Button bsSize="sm"
-                      bsStyle="primary"
-                      className="trigger-log-level-metrics"
-                      onClick={() => {
-                        setShowDetails((prevShowDetails) => !prevShowDetails);
+              <Button
+                bsSize="sm"
+                bsStyle="primary"
+                className="trigger-log-level-metrics"
+                onClick={() => {
+                  setShowDetails((prevShowDetails) => !prevShowDetails);
 
-                        sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.SHOW_LOG_LEVEL_METRICS_TOGGLED, {
-                          app_pathname: getPathnameWithoutId(location.pathname),
-                          app_section: 'log-level',
-                          app_action_value: 'show-metrics',
-                          event_details: { showing: !showDetails },
-                        });
-                      }}>
-                <Icon name="speed" />{' '}
-                {showDetails ? 'Hide' : 'Show'} log level metrics
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.SHOW_LOG_LEVEL_METRICS_TOGGLED, {
+                    app_pathname: getPathnameWithoutId(location.pathname),
+                    app_section: 'log-level',
+                    app_action_value: 'show-metrics',
+                    event_details: { showing: !showDetails },
+                  });
+                }}>
+                <Icon name="speed" /> {showDetails ? 'Hide' : 'Show'} log level metrics
               </Button>
             </div>
             <h2>
@@ -97,9 +100,7 @@ const NodeLoggers = ({ nodeId, subsystems }: Props) => {
               </small>
             </h2>
           </div>
-          <div className="subsystems">
-            {subsystemKeys}
-          </div>
+          <div className="subsystems">{subsystemKeys}</div>
           {showDetails && logLevelMetrics}
         </IfPermitted>
       </Col>

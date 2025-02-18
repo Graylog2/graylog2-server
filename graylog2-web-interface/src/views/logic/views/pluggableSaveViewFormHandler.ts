@@ -20,7 +20,11 @@ import type View from 'views/logic/views/View';
 import UserNotification from 'util/UserNotification';
 import type { SaveViewControls } from 'views/types';
 
-const executeDuplicationHandler = async (view: View, userPermissions: Immutable.List<string>, duplicationHandlers: Array<(view: View, userPermissions: Immutable.List<string>) => Promise<View>>): Promise<View> => {
+const executeDuplicationHandler = async (
+  view: View,
+  userPermissions: Immutable.List<string>,
+  duplicationHandlers: Array<(view: View, userPermissions: Immutable.List<string>) => Promise<View>>,
+): Promise<View> => {
   let updatedView = view.toBuilder().build();
 
   // eslint-disable-next-line no-restricted-syntax
@@ -43,14 +47,26 @@ const executeDuplicationHandler = async (view: View, userPermissions: Immutable.
   return updatedView;
 };
 
-export const executePluggableSearchDuplicationHandler = (view: View, userPermissions: Immutable.List<string>, pluggableSaveViewControls: Array<SaveViewControls>) => {
-  const pluginDuplicationHandlers = pluggableSaveViewControls?.map(({ onSearchDuplication }) => onSearchDuplication).filter((pluginData) => !!pluginData);
+export const executePluggableSearchDuplicationHandler = (
+  view: View,
+  userPermissions: Immutable.List<string>,
+  pluggableSaveViewControls: Array<SaveViewControls>,
+) => {
+  const pluginDuplicationHandlers = pluggableSaveViewControls
+    ?.map(({ onSearchDuplication }) => onSearchDuplication)
+    .filter((pluginData) => !!pluginData);
 
   return executeDuplicationHandler(view, userPermissions, pluginDuplicationHandlers);
 };
 
-export const executePluggableDashboardDuplicationHandler = (view: View, userPermissions: Immutable.List<string>, pluggableSaveViewControls: Array<SaveViewControls>) => {
-  const pluginDuplicationHandlers = pluggableSaveViewControls?.map(({ onDashboardDuplication }) => onDashboardDuplication).filter((pluginData) => !!pluginData);
+export const executePluggableDashboardDuplicationHandler = (
+  view: View,
+  userPermissions: Immutable.List<string>,
+  pluggableSaveViewControls: Array<SaveViewControls>,
+) => {
+  const pluginDuplicationHandlers = pluggableSaveViewControls
+    ?.map(({ onDashboardDuplication }) => onDashboardDuplication)
+    .filter((pluginData) => !!pluginData);
 
   return executeDuplicationHandler(view, userPermissions, pluginDuplicationHandlers);
 };
