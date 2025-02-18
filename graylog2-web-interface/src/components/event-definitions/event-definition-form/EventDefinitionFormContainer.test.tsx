@@ -28,17 +28,10 @@ import useScopePermissions from 'hooks/useScopePermissions';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import { SYSTEM_EVENT_DEFINITION_TYPE as mockSYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
+import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
 
 import EventDefinitionFormContainer from './EventDefinitionFormContainer';
-
-type entityScope = {
-  is_mutable: boolean;
-};
-
-type getPermissionsByScopeReturnType = {
-  loadingScopePermissions: boolean;
-  scopePermissions: entityScope;
-};
 
 const mockAggregationEventDefinition = {
   ...mockEventDefinition,
@@ -48,14 +41,16 @@ const mockAggregationEventDefinition = {
   },
 };
 
-const exampleEntityScopeMutable: getPermissionsByScopeReturnType = {
+const exampleEntityScopeMutable: PermissionsByScopeReturnType = {
   loadingScopePermissions: false,
   scopePermissions: { is_mutable: true },
+  checkPermissions: (_inEntity: Partial<GenericEntityType>) => true,
 };
 
-const exampleEntityScopeImmutable: getPermissionsByScopeReturnType = {
+const exampleEntityScopeImmutable: PermissionsByScopeReturnType = {
   loadingScopePermissions: false,
   scopePermissions: { is_mutable: false },
+  checkPermissions: (_inEntity: Partial<GenericEntityType>) => false,
 };
 
 jest.mock('react-router-dom', () => {

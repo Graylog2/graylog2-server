@@ -35,11 +35,17 @@ type EntityScopeType = {
   entity_scopes: EntityScopeRecord;
 };
 
+export type PermissionsByScopeReturnType = {
+  loadingScopePermissions: boolean;
+  scopePermissions: ScopeParams;
+  checkPermissions: (inEntity: Partial<GenericEntityType>) => boolean;
+};
+
 function fetchScopePermissions() {
   return fetch('GET', qualifyUrl(ApiRoutes.EntityScopeController.getScope().url));
 }
 
-const useGetPermissionsByScope = (entity: Partial<GenericEntityType>) => {
+const useGetPermissionsByScope = (entity: Partial<GenericEntityType> = undefined) => {
   const { data, isLoading } = useQuery<EntityScopeType, Error>(
     ['scope-permissions'],
     () => onError(fetchScopePermissions(), (e) => UserNotification.error(e.message)),
@@ -56,6 +62,11 @@ const useGetPermissionsByScope = (entity: Partial<GenericEntityType>) => {
   return {
     loadingScopePermissions: isLoading,
     scopePermissions: permissions,
+    checkPermissions: (inEntity: Partial<GenericEntityType>) => {
+      const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
+
+      return data.entity_scopes[entityScope].is_mutable;
+    },
   };
 };
 

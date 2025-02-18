@@ -26,21 +26,15 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
 import { adminUser } from 'fixtures/users';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
+import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
 import EditEventDefinitionPage from 'pages/EditEventDefinitionPage';
 import useCurrentUser from 'hooks/useCurrentUser';
+import type { GenericEntityType } from 'logic/lookup-tables/types';
 
-type entityScope = {
-  is_mutable: boolean;
-};
-
-type getPermissionsByScopeReturnType = {
-  loadingScopePermissions: boolean;
-  scopePermissions: entityScope;
-};
-
-const exampleEntityScopeMutable: getPermissionsByScopeReturnType = {
+const exampleEntityScopeMutable: PermissionsByScopeReturnType = {
   loadingScopePermissions: false,
   scopePermissions: { is_mutable: true },
+  checkPermissions: (_inEntity: Partial<GenericEntityType>) => true,
 };
 
 jest.mock('react-router-dom', () => ({
