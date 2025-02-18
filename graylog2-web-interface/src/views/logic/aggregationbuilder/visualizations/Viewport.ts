@@ -19,14 +19,14 @@ import * as Immutable from 'immutable';
 type Center = [number, number];
 type Zoom = number;
 type State = {
-  center: Center,
-  zoom: Zoom,
+  center: Center;
+  zoom: Zoom;
 };
 
 export type ViewportJson = {
-  center_x: number,
-  center_y: number,
-  zoom: number,
+  center_x: number;
+  center_y: number;
+  zoom: number;
 };
 
 export default class Viewport {

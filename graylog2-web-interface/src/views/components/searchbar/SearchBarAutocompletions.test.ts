@@ -40,7 +40,7 @@ const sourceCompletion = {
 
 class SimpleCompleter implements Completer {
   // eslint-disable-next-line class-methods-use-this
-  getCompletions = () => ([sourceIpCompletion]);
+  getCompletions = () => [sourceIpCompletion];
 }
 
 class AsyncCompleter implements Completer {
@@ -52,7 +52,7 @@ const EditorMock = {
   completer: {},
   session: {
     getLength: () => 1,
-    getTokens: () => ([{ type: 'term', value: 's', index: 0, start: 0 }]),
+    getTokens: () => [{ type: 'term', value: 's', index: 0, start: 0 }],
     getTokenAt: () => ({ type: 'term', value: 's', index: 0, start: 0 }),
   },
 };
@@ -64,7 +64,14 @@ describe('SearchAutoCompletions', () => {
 
   describe('getCompletions', () => {
     it('should return completions based on provided Completers', async () => {
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES, 'Europe/Berlin', view);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions(
+        [new SimpleCompleter()],
+        DEFAULT_TIMERANGE,
+        [],
+        EMPTY_FIELDTYPES,
+        'Europe/Berlin',
+        view,
+      );
 
       const callback = jest.fn();
 
@@ -81,7 +88,14 @@ describe('SearchAutoCompletions', () => {
     });
 
     it('should support Completers which provide the completions asynchronously', async () => {
-      const searchBarAutoCompletions = new SearchBarAutoCompletions([new SimpleCompleter(), new AsyncCompleter()], DEFAULT_TIMERANGE, [], EMPTY_FIELDTYPES, 'Europe/Berlin', view);
+      const searchBarAutoCompletions = new SearchBarAutoCompletions(
+        [new SimpleCompleter(), new AsyncCompleter()],
+        DEFAULT_TIMERANGE,
+        [],
+        EMPTY_FIELDTYPES,
+        'Europe/Berlin',
+        view,
+      );
 
       const callback = jest.fn();
 

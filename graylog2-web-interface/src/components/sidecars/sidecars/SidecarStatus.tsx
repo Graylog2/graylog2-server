@@ -29,13 +29,18 @@ import SidecarStatusFileList from './SidecarStatusFileList';
 import VerboseMessageModal from './VerboseMessageModal';
 
 type Props = {
-  sidecar: SidecarSummary,
-  collectors: Array<Collector>,
-}
+  sidecar: SidecarSummary;
+  collectors: Array<Collector>;
+};
 
 const formatNodeDetails = (details: NodeDetails) => {
   if (!details) {
-    return <p>Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
+    return (
+      <p>
+        Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to
+        the server.
+      </p>
+    );
   }
 
   const { metrics } = details;
@@ -51,20 +56,36 @@ const formatNodeDetails = (details: NodeDetails) => {
       <dt>Load</dt>
       <dd>{defaultTo(metrics?.load_1, 'Not available')}</dd>
       <dt>Volumes &gt; 75% full</dt>
-      {metrics?.disks_75 === undefined
-        ? <dd>Not available</dd>
-        : <dd>{metrics?.disks_75.length > 0 ? metrics?.disks_75.join(', ') : 'None'}</dd>}
+      {metrics?.disks_75 === undefined ? (
+        <dd>Not available</dd>
+      ) : (
+        <dd>{metrics?.disks_75.length > 0 ? metrics?.disks_75.join(', ') : 'None'}</dd>
+      )}
     </dl>
   );
 };
 
-const formatCollectorStatus = (details: NodeDetails, collectors: Array<Collector>, _onShowVerbose: (name: string, verbose: string) => void) => {
+const formatCollectorStatus = (
+  details: NodeDetails,
+  collectors: Array<Collector>,
+  _onShowVerbose: (name: string, verbose: string) => void,
+) => {
   if (!details || !collectors) {
-    return <p>Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
+    return (
+      <p>
+        Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected
+        to the server.
+      </p>
+    );
   }
 
   if (!details.status) {
-    return <p>Did not receive collectors status, set the option <code>send_status: true</code> in the sidecar configuration to see this information.</p>;
+    return (
+      <p>
+        Did not receive collectors status, set the option <code>send_status: true</code> in the sidecar configuration to
+        see this information.
+      </p>
+    );
   }
 
   const collectorStatuses = details.status.collectors;
@@ -96,9 +117,7 @@ const formatCollectorStatus = (details: NodeDetails, collectors: Array<Collector
 
         if (status.verbose_message) {
           verboseButton = (
-            <Button bsStyle="link"
-                    bsSize="xs"
-                    onClick={() => _onShowVerbose(collector.name, status.verbose_message)}>
+            <Button bsStyle="link" bsSize="xs" onClick={() => _onShowVerbose(collector.name, status.verbose_message)}>
               Show Details
             </Button>
           );
@@ -118,17 +137,17 @@ const formatCollectorStatus = (details: NodeDetails, collectors: Array<Collector
 
     if (collector) {
       statuses.push(
-        <dt key={`${collector.id}-key`} className={statusClass}>{collector.name}</dt>,
-        <dd key={`${collector.id}-description`} className={statusClass}>{statusBadge}&ensp;{statusMessage}&ensp;{verboseButton}</dd>,
+        <dt key={`${collector.id}-key`} className={statusClass}>
+          {collector.name}
+        </dt>,
+        <dd key={`${collector.id}-description`} className={statusClass}>
+          {statusBadge}&ensp;{statusMessage}&ensp;{verboseButton}
+        </dd>,
       );
     }
   });
 
-  return (
-    <dl className={commonStyles.deflist}>
-      {statuses}
-    </dl>
-  );
+  return <dl className={commonStyles.deflist}>{statuses}</dl>;
 };
 
 const SidecarStatus = ({ sidecar, collectors }: Props) => {
@@ -173,10 +192,12 @@ const SidecarStatus = ({ sidecar, collectors }: Props) => {
           </div>
         </Col>
       </Row>
-      <VerboseMessageModal showModal={showVerboseModal}
-                           onHide={_onHideVerbose}
-                           collectorName={collectorName}
-                           collectorVerbose={collectorVerbose} />
+      <VerboseMessageModal
+        showModal={showVerboseModal}
+        onHide={_onHideVerbose}
+        collectorName={collectorName}
+        collectorVerbose={collectorVerbose}
+      />
     </div>
   );
 };

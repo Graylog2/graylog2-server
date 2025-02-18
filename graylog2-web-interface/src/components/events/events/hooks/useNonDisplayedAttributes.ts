@@ -23,7 +23,10 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 
 const useNonDisplayedAttributes = (defaultLayout) => {
   const { attributes } = useTableFetchContext();
-  const { layoutConfig: { displayedAttributes }, isInitialLoading } = useTableLayout(defaultLayout);
+  const {
+    layoutConfig: { displayedAttributes },
+    isInitialLoading,
+  } = useTableLayout(defaultLayout);
 
   return useMemo<Array<Attribute>>(() => {
     if (isInitialLoading) return [];

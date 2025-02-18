@@ -30,9 +30,7 @@ type EmbeddedCloudWatchAppProps = {
   onSubmit?: (...args: any[]) => void;
 };
 
-const EmbeddedCloudWatchApp = ({
-  onSubmit,
-}: EmbeddedCloudWatchAppProps) => {
+const EmbeddedCloudWatchApp = ({ onSubmit }: EmbeddedCloudWatchAppProps) => {
   const handleSubmit = (formData) => {
     if (!onSubmit) {
       return;

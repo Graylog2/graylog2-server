@@ -25,9 +25,12 @@ type MessageFieldExtractorActionsProps = {
   message: any;
 };
 
-class MessageFieldExtractorActions extends React.Component<MessageFieldExtractorActionsProps, {
-  [key: string]: any;
-}> {
+class MessageFieldExtractorActions extends React.Component<
+  MessageFieldExtractorActionsProps,
+  {
+    [key: string]: any;
+  }
+> {
   private newExtractorRoutes: { [key: string]: string };
 
   UNSAFE_componentWillMount() {
@@ -39,18 +42,18 @@ class MessageFieldExtractorActions extends React.Component<MessageFieldExtractor
   }
 
   _refreshExtractorRoutes = (props) => {
-    this.newExtractorRoutes = ExtractorUtils.getNewExtractorRoutes(props.message.source_node_id,
+    this.newExtractorRoutes = ExtractorUtils.getNewExtractorRoutes(
+      props.message.source_node_id,
       props.message.source_input_id,
       props.fieldName,
       props.message.index,
-      props.message.id);
+      props.message.id,
+    );
   };
 
   _formatExtractorMenuItem = (extractorType) => (
     <LinkContainer key={`menu-item-${extractorType}`} to={this.newExtractorRoutes[extractorType]}>
-      <MenuItem>
-        {ExtractorUtils.getReadableExtractorTypeName(extractorType)}
-      </MenuItem>
+      <MenuItem>{ExtractorUtils.getReadableExtractorTypeName(extractorType)}</MenuItem>
     </LinkContainer>
   );
 
@@ -61,11 +64,12 @@ class MessageFieldExtractorActions extends React.Component<MessageFieldExtractor
     if (typeof messageField === 'string') {
       return (
         <div className="message-field-actions pull-right">
-          <DropdownButton pullRight
-                          bsSize="xsmall"
-                          title="Select extractor type"
-                          key={1}
-                          id={`select-extractor-type-dropdown-field-${fieldName}`}>
+          <DropdownButton
+            pullRight
+            bsSize="xsmall"
+            title="Select extractor type"
+            key={1}
+            id={`select-extractor-type-dropdown-field-${fieldName}`}>
             {ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => this._formatExtractorMenuItem(extractorType))}
           </DropdownButton>
         </div>
@@ -74,11 +78,12 @@ class MessageFieldExtractorActions extends React.Component<MessageFieldExtractor
 
     return (
       <div className="message-field-actions pull-right">
-        <DropdownButton pullRight
-                        bsSize="xsmall"
-                        title="Select extractor type"
-                        key={1}
-                        id={`select-extractor-type-dropdown-field-${fieldName}`}>
+        <DropdownButton
+          pullRight
+          bsSize="xsmall"
+          title="Select extractor type"
+          key={1}
+          id={`select-extractor-type-dropdown-field-${fieldName}`}>
           <MenuItem key="select-extractor-type-disabled" disabled>
             Extractors can only be used with string fields.
           </MenuItem>

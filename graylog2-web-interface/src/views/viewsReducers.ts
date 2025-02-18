@@ -21,19 +21,23 @@ import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionS
 import { searchMetadataSliceReducer } from 'views/logic/slices/searchMetadataSlice';
 import { undoRedoSliceReducer } from 'views/logic/slices/undoRedoSlice';
 
-const viewsReducers: PluginExports['views.reducers'] = [{
-  key: 'view',
-  reducer: viewSliceReducer,
-}, {
-  key: 'searchExecution',
-  reducer: searchExecutionSliceReducer,
-}, {
-  key: 'searchMetadata',
-  reducer: searchMetadataSliceReducer,
-}, {
-  key: 'undoRedo',
-  reducer: undoRedoSliceReducer,
-},
+const viewsReducers: PluginExports['views.reducers'] = [
+  {
+    key: 'view',
+    reducer: viewSliceReducer,
+  },
+  {
+    key: 'searchExecution',
+    reducer: searchExecutionSliceReducer,
+  },
+  {
+    key: 'searchMetadata',
+    reducer: searchMetadataSliceReducer,
+  },
+  {
+    key: 'undoRedo',
+    reducer: undoRedoSliceReducer,
+  },
 ];
 
 export default viewsReducers;

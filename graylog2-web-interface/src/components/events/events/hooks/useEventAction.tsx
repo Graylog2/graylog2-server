@@ -27,11 +27,23 @@ const useEventAction = (event: Event) => {
   const sendEventActionTelemetry = useSendEventActionTelemetry();
   const hasReplayInfo = !!event.replay_info;
 
-  const moreActions = useMemo(() => [
-    hasReplayInfo ? <MenuItem key="replay_info"><LinkToReplaySearch onClick={() => sendEventActionTelemetry('REPLAY_SEARCH', false)} id={event.id} isEvent /></MenuItem> : null,
-    pluggableActions.length && hasReplayInfo ? <MenuItem divider key="divider" /> : null,
-    pluggableActions.length ? pluggableActions : null,
-  ].filter(Boolean), [sendEventActionTelemetry, event.id, hasReplayInfo, pluggableActions]);
+  const moreActions = useMemo(
+    () =>
+      [
+        hasReplayInfo ? (
+          <LinkToReplaySearch
+            key="replay-search"
+            isMenuitem
+            onClick={() => sendEventActionTelemetry('REPLAY_SEARCH', false)}
+            id={event.id}
+            isEvent
+          />
+        ) : null,
+        pluggableActions.length && hasReplayInfo ? <MenuItem divider key="divider" /> : null,
+        pluggableActions.length ? pluggableActions : null,
+      ].filter(Boolean),
+    [sendEventActionTelemetry, event.id, hasReplayInfo, pluggableActions],
+  );
 
   return { moreActions, pluggableActionModals };
 };

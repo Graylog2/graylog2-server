@@ -35,32 +35,33 @@ const FilterGroupTitle = styled.div`
 `;
 
 type Props = {
-  attributes: Attributes,
-  filterValueRenderers: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined,
-  filters: Filters,
-  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void,
-  onDeleteFilter: (attributeId: string, filterValue: string) => void,
-}
+  attributes: Attributes;
+  filterValueRenderers: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined;
+  filters: Filters;
+  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void;
+  onDeleteFilter: (attributeId: string, filterValue: string) => void;
+};
 
 const ActiveFilters = ({ attributes, filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
   <>
-    {filters.entrySeq()
+    {filters
+      .entrySeq()
       .map(([attributeId, filterValues]) => {
         const attribute = attributes?.find(({ id }) => id === attributeId);
 
         return (
           <FilterGroup key={attributeId}>
-            <FilterGroupTitle>
-              {attribute.title}:
-            </FilterGroupTitle>
+            <FilterGroupTitle>{attribute.title}:</FilterGroupTitle>
             {filterValues.map((filter) => (
-              <ActiveFilter filter={filter}
-                            allActiveFilters={filters}
-                            key={`${attribute.id}-${filter.value}`}
-                            attribute={attribute}
-                            filterValueRenderer={filterValueRenderers?.[attributeId]}
-                            onChangeFilter={onChangeFilter}
-                            onDeleteFilter={onDeleteFilter} />
+              <ActiveFilter
+                filter={filter}
+                allActiveFilters={filters}
+                key={`${attribute.id}-${filter.value}`}
+                attribute={attribute}
+                filterValueRenderer={filterValueRenderers?.[attributeId]}
+                onChangeFilter={onChangeFilter}
+                onDeleteFilter={onDeleteFilter}
+              />
             ))}
           </FilterGroup>
         );

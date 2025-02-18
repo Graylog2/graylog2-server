@@ -23,16 +23,27 @@ import useDataNodes from 'components/datanode/hooks/useDataNodes';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 import type { MigrationStepComponentProps } from '../../Types';
 
-const Welcome = ({ currentStep, onTriggerStep, hideActions } : MigrationStepComponentProps) => {
+const Welcome = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
   const { data: dataNodes } = useDataNodes();
 
   return (
     <>
       <h3>Welcome</h3>
-      <p>Using the Remote Reindexing will allow you to move to Data Nodes by reindexing the data in your existing cluster to a Data Node cluster.</p>
-      <p>To start please install Data Node on every OS/ES node from your previous setup. You can find more information on how to download and install the Data Node  <DocumentationLink page="graylog-data-node" text="here" />.</p>
+      <p>
+        Using the Remote Reindexing will allow you to move to Data Nodes by reindexing the data in your existing cluster
+        to a Data Node cluster.
+      </p>
+      <p>
+        To start please install Data Node on every OS/ES node from your previous setup. You can find more information on
+        how to download and install the Data Node <DocumentationLink page="graylog-data-node" text="here" />.
+      </p>
       <MigrationDatanodeList />
-      <MigrationStepTriggerButtonToolbar hidden={hideActions} disabled={dataNodes?.list?.length <= 0} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar
+        hidden={hideActions}
+        disabled={dataNodes?.list?.length <= 0}
+        nextSteps={currentStep.next_steps}
+        onTriggerStep={onTriggerStep}
+      />
     </>
   );
 };

@@ -22,7 +22,7 @@ import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-
 import { useStore } from 'stores/connect';
 
 type Props = {
-  children: React.ReactElement[],
+  children: React.ReactElement[];
 };
 
 const CachesContainer = ({ children }: Props) => {
@@ -37,9 +37,7 @@ const CachesContainer = ({ children }: Props) => {
     return <Spinner />;
   }
 
-  const childrenWithProps = React.Children.map(children,
-    (child) => React.cloneElement(child,
-      { caches, pagination }));
+  const childrenWithProps = React.Children.map(children, (child) => React.cloneElement(child, { caches, pagination }));
 
   return <div>{childrenWithProps}</div>;
 };

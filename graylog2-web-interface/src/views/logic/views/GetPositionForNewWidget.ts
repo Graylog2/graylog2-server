@@ -21,12 +21,7 @@ import type Widget from 'views/logic/widgets/Widget';
 const GetPositionForNewWidget = (widget: Widget) => {
   const { defaultHeight, defaultWidth } = widgetDefinition(widget.type);
 
-  return WidgetPosition.builder()
-    .height(defaultHeight)
-    .width(defaultWidth)
-    .col(1)
-    .row(1)
-    .build();
+  return WidgetPosition.builder().height(defaultHeight).width(defaultWidth).col(1).row(1).build();
 };
 
 export default GetPositionForNewWidget;

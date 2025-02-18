@@ -21,40 +21,36 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type ServerAvailabilityActionsType = {
-  reportError: (error: any) => void,
-  reportSuccess: () => void,
-}
-export const ServerAvailabilityActions = singletonActions(
-  'core.ServerAvailability',
-  () => Reflux.createActions([
-    'reportError',
-    'reportSuccess',
-  ]),
+  reportError: (error: any) => void;
+  reportSuccess: () => void;
+};
+export const ServerAvailabilityActions = singletonActions('core.ServerAvailability', () =>
+  Reflux.createActions(['reportError', 'reportSuccess']),
 ) as unknown as ServerAvailabilityActionsType;
 
 export type ServerError = {
-  message: string,
+  message: string;
   originalError: {
-    method: string,
-    url: string,
-    status: number,
-  },
+    method: string;
+    url: string;
+    status: number;
+  };
 };
 export type ServerAvailabilityStoreState = {
-  server: { up: true } | { up: false, error: ServerError },
+  server: { up: true } | { up: false; error: ServerError };
 };
 
-const ping = (url: string) => window.fetch(url, {
-  method: 'GET',
-  headers: {
-    Accept: 'application/json',
-    'X-Graylog-No-Session-Extension': 'true',
-  },
-});
+const ping = (url: string) =>
+  window.fetch(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'X-Graylog-No-Session-Extension': 'true',
+    },
+  });
 
-export const ServerAvailabilityStore = singletonStore(
-  'core.ServerAvailability',
-  () => Reflux.createStore<ServerAvailabilityStoreState>({
+export const ServerAvailabilityStore = singletonStore('core.ServerAvailability', () =>
+  Reflux.createStore<ServerAvailabilityStoreState>({
     listenables: [ServerAvailabilityActions],
     server: { up: true },
     init() {
@@ -64,11 +60,10 @@ export const ServerAvailabilityStore = singletonStore(
       return { server: this.server };
     },
     ping() {
-      return ping(URLUtils.qualifyUrl(ApiRoutes.ping().url))
-        .then(
-          () => ServerAvailabilityActions.reportSuccess(),
-          (error) => ServerAvailabilityActions.reportError(error),
-        );
+      return ping(URLUtils.qualifyUrl(ApiRoutes.ping().url)).then(
+        () => ServerAvailabilityActions.reportSuccess(),
+        (error) => ServerAvailabilityActions.reportError(error),
+      );
     },
     reportError(error) {
       if (this.server.up) {

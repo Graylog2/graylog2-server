@@ -28,29 +28,29 @@ export type QueryId = string;
 export type FilterType = Immutable.Map<string, any>;
 
 export type SearchTypeList = Array<SearchType>;
-type InternalBuilderState = Immutable.Map<string, any>;
+type InternalBuilderState = Immutable.Map<keyof InternalState, any>;
 
 type InternalState = {
-  id: QueryId,
-  query: any,
-  timerange: any,
-  filter?: FilterType,
-  filters?: FiltersType,
-  searchTypes: SearchTypeList,
+  id: QueryId;
+  query: QueryString;
+  timerange: TimeRange;
+  filter?: FilterType;
+  filters?: FiltersType;
+  searchTypes: SearchTypeList;
 };
 
 export type QueryJson = {
-  id: QueryId,
-  query: any,
-  timerange: any,
-  filter?: { [key: string]: any },
-  filters?: Array<SearchFilter>,
-  search_types: any,
+  id: QueryId;
+  query: QueryString;
+  timerange: TimeRange;
+  filter?: { [key: string]: unknown };
+  filters?: Array<SearchFilter>;
+  search_types: SearchTypeList;
 };
 
 export type ElasticsearchQueryString = {
-  type: 'elasticsearch',
-  query_string: string,
+  type: 'elasticsearch';
+  query_string: string;
 };
 
 export const createElasticsearchQueryString = (query = ''): ElasticsearchQueryString => ({
@@ -58,8 +58,10 @@ export const createElasticsearchQueryString = (query = ''): ElasticsearchQuerySt
   query_string: query,
 });
 
-const _streamFilters = (selectedStreams: Array<string>) => Immutable.List(selectedStreams?.map((stream) => Immutable.Map({ type: 'stream', id: stream })));
-const _streamCategoryFilters = (selectedCategories: Array<string>) => Immutable.List(selectedCategories?.map((category) => Immutable.Map({ type: 'stream_category', category: category })));
+const _streamFilters = (selectedStreams: Array<string>) =>
+  Immutable.List(selectedStreams?.map((stream) => Immutable.Map({ type: 'stream', id: stream })));
+const _streamCategoryFilters = (selectedCategories: Array<string>) =>
+  Immutable.List(selectedCategories?.map((category) => Immutable.Map({ type: 'stream_category', category: category })));
 
 export const filtersForQuery = (streams: Array<string> | null | undefined): FilterType | null | undefined => {
   if (!streams || streams.length === 0) {
@@ -74,7 +76,9 @@ export const filtersForQuery = (streams: Array<string> | null | undefined): Filt
   });
 };
 
-export const categoryFiltersForQuery = (categories: Array<string> | null | undefined): FilterType | null | undefined => {
+export const categoryFiltersForQuery = (
+  categories: Array<string> | null | undefined,
+): FilterType | null | undefined => {
   if (!categories || categories.length === 0) {
     return null;
   }
@@ -87,21 +91,26 @@ export const categoryFiltersForQuery = (categories: Array<string> | null | undef
   });
 };
 
-export const newFiltersForQuery = (streams: Array<string> | null | undefined, categories: Array<string> | null | undefined): FilterType | null | undefined => {
+export const newFiltersForQuery = (
+  streams: Array<string> | null | undefined,
+  categories: Array<string> | null | undefined,
+): FilterType | null | undefined => {
   const streamFilter: Immutable.List<FilterType> = _streamFilters(streams);
   const categoryFilter: Immutable.List<FilterType> = _streamCategoryFilters(categories);
 
   if (streamFilter.size > 0 && categoryFilter.size > 0) {
     return Immutable.Map({
       type: 'or',
-      filters: Immutable.List([...streamFilter.toArray(), ...categoryFilter.toArray()].map((filter: FilterType) => filter)),
+      filters: Immutable.List(
+        [...streamFilter.toArray(), ...categoryFilter.toArray()].map((filter: FilterType) => filter),
+      ),
     });
   }
 
   return filtersForQuery(streams) || categoryFiltersForQuery(categories);
 };
 
-export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {
+export const filtersToStreamSet = (filter: FilterType | null | undefined): Immutable.Set<string> => {
   if (!filter) {
     return Immutable.Set();
   }
@@ -117,7 +126,7 @@ export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | u
   return filters.map(filtersToStreamSet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
 };
 
-export const filtersToStreamCategorySet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {
+export const filtersToStreamCategorySet = (filter: FilterType | null | undefined): Immutable.Set<string> => {
   if (!filter) {
     return Immutable.Set();
   }
@@ -138,42 +147,49 @@ export type QueryString = ElasticsearchQueryString;
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
 
 export type RelativeTimeRangeStartOnly = {
-  type: 'relative',
-  range: number,
-}
+  type: 'relative';
+  range: number;
+};
 
 export type RelativeTimeRangeWithEnd = {
-  type: 'relative',
-  from: number,
-  to?: number
-}
+  type: 'relative';
+  from: number;
+  to?: number;
+};
 
-export type RelativeTimeRange = RelativeTimeRangeStartOnly | RelativeTimeRangeWithEnd
+export type RelativeTimeRange = RelativeTimeRangeStartOnly | RelativeTimeRangeWithEnd;
 
 export type AbsoluteTimeRange = {
-  type: 'absolute',
-  from: string,
-  to: string,
+  type: 'absolute';
+  from: string;
+  to: string;
 };
 
 export type KeywordTimeRange = {
-  type: 'keyword',
-  keyword: string,
-  from?: string,
-  to?: string,
-  timezone?: string,
+  type: 'keyword';
+  keyword: string;
+  from?: string;
+  to?: string;
+  timezone?: string;
 };
 
 export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange;
 
 export type NoTimeRangeOverride = typeof NO_TIMERANGE_OVERRIDE;
 
-const isNullish = (o: any) => (o === null || o === undefined);
+const isNullish = (o: unknown) => o === null || o === undefined;
 
 export default class Query {
   private _value: InternalState;
 
-  constructor(id: QueryId, query: any, timerange: any, filter?: FilterType, searchTypes?: SearchTypeList, filters?: FiltersType) {
+  constructor(
+    id: QueryId,
+    query: QueryString,
+    timerange: TimeRange,
+    filter?: FilterType,
+    searchTypes?: SearchTypeList,
+    filters?: FiltersType,
+  ) {
     this._value = { id, query, timerange, filter, filters, searchTypes };
   }
 
@@ -215,7 +231,7 @@ export default class Query {
     return filter ? builder.filter(filter) : builder;
   }
 
-  equals(other: any): boolean {
+  equals(other: Query): boolean {
     if (other === undefined) {
       return false;
     }
@@ -224,12 +240,14 @@ export default class Query {
       return false;
     }
 
-    if (this.id !== other.id
-      || !isDeepEqual(this.query, other.query)
-      || !isDeepEqual(this.timerange, other.timerange)
-      || !((isNullish(this.filter) && isNullish(other.filter)) || isDeepEqual(this.filter, other.filter))
-      || !((isNullish(this.filters) && isNullish(other.filters)) || isDeepEqual(this.filters, other.filters))
-      || !isDeepEqual(this.searchTypes, other.searchTypes)) {
+    if (
+      this.id !== other.id ||
+      !isDeepEqual(this.query, other.query) ||
+      !isDeepEqual(this.timerange, other.timerange) ||
+      !((isNullish(this.filter) && isNullish(other.filter)) || isDeepEqual(this.filter, other.filter)) ||
+      !((isNullish(this.filters) && isNullish(other.filters)) || isDeepEqual(this.filters, other.filters)) ||
+      !isDeepEqual(this.searchTypes, other.searchTypes)
+    ) {
       return false;
     }
 
@@ -251,14 +269,20 @@ export default class Query {
 
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .searchTypes([]);
+    return new Builder().searchTypes([]);
   }
 
   static fromJSON(value: QueryJson): Query {
     const { id, query, timerange, filter, filters, search_types } = value;
 
-    return new Query(id, query, timerange, Immutable.fromJS(filter), search_types, filters ? Immutable.List(filters) : undefined);
+    return new Query(
+      id,
+      query,
+      timerange,
+      Immutable.fromJS(filter),
+      search_types,
+      filters ? Immutable.List(filters) : undefined,
+    );
   }
 }
 
@@ -298,7 +322,7 @@ class Builder {
   }
 
   build(): Query {
-    const { id, query, timerange, filter, filters, searchTypes } = this.value.toObject();
+    const { id, query, timerange, filter, filters, searchTypes } = this.value.toObject() as InternalState;
 
     return new Query(id, query, timerange, filter, searchTypes, filters);
   }

@@ -38,29 +38,34 @@ const HiddenButton = styled.button`
 `;
 
 type Props = {
-  filterComponents: FilterComponents,
-  columnTitle: (column: string) => string,
-  onCreate: (column: string, value: string) => void,
-  selectedFilters: Array<Filter>,
-}
+  filterComponents: FilterComponents;
+  columnTitle: (column: string) => string;
+  onCreate: (column: string, value: string) => void;
+  selectedFilters: Array<Filter>;
+};
 
 const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters }: Props) => {
   const container = useRef(null);
   const [open, setOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<string>(null);
   const [createValue, setCreateValue] = React.useState<string>();
-  const filterComponent = selectedColumn ? filterComponents.find(({ attribute }) => attribute === selectedColumn) : undefined;
+  const filterComponent = selectedColumn
+    ? filterComponents.find(({ attribute }) => attribute === selectedColumn)
+    : undefined;
   const selectedValues = selectedColumn ? selectedFilters.find(({ field }) => field === selectedColumn)?.value : [];
 
-  const filterOptions = useMemo(() => (
-    filterComponents
-      .map((filtComp) => ({
-        value: filtComp.attribute,
-        label: columnTitle(filtComp.attribute),
-        disabled: !filtComp.allowMultipleValues && !!selectedFilters.find(({ field }) => field === filtComp.attribute),
-      }))
-      .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2))
-  ), [columnTitle, filterComponents, selectedFilters]);
+  const filterOptions = useMemo(
+    () =>
+      filterComponents
+        .map((filtComp) => ({
+          value: filtComp.attribute,
+          label: columnTitle(filtComp.attribute),
+          disabled:
+            !filtComp.allowMultipleValues && !!selectedFilters.find(({ field }) => field === filtComp.attribute),
+        }))
+        .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2)),
+    [columnTitle, filterComponents, selectedFilters],
+  );
 
   const onSelectColumn = (selectedCol: string) => {
     setSelectedColumn(selectedCol);
@@ -82,7 +87,7 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
   };
 
   const onChange = (newValue: unknown, shouldSubmit = true) => {
-    const normalizedValue = filterComponent?.valueForConfig?.(newValue) ?? newValue as string;
+    const normalizedValue = filterComponent?.valueForConfig?.(newValue) ?? (newValue as string);
 
     if (shouldSubmit) {
       onSubmit(selectedColumn, normalizedValue);
@@ -93,22 +98,33 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
 
   return (
     <Container ref={container}>
-      <Select id="filter-select"
-              placeholder={SELECT_TITLE}
-              aria-label={SELECT_TITLE}
-              options={filterOptions}
-              matchProp="label"
-              menuPortalTarget={document.body}
-              clearable={false}
-              size="small"
-              onChange={(selectedCol) => onSelectColumn(selectedCol)}
-              value={selectedColumn} />
-      <Menu position="bottom-start" withinPortal onClose={onClose} opened={open} width={container?.current?.offsetWidth}>
+      <Select
+        id="filter-select"
+        placeholder={SELECT_TITLE}
+        aria-label={SELECT_TITLE}
+        options={filterOptions}
+        matchProp="label"
+        menuPortalTarget={document.body}
+        clearable={false}
+        size="small"
+        onChange={(selectedCol) => onSelectColumn(selectedCol)}
+        value={selectedColumn}
+      />
+      <Menu
+        position="bottom-start"
+        withinPortal
+        onClose={onClose}
+        opened={open}
+        width={container?.current?.offsetWidth}>
         <Menu.Target>
           <HiddenButton type="button" />
         </Menu.Target>
         <Menu.Dropdown>
-          {filterComponent?.configuration(selectedValues ?? [], filterComponent?.valueFromConfig?.(createValue) ?? createValue, onChange)}
+          {filterComponent?.configuration(
+            selectedValues ?? [],
+            filterComponent?.valueFromConfig?.(createValue) ?? createValue,
+            onChange,
+          )}
         </Menu.Dropdown>
       </Menu>
     </Container>

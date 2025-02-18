@@ -41,7 +41,11 @@ import LinkToReplaySearch from '../replay-search/LinkToReplaySearch';
 
 const StreamOrId = ({ streamOrId }: { streamOrId: Stream | string }) => {
   if (typeof streamOrId === 'string') {
-    return <span key={streamOrId}><em>{streamOrId}</em></span>;
+    return (
+      <span key={streamOrId}>
+        <em>{streamOrId}</em>
+      </span>
+    );
   }
 
   return (
@@ -54,34 +58,34 @@ const StreamOrId = ({ streamOrId }: { streamOrId: Stream | string }) => {
 const getConditionType = (config: EventDefinition['config']) => {
   const { group_by: groupBy, series, conditions } = config;
 
-  return (isEmpty(groupBy)
-    && (!conditions || isEmpty(conditions) || conditions.expression === null)
-    && isEmpty(series)
-    ? 'filter' : 'aggregation');
+  return isEmpty(groupBy) && (!conditions || isEmpty(conditions) || conditions.expression === null) && isEmpty(series)
+    ? 'filter'
+    : 'aggregation';
 };
 
-const QueryParameters = ({ queryParameters }: { queryParameters: Array<LookupTableParameterJson & { embryonic?: boolean }> }) => {
+const QueryParameters = ({
+  queryParameters,
+}: {
+  queryParameters: Array<LookupTableParameterJson & { embryonic?: boolean }>;
+}) => {
   if (queryParameters.some((p) => p.embryonic)) {
-    const undeclaredParameters = queryParameters.filter((p) => p.embryonic)
+    const undeclaredParameters = queryParameters
+      .filter((p) => p.embryonic)
       .map((p) => p.name)
       .join(', ');
 
-    return (
-      <Alert bsStyle="danger">
-        There are undeclared query parameters: {undeclaredParameters}
-      </Alert>
-    );
+    return <Alert bsStyle="danger">There are undeclared query parameters: {undeclaredParameters}</Alert>;
   }
 
   return <dd>{queryParameters.map((p) => p.name).join(', ')}</dd>;
 };
 
 type Props = {
-  streams: Array<Stream>,
-  config: EventDefinition['config'],
-  currentUser: User,
-  definitionId?: string,
-}
+  streams: Array<Stream>;
+  config: EventDefinition['config'];
+  currentUser: User;
+  definitionId?: string;
+};
 
 const SearchFilters = ({ filters }: { filters: EventDefinition['config']['filters'] }) => {
   if (!filters || filters.length === 0) {
@@ -92,7 +96,8 @@ const SearchFilters = ({ filters }: { filters: EventDefinition['config']['filter
     <dd>
       {filters.map((filter) => (
         <div key={filter.id}>
-          {filter.title ? `${filter.title} -> ` : null}<code>{filter.queryString}</code>
+          {filter.title ? `${filter.title} -> ` : null}
+          <code>{filter.queryString}</code>
         </div>
       ))}
     </dd>
@@ -100,23 +105,30 @@ const SearchFilters = ({ filters }: { filters: EventDefinition['config']['filter
 };
 
 type StreamsProps = {
-  streams: Array<Stream>,
-  streamIds: Array<string>,
-  streamIdsWithMissingPermission: Array<string>,
-}
+  streams: Array<Stream>;
+  streamIds: Array<string>;
+  streamIdsWithMissingPermission: Array<string>;
+};
 
 const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: StreamsProps) => {
   if ((!streamIds || streamIds.length === 0) && streamIdsWithMissingPermission.length <= 0) {
     return <>No Streams selected, searches in all Streams</>;
   }
 
-  const warning = streamIdsWithMissingPermission.length > 0
-    ? <Alert bsStyle="warning">Missing Stream Permissions for:<br />{streamIdsWithMissingPermission.join(', ')}</Alert>
-    : null;
+  const warning =
+    streamIdsWithMissingPermission.length > 0 ? (
+      <Alert bsStyle="warning">
+        Missing Stream Permissions for:
+        <br />
+        {streamIdsWithMissingPermission.join(', ')}
+      </Alert>
+    ) : null;
 
   const renderedStreams = streamIds
     .map((id) => streams.find((s) => s.id === id) || id)
-    .sort((s1, s2) => naturalSortIgnoreCase(typeof s1 === 'object' ? s1.title : s1, typeof s2 === 'object' ? s2.title : s2))
+    .sort((s1, s2) =>
+      naturalSortIgnoreCase(typeof s1 === 'object' ? s1.title : s1, typeof s2 === 'object' ? s2.title : s2),
+    )
     .map((s) => <StreamOrId streamOrId={s} />);
 
   return (
@@ -187,29 +199,37 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId }: Props) 
       <dt>Search Filters</dt>
       <SearchFilters filters={config.filters} />
       <dt>Streams</dt>
-      <dd className={styles.streamList}><Streams streams={streams} streamIds={effectiveStreamIds} streamIdsWithMissingPermission={streamIdsWithMissingPermission} /></dd>
+      <dd className={styles.streamList}>
+        <Streams
+          streams={streams}
+          streamIds={effectiveStreamIds}
+          streamIdsWithMissingPermission={streamIdsWithMissingPermission}
+        />
+      </dd>
       {renderStreamCategories()}
       <dt>Search within</dt>
-      <dd>{searchWithin.duration} {searchWithin.unit.toLowerCase()}</dd>
+      <dd>
+        {searchWithin.duration} {searchWithin.unit.toLowerCase()}
+      </dd>
       <dt>Use Cron Scheduling</dt>
       <dd>{useCronScheduling ? 'yes' : 'no'}</dd>
-      {useCronScheduling
-        ? (
-          <>
-            <dt>Cron Expression</dt>
-            <dd>{cronExpression}</dd>
-            <dt>Cron Description</dt>
-            <dd>{renderCronExpression(cronExpression)}</dd>
-            <dt>Time Zone</dt>
-            <dd>{cronTimezone}</dd>
-          </>
-        )
-        : (
-          <>
-            <dt>Execute search every</dt>
-            <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
-          </>
-        )}
+      {useCronScheduling ? (
+        <>
+          <dt>Cron Expression</dt>
+          <dd>{cronExpression}</dd>
+          <dt>Cron Description</dt>
+          <dd>{renderCronExpression(cronExpression)}</dd>
+          <dt>Time Zone</dt>
+          <dd>{cronTimezone}</dd>
+        </>
+      ) : (
+        <>
+          <dt>Execute search every</dt>
+          <dd>
+            {executeEvery.duration} {executeEvery.unit.toLowerCase()}
+          </dd>
+        </>
+      )}
       <dt>Enable scheduling</dt>
       <dd>{isScheduled ? 'yes' : 'no'}</dd>
       {conditionType === 'filter' && (
@@ -224,13 +244,11 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId }: Props) 
           <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
           <dt>Create Events if</dt>
           <dd>
-            {validationResults.isValid
-              ? <AggregationConditionSummary series={series} conditions={conditions} />
-              : (
-                <Alert bsStyle="danger">
-                  Condition is not valid: {validationResults.errors.join(', ')}
-                </Alert>
-              )}
+            {validationResults.isValid ? (
+              <AggregationConditionSummary series={series} conditions={conditions} />
+            ) : (
+              <Alert bsStyle="danger">Condition is not valid: {validationResults.errors.join(', ')}</Alert>
+            )}
           </dd>
         </>
       )}

@@ -23,29 +23,23 @@ import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 import type { Input } from 'components/messageloaders/Types';
 
-export type InputState = | 'RUNNING'
-    | 'FAILED'
-    | 'STOPPED'
-    | 'STARTING'
-    | 'FAILING'
-    | 'SETUP'
+export type InputState = 'RUNNING' | 'FAILED' | 'STOPPED' | 'STARTING' | 'FAILING' | 'SETUP';
 
 export type InputStateByNode = {
   [nodeId: string]: {
-    state: InputState,
-    id: string,
-    detailed_message: string | null,
-    message_input: Input,
-  }
-}
+    state: InputState;
+    id: string;
+    detailed_message: string | null;
+    message_input: Input;
+  };
+};
 
 export type InputStates = {
-  [inputId: string]: InputStateByNode,
-}
+  [inputId: string]: InputStateByNode;
+};
 
-export const InputStatesStore = singletonStore(
-  'core.InputStates',
-  () => Reflux.createStore({
+export const InputStatesStore = singletonStore('core.InputStates', () =>
+  Reflux.createStore({
     listenables: [],
 
     init() {
@@ -59,29 +53,28 @@ export const InputStatesStore = singletonStore(
     list() {
       const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.list().url);
 
-      return fetch('GET', url)
-        .then((response) => {
-          const result = {};
+      return fetch('GET', url).then((response) => {
+        const result = {};
 
-          Object.keys(response).forEach((node) => {
-            if (!response[node]) {
-              return;
+        Object.keys(response).forEach((node) => {
+          if (!response[node]) {
+            return;
+          }
+
+          response[node].forEach((input) => {
+            if (!result[input.id]) {
+              result[input.id] = {};
             }
 
-            response[node].forEach((input) => {
-              if (!result[input.id]) {
-                result[input.id] = {};
-              }
-
-              result[input.id][node] = input;
-            });
+            result[input.id][node] = input;
           });
-
-          this.inputStates = result;
-          this.trigger({ inputStates: this.inputStates });
-
-          return result;
         });
+
+        this.inputStates = result;
+        this.trigger({ inputStates: this.inputStates });
+
+        return result;
+      });
     },
 
     _checkInputStateChangeResponse(input, response, action) {
@@ -100,66 +93,78 @@ export const InputStatesStore = singletonStore(
       };
 
       if (failedNodes.length === 0) {
-        UserNotification.success(`Request to ${action.toLowerCase()} input '${input.title}' was sent successfully.`,
-          `Input '${input.title}' will be ${actionText()} shortly`);
+        UserNotification.success(
+          `Request to ${action.toLowerCase()} input '${input.title}' was sent successfully.`,
+          `Input '${input.title}' will be ${actionText()} shortly`,
+        );
       } else if (failedNodes.length === nodes.length) {
-        UserNotification.error(`Request to ${action.toLowerCase()} input '${input.title}' failed. Check your Graylog logs for more information.`,
-          `Input '${input.title}' could not be ${actionText()}`);
+        UserNotification.error(
+          `Request to ${action.toLowerCase()} input '${input.title}' failed. Check your Graylog logs for more information.`,
+          `Input '${input.title}' could not be ${actionText()}`,
+        );
       } else {
-        UserNotification.warning(`Request to ${action.toLowerCase()} input '${input.title}' failed in some nodes. Check your Graylog logs for more information.`,
-          `Input '${input.title}' could not be ${actionText()} in all nodes`);
+        UserNotification.warning(
+          `Request to ${action.toLowerCase()} input '${input.title}' failed in some nodes. Check your Graylog logs for more information.`,
+          `Input '${input.title}' could not be ${actionText()} in all nodes`,
+        );
       }
     },
 
     start(input) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.start(input.id).url);
 
-      return fetch('PUT', url)
-        .then(
-          (response) => {
-            this._checkInputStateChangeResponse(input, response, 'START');
-            this.list();
+      return fetch('PUT', url).then(
+        (response) => {
+          this._checkInputStateChangeResponse(input, response, 'START');
+          this.list();
 
-            return response;
-          },
-          (error) => {
-            UserNotification.error(`Error starting input '${input.title}': ${error}`, `Input '${input.title}' could not be started`);
-          },
-        );
+          return response;
+        },
+        (error) => {
+          UserNotification.error(
+            `Error starting input '${input.title}': ${error}`,
+            `Input '${input.title}' could not be started`,
+          );
+        },
+      );
     },
 
     stop(input) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.stop(input.id).url);
 
-      return fetch('DELETE', url)
-        .then(
-          (response) => {
-            this._checkInputStateChangeResponse(input, response, 'STOP');
-            this.list();
+      return fetch('DELETE', url).then(
+        (response) => {
+          this._checkInputStateChangeResponse(input, response, 'STOP');
+          this.list();
 
-            return response;
-          },
-          (error) => {
-            UserNotification.error(`Error stopping input '${input.title}': ${error}`, `Input '${input.title}' could not be stopped`);
-          },
-        );
+          return response;
+        },
+        (error) => {
+          UserNotification.error(
+            `Error stopping input '${input.title}': ${error}`,
+            `Input '${input.title}' could not be stopped`,
+          );
+        },
+      );
     },
 
     setup(input) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.setup(input.id).url);
 
-      return fetch('PUT', url)
-        .then(
-          (response) => {
-            this._checkInputStateChangeResponse(input, response, 'SETUP');
-            this.list();
+      return fetch('PUT', url).then(
+        (response) => {
+          this._checkInputStateChangeResponse(input, response, 'SETUP');
+          this.list();
 
-            return response;
-          },
-          (error) => {
-            UserNotification.error(`Error entering setup mode '${input.title}': ${error}`, `Input '${input.title}' could not set to setup mode`);
-          },
-        );
+          return response;
+        },
+        (error) => {
+          UserNotification.error(
+            `Error entering setup mode '${input.title}': ${error}`,
+            `Input '${input.title}' could not set to setup mode`,
+          );
+        },
+      );
     },
   }),
 );

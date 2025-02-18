@@ -17,7 +17,7 @@
 import type Widget from '../widgets/Widget';
 
 const duplicateCommonWidgetSettings = (
-// @ts-ignore
+  // @ts-ignore
   widgetBuilder: Widget.Builder,
   originalWidget: Widget,
 ) => {

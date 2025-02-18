@@ -23,14 +23,24 @@ type ShardMeterProps = {
   shardMeter: any;
 };
 
-class ShardMeter extends React.Component<ShardMeterProps, {
-  [key: string]: any;
-}> {
+class ShardMeter extends React.Component<
+  ShardMeterProps,
+  {
+    [key: string]: any;
+  }
+> {
   _formatMeter = (meter) => {
     const value = <span>{numeral(meter.total).format('0,0')} ops</span>;
 
     if (meter.total > 0) {
-      return <span>{value} <span title={`${meter.time_seconds}s`}>(took {moment.duration(meter.time_seconds, 'seconds').humanize()})</span></span>;
+      return (
+        <span>
+          {value}{' '}
+          <span title={`${meter.time_seconds}s`}>
+            (took {moment.duration(meter.time_seconds, 'seconds').humanize()})
+          </span>
+        </span>
+      );
     }
 
     return value;

@@ -109,11 +109,12 @@ describe('QueryBar', () => {
     const setDashboard = jest.fn();
 
     render(
-      <DashboardPageContext.Provider value={{
-        setDashboardPage: setDashboard,
-        unsetDashboardPage: jest.fn(),
-        dashboardPage: undefined,
-      }}>
+      <DashboardPageContext.Provider
+        value={{
+          setDashboardPage: setDashboard,
+          unsetDashboardPage: jest.fn(),
+          dashboardPage: undefined,
+        }}>
         <QueryBar />
       </DashboardPageContext.Provider>,
     );

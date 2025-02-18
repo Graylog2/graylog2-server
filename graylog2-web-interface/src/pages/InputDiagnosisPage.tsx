@@ -39,20 +39,26 @@ const StyledDl = styled.dl`
   }
 `;
 
-const ContainerCol = styled(Col)(({ theme }) => css`
-  margin-left: ${theme.spacings.sm};
-  margin-right: ${theme.spacings.sm};
-`);
+const ContainerCol = styled(Col)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.sm};
+    margin-right: ${theme.spacings.sm};
+  `,
+);
 
-const InfoCol = styled(Col)(({ theme }) => css`
-  border: 1px solid;
-  border-radius: ${theme.spacings.sm};
-  padding: ${theme.spacings.sm};
-`);
+const InfoCol = styled(Col)(
+  ({ theme }) => css`
+    border: 1px solid;
+    border-radius: ${theme.spacings.sm};
+    padding: ${theme.spacings.sm};
+  `,
+);
 
-const MetricsCol = styled(Col)(({ theme }) => css`
-  padding: ${theme.spacings.sm};
-`);
+const MetricsCol = styled(Col)(
+  ({ theme }) => css`
+    padding: ${theme.spacings.sm};
+  `,
+);
 
 const InputNodeInfo = styled.div`
   max-width: 500px;
@@ -66,7 +72,9 @@ const InputDiagnosisPage = () => {
   return (
     <DocumentTitle title="Input Diagnosis">
       <PageHeader title="Input Diagnosis">
-        <span>Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.</span>
+        <span>
+          Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.
+        </span>
       </PageHeader>
       {input && (
         <Row className="content">
@@ -84,11 +92,10 @@ const InputDiagnosisPage = () => {
                     <>
                       <dt>This Input is listening on:</dt>
                       <dd>
-                        Bind address {input.attributes?.bind_address},
-                        Port {input.attributes?.port}.
+                        Bind address {input.attributes?.bind_address}, Port {input.attributes?.port}.
                       </dd>
                       <dt>This Input is listening for:</dt>
-                      <dd>{('tcp_keepalive' in (input.attributes || {})) ? 'TCP Traffic.' : 'UDP Traffic.'}</dd>
+                      <dd>{'tcp_keepalive' in (input.attributes || {}) ? 'TCP Traffic.' : 'UDP Traffic.'}</dd>
                     </>
                   )}
                 </StyledDl>
@@ -100,53 +107,67 @@ const InputDiagnosisPage = () => {
                     <dd>{inputMetrics.incomingMessagesTotal} events</dd>
                     <dt>Empty Messages discarded:</dt>
                     <dd>{inputMetrics.emptyMessages}</dd>
-                    {Number.isInteger(inputMetrics.open_connections) && Number.isInteger(inputMetrics.total_connections) && (
-                      <>
-                        <dt>Active Connections:</dt>
-                        <dd>
-                          {inputMetrics.open_connections}&nbsp;
-                          ({inputMetrics.total_connections} total)
-                        </dd>
-                      </>
-                    )}
-                    {Number.isInteger(inputMetrics.read_bytes_1sec) && Number.isInteger(inputMetrics.read_bytes_total) && (
-                      <>
-                        <dt>Network I/O:</dt>
-                        <dd>
-                          <NetworkStats readBytes1Sec={inputMetrics.read_bytes_1sec}
-                                        readBytesTotal={inputMetrics.read_bytes_total}
-                                        writtenBytes1Sec={inputMetrics.write_bytes_1sec}
-                                        writtenBytesTotal={inputMetrics.write_bytes_total} />
-                        </dd>
-                      </>
-                    )}
+                    {Number.isInteger(inputMetrics.open_connections) &&
+                      Number.isInteger(inputMetrics.total_connections) && (
+                        <>
+                          <dt>Active Connections:</dt>
+                          <dd>
+                            {inputMetrics.open_connections}&nbsp; ({inputMetrics.total_connections} total)
+                          </dd>
+                        </>
+                      )}
+                    {Number.isInteger(inputMetrics.read_bytes_1sec) &&
+                      Number.isInteger(inputMetrics.read_bytes_total) && (
+                        <>
+                          <dt>Network I/O:</dt>
+                          <dd>
+                            <NetworkStats
+                              readBytes1Sec={inputMetrics.read_bytes_1sec}
+                              readBytesTotal={inputMetrics.read_bytes_total}
+                              writtenBytes1Sec={inputMetrics.write_bytes_1sec}
+                              writtenBytesTotal={inputMetrics.write_bytes_total}
+                            />
+                          </dd>
+                        </>
+                      )}
                   </StyledDl>
                 )}
               </MetricsCol>
             </Row>
-            <br /><br />
+            <br />
+            <br />
             <Row>
               <Col xs={6}>
                 <h3>Input Test Results</h3>
                 Metrics show the last 15 minutes:
               </Col>
             </Row>
-            <br /><br />
+            <br />
+            <br />
             <Row>
               <Col xs={3}>
                 <dt>Input State</dt>
                 {Object.keys(inputNodeStates.states).map((state) => (
-                  <DropdownButton title={<dd key={state}>{state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}</dd>}
-                                  key={state}
-                                  bsSize="xs">
+                  <DropdownButton
+                    title={
+                      <dd key={state}>
+                        {state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}
+                      </dd>
+                    }
+                    key={state}
+                    bsSize="xs">
                     {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
                       <LinkContainer key={node_id} to={Routes.SYSTEM.NODES.SHOW(node_id)}>
                         <MenuItem>
                           {node_id && (
-                            <div><b>Node ID:</b> {node_id}</div>
+                            <div>
+                              <b>Node ID:</b> {node_id}
+                            </div>
                           )}
                           {detailed_message && (
-                            <InputNodeInfo><b>Message:</b> {detailed_message}</InputNodeInfo>
+                            <InputNodeInfo>
+                              <b>Message:</b> {detailed_message}
+                            </InputNodeInfo>
                           )}
                         </MenuItem>
                       </LinkContainer>
@@ -167,7 +188,8 @@ const InputDiagnosisPage = () => {
                 <dd>{inputMetrics.failures_indexing}</dd>
               </Col>
             </Row>
-            <br /><br />
+            <br />
+            <br />
             <Row>
               <Col xs={6}>
                 <h3>Received Message count by Stream</h3>

@@ -31,23 +31,33 @@ type Props = {
   stream: Stream;
 };
 
-const Container = styled.div(({ theme }) => css`
-  > div {
-    margin-bottom: ${theme.spacings.sm};
-  }
-`);
+const Container = styled.div(
+  ({ theme }) => css`
+    > div {
+      margin-bottom: ${theme.spacings.sm};
+    }
+  `,
+);
 
 const StreamDataRoutingDestinations = ({ stream }: Props) => {
   const currentUser = useCurrentUser();
-  const StreamDataWarehouseComponent = PluginStore.exports('dataWarehouse')?.[0]?.StreamDataWarehouse;
+  const StreamDataLakeComponent = PluginStore.exports('dataLake')?.[0]?.StreamDataLake;
 
-  const destinationIndexset = isPermitted(currentUser.permissions, ['indexsets:read']) ? <DestinationIndexSetSection stream={stream} /> : <DestinationPermissionAlert sectionName="Index Set" />;
-  const destinationOutput = isPermitted(currentUser.permissions, ['output:read']) ? <DestinationOutputs stream={stream} /> : <DestinationPermissionAlert sectionName="Outputs" />;
+  const destinationIndexset = isPermitted(currentUser.permissions, ['indexsets:read']) ? (
+    <DestinationIndexSetSection stream={stream} />
+  ) : (
+    <DestinationPermissionAlert sectionName="Index Set" />
+  );
+  const destinationOutput = isPermitted(currentUser.permissions, ['output:read']) ? (
+    <DestinationOutputs stream={stream} />
+  ) : (
+    <DestinationPermissionAlert sectionName="Outputs" />
+  );
 
   return (
     <Container>
       {destinationIndexset}
-      {StreamDataWarehouseComponent && <StreamDataWarehouseComponent permissions={currentUser.permissions} />}
+      {StreamDataLakeComponent && <StreamDataLakeComponent permissions={currentUser.permissions} />}
       {destinationOutput}
     </Container>
   );
