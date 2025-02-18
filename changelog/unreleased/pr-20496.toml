@@ -1,0 +1,4 @@
+type = "c"
+message = "Bump data node's bundled OpenSearch to 2.17.0."
+
+pulls = ["20496"]
