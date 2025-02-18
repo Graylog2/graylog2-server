@@ -85,8 +85,7 @@ public class OpensearchDefaultConfigFilesBean implements DatanodeConfigurationBe
     }
 
     private static List<DatanodeConfigFile> copyFromLocalFs(Path configRelativePath) throws URISyntaxException, IOException {
-        final Path resourcesRoot = Paths.get(OpensearchDefaultConfigFilesBean.class.getResource("/").toURI());
-        final Path source = resourcesRoot.resolve(configRelativePath);
+        final Path source = Paths.get(OpensearchDefaultConfigFilesBean.class.getResource("/" + configRelativePath).toURI());
         return collectRecursively(source);
     }
 

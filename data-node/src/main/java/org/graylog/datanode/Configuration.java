@@ -670,4 +670,10 @@ public class Configuration implements CommonNodeConfiguration {
     public String getSystemPropertyPrefix() {
         return "graylog.datanode.";
     }
+
+    @Override
+    public boolean withPlugins() {
+        return true;
+    }
+
 }

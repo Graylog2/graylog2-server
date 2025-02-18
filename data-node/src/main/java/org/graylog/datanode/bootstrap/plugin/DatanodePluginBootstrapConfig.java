@@ -14,9 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+package org.graylog.datanode.bootstrap.plugin;
 
-import org.graylog2.configuration.PluginPathConfiguration;
+import org.graylog2.plugin.PluginBootstrapConfig;
 
-public class PluginLoaderConfig extends PluginPathConfiguration {
+/**
+ * A configuration bean to be processed by {@link com.github.joschi.jadconfig.JadConfig} for data node plugins.
+ * <p>
+ * Configurations implementing this interface should be loaded via the {@link java.util.ServiceLoader} mechanism. See
+ * {@link DatanodePluginLoader#loadPluginBootstrapConfigs()}.
+ */
+public interface DatanodePluginBootstrapConfig extends PluginBootstrapConfig {
 }
