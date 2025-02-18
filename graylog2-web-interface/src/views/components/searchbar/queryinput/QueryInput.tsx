@@ -212,10 +212,14 @@ const useShowHotkeysInOverview = () => {
 };
 
 type Props = BaseProps & {
+  // eslint-disable-next-line react/require-default-props
   commands?: Array<Command>;
+  // eslint-disable-next-line react/require-default-props
   disableExecution?: boolean;
+  // eslint-disable-next-line react/require-default-props
   isValidating?: boolean;
   name: string;
+  // eslint-disable-next-line react/require-default-props
   onBlur?: (query: string) => void;
   onChange: (changeEvent: { target: { value: string; name: string } }) => Promise<string>;
   onExecute: (query: string) => void;
@@ -232,9 +236,9 @@ const QueryInput = React.forwardRef<Editor, Props>(
       error,
       height,
       inputId,
-      isValidating,
+      isValidating = undefined,
       maxLines,
-      onBlur,
+      onBlur = undefined,
       onChange,
       onExecute: onExecuteProp,
       placeholder = '',
@@ -297,7 +301,7 @@ const QueryInput = React.forwardRef<Editor, Props>(
         // The following will disable the mentioned hotkeys.
         {
           name: 'Do nothing',
-          bindKey: { win: 'Ctrl-Space|Ctrl-Shift-Space', mac: 'Ctrl-Space|Ctrl-Shift-Space' },
+          bindKey: { win: 'Ctrl-Shift-Space', mac: 'Ctrl-Space|Ctrl-Shift-Space' },
           exec: () => {},
         },
       ],
