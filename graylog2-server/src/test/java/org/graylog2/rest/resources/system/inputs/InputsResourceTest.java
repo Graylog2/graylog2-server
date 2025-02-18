@@ -27,6 +27,8 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -118,7 +120,8 @@ class InputsResourceTest {
         public InputsTestResource(InputService inputService,
                                   MessageInputFactory messageInputFactory,
                                   Configuration config) {
-            super(inputService, mock(InputDiagnosticService.class), messageInputFactory, config, mock(ClusterEventBus.class));
+            super(inputService, mock(InputDiagnosticService.class), mock(StreamService.class), mock(StreamRuleService.class),
+                    messageInputFactory, config, mock(ClusterEventBus.class));
             configuration = mock(HttpConfiguration.class);
             this.user = mock(User.class);
             lenient().when(user.getName()).thenReturn("foo");

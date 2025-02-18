@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -40,6 +41,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventTypes;
@@ -52,6 +55,7 @@ import org.graylog2.inputs.encryption.EncryptedInputConfigs;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDiagnostics;
@@ -60,11 +64,15 @@ import org.graylog2.rest.models.system.inputs.responses.InputsList;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -84,6 +92,9 @@ public class InputsResource extends AbstractInputsResource {
 
     private final InputService inputService;
     private final InputDiagnosticService inputDiagnosticService;
+    private final StreamService streamService;
+    private final StreamRuleService streamRuleService;
+    private final PipelineService pipelineService;
     private final MessageInputFactory messageInputFactory;
     private final Configuration config;
     private final ClusterEventBus clusterEventBus;
@@ -91,12 +102,18 @@ public class InputsResource extends AbstractInputsResource {
     @Inject
     public InputsResource(InputService inputService,
                           InputDiagnosticService inputDiagnosticService,
+                          StreamService streamService,
+                          StreamRuleService streamRuleService,
+                          PipelineService pipelineService,
                           MessageInputFactory messageInputFactory,
                           Configuration config,
                           ClusterEventBus clusterEventBus) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.inputDiagnosticService = inputDiagnosticService;
+        this.streamService = streamService;
+        this.streamRuleService = streamRuleService;
+        this.pipelineService = pipelineService;
         this.messageInputFactory = messageInputFactory;
         this.config = config;
         this.clusterEventBus = clusterEventBus;
@@ -130,6 +147,40 @@ public class InputsResource extends AbstractInputsResource {
                                         @Context SearchUser searchUser) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         return inputDiagnosticService.getInputDiagnostics(inputService.find(inputId), searchUser);
+    }
+
+    public record InputReferences(
+            @JsonProperty("input_id") String inputId,
+            @JsonProperty("stream_refs") List<InputReference> streamRefs,
+            @JsonProperty("pipeline_refs") List<InputReference> pipelineRefs) {
+    }
+
+    public record InputReference(
+            @JsonProperty("id") String id,
+            @Nullable @JsonProperty("name") String name) {
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Returns any streams or pipeline that reference the given input")
+    @Path("/references/{inputId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input.")
+    })
+    public InputReferences getReferences(@ApiParam(name = "inputId", required = true)
+                                         @PathParam("inputId") String inputId) {
+        checkPermission(RestPermissions.INPUTS_READ, inputId);
+        checkPermission(RestPermissions.STREAMS_READ);
+        checkPermission(PipelineRestPermissions.PIPELINE_READ);
+
+
+        return new InputReferences(inputId,
+                streamRuleService.loadForInput(inputId).stream()
+                        .map(StreamRule::getStreamId)
+                        .distinct()
+                        .map(streamId -> new InputReference(streamId, streamService.streamTitleFromCache(streamId)))
+                        .collect(Collectors.toList()),
+                null);
     }
 
     @GET

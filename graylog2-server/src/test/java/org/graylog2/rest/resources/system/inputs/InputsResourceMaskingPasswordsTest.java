@@ -33,6 +33,8 @@ import org.graylog2.rest.models.system.inputs.responses.InputsList;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,7 +71,8 @@ public class InputsResourceMaskingPasswordsTest {
 
     class InputsTestResource extends InputsResource {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
-            super(inputService, mock(InputDiagnosticService.class), messageInputFactory, new Configuration(), mock(ClusterEventBus.class));
+            super(inputService, mock(InputDiagnosticService.class), mock(StreamService.class), mock(StreamRuleService.class),
+                    messageInputFactory, new Configuration(), mock(ClusterEventBus.class));
         }
 
         @Override
