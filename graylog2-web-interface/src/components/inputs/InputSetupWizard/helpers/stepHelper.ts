@@ -52,7 +52,12 @@ export const checkHasPreviousStep = (orderedSteps: Array<InputSetupWizardStep>, 
   return true;
 };
 
-export const updateStepData = (stepsData: StepsData, stepName: InputSetupWizardStep, data: object = {}, override: boolean = false) : StepsData => {
+export const updateStepData = (
+  stepsData: StepsData,
+  stepName: InputSetupWizardStep,
+  data: object = {},
+  override: boolean = false,
+): StepsData => {
   if (!stepName) return {};
 
   if (!stepsData) return { [stepName]: data };

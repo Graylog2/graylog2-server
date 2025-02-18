@@ -21,9 +21,9 @@ import { singleton } from 'logic/singleton';
 import type { InputSetupWizardStep, WizardData } from 'components/inputs/InputSetupWizard/types';
 
 type InputSetupWizardContextType = {
-  activeStep: InputSetupWizardStep | undefined,
-  setActiveStep: (step: InputSetupWizardStep) => void,
-  wizardData: WizardData,
+  activeStep: InputSetupWizardStep | undefined;
+  setActiveStep: (step: InputSetupWizardStep) => void;
+  wizardData: WizardData;
   setWizardData: (wizardData: WizardData) => void;
   orderedSteps: Array<InputSetupWizardStep>;
   setOrderedSteps: (steps: Array<InputSetupWizardStep>) => void;
