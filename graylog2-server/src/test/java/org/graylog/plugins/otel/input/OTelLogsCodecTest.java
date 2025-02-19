@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
-import org.graylog.plugins.otel.input.codec.LogsCodec;
+import org.graylog.plugins.otel.input.codec.OTelLogsCodec;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.TestMessageFactory;
@@ -44,9 +44,9 @@ import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
-class LogsCodecTest {
+class OTelLogsCodecTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-    private LogsCodec codec;
+    private OTelLogsCodec codec;
 
     private final ResolvableInetSocketAddress remoteAddress = ResolvableInetSocketAddress.wrap(
             new InetSocketAddress(Inet4Address.getLoopbackAddress(), 12345)
@@ -54,7 +54,7 @@ class LogsCodecTest {
 
     @BeforeEach
     void setUp() {
-        codec = new LogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get(), false);
+        codec = new OTelLogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get(), false);
     }
 
     // Uses a modified official example that was copied from
@@ -94,7 +94,7 @@ class LogsCodecTest {
 
     @Test
     void prefixesFieldNames() throws IOException {
-        final var prefixingCodec = new LogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get(), true);
+        final var prefixingCodec = new OTelLogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get(), true);
         final var decoded = prefixingCodec.decode(parseFixture("logs.json"), new DateTime(DateTimeZone.UTC), remoteAddress);
         assertThat(decoded).isNotEmpty();
 
@@ -205,13 +205,13 @@ class LogsCodecTest {
         assertThat(decoded.get().getSource()).isEqualTo("localhost");
     }
 
-    private Journal.Log parseFixture(String filename) throws IOException {
+    private OTelJournal.Log parseFixture(String filename) throws IOException {
         final var requestBuilder = ExportLogsServiceRequest.newBuilder();
         JsonFormat.parser().merge(
                 Resources.toString(Resources.getResource(
-                        OpenTelemetryGrpcInput.class, filename), StandardCharsets.UTF_8),
+                        OTelGrpcInput.class, filename), StandardCharsets.UTF_8),
                 requestBuilder);
-        return new JournalRecordFactory().createFromRequest(requestBuilder.build()).stream()
-                .map(Journal.Record::getLog).findFirst().orElseThrow();
+        return new OTelJournalRecordFactory().createFromRequest(requestBuilder.build()).stream()
+                .map(OTelJournal.Record::getLog).findFirst().orElseThrow();
     }
 }

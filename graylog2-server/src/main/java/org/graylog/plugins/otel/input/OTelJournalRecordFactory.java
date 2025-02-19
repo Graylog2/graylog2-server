@@ -24,15 +24,15 @@ import io.opentelemetry.proto.logs.v1.ScopeLogs;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JournalRecordFactory {
+public class OTelJournalRecordFactory {
 
-    public List<Journal.Record> createFromRequest(ExportLogsServiceRequest request) {
-        final List<Journal.Record> journalRecords = new ArrayList<>();
+    public List<OTelJournal.Record> createFromRequest(ExportLogsServiceRequest request) {
+        final List<OTelJournal.Record> journalRecords = new ArrayList<>();
         for (ResourceLogs resourceLogs : request.getResourceLogsList()) {
             for (ScopeLogs scopeLogs : resourceLogs.getScopeLogsList()) {
                 for (LogRecord logRecord : scopeLogs.getLogRecordsList()) {
-                    final var journalRecord = Journal.Record.newBuilder()
-                            .setLog(Journal.Log.newBuilder()
+                    final var journalRecord = OTelJournal.Record.newBuilder()
+                            .setLog(OTelJournal.Log.newBuilder()
                                     .setResource(resourceLogs.getResource())
                                     .setResourceSchemaUrl(resourceLogs.getSchemaUrl())
                                     .setScope(scopeLogs.getScope())

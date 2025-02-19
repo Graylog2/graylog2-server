@@ -23,8 +23,8 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.protobuf.StatusProto;
 
-public class Utils {
-    private Utils() {
+public class GrpcUtils {
+    private GrpcUtils() {
     }
 
     public static StatusRuntimeException createThrottledStatusRuntimeException() {

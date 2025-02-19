@@ -19,8 +19,8 @@ package org.graylog.plugins.otel.input;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import org.graylog.plugins.otel.input.codec.OpenTelemetryCodec;
-import org.graylog.plugins.otel.input.grpc.OpenTelemetryGrpcTransport;
+import org.graylog.plugins.otel.input.codec.OTelCodec;
+import org.graylog.plugins.otel.input.grpc.OTelGrpcTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -28,31 +28,31 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
-public class OpenTelemetryGrpcInput extends MessageInput {
+public class OTelGrpcInput extends MessageInput {
     public static final String NAME = "OpenTelemetry (gRPC)";
 
     @Inject
-    public OpenTelemetryGrpcInput(MetricRegistry metricRegistry,
-                                  @Assisted Configuration configuration,
-                                  OpenTelemetryGrpcTransport transport,
-                                  LocalMetricRegistry localRegistry,
-                                  OpenTelemetryCodec codec,
-                                  Config config,
-                                  Descriptor descriptor,
-                                  ServerStatus serverStatus) {
+    public OTelGrpcInput(MetricRegistry metricRegistry,
+                         @Assisted Configuration configuration,
+                         OTelGrpcTransport transport,
+                         LocalMetricRegistry localRegistry,
+                         OTelCodec codec,
+                         Config config,
+                         Descriptor descriptor,
+                         ServerStatus serverStatus) {
         super(metricRegistry, configuration, transport, localRegistry, codec, config, descriptor, serverStatus);
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<OpenTelemetryGrpcInput> {
+    public interface Factory extends MessageInput.Factory<OTelGrpcInput> {
         @Override
-        OpenTelemetryGrpcInput create(Configuration configuration);
+        OTelGrpcInput create(Configuration configuration);
 
         @Override
-        OpenTelemetryGrpcInput.Config getConfig();
+        OTelGrpcInput.Config getConfig();
 
         @Override
-        OpenTelemetryGrpcInput.Descriptor getDescriptor();
+        OTelGrpcInput.Descriptor getDescriptor();
     }
 
     public static class Descriptor extends MessageInput.Descriptor {
@@ -65,7 +65,7 @@ public class OpenTelemetryGrpcInput extends MessageInput {
     public static class Config extends MessageInput.Config {
 
         @Inject
-        public Config(OpenTelemetryGrpcTransport.Factory transport, OpenTelemetryCodec.Factory codec) {
+        public Config(OTelGrpcTransport.Factory transport, OTelCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }

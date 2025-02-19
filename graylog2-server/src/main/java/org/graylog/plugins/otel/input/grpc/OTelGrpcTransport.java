@@ -32,25 +32,25 @@ import org.graylog2.security.encryption.EncryptedValueService;
 
 import java.util.List;
 
-public class OpenTelemetryGrpcTransport extends AbstractGrpcTransport {
+public class OTelGrpcTransport extends AbstractGrpcTransport {
     public static final String NAME = "GrpcTransport";
 
-    private final LogsService.Factory logsServiceFactory;
+    private final OTelLogsService.Factory logsServiceFactory;
 
     @Inject
-    public OpenTelemetryGrpcTransport(EventBus eventBus,
-                                      @Assisted Configuration configuration,
-                                      LocalMetricRegistry localMetricRegistry,
-                                      LogsService.Factory logsServiceFactory,
-                                      EncryptedValueService encryptedValueService) {
+    public OTelGrpcTransport(EventBus eventBus,
+                             @Assisted Configuration configuration,
+                             LocalMetricRegistry localMetricRegistry,
+                             OTelLogsService.Factory logsServiceFactory,
+                             EncryptedValueService encryptedValueService) {
         super(eventBus, configuration, localMetricRegistry, encryptedValueService);
         this.logsServiceFactory = logsServiceFactory;
     }
 
     @FactoryClass
-    public interface Factory extends Transport.Factory<OpenTelemetryGrpcTransport> {
+    public interface Factory extends Transport.Factory<OTelGrpcTransport> {
         @Override
-        OpenTelemetryGrpcTransport create(Configuration configuration);
+        OTelGrpcTransport create(Configuration configuration);
 
         @Override
         Config getConfig();

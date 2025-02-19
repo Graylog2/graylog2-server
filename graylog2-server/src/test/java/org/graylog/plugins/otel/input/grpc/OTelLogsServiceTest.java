@@ -24,9 +24,9 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.KeyValue;
-import org.graylog.plugins.otel.input.Journal;
-import org.graylog.plugins.otel.input.JournalRecordFactory;
-import org.graylog.plugins.otel.input.OpenTelemetryGrpcInput;
+import org.graylog.plugins.otel.input.OTelGrpcInput;
+import org.graylog.plugins.otel.input.OTelJournal;
+import org.graylog.plugins.otel.input.OTelJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +44,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class LogsServiceTest {
+class OTelLogsServiceTest {
 
     @Mock
     private ThrottleableTransport2 transport;
@@ -53,11 +53,11 @@ class LogsServiceTest {
     @Mock
     private StreamObserver<ExportLogsServiceResponse> responseObserver;
 
-    private LogsService logsService;
+    private OTelLogsService logsService;
 
     @BeforeEach
     void setUp() {
-        logsService = new LogsService(transport, input, new JournalRecordFactory());
+        logsService = new OTelLogsService(transport, input, new OTelJournalRecordFactory());
     }
 
     // Test processing a request using the official example from
@@ -66,7 +66,7 @@ class LogsServiceTest {
     void testExport() throws IOException {
         final var requestBuilder = ExportLogsServiceRequest.newBuilder();
         JsonFormat.parser().merge(
-                Resources.toString(Resources.getResource(OpenTelemetryGrpcInput.class, "logs.json"), StandardCharsets.UTF_8),
+                Resources.toString(Resources.getResource(OTelGrpcInput.class, "logs.json"), StandardCharsets.UTF_8),
                 requestBuilder);
 
         logsService.export(requestBuilder.build(), responseObserver);
@@ -89,9 +89,9 @@ class LogsServiceTest {
         verify(responseObserver).onCompleted();
     }
 
-    private Journal.Record parseJournalRecord(byte[] payload) {
+    private OTelJournal.Record parseJournalRecord(byte[] payload) {
         try {
-            return Journal.Record.parseFrom(payload);
+            return OTelJournal.Record.parseFrom(payload);
         } catch (InvalidProtocolBufferException e) {
             throw new RuntimeException(e);
         }

@@ -3,7 +3,7 @@ syntax = "proto3";
 package org.graylog.plugins.otel.input;
 
 option java_package = "org.graylog.plugins.otel.input";
-option java_outer_classname = "Journal";
+option java_outer_classname = "OTelJournal";
 
 import "opentelemetry/proto/resource/v1/resource.proto";
 import "opentelemetry/proto/common/v1/common.proto";

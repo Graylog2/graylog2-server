@@ -25,7 +25,7 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import jakarta.inject.Inject;
-import org.graylog.plugins.otel.input.JournalRecordFactory;
+import org.graylog.plugins.otel.input.OTelJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
@@ -33,24 +33,24 @@ import org.graylog2.plugin.journal.RawMessage;
 import java.net.InetSocketAddress;
 import java.util.function.Function;
 
+import static org.graylog.plugins.otel.input.grpc.GrpcUtils.createThrottledStatusRuntimeException;
 import static org.graylog.plugins.otel.input.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
-import static org.graylog.plugins.otel.input.grpc.Utils.createThrottledStatusRuntimeException;
 
-public class LogsService extends LogsServiceGrpc.LogsServiceImplBase {
-    private final JournalRecordFactory journalRecordFactory;
+public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
+    private final OTelJournalRecordFactory journalRecordFactory;
     private final ThrottleableTransport2 transport;
     private final MessageInput input;
 
     @Inject
-    public LogsService(@Assisted ThrottleableTransport2 transport, @Assisted MessageInput input,
-                       JournalRecordFactory journalRecordFactory) {
+    public OTelLogsService(@Assisted ThrottleableTransport2 transport, @Assisted MessageInput input,
+                           OTelJournalRecordFactory journalRecordFactory) {
         this.transport = transport;
         this.input = input;
         this.journalRecordFactory = journalRecordFactory;
     }
 
     public interface Factory {
-        LogsService create(ThrottleableTransport2 transport, MessageInput input);
+        OTelLogsService create(ThrottleableTransport2 transport, MessageInput input);
     }
 
     @Override

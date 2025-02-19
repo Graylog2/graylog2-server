@@ -20,7 +20,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.protobuf.InvalidProtocolBufferException;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import org.graylog.plugins.otel.input.Journal;
+import org.graylog.plugins.otel.input.OTelJournal;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -36,23 +36,23 @@ import org.graylog2.shared.utilities.ExceptionUtils;
 
 import java.util.Optional;
 
-public class OpenTelemetryCodec implements Codec {
+public class OTelCodec implements Codec {
     public static final String NAME = "OpenTelemetry";
     private static final String CK_ADD_OTEL_PREFIX = "add_otel_prefix";
 
     private final Configuration configuration;
-    private final LogsCodec logsCodec;
+    private final OTelLogsCodec logsCodec;
 
     @Inject
-    public OpenTelemetryCodec(@Assisted Configuration configuration, LogsCodec.Factory logsCodecFactory) {
+    public OTelCodec(@Assisted Configuration configuration, OTelLogsCodec.Factory logsCodecFactory) {
         this.configuration = configuration;
         this.logsCodec = logsCodecFactory.create(configuration.getBoolean(CK_ADD_OTEL_PREFIX, true));
     }
 
     @FactoryClass
-    public interface Factory extends AbstractCodec.Factory<OpenTelemetryCodec> {
+    public interface Factory extends AbstractCodec.Factory<OTelCodec> {
         @Override
-        OpenTelemetryCodec create(Configuration configuration);
+        OTelCodec create(Configuration configuration);
 
         @Override
         Codec.Config getConfig();
@@ -83,9 +83,9 @@ public class OpenTelemetryCodec implements Codec {
 
     @Override
     public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
-        final Journal.Record journalRecord;
+        final OTelJournal.Record journalRecord;
         try {
-            journalRecord = Journal.Record.parseFrom(rawMessage.getPayload());
+            journalRecord = OTelJournal.Record.parseFrom(rawMessage.getPayload());
         } catch (InvalidProtocolBufferException e) {
             throw InputProcessingException.create(
                     "Error parsing OpenTelemetry message", ExceptionUtils.getRootCause(e), rawMessage);

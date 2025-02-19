@@ -29,7 +29,7 @@ import io.opentelemetry.proto.common.v1.KeyValueList;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import jakarta.annotation.Nonnull;
 import org.apache.commons.codec.binary.Hex;
-import org.graylog.plugins.otel.input.Journal;
+import org.graylog.plugins.otel.input.OTelJournal;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -51,24 +51,24 @@ import static io.opentelemetry.proto.common.v1.AnyValue.ValueCase.ARRAY_VALUE;
 import static io.opentelemetry.proto.common.v1.AnyValue.ValueCase.KVLIST_VALUE;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class LogsCodec {
-    private static final Logger LOG = getLogger(LogsCodec.class);
+public class OTelLogsCodec {
+    private static final Logger LOG = getLogger(OTelLogsCodec.class);
     private final MessageFactory messageFactory;
     private final ObjectMapper objectMapper;
     private final boolean addOtelPrefix;
 
     public interface Factory {
-        LogsCodec create(boolean addOtelPrefix);
+        OTelLogsCodec create(boolean addOtelPrefix);
     }
 
     @AssistedInject
-    public LogsCodec(MessageFactory messageFactory, ObjectMapper objectMapper, @Assisted boolean addOtelPrefix) {
+    public OTelLogsCodec(MessageFactory messageFactory, ObjectMapper objectMapper, @Assisted boolean addOtelPrefix) {
         this.messageFactory = messageFactory;
         this.objectMapper = objectMapper;
         this.addOtelPrefix = addOtelPrefix;
     }
 
-    public Optional<Message> decode(@Nonnull Journal.Log log, DateTime receiveTimestamp, ResolvableInetSocketAddress remoteAddress) {
+    public Optional<Message> decode(@Nonnull OTelJournal.Log log, DateTime receiveTimestamp, ResolvableInetSocketAddress remoteAddress) {
         final var logRecord = log.getLogRecord();
 
         final String body = asString("body", logRecord.getBody()).orElse("");
