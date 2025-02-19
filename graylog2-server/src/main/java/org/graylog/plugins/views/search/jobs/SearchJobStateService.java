@@ -32,6 +32,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -69,6 +70,19 @@ public class SearchJobStateService {
                         .sort(Sorts.descending(CREATED_AT_FIELD))
                         .first()
         );
+    }
+
+    public boolean resetLatestForUser(final String user) {
+        return getLatestForUser(user).map(activeQuerySearchJobState ->
+                        update(
+                                activeQuerySearchJobState.toBuilder()
+                                        .status(SearchJobStatus.RESET)
+                                        .result(null)
+                                        .errors(Set.of())
+                                        .build()
+                        )
+                )
+                .orElse(false);
     }
 
     public boolean delete(final String id) {

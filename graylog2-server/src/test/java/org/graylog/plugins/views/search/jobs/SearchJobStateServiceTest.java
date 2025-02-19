@@ -33,9 +33,13 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -131,6 +135,40 @@ public class SearchJobStateServiceTest {
         assertTrue(retrieved.isPresent());
         assertEquals(SearchJobStatus.DONE, retrieved.get().status());
         assertTrue(retrieved.get().updatedAt().isAfter(toBeSaved.updatedAt()));
+    }
+
+    @Test
+    public void testReset() {
+        final SearchJobState savedSearchJobState = toTest.create(SearchJobState.builder()
+                .identifier(new SearchJobIdentifier(null,
+                        "677fd86ae6db8b71a8e10001",
+                        "john",
+                        "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(QueryResult.builder()
+                        .query(Query.builder()
+                                .id("0000000000000042")
+                                .timerange(KeywordRange.create("last year", "UTC"))
+                                .query(ElasticsearchQueryString.empty())
+                                .searchTypes(Set.of())
+                                .build())
+                        .searchTypes(Map.of())
+                        .build())
+                .errors(Set.of())
+                .status(SearchJobStatus.RUNNING)
+                .progress(42)
+                .createdAt(DateTime.parse("1999-01-01T11:11:11"))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build());
+
+        assertFalse(toTest.resetLatestForUser("jose")); //no active query for Jose
+
+        assertTrue(toTest.resetLatestForUser("john"));
+        final Optional<SearchJobState> latestForJohn = toTest.getLatestForUser("john");
+        assertTrue(latestForJohn.isPresent());
+        assertEquals(SearchJobStatus.RESET, latestForJohn.get().status());
+        assertEquals(savedSearchJobState.identifier(), latestForJohn.get().identifier());
+        assertNull(latestForJohn.get().result());
+        assertEquals(Set.of(), latestForJohn.get().errors());
     }
 
     @Test
