@@ -26,11 +26,10 @@ import Store from 'logic/local-storage/Store';
 import type ViewState from 'views/logic/views/ViewState';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import createSearch from 'views/logic/slices/createSearch';
-import { updateViewState } from 'views/logic/slices/viewSlice';
+import { updateViewState, executeSearch } from 'views/logic/slices/viewSlice';
 import Query from 'views/logic/queries/Query';
 
 import { mockFieldCharts, viewState as mockViewState } from './MigrateFieldCharts.fixtures';
@@ -55,14 +54,10 @@ jest.mock('logic/local-storage/Store', () => ({
   set: jest.fn(),
 }));
 
-jest.mock('views/logic/slices/searchExecutionSlice', () => ({
-  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
-  execute: jest.fn(() => async () => {}),
-}));
-
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
   updateViewState: jest.fn(() => async () => {}),
+  executeSearch: jest.fn(() => async () => {}),
 }));
 
 jest.mock('views/logic/slices/createSearch');
@@ -128,7 +123,7 @@ describe('MigrateFieldCharts', () => {
     it('execute search, when finished', async () => {
       Store.get.mockImplementation(mockStoreGet());
       renderAndMigrate();
-      await waitFor(() => expect(execute).toHaveBeenCalled());
+      await waitFor(() => expect(executeSearch).toHaveBeenCalled());
     });
 
     it('hide alert, when finished', async () => {

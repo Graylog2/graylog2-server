@@ -23,8 +23,8 @@ import Widget from 'views/logic/widgets/Widget';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { updateWidget } from 'views/logic/slices/widgetActions';
+import { executeSearch } from 'views/logic/slices/viewSlice';
 
 import EditWidgetFrame from './EditWidgetFrame';
 
@@ -51,9 +51,9 @@ jest.mock('moment', () => {
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
-jest.mock('views/logic/slices/searchExecutionSlice', () => ({
-  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
-  execute: jest.fn(() => async () => {}),
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  executeSearch: jest.fn(() => async () => {}),
 }));
 
 jest.mock('views/logic/slices/widgetActions', () => ({
@@ -90,7 +90,7 @@ describe('EditWidgetFrame', () => {
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(executeSearch).toHaveBeenCalledTimes(1));
     });
 
     it("changes the widget's streams when using stream filter", async () => {

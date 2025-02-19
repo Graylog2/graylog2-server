@@ -66,8 +66,7 @@ import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useQueryFilters from 'views/logic/queries/useQueryFilters';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
-import { updateQuery } from 'views/logic/slices/viewSlice';
+import { updateQuery, executeSearch } from 'views/logic/slices/viewSlice';
 import useHandlerContext from 'views/components/useHandlerContext';
 import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
@@ -118,7 +117,7 @@ const defaultOnSubmit = async (
     return dispatch(updateQuery(newQuery.id, newQuery));
   }
 
-  return dispatch(execute());
+  return dispatch(executeSearch());
 };
 
 const defaultProps = {

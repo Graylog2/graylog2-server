@@ -46,12 +46,13 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
-import { cancelExecutedJob, execute } from 'views/logic/slices/searchExecutionSlice';
+import { cancelExecutedJob } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import useParameters from 'views/hooks/useParameters';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useViewTitle from 'views/hooks/useViewTitle';
+import { executeSearch } from 'views/logic/slices/viewSlice';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
@@ -138,7 +139,7 @@ type Props = {
 
 const Search = ({ forceSideBarPinned = false }: Props) => {
   const dispatch = useAppDispatch();
-  const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
+  const refreshSearch = useCallback(() => dispatch(executeSearch()), [dispatch]);
   const {
     sidebar: { isShown: showSidebar },
     searchAreaContainer,

@@ -37,8 +37,7 @@ import Spinner from 'components/common/Spinner';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
-import { updateViewState } from 'views/logic/slices/viewSlice';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { updateViewState, executeSearch } from 'views/logic/slices/viewSlice';
 import type { WidgetPositions, GetState } from 'views/types';
 import { selectActiveViewState, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 
@@ -207,7 +206,7 @@ const _onMigrate = async (
 
   const { newViewState, currentQueryId } = await dispatch(_migrateWidgets(legacyCharts));
   await dispatch(updateViewState(currentQueryId, newViewState));
-  await dispatch(execute());
+  await dispatch(executeSearch());
   Store.set(FIELD_CHARTS_MIGRATED_KEY, 'finished');
   setMigrating(false);
   setMigrationFinished(true);

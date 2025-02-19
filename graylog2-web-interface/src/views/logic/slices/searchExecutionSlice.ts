@@ -32,7 +32,7 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { selectView, selectParameters, selectActiveQuery } from 'views/logic/slices/viewSelectors';
+import { selectParameters, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import {
   selectGlobalOverride,
   selectSearchTypesToSearch,
@@ -191,14 +191,13 @@ export const executeWithExecutionState =
       });
 
 export const execute =
-  () =>
+  (search: Search) =>
   (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
     const state = getState();
-    const view = selectView(state);
     const executionState = selectSearchExecutionState(state);
     const searchTypesToSearch = selectSearchTypesToSearch(state);
 
-    return dispatch(executeWithExecutionState(view.search, searchTypesToSearch, executionState, searchExecutors));
+    return dispatch(executeWithExecutionState(search, searchTypesToSearch, executionState, searchExecutors));
   };
 
 export const setGlobalOverrideQuery =

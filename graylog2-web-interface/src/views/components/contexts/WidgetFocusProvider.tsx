@@ -24,12 +24,13 @@ import useQuery from 'routing/useQuery';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useWidgets from 'views/hooks/useWidgets';
 import useAppDispatch from 'stores/useAppDispatch';
-import { execute, setSearchTypesToSearch } from 'views/logic/slices/searchExecutionSlice';
+import { setSearchTypesToSearch } from 'views/logic/slices/searchExecutionSlice';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import useView from 'views/hooks/useView';
 import useAppSelector from 'stores/useAppSelector';
 import { selectSearchTypesToSearch } from 'views/logic/slices/searchExecutionSelectors';
+import { executeSearch } from 'views/logic/slices/viewSlice';
 
 import type { FocusContextState } from './WidgetFocusContext';
 import WidgetFocusContext from './WidgetFocusContext';
@@ -109,7 +110,7 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       const searchTypeIds = widgetMapping.get(nextFocusedWidget.id);
 
       dispatch(setSearchTypesToSearch(searchTypeIds?.toArray()));
-      dispatch(execute());
+      dispatch(executeSearch());
     }
   }, [focusedWidget, setFocusedWidget, widgetIds, focusUriParams, dispatch, widgetMapping]);
 

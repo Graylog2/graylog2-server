@@ -19,8 +19,8 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 import type { AppDispatch } from 'stores/useAppDispatch';
-import { setGlobalOverrideTimerange, execute } from 'views/logic/slices/searchExecutionSlice';
-import { setTimerange } from 'views/logic/slices/viewSlice';
+import { setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
+import { setTimerange, executeSearch } from 'views/logic/slices/viewSlice';
 import type { GetState } from 'views/types';
 import { selectActiveQuery, selectViewType } from 'views/logic/slices/viewSelectors';
 
@@ -34,7 +34,7 @@ const onZoom = (from: string, to: string, userTz: string) => (dispatch: AppDispa
   };
 
   if (viewType === View.Type.Dashboard) {
-    dispatch(setGlobalOverrideTimerange(newTimeRange)).then(() => dispatch(execute()));
+    dispatch(setGlobalOverrideTimerange(newTimeRange)).then(() => dispatch(executeSearch()));
   } else {
     dispatch(setTimerange(activeQuery, newTimeRange));
   }

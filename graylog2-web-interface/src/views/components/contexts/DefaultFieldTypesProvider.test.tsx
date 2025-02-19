@@ -19,7 +19,6 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 
-import { execute } from 'views/logic/slices/searchExecutionSlice';
 import asMock from 'helpers/mocking/AsMock';
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
@@ -29,8 +28,9 @@ import type { SearchExecutionResult } from 'views/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useAppDispatch from 'stores/useAppDispatch';
-import executeSearch from 'views/logic/slices/executeJobResult';
+import executeSearchJobResult from 'views/logic/slices/executeJobResult';
 import generateId from 'logic/generateId';
+import { executeSearch } from 'views/logic/slices/viewSlice';
 
 import type { FieldTypes } from './FieldTypesContext';
 import FieldTypesContext from './FieldTypesContext';
@@ -104,13 +104,15 @@ describe('DefaultFieldTypesProvider', () => {
       const dispatch = useAppDispatch();
 
       return (
-        <button type="button" onClick={() => dispatch(execute())}>
+        <button type="button" onClick={() => dispatch(executeSearch())}>
           Refresh search
         </button>
       );
     };
 
-    asMock(executeSearch).mockResolvedValue({ result: { result: { id: generateId() } } } as SearchExecutionResult);
+    asMock(executeSearchJobResult).mockResolvedValue({
+      result: { result: { id: generateId() } },
+    } as SearchExecutionResult);
 
     const consume = () => <TriggerRefresh />;
 
