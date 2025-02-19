@@ -19,7 +19,9 @@ import type { Moment } from 'moment';
 import moment from 'moment';
 import trim from 'lodash/trim';
 
-import type { QueryString, TimeRange } from '../queries/Query';
+import type { QueryString } from 'views/logic/queries/types';
+
+import type { TimeRange } from '../queries/Query';
 
 export type SearchTypeOptions<T = any> = {
   [searchTypeId: string]: T;

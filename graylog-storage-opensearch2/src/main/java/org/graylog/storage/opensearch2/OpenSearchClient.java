@@ -185,8 +185,7 @@ public class OpenSearchClient {
     }
 
     private OpenSearchException exceptionFrom(Exception e, String errorMessage) {
-        if (e instanceof OpenSearchException) {
-            final OpenSearchException openSearchException = (OpenSearchException) e;
+        if (e instanceof OpenSearchException openSearchException) {
             if (isIndexNotFoundException(openSearchException)) {
                 throw IndexNotFoundException.create(errorMessage + openSearchException.getResourceId(), openSearchException.getIndex().getName());
             }
