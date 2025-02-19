@@ -24,11 +24,15 @@ import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
 import io.grpc.Status;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Blocks gRPC calls if there is no authorization header with a valid bearer token
  */
 public class BearerTokenAuthInterceptor implements ServerInterceptor {
+    private static final Logger LOG = getLogger(BearerTokenAuthInterceptor.class);
 
     private final String staticToken;
 
@@ -42,12 +46,12 @@ public class BearerTokenAuthInterceptor implements ServerInterceptor {
                 headers.get(Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER)));
 
         if (StringUtils.isEmpty(authHeader)) {
-            return closedCallWithDescription(call, headers, "Missing bearer token.");
+            return closedCall(call, headers, "\"Authorization\" header is missing");
         }
 
         final var token = StringUtils.removeStart(authHeader, "Bearer ");
         if (token.length() == authHeader.length() || token.isEmpty()) {
-            return closedCallWithDescription(call, headers, "Authorization header doesn't contain a bearer token.");
+            return closedCall(call, headers, "\"Authorization\" header doesn't contain a bearer token");
         }
 
         if (staticToken.equals(token)) {
@@ -55,13 +59,15 @@ public class BearerTokenAuthInterceptor implements ServerInterceptor {
             return Contexts.interceptCall(Context.current(), call, headers, next);
         }
 
-        return closedCallWithDescription(call, headers, "Invalid bearer token.");
+        return closedCall(call, headers, "Bearer token is invalid");
     }
 
-    private static <ReqT, RespT> ServerCall.Listener<ReqT> closedCallWithDescription(
-            ServerCall<ReqT, RespT> call, Metadata headers, String description) {
+    private static <ReqT, RespT> ServerCall.Listener<ReqT> closedCall(
+            ServerCall<ReqT, RespT> call, Metadata headers, String reason) {
 
-        call.close(Status.UNAUTHENTICATED.withDescription(description), headers);
+        // Respond with a generic description to not reveal any details, but log the actual reason for debugging.
+        LOG.debug("Authentication for gRPC call {} failed: {}.", call.getMethodDescriptor().getFullMethodName(), reason);
+        call.close(Status.UNAUTHENTICATED.withDescription("Authentication required"), headers);
         return new ServerCall.Listener<>() {};
     }
 }
