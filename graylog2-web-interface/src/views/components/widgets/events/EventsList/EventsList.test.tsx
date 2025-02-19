@@ -112,7 +112,6 @@ describe('EventsList', () => {
     const dispatch = jest.fn().mockResolvedValue(
       finishedLoading({
         result: new SearchResult(dummySearchJobResults),
-        widgetMapping: Immutable.Map(),
       }),
     );
     asMock(useAppDispatch).mockReturnValue(dispatch);
@@ -140,7 +139,6 @@ describe('EventsList', () => {
     const dispatch = jest.fn().mockResolvedValue(
       finishedLoading({
         result: new SearchResult(dummySearchJobResults),
-        widgetMapping: Immutable.Map(),
       }),
     );
     asMock(useAppDispatch).mockReturnValue(dispatch);
@@ -164,7 +162,6 @@ describe('EventsList', () => {
             } as SearchErrorResponse,
           ],
         }),
-        widgetMapping: Immutable.Map(),
       }),
     );
     asMock(useAppDispatch).mockReturnValue(dispatch);

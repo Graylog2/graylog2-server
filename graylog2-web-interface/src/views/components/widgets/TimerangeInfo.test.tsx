@@ -28,9 +28,13 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import useSearchResult from 'views/hooks/useSearchResult';
 import type { SearchExecutionResult } from 'views/types';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import useView from 'views/hooks/useView';
+import View from 'views/logic/views/View';
+import ViewState from 'views/logic/views/ViewState';
 
 import OriginalTimerangeInfo from './TimerangeInfo';
 
+jest.mock('views/hooks/useView');
 jest.mock('views/hooks/useGlobalOverride');
 
 const defaultSearchResult = {
@@ -64,7 +68,6 @@ const mockSearchStoreState = (storeState: Partial<SearchExecutionResult> = {}): 
       },
     },
   }),
-  widgetMapping: Immutable.Map({ 'widget-id': Immutable.Set(['search-type-id']) }),
   ...storeState,
 });
 
@@ -82,6 +85,17 @@ describe('TimerangeInfo', () => {
   useViewsPlugin();
 
   beforeEach(() => {
+    asMock(useView).mockReturnValue(
+      View.builder()
+        .type(View.Type.Search)
+        .state({
+          query1: ViewState.create()
+            .toBuilder()
+            .widgetMapping(Immutable.Map({ 'widget-id': Immutable.Set(['search-type-id']) }))
+            .build(),
+        })
+        .build(),
+    );
     asMock(useSearchResult).mockReturnValue(mockSearchStoreState());
     asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
   });
@@ -166,11 +180,8 @@ describe('TimerangeInfo', () => {
   });
 
   it('should not throw error and display default time range when widget id does not exist in search widget mapping', () => {
-    asMock(useSearchResult).mockReturnValue(
-      mockSearchStoreState({
-        widgetMapping: Immutable.Map(),
-      }) as SearchExecutionResult,
-    );
+    const exampleView = View.builder().type(View.Type.Search).state({ query1: ViewState.create() }).build();
+    asMock(useView).mockReturnValue(exampleView);
 
     render(<TimerangeInfo widget={widget} activeQuery="active-query-id" widgetId="widget-id" />);
 

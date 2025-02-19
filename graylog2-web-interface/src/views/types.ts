@@ -55,7 +55,6 @@ import type { ParameterBindings } from 'views/logic/search/SearchExecutionState'
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type SearchResult from 'views/logic/SearchResult';
-import type { WidgetMapping } from 'views/logic/views/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
@@ -447,7 +446,6 @@ export interface ViewState {
 
 export type SearchExecutionResult = {
   result: SearchResult;
-  widgetMapping: WidgetMapping;
 };
 
 export type JobIdsState = JobIds | null;

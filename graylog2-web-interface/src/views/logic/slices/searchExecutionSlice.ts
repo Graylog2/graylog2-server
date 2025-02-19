@@ -31,7 +31,6 @@ import type {
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
-import type View from 'views/logic/views/View';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { selectView, selectParameters, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import {
@@ -142,7 +141,7 @@ export type SearchExecutors = {
     executionStateParam: SearchExecutionState,
     keepQueries?: string[],
   ) => Promise<JobIds>;
-  executeJobResult: (jobIds: JobIds, view: View) => Promise<SearchExecutionResult>;
+  executeJobResult: (jobIds: JobIds) => Promise<SearchExecutionResult>;
   cancelJob: (jobIds: JobIds) => Promise<null>;
 };
 
@@ -161,26 +160,26 @@ export const cancelExecutedJob =
 
 export const executeWithExecutionState =
   (
-    view: View,
+    search: Search,
     searchTypesToSearch: Array<string>,
     executionState: SearchExecutionState,
     searchExecutors: SearchExecutors,
   ) =>
   (dispatch: AppDispatch, getState: GetState) =>
-    dispatch(parseSearch(view.search, searchExecutors.parse))
+    dispatch(parseSearch(search, searchExecutors.parse))
       .then(() => {
         dispatch(loading());
         dispatch(cancelExecutedJob());
 
         const activeQuery = selectActiveQuery(getState());
 
-        return searchExecutors.startJob(view.search, searchTypesToSearch, executionState, [activeQuery]);
+        return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
       })
       .then((jobIds: JobIds) => {
         dispatch(setJobIds(jobIds));
 
         return searchExecutors
-          .executeJobResult(jobIds, view)
+          .executeJobResult(jobIds)
           .then(searchExecutors.resultMapper)
           .then((result) => {
             dispatch(setJobIds(null));
@@ -199,7 +198,7 @@ export const execute =
     const executionState = selectSearchExecutionState(state);
     const searchTypesToSearch = selectSearchTypesToSearch(state);
 
-    return dispatch(executeWithExecutionState(view, searchTypesToSearch, executionState, searchExecutors));
+    return dispatch(executeWithExecutionState(view.search, searchTypesToSearch, executionState, searchExecutors));
   };
 
 export const setGlobalOverrideQuery =

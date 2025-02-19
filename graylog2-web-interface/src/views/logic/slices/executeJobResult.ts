@@ -18,7 +18,6 @@ import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { SearchJobType, JobIds } from 'views/stores/SearchJobs';
 import { runStartJob, runPollJob, runCancelJob } from 'views/stores/SearchJobs';
-import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
 import type Search from 'views/logic/search/Search';
@@ -78,17 +77,10 @@ export const pollJob = (jobIds: JobIds, result: SearchJobType | null, depth: num
     }
   });
 
-export const executeJobResult = async (
-  { asyncSearchId, nodeId }: JobIds,
-  view: View,
-): Promise<SearchExecutionResult> => {
-  const { widgetMapping } = view;
-
-  return pollJob({ asyncSearchId, nodeId }, null).then((result) => ({
-    widgetMapping,
+export const executeJobResult = async ({ asyncSearchId, nodeId }: JobIds): Promise<SearchExecutionResult> =>
+  pollJob({ asyncSearchId, nodeId }, null).then((result) => ({
     result: new SearchResult(result),
   }));
-};
 
 export const cancelJob = (jobIds: JobIds) => runCancelJob(jobIds);
 

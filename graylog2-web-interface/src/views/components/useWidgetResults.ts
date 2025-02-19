@@ -25,6 +25,7 @@ import type SearchError from 'views/logic/SearchError';
 import useAppSelector from 'stores/useAppSelector';
 import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 import { selectActiveQuery, selectWidget } from 'views/logic/slices/viewSelectors';
+import useView from 'views/hooks/useView';
 
 const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results: QueryResult) => {
   const { searchTypes } = results;
@@ -66,13 +67,14 @@ const _getErrorsForQuery = (currentQueryId: string, currentQueryErrors: SearchEr
   return { widgetData: undefined, error: queryError ? [queryError] : [] };
 };
 
-const selectWidgetResults = (widgetId: string) =>
+const selectWidgetResults = (widgetId: string, widgetMapping: WidgetMapping) =>
   createSelector(
     selectSearchExecutionResult,
     selectActiveQuery,
     selectWidget(widgetId),
     (searchExecutionResult, currentQueryId, widget) => {
-      const { result, widgetMapping } = searchExecutionResult ?? {};
+      const { result } = searchExecutionResult ?? {};
+      console.log('widgetMapping1', widgetMapping);
       const currentQueryResults = result?.results?.[currentQueryId];
       const currentQueryErrors = result?.errors;
 
@@ -84,6 +86,10 @@ const selectWidgetResults = (widgetId: string) =>
     },
   );
 
-const useWidgetResults = (widgetId: string) => useAppSelector(selectWidgetResults(widgetId));
+const useWidgetResults = (widgetId: string) => {
+  const { widgetMapping } = useView();
+
+  return useAppSelector(selectWidgetResults(widgetId, widgetMapping));
+};
 
 export default useWidgetResults;
