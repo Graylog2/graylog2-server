@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin;
+package org.graylog.plugins.views.search.errors;
 
-import org.graylog2.configuration.PluginPathConfiguration;
+/**
+ * Simple error, to be used where there is not need to precisely define query, search type or similar data describing precisely error location.
+ */
+public record SimpleSearchError(String description, boolean fatal) implements SearchError {
 
-public class PluginLoaderConfig extends PluginPathConfiguration {
 }
