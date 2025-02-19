@@ -19,12 +19,7 @@ import * as Immutable from 'immutable';
 import uniq from 'lodash/uniq';
 
 import View from 'views/logic/views/View';
-import type {
-  AbsoluteTimeRange,
-  ElasticsearchQueryString,
-  RelativeTimeRangeStartOnly,
-  TimeRange,
-} from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange, RelativeTimeRangeStartOnly, TimeRange } from 'views/logic/queries/Query';
 import type { Event } from 'components/events/events/types';
 import type { EventDefinition, SearchFilter } from 'components/event-definitions/event-definitions-types';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
@@ -51,6 +46,7 @@ import { concatQueryStrings, escape, predicate } from 'views/logic/queries/Query
 import HighlightingRule, { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import type { QueryString } from 'views/logic/queries/types';
 
 const AGGREGATION_WIDGET_HEIGHT = 3;
 
@@ -229,7 +225,7 @@ export const ViewGenerator = async ({
   streams: string | string[] | undefined | null;
   streamCategories: string | string[] | undefined | null;
   timeRange: AbsoluteTimeRange | RelativeTimeRangeStartOnly;
-  queryString: ElasticsearchQueryString;
+  queryString: QueryString;
   aggregations: Array<EventDefinitionAggregation>;
   groupBy: Array<string>;
   queryParameters: Array<ParameterJson>;
@@ -281,7 +277,7 @@ export const UseCreateViewForEvent = ({
         type: 'relative',
         range: (eventDefinition?.config?.search_within_ms ?? 0) / 1000,
       };
-  const queryString: ElasticsearchQueryString = {
+  const queryString: QueryString = {
     type: 'elasticsearch',
     query_string: eventData
       ? concatQueryStrings([eventQueryString, queryStringFromGrouping])

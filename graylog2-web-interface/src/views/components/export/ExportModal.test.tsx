@@ -25,7 +25,7 @@ import type { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
 import type { ViewStateMap, ViewType } from 'views/logic/views/View';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import type { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
@@ -46,6 +46,7 @@ import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { usePlugin } from 'views/test/testPlugins';
 import startDownload from 'views/components/export/startDownload';
+import type { QueryString } from 'views/logic/queries/types';
 
 import type { Props as ExportModalProps } from './ExportModal';
 import ExportModal from './ExportModal';
@@ -130,7 +131,7 @@ describe('ExportModal', () => {
       from: '2020-01-01T12:18:17.827Z',
       to: '2020-01-01T12:23:17.827Z',
     };
-    const globalQuery: ElasticsearchQueryString = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
+    const globalQuery: QueryString = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
     const globalOverride = new GlobalOverride(effectiveTimeRange, globalQuery);
     const executionState = new SearchExecutionState(parameterBindings, globalOverride);
 

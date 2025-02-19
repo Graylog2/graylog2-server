@@ -33,7 +33,7 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
   const goToNextStep = useCallback(() => {
     const nextStep = getNextStep(orderedSteps, activeStep);
 
-      if (!nextStep) return;
+    if (!nextStep) return;
 
     const nextStepIndex = orderedSteps.indexOf(nextStep);
 
@@ -48,29 +48,21 @@ const InputSetupWizardProvider = ({ children = null }: React.PropsWithChildren<{
     setActiveStep(orderedSteps[previousStepIndex]);
   }, [activeStep, orderedSteps]);
 
-  const value = useMemo(() => ({
-    setActiveStep,
-    activeStep,
-    wizardData,
-    setWizardData,
-    orderedSteps,
-    setOrderedSteps,
-    goToPreviousStep,
-    goToNextStep,
-  }), [
-    activeStep,
-    wizardData,
-    orderedSteps,
-    goToPreviousStep,
-    goToNextStep,
-  ]);
-
-  return (
-    <InputSetupWizardContext.Provider value={value}>
-      {children}
-    </InputSetupWizardContext.Provider>
+  const value = useMemo(
+    () => ({
+      setActiveStep,
+      activeStep,
+      wizardData,
+      setWizardData,
+      orderedSteps,
+      setOrderedSteps,
+      goToPreviousStep,
+      goToNextStep,
+    }),
+    [activeStep, wizardData, orderedSteps, goToPreviousStep, goToNextStep],
   );
 
+  return <InputSetupWizardContext.Provider value={value}>{children}</InputSetupWizardContext.Provider>;
 };
 
 export default InputSetupWizardProvider;

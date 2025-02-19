@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
+import type { QueryString } from 'views/logic/queries/types';
 
 export type Drilldown = {
   query: QueryString;
