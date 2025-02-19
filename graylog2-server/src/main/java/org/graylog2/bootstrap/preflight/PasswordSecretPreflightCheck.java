@@ -17,7 +17,7 @@
 package org.graylog2.bootstrap.preflight;
 
 import jakarta.inject.Inject;
-import org.graylog2.Configuration;
+import jakarta.inject.Named;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -34,14 +34,14 @@ import java.util.Optional;
  */
 public class PasswordSecretPreflightCheck implements PreflightCheck {
 
-    private final Configuration configuration;
+    private final String passwordSecret;
     private final ClusterConfigService clusterConfigService;
     private final EncryptedValueService encryptionService;
 
 
     @Inject
-    public PasswordSecretPreflightCheck(Configuration configuration, ClusterConfigService clusterConfigService, EncryptedValueService encryptionService) {
-        this.configuration = configuration;
+    public PasswordSecretPreflightCheck(@Named("password_secret") String passwordSecret, ClusterConfigService clusterConfigService, EncryptedValueService encryptionService) {
+        this.passwordSecret = passwordSecret;
         this.clusterConfigService = clusterConfigService;
         this.encryptionService = encryptionService;
     }
@@ -53,7 +53,7 @@ public class PasswordSecretPreflightCheck implements PreflightCheck {
     }
 
     private void persistSecret() {
-        final EncryptedValue encryptedValue = encryptionService.encrypt(configuration.getPasswordSecret());
+        final EncryptedValue encryptedValue = encryptionService.encrypt(passwordSecret);
         clusterConfigService.write(new PreflightEncryptedSecret(encryptedValue));
     }
 
@@ -62,7 +62,7 @@ public class PasswordSecretPreflightCheck implements PreflightCheck {
 
         try {
             final String decrypted = encryptionService.decrypt(encryptedSecret);
-            if (!configuration.getPasswordSecret().equals(decrypted)) {
+            if (!passwordSecret.equals(decrypted)) {
                 throwException();
             }
         } catch (Exception e) {

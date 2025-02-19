@@ -69,8 +69,6 @@ class PasswordSecretPreflightCheckTest {
     @Nonnull
     private static PasswordSecretPreflightCheck createCheckInstance(String passwordSecret, ClusterConfigService clusterConfigService) {
         final EncryptedValueService encryptionService = new EncryptedValueService(passwordSecret);
-        final Configuration configuration = Mockito.mock(Configuration.class);
-        Mockito.when(configuration.getPasswordSecret()).thenReturn(passwordSecret);
-        return new PasswordSecretPreflightCheck(configuration, clusterConfigService, encryptionService);
+        return new PasswordSecretPreflightCheck(passwordSecret, clusterConfigService, encryptionService);
     }
 }
