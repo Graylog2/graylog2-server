@@ -29,15 +29,10 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type FormValues = {
-  organization: string
-}
+  organization: string;
+};
 
-const createCA = (caData: FormValues) => fetch(
-  'POST',
-  qualifyUrl('ca/create'),
-  caData,
-  false,
-);
+const createCA = (caData: FormValues) => fetch('POST', qualifyUrl('ca/create'), caData, false);
 
 const CaCreateForm = () => {
   const queryClient = useQueryClient();
@@ -66,16 +61,21 @@ const CaCreateForm = () => {
   return (
     <div>
       <p>
-        Click on the &ldquo;Create CA&rdquo; button to quickly create a new certificate authority for your Graylog Data Nodes.
+        Click on the &ldquo;Create CA&rdquo; button to quickly create a new certificate authority for your Graylog Data
+        Nodes.
       </p>
-      <Formik initialValues={{ organization: 'Graylog CA' }} onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
+      <Formik
+        initialValues={{ organization: 'Graylog CA' }}
+        onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
         {({ isSubmitting, isValid }) => (
           <Form>
-            <FormikInput id="organization"
-                         placeholder="Organization Name"
-                         name="organization"
-                         label="Organization Name"
-                         required />
+            <FormikInput
+              id="organization"
+              placeholder="Organization Name"
+              name="organization"
+              label="Organization Name"
+              required
+            />
             <Button bsStyle="primary" bsSize="small" disabled={isSubmitting || !isValid} type="submit">
               {isSubmitting ? 'Creating CA...' : 'Create CA'}
             </Button>

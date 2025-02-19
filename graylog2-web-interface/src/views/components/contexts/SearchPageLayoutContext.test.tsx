@@ -21,7 +21,7 @@ import type { LayoutState } from 'views/components/contexts/SearchPageLayoutCont
 import SearchPageLayoutContext, { SAVE_COPY } from 'views/components/contexts/SearchPageLayoutContext';
 
 describe('SearchPageConfigProvider', () => {
-  const SUT = (suppliedProviderOverrides : LayoutState = undefined) => {
+  const SUT = (suppliedProviderOverrides: LayoutState = undefined) => {
     let contextValue;
 
     render(
@@ -33,7 +33,6 @@ describe('SearchPageConfigProvider', () => {
             return <div />;
           }}
         </SearchPageLayoutContext.Consumer>
-
       </SearchPageLayoutContext.Provider>,
     );
 
@@ -42,7 +41,8 @@ describe('SearchPageConfigProvider', () => {
 
   it('provides the overridden provider state when supplied', () => {
     const providerOverrides: LayoutState = {
-      sidebar: { isShown: false }, viewActions: SAVE_COPY,
+      sidebar: { isShown: false },
+      viewActions: SAVE_COPY,
     };
     const contextValue = SUT(providerOverrides);
 

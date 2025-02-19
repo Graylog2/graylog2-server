@@ -36,7 +36,7 @@ import { useStore } from 'stores/connect';
 const EditContentPackPage = () => {
   const { entityIndex } = useStore(CatalogStore);
   const {} = useStore(ContentPacksStore);
-  const { contentPackId, contentPackRev } = useParams<{ contentPackId: string, contentPackRev: string }>();
+  const { contentPackId, contentPackRev } = useParams<{ contentPackId: string; contentPackRev: string }>();
   const history = useHistory();
   const [selectedEntities, setSelectedEntities] = useState({});
   const [appliedParameter, setAppliedParameter] = useState({});
@@ -63,13 +63,12 @@ const EditContentPackPage = () => {
     }
 
     const groupedContentPackEntities = groupBy(contentPackEntities, 'type.name');
-    const newEntityCatalog = Object.keys(entityIndex)
-      .reduce((result, entityType) => {
-        /* eslint-disable-next-line no-param-reassign */
-        result[entityType] = entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []);
+    const newEntityCatalog = Object.keys(entityIndex).reduce((result, entityType) => {
+      /* eslint-disable-next-line no-param-reassign */
+      result[entityType] = entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []);
 
-        return result;
-      }, {});
+      return result;
+    }, {});
 
     return newEntityCatalog;
   }, [contentPack, entityIndex, contentPackEntities]);
@@ -80,8 +79,10 @@ const EditContentPackPage = () => {
     }
 
     const newSelectedEntities = contentPack.entities.reduce((result, entity) => {
-      if (entityCatalog[entity.type.name]
-        && entityCatalog[entity.type.name].findIndex((fetchedEntity) => fetchedEntity.id === entity.id) >= 0) {
+      if (
+        entityCatalog[entity.type.name] &&
+        entityCatalog[entity.type.name].findIndex((fetchedEntity) => fetchedEntity.id === entity.id) >= 0
+      ) {
         const newResult = result;
 
         newResult[entity.type.name] = result[entity.type.name] || [];
@@ -105,7 +106,9 @@ const EditContentPackPage = () => {
       const entityData = new ValueReferenceData(entity.data);
       const configPaths = entityData.getPaths();
 
-      const paramMap = Object.keys(configPaths).filter((path) => configPaths[path].isValueParameter()).map((path) => ({ configKey: path, paramName: configPaths[path].getValue(), readOnly: true }));
+      const paramMap = Object.keys(configPaths)
+        .filter((path) => configPaths[path].isValueParameter())
+        .map((path) => ({ configKey: path, paramName: configPaths[path].getValue(), readOnly: true }));
       const newResult = result;
 
       if (paramMap.length > 0) {
@@ -125,36 +128,35 @@ const EditContentPackPage = () => {
   };
 
   const _onSave = () => {
-    ContentPacksActions.create(contentPack.toJSON())
-      .then(
-        () => {
-          UserNotification.success('Content pack imported successfully', 'Success!');
-          history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
-        },
-        (response) => {
-          const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your '
-            + 'Graylog logs for more information.';
-          const title = 'Could not import content pack';
-          let smallMessage = '';
+    ContentPacksActions.create(contentPack.toJSON()).then(
+      () => {
+        UserNotification.success('Content pack imported successfully', 'Success!');
+        history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
+      },
+      (response) => {
+        const message =
+          'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
+          'Graylog logs for more information.';
+        const title = 'Could not import content pack';
+        let smallMessage = '';
 
-          if (response.additional && response.additional.body && response.additional.body.message) {
-            smallMessage = `<br /><small>${response.additional.body.message}</small>`;
-          }
+        if (response.additional && response.additional.body && response.additional.body.message) {
+          smallMessage = `<br /><small>${response.additional.body.message}</small>`;
+        }
 
-          UserNotification.error(message + smallMessage, title);
-        },
-      );
+        UserNotification.error(message + smallMessage, title);
+      },
+    );
   };
 
   const _getEntities = (selectedEntities) => {
     CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
       const contentPackEntities = Object.keys(selectedEntities)
-        .reduce((acc, entityType) => acc.concat(selectedEntities[entityType]), []).filter((e) => e instanceof Entity);
+        .reduce((acc, entityType) => acc.concat(selectedEntities[entityType]), [])
+        .filter((e) => e instanceof Entity);
       /* Mark entities from server */
       const entities = contentPackEntities.concat(result.entities.map((e) => Entity.fromJSON(e, true)));
-      const builtContentPack = contentPack.toBuilder()
-        .entities(entities)
-        .build();
+      const builtContentPack = contentPack.toBuilder().entities(entities).build();
 
       setContentPack(builtContentPack);
       setFetchedEntities(builtContentPack.entities);
@@ -164,28 +166,35 @@ const EditContentPackPage = () => {
   return (
     <DocumentTitle title="Content packs">
       <span>
-        <PageHeader title="Edit content pack"
-                    topActions={(
-                      <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-                        <Button bsStyle="info">Content Packs</Button>
-                      </LinkContainer>
-                    )}>
+        <PageHeader
+          title="Edit content pack"
+          topActions={
+            <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
+              <Button bsStyle="info">Content Packs</Button>
+            </LinkContainer>
+          }>
           <span>
-            Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
+            Content packs accelerate the set up process for a specific data source. A content pack can include
+            inputs/extractors, streams, and dashboards.
             <br />
-            Find more content packs in {' '}
-            <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">the Graylog Marketplace</a>.
+            Find more content packs in{' '}
+            <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">
+              the Graylog Marketplace
+            </a>
+            .
           </span>
         </PageHeader>
-        <ContentPackEdit contentPack={contentPack}
-                         onGetEntities={_getEntities}
-                         onStateChange={_onStateChanged}
-                         fetchedEntities={fetchedEntities}
-                         selectedEntities={selectedEntities}
-                         entityIndex={entityCatalog}
-                         appliedParameter={appliedParameter}
-                         edit
-                         onSave={_onSave} />
+        <ContentPackEdit
+          contentPack={contentPack}
+          onGetEntities={_getEntities}
+          onStateChange={_onStateChanged}
+          fetchedEntities={fetchedEntities}
+          selectedEntities={selectedEntities}
+          entityIndex={entityCatalog}
+          appliedParameter={appliedParameter}
+          edit
+          onSave={_onSave}
+        />
       </span>
     </DocumentTitle>
   );

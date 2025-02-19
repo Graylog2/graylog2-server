@@ -23,19 +23,11 @@ import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 import OwnersCell from './OwnersCell';
 
 type Props = {
-  capabilityTitle: string,
-  sharedEntity: SharedEntity,
+  capabilityTitle: string;
+  sharedEntity: SharedEntity;
 };
 
-const SharedEntitiesOverviewItem = ({
-  capabilityTitle,
-  sharedEntity: {
-    owners,
-    title,
-    type,
-    id,
-  },
-}: Props) => {
+const SharedEntitiesOverviewItem = ({ capabilityTitle, sharedEntity: { owners, title, type, id } }: Props) => {
   const entityRoute = useShowRouteFromGRN(id);
 
   return (

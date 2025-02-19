@@ -32,15 +32,13 @@ const file_name = 'bundle1';
 
 describe('ClusterSupportBundleOverview', () => {
   beforeAll(() => {
-    asMock(useClusterSupportBundle).mockImplementation(
-      () => ({
-        isCreating: false,
-        list: [{ size: 1, file_name }],
-        onCreate,
-        onDelete,
-        onDownload,
-      }),
-    );
+    asMock(useClusterSupportBundle).mockImplementation(() => ({
+      isCreating: false,
+      list: [{ size: 1, file_name }],
+      onCreate,
+      onDelete,
+      onDownload,
+    }));
   });
 
   it('Should create bundle', async () => {

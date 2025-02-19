@@ -34,7 +34,7 @@ type SelectableListProps = {
   /**
    * Array of string or objects containing the selected options.
    */
-  selectedOptions?: string[] | { label: string, value: string }[];
+  selectedOptions?: string[] | { label: string; value: string }[];
   /** Indicates which option object key contains the text to display in the select input. same as react-select's `labelkey` prop. */
   displayKey?: string;
   /** Indicates which option object key contains the value of the option. */
@@ -61,9 +61,12 @@ type SelectableListProps = {
  * This component also allows to select the same option many times, and
  * it accepts both arrays of strings and objects as selected options.
  */
-class SelectableList extends React.Component<SelectableListProps, {
-  [key: string]: any;
-}> {
+class SelectableList extends React.Component<
+  SelectableListProps,
+  {
+    [key: string]: any;
+  }
+> {
   private select: SelectInstance<unknown, boolean>;
 
   static defaultProps = {
@@ -114,22 +117,26 @@ class SelectableList extends React.Component<SelectableListProps, {
 
   render() {
     const formattedOptions = this.props.selectedOptions.map((option, idx) => (
-
-      (
-        <StyledListGroupItem key={`${this._getOptionId(option)}-${idx}`}>
-          <div>
-            {this._getOptionDisplayValue(option)}
-          </div>
-          <Button bsStyle="danger" bsSize="xsmall" onClick={this._onRemoveOption(idx)}>Remove</Button>
-        </StyledListGroupItem>
-      )
+      <StyledListGroupItem key={`${this._getOptionId(option)}-${idx}`}>
+        <div>{this._getOptionDisplayValue(option)}</div>
+        <Button bsStyle="danger" bsSize="xsmall" onClick={this._onRemoveOption(idx)}>
+          Remove
+        </Button>
+      </StyledListGroupItem>
     ));
 
     return (
       <div>
-        <Select ref={(select) => { this.select = select; }} autoFocus={this.props.autoFocus} options={this.props.options} onChange={this._onAddOption} clearable={false} />
-        {formattedOptions.length > 0
-        && <ListGroup style={{ marginTop: 10 }}>{formattedOptions}</ListGroup>}
+        <Select
+          ref={(select) => {
+            this.select = select;
+          }}
+          autoFocus={this.props.autoFocus}
+          options={this.props.options}
+          onChange={this._onAddOption}
+          clearable={false}
+        />
+        {formattedOptions.length > 0 && <ListGroup style={{ marginTop: 10 }}>{formattedOptions}</ListGroup>}
       </div>
     );
   }

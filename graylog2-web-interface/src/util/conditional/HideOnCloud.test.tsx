@@ -48,7 +48,11 @@ describe('HideOnCloud', () => {
     const onClick = jest.fn();
     asMock(AppConfig.isCloud).mockReturnValue(false);
 
-    render(<HideOnCloud onClick={onClick}><button type="button">Click Me!</button></HideOnCloud>);
+    render(
+      <HideOnCloud onClick={onClick}>
+        <button type="button">Click Me!</button>
+      </HideOnCloud>,
+    );
 
     const childrenButton = screen.getByText('Click Me!');
     userEvent.click(childrenButton);

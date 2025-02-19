@@ -16,6 +16,14 @@
  */
 package org.graylog.datanode.rest;
 
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 
 import jakarta.inject.Inject;
@@ -24,12 +32,17 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.graylog.datanode.rest.config.OnlyInSecuredNode;
+import org.graylog2.log4j.MemoryAppender;
 
 import java.util.List;
 
 @Path("/logs")
 @Produces(MediaType.APPLICATION_JSON)
 public class LogsController {
+
+    private static final String MEMORY_APPENDER_NAME = "datanode-internal-logs";
+
     private final OpensearchProcess managedOpensearch;
 
     @Inject
@@ -47,5 +60,33 @@ public class LogsController {
     @Path("/stderr")
     public List<String> getOpensearchStderr() {
         return managedOpensearch.stdErrLogs();
+    }
+
+    @GET
+    @OnlyInSecuredNode
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/internal")
+    public Response getOpensearchInternal() {
+        final Appender appender = getAppender(MEMORY_APPENDER_NAME);
+        if (appender == null) {
+            throw new NotFoundException("Memory appender is disabled. Please refer to the example log4j.xml file.");
+        }
+
+        if (!(appender instanceof MemoryAppender memoryAppender)) {
+            throw new InternalServerErrorException("Memory appender is not an instance of MemoryAppender. Please refer to the example log4j.xml file.");
+        }
+        var mediaType = MediaType.valueOf(MediaType.TEXT_PLAIN);
+
+        StreamingOutput streamingOutput = outputStream -> memoryAppender.streamFormattedLogMessages(outputStream, 0);
+        Response.ResponseBuilder response = Response.ok(streamingOutput, mediaType);
+
+        return response.build();
+    }
+
+
+    private Appender getAppender(final String appenderName) {
+        final LoggerContext loggerContext = (LoggerContext) LogManager.getContext(false);
+        final Configuration configuration = loggerContext.getConfiguration();
+        return configuration.getAppender(appenderName);
     }
 }

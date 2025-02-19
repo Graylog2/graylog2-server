@@ -21,13 +21,13 @@ import ColorPicker from 'components/common/ColorPicker';
 import Popover from 'components/common/Popover';
 
 type Props = {
-  id: string,
-  placement?: 'top' | 'right' | 'bottom' | 'left',
-  title?: string,
-  triggerNode: React.ReactElement,
-  color: string,
-  colors?: Array<Array<string>>,
-  onChange: (color: string, event: React.ChangeEvent<HTMLInputElement>, handleToggle: () => void) => void,
+  id: string;
+  placement?: 'top' | 'right' | 'bottom' | 'left';
+  title?: string;
+  triggerNode: React.ReactElement;
+  color: string;
+  colors?: Array<Array<string>>;
+  onChange: (color: string, event: React.ChangeEvent<HTMLInputElement>, handleToggle: () => void) => void;
 };
 
 /**
@@ -39,17 +39,29 @@ type Props = {
  * is left for that component. Please look at `ColorPicker`'s documentation for more
  * information.
  */
-const ColorPickerPopover = ({ id, placement = 'bottom', title = 'Pick a color', triggerNode, onChange, ...rest }: Props) => {
+const ColorPickerPopover = ({
+  id,
+  placement = 'bottom',
+  title = 'Pick a color',
+  triggerNode,
+  onChange,
+  ...rest
+}: Props) => {
   const [show, setShow] = useState(false);
   const toggleTarget = useRef();
 
-  const handleToggle = useCallback(() => { setShow(!show); }, [show]);
+  const handleToggle = useCallback(() => {
+    setShow(!show);
+  }, [show]);
 
   const onClose = useCallback(() => setShow(false), []);
 
-  const handleChange = useCallback((newColor: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(newColor, event, handleToggle);
-  }, [handleToggle, onChange]);
+  const handleChange = useCallback(
+    (newColor: string, event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(newColor, event, handleToggle);
+    },
+    [handleToggle, onChange],
+  );
 
   return (
     <Popover id={id} opened={show} position={placement} onClose={onClose}>
@@ -61,8 +73,7 @@ const ColorPickerPopover = ({ id, placement = 'bottom', title = 'Pick a color', 
       </Popover.Target>
 
       <Popover.Dropdown title={title}>
-        <ColorPicker onChange={handleChange}
-                     {...rest} />
+        <ColorPicker onChange={handleChange} {...rest} />
       </Popover.Dropdown>
     </Popover>
   );

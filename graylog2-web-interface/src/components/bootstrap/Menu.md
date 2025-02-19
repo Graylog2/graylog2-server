@@ -1,4 +1,5 @@
 #### Simple implementation
+
 ```tsx
 import { Menu, MenuItem, DeleteMenuItem, Button } from 'components/bootstrap';
 
@@ -11,5 +12,5 @@ import { Menu, MenuItem, DeleteMenuItem, Button } from 'components/bootstrap';
     <Menu.Divider />
     <DeleteMenuItem onClick={() => console.log('on click menu item')} />
   </Menu.Dropdown>
-</Menu>
+</Menu>;
 ```

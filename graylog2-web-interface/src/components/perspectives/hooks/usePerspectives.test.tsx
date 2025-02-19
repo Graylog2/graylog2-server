@@ -29,11 +29,7 @@ describe('usePerspectives', () => {
     jest.clearAllMocks();
   });
 
-  const wrapper = ({ children }: React.PropsWithChildren) => (
-    <PerspectivesProvider>
-      {children}
-    </PerspectivesProvider>
-  );
+  const wrapper = ({ children }: React.PropsWithChildren) => <PerspectivesProvider>{children}</PerspectivesProvider>;
 
   it('should return available perspectives', async () => {
     const { result } = renderHook(() => usePerspectives(), { wrapper });

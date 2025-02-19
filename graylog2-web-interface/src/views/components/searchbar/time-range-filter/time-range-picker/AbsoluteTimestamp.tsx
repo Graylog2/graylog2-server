@@ -23,18 +23,20 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import AbsoluteDateInput from './AbsoluteDateInput';
 
 type Props = {
-  disabled?: boolean
-  range: 'to' | 'from',
-  timeRange: AbsoluteTimeRange,
+  disabled?: boolean;
+  range: 'to' | 'from';
+  timeRange: AbsoluteTimeRange;
 };
 
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.small};
-  font-style: italic;
-  padding: 3px 3px 9px;
-  height: 1.5em;
-`);
+const ErrorMessage = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.dark.danger};
+    font-size: ${theme.fonts.size.small};
+    font-style: italic;
+    padding: 3px 3px 9px;
+    height: 1.5em;
+  `,
+);
 
 const AbsoluteTimestamp = ({ disabled = false, timeRange, range }: Props) => (
   <Field name={`timeRangeTabs.absolute.${range}`}>
@@ -44,10 +46,7 @@ const AbsoluteTimestamp = ({ disabled = false, timeRange, range }: Props) => (
 
       return (
         <>
-          <AbsoluteDateInput name={name}
-                             disabled={disabled}
-                             value={dateTime}
-                             onChange={_onChange} />
+          <AbsoluteDateInput name={name} disabled={disabled} value={dateTime} onChange={_onChange} />
 
           <ErrorMessage>{error}</ErrorMessage>
         </>

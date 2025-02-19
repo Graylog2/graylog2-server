@@ -87,16 +87,19 @@ const useFetch = (url, setHook = () => {}, method = 'GET', options = {}) => {
           fetcher = fetch(method, qualifiedURL, toAWSRequest(formData, options));
         }
 
-        fetcher.then((result) => {
-          setError(null);
-          setData(result);
-          setHook(result);
-        }).catch((err) => {
-          setData(null);
-          setError(parseError(err));
-        }).finally(() => {
-          setLoading(false);
-        });
+        fetcher
+          .then((result) => {
+            setError(null);
+            setData(result);
+            setHook(result);
+          })
+          .catch((err) => {
+            setData(null);
+            setError(parseError(err));
+          })
+          .finally(() => {
+            setLoading(false);
+          });
       }
 
       return fetcher;

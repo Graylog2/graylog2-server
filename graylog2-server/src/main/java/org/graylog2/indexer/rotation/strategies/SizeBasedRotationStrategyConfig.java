@@ -21,10 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.Min;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-
-import jakarta.validation.constraints.Min;
 
 @JsonAutoDetect
 @AutoValue
@@ -41,7 +40,6 @@ public abstract class SizeBasedRotationStrategyConfig implements RotationStrateg
         return new AutoValue_SizeBasedRotationStrategyConfig(type, maxSize);
     }
 
-    @JsonCreator
     public static SizeBasedRotationStrategyConfig create(@JsonProperty("max_size") @Min(1) long maxSize) {
         return create(SizeBasedRotationStrategyConfig.class.getCanonicalName(), maxSize);
     }

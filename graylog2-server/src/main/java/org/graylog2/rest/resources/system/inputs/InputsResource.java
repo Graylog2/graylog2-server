@@ -44,9 +44,10 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
-import org.graylog2.inputs.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.inputs.encryption.EncryptedInputConfigs;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
@@ -85,14 +86,20 @@ public class InputsResource extends AbstractInputsResource {
     private final InputDiagnosticService inputDiagnosticService;
     private final MessageInputFactory messageInputFactory;
     private final Configuration config;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public InputsResource(InputService inputService, InputDiagnosticService inputDiagnosticService, MessageInputFactory messageInputFactory, Configuration config) {
+    public InputsResource(InputService inputService,
+                          InputDiagnosticService inputDiagnosticService,
+                          MessageInputFactory messageInputFactory,
+                          Configuration config,
+                          ClusterEventBus clusterEventBus) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.inputDiagnosticService = inputDiagnosticService;
         this.messageInputFactory = messageInputFactory;
         this.config = config;
+        this.clusterEventBus = clusterEventBus;
     }
 
     @GET
@@ -190,7 +197,9 @@ public class InputsResource extends AbstractInputsResource {
     public void terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
         final Input input = inputService.find(inputId);
-        inputService.destroy(input);
+        if (0 < inputService.destroy(input)) {
+            clusterEventBus.post(new InputDeletedEvent(input.getId(), input.getTitle()));
+        }
     }
 
     @PUT
@@ -226,6 +235,9 @@ public class InputsResource extends AbstractInputsResource {
 
         final Input newInput = inputService.create(input.getId(), mergedInput);
         inputService.update(newInput);
+        if (!input.getTitle().equals(newInput.getTitle())) {
+            clusterEventBus.post(new InputRenamedEvent(input.getId(), input.getTitle(), newInput.getTitle()));
+        }
 
         final URI inputUri = getUriBuilderToSelf().path(InputsResource.class)
                 .path("{inputId}")

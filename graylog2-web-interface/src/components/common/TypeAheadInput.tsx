@@ -23,82 +23,84 @@ import styled, { css } from 'styled-components';
 import UniversalSearch from 'logic/search/UniversalSearch';
 import { Input } from 'components/bootstrap';
 
-export const Container = styled.div(({ theme }) => css`
-  width: 100%;
-
-  .twitter-typeahead {
+export const Container = styled.div(
+  ({ theme }) => css`
     width: 100%;
-  }
 
-  .typeahead,
-  .tt-query,
-  .tt-hint {
-    border: 2px solid #ccc;
-    border-radius: 4px;
-    outline: none;
-  }
+    .twitter-typeahead {
+      width: 100%;
+    }
 
-  .typeahead {
-    background-color: #fff;
-  }
+    .typeahead,
+    .tt-query,
+    .tt-hint {
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+    }
 
-  .typeahead:focus {
-    border: 2px solid #0097cf;
-  }
+    .typeahead {
+      background-color: #fff;
+    }
 
-  .tt-query {
-    box-shadow: inset 0 1px 1px rgb(0 0 0 / 7.5%);
-  }
+    .typeahead:focus {
+      border: 2px solid #0097cf;
+    }
 
-  input[type="text"].tt-hint {
-    color: #999
-  }
+    .tt-query {
+      box-shadow: inset 0 1px 1px rgb(0 0 0 / 7.5%);
+    }
 
-  .tt-menu {
-    min-width: 160px;
-    //background-color: #fff;
-    border: 1px solid rgb(0 0 0 / 20%);
-    border-radius: 4px;
-    //box-shadow: 0 5px 10px rgb(0 0 0 / 20%);
-    width: 100%;
-    background-color: ${theme.colors.global.contentBackground};
-    box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
-    color: ${theme.colors.global.textDefault};
+    input[type='text'].tt-hint {
+      color: #999;
+    }
+
+    .tt-menu {
+      min-width: 160px;
+      //background-color: #fff;
+      border: 1px solid rgb(0 0 0 / 20%);
+      border-radius: 4px;
+      //box-shadow: 0 5px 10px rgb(0 0 0 / 20%);
+      width: 100%;
+      background-color: ${theme.colors.global.contentBackground};
+      box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
+      color: ${theme.colors.global.textDefault};
+
+      .tt-suggestion:hover,
+      .tt-suggestion.tt-cursor {
+        color: ${theme.colors.variant.darkest.info};
+        background-color: ${theme.colors.variant.lighter.info};
+        background-image: none;
+      }
+    }
+
+    .tt-dataset {
+      margin-top: 10px;
+    }
+
+    .tt-suggestion {
+      font-size: 1rem; /* theme.fonts.size.body */
+      line-height: 20px;
+      padding: 3px 10px;
+      cursor: pointer;
+    }
 
     .tt-suggestion:hover,
     .tt-suggestion.tt-cursor {
-      color: ${theme.colors.variant.darkest.info};
-      background-color: ${theme.colors.variant.lighter.info};
-      background-image: none;
+      color: #fff;
+      text-decoration: none;
+      background-color: #0081c2;
+      background-image: linear-gradient(to bottom, #08c, #0077b3);
+      background-repeat: repeat-x;
+      outline: 0;
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
     }
-  }
 
-  .tt-dataset {
-    margin-top: 10px;
-  }
-
-  .tt-suggestion {
-    font-size: 1rem; /* theme.fonts.size.body */
-    line-height: 20px;
-    padding: 3px 10px;
-    cursor: pointer;
-  }
-
-  .tt-suggestion:hover,
-  .tt-suggestion.tt-cursor {
-    color: #fff;
-    text-decoration: none;
-    background-color: #0081c2;
-    background-image: linear-gradient(to bottom, #08c, #0077b3);
-    background-repeat: repeat-x;
-    outline: 0;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
-  }
-
-  .tt-suggestion p {
-    margin: 0;
-  }
-`);
+    .tt-suggestion p {
+      margin: 0;
+    }
+  `,
+);
 
 const StyledInput = styled(Input)`
   input&.tt-hint {
@@ -153,9 +155,12 @@ type TypeAheadInputProps = {
  * **Note** There are a few quirks around this component and it will be
  * refactored soon.
  */
-class TypeAheadInput extends React.Component<TypeAheadInputProps, {
-  [key: string]: any;
-}> {
+class TypeAheadInput extends React.Component<
+  TypeAheadInputProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     displayKey: 'suggestion',
     formGroupClassName: undefined,
@@ -210,26 +215,28 @@ class TypeAheadInput extends React.Component<TypeAheadInputProps, {
     const $fieldInput = $(this.fieldInput);
 
     // @ts-ignore
-    $fieldInput.typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1,
-    },
-    {
-      name: 'dataset-name',
-      displayKey: displayKey,
-      source: UniversalSearch.substringMatcher(suggestions, displayKey, 6),
-      templates: {
-        suggestion: (value) => {
-          // Escape all text here that may be user-generated, since this is not automatically escaped by React.
-          if (suggestionText) {
-            return `<div><strong>${escape(suggestionText)}</strong> ${escape(value[displayKey])}</div>`;
-          }
+    $fieldInput.typeahead(
+      {
+        hint: true,
+        highlight: true,
+        minLength: 1,
+      },
+      {
+        name: 'dataset-name',
+        displayKey: displayKey,
+        source: UniversalSearch.substringMatcher(suggestions, displayKey, 6),
+        templates: {
+          suggestion: (value) => {
+            // Escape all text here that may be user-generated, since this is not automatically escaped by React.
+            if (suggestionText) {
+              return `<div><strong>${escape(suggestionText)}</strong> ${escape(value[displayKey])}</div>`;
+            }
 
-          return `<div>${escape(value[displayKey])}</div>`;
+            return `<div>${escape(value[displayKey])}</div>`;
+          },
         },
       },
-    });
+    );
 
     if (typeof onTypeaheadLoaded === 'function') {
       onTypeaheadLoaded();
@@ -249,13 +256,17 @@ class TypeAheadInput extends React.Component<TypeAheadInputProps, {
 
     return (
       <Container>
-        <StyledInput id={id}
-                     type="text"
-                     ref={(fieldInput) => { this.fieldInputElem = fieldInput; }}
-                     wrapperClassName="typeahead-wrapper"
-                     formGroupClassName={formGroupClassName}
-                     label={label}
-                     onKeyPress={onKeyPress} />
+        <StyledInput
+          id={id}
+          type="text"
+          ref={(fieldInput) => {
+            this.fieldInputElem = fieldInput;
+          }}
+          wrapperClassName="typeahead-wrapper"
+          formGroupClassName={formGroupClassName}
+          label={label}
+          onKeyPress={onKeyPress}
+        />
       </Container>
     );
   }

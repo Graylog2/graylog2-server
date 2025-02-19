@@ -18,11 +18,15 @@ package org.graylog2.rest.models.system.inputs.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 
 public record InputDiagnostics(
-        @JsonProperty("stream_message_count") Map<String, Long> streamMessageCount) {
-    public static InputDiagnostics EMPTY_DIAGNOSTICS = new InputDiagnostics(Collections.emptyMap());
+        @JsonProperty("stream_message_count") List<StreamMessageCount> streamMessageCount) {
+
+    public static InputDiagnostics EMPTY_DIAGNOSTICS = new InputDiagnostics(List.of());
+
+    public record StreamMessageCount(@JsonProperty("stream_name") String streamName,
+                                     @JsonProperty("stream_id") String streamId,
+                                     @JsonProperty("count") long count) {}
 }
 
