@@ -48,6 +48,7 @@ import type Parameter from 'views/logic/parameters/Parameter';
 import { setParameters } from 'views/logic/slices/viewSlice';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { JobIds } from 'views/stores/SearchJobs';
+import type Search from 'views/logic/search/Search';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
@@ -136,7 +137,7 @@ export type SearchExecutors = {
   parse: SearchParser;
   resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult;
   startJob: (
-    view: View,
+    search: Search,
     searchTypesToSearch: string[],
     executionStateParam: SearchExecutionState,
     keepQueries?: string[],
@@ -173,7 +174,7 @@ export const executeWithExecutionState =
 
         const activeQuery = selectActiveQuery(getState());
 
-        return searchExecutors.startJob(view, searchTypesToSearch, executionState, [activeQuery]);
+        return searchExecutors.startJob(view.search, searchTypesToSearch, executionState, [activeQuery]);
       })
       .then((jobIds: JobIds) => {
         dispatch(setJobIds(jobIds));

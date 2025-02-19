@@ -21,6 +21,7 @@ import { runStartJob, runPollJob, runCancelJob } from 'views/stores/SearchJobs';
 import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
+import type Search from 'views/logic/search/Search';
 
 const delay = (ms: number) =>
   new Promise((resolve) => {
@@ -49,13 +50,11 @@ export const buildSearchExecutionState = (
 };
 
 export const startJob = async (
-  view: View,
+  search: Search,
   searchTypesToSearch: string[],
   executionStateParam: SearchExecutionState,
   keepQueries: string[] = [],
 ): Promise<JobIds> => {
-  const { search } = view;
-
   const executionState = buildSearchExecutionState(searchTypesToSearch, executionStateParam, keepQueries);
 
   return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
