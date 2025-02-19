@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.otel.input.grpc;
+package org.graylog.grpc;
 
 import io.grpc.Context;
 import io.grpc.Contexts;

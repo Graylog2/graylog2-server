@@ -20,6 +20,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import io.grpc.ServerServiceDefinition;
 import jakarta.inject.Inject;
+import org.graylog.grpc.AbstractGrpcTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -66,7 +67,7 @@ public class OTelGrpcTransport extends AbstractGrpcTransport {
     }
 
     @Override
-    List<ServerServiceDefinition> grpcServices(MessageInput input) {
+    protected List<ServerServiceDefinition> grpcServices(MessageInput input) {
         return List.of(logsServiceFactory.create(this, input).bindService());
     }
 

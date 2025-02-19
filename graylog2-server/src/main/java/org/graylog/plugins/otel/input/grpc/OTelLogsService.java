@@ -33,8 +33,8 @@ import org.graylog2.plugin.journal.RawMessage;
 import java.net.InetSocketAddress;
 import java.util.function.Function;
 
-import static org.graylog.plugins.otel.input.grpc.GrpcUtils.createThrottledStatusRuntimeException;
-import static org.graylog.plugins.otel.input.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
+import static org.graylog.grpc.GrpcUtils.createThrottledStatusRuntimeException;
+import static org.graylog.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
 
 public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
     private final OTelJournalRecordFactory journalRecordFactory;

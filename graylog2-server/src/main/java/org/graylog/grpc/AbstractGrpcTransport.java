@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.otel.input.grpc;
+package org.graylog.grpc;
 
 import com.codahale.metrics.MetricSet;
 import com.google.common.eventbus.EventBus;
@@ -84,7 +84,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
         this.encryptedValueService = encryptedValueService;
     }
 
-    abstract List<ServerServiceDefinition> grpcServices(MessageInput input);
+    abstract protected List<ServerServiceDefinition> grpcServices(MessageInput input);
 
     @Override
     protected void doLaunch(MessageInput input, InputFailureRecorder inputFailureRecorder) throws MisfireException {
@@ -189,10 +189,8 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
                     CK_BEARER_TOKEN,
                     "Required bearer token",
                     "",
-                    "A static bearer token that the server will enforce for all clients. If set, clients, " +
-                            "such as the OpenTelemetry Collector, must include this token in the Authorization " +
-                            "header of their requests. To configure this in the OpenTelemetry Collector, the Bearer " +
-                            "Token Extension (bearertokenauth) can be used.",
+                    "A static bearer token that the server will enforce for all clients. If set, clients," +
+                            "must include this token in the Authorization header of their requests.",
                     ConfigurationField.Optional.OPTIONAL,
                     true,
                     TextField.Attribute.IS_PASSWORD
