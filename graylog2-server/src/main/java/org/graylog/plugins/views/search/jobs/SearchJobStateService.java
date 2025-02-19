@@ -38,12 +38,14 @@ import java.util.Set;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Filters.ne;
 import static com.mongodb.client.model.Projections.include;
 import static org.graylog.plugins.views.search.SearchJobIdentifier.OWNER_FIELD;
 import static org.graylog.plugins.views.search.SearchJobIdentifier.SEARCH_ID_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.CREATED_AT_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.STATUS_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.TYPE_FIELD;
+import static org.graylog.plugins.views.search.jobs.SearchJobStatus.RESET;
 import static org.graylog.plugins.views.search.jobs.SearchJobType.DATA_LAKE;
 
 public class SearchJobStateService {
@@ -84,7 +86,7 @@ public class SearchJobStateService {
         return getLatestForUser(user).map(activeQuerySearchJobState -> {
                     update(
                             activeQuerySearchJobState.toBuilder()
-                                    .status(SearchJobStatus.RESET)
+                                    .status(RESET)
                                     .result(null)
                                     .errors(Set.of())
                                     .build()
@@ -107,7 +109,7 @@ public class SearchJobStateService {
         final UpdateResult updateResult = collection.updateMany(
                 and(
                         eq(TYPE_FIELD, DATA_LAKE),
-                        //eq(STATUS_FIELD, DONE) //TODO: should all jobs be expired, or only DONE ones?
+                        ne(STATUS_FIELD, RESET),
                         lte(CREATED_AT_FIELD, dateTime)
                 ),
                 Updates.set(STATUS_FIELD, SearchJobStatus.EXPIRED)
@@ -126,7 +128,7 @@ public class SearchJobStateService {
             throw new IllegalStateException("Missing ID of SearchJobState to update");
         }
         final Optional<SearchJobStatus> status = getStatus(searchJobState.identifier().id());
-        if (status.isPresent() && status.get() == SearchJobStatus.RESET) {
+        if (status.isPresent() && status.get() == RESET) {
             //RESET search jobs should not be changed anymore, are immutable
             return false;
         } else {
