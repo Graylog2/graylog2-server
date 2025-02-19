@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -73,6 +74,22 @@ public class SearchJobStateServiceTest {
         assertEquals(toBeSaved.toBuilder()
                 .identifier(new SearchJobIdentifier("777fd86ae6db8b71a8e10000", "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
                 .build(), retrieved.get());
+    }
+
+    @Test
+    public void testGetStatus() {
+        final SearchJobState toBeSaved = SearchJobState.builder()
+                .identifier(new SearchJobIdentifier("777fd86ae6db8b71a8e10000", "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(noResult())
+                .status(SearchJobStatus.RUNNING)
+                .progress(42)
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build();
+        toTest.create(toBeSaved);
+        final Optional<SearchJobStatus> retrieved = toTest.getStatus("777fd86ae6db8b71a8e10000");
+        assertTrue(retrieved.isPresent());
+        assertEquals(toBeSaved.status(), retrieved.get());
     }
 
     @Test
@@ -134,6 +151,22 @@ public class SearchJobStateServiceTest {
         assertTrue(retrieved.isPresent());
         assertEquals(SearchJobStatus.DONE, retrieved.get().status());
         assertTrue(retrieved.get().updatedAt().isAfter(toBeSaved.updatedAt()));
+    }
+
+    @Test
+    public void testResetJobsAreImmuneToUpdates() {
+        final SearchJobState toBeSaved = SearchJobState.builder()
+                .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(noResult())
+                .status(SearchJobStatus.RESET)
+                .progress(42)
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build();
+        final SearchJobState saved = toTest.create(toBeSaved);
+
+        assertFalse(toTest.changeStatus(saved.id(), SearchJobStatus.ERROR));
+        assertFalse(toTest.update(saved.toBuilder().progress(13).build()));
     }
 
     @Test
