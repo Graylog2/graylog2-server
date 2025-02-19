@@ -139,7 +139,7 @@ const Picker = ({ name }: PickerProps) => {
   const isChecked = !value;
 
   return (
-    <PickerWrap>
+    <PickerWrap data-testid={`date-picker-${name}`}>
       <SectionHeader>
         <StyledLabel htmlFor={`date-input-${name}`}>{label}</StyledLabel>
         <StyledCheckbox onChange={onChangeAllTime} checked={isChecked}>
