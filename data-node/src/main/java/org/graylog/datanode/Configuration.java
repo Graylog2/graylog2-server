@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode;
 
+import com.github.joschi.jadconfig.AggregatedParameter;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.ValidationException;
@@ -50,7 +51,9 @@ import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -284,6 +287,9 @@ public class Configuration implements CommonNodeConfiguration {
     @Documentation(visible = false)
     @Parameter(value = "async_eventbus_processors")
     private int asyncEventbusProcessors = 2;
+
+    @AggregatedParameter(prefix = {"opensearch.", "opensearch_"}, stripPrefix = true)
+    private Map<String, String> opensearchProperties = new LinkedHashMap<>();
 
     public int getAsyncEventbusProcessors() {
         return asyncEventbusProcessors;
@@ -674,6 +680,10 @@ public class Configuration implements CommonNodeConfiguration {
     @Override
     public boolean withPlugins() {
         return true;
+    }
+
+    public Map<String, String> getOpensearchProperties() {
+        return opensearchProperties;
     }
 
 }

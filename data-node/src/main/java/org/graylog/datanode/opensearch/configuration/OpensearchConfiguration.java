@@ -150,13 +150,6 @@ public class OpensearchConfiguration {
                 .map(DatanodeConfigurationPart::properties)
                 .forEach(config::putAll);
 
-        // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,
-        // because we are using tar distriburion and opensearch does this only for docker dist. See opensearch-env script
-        // additionally, the env variables have to be prefixed with opensearch. (e.g. "opensearch.cluster.routing.allocation.disk.threshold_enabled")
-        getEnv().getEnv().entrySet().stream()
-                .filter(entry -> entry.getKey().matches("^opensearch\\.[a-z0-9_]+(?:\\.[a-z0-9_]+)+"))
-                .peek(entry -> LOG.info("Detected pass-through opensearch property {}:{}", entry.getKey().substring("opensearch.".length()), entry.getValue()))
-                .forEach(entry -> config.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
         return config;
     }
 
