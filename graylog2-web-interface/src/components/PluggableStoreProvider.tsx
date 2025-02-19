@@ -69,7 +69,7 @@ const useInitialState = (
           activeQuery,
         },
         searchExecution: {
-          widgetsToSearch: undefined,
+          searchTypesToSearch: undefined,
           executionState,
           isLoading: false,
           result,

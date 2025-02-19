@@ -24,9 +24,10 @@ import useQuery from 'routing/useQuery';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useWidgets from 'views/hooks/useWidgets';
 import useAppDispatch from 'stores/useAppDispatch';
-import { execute, setWidgetsToSearch } from 'views/logic/slices/searchExecutionSlice';
+import { execute, setSearchTypesToSearch } from 'views/logic/slices/searchExecutionSlice';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
+import useView from 'views/hooks/useView';
 
 import type { FocusContextState } from './WidgetFocusContext';
 import WidgetFocusContext from './WidgetFocusContext';
@@ -87,6 +88,7 @@ const emptyFocusContext: FocusContextState = {
 
 const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocusedWidget, widgetIds }: SyncStateArgs) => {
   const dispatch = useAppDispatch();
+  const { widgetMapping } = useView();
 
   useEffect(() => {
     const nextFocusedWidget = {
@@ -101,12 +103,12 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       }
 
       setFocusedWidget(nextFocusedWidget);
-      const filter = nextFocusedWidget?.id ? [nextFocusedWidget.id] : undefined;
-      dispatch(setWidgetsToSearch(filter));
+      const searchTypeIds = widgetMapping.get(nextFocusedWidget.id);
+      dispatch(setSearchTypesToSearch(searchTypeIds.toArray()));
 
       dispatch(execute());
     }
-  }, [focusedWidget, setFocusedWidget, widgetIds, focusUriParams, dispatch]);
+  }, [focusedWidget, setFocusedWidget, widgetIds, focusUriParams, dispatch, widgetMapping]);
 };
 
 type CleanupArgs = {

@@ -23,17 +23,17 @@ import SearchExplainContext from 'views/components/contexts/SearchExplainContext
 import type { SearchExplainContextType, WidgetExplain } from 'views/components/contexts/SearchExplainContext';
 import { buildSearchExecutionState } from 'views/logic/slices/executeJobResult';
 import type { WidgetMapping } from 'views/logic/views/types';
-import { selectWidgetsToSearch, selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
-import { selectView } from 'views/logic/slices/viewSelectors';
+import { selectSearchTypesToSearch, selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
+import useView from 'views/hooks/useView';
 
 const SearchExplainContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
-  const view = useAppSelector(selectView);
+  const view = useView();
   const executionState = useAppSelector(selectSearchExecutionState);
-  const widgetsToSearch = useAppSelector(selectWidgetsToSearch);
+  const searchTypesToSearch = useAppSelector(selectSearchTypesToSearch);
   const [searchExplain, setSearchExplain] = useState<SearchExplainContextType['explainedSearch'] | undefined>(
     undefined,
   );
@@ -43,7 +43,7 @@ const SearchExplainContextProvider = ({ children }: { children: React.ReactNode 
       fetch(
         'POST',
         qualifyUrl(`views/search/${view.search.id}/explain`),
-        buildSearchExecutionState(view, widgetsToSearch, executionState),
+        buildSearchExecutionState(searchTypesToSearch, executionState),
       ),
     {
       onSuccess: (result) => {
@@ -72,7 +72,7 @@ const SearchExplainContextProvider = ({ children }: { children: React.ReactNode 
     if (view.search.id && viewType === View.Type.Dashboard && view._value.title) {
       onSearchExplain();
     }
-  }, [onSearchExplain, view.search.id, executionState, widgetsToSearch, viewType, view._value.title]);
+  }, [onSearchExplain, view.search.id, executionState, searchTypesToSearch, viewType, view._value.title]);
 
   return <SearchExplainContext.Provider value={searchExplainContextValue}>{children}</SearchExplainContext.Provider>;
 };

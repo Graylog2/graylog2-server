@@ -455,7 +455,7 @@ export interface SearchExecution {
   executionState: SearchExecutionState;
   result: SearchExecutionResult;
   isLoading: boolean;
-  widgetsToSearch: Array<string>;
+  searchTypesToSearch: Array<string>;
   jobIds?: JobIds | null;
 }
 

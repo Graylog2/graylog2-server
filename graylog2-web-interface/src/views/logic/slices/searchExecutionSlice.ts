@@ -36,7 +36,7 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { selectView, selectParameters, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import {
   selectGlobalOverride,
-  selectWidgetsToSearch,
+  selectSearchTypesToSearch,
   selectSearchExecutionState,
   selectParameterBindings,
   selectJobIds,
@@ -52,7 +52,7 @@ import type { JobIds } from 'views/stores/SearchJobs';
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
   initialState: {
-    widgetsToSearch: undefined,
+    searchTypesToSearch: undefined,
     executionState: SearchExecutionState.empty(),
     isLoading: false,
     result: undefined,
@@ -76,9 +76,9 @@ const searchExecutionSlice = createSlice({
       ...state,
       executionState: state.executionState.toBuilder().globalOverride(action.payload).build(),
     }),
-    setWidgetsToSearch: (state, action: PayloadAction<Array<string>>) => ({
+    setSearchTypesToSearch: (state, action: PayloadAction<Array<string>>) => ({
       ...state,
-      widgetsToSearch: action.payload,
+      searchTypesToSearch: action.payload,
     }),
     setParameterValues: (state, action: PayloadAction<Immutable.Map<string, any>>) => {
       const parameterMap = action.payload;
@@ -124,7 +124,7 @@ export const {
   stopLoading,
   finishedLoading,
   updateGlobalOverride,
-  setWidgetsToSearch,
+  setSearchTypesToSearch,
   setParameterValues,
   setParameterBindings,
   setJobIds,
@@ -137,7 +137,7 @@ export type SearchExecutors = {
   resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult;
   startJob: (
     view: View,
-    widgetsToSearch: string[],
+    searchTypesToSearch: string[],
     executionStateParam: SearchExecutionState,
     keepQueries?: string[],
   ) => Promise<JobIds>;
@@ -161,7 +161,7 @@ export const cancelExecutedJob =
 export const executeWithExecutionState =
   (
     view: View,
-    widgetsToSearch: Array<string>,
+    searchTypesToSearch: Array<string>,
     executionState: SearchExecutionState,
     searchExecutors: SearchExecutors,
   ) =>
@@ -173,7 +173,7 @@ export const executeWithExecutionState =
 
         const activeQuery = selectActiveQuery(getState());
 
-        return searchExecutors.startJob(view, widgetsToSearch, executionState, [activeQuery]);
+        return searchExecutors.startJob(view, searchTypesToSearch, executionState, [activeQuery]);
       })
       .then((jobIds: JobIds) => {
         dispatch(setJobIds(jobIds));
@@ -196,9 +196,9 @@ export const execute =
     const state = getState();
     const view = selectView(state);
     const executionState = selectSearchExecutionState(state);
-    const widgetsToSearch = selectWidgetsToSearch(state);
+    const searchTypesToSearch = selectSearchTypesToSearch(state);
 
-    return dispatch(executeWithExecutionState(view, widgetsToSearch, executionState, searchExecutors));
+    return dispatch(executeWithExecutionState(view, searchTypesToSearch, executionState, searchExecutors));
   };
 
 export const setGlobalOverrideQuery =

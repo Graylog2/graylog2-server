@@ -28,13 +28,10 @@ const delay = (ms: number) =>
   });
 
 export const buildSearchExecutionState = (
-  view: View,
-  widgetsToSearch: string[],
+  searchTypesToSearch: string[],
   executionStateParam: SearchExecutionState,
   keepQueries: string[] = [],
 ): SearchExecutionState => {
-  const { widgetMapping } = view;
-
   const globalOverride = (executionStateParam.globalOverride ?? GlobalOverride.empty())
     .toBuilder()
     .keepQueries(keepQueries)
@@ -42,13 +39,8 @@ export const buildSearchExecutionState = (
 
   let executionStateBuilder = executionStateParam.toBuilder().globalOverride(globalOverride);
 
-  if (widgetsToSearch) {
-    const keepSearchTypes = widgetsToSearch
-      .map((widgetId) => widgetMapping.get(widgetId))
-      .reduce(
-        (acc, searchTypeSet) => (searchTypeSet ? [...acc, ...searchTypeSet.toArray()] : acc),
-        globalOverride.keepSearchTypes || [],
-      );
+  if (searchTypesToSearch) {
+    const keepSearchTypes = [...(globalOverride.keepSearchTypes || []), ...searchTypesToSearch];
     const newGlobalOverride = globalOverride.toBuilder().keepSearchTypes(keepSearchTypes).build();
     executionStateBuilder = executionStateBuilder.globalOverride(newGlobalOverride);
   }
@@ -58,13 +50,13 @@ export const buildSearchExecutionState = (
 
 export const startJob = async (
   view: View,
-  widgetsToSearch: string[],
+  searchTypesToSearch: string[],
   executionStateParam: SearchExecutionState,
   keepQueries: string[] = [],
 ): Promise<JobIds> => {
   const { search } = view;
 
-  const executionState = buildSearchExecutionState(view, widgetsToSearch, executionStateParam, keepQueries);
+  const executionState = buildSearchExecutionState(searchTypesToSearch, executionStateParam, keepQueries);
 
   return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
 };
