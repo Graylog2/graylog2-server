@@ -24,7 +24,7 @@
             "query_string": "_exists_:(gim_event_category OR gim_event_type_code) AND _exists_:(event_source AND gim_event_subcategory) AND gim_event_subcategory:(\"iam.object modify\")"
           },
           "streams": [],
-          "stream_categories":[],
+          "stream_categories": [],
           "id": "8282fb72-ff54-4da0-8140-5bc9fe5e554b",
           "name": "chart",
           "series": [
