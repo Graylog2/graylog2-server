@@ -38,15 +38,15 @@ import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  eventDefinition: EventDefinition,
-  notifications: Array<EventNotification>,
+  eventDefinition: EventDefinition;
+  notifications: Array<EventNotification>;
   validation?: {
     errors: {
-      title?: string,
-    }
-  }
-  currentUser: User,
-}
+      title?: string;
+    };
+  };
+  currentUser: User;
+};
 
 const EventDefinitionSummary = ({ eventDefinition, notifications, validation, currentUser }: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
@@ -73,17 +73,22 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
         <dt style={{ margin: '16px 0 0' }}>Remediation Steps</dt>
         <dd>
-          <MarkdownPreview show
-                           withFullView
-                           noBorder
-                           noBackground
-                           value={eventDefinition.remediation_steps || 'No remediation steps given'} />
+          <MarkdownPreview
+            show
+            withFullView
+            noBorder
+            noBackground
+            value={eventDefinition.remediation_steps || 'No remediation steps given'}
+          />
         </dd>
       </dl>
     </>
   );
 
-  const getPlugin = <T extends 'eventDefinitionTypes' | 'fieldValueProviders' | 'eventNotificationTypes'>(name: T, type: string): PluginExports[T][number] => {
+  const getPlugin = <T extends 'eventDefinitionTypes' | 'fieldValueProviders' | 'eventNotificationTypes'>(
+    name: T,
+    type: string,
+  ): PluginExports[T][number] => {
     if (type === undefined) {
       return undefined;
     }
@@ -93,13 +98,16 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
 
   const renderCondition = (config: EventDefinition['config'], definitionId: string) => {
     const conditionPlugin = getPlugin('eventDefinitionTypes', config.type);
-    const component = (conditionPlugin?.summaryComponent
-      ? React.createElement(conditionPlugin.summaryComponent, {
+    const component = conditionPlugin?.summaryComponent ? (
+      React.createElement(conditionPlugin.summaryComponent, {
         config,
         currentUser,
         definitionId,
       })
-      : <p>Condition plugin <em>{config.type}</em> does not provide a summary.</p>
+    ) : (
+      <p>
+        Condition plugin <em>{config.type}</em> does not provide a summary.
+      </p>
     );
 
     return (
@@ -118,19 +126,26 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     const provider = config.providers[0];
     const fieldProviderPlugin = getPlugin('fieldValueProviders', provider?.type);
 
-    return (fieldProviderPlugin?.summaryComponent
-      ? React.createElement(fieldProviderPlugin.summaryComponent, {
+    return fieldProviderPlugin?.summaryComponent ? (
+      React.createElement(fieldProviderPlugin.summaryComponent, {
         fieldName,
         config,
         keys,
         key: fieldName,
         currentUser,
       })
-      : <p key={fieldName}>Provider plugin <em>{provider.type}</em> does not provide a summary.</p>
+    ) : (
+      <p key={fieldName}>
+        Provider plugin <em>{provider.type}</em> does not provide a summary.
+      </p>
     );
   };
 
-  const renderFieldList = (fieldNames: string[], fields: EventDefinition['field_spec'], keys: EventDefinition['key_spec']) => (
+  const renderFieldList = (
+    fieldNames: string[],
+    fields: EventDefinition['field_spec'],
+    keys: EventDefinition['key_spec'],
+  ) => (
     <>
       <dl>
         <dt>Keys</dt>
@@ -146,9 +161,11 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     return (
       <>
         <h3 className={commonStyles.title}>Fields</h3>
-        {fieldNames.length === 0
-          ? <p>No Fields configured for Events based on this Definition.</p>
-          : renderFieldList(fieldNames, fields, keys)}
+        {fieldNames.length === 0 ? (
+          <p>No Fields configured for Events based on this Definition.</p>
+        ) : (
+          renderFieldList(fieldNames, fields, keys)
+        )}
       </>
     );
   };
@@ -161,13 +178,16 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     if (notification) {
       const notificationPlugin = getPlugin('eventNotificationTypes', notification.config.type);
 
-      content = (notificationPlugin.summaryComponent
-        ? React.createElement(notificationPlugin.summaryComponent, {
+      content = notificationPlugin.summaryComponent ? (
+        React.createElement(notificationPlugin.summaryComponent, {
           type: notificationPlugin.displayName,
           notification,
           definitionNotification,
         })
-        : <p>Notification plugin <em>{notification.config.type}</em> does not provide a summary.</p>
+      ) : (
+        <p>
+          Notification plugin <em>{notification.config.type}</em> does not provide a summary.
+        </p>
       );
     } else {
       content = (
@@ -177,24 +197,21 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
       );
     }
 
-    return (
-      <React.Fragment key={definitionNotification.notification_id}>
-        {content}
-      </React.Fragment>
-    );
+    return <React.Fragment key={definitionNotification.notification_id}>{content}</React.Fragment>;
   };
 
   const renderNotificationSettings = (notificationSettings) => {
-    const formattedDuration = moment.duration(notificationSettings.grace_period_ms)
+    const formattedDuration = moment
+      .duration(notificationSettings.grace_period_ms)
       .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
-    const formattedGracePeriod = (notificationSettings.grace_period_ms
+    const formattedGracePeriod = notificationSettings.grace_period_ms
       ? `Grace Period is set to ${formattedDuration}`
-      : 'Grace Period is disabled');
+      : 'Grace Period is disabled';
 
-    const formattedBacklogSize = (notificationSettings.backlog_size
+    const formattedBacklogSize = notificationSettings.backlog_size
       ? `Notifications will include ${notificationSettings.backlog_size} messages`
-      : 'Notifications will not include any messages.');
+      : 'Notifications will not include any messages.';
 
     return (
       <>
@@ -207,34 +224,37 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     );
   };
 
-  const renderNotifications = (definitionNotifications: EventDefinition['notifications'], notificationSettings: EventDefinition['notification_settings']) => {
-    const effectiveDefinitionNotifications = definitionNotifications
-      .filter((n) => isPermitted(currentUser.permissions, `eventnotifications:read:${n.notification_id}`));
-    const notificationsWithMissingPermissions = definitionNotifications
-      .filter((n) => !effectiveDefinitionNotifications.map((nObj) => nObj.notification_id).includes(n.notification_id));
-    const warning = notificationsWithMissingPermissions.length > 0
-      ? (
+  const renderNotifications = (
+    definitionNotifications: EventDefinition['notifications'],
+    notificationSettings: EventDefinition['notification_settings'],
+  ) => {
+    const effectiveDefinitionNotifications = definitionNotifications.filter((n) =>
+      isPermitted(currentUser.permissions, `eventnotifications:read:${n.notification_id}`),
+    );
+    const notificationsWithMissingPermissions = definitionNotifications.filter(
+      (n) => !effectiveDefinitionNotifications.map((nObj) => nObj.notification_id).includes(n.notification_id),
+    );
+    const warning =
+      notificationsWithMissingPermissions.length > 0 ? (
         <Alert bsStyle="warning">
-          Missing Notifications Permissions for:<br />
+          Missing Notifications Permissions for:
+          <br />
           {notificationsWithMissingPermissions.map((n) => n.notification_id).join(', ')}
         </Alert>
-      )
-      : null;
+      ) : null;
 
     return (
       <>
         <h3 className={commonStyles.title}>Notifications</h3>
-        <p>
-          {warning}
-        </p>
-        {effectiveDefinitionNotifications.length === 0 && notificationsWithMissingPermissions.length <= 0
-          ? <p>This Event is not configured to trigger any Notifications.</p>
-          : (
-            <>
-              {renderNotificationSettings(notificationSettings)}
-              {definitionNotifications.map(renderNotification)}
-            </>
-          )}
+        <p>{warning}</p>
+        {effectiveDefinitionNotifications.length === 0 && notificationsWithMissingPermissions.length <= 0 ? (
+          <p>This Event is not configured to trigger any Notifications.</p>
+        ) : (
+          <>
+            {renderNotificationSettings(notificationSettings)}
+            {definitionNotifications.map(renderNotification)}
+          </>
+        )}
       </>
     );
   };
@@ -247,9 +267,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         <h2 className={commonStyles.title}>Event Summary</h2>
         {showValidation && <EventDefinitionValidationSummary validation={validation} />}
         <Row>
-          <Col md={5}>
-            {renderDetails()}
-          </Col>
+          <Col md={5}>{renderDetails()}</Col>
 
           {!isSystemEventDefinition && (
             <Col md={5} mdOffset={1}>
@@ -259,9 +277,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         </Row>
         <Row>
           {!isSystemEventDefinition && (
-            <Col md={5}>
-              {renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
-            </Col>
+            <Col md={5}>{renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}</Col>
           )}
           <Col md={5} mdOffset={isSystemEventDefinition ? 0 : 1}>
             {renderNotifications(eventDefinition.notifications, eventDefinition.notification_settings)}

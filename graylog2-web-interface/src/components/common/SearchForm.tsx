@@ -25,17 +25,19 @@ import IconButton from './IconButton';
 
 export const SEARCH_DEBOUNCE_THRESHOLD = 300;
 
-const FormContent = styled.div<{ $buttonLeftMargin: number }>(({ $buttonLeftMargin }) => css`
-  > :not(:last-child) {
-    margin-right: ${$buttonLeftMargin}px;
-  }
+const FormContent = styled.div<{ $buttonLeftMargin: number }>(
+  ({ $buttonLeftMargin }) => css`
+    > :not(:last-child) {
+      margin-right: ${$buttonLeftMargin}px;
+    }
 
-  > * {
-    display: inline-block;
-    vertical-align: top;
-    margin-bottom: 5px;
-  }
-`);
+    > * {
+      display: inline-block;
+      vertical-align: top;
+      margin-bottom: 5px;
+    }
+  `,
+);
 
 const InputFeedback = styled.div`
   position: absolute;
@@ -47,14 +49,18 @@ const InputFeedback = styled.div`
   padding-right: 3px;
 `;
 
-const StyledContainer = styled.div<{ $topMargin: number }>(({ $topMargin }) => css`
-  margin-top: ${$topMargin}px;
-`);
+const StyledContainer = styled.div<{ $topMargin: number }>(
+  ({ $topMargin }) => css`
+    margin-top: ${$topMargin}px;
+  `,
+);
 
-const StyledInput = styled.input<{ $queryWidth: number, $feedbackContainerWidth: number }>(({ $queryWidth, $feedbackContainerWidth }) => css`
-  width: ${$queryWidth}px;
-  padding-right: ${$feedbackContainerWidth ?? 12}px;
-`);
+const StyledInput = styled.input<{ $queryWidth: number; $feedbackContainerWidth: number }>(
+  ({ $queryWidth, $feedbackContainerWidth }) => css`
+    width: ${$queryWidth}px;
+    padding-right: ${$feedbackContainerWidth ?? 12}px;
+  `,
+);
 
 const Label = styled.label`
   margin-right: 5px;
@@ -65,45 +71,48 @@ const InputContainer = styled.div`
   position: relative;
 `;
 
-const handleQueryChange = debounce(({
-  query,
-  onSearch,
-  useLoadingState,
-  setLoadingState,
-  resetLoadingState,
-}: {
-  query: string,
-  onSearch: (query: string, resetLoadingState?: () => void) => void,
-  useLoadingState: boolean,
-  setLoadingState: () => Promise<void>,
-  resetLoadingState: () => void,
-}) => {
-  if (useLoadingState) {
-    setLoadingState().then(() => {
-      onSearch(query, resetLoadingState);
-    });
-  } else {
-    onSearch(query);
-  }
-}, SEARCH_DEBOUNCE_THRESHOLD);
+const handleQueryChange = debounce(
+  ({
+    query,
+    onSearch,
+    useLoadingState,
+    setLoadingState,
+    resetLoadingState,
+  }: {
+    query: string;
+    onSearch: (query: string, resetLoadingState?: () => void) => void;
+    useLoadingState: boolean;
+    setLoadingState: () => Promise<void>;
+    resetLoadingState: () => void;
+  }) => {
+    if (useLoadingState) {
+      setLoadingState().then(() => {
+        onSearch(query, resetLoadingState);
+      });
+    } else {
+      onSearch(query);
+    }
+  },
+  SEARCH_DEBOUNCE_THRESHOLD,
+);
 
 type Props = {
-  useLoadingState?: boolean,
-  queryHelpComponent?: React.ReactNode,
-  queryWidth?: number,
-  focusAfterMount?: boolean,
-  children?: React.ReactNode,
-  className?: string,
-  placeholder?: string,
-  buttonLeftMargin?: number,
-  label?: React.ReactNode,
-  onReset?: () => void,
-  onSearch?: (query: string, reset?: () => void) => void,
-  wrapperClass?: string,
-  topMargin?: number,
-  onQueryChange?: (query: string) => void,
-  query?: string,
-}
+  useLoadingState?: boolean;
+  queryHelpComponent?: React.ReactNode;
+  queryWidth?: number;
+  focusAfterMount?: boolean;
+  children?: React.ReactNode;
+  className?: string;
+  placeholder?: string;
+  buttonLeftMargin?: number;
+  label?: React.ReactNode;
+  onReset?: () => void;
+  onSearch?: (query: string, reset?: () => void) => void;
+  wrapperClass?: string;
+  topMargin?: number;
+  onQueryChange?: (query: string) => void;
+  query?: string;
+};
 
 /**
  * Component that renders a customizable search form. The component
@@ -142,14 +151,15 @@ const SearchForm = ({
    * before setting it to "true" has happened and thus not resetting the state after a search request.
    * @private
    */
-  const setLoadingState = () => new Promise<void>((resolve) => {
-    if (useLoadingState) {
-      setIsLoading(true);
-      resolve();
-    } else {
-      resolve();
-    }
-  });
+  const setLoadingState = () =>
+    new Promise<void>((resolve) => {
+      if (useLoadingState) {
+        setIsLoading(true);
+        resolve();
+      } else {
+        resolve();
+      }
+    });
 
   const resetLoadingState = () => {
     if (useLoadingState) {
@@ -202,20 +212,24 @@ const SearchForm = ({
             </Label>
           )}
           <InputContainer className="input-container">
-            <StyledInput id="common-search-form-query-input"
-                         autoFocus={focusAfterMount}
-                         onChange={onChange}
-                         value={query}
-                         placeholder={placeholder}
-                         type="text"
-                         $queryWidth={queryWidth}
-                         className="query form-control"
-                         autoComplete="off"
-                         spellCheck="false"
-                         $feedbackContainerWidth={inputFeedbackContainer.current?.scrollWidth} />
+            <StyledInput
+              id="common-search-form-query-input"
+              autoFocus={focusAfterMount}
+              onChange={onChange}
+              value={query}
+              placeholder={placeholder}
+              type="text"
+              $queryWidth={queryWidth}
+              className="query form-control"
+              autoComplete="off"
+              spellCheck="false"
+              $feedbackContainerWidth={inputFeedbackContainer.current?.scrollWidth}
+            />
             <InputFeedback ref={inputFeedbackContainer}>
               {isLoading && <Spinner text="" />}
-              {(query && typeof onReset === 'function') && <IconButton name="close" title="Reset search" onClick={handleReset} />}
+              {query && typeof onReset === 'function' && (
+                <IconButton name="close" title="Reset search" onClick={handleReset} />
+              )}
               {queryHelpComponent}
             </InputFeedback>
           </InputContainer>

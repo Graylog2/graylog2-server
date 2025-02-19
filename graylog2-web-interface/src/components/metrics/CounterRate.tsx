@@ -28,9 +28,12 @@ type CounterRateProps = {
   hideOnMissing?: boolean;
 };
 
-class CounterRate extends React.Component<CounterRateProps, {
-  [key: string]: any;
-}> {
+class CounterRate extends React.Component<
+  CounterRateProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     showTotal: false,
     prefix: null,
@@ -60,7 +63,7 @@ class CounterRate extends React.Component<CounterRateProps, {
       return null;
     }
 
-    return (<span>{this._prefix()}Calculating...</span>);
+    return <span>{this._prefix()}Calculating...</span>;
   };
 
   _prefix = () => {
@@ -97,7 +100,13 @@ class CounterRate extends React.Component<CounterRateProps, {
     if (this._checkPrevMetric()) {
       const rateNum = (count - this.state.prevMetric.count) / (this.state.nowTs - this.state.prevTs);
 
-      rate = (<span key="rate" className="number-format">{this._prefix()}{numeral(rateNum).format('0,0')}{this._suffix()}</span>);
+      rate = (
+        <span key="rate" className="number-format">
+          {this._prefix()}
+          {numeral(rateNum).format('0,0')}
+          {this._suffix()}
+        </span>
+      );
     } else {
       return this._placeholder();
     }
@@ -109,7 +118,12 @@ class CounterRate extends React.Component<CounterRateProps, {
     return (
       <span>
         {rate}
-        {this.props.showTotal && <span key="absolute" className="number-format"> ({numeral(count).format('0')} total)</span>}
+        {this.props.showTotal && (
+          <span key="absolute" className="number-format">
+            {' '}
+            ({numeral(count).format('0')} total)
+          </span>
+        )}
       </span>
     );
   }

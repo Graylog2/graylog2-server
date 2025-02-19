@@ -17,17 +17,17 @@
 export interface CachePluginType {
   type: string;
   displayName: string;
-  formComponent?: any,
-  summaryComponent?: any,
-  documentationComponent?: any,
+  formComponent?: any;
+  summaryComponent?: any;
+  documentationComponent?: any;
 }
 
 export interface DataAdapterPluginType {
   type: string;
   displayName: string;
-  formComponent?: any,
-  summaryComponent?: any,
-  documentationComponent?: any,
+  formComponent?: any;
+  summaryComponent?: any;
+  documentationComponent?: any;
 }
 
 declare module 'graylog-web-plugin/plugin' {

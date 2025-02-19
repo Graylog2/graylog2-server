@@ -35,8 +35,8 @@ import StartStreamsAction from './StartStreamsAction';
 import AssignIndexSetModal from './AssignIndexSetModal';
 
 type Props = {
-  indexSets: Array<IndexSet>
-}
+  indexSets: Array<IndexSet>;
+};
 
 const BulkActions = ({ indexSets }: Props) => {
   const queryClient = useQueryClient();
@@ -50,52 +50,59 @@ const BulkActions = ({ indexSets }: Props) => {
     setShowIndexSetModal((cur) => !cur);
   }, []);
 
-  const handleFailures = useCallback((failures: Array<{ entity_id: string }>, actionPastTense: string) => {
-    if (failures?.length) {
-      const notDeletedStreamIds = failures.map(({ entity_id }) => entity_id);
-      setSelectedEntities(notDeletedStreamIds);
-      UserNotification.error(`${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be ${actionPastTense}.`);
-    } else {
-      setSelectedEntities([]);
-      UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionPastTense} successfully.`, 'Success');
-    }
-  }, [descriptor, selectedItemsAmount, setSelectedEntities]);
+  const handleFailures = useCallback(
+    (failures: Array<{ entity_id: string }>, actionPastTense: string) => {
+      if (failures?.length) {
+        const notDeletedStreamIds = failures.map(({ entity_id }) => entity_id);
+        setSelectedEntities(notDeletedStreamIds);
+        UserNotification.error(
+          `${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be ${actionPastTense}.`,
+        );
+      } else {
+        setSelectedEntities([]);
+        UserNotification.success(
+          `${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionPastTense} successfully.`,
+          'Success',
+        );
+      }
+    },
+    [descriptor, selectedItemsAmount, setSelectedEntities],
+  );
 
   const onDelete = useCallback(() => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}? This action cannot be undone.`)) {
-      fetch(
-        'POST',
-        qualifyUrl(ApiRoutes.StreamsApiController.bulk_delete().url),
-        { entity_ids: selectedEntities },
-      ).then(({ failures }) => handleFailures(failures, 'deleted')).catch((error) => {
-        UserNotification.error(`An error occurred while deleting streams. ${error}`);
-      }).finally(() => {
-        refetchStreams();
-      });
+    if (
+      // eslint-disable-next-line no-alert
+      window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}? This action cannot be undone.`)
+    ) {
+      fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.bulk_delete().url), { entity_ids: selectedEntities })
+        .then(({ failures }) => handleFailures(failures, 'deleted'))
+        .catch((error) => {
+          UserNotification.error(`An error occurred while deleting streams. ${error}`);
+        })
+        .finally(() => {
+          refetchStreams();
+        });
     }
   }, [descriptor, handleFailures, refetchStreams, selectedItemsAmount, selectedEntities]);
 
   return (
     <>
       {showIndexSetModal && (
-        <AssignIndexSetModal toggleShowModal={toggleAssignIndexSetModal}
-                             indexSets={indexSets}
-                             descriptor={descriptor}
-                             refetchStreams={refetchStreams} />
+        <AssignIndexSetModal
+          toggleShowModal={toggleAssignIndexSetModal}
+          indexSets={indexSets}
+          descriptor={descriptor}
+          refetchStreams={refetchStreams}
+        />
       )}
       <BulkActionsDropdown>
         <IfPermitted permissions="indexsets:read">
           <MenuItem onSelect={toggleAssignIndexSetModal}>Assign index set</MenuItem>
         </IfPermitted>
         <SearchStreamsAction />
-        <StartStreamsAction handleFailures={handleFailures}
-                            refetchStreams={refetchStreams}
-                            descriptor={descriptor} />
+        <StartStreamsAction handleFailures={handleFailures} refetchStreams={refetchStreams} descriptor={descriptor} />
 
-        <StopStreamsAction handleFailures={handleFailures}
-                           refetchStreams={refetchStreams}
-                           descriptor={descriptor} />
+        <StopStreamsAction handleFailures={handleFailures} refetchStreams={refetchStreams} descriptor={descriptor} />
 
         <DeleteMenuItem onSelect={onDelete} />
       </BulkActionsDropdown>

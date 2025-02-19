@@ -22,24 +22,26 @@ import copyToClipboard from 'util/copyToClipboard';
 import { Button } from 'components/bootstrap';
 
 type Props = {
-  clientCerts: ClientCertCreateResponse
+  clientCerts: ClientCertCreateResponse;
 };
 
-const Textarea = styled.textarea(({ theme }) => css`
-  width: 100%;
-  padding: 3px;
-  resize: none;
-  flex: 1;
-  margin: 15px 0 7px;
-  border: 1px solid ${theme.colors.variant.lighter.default};
-  font-family: ${theme.fonts.family.monospace};
-  font-size: ${theme.fonts.size.body};
+const Textarea = styled.textarea(
+  ({ theme }) => css`
+    width: 100%;
+    padding: 3px;
+    resize: none;
+    flex: 1;
+    margin: 15px 0 7px;
+    border: 1px solid ${theme.colors.variant.lighter.default};
+    font-family: ${theme.fonts.family.monospace};
+    font-size: ${theme.fonts.size.body};
 
-  &:focus {
-    border-color: ${theme.colors.variant.light.info};
-    outline: none;
-  }
-`);
+    &:focus {
+      border-color: ${theme.colors.variant.light.info};
+      outline: none;
+    }
+  `,
+);
 
 const ClientCertificateView = ({ clientCerts }: Props) => (
   <>
@@ -47,23 +49,32 @@ const ClientCertificateView = ({ clientCerts }: Props) => (
     <dd>{clientCerts.principal}</dd>
     <dt>Role:</dt>
     <dd>{clientCerts.role}</dd>
-    <dt>CA certificate <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.ca_certificate)}>Copy to clipboard</Button></dt>
+    <dt>
+      CA certificate{' '}
+      <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.ca_certificate)}>
+        Copy to clipboard
+      </Button>
+    </dt>
     <dd>
-      <Textarea id="ca_certificate"
-                value={clientCerts.ca_certificate}
-                spellCheck={false} />
+      <Textarea id="ca_certificate" value={clientCerts.ca_certificate} spellCheck={false} />
     </dd>
-    <dt>Private key <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.private_key)}>Copy to clipboard</Button></dt>
+    <dt>
+      Private key{' '}
+      <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.private_key)}>
+        Copy to clipboard
+      </Button>
+    </dt>
     <dd>
-      <Textarea id="private_key"
-                value={clientCerts.private_key}
-                spellCheck={false} />
+      <Textarea id="private_key" value={clientCerts.private_key} spellCheck={false} />
     </dd>
-    <dt>Certificate <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.certificate)}>Copy to clipboard</Button></dt>
+    <dt>
+      Certificate{' '}
+      <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.certificate)}>
+        Copy to clipboard
+      </Button>
+    </dt>
     <dd>
-      <Textarea id="certificate"
-                value={clientCerts.certificate}
-                spellCheck={false} />
+      <Textarea id="certificate" value={clientCerts.certificate} spellCheck={false} />
     </dd>
   </>
 );

@@ -32,19 +32,26 @@ const StopMessageProcessing = ({ currentStep, onTriggerStep, hideActions }: Migr
     <p>Graylog processing is stopped.</p>
     <StyledHelpPanel bsStyle="warning">
       <Panel.Heading>
-        <Panel.Title componentClass="h3"><Icon name="warning" />Stop OpenSearch</Panel.Title>
+        <Panel.Title componentClass="h3">
+          <Icon name="warning" />
+          Stop OpenSearch
+        </Panel.Title>
       </Panel.Heading>
       <Panel.Body>
         <p>Please stop your OpenSearch cluster before proceeding.</p>
-        <p>If you are migrating existing OpenSearch data by pointing the data node to its data directory, make sure that
+        <p>
+          If you are migrating existing OpenSearch data by pointing the data node to its data directory, make sure that
           the user running the data node (usually graylog-datanode) has permissions to write to the data directory set
           in the data node configuration.
         </p>
       </Panel.Body>
     </StyledHelpPanel>
     <p />
-    <MigrationStepTriggerButtonToolbar hidden={hideActions} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
-
+    <MigrationStepTriggerButtonToolbar
+      hidden={hideActions}
+      nextSteps={currentStep.next_steps}
+      onTriggerStep={onTriggerStep}
+    />
   </>
 );
 

@@ -23,9 +23,9 @@ import useNonDisplayedAttributes from 'components/events/events/hooks/useNonDisp
 import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
 type Props = {
-  defaultLayout: DefaultLayout,
-  event: Event,
-}
+  defaultLayout: DefaultLayout;
+  event: Event;
+};
 
 const ExpandedSection = ({ defaultLayout, event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();

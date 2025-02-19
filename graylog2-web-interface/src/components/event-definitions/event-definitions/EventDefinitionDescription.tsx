@@ -25,33 +25,37 @@ import { Button, Col, Row } from 'components/bootstrap';
 import { Icon, Pluralize, Timestamp } from 'components/common';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 
-const DetailsList = styled.dl`
-`;
+const DetailsList = styled.dl``;
 
 const DetailTitle = styled.dt`
   float: left;
   clear: left;
 `;
 
-const DetailValue = styled.dd(({ theme }) => css`
-  margin-left: 180px;
-  word-wrap: break-word;
+const DetailValue = styled.dd(
+  ({ theme }) => css`
+    margin-left: 180px;
+    word-wrap: break-word;
 
-  &:not(:last-child) {
-    border-bottom: 1px solid ${theme.colors.variant.lightest.default};
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-  }
-`);
+    &:not(:last-child) {
+      border-bottom: 1px solid ${theme.colors.variant.lightest.default};
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+    }
+  `,
+);
 
 type EventDefinitionDescriptionProps = {
   definition: any;
   context?: any;
 };
 
-class EventDefinitionDescription extends React.Component<EventDefinitionDescriptionProps, {
-  [key: string]: any;
-}> {
+class EventDefinitionDescription extends React.Component<
+  EventDefinitionDescriptionProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     context: {},
   };
@@ -64,16 +68,24 @@ class EventDefinitionDescription extends React.Component<EventDefinitionDescript
       return cronDescription.charAt(0).toLowerCase() + cronDescription.slice(1);
     }
 
-    return `every ${moment.duration(value)
+    return `every ${moment
+      .duration(value)
       .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false })}`;
   };
 
   static renderSchedulingInformation = (definition) => {
     let schedulingInformation = 'Not scheduled.';
 
-    if (definition.config.search_within_ms && (definition.config.use_cron_scheduling || definition.config.execute_every_ms)) {
-      const executeEveryFormatted = EventDefinitionDescription.describeSchedule(definition.config.use_cron_scheduling, definition.config.use_cron_scheduling ? definition.config.cron_expression : definition.config.execute_every_ms);
-      const searchWithinFormatted = moment.duration(definition.config.search_within_ms)
+    if (
+      definition.config.search_within_ms &&
+      (definition.config.use_cron_scheduling || definition.config.execute_every_ms)
+    ) {
+      const executeEveryFormatted = EventDefinitionDescription.describeSchedule(
+        definition.config.use_cron_scheduling,
+        definition.config.use_cron_scheduling ? definition.config.cron_expression : definition.config.execute_every_ms,
+      );
+      const searchWithinFormatted = moment
+        .duration(definition.config.search_within_ms)
         .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
       schedulingInformation = `Runs ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
@@ -83,7 +95,11 @@ class EventDefinitionDescription extends React.Component<EventDefinitionDescript
   };
 
   static renderNotificationsInformation = (definition) => {
-    let notificationsInformation = <span>Does <b>not</b> trigger any Notifications.</span>;
+    let notificationsInformation = (
+      <span>
+        Does <b>not</b> trigger any Notifications.
+      </span>
+    );
 
     if (definition.notifications.length > 0) {
       notificationsInformation = (
@@ -122,7 +138,7 @@ class EventDefinitionDescription extends React.Component<EventDefinitionDescript
     const scheduleCtx = get(context, `scheduler.${definition.id}`, null);
 
     if (!scheduleCtx.is_scheduled) {
-      return (<p>Event definition is not scheduled, no details available.</p>);
+      return <p>Event definition is not scheduled, no details available.</p>;
     }
 
     let timerange = null;
@@ -134,7 +150,9 @@ class EventDefinitionDescription extends React.Component<EventDefinitionDescript
       timerange = (
         <>
           <DetailTitle>Next timerange:</DetailTitle>
-          <DetailValue><Timestamp dateTime={from} /> <Icon name="arrow_circle_right" /> <Timestamp dateTime={to} /></DetailValue>
+          <DetailValue>
+            <Timestamp dateTime={from} /> <Icon name="arrow_circle_right" /> <Timestamp dateTime={to} />
+          </DetailValue>
         </>
       );
     }
@@ -148,20 +166,28 @@ class EventDefinitionDescription extends React.Component<EventDefinitionDescript
             {scheduleCtx.triggered_at && (
               <>
                 <DetailTitle>Last execution:</DetailTitle>
-                <DetailValue><Timestamp dateTime={scheduleCtx.triggered_at} /></DetailValue>
+                <DetailValue>
+                  <Timestamp dateTime={scheduleCtx.triggered_at} />
+                </DetailValue>
               </>
             )}
             {scheduleCtx.next_time && (
               <>
                 <DetailTitle>Next execution:</DetailTitle>
-                <DetailValue><Timestamp dateTime={scheduleCtx.next_time} /></DetailValue>
+                <DetailValue>
+                  <Timestamp dateTime={scheduleCtx.next_time} />
+                </DetailValue>
               </>
             )}
             {timerange}
             <DetailTitle>Queued notifications:</DetailTitle>
-            <DetailValue>{scheduleCtx.queued_notifications}
+            <DetailValue>
+              {scheduleCtx.queued_notifications}
               {scheduleCtx.queued_notifications > 0 && (
-                <Button bsStyle="link" bsSize="xsmall" onClick={EventDefinitionDescription.clearNotifications(definition)}>
+                <Button
+                  bsStyle="link"
+                  bsSize="xsmall"
+                  onClick={EventDefinitionDescription.clearNotifications(definition)}>
                   clear
                 </Button>
               )}
@@ -186,7 +212,8 @@ class EventDefinitionDescription extends React.Component<EventDefinitionDescript
       <>
         <p>{definition.description}</p>
         <p>
-          {EventDefinitionDescription.renderSchedulingInformation(definition)} {EventDefinitionDescription.renderNotificationsInformation(definition)}
+          {EventDefinitionDescription.renderSchedulingInformation(definition)}{' '}
+          {EventDefinitionDescription.renderNotificationsInformation(definition)}
           <Button bsStyle="link" bsSize="xsmall" onClick={this.handleDetailsToggle}>
             {showDetails ? 'Hide' : 'Show'} details
           </Button>

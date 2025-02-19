@@ -19,34 +19,38 @@ import styled, { css } from 'styled-components';
 
 import Icon from './Icon';
 
-const ScrollBtn = styled.button(({ theme }) => css`
-  opacity: 0.3;
-  background-color: ${theme.colors.variant.primary};
-  width: 40px;
-  height: 40px;
-  position: fixed;
-  bottom: 60px;
-  right: 20px;
-  border-radius: 5px;
-  border: none;
+const ScrollBtn = styled.button(
+  ({ theme }) => css`
+    opacity: 0.3;
+    background-color: ${theme.colors.variant.primary};
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    bottom: 60px;
+    right: 20px;
+    border-radius: 5px;
+    border: none;
 
-  &:hover {
-    opacity: 1;
-  }
+    &:hover {
+      opacity: 1;
+    }
 
-  &.middle {
-    right: 35%;
-  }
-`);
+    &.middle {
+      right: 35%;
+    }
+  `,
+);
 
-const ArrowUpIcon = styled(Icon)(({ theme }) => css`
-  color: ${theme.utils.readableColor(theme.colors.variant.primary)};
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -9px;
-  margin-left: -5px;
-`);
+const ArrowUpIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.utils.readableColor(theme.colors.variant.primary)};
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -9px;
+    margin-left: -5px;
+  `,
+);
 
 type ScrollButtonProps = {
   delay?: number;
@@ -54,9 +58,12 @@ type ScrollButtonProps = {
   position?: string;
 };
 
-class ScrollButton extends React.Component<ScrollButtonProps, {
-  [key: string]: any;
-}> {
+class ScrollButton extends React.Component<
+  ScrollButtonProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     delay: 5,
     scrollSteps: 50,
@@ -107,14 +114,11 @@ class ScrollButton extends React.Component<ScrollButtonProps, {
     const { hideButton } = this.state;
 
     if (hideButton) {
-      return (<span />);
+      return <span />;
     }
 
     return (
-      <ScrollBtn title="Back to top"
-                 type="button"
-                 className={position}
-                 onClick={this.scrollToTop}>
+      <ScrollBtn title="Back to top" type="button" className={position} onClick={this.scrollToTop}>
         <ArrowUpIcon name="keyboard_arrow_up" />
       </ScrollBtn>
     );

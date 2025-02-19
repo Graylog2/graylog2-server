@@ -18,11 +18,13 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Col } from 'components/bootstrap';
-import {
-  MIGRATION_STATE,
-  REMOTE_REINDEXING_MIGRATION_STEPS,
-} from 'components/datanode/Constants';
-import type { MigrationActions, StepArgs, MigrationStateItem, MigrationStepComponentProps } from 'components/datanode/Types';
+import { MIGRATION_STATE, REMOTE_REINDEXING_MIGRATION_STEPS } from 'components/datanode/Constants';
+import type {
+  MigrationActions,
+  StepArgs,
+  MigrationStateItem,
+  MigrationStepComponentProps,
+} from 'components/datanode/Types';
 
 import Welcome from './remoteReindexing/Welcome';
 import ExistingDataMigrationQuestion from './remoteReindexing/ExistingDataMigrationQuestion';
@@ -48,15 +50,33 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStep
       case MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key:
         return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
       case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key:
-        return <CertificatesProvisioning currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
+        return (
+          <CertificatesProvisioning
+            currentStep={currentStep}
+            onTriggerStep={onStepComplete}
+            hideActions={hideActions}
+          />
+        );
       case MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key:
-        return <ExistingDataMigrationQuestion currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
+        return (
+          <ExistingDataMigrationQuestion
+            currentStep={currentStep}
+            onTriggerStep={onStepComplete}
+            hideActions={hideActions}
+          />
+        );
       case MIGRATION_STATE.MIGRATE_EXISTING_DATA.key:
-        return <MigrateExistingData currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
+        return (
+          <MigrateExistingData currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />
+        );
       case MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key:
-        return <RemoteReindexRunning currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
+        return (
+          <RemoteReindexRunning currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />
+        );
       case MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key:
-        return <ShutdownClusterStep currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
+        return (
+          <ShutdownClusterStep currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />
+        );
       default:
         return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} hideActions={hideActions} />;
     }
@@ -66,9 +86,11 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStep
     <Col>
       <StyledTitle>Remote reindexing migration</StyledTitle>
       <p>Follow these steps to migrate your existing OpenSearch 2.x or 1.3.x cluster to Data Nodes.</p>
-      <MigrationStepsPanel currentStep={currentStep}
-                           sortedMigrationSteps={REMOTE_REINDEXING_MIGRATION_STEPS}
-                           renderStepComponent={renderStepComponent} />
+      <MigrationStepsPanel
+        currentStep={currentStep}
+        sortedMigrationSteps={REMOTE_REINDEXING_MIGRATION_STEPS}
+        renderStepComponent={renderStepComponent}
+      />
     </Col>
   );
 };

@@ -58,7 +58,6 @@ const bindings: PluginExports = {
       component: MockCreateParameterDialog,
     },
   ],
-
 };
 
 const plugin = {
@@ -88,8 +87,9 @@ describe('AddWidgetButton', () => {
     render(<AddWidgetButton onClick={onClick} />);
     await screen.findByText(/Use the following options to add an aggregation/i);
 
-    ['Aggregation', 'Message Count', 'Message Table', 'Parameter']
-      .forEach((title) => expect(screen.getByRole('button', { name: title })).toBeInTheDocument());
+    ['Aggregation', 'Message Count', 'Message Table', 'Parameter'].forEach((title) =>
+      expect(screen.getByRole('button', { name: title })).toBeInTheDocument(),
+    );
   });
 
   it('clicking on option to add aggregation calls AggregateActionHandler', async () => {

@@ -27,7 +27,9 @@ import { useStore } from 'stores/connect';
 const ProcessBufferDumpPage = () => {
   const { nodeId } = useParams<{ nodeId: string }>();
   const { nodes } = useStore(NodesStore);
-  const { data: processbufferDump } = useQuery(['processBufferDump', nodeId], () => ClusterOverviewStore.processbufferDump(nodeId));
+  const { data: processbufferDump } = useQuery(['processBufferDump', nodeId], () =>
+    ClusterOverviewStore.processbufferDump(nodeId),
+  );
 
   const node = nodes?.[nodeId];
 
@@ -38,21 +40,25 @@ const ProcessBufferDumpPage = () => {
   const title = (
     <span>
       Process-buffer dump of node {node.short_node_id} / {node.hostname}
-        &nbsp;
-      <small>Taken at <Timestamp dateTime={new Date()} /> </small>
+      &nbsp;
+      <small>
+        Taken at <Timestamp dateTime={new Date()} />{' '}
+      </small>
     </span>
   );
 
-  const content = processbufferDump ? <pre className="processbufferdump">{JSON.stringify(processbufferDump, null, 2)}</pre> : <Spinner />;
+  const content = processbufferDump ? (
+    <pre className="processbufferdump">{JSON.stringify(processbufferDump, null, 2)}</pre>
+  ) : (
+    <Spinner />
+  );
 
   return (
     <DocumentTitle title={`Process-buffer dump of node ${node.short_node_id} / ${node.hostname}`}>
       <div>
         <PageHeader title={title} />
         <Row className="content">
-          <Col md={12}>
-            {content}
-          </Col>
+          <Col md={12}>{content}</Col>
         </Row>
       </div>
     </DocumentTitle>

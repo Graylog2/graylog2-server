@@ -30,7 +30,12 @@ const ContentPackInstallEntityList = ({
   entities = undefined,
   uninstall = false,
 }: ContentPackInstallEntityListProps) => {
-  const rowFormatter = (entity: InstalledEntity) => (<tr><td>{entity.title}</td><td>{entity.type.name}</td></tr>);
+  const rowFormatter = (entity: InstalledEntity) => (
+    <tr>
+      <td>{entity.title}</td>
+      <td>{entity.type.name}</td>
+    </tr>
+  );
   const headers = ['Title', 'Type'];
   const headerTitle = uninstall ? 'Entites to be uninstalled' : 'Installed Entities';
 
@@ -41,12 +46,14 @@ const ContentPackInstallEntityList = ({
   return (
     <div>
       <h3>{headerTitle}</h3>
-      <DataTable id="installed-entities"
-                 headers={headers}
-                 sortByKey="title"
-                 dataRowFormatter={rowFormatter}
-                 rows={entities}
-                 filterKeys={[]} />
+      <DataTable
+        id="installed-entities"
+        headers={headers}
+        sortByKey="title"
+        dataRowFormatter={rowFormatter}
+        rows={entities}
+        filterKeys={[]}
+      />
     </div>
   );
 };

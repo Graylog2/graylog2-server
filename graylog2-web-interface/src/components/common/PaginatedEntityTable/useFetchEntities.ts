@@ -22,16 +22,16 @@ import { type Attribute } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
 export type PaginatedResponse<T, M = unknown> = {
-  list: Array<T>,
+  list: Array<T>;
   pagination: {
-    total: number
-  },
-  attributes: Array<Attribute>,
-  meta?: M
-}
+    total: number;
+  };
+  attributes: Array<Attribute>;
+  meta?: M;
+};
 
 export type FetchOptions = {
-  refetchInterval?: number,
+  refetchInterval?: number;
 };
 
 const useFetchEntities = <T, M = unknown>({
@@ -42,20 +42,25 @@ const useFetchEntities = <T, M = unknown>({
   humanName,
   fetchOptions = {},
 }: {
-  fetchKey: Array<unknown>,
-  searchParams: SearchParams,
-  fetchEntities: (searchParams: SearchParams) => Promise<PaginatedResponse<T, M>>
-  enabled: boolean,
-  humanName: string
-  fetchOptions?: FetchOptions,
+  fetchKey: Array<unknown>;
+  searchParams: SearchParams;
+  fetchEntities: (searchParams: SearchParams) => Promise<PaginatedResponse<T, M>>;
+  enabled: boolean;
+  humanName: string;
+  fetchOptions?: FetchOptions;
 }): {
-  isInitialLoading: boolean,
-  data: PaginatedResponse<T, M>,
-  refetch: () => void,
+  isInitialLoading: boolean;
+  data: PaginatedResponse<T, M>;
+  refetch: () => void;
 } => {
   const { data, isInitialLoading, refetch } = useQuery(
     fetchKey,
-    () => defaultOnError(fetchEntities(searchParams), `Fetching ${humanName} failed with status`, `Could not retrieve ${humanName}`),
+    () =>
+      defaultOnError(
+        fetchEntities(searchParams),
+        `Fetching ${humanName} failed with status`,
+        `Could not retrieve ${humanName}`,
+      ),
     {
       enabled,
       keepPreviousData: true,
@@ -63,11 +68,11 @@ const useFetchEntities = <T, M = unknown>({
     },
   );
 
-  return ({
+  return {
     data,
     isInitialLoading,
     refetch,
-  });
+  };
 };
 
 export default useFetchEntities;

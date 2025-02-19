@@ -17,7 +17,7 @@
 import isEqualWith from 'lodash/isEqualWith';
 import isFunction from 'lodash/isFunction';
 
-const hasFn = (obj, fn) => (obj && obj[fn] && isFunction(obj[fn]));
+const hasFn = (obj, fn) => obj && obj[fn] && isFunction(obj[fn]);
 const hasEquals = (obj) => hasFn(obj, 'equals');
 const hasEqualsForSearch = (obj) => hasFn(obj, 'equalsForSearch');
 const isImmutable = (obj) => hasFn(obj, 'toJS');

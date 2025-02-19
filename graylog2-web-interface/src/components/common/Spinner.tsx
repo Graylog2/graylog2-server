@@ -28,16 +28,18 @@ const Container = styled.span`
   vertical-align: baseline;
 `;
 
-const StyledIcon = styled(Icon)<{ $displayMargin: boolean }>(({ $displayMargin }) => css`
-  ${$displayMargin ? 'margin-right: 6px;' : ''}
-`);
+const StyledIcon = styled(Icon)<{ $displayMargin: boolean }>(
+  ({ $displayMargin }) => css`
+    ${$displayMargin ? 'margin-right: 6px;' : ''}
+  `,
+);
 
 type Props = {
-  delay?: number,
-  name?: IconName,
-  text?: string,
-  size?: React.ComponentProps<typeof StyledIcon>['size'],
-  style?: React.ComponentProps<typeof StyledIcon>['style'],
+  delay?: number;
+  name?: IconName;
+  text?: string;
+  size?: React.ComponentProps<typeof StyledIcon>['size'];
+  style?: React.ComponentProps<typeof StyledIcon>['style'];
 };
 
 /**
@@ -46,7 +48,8 @@ type Props = {
 const Spinner = ({ name = 'progress_activity', text = 'Loading...', delay = 200, ...rest }: Props) => (
   <Delayed delay={delay}>
     <Container>
-      <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />{text}
+      <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />
+      {text}
     </Container>
   </Delayed>
 );

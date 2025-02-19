@@ -129,7 +129,7 @@ public class PipelineInterpreterTest {
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         "pipeline \"pipeline\"\n" +
                                 "stage 0 match all\n" +
                                 "    rule \"creates message\";\n" +
@@ -158,7 +158,7 @@ public class PipelineInterpreterTest {
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         "pipeline \"pipeline\"\n" +
                                 "stage 0 match all\n" +
                                 "    rule \"true\";\n" +
@@ -188,7 +188,7 @@ public class PipelineInterpreterTest {
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         "pipeline \"pipeline\"\n" +
                                 "stage 0 match all\n" +
                                 "    rule \"true\";\n" +
@@ -219,7 +219,7 @@ public class PipelineInterpreterTest {
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         "pipeline \"pipeline\"\n" +
                                 "stage 0 match either\n" +
                                 "    rule \"true\";\n" +
@@ -250,7 +250,7 @@ public class PipelineInterpreterTest {
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         "pipeline \"pipeline\"\n" +
                                 "stage 0 match either\n" +
                                 "    rule \"false\";\n" +
@@ -280,7 +280,7 @@ public class PipelineInterpreterTest {
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         "pipeline \"pipeline\"\n" +
                                 "stage 0 match pass\n" +
                                 "    rule \"true\";\n" +
@@ -311,7 +311,7 @@ public class PipelineInterpreterTest {
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         "pipeline \"pipeline\"\n" +
                                 "stage 0 match pass\n" +
                                 "    rule \"false\";\n" +
@@ -347,7 +347,7 @@ public class PipelineInterpreterTest {
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(ImmutableList.of(
-                PipelineDao.create("p1", "title1", "description",
+                PipelineDao.create("p1", null, "title1", "description",
                         "pipeline \"pipeline1\"\n" +
                                 "stage 0 match pass\n" +
                                 "    rule \"1-a\";\n" +
@@ -357,7 +357,7 @@ public class PipelineInterpreterTest {
                                 "end\n",
                         Tools.nowUTC(),
                         null),
-                PipelineDao.create("p2", "title2", "description",
+                PipelineDao.create("p2", null, "title2", "description",
                         "pipeline \"pipeline2\"\n" +
                                 "stage 0 match pass\n" +
                                 "    rule \"2-a\";\n" +
@@ -445,7 +445,7 @@ public class PipelineInterpreterTest {
         );
 
         final PipelineService pipelineService = new InMemoryPipelineService(new ClusterEventBus());
-        pipelineService.save(PipelineDao.create("cde", "title", "description",
+        pipelineService.save(PipelineDao.create("cde", null, "title", "description",
                 "pipeline \"pipeline\"\n" +
                         "stage 0 match all\n" +
                         "    rule \"match_all\";\n" +
@@ -538,7 +538,7 @@ public class PipelineInterpreterTest {
                         "end", null, null, null, null)));
 
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         "pipeline \"pipeline\"\n" +
                                 "stage 0 match all\n" +
                                 "    rule \"broken_condition\";\n" +
@@ -583,7 +583,7 @@ public class PipelineInterpreterTest {
                         "end", null, null, null, null)));
 
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         "pipeline \"pipeline\"\n" +
                                 "stage 0 match all\n" +
                                 "    rule \"broken_statement\";\n" +
@@ -629,7 +629,7 @@ public class PipelineInterpreterTest {
                         "end", null, null, null, null)));
 
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
-                PipelineDao.create("p1", "title", "description",
+                PipelineDao.create("p1", null, "title", "description",
                         "pipeline \"pipeline\"\n" +
                                 "stage 0 match all\n" +
                                 "    rule \"valid_rule\";\n" +

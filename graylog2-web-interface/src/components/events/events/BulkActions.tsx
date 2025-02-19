@@ -28,8 +28,8 @@ import useLocation from 'routing/useLocation';
 import useSendEventActionTelemetry from 'components/events/events/hooks/useSendEventActionTelemetry';
 
 type Props = {
-  selectedEntitiesData: { [eventId: string]: Event }
-}
+  selectedEntitiesData: { [eventId: string]: Event };
+};
 
 const BulkActions = ({ selectedEntitiesData }: Props) => {
   const events = Object.values(selectedEntitiesData);

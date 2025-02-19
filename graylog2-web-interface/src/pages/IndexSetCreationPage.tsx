@@ -23,12 +23,11 @@ import { CreateIndexSet, IndicesPageNavigation } from 'components/indices';
 import DocsHelper from 'util/DocsHelper';
 import SelectIndexSetTemplateProvider from 'components/indices/IndexSetTemplates/contexts/SelectedIndexSetTemplateProvider';
 
-const SelectTemplateButton = ({ onClick } : {onClick : () => void}) => {
+const SelectTemplateButton = ({ onClick }: { onClick: () => void }) => {
   const isCloud = AppConfig.isCloud();
   if (isCloud) return null;
 
-  return (
-    <Button onClick={onClick}>Select Template</Button>);
+  return <Button onClick={onClick}>Select Template</Button>;
 };
 
 const IndexSetCreationPage = () => {
@@ -39,12 +38,13 @@ const IndexSetCreationPage = () => {
       <DocumentTitle title="Create Index Set">
         <IndicesPageNavigation />
         <div>
-          <PageHeader title="Create Index Set"
-                      documentationLink={{
-                        title: 'Index model documentation',
-                        path: DocsHelper.PAGES.INDEX_MODEL,
-                      }}
-                      actions={<SelectTemplateButton onClick={() => setShowSelectTemplateModal(true)} />}>
+          <PageHeader
+            title="Create Index Set"
+            documentationLink={{
+              title: 'Index model documentation',
+              path: DocsHelper.PAGES.INDEX_MODEL,
+            }}
+            actions={<SelectTemplateButton onClick={() => setShowSelectTemplateModal(true)} />}>
             <span>
               Create a new index set that will let you configure the retention, sharding, and replication of messages
               coming from one or more streams.
@@ -53,8 +53,10 @@ const IndexSetCreationPage = () => {
 
           <Row className="content">
             <Col md={12}>
-              <CreateIndexSet showSelectTemplateModal={showSelectTemplateModal}
-                              setShowSelectTemplateModal={setShowSelectTemplateModal} />
+              <CreateIndexSet
+                showSelectTemplateModal={showSelectTemplateModal}
+                setShowSelectTemplateModal={setShowSelectTemplateModal}
+              />
             </Col>
           </Row>
         </div>

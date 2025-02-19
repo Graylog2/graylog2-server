@@ -21,13 +21,15 @@ import styled, { css } from 'styled-components';
 import ContentStreamNewsContentActions from 'components/content-stream/news/ContentStreamNewsContentActions';
 import { ExternalLink } from 'components/common';
 
-const StyledDiv = styled.div(({ theme }: { theme: DefaultTheme }) => css`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
-  grid-auto-flow: row;
-  margin-top: ${theme.spacings.sm};
-`);
+const StyledDiv = styled.div(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-auto-flow: row;
+    margin-top: ${theme.spacings.sm};
+  `,
+);
 const StyledActionDiv = styled.div`
   display: flex;
   align-items: center;
@@ -42,11 +44,11 @@ const StyledReadMoreDiv = styled.div`
 const ContentStreamNewsFooter = () => (
   <StyledDiv>
     <StyledReadMoreDiv>
-      <ExternalLink href="https://www.graylog.org/blog/">
-        Read more
-      </ExternalLink>
+      <ExternalLink href="https://www.graylog.org/blog/">Read more</ExternalLink>
     </StyledReadMoreDiv>
-    <StyledActionDiv><ContentStreamNewsContentActions /></StyledActionDiv>
+    <StyledActionDiv>
+      <ContentStreamNewsContentActions />
+    </StyledActionDiv>
   </StyledDiv>
 );
 
