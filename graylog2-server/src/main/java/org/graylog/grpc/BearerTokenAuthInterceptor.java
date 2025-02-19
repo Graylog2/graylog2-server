@@ -19,12 +19,10 @@ package org.graylog.grpc;
 import io.grpc.Context;
 import io.grpc.Contexts;
 import io.grpc.Metadata;
-import io.grpc.MethodDescriptor;
 import io.grpc.ServerCall;
 import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
 import io.grpc.Status;
-import io.grpc.reflection.v1.ServerReflectionGrpc;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -33,7 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 public class BearerTokenAuthInterceptor implements ServerInterceptor {
 
     private final String staticToken;
-    private final MethodDescriptor<?, ?> reflectionMethod = ServerReflectionGrpc.getServerReflectionInfoMethod();
 
     public BearerTokenAuthInterceptor(String staticToken) {
         this.staticToken = staticToken;
@@ -41,12 +38,6 @@ public class BearerTokenAuthInterceptor implements ServerInterceptor {
 
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
-
-        // Don't enforce authentication for reflection calls
-        if (call.getMethodDescriptor().equals(reflectionMethod)) {
-            return Contexts.interceptCall(Context.current(), call, headers, next);
-        }
-
         final var authHeader = StringUtils.strip(
                 headers.get(Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER)));
 
