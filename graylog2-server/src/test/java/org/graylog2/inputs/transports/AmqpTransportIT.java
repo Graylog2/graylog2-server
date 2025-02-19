@@ -29,7 +29,6 @@ import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -111,7 +110,7 @@ class AmqpTransportIT {
         });
     }
 
-    private @NotNull MessageInput launchTransport(String queueName, boolean passiveQueue) throws MisfireException {
+    private MessageInput launchTransport(String queueName, boolean passiveQueue) throws MisfireException {
         final var configuration = new Configuration(Map.of(
                 AmqpTransport.CK_HOSTNAME, RABBITMQ.getHost(),
                 AmqpTransport.CK_PORT, RABBITMQ.getAmqpPort(),
@@ -139,7 +138,7 @@ class AmqpTransportIT {
         return input;
     }
 
-    private static @NotNull ConnectionFactory rabbitMQConnectionFactory() {
+    private static ConnectionFactory rabbitMQConnectionFactory() {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(RABBITMQ.getHost());
         factory.setPort(RABBITMQ.getAmqpPort());
