@@ -20,6 +20,7 @@ import isDeepEqual from 'stores/isDeepEqual';
 import generateId from 'logic/generateId';
 import type { FiltersType, SearchFilter } from 'views/types';
 import type { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
+import type { QueryString, ElasticsearchQueryString } from 'views/logic/queries/types';
 
 import type { SearchType } from './SearchType';
 
@@ -28,12 +29,12 @@ export type QueryId = string;
 export type FilterType = Immutable.Map<string, any>;
 
 export type SearchTypeList = Array<SearchType>;
-type InternalBuilderState = Immutable.Map<string, any>;
+type InternalBuilderState = Immutable.Map<keyof InternalState, any>;
 
 type InternalState = {
   id: QueryId;
-  query: any;
-  timerange: any;
+  query: QueryString;
+  timerange: TimeRange;
   filter?: FilterType;
   filters?: FiltersType;
   searchTypes: SearchTypeList;
@@ -41,16 +42,11 @@ type InternalState = {
 
 export type QueryJson = {
   id: QueryId;
-  query: any;
-  timerange: any;
-  filter?: { [key: string]: any };
+  query: QueryString;
+  timerange: TimeRange;
+  filter?: { [key: string]: unknown };
   filters?: Array<SearchFilter>;
-  search_types: any;
-};
-
-export type ElasticsearchQueryString = {
-  type: 'elasticsearch';
-  query_string: string;
+  search_types: SearchTypeList;
 };
 
 export const createElasticsearchQueryString = (query = ''): ElasticsearchQueryString => ({
@@ -110,7 +106,7 @@ export const newFiltersForQuery = (
   return filtersForQuery(streams) || categoryFiltersForQuery(categories);
 };
 
-export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | undefined): Immutable.Set<string> => {
+export const filtersToStreamSet = (filter: FilterType | null | undefined): Immutable.Set<string> => {
   if (!filter) {
     return Immutable.Set();
   }
@@ -126,9 +122,7 @@ export const filtersToStreamSet = (filter: Immutable.Map<string, any> | null | u
   return filters.map(filtersToStreamSet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
 };
 
-export const filtersToStreamCategorySet = (
-  filter: Immutable.Map<string, any> | null | undefined,
-): Immutable.Set<string> => {
+export const filtersToStreamCategorySet = (filter: FilterType | null | undefined): Immutable.Set<string> => {
   if (!filter) {
     return Immutable.Set();
   }
@@ -143,8 +137,6 @@ export const filtersToStreamCategorySet = (
 
   return filters.map(filtersToStreamCategorySet).reduce((prev, cur) => prev.merge(cur), Immutable.Set());
 };
-
-export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';
 
@@ -179,15 +171,15 @@ export type TimeRange = RelativeTimeRange | AbsoluteTimeRange | KeywordTimeRange
 
 export type NoTimeRangeOverride = typeof NO_TIMERANGE_OVERRIDE;
 
-const isNullish = (o: any) => o === null || o === undefined;
+const isNullish = (o: unknown) => o === null || o === undefined;
 
 export default class Query {
   private _value: InternalState;
 
   constructor(
     id: QueryId,
-    query: any,
-    timerange: any,
+    query: QueryString,
+    timerange: TimeRange,
     filter?: FilterType,
     searchTypes?: SearchTypeList,
     filters?: FiltersType,
@@ -233,7 +225,7 @@ export default class Query {
     return filter ? builder.filter(filter) : builder;
   }
 
-  equals(other: any): boolean {
+  equals(other: Query): boolean {
     if (other === undefined) {
       return false;
     }
@@ -324,7 +316,7 @@ class Builder {
   }
 
   build(): Query {
-    const { id, query, timerange, filter, filters, searchTypes } = this.value.toObject();
+    const { id, query, timerange, filter, filters, searchTypes } = this.value.toObject() as InternalState;
 
     return new Query(id, query, timerange, filter, searchTypes, filters);
   }

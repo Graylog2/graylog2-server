@@ -17,11 +17,12 @@
 import { Map, List } from 'immutable';
 import * as Immutable from 'immutable';
 
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { singleton } from 'logic/singleton';
 import generateId from 'logic/generateId';
 import isDeepEqual from 'stores/isDeepEqual';
 import type { FiltersType, SearchFilter } from 'views/types';
+import type { QueryString } from 'views/logic/queries/types';
 
 export type WidgetState = {
   id: string;
