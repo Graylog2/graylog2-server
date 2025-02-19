@@ -14,7 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 
 export const INPUT_SETUP_MODE_FEATURE_FLAG = 'setup_mode';
 
 export default INPUT_SETUP_MODE_FEATURE_FLAG;
+
+export const DEFAULT_ORDERED_STEPS = [
+  INPUT_WIZARD_STEPS.SETUP_ROUTING,
+  INPUT_WIZARD_STEPS.START_INPUT,
+  INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
+];

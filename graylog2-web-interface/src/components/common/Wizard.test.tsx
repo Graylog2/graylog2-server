@@ -33,14 +33,14 @@ describe('<Wizard />', () => {
   ];
 
   it('should render with 3 steps', async () => {
-    render(<Wizard steps={steps} />);
+    render(<Wizard onStepChange={jest.fn} steps={steps} />);
 
     await screen.findByText('Component1');
   });
 
   it('should render with 3 steps and children', async () => {
     render(
-      <Wizard steps={steps}>
+      <Wizard onStepChange={jest.fn} steps={steps}>
         <span>Preview</span>
       </Wizard>,
     );
@@ -49,14 +49,14 @@ describe('<Wizard />', () => {
   });
 
   it('should render in horizontal mode with 3 steps', async () => {
-    render(<Wizard steps={steps} horizontal />);
+    render(<Wizard onStepChange={jest.fn} steps={steps} horizontal />);
 
     await screen.findByText('Component1');
   });
 
   it('should render in horizontal mode with 3 steps and children', async () => {
     render(
-      <Wizard steps={steps} horizontal>
+      <Wizard onStepChange={jest.fn} steps={steps} horizontal>
         <span>Preview</span>
       </Wizard>,
     );
@@ -66,7 +66,7 @@ describe('<Wizard />', () => {
 
   describe('When used in an uncontrolled way', () => {
     it('should render step 1 when nothing was clicked', async () => {
-      render(<Wizard steps={steps} />);
+      render(<Wizard onStepChange={jest.fn} steps={steps} />);
 
       await screen.findByText('Component1');
 
@@ -78,7 +78,7 @@ describe('<Wizard />', () => {
     });
 
     it('should render step 2 when clicked on step 2', async () => {
-      render(<Wizard steps={steps} />);
+      render(<Wizard onStepChange={jest.fn} steps={steps} />);
 
       await screen.findByText('Title1');
       await userEvent.click(await screen.findByText('Title2'));
@@ -93,7 +93,7 @@ describe('<Wizard />', () => {
     });
 
     it('should render step 2 when clicked on next', async () => {
-      render(<Wizard steps={steps} />);
+      render(<Wizard onStepChange={jest.fn} steps={steps} />);
 
       await userEvent.click(await nextButton());
 
@@ -107,7 +107,7 @@ describe('<Wizard />', () => {
     });
 
     it('should render step 3 when two times clicked on next', async () => {
-      render(<Wizard steps={steps} />);
+      render(<Wizard onStepChange={jest.fn} steps={steps} />);
 
       await userEvent.click(await nextButton());
       await screen.findByText('Component2');
@@ -145,7 +145,7 @@ describe('<Wizard />', () => {
 
   describe('When used in a controlled way', () => {
     it('should render active step given from prop', async () => {
-      render(<Wizard steps={steps} activeStep="Key2" />);
+      render(<Wizard onStepChange={jest.fn} steps={steps} activeStep="Key2" />);
 
       await screen.findByText('Component2');
 
@@ -161,14 +161,14 @@ describe('<Wizard />', () => {
     });
 
     it('should change the active step when prop changes', async () => {
-      const { rerender } = render(<Wizard steps={steps} activeStep="Key2" />);
+      const { rerender } = render(<Wizard onStepChange={jest.fn} steps={steps} activeStep="Key2" />);
 
       await screen.findByText('Component2');
 
       expect(screen.queryByText('Component1')).not.toBeInTheDocument();
       expect(screen.queryByText('Component3')).not.toBeInTheDocument();
 
-      rerender(<Wizard steps={steps} activeStep="Key1" />);
+      rerender(<Wizard onStepChange={jest.fn} steps={steps} activeStep="Key1" />);
 
       await screen.findByText('Component1');
 
@@ -181,7 +181,7 @@ describe('<Wizard />', () => {
       const consoleWarn = console.warn;
 
       console.warn = jest.fn();
-      const { rerender } = render(<Wizard steps={steps} activeStep={0} />);
+      const { rerender } = render(<Wizard onStepChange={jest.fn} steps={steps} activeStep={0} />);
 
       await screen.findByText('Component1');
 
@@ -189,7 +189,7 @@ describe('<Wizard />', () => {
       expect(screen.queryByText('Component3')).not.toBeInTheDocument();
       expect(console.warn).toHaveBeenCalledTimes(1);
 
-      rerender(<Wizard steps={steps} activeStep="Key12314" />);
+      rerender(<Wizard onStepChange={jest.fn} steps={steps} activeStep="Key12314" />);
 
       await screen.findByText('Component1');
 
@@ -224,7 +224,7 @@ describe('<Wizard />', () => {
   it('should respect disabled flag for a step', async () => {
     steps[1].disabled = true;
     steps[2].disabled = true;
-    render(<Wizard steps={steps} />);
+    render(<Wizard onStepChange={jest.fn} steps={steps} />);
 
     await userEvent.click(await nextButton());
 
@@ -244,24 +244,24 @@ describe('<Wizard />', () => {
   });
 
   it('should render next/previous buttons by default', async () => {
-    const { rerender } = render(<Wizard steps={steps} />);
+    const { rerender } = render(<Wizard onStepChange={jest.fn} steps={steps} />);
 
     expect(await nextButton()).toBeInTheDocument();
     expect(await previousButton()).toBeInTheDocument();
 
-    rerender(<Wizard steps={steps} horizontal />);
+    rerender(<Wizard onStepChange={jest.fn} steps={steps} horizontal />);
 
     expect(screen.getByLabelText('Next')).toBeInTheDocument();
     expect(screen.getByLabelText('Previous')).toBeInTheDocument();
   });
 
   it('should hide next/previous buttons if hidePreviousNextButtons is set', async () => {
-    const { rerender } = render(<Wizard steps={steps} hidePreviousNextButtons />);
+    const { rerender } = render(<Wizard onStepChange={jest.fn} steps={steps} hidePreviousNextButtons />);
 
     expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Previous' })).not.toBeInTheDocument();
 
-    rerender(<Wizard steps={steps} horizontal hidePreviousNextButtons />);
+    rerender(<Wizard onStepChange={jest.fn} steps={steps} horizontal hidePreviousNextButtons />);
 
     expect(screen.queryByLabelText('Next')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Previous')).not.toBeInTheDocument();

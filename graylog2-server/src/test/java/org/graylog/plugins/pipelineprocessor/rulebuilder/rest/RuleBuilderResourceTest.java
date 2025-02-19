@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderServi
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,7 +67,7 @@ public class RuleBuilderResourceTest {
     public void ruleParsedAndStoredByRuleResource() {
         when(ruleBuilderService.generateRuleSource(any(), any(RuleBuilder.class), anyBoolean()))
                 .thenReturn("rulesource");
-        when(ruleResource.createFromParser(any())).thenReturn(RuleSource.builder().id("new_id").source("rulesource").build());
+        when(ruleResource.createFromParser(any())).thenReturn(RuleSource.builder().id("new_id").scope(DefaultEntityScope.NAME).source("rulesource").build());
         RuleBuilder ruleBuilder = RuleBuilder.builder().build();
         when(ruleBuilderService.generateTitles(any())).thenReturn(ruleBuilder);
         RuleBuilderDto toSave = RuleBuilderDto.builder()
@@ -83,7 +84,7 @@ public class RuleBuilderResourceTest {
         when(ruleBuilderService.generateRuleSource(any(), any(RuleBuilder.class), anyBoolean()))
                 .thenReturn("rulesource");
         final String updatedId = "updated_id";
-        when(ruleResource.update(eq(updatedId), any(RuleSource.class))).thenReturn(RuleSource.builder().id(updatedId).source("rulesource").build());
+        when(ruleResource.update(eq(updatedId), any(RuleSource.class))).thenReturn(RuleSource.builder().id(updatedId).scope(DefaultEntityScope.NAME).source("rulesource").build());
         RuleBuilder ruleBuilder = RuleBuilder.builder().build();
         when(ruleBuilderService.generateTitles(any())).thenReturn(ruleBuilder);
         RuleBuilderDto toSave = RuleBuilderDto.builder()

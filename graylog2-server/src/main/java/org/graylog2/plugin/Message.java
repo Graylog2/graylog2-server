@@ -19,6 +19,7 @@ package org.graylog2.plugin;
 import com.codahale.metrics.Meter;
 import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -519,9 +520,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         }
     }
 
-    private void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
-        addField(FIELD_TIMESTAMP, newTimeStamp);
-        addField(FIELD_GL2_ORIGINAL_TIMESTAMP, oldTimeStamp);
+    @VisibleForTesting
+    public void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
+        addTimestampField(FIELD_TIMESTAMP, newTimeStamp);
+        addTimestampField(FIELD_GL2_ORIGINAL_TIMESTAMP, oldTimeStamp);
     }
 
     private DateTime convertToDateTime(@Nonnull Object value) {
@@ -598,6 +600,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     public void addField(final String key, final Object value) {
         addField(key, value, false);
+    }
+
+    private void addTimestampField(final String key, final DateTime value) {
+        addField(key, buildElasticSearchTimeFormat(value.withZone(UTC)), false);
     }
 
     private void addRequiredField(final String key, final Object value) {
@@ -909,7 +915,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public void setReceiveTime(DateTime receiveTime) {
         if (receiveTime != null) {
             this.receiveTime = receiveTime;
-            addField(FIELD_GL2_RECEIVE_TIMESTAMP, buildElasticSearchTimeFormat(receiveTime.withZone(UTC)));
+            addTimestampField(FIELD_GL2_RECEIVE_TIMESTAMP, receiveTime);
         }
     }
 
@@ -928,7 +934,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public void setProcessingTime(DateTime processingTime) {
         if (processingTime != null) {
             this.processingTime = processingTime;
-            addField(FIELD_GL2_PROCESSING_TIMESTAMP, buildElasticSearchTimeFormat(processingTime.withZone(UTC)));
+            addTimestampField(FIELD_GL2_PROCESSING_TIMESTAMP, processingTime);
             if (getReceiveTime() != null) {
                 final long duration = processingTime.getMillis() - getReceiveTime().getMillis();
                 addField(FIELD_GL2_PROCESSING_DURATION_MS, Ints.saturatedCast(duration));
