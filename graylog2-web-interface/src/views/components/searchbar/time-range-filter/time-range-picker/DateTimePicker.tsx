@@ -14,7 +14,20 @@ const ErrorMessage = styled.span(
   `,
 );
 
+const Overlay = styled.div`
+  opacity: 0.1;
+`;
+const Disabled = ({ disabled, children = undefined }: React.PropsWithChildren<{ disabled: boolean }>) =>
+  disabled ? (
+    <Overlay>
+      <div inert="">{children}</div>
+    </Overlay>
+  ) : (
+    children
+  );
+
 type Props = {
+  disabled?: boolean;
   error: string;
   onChange: (newValue: string) => void;
   startDate?: Date;
@@ -22,11 +35,20 @@ type Props = {
   range?: string;
 };
 
-const DateTimePicker = ({ error, onChange, startDate = undefined, value, range = 'Range' }: Props) => (
+const DateTimePicker = ({
+  disabled = false,
+  error,
+  onChange,
+  startDate = undefined,
+  value,
+  range = 'Range',
+}: Props) => (
   <>
-    <AbsoluteDatePicker onChange={onChange} startDate={startDate} dateTime={value} />
+    <Disabled disabled={disabled}>
+      <AbsoluteDatePicker onChange={onChange} startDate={startDate} dateTime={value} />
 
-    <AbsoluteTimeInput onChange={onChange} range={range} dateTime={value} />
+      <AbsoluteTimeInput onChange={onChange} range={range} dateTime={value} />
+    </Disabled>
 
     <ErrorMessage>{error}</ErrorMessage>
   </>

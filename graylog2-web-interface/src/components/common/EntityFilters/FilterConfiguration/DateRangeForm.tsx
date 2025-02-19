@@ -136,16 +136,17 @@ const Picker = ({ name }: PickerProps) => {
   );
   const onChangeAllTime = () => _onChange(value ? undefined : formatTime(new Date(), 'complete'));
   const checkboxLabel = name === 'from' ? 'All Time' : 'Now';
+  const isChecked = !value;
 
   return (
     <PickerWrap>
       <SectionHeader>
         <StyledLabel htmlFor={`date-input-${name}`}>{label}</StyledLabel>
-        <StyledCheckbox onChange={onChangeAllTime} checked={!value}>
+        <StyledCheckbox onChange={onChangeAllTime} checked={isChecked}>
           {checkboxLabel}
         </StyledCheckbox>
       </SectionHeader>
-      <DateTimePicker error={meta.error} onChange={_onChange} value={value} range={label} />
+      <DateTimePicker disabled={isChecked} error={meta.error} onChange={_onChange} value={value} range={label} />
     </PickerWrap>
   );
 };
