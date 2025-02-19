@@ -198,7 +198,7 @@ public class AmqpConsumer {
         }
     }
 
-    public void connect() throws IOException, TimeoutException {
+    private void connect() throws IOException, TimeoutException {
         if (connection == null) {
             establishConnection();
         }
