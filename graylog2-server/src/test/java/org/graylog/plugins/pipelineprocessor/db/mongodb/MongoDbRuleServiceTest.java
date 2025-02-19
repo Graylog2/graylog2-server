@@ -18,9 +18,12 @@ package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
 import org.bson.types.ObjectId;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +34,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MongoDBExtension.class)
@@ -40,11 +45,13 @@ class MongoDbRuleServiceTest {
     @Mock
     ClusterEventBus clusterEventBus;
 
+    EntityScopeService entityScopeService;
     MongoDbRuleService ruleService;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        ruleService = new MongoDbRuleService(mongoCollections, clusterEventBus);
+        entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new SystemPipelineRuleScope()));
+        ruleService = new MongoDbRuleService(mongoCollections, clusterEventBus, entityScopeService);
     }
 
     @Test
@@ -52,7 +59,15 @@ class MongoDbRuleServiceTest {
         final var rule = dummyRule();
         final var savedRule = ruleService.save(rule);
         assertThat(ruleService.load(savedRule.id())).isEqualTo(rule.toBuilder().id(savedRule.id()).build());
-        verify(clusterEventBus).post(eq(RulesChangedEvent.updatedRuleId(savedRule.id())));
+        verify(clusterEventBus).post(RulesChangedEvent.updatedRuleId(savedRule.id()));
+    }
+
+    @Test
+    void createSystemRuleSucceeds() throws Exception {
+        final var rule = systemRule();
+        final var savedRule = ruleService.save(rule);
+        assertThat(ruleService.load(savedRule.id())).isEqualTo(rule.toBuilder().id(savedRule.id()).build());
+        verify(clusterEventBus).post(RulesChangedEvent.updatedRuleId(savedRule.id()));
     }
 
     @Test
@@ -60,7 +75,16 @@ class MongoDbRuleServiceTest {
         final var rule = dummyRule().toBuilder().id(new ObjectId().toHexString()).build();
         final var savedRule = ruleService.save(rule);
         assertThat(ruleService.load(savedRule.id())).isEqualTo(rule);
-        verify(clusterEventBus).post(eq(RulesChangedEvent.updatedRuleId(savedRule.id())));
+        verify(clusterEventBus).post(RulesChangedEvent.updatedRuleId(savedRule.id()));
+    }
+
+    @Test
+    void updateSystemRuleThrows() {
+        final var rule = systemRule().toBuilder().id(new ObjectId().toHexString()).build();
+        assertThatThrownBy(() -> ruleService.save(rule))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Immutable entity cannot be modified");
+        verify(clusterEventBus, times(0)).post(any());
     }
 
     @Test
@@ -85,7 +109,16 @@ class MongoDbRuleServiceTest {
         assertThat(ruleService.loadAll()).hasSize(1);
         ruleService.delete(rule.id());
         assertThat(ruleService.loadAll()).hasSize(0);
-        verify(clusterEventBus).post(eq(RulesChangedEvent.deletedRuleId(rule.id())));
+        verify(clusterEventBus).post(RulesChangedEvent.deletedRuleId(rule.id()));
+    }
+
+    @Test
+    void deleteSystemRuleSucceeds() {
+        final var rule = ruleService.save(systemRule().toBuilder().title("title 2").build());
+        assertThat(ruleService.loadAll()).hasSize(1);
+        ruleService.delete(rule.id());
+        assertThat(ruleService.loadAll()).hasSize(0);
+        verify(clusterEventBus).post(RulesChangedEvent.deletedRuleId(rule.id()));
     }
 
     @Test
@@ -100,6 +133,10 @@ class MongoDbRuleServiceTest {
 
     private static RuleDao dummyRule() {
         return RuleDao.builder().title("a title").source("a source").build();
+    }
+
+    private static RuleDao systemRule() {
+        return RuleDao.builder().scope(SystemPipelineRuleScope.NAME).title("a sysytem rule").source("a source").build();
     }
 
 }
