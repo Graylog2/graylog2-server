@@ -265,6 +265,7 @@ public class AmqpConsumer {
             factory.setUsername(username);
             factory.setPassword(encryptedValueService.decrypt(password));
         }
+        // include hashCode() to identify multiple consumers from the same input
         connection = factory.newConnection(f("graylog-node-%s-input%s-%s", nodeId.getNodeId(), sourceInput.toIdentifier(), hashCode()));
         connection.addShutdownListener(cause -> {
             if (cause.isInitiatedByApplication()) {
