@@ -28,6 +28,8 @@ import { execute, setSearchTypesToSearch } from 'views/logic/slices/searchExecut
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import useView from 'views/hooks/useView';
+import useAppSelector from 'stores/useAppSelector';
+import { selectSearchTypesToSearch } from 'views/logic/slices/searchExecutionSelectors';
 
 import type { FocusContextState } from './WidgetFocusContext';
 import WidgetFocusContext from './WidgetFocusContext';
@@ -89,6 +91,7 @@ const emptyFocusContext: FocusContextState = {
 const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocusedWidget, widgetIds }: SyncStateArgs) => {
   const dispatch = useAppDispatch();
   const { widgetMapping } = useView();
+  const searchTypesToSearch = useAppSelector(selectSearchTypesToSearch);
 
   useEffect(() => {
     const nextFocusedWidget = {
@@ -104,11 +107,25 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
 
       setFocusedWidget(nextFocusedWidget);
       const searchTypeIds = widgetMapping.get(nextFocusedWidget.id);
-      dispatch(setSearchTypesToSearch(searchTypeIds.toArray()));
 
+      dispatch(setSearchTypesToSearch(searchTypeIds?.toArray()));
       dispatch(execute());
     }
   }, [focusedWidget, setFocusedWidget, widgetIds, focusUriParams, dispatch, widgetMapping]);
+
+  useEffect(() => {
+    if (focusedWidget) {
+      const searchTypeIds = widgetMapping.get(focusedWidget.id)?.toArray() ?? [];
+      const searchTypesToSearchIsUpToDate =
+        searchTypeIds.length === 0 ||
+        !searchTypesToSearch ||
+        searchTypesToSearch.length === 0 ||
+        searchTypeIds.every((id) => searchTypesToSearch?.includes(id));
+      if (!searchTypesToSearchIsUpToDate) {
+        dispatch(setSearchTypesToSearch(searchTypeIds));
+      }
+    }
+  }, [dispatch, focusedWidget, searchTypesToSearch, widgetMapping]);
 };
 
 type CleanupArgs = {

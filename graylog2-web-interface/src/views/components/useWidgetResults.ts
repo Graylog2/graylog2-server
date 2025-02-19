@@ -74,7 +74,6 @@ const selectWidgetResults = (widgetId: string, widgetMapping: WidgetMapping) =>
     selectWidget(widgetId),
     (searchExecutionResult, currentQueryId, widget) => {
       const { result } = searchExecutionResult ?? {};
-      console.log('widgetMapping1', widgetMapping);
       const currentQueryResults = result?.results?.[currentQueryId];
       const currentQueryErrors = result?.errors;
 
