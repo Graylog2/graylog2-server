@@ -17,6 +17,7 @@
 package org.graylog2.bootstrap.preflight;
 
 import jakarta.inject.Inject;
+import org.graylog2.Configuration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -33,16 +34,14 @@ import java.util.Optional;
  */
 public class PasswordSecretPreflightCheck implements PreflightCheck {
 
-
-    private static final String KNOWN_VALUE = "graylog";
-
+    private final Configuration configuration;
     private final ClusterConfigService clusterConfigService;
-
     private final EncryptedValueService encryptionService;
 
 
     @Inject
-    public PasswordSecretPreflightCheck(ClusterConfigService clusterConfigService, EncryptedValueService encryptionService) {
+    public PasswordSecretPreflightCheck(Configuration configuration, ClusterConfigService clusterConfigService, EncryptedValueService encryptionService) {
+        this.configuration = configuration;
         this.clusterConfigService = clusterConfigService;
         this.encryptionService = encryptionService;
     }
@@ -50,12 +49,11 @@ public class PasswordSecretPreflightCheck implements PreflightCheck {
     @Override
     public void runCheck() throws PreflightCheckException {
         final PreflightEncryptedSecret encryptedValue = clusterConfigService.get(PreflightEncryptedSecret.class);
-        Optional.ofNullable(encryptedValue)
-                .ifPresentOrElse(this::validateSecret, this::persistSecret);
+        Optional.ofNullable(encryptedValue).ifPresentOrElse(this::validateSecret, this::persistSecret);
     }
 
     private void persistSecret() {
-        final EncryptedValue encryptedValue = encryptionService.encrypt(KNOWN_VALUE);
+        final EncryptedValue encryptedValue = encryptionService.encrypt(configuration.getPasswordSecret());
         clusterConfigService.write(new PreflightEncryptedSecret(encryptedValue));
     }
 
@@ -64,7 +62,7 @@ public class PasswordSecretPreflightCheck implements PreflightCheck {
 
         try {
             final String decrypted = encryptionService.decrypt(encryptedSecret);
-            if (!KNOWN_VALUE.equals(decrypted)) {
+            if (!configuration.getPasswordSecret().equals(decrypted)) {
                 throwException();
             }
         } catch (Exception e) {

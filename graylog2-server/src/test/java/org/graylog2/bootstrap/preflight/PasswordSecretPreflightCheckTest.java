@@ -21,9 +21,11 @@ import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog.security.certutil.InMemoryClusterConfigService;
+import org.graylog2.Configuration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class PasswordSecretPreflightCheckTest {
 
@@ -56,9 +58,9 @@ class PasswordSecretPreflightCheckTest {
         createCheckInstance(randomStringUtils.nextAlphanumeric(20), clusterConfigService).runCheck();
 
         Assertions.assertThatThrownBy(() -> {
-            // now repeat the check, but with different password. Should fail
-            createCheckInstance(randomStringUtils.nextAlphanumeric(20), clusterConfigService).runCheck();
-        })
+                    // now repeat the check, but with different password. Should fail
+                    createCheckInstance(randomStringUtils.nextAlphanumeric(20), clusterConfigService).runCheck();
+                })
                 .isInstanceOf(PreflightCheckException.class)
                 .hasMessageContaining("Invalid password_secret");
 
@@ -67,6 +69,8 @@ class PasswordSecretPreflightCheckTest {
     @Nonnull
     private static PasswordSecretPreflightCheck createCheckInstance(String passwordSecret, ClusterConfigService clusterConfigService) {
         final EncryptedValueService encryptionService = new EncryptedValueService(passwordSecret);
-        return new PasswordSecretPreflightCheck(clusterConfigService, encryptionService);
+        final Configuration configuration = Mockito.mock(Configuration.class);
+        Mockito.when(configuration.getPasswordSecret()).thenReturn(passwordSecret);
+        return new PasswordSecretPreflightCheck(configuration, clusterConfigService, encryptionService);
     }
 }
