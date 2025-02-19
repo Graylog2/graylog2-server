@@ -34,7 +34,10 @@ public abstract class UserConfiguration {
 
     //Starting with graylog version 6.2, external users are not allowed to own access tokens by default.
     // Before this version, it is allowed, to not introduce a breaking change:
-    public static final UserConfiguration DEFAULT_VALUES = create(false, Duration.of(8, ChronoUnit.HOURS), IS_BEFORE_VERSION_6_2);
+    // Similarly, starting from version 6.2, creation of tokens is restricted to admins only:
+    public static final UserConfiguration DEFAULT_VALUES = create(false, Duration.of(8, ChronoUnit.HOURS), IS_BEFORE_VERSION_6_2, !IS_BEFORE_VERSION_6_2);
+    //In case the installation is upgraded, we apply some less strict defaults:
+    public static final UserConfiguration DEFAULT_VALUES_FOR_UPGRADE = create(false, Duration.of(8, ChronoUnit.HOURS), IS_BEFORE_VERSION_6_2, false);
 
     @JsonProperty("enable_global_session_timeout")
     public abstract boolean enableGlobalSessionTimeout();
@@ -45,11 +48,15 @@ public abstract class UserConfiguration {
     @JsonProperty("allow_access_token_for_external_user")
     public abstract boolean allowAccessTokenForExternalUsers();
 
+    @JsonProperty("restrict_access_token_to_admins")
+    public abstract boolean restrictAccessTokenToAdmins();
+
     @JsonCreator
     public static UserConfiguration create(
             @JsonProperty("enable_global_session_timeout") boolean enableGlobalSessionTimeout,
             @JsonProperty("global_session_timeout_interval") Duration globalSessionTimeoutInterval,
-            @JsonProperty("allow_access_token_for_external_user") boolean allowAccessTokenForExternalUsers) {
-        return new AutoValue_UserConfiguration(enableGlobalSessionTimeout, globalSessionTimeoutInterval, allowAccessTokenForExternalUsers);
+            @JsonProperty("allow_access_token_for_external_user") boolean allowAccessTokenForExternalUsers,
+            @JsonProperty("restrict_access_token_to_admins") boolean restrictAccessTokensToAdmins) {
+        return new AutoValue_UserConfiguration(enableGlobalSessionTimeout, globalSessionTimeoutInterval, allowAccessTokenForExternalUsers, restrictAccessTokensToAdmins);
     }
 }
