@@ -38,7 +38,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -160,9 +159,11 @@ public class SearchJobStateServiceTest {
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build());
 
-        assertFalse(toTest.resetLatestForUser("jose")); //no active query for Jose
+        assertTrue(toTest.resetLatestForUser("jose").isEmpty()); //no active query for Jose
 
-        assertTrue(toTest.resetLatestForUser("john"));
+        final Optional<SearchJobState> previousState = toTest.resetLatestForUser("john");
+        assertTrue(previousState.isPresent());
+        assertEquals(savedSearchJobState, previousState.get());
         final Optional<SearchJobState> latestForJohn = toTest.getLatestForUser("john");
         assertTrue(latestForJohn.isPresent());
         assertEquals(SearchJobStatus.RESET, latestForJohn.get().status());

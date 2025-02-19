@@ -72,17 +72,24 @@ public class SearchJobStateService {
         );
     }
 
-    public boolean resetLatestForUser(final String user) {
-        return getLatestForUser(user).map(activeQuerySearchJobState ->
-                        update(
-                                activeQuerySearchJobState.toBuilder()
-                                        .status(SearchJobStatus.RESET)
-                                        .result(null)
-                                        .errors(Set.of())
-                                        .build()
-                        )
-                )
-                .orElse(false);
+    /**
+     * Reset latest/active search job for a given user.
+     *
+     * @param user Current user
+     * @return {@link Optional<SearchJobState>} object representing state of latest/active search job before the reset.
+     */
+    public Optional<SearchJobState> resetLatestForUser(final String user) {
+        return getLatestForUser(user).map(activeQuerySearchJobState -> {
+                    update(
+                            activeQuerySearchJobState.toBuilder()
+                                    .status(SearchJobStatus.RESET)
+                                    .result(null)
+                                    .errors(Set.of())
+                                    .build()
+                    );
+                    return activeQuerySearchJobState;
+                }
+        );
     }
 
     public boolean delete(final String id) {
