@@ -34,7 +34,13 @@ public interface PipelineService {
 
     PipelineDao loadByName(String name) throws NotFoundException;
 
-    Collection<PipelineDao> loadByInputId(String inputId);
+    /**
+     * Returns all pipelines with given source pattern.
+     * This method is only implemented in the MongoDB implementation.
+     */
+    default Collection<PipelineDao> loadBySourcePattern(String sourcePattern) {
+        throw new UnsupportedOperationException("loadBySourcePattern is not implemented");
+    }
 
     Collection<PipelineDao> loadAll();
 

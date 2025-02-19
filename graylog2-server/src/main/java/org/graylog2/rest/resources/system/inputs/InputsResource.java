@@ -183,7 +183,7 @@ public class InputsResource extends AbstractInputsResource {
                         .distinct()
                         .map(streamId -> new InputReference(streamId, streamService.streamTitleFromCache(streamId)))
                         .toList(),
-                pipelineService.loadByInputId(inputId).stream()
+                pipelineService.loadBySourcePattern(inputId).stream()
                         .filter(pipelineDao -> !pipelineStreamConnectionsService.loadByPipelineId(pipelineDao.id()).isEmpty())
                         .map(pipelineDao -> new InputReference(pipelineDao.id(), pipelineDao.title()))
                         .toList());

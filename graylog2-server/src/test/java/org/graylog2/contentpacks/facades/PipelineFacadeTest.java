@@ -33,6 +33,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.SystemPipelineScope;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -108,7 +109,7 @@ public class PipelineFacadeTest {
 
         final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection());
-        pipelineService = new MongoDbPipelineService(mongoCollections, entityScopeService, clusterEventBus);
+        pipelineService = new MongoDbPipelineService(mongoCollections, entityScopeService, clusterEventBus, mock(MongoDbRuleService.class));
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoCollections, clusterEventBus);
 
         facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService, streamService);
