@@ -24,7 +24,6 @@ import org.graylog.plugins.otel.input.OTelJournal;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
@@ -38,15 +37,14 @@ import java.util.Optional;
 
 public class OTelCodec implements Codec {
     public static final String NAME = "OpenTelemetry";
-    private static final String CK_ADD_OTEL_PREFIX = "add_otel_prefix";
 
     private final Configuration configuration;
     private final OTelLogsCodec logsCodec;
 
     @Inject
-    public OTelCodec(@Assisted Configuration configuration, OTelLogsCodec.Factory logsCodecFactory) {
+    public OTelCodec(@Assisted Configuration configuration, OTelLogsCodec logsCodec) {
         this.configuration = configuration;
-        this.logsCodec = logsCodecFactory.create(configuration.getBoolean(CK_ADD_OTEL_PREFIX, true));
+        this.logsCodec = logsCodec;
     }
 
     @FactoryClass
@@ -69,13 +67,6 @@ public class OTelCodec implements Codec {
             // Keep only source override config. Charset override is not being used.
             final ConfigurationRequest cr = new ConfigurationRequest();
             cr.addField(super.getRequestedConfiguration().getField(CK_OVERRIDE_SOURCE));
-
-            cr.addField(new BooleanField(
-                    CK_ADD_OTEL_PREFIX,
-                    "Add \"otel\" field name prefix.",
-                    true,
-                    "Prefix each field with \"otel_\", e. g. \"trace_id\" -> \"otel_trace_id\"."
-            ));
 
             return cr;
         }

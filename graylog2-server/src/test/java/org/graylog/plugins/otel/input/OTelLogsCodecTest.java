@@ -22,7 +22,6 @@ import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import org.graylog.plugins.otel.input.codec.OTelLogsCodec;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -38,7 +37,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +52,7 @@ class OTelLogsCodecTest {
 
     @BeforeEach
     void setUp() {
-        codec = new OTelLogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get(), false);
+        codec = new OTelLogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get());
     }
 
     // Uses a modified official example that was copied from
@@ -71,39 +69,25 @@ class OTelLogsCodecTest {
         final Map<String, Object> expected = new HashMap<>();
         expected.put("message", "Example log record");
         expected.put("timestamp", DateTime.parse("2018-12-13T14:51:00.300Z"));
-        expected.put("time_unix_nano", 1544712660300000000L);
-        expected.put("observed_time_unix_nano", 1544712660300000000L);
-        expected.put("severity_number", 10);
-        expected.put("trace_id", "5b8efff798038103d269b633813fc60c");
-        expected.put("span_id", "eee19b7ec3c1b174");
-        expected.put("severity_text", "Information");
-        expected.put("scope_name", "my.library");
-        expected.put("scope_version", "1.0.0");
-        expected.put("scope_attributes_my_scope_attribute", "some scope attribute");
-        expected.put("attributes_string_attribute", "some string");
-        expected.put("attributes_boolean_attribute", true);
-        expected.put("attributes_int_attribute", 10L);
-        expected.put("attributes_double_attribute", 637.704);
-        expected.put("attributes_array_attribute", List.of("many", "values"));
-        expected.put("attributes_map_attribute_some_map_key", "some value");
-        expected.put("resource_attributes_service_name", "my.service");
+        expected.put("source", "127.0.0.1");
+        expected.put("otel_time_unix_nano", 1544712660300000000L);
+        expected.put("otel_observed_time_unix_nano", 1544712660300000000L);
+        expected.put("otel_severity_number", 10);
+        expected.put("otel_trace_id", "5b8efff798038103d269b633813fc60c");
+        expected.put("otel_span_id", "eee19b7ec3c1b174");
+        expected.put("otel_severity_text", "Information");
+        expected.put("otel_scope_name", "my.library");
+        expected.put("otel_scope_version", "1.0.0");
+        expected.put("otel_scope_attributes_my_scope_attribute", "some scope attribute");
+        expected.put("otel_attributes_string_attribute", "some string");
+        expected.put("otel_attributes_boolean_attribute", true);
+        expected.put("otel_attributes_int_attribute", 10L);
+        expected.put("otel_attributes_double_attribute", 637.704);
+        expected.put("otel_attributes_array_attribute", List.of("many", "values"));
+        expected.put("otel_attributes_map_attribute_some_map_key", "some value");
+        expected.put("otel_resource_attributes_service_name", "my.service");
 
         assertThat(message.getFields()).containsAllEntriesOf(expected);
-        assertThat(message.getSource()).isEqualTo("127.0.0.1");
-    }
-
-    @Test
-    void prefixesFieldNames() throws IOException {
-        final var prefixingCodec = new OTelLogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get(), true);
-        final var decoded = prefixingCodec.decode(parseFixture("logs.json"), new DateTime(DateTimeZone.UTC), remoteAddress);
-        assertThat(decoded).isNotEmpty();
-
-        final var coreFields = Set.of(Message.FIELD_ID, Message.FIELD_MESSAGE, Message.FIELD_SOURCE, Message.FIELD_TIMESTAMP);
-
-        assertThat(decoded.get().getFieldNames())
-                .containsAll(coreFields)
-                .filteredOn(name -> !coreFields.contains(name))
-                .allSatisfy(name -> assertThat(name).startsWith("otel_"));
     }
 
     @Test
@@ -112,7 +96,7 @@ class OTelLogsCodecTest {
         assertThat(decoded).isNotEmpty();
         final var message = decoded.get();
 
-        assertThat(message.getFieldAs(String.class, "attributes_array_attribute")).isNotNull()
+        assertThat(message.getFieldAs(String.class, "otel_attributes_array_attribute")).isNotNull()
                 .satisfies(value -> {
                     final var parsed = objectMapper.readValue(value, List.class);
                     assertThat(parsed).isEqualTo(List.of(Map.of("some.map.key", List.of("many", "values"))));
@@ -126,9 +110,9 @@ class OTelLogsCodecTest {
         final var message = decoded.get();
 
         assertThat(message.getFields())
-                .containsEntry("resource_attributes_host_name", "example.com")
-                .containsEntry("resource_attributes_service_name", "my.service")
-                .containsEntry("resource_attributes_map_attribute_some_map_key", "some value");
+                .containsEntry("otel_resource_attributes_host_name", "example.com")
+                .containsEntry("otel_resource_attributes_service_name", "my.service")
+                .containsEntry("otel_resource_attributes_map_attribute_some_map_key", "some value");
         assertThat(message.getFieldAs(String.class, "message")).isEqualTo(message.getMessage()).isNotNull()
                 .satisfies(value -> {
                     final var parsed = objectMapper.readValue(value, List.class);
@@ -142,13 +126,13 @@ class OTelLogsCodecTest {
         assertThat(decoded).isNotEmpty();
         final var message = decoded.get();
 
-        assertThat(message.getFields()).containsEntry("attributes_string_array", List.of("a", "b", "c"));
-        assertThat(message.getFields()).containsEntry("attributes_bool_array", List.of(true, false, true));
-        assertThat(message.getFields()).containsEntry("attributes_int_array", List.of(1L, 2L, 3L));
-        assertThat(message.getFields()).containsEntry("attributes_double_array", List.of(1.1, 2.2, 3.3));
-        assertThat(message.getFields()).containsEntry("attributes_bytes_array", List.of("AQID", "BAUG", "BwgJ"));
+        assertThat(message.getFields()).containsEntry("otel_attributes_string_array", List.of("a", "b", "c"));
+        assertThat(message.getFields()).containsEntry("otel_attributes_bool_array", List.of(true, false, true));
+        assertThat(message.getFields()).containsEntry("otel_attributes_int_array", List.of(1L, 2L, 3L));
+        assertThat(message.getFields()).containsEntry("otel_attributes_double_array", List.of(1.1, 2.2, 3.3));
+        assertThat(message.getFields()).containsEntry("otel_attributes_bytes_array", List.of("AQID", "BAUG", "BwgJ"));
 
-        assertThat(message.getFieldAs(String.class, "attributes_array_array"))
+        assertThat(message.getFieldAs(String.class, "otel_attributes_array_array"))
                 .satisfies(value -> {
                     final var parsed = objectMapper.readValue(value, new TypeReference<List<List<String>>>() {});
                     assertThat(parsed).satisfiesExactly(
@@ -156,7 +140,7 @@ class OTelLogsCodecTest {
                             e -> assertThat(e).isEqualTo(List.of("ba", "bb"))
                     );
                 });
-        assertThat(message.getFieldAs(String.class, "attributes_map_array"))
+        assertThat(message.getFieldAs(String.class, "otel_attributes_map_array"))
                 .satisfies(value -> {
                     final var parsed = objectMapper.readValue(value, new TypeReference<List<Map<String, Object>>>() {});
                     assertThat(parsed).satisfiesExactly(
@@ -165,10 +149,10 @@ class OTelLogsCodecTest {
                     );
                 });
 
-        assertThat(message.getFields()).extracting("attributes_mixed_primitives_array", as(LIST))
+        assertThat(message.getFields()).extracting("otel_attributes_mixed_primitives_array", as(LIST))
                 .isEqualTo(List.of("a", "true", "1", "1.1", "AQID"));
 
-        assertThat(message.getFieldAs(String.class, "attributes_mixed_complex_array"))
+        assertThat(message.getFieldAs(String.class, "otel_attributes_mixed_complex_array"))
                 .satisfies(value -> {
                     final var parsed = objectMapper.readValue(value, List.class);
                     assertThat(parsed).isEqualTo(List.of("a", List.of("a", "b")));

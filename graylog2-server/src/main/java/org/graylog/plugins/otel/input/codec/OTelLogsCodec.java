@@ -19,8 +19,6 @@ package org.graylog.plugins.otel.input.codec;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.InetAddresses;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.ArrayValue;
 import io.opentelemetry.proto.common.v1.InstrumentationScope;
@@ -28,6 +26,7 @@ import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.common.v1.KeyValueList;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import org.apache.commons.codec.binary.Hex;
 import org.graylog.plugins.otel.input.OTelJournal;
 import org.graylog2.plugin.Message;
@@ -55,17 +54,11 @@ public class OTelLogsCodec {
     private static final Logger LOG = getLogger(OTelLogsCodec.class);
     private final MessageFactory messageFactory;
     private final ObjectMapper objectMapper;
-    private final boolean addOtelPrefix;
 
-    public interface Factory {
-        OTelLogsCodec create(boolean addOtelPrefix);
-    }
-
-    @AssistedInject
-    public OTelLogsCodec(MessageFactory messageFactory, ObjectMapper objectMapper, @Assisted boolean addOtelPrefix) {
+    @Inject
+    public OTelLogsCodec(MessageFactory messageFactory, ObjectMapper objectMapper) {
         this.messageFactory = messageFactory;
         this.objectMapper = objectMapper;
-        this.addOtelPrefix = addOtelPrefix;
     }
 
     public Optional<Message> decode(@Nonnull OTelJournal.Log log, DateTime receiveTimestamp, ResolvableInetSocketAddress remoteAddress) {
@@ -77,33 +70,26 @@ public class OTelLogsCodec {
 
         final Message message = messageFactory.createMessage(body, source, timestamp);
 
-        message.addField(prefixed("trace_id"), Hex.encodeHexString(logRecord.getTraceId().toByteArray()));
-        message.addField(prefixed("span_id"), Hex.encodeHexString(logRecord.getSpanId().toByteArray()));
-        message.addField(prefixed("flags"), logRecord.getFlags());
-        message.addField(prefixed("severity_text"), logRecord.getSeverityText());
-        message.addField(prefixed("severity_number"), logRecord.getSeverityNumberValue());
+        message.addField("otel_trace_id", Hex.encodeHexString(logRecord.getTraceId().toByteArray()));
+        message.addField("otel_span_id", Hex.encodeHexString(logRecord.getSpanId().toByteArray()));
+        message.addField("otel_flags", logRecord.getFlags());
+        message.addField("otel_severity_text", logRecord.getSeverityText());
+        message.addField("otel_severity_number", logRecord.getSeverityNumberValue());
 
         if (logRecord.getTimeUnixNano() > 0) {
-            message.addField(prefixed("time_unix_nano"), logRecord.getTimeUnixNano());
+            message.addField("otel_time_unix_nano", logRecord.getTimeUnixNano());
         }
         if (logRecord.getObservedTimeUnixNano() > 0) {
-            message.addField(prefixed("observed_time_unix_nano"), logRecord.getObservedTimeUnixNano());
+            message.addField("otel_observed_time_unix_nano", logRecord.getObservedTimeUnixNano());
         }
 
         Stream.of(
-                convertKvList(prefixed("resource_attributes"), log.getResource().getAttributesList()),
-                convertKvList(prefixed("attributes"), logRecord.getAttributesList()),
+                convertKvList("otel_resource_attributes", log.getResource().getAttributesList()),
+                convertKvList("otel_attributes", logRecord.getAttributesList()),
                 scope(log.getScope())
         ).flatMap(s -> s).forEach(field -> message.addField(field.getKey().replace('.', '_'), field.getValue()));
 
         return Optional.of(message);
-    }
-
-    private String prefixed(String fieldName) {
-        if (addOtelPrefix) {
-            return "otel_" + fieldName;
-        }
-        return fieldName;
     }
 
     private Optional<DateTime> timestamp(LogRecord logRecord) {
@@ -129,9 +115,9 @@ public class OTelLogsCodec {
 
     private Stream<Map.Entry<String, ?>> scope(InstrumentationScope scope) {
         return Stream.concat(Stream.of(
-                        Map.entry(prefixed("scope_name"), scope.getName()),
-                        Map.entry(prefixed("scope_version"), scope.getVersion())),
-                convertKvList(prefixed("scope_attributes"), scope.getAttributesList())
+                        Map.entry("otel_scope_name", scope.getName()),
+                        Map.entry("otel_scope_version", scope.getVersion())),
+                convertKvList("otel_scope_attributes", scope.getAttributesList())
         );
     }
 

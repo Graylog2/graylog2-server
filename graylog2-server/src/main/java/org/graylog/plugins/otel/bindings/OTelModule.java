@@ -19,7 +19,6 @@ package org.graylog.plugins.otel.bindings;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.otel.input.OTelGrpcInput;
 import org.graylog.plugins.otel.input.codec.OTelCodec;
-import org.graylog.plugins.otel.input.codec.OTelLogsCodec;
 import org.graylog.plugins.otel.input.grpc.OTelGrpcTransport;
 import org.graylog.plugins.otel.input.grpc.OTelLogsService;
 import org.graylog2.plugin.PluginModule;
@@ -31,7 +30,6 @@ public class OTelModule extends PluginModule {
         addTransport(OTelGrpcTransport.NAME, OTelGrpcTransport.class);
         addCodec(OTelCodec.NAME, OTelCodec.class);
 
-        install(new FactoryModuleBuilder().build(OTelLogsCodec.Factory.class));
         install(new FactoryModuleBuilder().build(OTelLogsService.Factory.class));
     }
 }
