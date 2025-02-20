@@ -17,28 +17,28 @@
 import * as React from 'react';
 
 import { createSearch } from 'fixtures/searches';
-import PluggableStoreProvider from 'components/PluggableStoreProvider';
+import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 const TestStoreProvider = ({
   children,
   undoRedoState,
   ...rest
-}: React.PropsWithChildren<Partial<React.ComponentProps<typeof PluggableStoreProvider>>>) => {
+}: React.PropsWithChildren<Partial<React.ComponentProps<typeof ViewsStoreProvider>>>) => {
   const view = rest.view ?? createSearch();
   const isNew = rest.isNew ?? false;
   const initialQuery = rest.initialQuery ?? 'query-id-1';
   const executionState = rest.executionState ?? SearchExecutionState.empty();
 
   return (
-    <PluggableStoreProvider
+    <ViewsStoreProvider
       undoRedoState={undoRedoState}
       view={view}
       initialQuery={initialQuery}
       isNew={isNew}
       executionState={executionState}>
       {children}
-    </PluggableStoreProvider>
+    </ViewsStoreProvider>
   );
 };
 

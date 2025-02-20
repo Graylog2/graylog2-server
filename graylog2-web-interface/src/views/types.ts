@@ -18,7 +18,6 @@
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
-import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 
 import type { ExportPayload } from 'util/MessagesExportUtils';
 import type { IconName } from 'components/common/Icon';
@@ -62,6 +61,7 @@ import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
 import type { Event } from 'components/events/events/types';
+import type { PluggableReducer } from 'store';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -477,10 +477,7 @@ export interface ExtraArguments {
 
 export type GetState = () => RootState;
 
-export type ViewsReducer = {
-  key: keyof RootState;
-  reducer: Reducer<RootState[keyof RootState], AnyAction>;
-};
+export type ViewsReducer = PluggableReducer<RootState>;
 
 export type Widgets = Immutable.OrderedMap<string, Widget>;
 
