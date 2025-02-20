@@ -17,16 +17,30 @@
 package org.graylog.failure;
 
 
-import org.graylog2.indexer.messages.Indexable;
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.graylog2.shared.messageq.Acknowledgeable;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
+import java.util.Map;
 
 /**
  * A failure occurring at different stages of message processing
  * (e.g. pipeline processing, extraction, Elasticsearch indexing)
  */
-public interface Failure {
+public interface Failure extends Acknowledgeable {
+
+    String FIELD_FAILURE_TYPE = "failure_type";
+    String FIELD_FAILURE_CAUSE = "failure_cause";
+    String FIELD_FAILURE_DETAILS = "failure_details";
+    String FIELD_FAILED_MESSAGE = "failed_message";
+    String FIELD_FAILED_MESSAGE_ID = "failed_message_id";
+    String FIELD_FAILED_MESSAGE_STREAMS = "failed_message_streams";
+    String FIELD_FAILED_MESSAGE_TIMESTAMP = "failed_message_timestamp";
+    String FIELD_FAILED_MESSAGE_TARGET_INDEX = "failed_message_target_index";
 
     /**
      * Returns a type of this failure
@@ -41,8 +55,8 @@ public interface Failure {
     /**
      * Returns a brief description of this failure, which
      * is supposed to answer the following 2 questions:
-     *      1) WHAT has happened?
-     *      2) WHICH component has caused it?
+     * 1) WHAT has happened?
+     * 2) WHICH component has caused it?
      */
     String message();
 
@@ -58,11 +72,6 @@ public interface Failure {
     DateTime failureTimestamp();
 
     /**
-     * Returns a failed message
-     */
-    Indexable failedMessage();
-
-    /**
      * Returns an ElasticSearch index name targeted by
      * the failed message. For non-indexing failures
      * the value might be null.
@@ -70,10 +79,27 @@ public interface Failure {
     @Nullable
     String targetIndex();
 
-
     /**
      * Returns true if the failed message must
      * be acknowledged upon failure handling
      */
     boolean requiresAcknowledgement();
+
+    /**
+     * Returns the message ID
+     */
+    @Nonnull
+    String messageId();
+
+    /**
+     * Returns the message timestamp
+     */
+    @Nonnull
+    DateTime messageTimestamp();
+
+    @Nonnull
+    Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,
+                                              @NonNull Meter invalidTimestampMeter,
+                                              boolean includeFailedMessage);
+
 }
