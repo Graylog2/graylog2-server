@@ -40,6 +40,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
@@ -110,9 +111,9 @@ public class MessageResource extends RestResource {
 
             return resultMessage;
         } catch (DocumentNotFoundException e) {
-            final String msg = "Message " + messageId + " does not exist in index " + index;
-            LOG.error(msg, e);
-            throw new NotFoundException(msg, e);
+            throw new NotFoundException("Message " + messageId + " does not exist in index " + index, e);
+        } catch (IndexNotFoundException e) {
+            throw new NotFoundException("Index " + index + " does not exist.", e);
         }
     }
 

@@ -24,34 +24,37 @@ import { Spinner } from 'components/common';
 const DEFAULT_PAGINATION = { page: 1, perPage: 50, query: '' };
 
 type Pagination = {
-  page: number,
-  perPage: number,
-  query: string,
-}
+  page: number;
+  perPage: number;
+  query: string;
+};
 
 type PaginatedOptions = {
-  total: number,
-  pagination: Pagination,
-  list: Array<{ label: string, value: unknown }>,
-}
+  total: number;
+  pagination: Pagination;
+  list: Array<{ label: string; value: unknown }>;
+};
 
 type Props = Omit<React.ComponentProps<typeof Select>, 'options'> & {
-  onLoadOptions: (pagination: Pagination) => Promise<PaginatedOptions>,
-}
+  onLoadOptions: (pagination: Pagination) => Promise<PaginatedOptions>;
+};
 
 const PaginatedSelect = ({ onLoadOptions, ...rest }: Props) => {
   const selectRef = useRef();
   const [paginatedOptions, setPaginatedOptions] = useState<PaginatedOptions | undefined>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const loadOptions = useCallback((pagination: Pagination, processResponse = (res: PaginatedOptions, _cur: PaginatedOptions) => res) => {
-    setIsLoading(true);
+  const loadOptions = useCallback(
+    (pagination: Pagination, processResponse = (res: PaginatedOptions, _cur: PaginatedOptions) => res) => {
+      setIsLoading(true);
 
-    return onLoadOptions(pagination).then((res) => {
-      setPaginatedOptions((cur) => processResponse(res, cur));
-      setIsLoading(false);
-    });
-  }, [onLoadOptions]);
+      return onLoadOptions(pagination).then((res) => {
+        setPaginatedOptions((cur) => processResponse(res, cur));
+        setIsLoading(false);
+      });
+    },
+    [onLoadOptions],
+  );
 
   const handleSearch = debounce((newValue, actionMeta) => {
     if (actionMeta.action === 'input-change') {
@@ -93,13 +96,15 @@ const PaginatedSelect = ({ onLoadOptions, ...rest }: Props) => {
   }
 
   return (
-    <Select {...rest}
-            ref={selectRef}
-            options={paginatedOptions.list}
-            onInputChange={handleSearch}
-            loadOptions={handleLoadMore}
-            async
-            total={paginatedOptions.total} />
+    <Select
+      {...rest}
+      ref={selectRef}
+      options={paginatedOptions.list}
+      onInputChange={handleSearch}
+      loadOptions={handleLoadMore}
+      async
+      total={paginatedOptions.total}
+    />
   );
 };
 

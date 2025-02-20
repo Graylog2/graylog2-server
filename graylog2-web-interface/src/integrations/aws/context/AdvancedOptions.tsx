@@ -23,19 +23,18 @@ type AdvancedOptionsProviderProps = {
   children: any;
 };
 
-export const AdvancedOptionsProvider = ({
-  children,
-}: AdvancedOptionsProviderProps) => {
+export const AdvancedOptionsProvider = ({ children }: AdvancedOptionsProviderProps) => {
   const [isAdvancedOptionsVisible, setAdvancedOptionsVisibility] = useState(false);
   const [isAWSCustomEndpointsVisible, setAWSCustomEndpointsVisibility] = useState(false);
 
   return (
-    <AdvancedOptionsContext.Provider value={{
-      isAdvancedOptionsVisible,
-      isAWSCustomEndpointsVisible,
-      setAdvancedOptionsVisibility,
-      setAWSCustomEndpointsVisibility,
-    }}>
+    <AdvancedOptionsContext.Provider
+      value={{
+        isAdvancedOptionsVisible,
+        isAWSCustomEndpointsVisible,
+        setAdvancedOptionsVisibility,
+        setAWSCustomEndpointsVisibility,
+      }}>
       {children}
     </AdvancedOptionsContext.Provider>
   );

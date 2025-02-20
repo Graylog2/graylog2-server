@@ -33,60 +33,69 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
-export const keyFn = (searchParams: SearchParams) => (['indexSetFieldTypeProfiles', searchParams]);
+export const keyFn = (searchParams: SearchParams) => ['indexSetFieldTypeProfiles', searchParams];
 
 export const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams) => {
   const indexSetFieldTypeUrl = qualifyUrl('/system/indices/index_sets/profiles/paginated');
-  const url = PaginationURL(
-    indexSetFieldTypeUrl,
-    searchParams.page,
-    searchParams.pageSize,
-    searchParams.query,
-    { filters: FiltersForQueryParams(searchParams.filters), sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+  const url = PaginationURL(indexSetFieldTypeUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
+    filters: FiltersForQueryParams(searchParams.filters),
+    sort: searchParams.sort.attributeId,
+    order: searchParams.sort.direction,
+  });
 
-  return fetch('GET', url).then(
-    ({ elements, total, attributes }) => ({
-      list: elements.map((profile: IndexSetFieldTypeProfileJson) => ({
-        id: profile.id,
-        name: profile.name,
-        description: profile.description,
-        customFieldMappings: profile.custom_field_mappings,
-        indexSetIds: profile.index_set_ids,
-      })),
-      pagination: { total },
-      attributes: [...attributes, {
+  return fetch('GET', url).then(({ elements, total, attributes }) => ({
+    list: elements.map((profile: IndexSetFieldTypeProfileJson) => ({
+      id: profile.id,
+      name: profile.name,
+      description: profile.description,
+      customFieldMappings: profile.custom_field_mappings,
+      indexSetIds: profile.index_set_ids,
+    })),
+    pagination: { total },
+    attributes: [
+      ...attributes,
+      {
         id: 'index_set_ids',
         searchable: false,
         sortable: false,
         title: 'Used in',
         type: 'STRING',
-      }],
-    }));
+      },
+    ],
+  }));
 };
 
-const useProfiles = (searchParams: SearchParams, { enabled }): {
+const useProfiles = (
+  searchParams: SearchParams,
+  { enabled },
+): {
   data: {
-    list: Readonly<Array<IndexSetFieldTypeProfile>>,
-    pagination: { total: number },
-    attributes: Array<Attribute>
-  },
-  isLoading: boolean,
-  refetch: () => void,
+    list: Readonly<Array<IndexSetFieldTypeProfile>>;
+    pagination: { total: number };
+    attributes: Array<Attribute>;
+  };
+  isLoading: boolean;
+  refetch: () => void;
 } => {
   const { data, isLoading, refetch } = useQuery(
     keyFn(searchParams),
-    () => defaultOnError(fetchIndexSetFieldTypeProfiles(searchParams), 'Loading index field type profiles failed with status', 'Could not load index field type profiles'),
+    () =>
+      defaultOnError(
+        fetchIndexSetFieldTypeProfiles(searchParams),
+        'Loading index field type profiles failed with status',
+        'Could not load index field type profiles',
+      ),
     {
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     isLoading,
     refetch,
-  });
+  };
 };
 
 export default useProfiles;

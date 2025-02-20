@@ -19,9 +19,9 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 
 export type DashboardPageContextType = {
-  dashboardPage: string,
-  setDashboardPage: (pageId: string) => void,
-  unsetDashboardPage: () => void,
+  dashboardPage: string;
+  setDashboardPage: (pageId: string) => void;
+  unsetDashboardPage: () => void;
 };
 
 const defaultContext = {

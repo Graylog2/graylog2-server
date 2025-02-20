@@ -26,11 +26,12 @@ import type { AggregationElement } from '../AggregationElementType';
 import type { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 type SortError = {
-  field?: string,
-  direction?: string,
-}
+  field?: string;
+  direction?: string;
+};
 
-const hasErrors = <T extends {}> (errors: Array<T>): boolean => errors.filter((error) => Object.keys(error).length > 0).length > 0;
+const hasErrors = <T extends {}>(errors: Array<T>): boolean =>
+  errors.filter((error) => Object.keys(error).length > 0).length > 0;
 
 const validateSorts = (values: WidgetConfigFormValues) => {
   const errors = {};
@@ -97,25 +98,29 @@ const SortElement: AggregationElement<'sort'> = {
   allowCreate: () => true,
   onCreate: (formValues) => ({
     ...formValues,
-    sort: [
-      ...formValues.sort,
-      addRandomId({}),
-    ],
+    sort: [...formValues.sort, addRandomId({})],
   }),
   component: SortsConfiguration,
   fromConfig: (config: AggregationWidgetConfig) => ({
-    sort: config.sort.map((s) => addRandomId({
-      type: configTypeToFormValueType(s.type),
-      field: s.field,
-      direction: s.direction?.direction,
-    })),
+    sort: config.sort.map((s) =>
+      addRandomId({
+        type: configTypeToFormValueType(s.type),
+        field: s.field,
+        direction: s.direction?.direction,
+      }),
+    ),
   }),
-  toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
-    .sort(formValues.sort.map((sort) => new SortConfig(formValueTypeToConfigType(sort.type), sort.field, Direction.fromString(sort.direction)))),
-  onRemove: ((index, formValues) => ({
+  toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) =>
+    configBuilder.sort(
+      formValues.sort.map(
+        (sort) =>
+          new SortConfig(formValueTypeToConfigType(sort.type), sort.field, Direction.fromString(sort.direction)),
+      ),
+    ),
+  onRemove: (index, formValues) => ({
     ...formValues,
     sort: formValues.sort.filter((_value, i) => index !== i),
-  })),
+  }),
   validate: validateSorts,
   isEmpty: (formValues: WidgetConfigFormValues['sort']) => (formValues ?? []).length === 0,
 };

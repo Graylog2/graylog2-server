@@ -45,9 +45,12 @@ export default class Direction {
 
   static fromString(value: string): Direction {
     switch (value) {
-      case 'Ascending': return Direction.Ascending;
-      case 'Descending': return Direction.Descending;
-      default: throw new Error(`Invalid direction: ${value}`);
+      case 'Ascending':
+        return Direction.Ascending;
+      case 'Descending':
+        return Direction.Descending;
+      default:
+        throw new Error(`Invalid direction: ${value}`);
     }
   }
 }

@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
+import type * as Immutable from 'immutable';
+import type { FormikProps } from 'formik';
 
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type {
@@ -32,12 +34,12 @@ export interface DirectoryServiceAuthenticationService {
   displayName: string;
   createComponent: React.ComponentType<{}>;
   editComponent: React.ComponentType<{
-    authenticationBackend: (typeof DirectoryServiceBackend | typeof OktaBackendConfig),
-    initialStepKey: string | null | undefined
+    authenticationBackend: AuthenticationBackend | DirectoryServiceBackend | OktaBackendConfig;
+    initialStepKey: string | null | undefined;
   }>;
   configDetailsComponent: React.ComponentType<{
-    authenticationBackend:(typeof AuthenticationBackend | typeof OktaBackend),
-    roles?: Immutable.List<Role>,
+    authenticationBackend: DirectoryServiceBackend | AuthenticationBackend | OktaBackend;
+    roles?: Immutable.List<Role>;
   }>;
   configToJson: (config: {}) => DirectoryServiceBackendConfigJson;
   configFromJson: (json: {}) => DirectoryServiceBackendConfig;
@@ -81,22 +83,30 @@ interface Backend {
   excludedFields: { [field: string]: boolean };
 }
 
-interface DirectoryServicesGroupSync {
+export interface DirectoryServicesGroupSync {
   actions: {
-    onDirectoryServiceBackendUpdate: (backendGroupSyncIsActive: boolean, formValues: WizardFormValues, backendId: string, serviceType: string) => Promise<void>;
-  },
+    onDirectoryServiceBackendUpdate: (
+      backendGroupSyncIsActive: boolean,
+      formValues: WizardFormValues,
+      backendId: string,
+      serviceType: string,
+    ) => Promise<void>;
+  };
   validation: {
     GroupSyncValidation: (teamType: string) => {};
-  },
+  };
   components: {
     GroupSyncSection: React.ComponentType<GroupSyncSectionProps>;
     MatchingGroupsProvider: React.ComponentType<React.PropsWithChildren<MatchingGroupsProviderProps>>;
     GroupSyncForm: React.ComponentType<GroupSyncFormProps>;
-  },
-  wizardConfig: Record<SupportedBackends, Backend>,
+  };
+  wizardConfig: Record<SupportedBackends, Backend>;
   hooks: {
-    useInitialGroupSyncValues: (backendId: string, formValues: WizardFormValues) => { formValues: WizardFormValues, finishedLoading: boolean };
-  }
+    useInitialGroupSyncValues: (
+      backendId: string,
+      formValues: WizardFormValues,
+    ) => { formValues: WizardFormValues; finishedLoading: boolean };
+  };
 }
 
 interface AuthenticationPlugin {

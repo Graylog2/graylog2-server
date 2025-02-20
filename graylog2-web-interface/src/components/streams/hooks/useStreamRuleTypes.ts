@@ -23,14 +23,19 @@ import { defaultOnError } from 'util/conditional/onError';
 const useStreamRuleTypes = (): { data: Array<StreamRuleType> | undefined } => {
   const { data } = useQuery(
     ['streams', 'rule-types'],
-    () => defaultOnError<Array<StreamRuleType>>(StreamRulesStore.types(), 'Loading stream rule types failed with status', 'Could not load stream rule types'),
+    () =>
+      defaultOnError<Array<StreamRuleType>>(
+        StreamRulesStore.types(),
+        'Loading stream rule types failed with status',
+        'Could not load stream rule types',
+      ),
     {
       keepPreviousData: true,
       staleTime: 60 * (60 * 1000), // 1 hour
     },
   );
 
-  return ({ data });
+  return { data };
 };
 
 export default useStreamRuleTypes;

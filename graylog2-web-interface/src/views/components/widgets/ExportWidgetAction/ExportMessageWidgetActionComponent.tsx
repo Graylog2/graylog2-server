@@ -28,11 +28,14 @@ const ExportMessageWidgetActionComponent = ({ widget, disabled }: WidgetMenuActi
 
   return (
     <>
-      <IconButton disabled={disabled} onClick={showMessageExportModal} name="download" title="Export all search results" />
+      <IconButton
+        disabled={disabled}
+        onClick={showMessageExportModal}
+        name="download"
+        title="Export all search results"
+      />
       {showExport && (
-      <ExportModal view={view}
-                   directExportWidgetId={widget.id}
-                   closeModal={() => setShowExport(false)} />
+        <ExportModal view={view} directExportWidgetId={widget.id} closeModal={() => setShowExport(false)} />
       )}
     </>
   );

@@ -24,13 +24,12 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 import type { SidecarSummary } from 'components/sidecars/types';
 
 type Actions = {
-  list: (opts: { query: string, page: number, pageSize: number, filters?: {} }) => Promise<unknown>,
-  refreshList: () => Promise<unknown>,
-  setAction: (action: string, selectedCollectors: { [sidecarId: string]: string[] }) => Promise<unknown>,
-}
-export const SidecarsAdministrationActions = singletonActions(
-  'core.SidecarsAdministration',
-  () => Reflux.createActions<Actions>({
+  list: (opts: { query: string; page: number; pageSize: number; filters?: {} }) => Promise<unknown>;
+  refreshList: () => Promise<unknown>;
+  setAction: (action: string, selectedCollectors: { [sidecarId: string]: string[] }) => Promise<unknown>;
+};
+export const SidecarsAdministrationActions = singletonActions('core.SidecarsAdministration', () =>
+  Reflux.createActions<Actions>({
     list: { asyncResult: true },
     refreshList: { asyncResult: true },
     setAction: { asyncResult: true },
@@ -39,30 +38,29 @@ export const SidecarsAdministrationActions = singletonActions(
 
 type StoreState = {
   pagination: {
-    count: number,
-    page: number,
-    pageSize: number,
-    total: number,
-    perPage: number
-  },
-  sidecars: Array<SidecarSummary>,
-  filters: {},
-  query: string,
-}
+    count: number;
+    page: number;
+    pageSize: number;
+    total: number;
+    perPage: number;
+  };
+  sidecars: Array<SidecarSummary>;
+  filters: {};
+  query: string;
+};
 type Response = {
-  sidecars: Array<SidecarSummary>,
-  query: string,
-  filters: {},
+  sidecars: Array<SidecarSummary>;
+  query: string;
+  filters: {};
   pagination: {
-    total: number,
-    count: number,
-    page: number,
-    per_page: number,
-  }
-}
-export const SidecarsAdministrationStore = singletonStore(
-  'core.SidecarsAdministration',
-  () => Reflux.createStore<StoreState>({
+    total: number;
+    count: number;
+    page: number;
+    per_page: number;
+  };
+};
+export const SidecarsAdministrationStore = singletonStore('core.SidecarsAdministration', () =>
+  Reflux.createStore<StoreState>({
     listenables: [SidecarsAdministrationActions],
     sourceUrl: '/sidecar',
     sidecars: undefined,
@@ -121,8 +119,10 @@ export const SidecarsAdministrationStore = singletonStore(
           return response;
         },
         (error) => {
-          UserNotification.error(error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
-            'Could not retrieve Sidecars');
+          UserNotification.error(
+            error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
+            'Could not retrieve Sidecars',
+          );
         },
       );
 
@@ -130,7 +130,12 @@ export const SidecarsAdministrationStore = singletonStore(
     },
 
     refreshList() {
-      this.list({ query: this.query, page: this.pagination.page, pageSize: this.pagination.pageSize, filters: this.filters });
+      this.list({
+        query: this.query,
+        page: this.pagination.page,
+        pageSize: this.pagination.pageSize,
+        filters: this.filters,
+      });
     },
 
     setAction(action, collectors) {
@@ -153,8 +158,7 @@ export const SidecarsAdministrationStore = singletonStore(
           return response;
         },
         (error) => {
-          UserNotification.error(`Requesting ${action} failed with status: ${error}`,
-            `Could not ${action} collectors`);
+          UserNotification.error(`Requesting ${action} failed with status: ${error}`, `Could not ${action} collectors`);
         },
       );
 

@@ -50,6 +50,5 @@ export type SearchParser = (search: Search) => Promise<SearchMetadata>;
 export const parseSearch = (search: Search, parse: SearchParser) => async (dispatch: AppDispatch) => {
   dispatch(loading());
 
-  return parse(search)
-    .then((result) => dispatch(finishedLoading(result)));
+  return parse(search).then((result) => dispatch(finishedLoading(result)));
 };

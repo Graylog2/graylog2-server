@@ -21,7 +21,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import type { IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
 import { defaultOnError } from 'util/conditional/onError';
 
-export type FieldOptions = Array<{ value: string, label: string, disabled: boolean }>;
+export type FieldOptions = Array<{ value: string; label: string; disabled: boolean }>;
 export type CurrentTypes = Record<string, string>;
 const INITIAL_DATA = {
   options: [],
@@ -31,36 +31,44 @@ const INITIAL_DATA = {
 const fetchIndexSetFieldTypesAll = async (indexSetId: string) => {
   const indexSetFieldTypeAllUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}/all`);
 
-  return fetch('GET', indexSetFieldTypeAllUrl).then(
-    (elements) => ({
-      currentTypes: Object.fromEntries(elements.map((fieldType: IndexSetFieldTypeJson) => ([fieldType.field_name, fieldType.type]))),
-      options: elements.map((fieldType: IndexSetFieldTypeJson) => ({
-        value: fieldType.field_name,
-        label: fieldType.field_name,
-        disabled: fieldType.is_reserved === true,
-      })),
-    }));
+  return fetch('GET', indexSetFieldTypeAllUrl).then((elements) => ({
+    currentTypes: Object.fromEntries(
+      elements.map((fieldType: IndexSetFieldTypeJson) => [fieldType.field_name, fieldType.type]),
+    ),
+    options: elements.map((fieldType: IndexSetFieldTypeJson) => ({
+      value: fieldType.field_name,
+      label: fieldType.field_name,
+      disabled: fieldType.is_reserved === true,
+    })),
+  }));
 };
 
-const useIndexSetFieldTypesAll = (indexSetId: string): {
-  data: { options: FieldOptions, currentTypes: CurrentTypes },
-  isLoading: boolean,
-  refetch: () => void,
+const useIndexSetFieldTypesAll = (
+  indexSetId: string,
+): {
+  data: { options: FieldOptions; currentTypes: CurrentTypes };
+  isLoading: boolean;
+  refetch: () => void;
 } => {
   const { data, isLoading, refetch } = useQuery(
     ['indexSetFieldTypesAll', indexSetId],
-    () => defaultOnError(fetchIndexSetFieldTypesAll(indexSetId), 'Loading index field types failed with status', 'Could not load index field types'),
+    () =>
+      defaultOnError(
+        fetchIndexSetFieldTypesAll(indexSetId),
+        'Loading index field types failed with status',
+        'Could not load index field types',
+      ),
     {
       keepPreviousData: true,
       enabled: !!indexSetId,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     isLoading,
     refetch,
-  });
+  };
 };
 
 export default useIndexSetFieldTypesAll;

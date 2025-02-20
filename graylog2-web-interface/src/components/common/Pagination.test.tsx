@@ -24,8 +24,7 @@ describe('<Pagination />', () => {
     const currentPage = 1;
     const totalPages = 5;
 
-    render(<Pagination currentPage={currentPage}
-                       totalPages={totalPages} />);
+    render(<Pagination currentPage={currentPage} totalPages={totalPages} />);
 
     const activePage = await screen.findByTitle('Active page');
 
@@ -40,8 +39,7 @@ describe('<Pagination />', () => {
     const currentPage = 1;
     const totalPages = 1;
 
-    render(<Pagination currentPage={currentPage}
-                       totalPages={totalPages} />);
+    render(<Pagination currentPage={currentPage} totalPages={totalPages} />);
 
     expect(screen.queryByTitle('Active page')).not.toBeInTheDocument();
   });
@@ -51,9 +49,7 @@ describe('<Pagination />', () => {
     const totalPages = 10;
     const onChangeSpy = jest.fn();
 
-    render(<Pagination currentPage={currentPage}
-                       totalPages={totalPages}
-                       onChange={onChangeSpy} />);
+    render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
     fireEvent.click(screen.getByLabelText('Open next page'));
 
@@ -65,9 +61,7 @@ describe('<Pagination />', () => {
     const totalPages = 10;
     const onChangeSpy = jest.fn();
 
-    render(<Pagination currentPage={currentPage}
-                       totalPages={totalPages}
-                       onChange={onChangeSpy} />);
+    render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
     fireEvent.click(screen.getByLabelText('Open previous page'));
 
@@ -79,9 +73,7 @@ describe('<Pagination />', () => {
     const totalPages = 10;
     const onChangeSpy = jest.fn();
 
-    render(<Pagination currentPage={currentPage}
-                       totalPages={totalPages}
-                       onChange={onChangeSpy} />);
+    render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
     fireEvent.click(screen.getByLabelText('Open last page'));
 
@@ -93,9 +85,7 @@ describe('<Pagination />', () => {
     const totalPages = 10;
     const onChangeSpy = jest.fn();
 
-    render(<Pagination currentPage={currentPage}
-                       totalPages={totalPages}
-                       onChange={onChangeSpy} />);
+    render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
     fireEvent.click(screen.getByLabelText('Open first page'));
 
