@@ -141,8 +141,30 @@ class SearchableSnapshotsConfigurationBeanTest {
         Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(emptyBuildParams()))
                 .isInstanceOf(OpensearchConfigurationException.class)
                 .hasMessageContaining("There is not enough usable space for the node search cache. Your system has only 8gb available");
+    }
 
+    @Test
+    void testRepoConfigWithoutSearchRole(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final S3RepositoryConfiguration config = s3Configuration(Map.of());
 
+        // only path_repo in general datanode configuration
+        final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
+                datanodeConfiguration(Map.of(
+                        "node_roles", "cluster_manager,data,ingest,remote_cluster_client",
+                        "path_repo", "/mnt/data/snapshots",
+                        "node_search_cache_size", "10gb"
+                )),
+                config,
+                () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
+
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+
+        Assertions.assertThat(configurationPart.nodeRoles())
+                .isEmpty(); // no search role should be provided, we have to use only those that are given in the configuration
+
+        Assertions.assertThat(configurationPart.properties())
+                .containsEntry("path.repo", "/mnt/data/snapshots")
+                .doesNotContainEntry("node.search.cache.size", "10gb");
     }
 
     private S3RepositoryConfiguration s3Configuration(Map<String, String> properties) throws RepositoryException, ValidationException {
