@@ -59,7 +59,7 @@ class MongoDbRuleServiceTest {
         final var rule = dummyRule();
         final var savedRule = ruleService.save(rule);
         assertThat(ruleService.load(savedRule.id())).isEqualTo(rule.toBuilder().id(savedRule.id()).build());
-        verify(clusterEventBus).post(RulesChangedEvent.updatedRuleId(savedRule.id()));
+        verify(clusterEventBus).post(RulesChangedEvent.updatedRule(savedRule.id(), savedRule.title()));
     }
 
     @Test
@@ -67,7 +67,7 @@ class MongoDbRuleServiceTest {
         final var rule = systemRule();
         final var savedRule = ruleService.save(rule);
         assertThat(ruleService.load(savedRule.id())).isEqualTo(rule.toBuilder().id(savedRule.id()).build());
-        verify(clusterEventBus).post(RulesChangedEvent.updatedRuleId(savedRule.id()));
+        verify(clusterEventBus).post(RulesChangedEvent.updatedRule(savedRule.id(), savedRule.title()));
     }
 
     @Test
@@ -75,7 +75,7 @@ class MongoDbRuleServiceTest {
         final var rule = dummyRule().toBuilder().id(new ObjectId().toHexString()).build();
         final var savedRule = ruleService.save(rule);
         assertThat(ruleService.load(savedRule.id())).isEqualTo(rule);
-        verify(clusterEventBus).post(RulesChangedEvent.updatedRuleId(savedRule.id()));
+        verify(clusterEventBus).post(RulesChangedEvent.updatedRule(savedRule.id(), savedRule.title()));
     }
 
     @Test
@@ -107,18 +107,18 @@ class MongoDbRuleServiceTest {
     void delete() {
         final var rule = ruleService.save(dummyRule().toBuilder().title("title 1").build());
         assertThat(ruleService.loadAll()).hasSize(1);
-        ruleService.delete(rule.id());
+        ruleService.delete(rule);
         assertThat(ruleService.loadAll()).hasSize(0);
-        verify(clusterEventBus).post(RulesChangedEvent.deletedRuleId(rule.id()));
+        verify(clusterEventBus).post(RulesChangedEvent.deletedRule(rule.id(), rule.title()));
     }
 
     @Test
     void deleteSystemRuleSucceeds() {
         final var rule = ruleService.save(systemRule().toBuilder().title("title 2").build());
         assertThat(ruleService.loadAll()).hasSize(1);
-        ruleService.delete(rule.id());
+        ruleService.delete(rule);
         assertThat(ruleService.loadAll()).hasSize(0);
-        verify(clusterEventBus).post(RulesChangedEvent.deletedRuleId(rule.id()));
+        verify(clusterEventBus).post(RulesChangedEvent.deletedRule(rule.id(), rule.title()));
     }
 
     @Test
