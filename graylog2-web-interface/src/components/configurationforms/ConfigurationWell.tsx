@@ -54,6 +54,22 @@ const RegularField = ({ id, value, name }: { id: string; value: ConfigurationFie
   );
 };
 
+const InlineBinaryField = ({ id, value, name }: { id: string; value: ConfigurationFieldValue; name: string }) => {
+  let finalValue;
+
+  if (value === null || value === undefined || value === '') {
+    finalValue = <i>{'<empty>'}</i>;
+  } else {
+    finalValue = <i>{'<uploaded file content>'}</i>
+  }
+
+  return (
+    <li key={`${id}-${name}`}>
+      <div className="key">{name}:</div> <div className="value">{finalValue}</div>
+    </li>
+  );
+};
+
 const EncryptedField = ({ id, value, name }: { id: string; value: EncryptedFieldValue<unknown>; name: string }) => {
   let finalValue;
 
@@ -103,8 +119,12 @@ const Configuration = ({
         return <PasswordField id={_id} name={key} />;
       }
 
-      if (requestedConfiguration && 'is_encrypted' in requestedConfiguration && requestedConfiguration.is_encrypted) {
-        return <EncryptedField id={_id} value={value as EncryptedFieldValue<unknown>} name={key} />;
+      if (requestedConfiguration?.type === 'inline_binary') {
+        if ('is_encrypted' in requestedConfiguration && requestedConfiguration.is_encrypted) {
+          return <EncryptedField id={_id} value={value as EncryptedFieldValue<unknown>} name={key} />;
+        } else {
+          return <InlineBinaryField id={_id} value={value} name={key} />;
+        }
       }
 
       return <RegularField id={_id} value={value} name={key} />;
