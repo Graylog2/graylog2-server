@@ -124,7 +124,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
         final var fields = new Config().getRequestedConfiguration();
 
         final List<String> missingFieldNames = new ArrayList<>();
-        if (!configuration.encryptedValueIsSet(CK_TLS_CERT)) {
+        if (configuration.getString(CK_TLS_CERT, "").isBlank()) {
             missingFieldNames.add(fields.getField(CK_TLS_CERT).getHumanName());
         }
         if (!configuration.encryptedValueIsSet(CK_TLS_KEY)) {
@@ -139,13 +139,12 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
 
         final Base64.Decoder base64Decoder = Base64.getDecoder();
 
-        final var certChain = base64Decoder.decode(
-                encryptedValueService.decrypt(configuration.getEncryptedValue(CK_TLS_CERT)));
+        final var certChain = base64Decoder.decode(configuration.getString(CK_TLS_CERT));
         final var privateKey = base64Decoder.decode(
                 encryptedValueService.decrypt(configuration.getEncryptedValue(CK_TLS_KEY)));
 
-        final var clientCaCert = configuration.encryptedValueIsSet(CK_TLS_CLIENT_CA) ?
-                base64Decoder.decode(encryptedValueService.decrypt(configuration.getEncryptedValue(CK_TLS_CLIENT_CA))) :
+        final var clientCaCert = !configuration.getString(CK_TLS_CLIENT_CA, "").isBlank() ?
+                base64Decoder.decode(configuration.getString(CK_TLS_CLIENT_CA)) :
                 null;
 
         try {
@@ -212,7 +211,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
                             "PEM-encoded certificate chain used by the input to authenticate itself to " +
                                     "clients.",
                             ConfigurationField.Optional.OPTIONAL,
-                            true, // TODO: no need to encrypt, but our UI doesn't support unencrypted yet
+                            false,
                             ""
                     )
             );
@@ -235,7 +234,7 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
                     "PEM-encoded certificate chain used to validate client certificates during mutual TLS " +
                             "authentication. Clients that fail to provide a trusted certificate will be rejected.",
                             ConfigurationField.Optional.OPTIONAL,
-                    true, // TODO: no need to encrypt, but our UI doesn't support unencrypted yet
+                    false,
                     ""
                     )
             );
