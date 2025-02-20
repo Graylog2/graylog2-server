@@ -21,11 +21,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.lang.Collections;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,9 +47,6 @@ public class RemoteReindexMigration {
     private final List<RemoteReindexIndex> indices;
 
     private final List<LogEntry> logs;
-
-    @JsonProperty("error")
-    private String error;
 
     @JsonCreator
     public RemoteReindexMigration(@JsonProperty("id") @NotNull String migrationID, @JsonProperty("indices") List<RemoteReindexIndex> indices, @JsonProperty("logs") List<LogEntry> logs) {
@@ -71,6 +70,11 @@ public class RemoteReindexMigration {
 
     @JsonProperty("status")
     public Status status() {
+
+        if (errorFromLogs() != null) {
+            return Status.ERROR;
+        }
+
         if (indices.isEmpty() || indices.stream().allMatch(i -> i.status() == Status.NOT_STARTED)) {
             return Status.NOT_STARTED;
         } else if (indices.stream().allMatch(RemoteReindexIndex::isCompleted)) {
@@ -83,6 +87,18 @@ public class RemoteReindexMigration {
         } else {
             return Status.RUNNING;
         }
+    }
+
+    @JsonProperty("error")
+    @Nullable
+    private String errorFromLogs() {
+        return Optional.ofNullable(logs)
+                .stream()
+                .flatMap(Collection::stream)
+                .filter(l -> l.logLevel() == LogLevel.ERROR)
+                .findFirst()
+                .map(LogEntry::message)
+                .orElse(null);
     }
 
     /**
