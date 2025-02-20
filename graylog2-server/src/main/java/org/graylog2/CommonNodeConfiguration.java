@@ -74,4 +74,9 @@ public interface CommonNodeConfiguration extends GraylogNodeConfiguration {
     default String getSystemPropertyPrefix() {
         return "graylog.";
     }
+
+    @Override
+    default boolean isCloud() {
+        return false;
+    }
 }

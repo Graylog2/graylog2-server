@@ -325,17 +325,22 @@ public class MessageTest {
     }
 
     @Test
-    public void testProcessingAndReceiveTimestoESObject() {
+    public void testOtherTimestoESObject() {
         final DateTime receiveTime = Tools.nowUTC();
 
         message.setReceiveTime(receiveTime);
         final DateTime processingTime = receiveTime.plusSeconds(1);
         message.setProcessingTime(processingTime);
+        final DateTime originalTime = receiveTime.plusSeconds(2);
+        final DateTime updatedTime = receiveTime.plusSeconds(3);
+        message.updateTimeStamp(originalTime, updatedTime);
         final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
 
         assertThat(elasticSearchObject.get(Message.FIELD_GL2_RECEIVE_TIMESTAMP)).isEqualTo(Tools.buildElasticSearchTimeFormat(receiveTime));
         assertThat(elasticSearchObject.get(Message.FIELD_GL2_PROCESSING_TIMESTAMP)).isEqualTo(Tools.buildElasticSearchTimeFormat(processingTime));
         assertThat(elasticSearchObject.get(Message.FIELD_GL2_PROCESSING_DURATION_MS)).isEqualTo(1000);
+        assertThat(elasticSearchObject.get(Message.FIELD_GL2_ORIGINAL_TIMESTAMP)).isEqualTo(Tools.buildElasticSearchTimeFormat(originalTime));
+        assertThat(elasticSearchObject.get(Message.FIELD_TIMESTAMP)).isEqualTo(Tools.buildElasticSearchTimeFormat(updatedTime));
     }
 
     @Test

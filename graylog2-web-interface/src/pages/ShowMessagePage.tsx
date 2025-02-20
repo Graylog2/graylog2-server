@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useMemo, useState, useContext } from 'react';
 import * as Immutable from 'immutable';
+import styled from 'styled-components';
 
 import useMessage from 'views/hooks/useMessage';
 import DocumentTitle from 'components/common/DocumentTitle';
@@ -35,6 +36,8 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import SingleMessageFieldTypesProvider from 'views/components/fieldtypes/SingleMessageFieldTypesProvider';
 import StreamsContext from 'contexts/StreamsContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import type { Message } from 'views/components/messagelist/Types';
+import ErrorPage from 'components/errors/ErrorPage';
 
 type Props = {
   params: {
@@ -70,15 +73,15 @@ type MessageFields = {
   timestamp: string;
 };
 
-const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
-  if (!index || !messageId) {
-    throw new Error('index and messageId need to be specified!');
-  }
-
+type ShowMessagePageProps = {
+  message: Message;
+  messageId: string;
+  index: string;
+};
+const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) => {
   const streams = useContext(StreamsContext);
   const streamsMap = Immutable.Map(Object.fromEntries(streams.map((stream) => [stream.id, stream])));
   const streamsList = Immutable.List(streams);
-  const { data: message } = useMessage(index, messageId);
   const inputs = useInputs(message?.source_input_id, message?.fields.gl2_source_node);
 
   useEffect(() => {
@@ -127,4 +130,25 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   return <Spinner data-testid="spinner" />;
 };
 
-export default withParams(ShowMessagePage);
+const ErrorPre = styled.pre`
+  margin: 0 3rem;
+`;
+const ShowMessagePageLoader = ({ params: { index, messageId } }: Props) => {
+  if (!index || !messageId) {
+    throw new Error('index and messageId need to be specified!');
+  }
+  const { data: message, isError, error } = useMessage(index, messageId);
+
+  return isError ? (
+    <ErrorPage
+      title="Index/Message not found"
+      description="The index or message specified was not found. The most probable reason for this is that the index containing the
+      message referenced has been deleted. The full error message is:">
+      <ErrorPre>{error.details}</ErrorPre>
+    </ErrorPage>
+  ) : (
+    <ShowMessagePage message={message} messageId={messageId} index={index} />
+  );
+};
+
+export default withParams(ShowMessagePageLoader);

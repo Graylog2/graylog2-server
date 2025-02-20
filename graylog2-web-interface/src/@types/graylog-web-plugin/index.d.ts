@@ -158,9 +158,9 @@ type DataTiering = {
 
 type InputSetupWizard = {
   EnterpriseInputSetupWizard: React.ComponentType<{
-    openSteps: {[key in InputSetupWizardStep]?: StepType},
-  }>
-}
+    openSteps: { [key in InputSetupWizardStep]?: StepType };
+  }>;
+};
 
 type License = {
   EnterpriseTrafficGraph: React.ComponentType;
