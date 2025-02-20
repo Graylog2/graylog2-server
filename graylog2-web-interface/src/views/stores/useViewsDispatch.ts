@@ -14,9 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useViewsSelector from 'views/stores/useViewsSelector';
-import { selectIsDirty } from 'views/logic/slices/viewSelectors';
 
-const useIsDirty = () => useViewsSelector(selectIsDirty);
+import type { RootState } from 'views/types';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
 
-export default useIsDirty;
+export type ViewsDispatch = AppDispatch<RootState>;
+
+const useViewsDispatch = useAppDispatch<RootState>;
+
+export default useViewsDispatch;

@@ -21,7 +21,7 @@ import type { FieldName, FieldValue } from 'views/logic/fieldtypes/FieldType';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import type { QueryId } from 'views/logic/queries/Query';
 import generateId from 'logic/generateId';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 
 export type ActionComponentProps = {
   onClose: () => void;
@@ -63,7 +63,7 @@ type ActionDefinitionBase<Contexts> = {
 
 export type ThunkActionHandler<T> = (
   args: ActionHandlerArguments<T>,
-) => (dispatch: AppDispatch, getState: GetState) => unknown | Promise<unknown>;
+) => (dispatch: ViewsDispatch, getState: GetState) => unknown | Promise<unknown>;
 
 type FunctionHandlerAction<Contexts> = {
   handler: ActionHandler<Contexts>;
@@ -94,7 +94,7 @@ export function isExternalLinkAction<T>(action: ActionDefinition<T>): action is 
 }
 
 export function createHandlerFor<T>(
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   action: ActionDefinitionBase<T> & HandlerAction<T>,
   setActionComponents: SetActionComponents,
 ): ActionHandler<T> {

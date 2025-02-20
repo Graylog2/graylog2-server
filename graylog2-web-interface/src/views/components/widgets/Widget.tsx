@@ -32,8 +32,8 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidget, updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import { setTitle } from 'views/logic/slices/titlesActions';
@@ -179,7 +179,7 @@ export const EditWrapper = ({
 }: EditWrapperProps) => {
   const EditComponent = useMemo(() => _editComponentForType(type), [type]);
   const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const onSubmitEdit = useCallback(
     (newWidget: WidgetType, hasChanges: boolean) => {
       if (hasChanges) {
@@ -215,7 +215,7 @@ export const EditWrapper = ({
   );
 };
 
-const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: AppDispatch, getState: GetState) => {
+const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: ViewsDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
 
   return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
@@ -228,7 +228,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
 

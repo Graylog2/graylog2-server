@@ -16,7 +16,7 @@
  */
 import { useEffect } from 'react';
 
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectQuery } from 'views/logic/slices/viewSlice';
 import useView from 'views/hooks/useView';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
@@ -29,7 +29,7 @@ type Props = {
 const CycleQueryTab = ({ interval, tabs }: Props) => {
   const view = useView();
   const activeQuery = useActiveQueryId();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   useEffect(() => {
     const cycleInterval = setInterval(() => {

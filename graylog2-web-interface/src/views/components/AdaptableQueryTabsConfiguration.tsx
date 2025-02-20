@@ -27,7 +27,7 @@ import TitleTypes from 'views/stores/TitleTypes';
 import EditableTitle from 'views/components/common/EditableTitle';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -83,7 +83,7 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
   const widgetIds = useWidgetIds();
   const [nextQueriesList, setNextQueriesList] = useState<Immutable.OrderedSet<PageListItem>>(queriesList);
   const disablePageDelete = nextQueriesList.size <= 1;
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const sendTelemetry = useSendTelemetry();
   const onConfirmPagesConfiguration = useCallback(() => {
     const isActiveQueryDeleted = !nextQueriesList.find(({ id }) => id === activeQueryId);

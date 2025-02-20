@@ -25,7 +25,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 
 import GenericPlot from './GenericPlot';
 import type { ChartColor, ChartConfig, PlotLayout } from './GenericPlot';
@@ -96,7 +96,7 @@ const XYPlot = ({
   }
 
   const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(
     config.isTimeline

@@ -52,7 +52,7 @@ import type { CustomCommand, CustomCommandContext } from 'views/components/searc
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type SearchResult from 'views/logic/SearchResult';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type Parameter from 'views/logic/parameters/Parameter';
@@ -395,12 +395,12 @@ export interface SearchBarControl {
   id: string;
   onSearchSubmit?: <T extends Query | undefined>(
     values: CombinedSearchBarFormValues,
-    dispatch: AppDispatch,
+    dispatch: ViewsDispatch,
     currentQuery?: T,
   ) => Promise<T>;
   onDashboardWidgetSubmit: (
     values: CombinedSearchBarFormValues,
-    dispatch: AppDispatch,
+    dispatch: ViewsDispatch,
     currentWidget: Widget,
   ) => Promise<Widget | void>;
   onValidate?: (values: CombinedSearchBarFormValues, context?: HandlerContext) => FormikErrors<{}>;
