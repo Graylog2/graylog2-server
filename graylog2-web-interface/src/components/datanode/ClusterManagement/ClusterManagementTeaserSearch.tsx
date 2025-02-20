@@ -19,6 +19,7 @@ import styled from 'styled-components';
 
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
 import { Alert } from 'components/bootstrap';
+import type { SearchJson } from 'views/logic/search/Search';
 
 import viewJson from './sample-dashboards/overview_view.json';
 import searchJson from './sample-dashboards/overview_search.json';
@@ -42,7 +43,12 @@ const ClusterManagementTeaserSearch = () => (
       Please make sure you have a valid license and Data Node configured to see the performance metrics of your Data
       Node and your managed OpenSearch cluster.
     </StyledAlert>
-    <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
+    <TeaserSearch
+      viewJson={viewJson}
+      searchJson={searchJson as SearchJson}
+      searchJobResult={resultJson}
+      hotspots={hotspots}
+    />
   </>
 );
 

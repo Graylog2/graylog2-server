@@ -18,8 +18,9 @@ import { Map } from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import type { FiltersType } from 'views/types';
+import type { QueryString } from 'views/logic/queries/types';
 
 import AggregationWidgetConfig from './AggregationWidgetConfig';
 
