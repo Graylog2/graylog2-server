@@ -104,12 +104,31 @@ class MongoDbRuleServiceTest {
     }
 
     @Test
-    void delete() {
+    void deleteRule() {
         final var rule = ruleService.save(dummyRule().toBuilder().title("title 1").build());
         assertThat(ruleService.loadAll()).hasSize(1);
         ruleService.delete(rule);
         assertThat(ruleService.loadAll()).hasSize(0);
         verify(clusterEventBus).post(RulesChangedEvent.deletedRule(rule.id(), rule.title()));
+    }
+
+    @Test
+    void deleteId() {
+        final var rule = ruleService.save(dummyRule().toBuilder().title("title 1").build());
+        assertThat(ruleService.loadAll()).hasSize(1);
+        ruleService.delete(rule.id());
+        assertThat(ruleService.loadAll()).hasSize(0);
+        verify(clusterEventBus).post(RulesChangedEvent.deletedRule(rule.id(), rule.title()));
+    }
+
+    @Test
+    void deleteMissing() {
+        final var rule = ruleService.save(dummyRule().toBuilder().title("title 1").build());
+        verify(clusterEventBus, times(1)).post(any());
+        assertThat(ruleService.loadAll()).hasSize(1);
+
+        ruleService.delete("abcdefabcdefabcdefabcdef");
+        verify(clusterEventBus, times(1)).post(any());
     }
 
     @Test
