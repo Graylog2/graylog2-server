@@ -56,7 +56,13 @@ const StyledIcon = styled(Icon)(
 const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) =>
   result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
 
-const TimerangeInfo = ({ className, widget, activeQuery, widgetId, returnsAllRecords }: Props) => {
+const TimerangeInfo = ({
+  className = undefined,
+  widget,
+  activeQuery = undefined,
+  widgetId = undefined,
+  returnsAllRecords = undefined,
+}: Props) => {
   const { formatTime } = useUserDateTime();
   const { result } = useSearchResult() ?? {};
   const { widgetMapping } = useView();

@@ -73,7 +73,7 @@ const mockSearchStoreState = (storeState: Partial<SearchExecutionResult> = {}): 
 
 jest.mock('views/hooks/useSearchResult');
 
-const TimerangeInfo = (props: React.ComponentProps<typeof OriginalTimerangeInfo>) => (
+const TimerangeInfo = ({ ...props }: React.ComponentProps<typeof OriginalTimerangeInfo>) => (
   <TestStoreProvider>
     <OriginalTimerangeInfo {...props} />
   </TestStoreProvider>

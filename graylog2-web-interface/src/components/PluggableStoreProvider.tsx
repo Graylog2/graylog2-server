@@ -53,7 +53,7 @@ const useInitialState = (
   undoRedoState: UndoRedoState,
   view: View,
   isNew: boolean,
-  activeQuery,
+  activeQuery: QueryId,
   executionState: SearchExecutionState,
   result?: Props['result'],
 ): Partial<RootState> =>
@@ -83,12 +83,12 @@ const useInitialState = (
 
 const PluggableStoreProvider = ({
   initialQuery,
-  children,
+  children = undefined,
   isNew,
   view,
   executionState,
-  undoRedoState,
-  result,
+  undoRedoState = undefined,
+  result = undefined,
 }: React.PropsWithChildren<Props>) => {
   const reducers = usePluginEntities('views.reducers');
   const activeQuery = useActiveQuery(initialQuery, view);
