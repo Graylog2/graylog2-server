@@ -29,6 +29,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public interface MoreSearchAdapter {
     MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting, int page, int perPage, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams);
 
+    MoreSearch.Histogram eventHistogram(int buckets, String queryString, TimeRange timerange, Set<String> affectedIndices, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams);
+
     interface ScrollEventsCallback {
         void accept(List<ResultMessage> results, AtomicBoolean requestContinue) throws EventProcessorException;
     }
