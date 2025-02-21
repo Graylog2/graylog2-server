@@ -123,6 +123,7 @@ const Configuration = ({
         if ('is_encrypted' in requestedConfiguration && requestedConfiguration.is_encrypted) {
           return <EncryptedField id={_id} value={value as EncryptedFieldValue<unknown>} name={key} />;
         }
+
         return <InlineBinaryField id={_id} value={value} name={key} />;
       }
 

@@ -139,31 +139,32 @@ const EncryptedInlineBinaryField = ({
 
   const readOnlyFileInput = () => {
     if (field.is_encrypted) {
-      return <Input
-        id={fieldId}
-        type="password"
-        name={`configuration[${title}]`}
-        label={optionableLabel(field)}
-        required={isRequired}
-        readOnly
-        help={field.description}
-        value="encrypted value"
-        buttonAfter={resetButton()}
-        autoFocus={autoFocus}
-      />;
+      return (
+        <Input id={fieldId}
+               type="password"
+               name={`configuration[${title}]`}
+               label={optionableLabel(field)}
+               required={isRequired}
+               readOnly
+               help={field.description}
+               value="encrypted value"
+               buttonAfter={resetButton()}
+               autoFocus={autoFocus} />
+      );
     }
-    return <Input
-      id={fieldId}
-      type="text"
-      name={`configuration[${title}]`}
-      label={optionableLabel(field)}
-      required={isRequired}
-      readOnly
-      help={field.description}
-      value="uploaded file content"
-      buttonAfter={resetButton()}
-      autoFocus={autoFocus}
-    />;
+
+    return (
+      <Input id={fieldId}
+             type="text"
+             name={`configuration[${title}]`}
+             label={optionableLabel(field)}
+             required={isRequired}
+             readOnly
+             help={field.description}
+             value="uploaded file content"
+             buttonAfter={resetButton()}
+             autoFocus={autoFocus} />
+    );
   };
 
   const fileInput = () =>
