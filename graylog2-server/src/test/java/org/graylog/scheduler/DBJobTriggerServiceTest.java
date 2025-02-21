@@ -80,12 +80,11 @@ public class DBJobTriggerServiceTest {
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
 
     private DBJobTriggerService dbJobTriggerService;
-    private final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-    private MongoJackObjectMapperProvider mapperProvider;
+    private JobSchedulerTestClock clock;
     private MongoCollections mongoCollections;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         lenient().when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of());
 
         ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -93,8 +92,9 @@ public class DBJobTriggerServiceTest {
         objectMapper.registerSubtypes(new NamedType(OnceJobSchedule.class, OnceJobSchedule.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));
 
-        mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         this.mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
+        clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         this.dbJobTriggerService = serviceWithClock(clock);
     }
 
@@ -126,7 +126,7 @@ public class DBJobTriggerServiceTest {
             assertThat(dto.triggeredAt()).isNotPresent();
             assertThat(dto.status()).isEqualTo(JobTriggerStatus.RUNNABLE);
             assertThat(dto.executionDurationMs()).isEmpty();
-            assertThat(dto.concurrencyRescheduleCount()).isEqualTo(0);
+            assertThat(dto.concurrencyRescheduleCount()).isZero();
             assertThat(dto.constraints()).isEmpty();
             assertThat(dto.isCancelled()).isFalse();
 
@@ -154,7 +154,7 @@ public class DBJobTriggerServiceTest {
             assertThat(dto.triggeredAt()).isNotPresent();
             assertThat(dto.status()).isEqualTo(JobTriggerStatus.RUNNABLE);
             assertThat(dto.executionDurationMs()).isEmpty();
-            assertThat(dto.concurrencyRescheduleCount()).isEqualTo(0);
+            assertThat(dto.concurrencyRescheduleCount()).isZero();
             assertThat(dto.constraints()).isEmpty();
             assertThat(dto.isCancelled()).isFalse();
 
@@ -186,7 +186,7 @@ public class DBJobTriggerServiceTest {
             assertThat(dto.triggeredAt()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T01:00:00.000Z"));
             assertThat(dto.status()).isEqualTo(JobTriggerStatus.RUNNING);
             assertThat(dto.executionDurationMs()).isEmpty();
-            assertThat(dto.concurrencyRescheduleCount()).isEqualTo(0);
+            assertThat(dto.concurrencyRescheduleCount()).isZero();
             assertThat(dto.constraints()).isEmpty();
             assertThat(dto.isCancelled()).isFalse();
 
@@ -631,7 +631,7 @@ public class DBJobTriggerServiceTest {
                     assertThat(trigger.status()).isEqualTo(JobTriggerStatus.RUNNABLE);
                     assertThat(trigger.nextTime()).isEqualTo(update.nextTime().orElse(null));
                     assertThat(trigger.executionDurationMs()).isPresent().get().isEqualTo(15_000L);
-                    assertThat(trigger.concurrencyRescheduleCount()).isEqualTo(0);
+                    assertThat(trigger.concurrencyRescheduleCount()).isZero();
                     assertThat(trigger.data()).isPresent().get().satisfies(data -> {
                         assertThat(data).isInstanceOf(TestJobTriggerData.class);
                         assertThat(data).isEqualTo(TestJobTriggerData.create(Collections.singletonMap("hello", "world")));
@@ -961,7 +961,7 @@ public class DBJobTriggerServiceTest {
             updatedJobTriggerIds = triggerStream
                     .filter(jobTriggerDto -> newLockTime.equals(jobTriggerDto.lock().lastLockTime()))
                     .map(JobTriggerDto::id)
-                    .collect(Collectors.toList());
+                    .toList();
         }
         assertThat(updatedJobTriggerIds).containsOnly("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002");
     }
@@ -1020,7 +1020,7 @@ public class DBJobTriggerServiceTest {
     public void updateProgress() {
         final JobTriggerDto trigger = dbJobTriggerService.get("54e3deadbeefdeadbeef0003").orElseThrow(AssertionError::new);
 
-        assertThat(trigger.lock().progress()).isEqualTo(0);
+        assertThat(trigger.lock().progress()).isZero();
 
         assertThat(dbJobTriggerService.updateProgress(trigger, 42)).isEqualTo(1);
 
