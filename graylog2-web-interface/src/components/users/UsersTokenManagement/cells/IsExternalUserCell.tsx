@@ -19,7 +19,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Tooltip } from 'components/common';
-import {Token} from 'components/users/UsersTokenManagement/hooks/useTokens';
+import type {Token} from 'components/users/UsersTokenManagement/hooks/useTokens';
 import {Label} from 'components/bootstrap';
 
 type Props = {

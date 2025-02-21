@@ -1,8 +1,7 @@
 import * as React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-
-import {Token} from 'components/users/UsersTokenManagement/hooks/useTokens';
+import type {Token} from 'components/users/UsersTokenManagement/hooks/useTokens';
 import {Timestamp} from 'components/common';
 import IsExternalUserCell from 'components/users/UsersTokenManagement/cells/IsExternalUserCell';
 

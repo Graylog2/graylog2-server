@@ -1,4 +1,4 @@
-import {SearchParams, Attributes} from 'stores/PaginationTypes';
+import type {SearchParams, Attributes} from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import {qualifyUrl} from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
