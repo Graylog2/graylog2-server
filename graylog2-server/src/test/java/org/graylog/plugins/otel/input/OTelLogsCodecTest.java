@@ -22,6 +22,8 @@ import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import org.graylog.plugins.otel.input.codec.OTelLogsCodec;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -37,12 +39,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 class OTelLogsCodecTest {
+    private static final String FIXED_MESSAGE_ID = UUID.randomUUID().toString();
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private OTelLogsCodec codec;
 
@@ -50,9 +54,22 @@ class OTelLogsCodecTest {
             new InetSocketAddress(Inet4Address.getLoopbackAddress(), 12345)
     );
 
+    // Creates messages with a single, fixed id
+    private final MessageFactory messageFactory = new TestMessageFactory() {
+
+        @Override
+        public Message createMessage(String message, String source, DateTime timestamp) {
+            final var msg = super.createMessage(message, source, timestamp);
+            final var fields = new HashMap<>(msg.getFields());
+            fields.remove(Message.FIELD_ID);
+            return super.createMessage(FIXED_MESSAGE_ID, fields);
+        }
+    };
+
+
     @BeforeEach
     void setUp() {
-        codec = new OTelLogsCodec(new TestMessageFactory(), new ObjectMapperProvider().get());
+        codec = new OTelLogsCodec(messageFactory, new ObjectMapperProvider().get());
     }
 
     // Uses a modified official example that was copied from
@@ -67,6 +84,7 @@ class OTelLogsCodecTest {
         final var message = decoded.get();
 
         final Map<String, Object> expected = new HashMap<>();
+        expected.put(Message.FIELD_ID, FIXED_MESSAGE_ID);
         expected.put("message", "Example log record");
         expected.put("timestamp", DateTime.parse("2018-12-13T14:51:00.300Z"));
         expected.put("source", "127.0.0.1");
@@ -87,7 +105,7 @@ class OTelLogsCodecTest {
         expected.put("otel_attributes_map_attribute_some_map_key", "some value");
         expected.put("otel_resource_attributes_service_name", "my.service");
 
-        assertThat(message.getFields()).containsAllEntriesOf(expected);
+        assertThat(message.getFields()).isEqualTo(expected);
     }
 
     @Test
@@ -162,7 +180,7 @@ class OTelLogsCodecTest {
     @Test
     void fallbackToReceiveTimestamp() throws IOException {
         final DateTime receiveTimestamp = new DateTime(2025, 2, 7, 14, 0, 0, DateTimeZone.UTC);
-        final var decoded = codec.decode(parseFixture("empty_record.json"), receiveTimestamp, remoteAddress);
+        final var decoded = codec.decode(parseFixture("minimal_record.json"), receiveTimestamp, remoteAddress);
         assertThat(decoded).isNotEmpty();
         final var message = decoded.get();
 
@@ -174,19 +192,31 @@ class OTelLogsCodecTest {
         final var address = ResolvableInetSocketAddress.wrap(
                 new InetSocketAddress(Inet4Address.getLoopbackAddress(), 12345));
 
-        var decoded = codec.decode(parseFixture("empty_record.json"), DateTime.now(DateTimeZone.UTC), null);
+        var decoded = codec.decode(parseFixture("minimal_record.json"), DateTime.now(DateTimeZone.UTC), null);
         assertThat(decoded).isNotEmpty();
         assertThat(decoded.get().getSource()).isEqualTo("unknown");
 
-        decoded = codec.decode(parseFixture("empty_record.json"), DateTime.now(DateTimeZone.UTC), address);
+        decoded = codec.decode(parseFixture("minimal_record.json"), DateTime.now(DateTimeZone.UTC), address);
         assertThat(decoded).isNotEmpty();
         assertThat(decoded.get().getSource()).isEqualTo("127.0.0.1");
 
         address.reverseLookup();
 
-        decoded = codec.decode(parseFixture("empty_record.json"), DateTime.now(DateTimeZone.UTC), address);
+        decoded = codec.decode(parseFixture("minimal_record.json"), DateTime.now(DateTimeZone.UTC), address);
         assertThat(decoded).isNotEmpty();
         assertThat(decoded.get().getSource()).isEqualTo("localhost");
+    }
+
+    @Test
+    void ignoresEmptyRecord() throws IOException {
+        final var decoded = codec.decode(parseFixture("empty_record.json"), DateTime.now(DateTimeZone.UTC), remoteAddress);
+        assertThat(decoded).isEmpty();
+    }
+
+    @Test
+    void ignoresInvalidTraceAndSpanIds() throws IOException {
+        final var decoded = codec.decode(parseFixture("illegal_trace_and_span_ids.json"), DateTime.now(DateTimeZone.UTC), remoteAddress);
+        assertThat(decoded).isEmpty();
     }
 
     private OTelJournal.Log parseFixture(String filename) throws IOException {

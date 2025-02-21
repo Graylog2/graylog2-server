@@ -19,15 +19,16 @@ package org.graylog.plugins.otel.input.codec;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.InetAddresses;
+import com.google.protobuf.ByteString;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.ArrayValue;
-import io.opentelemetry.proto.common.v1.InstrumentationScope;
 import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.common.v1.KeyValueList;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.otel.input.OTelJournal;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 
 import java.util.Base64;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +54,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class OTelLogsCodec {
     private static final Logger LOG = getLogger(OTelLogsCodec.class);
+    private static final ByteString INVALID_TRACE_ID = ByteString.copyFrom(new byte[16]);
+    private static final ByteString INVALID_SPAN_ID = ByteString.copyFrom(new byte[8]);
+
     private final MessageFactory messageFactory;
     private final ObjectMapper objectMapper;
 
@@ -64,32 +69,83 @@ public class OTelLogsCodec {
     public Optional<Message> decode(@Nonnull OTelJournal.Log log, DateTime receiveTimestamp, ResolvableInetSocketAddress remoteAddress) {
         final var logRecord = log.getLogRecord();
 
-        final String body = asString("body", logRecord.getBody()).orElse("");
-        final String source = remoteAddress == null ? "unknown" : source(remoteAddress);
-        final DateTime timestamp = timestamp(logRecord).orElse(receiveTimestamp);
-
-        final Message message = messageFactory.createMessage(body, source, timestamp);
-
-        message.addField("otel_trace_id", Hex.encodeHexString(logRecord.getTraceId().toByteArray()));
-        message.addField("otel_span_id", Hex.encodeHexString(logRecord.getSpanId().toByteArray()));
-        message.addField("otel_flags", logRecord.getFlags());
-        message.addField("otel_severity_text", logRecord.getSeverityText());
-        message.addField("otel_severity_number", logRecord.getSeverityNumberValue());
-
-        if (logRecord.getTimeUnixNano() > 0) {
-            message.addField("otel_time_unix_nano", logRecord.getTimeUnixNano());
-        }
-        if (logRecord.getObservedTimeUnixNano() > 0) {
-            message.addField("otel_observed_time_unix_nano", logRecord.getObservedTimeUnixNano());
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Decoding log record: {}", logRecord);
         }
 
-        Stream.of(
-                convertKvList("otel_resource_attributes", log.getResource().getAttributesList()),
-                convertKvList("otel_attributes", logRecord.getAttributesList()),
-                scope(log.getScope())
-        ).flatMap(s -> s).forEach(field -> message.addField(field.getKey().replace('.', '_'), field.getValue()));
+        final var body = asString("body", logRecord.getBody()).orElse("");
+        final var source = remoteAddress == null ? "unknown" : source(remoteAddress);
+        final var timestamp = timestamp(logRecord).orElse(receiveTimestamp);
+
+        final var message = messageFactory.createMessage(body, source, timestamp);
+
+        final var fieldMap = transformToMessageFields(log, logRecord);
+
+        if (StringUtils.isBlank(body) && fieldMap.isEmpty()) {
+            LOG.debug("Skipping empty message.");
+            return Optional.empty();
+        }
+
+        message.addFields(fieldMap);
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Parsed message: {}", message);
+        }
 
         return Optional.of(message);
+    }
+
+    private HashMap<String, Object> transformToMessageFields(OTelJournal.Log log, LogRecord logRecord) {
+        final var fieldMap = new HashMap<String, Object>();
+
+        if (logRecord.getTraceId().size() == 16 && !logRecord.getTraceId().equals(INVALID_TRACE_ID)) {
+            fieldMap.put("otel_trace_id", Hex.encodeHexString(logRecord.getTraceId().toByteArray()));
+        }
+        if (logRecord.getSpanId().size() == 8 && !logRecord.getSpanId().equals(INVALID_SPAN_ID)) {
+            fieldMap.put("otel_span_id", Hex.encodeHexString(logRecord.getSpanId().toByteArray()));
+        }
+        if (logRecord.getFlags() > 0) {
+            fieldMap.put("otel_flags", logRecord.getFlags());
+        }
+        if (StringUtils.isNotBlank(logRecord.getSeverityText())) {
+            fieldMap.put("otel_severity_text", logRecord.getSeverityText());
+        }
+        if (logRecord.getSeverityNumberValue() > 0) {
+            fieldMap.put("otel_severity_number", logRecord.getSeverityNumberValue());
+        }
+        if (logRecord.getTimeUnixNano() > 0) {
+            fieldMap.put("otel_time_unix_nano", logRecord.getTimeUnixNano());
+        }
+        if (logRecord.getObservedTimeUnixNano() > 0) {
+            fieldMap.put("otel_observed_time_unix_nano", logRecord.getObservedTimeUnixNano());
+        }
+        if (StringUtils.isNotBlank(log.getResourceSchemaUrl())) {
+            fieldMap.put("otel_resource_schema_url", log.getResourceSchemaUrl());
+        }
+        if (StringUtils.isNotBlank(log.getLogRecordSchemaUrl())) {
+            fieldMap.put("otel_schema_url", log.getLogRecordSchemaUrl());
+        }
+        if (log.hasScope()) {
+            final var scope = log.getScope();
+            if (StringUtils.isNotBlank(scope.getName())) {
+                fieldMap.put("otel_scope_name", scope.getName());
+            }
+            if (StringUtils.isNotBlank(scope.getVersion())) {
+                fieldMap.put("otel_scope_version", scope.getVersion());
+            }
+            convertKvList("otel_scope_attributes", scope.getAttributesList())
+                    .forEach(f -> fieldMap.put(f.getKey(), f.getValue()));
+        }
+        convertKvList("otel_resource_attributes", log.getResource().getAttributesList())
+                .forEach(f -> fieldMap.put(f.getKey(), f.getValue()));
+        convertKvList("otel_attributes", logRecord.getAttributesList())
+                .forEach(f -> fieldMap.put(f.getKey(), f.getValue()));
+        Stream.concat(
+                convertKvList("otel_resource_attributes", log.getResource().getAttributesList()),
+                convertKvList("otel_attributes", logRecord.getAttributesList())
+        ).forEach(f -> fieldMap.put(f.getKey(), f.getValue()));
+
+        return fieldMap;
     }
 
     private Optional<DateTime> timestamp(LogRecord logRecord) {
@@ -111,14 +167,6 @@ public class OTelLogsCodec {
             return remoteAddress.getHostName();
         }
         return InetAddresses.toAddrString(remoteAddress.getAddress());
-    }
-
-    private Stream<Map.Entry<String, ?>> scope(InstrumentationScope scope) {
-        return Stream.concat(Stream.of(
-                        Map.entry("otel_scope_name", scope.getName()),
-                        Map.entry("otel_scope_version", scope.getVersion())),
-                convertKvList("otel_scope_attributes", scope.getAttributesList())
-        );
     }
 
     private Stream<Map.Entry<String, ?>> convertAnyValue(String key, AnyValue anyValue) {
@@ -157,7 +205,7 @@ public class OTelLogsCodec {
     }
 
     private Stream<Map.Entry<String, ?>> convertKvList(String key, List<KeyValue> kvList) {
-        return kvList.stream().flatMap(kv -> convertAnyValue(key + "_" + kv.getKey(), kv.getValue()));
+        return kvList.stream().flatMap(kv -> convertAnyValue(key + "_" + kv.getKey().replace('.', '_'), kv.getValue()));
     }
 
     private Optional<?> convertArray(String key, ArrayValue arrayValue) {
