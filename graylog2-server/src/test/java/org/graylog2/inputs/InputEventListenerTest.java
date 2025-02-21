@@ -30,6 +30,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.PersistedInputs;
+import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,14 +51,16 @@ public class InputEventListenerTest {
     private static final String THIS_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
     private static final String OTHER_NODE_ID = "c0c0a000-0000-4000-a000-000000000000";
 
-    // Input events will be processed by an asynchronous queue
-    private static final int EVENT_QUEUE_WAIT_TIME_MS = InputEventListener.EVENT_QUEUE_POLL_PERIOD_MS + 100;
+    // Input events will be processed by an asynchronous queue, so we need to wait a bit for the effects to happen
+    private static final int EVENT_QUEUE_WAIT_TIME_MS = InputEventListener.INPUT_START_GRACE_PERIOD_MS + 100;
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private InputLauncher inputLauncher;
+    @Mock
+    private GracefulShutdownService gracefulShutdownService;
     @Mock
     private InputRegistry inputRegistry;
     @Mock
@@ -79,7 +82,7 @@ public class InputEventListenerTest {
     @Before
     public void setUp() throws Exception {
         final EventBus eventBus = new EventBus(this.getClass().getSimpleName());
-        listener = new InputEventListener(eventBus, inputLauncher, inputRegistry, inputService, nodeId, leaderElectionService, persistedInputs, serverStatus);
+        listener = new InputEventListener(eventBus, gracefulShutdownService, inputLauncher, inputRegistry, inputService, nodeId, leaderElectionService, persistedInputs, serverStatus);
     }
 
     @Test

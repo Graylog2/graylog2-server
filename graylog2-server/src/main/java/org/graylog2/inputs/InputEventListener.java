@@ -36,20 +36,20 @@ import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.inputs.PersistedInputs;
+import org.graylog2.system.shutdown.GracefulShutdownHook;
+import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
-public class InputEventListener {
+public class InputEventListener implements GracefulShutdownHook {
     private static final Logger LOG = LoggerFactory.getLogger(InputEventListener.class);
-    protected static final int EVENT_QUEUE_POLL_PERIOD_MS = 100;
     protected static final int INPUT_START_GRACE_PERIOD_MS = 100;
-    private final LinkedBlockingQueue<QueuedEvent> eventQueue = new LinkedBlockingQueue<>(INPUT_START_GRACE_PERIOD_MS);
+    private final LinkedBlockingQueue<Runnable> eventQueue = new LinkedBlockingQueue<>(1000);
     private final InputLauncher inputLauncher;
     private final InputRegistry inputRegistry;
     private final InputService inputService;
@@ -57,12 +57,11 @@ public class InputEventListener {
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
-    private final ScheduledExecutorService daemonScheduler;
-
-    private record QueuedEvent(Object receivedEvent) {}
+    private final ExecutorService executorService;
 
     @Inject
     public InputEventListener(EventBus eventBus,
+                              GracefulShutdownService shutdownService,
                               InputLauncher inputLauncher,
                               InputRegistry inputRegistry,
                               InputService inputService,
@@ -78,45 +77,38 @@ public class InputEventListener {
         this.persistedInputs = persistedInputs;
         this.serverStatus = serverStatus;
 
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("input-event-listener-%d").build();
-        this.daemonScheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("input-event-listener-%d")
+                .setDaemon(true)
+                .build();
+        this.executorService = Executors.newSingleThreadScheduledExecutor(threadFactory);
 
         initializeEventQueueTask();
+
+        shutdownService.register(this);
         eventBus.register(this);
     }
 
+    @Override
+    public void doGracefulShutdown() {
+        executorService.shutdown();
+    }
+
     private void initializeEventQueueTask() {
-        daemonScheduler.scheduleAtFixedRate(() -> {
-            try {
-                final var queuedEvent = eventQueue.poll();
-                if (queuedEvent != null) {
-                    final Object receivedEvent = queuedEvent.receivedEvent;
-                    LOG.debug("Processing event: {}", receivedEvent);
-                    if (receivedEvent instanceof InputCreated) {
-                        doInputCreated(((InputCreated) receivedEvent).id());
-                    } else if (receivedEvent instanceof InputDeleted) {
-                        doInputDeleted(((InputDeleted) receivedEvent).id());
-                    } else if (receivedEvent instanceof InputSetup) {
-                        doInputSetup(((InputSetup) receivedEvent).id());
-                    } else if (receivedEvent instanceof InputUpdated) {
-                        doInputUpdated(((InputUpdated) receivedEvent).id());
-                    } else if (receivedEvent instanceof LeaderChangedEvent) {
-                        doLeaderChanged();
-                    } else {
-                        throw new IllegalArgumentException("Unexpected event: " + queuedEvent.receivedEvent);
-                    }
-                }
-            } catch (Exception e) {
-                LOG.error("Caught exception while trying to process queued event", e);
+        executorService.submit(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                Runnable task = eventQueue.take();
+                task.run();
             }
-        }, 0, EVENT_QUEUE_POLL_PERIOD_MS, TimeUnit.MILLISECONDS);
+            return null;
+        });
     }
 
     @Subscribe
     public void inputCreated(InputCreated inputCreatedEvent) {
         final String inputId = inputCreatedEvent.id();
         LOG.debug("Input created: {}", inputId);
-        eventQueue.add(new QueuedEvent(inputCreatedEvent));
+        eventQueue.add(() -> doInputCreated(inputId));
     }
 
     private void doInputCreated(String inputId) {
@@ -142,7 +134,7 @@ public class InputEventListener {
     public void inputUpdated(InputUpdated inputUpdatedEvent) {
         final String inputId = inputUpdatedEvent.id();
         LOG.debug("Input updated: {}", inputId);
-        eventQueue.add(new QueuedEvent(inputUpdatedEvent));
+        eventQueue.add(() -> doInputUpdated(inputId));
     }
 
     private void doInputUpdated(final String inputId) {
@@ -183,6 +175,7 @@ public class InputEventListener {
                     input.toIdentifier());
         }
         try {
+            LOG.debug("Waiting {}ms before processing next event to prevent input state conflicts", INPUT_START_GRACE_PERIOD_MS);
             Thread.sleep(INPUT_START_GRACE_PERIOD_MS);
         } catch (InterruptedException ignored) {
         }
@@ -197,8 +190,9 @@ public class InputEventListener {
 
     @Subscribe
     public void inputDeleted(InputDeleted inputDeletedEvent) {
-        LOG.debug("Input deleted: {}", inputDeletedEvent.id());
-        eventQueue.add(new QueuedEvent(inputDeletedEvent));
+        final String inputId = inputDeletedEvent.id();
+        LOG.debug("Input deleted: {}", inputId);
+        eventQueue.add(() -> doInputDeleted(inputId));
     }
 
     private void doInputDeleted(String inputId) {
@@ -210,8 +204,9 @@ public class InputEventListener {
 
     @Subscribe
     public void inputSetup(InputSetup inputSetupEvent) {
-        LOG.info("Input setup: {}", inputSetupEvent.id());
-        eventQueue.add(new QueuedEvent(inputSetupEvent));
+        final String inputId = inputSetupEvent.id();
+        LOG.info("Input setup: {}", inputId);
+        eventQueue.add(() -> doInputSetup(inputId));
     }
 
     private void doInputSetup(String inputId) {
@@ -240,7 +235,7 @@ public class InputEventListener {
             LOG.debug("Ignoring LeaderChangedEvent during server startup.");
             return;
         }
-        eventQueue.add(new QueuedEvent(leaderChangedEvent));
+        eventQueue.add(this::doLeaderChanged);
     }
 
     private void doLeaderChanged() {
