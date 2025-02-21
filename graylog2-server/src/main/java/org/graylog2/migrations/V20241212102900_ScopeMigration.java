@@ -19,8 +19,8 @@ package org.graylog2.migrations;
 import jakarta.inject.Inject;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.indexer.indexset.NonDeletableSystemScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

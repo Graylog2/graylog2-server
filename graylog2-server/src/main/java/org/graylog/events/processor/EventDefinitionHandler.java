@@ -28,7 +28,7 @@ import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.database.entities.DefaultEntityScope;
-import org.graylog2.indexer.indexset.NonDeletableSystemScope;
+import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.plugin.database.users.User;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;

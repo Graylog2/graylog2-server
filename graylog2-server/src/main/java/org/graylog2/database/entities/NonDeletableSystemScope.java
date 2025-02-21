@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.indexset;
-
-import org.graylog2.database.entities.EntityScope;
+package org.graylog2.database.entities;
 
 public class NonDeletableSystemScope extends EntityScope {
     public static final String NAME = "GRAYLOG_NONDELETEABLE_SCOPE";

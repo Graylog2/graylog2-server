@@ -22,7 +22,7 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
-import org.graylog2.indexer.indexset.NonDeletableSystemScope;
+import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
