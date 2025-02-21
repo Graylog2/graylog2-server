@@ -48,7 +48,8 @@ import java.util.concurrent.TimeUnit;
 public class InputEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(InputEventListener.class);
     protected static final int EVENT_QUEUE_POLL_PERIOD_MS = 100;
-    private static final int EVENT_QUEUE_CAPACITY = 100;
+    protected static final int INPUT_START_GRACE_PERIOD_MS = 100;
+    private final LinkedBlockingQueue<QueuedEvent> eventQueue = new LinkedBlockingQueue<>(INPUT_START_GRACE_PERIOD_MS);
     private final InputLauncher inputLauncher;
     private final InputRegistry inputRegistry;
     private final InputService inputService;
@@ -57,7 +58,6 @@ public class InputEventListener {
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
     private final ScheduledExecutorService daemonScheduler;
-    private final LinkedBlockingQueue<QueuedEvent> eventQueue = new LinkedBlockingQueue<>(EVENT_QUEUE_CAPACITY);
 
     private record QueuedEvent(Object receivedEvent) {}
 
@@ -181,6 +181,10 @@ public class InputEventListener {
         } else {
             LOG.info("Not launching 'onlyOnePerCluster' input {} because this node is not the leader.",
                     input.toIdentifier());
+        }
+        try {
+            Thread.sleep(INPUT_START_GRACE_PERIOD_MS);
+        } catch (InterruptedException ignored) {
         }
     }
 
