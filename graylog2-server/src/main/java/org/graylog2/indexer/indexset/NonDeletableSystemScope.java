@@ -18,8 +18,8 @@ package org.graylog2.indexer.indexset;
 
 import org.graylog2.database.entities.EntityScope;
 
-public class SystemIndexSetScope extends EntityScope {
-    public static final String NAME = "GRAYLOG_SYSTEM_INDEX_SET_SCOPE";
+public class NonDeletableSystemScope extends EntityScope {
+    public static final String NAME = "GRAYLOG_NONDELETEABLE_SCOPE";
 
     @Override
     public String getName() {

@@ -27,7 +27,6 @@ import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
@@ -38,6 +37,7 @@ import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfigFactory;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.NonDeletableSystemScope;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
@@ -54,6 +54,7 @@ import java.util.Optional;
 
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
+import static org.graylog.events.processor.DBEventDefinitionService.SYSTEM_NOTIFICATION_EVENT_DEFINITION;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_PREFIX;
 import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE;
@@ -216,7 +217,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
             if (eventDefinitionStream.findAny().isEmpty()) {
                 EventDefinitionDto eventDto =
                         EventDefinitionDto.builder()
-                                .title("System notification events")
+                                .title(SYSTEM_NOTIFICATION_EVENT_DEFINITION)
                                 .description("Reserved event definition for system notification events")
                                 .alert(false)
                                 .priority(1)
@@ -227,7 +228,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                                         .build())
                                 .config(SystemNotificationEventProcessorConfig.builder().build())
                                 .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
-                                .scope(SystemNotificationEventEntityScope.NAME)
+                                .scope(NonDeletableSystemScope.NAME)
                                 .build();
                 dbService.save(eventDto);
             }

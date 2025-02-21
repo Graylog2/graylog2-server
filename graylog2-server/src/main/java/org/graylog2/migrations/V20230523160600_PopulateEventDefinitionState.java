@@ -20,9 +20,9 @@ import jakarta.inject.Inject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinition;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog2.indexer.indexset.NonDeletableSystemScope;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +65,7 @@ public class V20230523160600_PopulateEventDefinitionState extends Migration {
         try (var stream = dbEventDefinitionService.streamAll()) {
             stream.forEach(dto -> {
                 Optional<JobDefinitionDto> jobDefinition = dbJobDefinitionService.getByConfigField(EventDto.FIELD_EVENT_DEFINITION_ID, dto.id());
-                if (dto.scope().equals(SystemNotificationEventEntityScope.NAME) || jobDefinition.isPresent()) {
+                if (dto.scope().equals(NonDeletableSystemScope.NAME) || jobDefinition.isPresent()) {
                     enabledEventDefinitionIds.add(dto.id());
                 }
             });

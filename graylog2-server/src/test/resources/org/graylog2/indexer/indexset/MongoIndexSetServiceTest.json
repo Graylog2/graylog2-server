@@ -110,7 +110,7 @@
       "index_template_type": "events",
       "index_optimization_max_num_segments": 1,
       "index_optimization_disabled": false,
-      "_scope" : "GRAYLOG_SYSTEM_INDEX_SET_SCOPE"
+      "_scope" : "GRAYLOG_NONDELETEABLE_SCOPE"
     }
   ]
 }

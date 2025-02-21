@@ -18,20 +18,22 @@ package org.graylog.events.processor;
 
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import org.bson.conversions.Bson;
 import org.graylog.events.notifications.EventNotificationConfig;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
+import org.graylog2.indexer.indexset.NonDeletableSystemScope;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
@@ -51,6 +53,7 @@ import java.util.stream.Stream;
 import static com.mongodb.client.model.Filters.elemMatch;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_TITLE;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.stream;
 
@@ -58,6 +61,7 @@ public class DBEventDefinitionService {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
 
     public static final String COLLECTION_NAME = "event_definitions";
+    public static final String SYSTEM_NOTIFICATION_EVENT_DEFINITION = "System notification events";
 
     private final MongoCollection<EventDefinitionDto> collection;
     private final MongoUtils<EventDefinitionDto> mongoUtils;
@@ -197,7 +201,10 @@ public class DBEventDefinitionService {
      */
     @MustBeClosed
     public Stream<EventDefinitionDto> streamSystemEventDefinitions() {
-        return stream(collection.find(eq(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME)));
+        return stream(collection.find(
+                Filters.or(
+                        eq(FIELD_TITLE, SYSTEM_NOTIFICATION_EVENT_DEFINITION),
+                        eq(ScopedEntity.FIELD_SCOPE, NonDeletableSystemScope.NAME))));
     }
 
     /**

@@ -89,7 +89,7 @@ public class MongoIndexSetServiceTest {
                 new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 clusterEventBus);
         MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
-        final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new SystemIndexSetScope()));
+        final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new NonDeletableSystemScope()));
         indexSetService = new MongoIndexSetService(mongoCollections, streamService, clusterConfigService, clusterEventBus, entityScopeService);
     }
 
@@ -253,7 +253,7 @@ public class MongoIndexSetServiceTest {
                         ),
                         IndexSetConfig.create(
                                 "57f3d721a43c2d59cb750004",
-                                SystemIndexSetScope.NAME,
+                                NonDeletableSystemScope.NAME,
                                 "Test 4",
                                 "Index with system scope - not deletable",
                                 true, null,

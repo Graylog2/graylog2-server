@@ -107,7 +107,7 @@ public abstract class IndexSetConfig extends ScopedEntity implements Comparable<
         }
 
         if (scope == null) {
-            scope = Boolean.FALSE.equals(isRegular) ? SystemIndexSetScope.NAME : DefaultEntityScope.NAME;
+            scope = Boolean.FALSE.equals(isRegular) ? NonDeletableSystemScope.NAME : DefaultEntityScope.NAME;
         }
 
         return AutoValue_IndexSetConfig.builder()
