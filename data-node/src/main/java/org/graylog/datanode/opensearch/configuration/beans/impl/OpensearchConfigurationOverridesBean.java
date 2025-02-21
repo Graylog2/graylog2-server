@@ -36,19 +36,19 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-public class OpensearchPassThroughConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
+public class OpensearchConfigurationOverridesBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchPassThroughConfigurationBean.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfigurationOverridesBean.class);
     private final Supplier<Map<String, String>> systemEnvSupplier;
     private final DatanodeDirectories datanodeDirectories;
     private final Path overridesFile;
 
     @Inject
-    public OpensearchPassThroughConfigurationBean(DatanodeConfiguration datanodeConfiguration, Configuration configuration) {
+    public OpensearchConfigurationOverridesBean(DatanodeConfiguration datanodeConfiguration, Configuration configuration) {
         this(datanodeConfiguration.datanodeDirectories(), configuration.getOpensearchConfigurationOverridesFile() , System::getenv);
     }
 
-    public OpensearchPassThroughConfigurationBean(DatanodeDirectories datanodeDirectories, Path overridesFile, Supplier<Map<String, String>> systemEnvSupplier) {
+    public OpensearchConfigurationOverridesBean(DatanodeDirectories datanodeDirectories, Path overridesFile, Supplier<Map<String, String>> systemEnvSupplier) {
         this.datanodeDirectories = datanodeDirectories;
         this.overridesFile = overridesFile;
         this.systemEnvSupplier = systemEnvSupplier;

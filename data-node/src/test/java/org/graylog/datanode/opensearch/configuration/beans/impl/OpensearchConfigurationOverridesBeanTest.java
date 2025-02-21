@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
 
-class OpensearchPassThroughConfigurationBeanTest {
+class OpensearchConfigurationOverridesBeanTest {
 
     @Test
     void testPassThroughConfigurationPart(@TempDir Path tempDir) {
@@ -46,7 +46,7 @@ class OpensearchPassThroughConfigurationBeanTest {
                         """);
 
 
-        final OpensearchPassThroughConfigurationBean cb = new OpensearchPassThroughConfigurationBean(datanodeDirectories, opensearchOverridesFile, Collections::emptyMap);
+        final OpensearchConfigurationOverridesBean cb = new OpensearchConfigurationOverridesBean(datanodeDirectories, opensearchOverridesFile, Collections::emptyMap);
         final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.properties())
@@ -70,7 +70,7 @@ class OpensearchPassThroughConfigurationBeanTest {
 
         final Supplier<Map<String, String>> env = () -> Map.of("opensearch.cluster.max_shards_per_node", "500");
 
-        final OpensearchPassThroughConfigurationBean cb = new OpensearchPassThroughConfigurationBean(datanodeDirectories, opensearchOverridesFile, env);
+        final OpensearchConfigurationOverridesBean cb = new OpensearchConfigurationOverridesBean(datanodeDirectories, opensearchOverridesFile, env);
         final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.properties())
