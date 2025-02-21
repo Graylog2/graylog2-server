@@ -29,6 +29,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.events.event.EventDto;
+import org.graylog.events.search.EventsHistogramResult;
 import org.graylog.events.search.EventsSearchFilter;
 import org.graylog.events.search.EventsSearchParameters;
 import org.graylog.events.search.EventsSearchResult;
@@ -67,6 +68,14 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("Doesn't change any data, only searches for events")
     public EventsSearchResult search(@ApiParam(name = "JSON body") final EventsSearchParameters request) {
         return searchService.search(firstNonNull(request, EventsSearchParameters.empty()), getSubject());
+    }
+
+    @POST
+    @Path("/histogram")
+    @ApiOperation("Build histogram of events over time")
+    @NoAuditEvent("Doesn't change any data, only searches for events")
+    public EventsHistogramResult histogram(@ApiParam(name = "JSON body") final EventsSearchParameters request) {
+        return searchService.histogram(firstNonNull(request, EventsSearchParameters.empty()), getSubject());
     }
 
     @GET
