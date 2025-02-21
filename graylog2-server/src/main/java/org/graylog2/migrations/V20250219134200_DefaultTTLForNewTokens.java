@@ -17,7 +17,6 @@
 package org.graylog2.migrations;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.users.UserConfiguration;
 
@@ -35,12 +34,10 @@ import java.util.Objects;
  */
 public class V20250219134200_DefaultTTLForNewTokens extends Migration {
     private final ClusterConfigService configService;
-    private final boolean isFreshInstallation;
 
     @Inject
-    public V20250219134200_DefaultTTLForNewTokens(ClusterConfigService configService, @Named("isFreshInstallation") boolean isFreshInstallation) {
+    public V20250219134200_DefaultTTLForNewTokens(ClusterConfigService configService) {
         this.configService = configService;
-        this.isFreshInstallation = isFreshInstallation;
     }
 
     @Override
@@ -55,33 +52,27 @@ public class V20250219134200_DefaultTTLForNewTokens extends Migration {
             return;
         }
 
-        if (isFreshInstallation) {
-            //For a fresh installation, there's no risk of existing API-tokens owned by external or non-admin users.
-            // Thus, applying strict config:
-            configService.write(UserConfiguration.DEFAULT_VALUES);
+        //No major upgrade, so the permissions are more relaxed to not introduce breaking changes:
+        final UserConfiguration newDefaults = UserConfiguration.DEFAULT_VALUES_FOR_UPGRADE;
+
+        UserConfiguration configToUpdate = this.configService.get(UserConfiguration.class);
+        if (configToUpdate == null) {
+            //No userConfig exists, let's simply save the default for the current version:
+            // Actually, this should not happen, as the migration V20250206105400_TokenManagementConfiguration
+            // should be executed before, where some defaults are set.
+            configToUpdate = newDefaults;
         } else {
-            //No major upgrade, so the permissions are more relaxed to not introduce breaking changes:
-            final UserConfiguration newDefaults = UserConfiguration.DEFAULT_VALUES_FOR_UPGRADE;
-
-            UserConfiguration configToUpdate = this.configService.get(UserConfiguration.class);
-            if (configToUpdate == null) {
-                //No userConfig exists, let's simply save the default for the current version:
-                // Actually, this should not happen, as the migration V20250206105400_TokenManagementConfiguration
-                // should be executed before, where some defaults are set.
-                configToUpdate = newDefaults;
-            } else {
-                //A UserConfig already exists. As V20250206105400_TokenManagementConfiguration should have run already,
-                // which did set defaults restricting externals and admins, respectively, we only need to add the new default TTL:
-                configToUpdate = UserConfiguration.create(
-                        configToUpdate.enableGlobalSessionTimeout(),
-                        configToUpdate.globalSessionTimeoutInterval(),
-                        configToUpdate.allowAccessTokenForExternalUsers(),
-                        configToUpdate.restrictAccessTokenToAdmins(),
-                        newDefaults.defaultTTLForNewTokens());
-            }
-
-            configService.write(configToUpdate);
+            //A UserConfig already exists. As V20250206105400_TokenManagementConfiguration should have run already,
+            // which did set defaults restricting externals and admins, respectively, we only need to add the new default TTL:
+            configToUpdate = UserConfiguration.create(
+                    configToUpdate.enableGlobalSessionTimeout(),
+                    configToUpdate.globalSessionTimeoutInterval(),
+                    configToUpdate.allowAccessTokenForExternalUsers(),
+                    configToUpdate.restrictAccessTokenToAdmins(),
+                    newDefaults.defaultTTLForNewTokens());
         }
+
+        configService.write(configToUpdate);
 
         markMigrationApplied();
     }

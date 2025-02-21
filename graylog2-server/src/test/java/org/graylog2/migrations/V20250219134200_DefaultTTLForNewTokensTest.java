@@ -45,7 +45,7 @@ public class V20250219134200_DefaultTTLForNewTokensTest {
 
     @Before
     public void setUp() {
-        testee = new V20250219134200_DefaultTTLForNewTokens(configService, false);
+        testee = new V20250219134200_DefaultTTLForNewTokens(configService);
     }
 
     @Test
@@ -55,20 +55,6 @@ public class V20250219134200_DefaultTTLForNewTokensTest {
         testee.upgrade();
 
         verify(configService).get(V20250219134200_DefaultTTLForNewTokens.MigrationCompleted.class);
-        verifyNoMoreInteractions(configService);
-    }
-
-    @Test
-    public void newInstallationInsertsFullUserConfigWithDefaultValues() {
-        //This time, it is a fresh installation:
-        testee = new V20250219134200_DefaultTTLForNewTokens(configService, true);
-        setupMocks(false, false);
-
-        testee.upgrade();
-
-        verify(configService).get(V20250219134200_DefaultTTLForNewTokens.MigrationCompleted.class);
-        verify(configService).write(UserConfiguration.DEFAULT_VALUES);
-        verify(configService).write(new V20250219134200_DefaultTTLForNewTokens.MigrationCompleted());
         verifyNoMoreInteractions(configService);
     }
 
