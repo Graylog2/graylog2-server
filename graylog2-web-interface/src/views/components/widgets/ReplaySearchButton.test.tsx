@@ -17,14 +17,15 @@
 import * as React from 'react';
 import { asElement, render, screen } from 'wrappedTestingLibrary';
 
-import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { QueryString } from 'views/logic/queries/types';
 
 import ReplaySearchButton from './ReplaySearchButton';
 
 type OptionalOverrides = {
   streams?: Array<string>;
-  query?: ElasticsearchQueryString;
+  query?: QueryString;
   timerange?: TimeRange;
 };
 

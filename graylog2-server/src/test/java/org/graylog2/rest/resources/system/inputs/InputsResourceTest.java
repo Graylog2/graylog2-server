@@ -21,7 +21,7 @@ import jakarta.ws.rs.BadRequestException;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.inputs.InputDiagnosticService;
+import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.MessageInput;

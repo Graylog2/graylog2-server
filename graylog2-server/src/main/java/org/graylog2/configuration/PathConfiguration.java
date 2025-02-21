@@ -25,20 +25,16 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
 
-public class PathConfiguration {
+public class PathConfiguration extends PluginPathConfiguration {
     public static final String ALLOWED_AUXILIARY_PATHS = "allowed_auxiliary_paths";
 
     protected static final Path DEFAULT_BIN_DIR = Paths.get("bin");
-    protected static final Path DEFAULT_PLUGIN_DIR = Paths.get("plugin");
 
     @Parameter(value = "bin_dir", required = true)
     private Path binDir = DEFAULT_BIN_DIR;
 
     @Parameter(value = "data_dir", required = true)
     private Path dataDir;
-
-    @Parameter(value = "plugin_dir", required = true)
-    private Path pluginDir = DEFAULT_PLUGIN_DIR;
 
     /**
      * Optional allowed paths for Graylog data files.
@@ -63,10 +59,6 @@ public class PathConfiguration {
 
     public Path getNativeLibDir() {
         return dataDir.resolve("libnative");
-    }
-
-    public Path getPluginDir() {
-        return pluginDir;
     }
 
     public Set<Path> getAllowedAuxiliaryPaths() {

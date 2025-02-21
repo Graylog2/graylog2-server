@@ -34,6 +34,7 @@ public abstract class EventsSearchFilter {
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_AGGREGATION_TIMERANGE = "aggregation_timerange";
     private static final String FIELD_KEY = "key";
+    private static final String FIELD_ID = "id";
 
     public enum Alerts {
         @JsonProperty("include")
@@ -59,6 +60,9 @@ public abstract class EventsSearchFilter {
     @JsonProperty(FIELD_KEY)
     public abstract Set<String> key();
 
+    @JsonProperty(FIELD_ID)
+    public abstract Set<String> id();
+
     public static EventsSearchFilter empty() {
         return builder().build();
     }
@@ -77,7 +81,8 @@ public abstract class EventsSearchFilter {
                     .alerts(Alerts.INCLUDE)
                     .eventDefinitions(Collections.emptySet())
                     .priority(Collections.emptySet())
-                    .key(Collections.emptySet());
+                    .key(Collections.emptySet())
+                    .id(Collections.emptySet());
         }
 
         @JsonProperty(FIELD_ALERTS)
@@ -94,6 +99,9 @@ public abstract class EventsSearchFilter {
 
         @JsonProperty(FIELD_KEY)
         public abstract Builder key(Set<String> key);
+
+        @JsonProperty(FIELD_ID)
+        public abstract Builder id(Set<String> id);
 
         public abstract EventsSearchFilter build();
     }

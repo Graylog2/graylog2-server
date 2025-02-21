@@ -16,7 +16,8 @@
  */
 import { useMemo } from 'react';
 
-import type { TimeRange, FilterType, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { TimeRange, FilterType } from 'views/logic/queries/Query';
+import type { QueryString } from 'views/logic/queries/types';
 import {
   filtersForQuery,
   categoryFiltersForQuery,
@@ -79,7 +80,7 @@ type NormalizedSearchURLQueryParams = {
   timeRange: TimeRange | undefined;
   streamsFilter: FilterType | undefined;
   streamCategoriesFilter: FilterType | undefined;
-  queryString: ElasticsearchQueryString | undefined;
+  queryString: QueryString | undefined;
 };
 
 const normalizeSearchURLQueryParams = (query: RawQuery): NormalizedSearchURLQueryParams => {

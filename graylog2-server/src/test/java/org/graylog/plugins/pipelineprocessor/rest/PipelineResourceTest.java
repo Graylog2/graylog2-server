@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.inputs.InputRoutingService;
@@ -65,12 +66,15 @@ public class PipelineResourceTest {
     @Mock
     private InputRoutingService inputRoutingService;
 
+    @Mock
+    private RuleService ruleService;
+
     private PipelineResource pipelineResource;
 
     @Before
     public void setup() {
         pipelineResource = new PipelineResource(
-                pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, inputRoutingService);
+                pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, inputRoutingService, ruleService);
     }
 
     @Test
