@@ -16,12 +16,15 @@
  */
 package org.graylog.plugins.views.search.jobs;
 
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
-import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -29,9 +32,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -53,19 +61,35 @@ public class SearchJobStateServiceTest {
     @Test
     public void testSaveAndGet() {
         final SearchJobState toBeSaved = SearchJobState.builder()
-                .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .identifier(new SearchJobIdentifier("777fd86ae6db8b71a8e10000", "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
                 .result(noResult())
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
-        final SearchJobState saved = toTest.create(toBeSaved);
-        final Optional<SearchJobState> retrieved = toTest.get(saved.id());
+        toTest.create(toBeSaved);
+        final Optional<SearchJobState> retrieved = toTest.get("777fd86ae6db8b71a8e10000");
         assertTrue(retrieved.isPresent());
         assertEquals(toBeSaved.toBuilder()
-                .identifier(new SearchJobIdentifier(saved.id(), "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .identifier(new SearchJobIdentifier("777fd86ae6db8b71a8e10000", "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
                 .build(), retrieved.get());
+    }
+
+    @Test
+    public void testGetStatus() {
+        final SearchJobState toBeSaved = SearchJobState.builder()
+                .identifier(new SearchJobIdentifier("777fd86ae6db8b71a8e10000", "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(noResult())
+                .status(SearchJobStatus.RUNNING)
+                .progress(42)
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build();
+        toTest.create(toBeSaved);
+        final Optional<SearchJobStatus> retrieved = toTest.getStatus("777fd86ae6db8b71a8e10000");
+        assertTrue(retrieved.isPresent());
+        assertEquals(toBeSaved.status(), retrieved.get());
     }
 
     @Test
@@ -127,6 +151,58 @@ public class SearchJobStateServiceTest {
         assertTrue(retrieved.isPresent());
         assertEquals(SearchJobStatus.DONE, retrieved.get().status());
         assertTrue(retrieved.get().updatedAt().isAfter(toBeSaved.updatedAt()));
+    }
+
+    @Test
+    public void testResetJobsAreImmuneToUpdates() {
+        final SearchJobState toBeSaved = SearchJobState.builder()
+                .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(noResult())
+                .status(SearchJobStatus.RESET)
+                .progress(42)
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build();
+        final SearchJobState saved = toTest.create(toBeSaved);
+
+        assertFalse(toTest.changeStatus(saved.id(), SearchJobStatus.ERROR));
+        assertFalse(toTest.update(saved.toBuilder().progress(13).build()));
+    }
+
+    @Test
+    public void testReset() {
+        final SearchJobState savedSearchJobState = toTest.create(SearchJobState.builder()
+                .identifier(new SearchJobIdentifier(null,
+                        "677fd86ae6db8b71a8e10001",
+                        "john",
+                        "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(QueryResult.builder()
+                        .query(Query.builder()
+                                .id("0000000000000042")
+                                .timerange(KeywordRange.create("last year", "UTC"))
+                                .query(ElasticsearchQueryString.empty())
+                                .searchTypes(Set.of())
+                                .build())
+                        .searchTypes(Map.of())
+                        .build())
+                .errors(Set.of())
+                .status(SearchJobStatus.RUNNING)
+                .progress(42)
+                .createdAt(DateTime.parse("1999-01-01T11:11:11"))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build());
+
+        assertTrue(toTest.resetLatestForUser("jose").isEmpty()); //no active query for Jose
+
+        final Optional<SearchJobState> previousState = toTest.resetLatestForUser("john");
+        assertTrue(previousState.isPresent());
+        assertEquals(savedSearchJobState, previousState.get());
+        final Optional<SearchJobState> latestForJohn = toTest.getLatestForUser("john");
+        assertTrue(latestForJohn.isPresent());
+        assertEquals(SearchJobStatus.RESET, latestForJohn.get().status());
+        assertEquals(savedSearchJobState.identifier(), latestForJohn.get().identifier());
+        assertNull(latestForJohn.get().result());
+        assertEquals(Set.of(), latestForJohn.get().errors());
     }
 
     @Test
@@ -226,7 +302,13 @@ public class SearchJobStateServiceTest {
 
     }
 
-    private SearchType.Result noResult() {
-        return null;
+    private QueryResult noResult() {
+        return QueryResult.builder()
+                .searchTypes(Collections.emptyMap())
+                .query(Query.builder()
+                        .id("0000000000000042")
+                        .timerange(KeywordRange.create("last year", "UTC"))
+                        .query(ElasticsearchQueryString.empty())
+                        .build()).build();
     }
 }

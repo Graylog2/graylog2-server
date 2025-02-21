@@ -35,63 +35,53 @@ type Props = {
 
 const Wizard = ({ show, input, onClose }: Props) => {
   const { activeStep, setActiveStep, orderedSteps, setOrderedSteps, setWizardData, wizardData } = useInputSetupWizard();
-  const EnterpriseWizard = PluginStore.exports('inputSetupWizard').find(plugin => !!plugin.EnterpriseInputSetupWizard)?.EnterpriseInputSetupWizard;
+  const EnterpriseWizard = PluginStore.exports('inputSetupWizard').find(
+    (plugin) => !!plugin.EnterpriseInputSetupWizard,
+  )?.EnterpriseInputSetupWizard;
 
   useEffect(() => {
     setWizardData({ ...wizardData, input }); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Initial setup: intentionally ommiting dependencies to prevent from unneccesary rerenders
 
-  const steps = useMemo(() => ({
+  const steps = useMemo(
+    () => ({
       [INPUT_WIZARD_STEPS.SETUP_ROUTING]: {
         key: INPUT_WIZARD_STEPS.SETUP_ROUTING,
-        title: (
-          <>
-            Routing
-          </>
-        ),
-        component: (
-          <SetupRoutingStep />
-        ),
+        title: <>Routing</>,
+        component: <SetupRoutingStep />,
         disabled: true,
       },
       [INPUT_WIZARD_STEPS.START_INPUT]: {
         key: INPUT_WIZARD_STEPS.START_INPUT,
-        title: (
-          <>
-            Launch
-          </>
-        ),
-        component: (
-          <StartInputStep />
-        ),
+        title: <>Launch</>,
+        component: <StartInputStep />,
         disabled: true,
       },
       [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
         key: INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
-        title: (
-          <>
-            Diagnosis
-          </>
-        ),
-        component: (
-          <InputDiagnosisStep onClose={() => onClose()} />
-        ),
+        title: <>Diagnosis</>,
+        component: <InputDiagnosisStep onClose={() => onClose()} />,
         disabled: true,
       },
-    }
-  ), [onClose]);
+    }),
+    [onClose],
+  );
 
   const setInitialSteps = useCallback(() => {
-    setOrderedSteps([INPUT_WIZARD_STEPS.SETUP_ROUTING, INPUT_WIZARD_STEPS.START_INPUT, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]);
+    setOrderedSteps([
+      INPUT_WIZARD_STEPS.SETUP_ROUTING,
+      INPUT_WIZARD_STEPS.START_INPUT,
+      INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
+    ]);
     setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);
-  }, [setOrderedSteps, setActiveStep])
+  }, [setOrderedSteps, setActiveStep]);
 
   useEffect(() => {
     if (EnterpriseWizard) return;
     if (!activeStep) {
-      setInitialSteps()
+      setInitialSteps();
     }
-  }, [EnterpriseWizard, activeStep, setInitialSteps])
+  }, [EnterpriseWizard, activeStep, setInitialSteps]);
 
   if (!show) return null;
 
@@ -102,20 +92,20 @@ const Wizard = ({ show, input, onClose }: Props) => {
       <Modal.Header closeButton>Input Setup Wizard</Modal.Header>
       <Modal.Body>
         <InputSetupWizardStepsProvider>
-        {EnterpriseWizard ? (
-          <EnterpriseWizard
-            openSteps={steps}
-          />
-        ) : (
-          orderedSteps.length > 0 && (
-            <CommonWizard activeStep={activeStep}
+          {EnterpriseWizard ? (
+            <EnterpriseWizard openSteps={steps} />
+          ) : (
+            orderedSteps.length > 0 && (
+              <CommonWizard
+                activeStep={activeStep}
                 hidePreviousNextButtons
                 horizontal
                 justified
                 onStepChange={setActiveStep}
-                steps={orderedStepsConfig} />
-          )
-        )}
+                steps={orderedStepsConfig}
+              />
+            )
+          )}
         </InputSetupWizardStepsProvider>
       </Modal.Body>
     </Modal>
