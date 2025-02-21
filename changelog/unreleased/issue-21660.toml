@@ -1,0 +1,5 @@
+type="a"
+message="Add new configurable default TTL for creating API tokens."
+
+issues=["21660", "21661", "21662"]
+pulls=["21687"]

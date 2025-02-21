@@ -87,7 +87,7 @@
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- Dependencies -->
-        <opensearch.shaded.version>2.15.0-1</opensearch.shaded.version>
+        <opensearch.shaded.version>2.19.0-1</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
         <amqp-client.version>5.25.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
@@ -179,7 +179,7 @@
         <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.6-10</zstd.version>
+        <zstd.version>1.5.7-1</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.6</jjwt.version>
@@ -198,7 +198,7 @@
         <mockito.version>5.15.2</mockito.version>
         <restassured.version>5.5.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.20.4</testcontainers.version>
+        <testcontainers.version>1.20.5</testcontainers.version>
         <testcontainers.opensearch.version>2.1.2</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -549,7 +549,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.4.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
