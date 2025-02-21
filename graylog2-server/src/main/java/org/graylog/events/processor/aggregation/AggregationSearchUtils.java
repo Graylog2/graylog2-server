@@ -20,7 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import jakarta.inject.Inject;
 import org.graylog.events.conditions.BooleanNumberConditionsVisitor;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
@@ -62,7 +61,6 @@ public class AggregationSearchUtils {
     private final MessageFactory messageFactory;
     private final PermittedStreams permittedStreams;
 
-    @Inject
     public AggregationSearchUtils(EventDefinition eventDefinition,
                                   AggregationEventProcessorConfig config,
                                   Set<EventQuerySearchTypeSupplier> eventQueryModifiers,
