@@ -150,21 +150,20 @@ const EncryptedInlineBinaryField = ({
         value="encrypted value"
         buttonAfter={resetButton()}
         autoFocus={autoFocus}
-      />
-    } else {
-      return <Input
-        id={fieldId}
-        type="text"
-        name={`configuration[${title}]`}
-        label={optionableLabel(field)}
-        required={isRequired}
-        readOnly
-        help={field.description}
-        value="uploaded file content"
-        buttonAfter={resetButton()}
-        autoFocus={autoFocus}
-      />
+      />;
     }
+    return <Input
+      id={fieldId}
+      type="text"
+      name={`configuration[${title}]`}
+      label={optionableLabel(field)}
+      required={isRequired}
+      readOnly
+      help={field.description}
+      value="uploaded file content"
+      buttonAfter={resetButton()}
+      autoFocus={autoFocus}
+    />;
   };
 
   const fileInput = () =>

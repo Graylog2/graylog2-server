@@ -122,9 +122,8 @@ const Configuration = ({
       if (requestedConfiguration?.type === 'inline_binary') {
         if ('is_encrypted' in requestedConfiguration && requestedConfiguration.is_encrypted) {
           return <EncryptedField id={_id} value={value as EncryptedFieldValue<unknown>} name={key} />;
-        } else {
-          return <InlineBinaryField id={_id} value={value} name={key} />;
         }
+        return <InlineBinaryField id={_id} value={value} name={key} />;
       }
 
       return <RegularField id={_id} value={value} name={key} />;
