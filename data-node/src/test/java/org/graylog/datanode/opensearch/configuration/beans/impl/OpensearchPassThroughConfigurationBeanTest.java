@@ -16,32 +16,75 @@
  */
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
-import com.github.joschi.jadconfig.RepositoryException;
-import com.github.joschi.jadconfig.ValidationException;
 import org.assertj.core.api.Assertions;
-import org.graylog.datanode.Configuration;
-import org.graylog.datanode.DatanodeTestUtils;
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.Supplier;
 
 class OpensearchPassThroughConfigurationBeanTest {
 
     @Test
-    void testPassThroughConfigurationPart() throws ValidationException, RepositoryException {
-        final Configuration datanodeConfiguration = DatanodeTestUtils.datanodeConfiguration(Map.of(
-                "opensearch.cluster.routing.allocation.disk.watermark.low", "98%"
-        ));
-        final OpensearchPassThroughConfigurationBean cb = new OpensearchPassThroughConfigurationBean(datanodeConfiguration, Collections::emptyMap);
+    void testPassThroughConfigurationPart(@TempDir Path tempDir) {
+        final DatanodeDirectories datanodeDirectories = new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir);
+
+
+        final Path opensearchOverridesFile = tempDir.resolve("opensearch.overrides");
+        writePropertiesFile(opensearchOverridesFile,
+                """
+                        cluster.routing.allocation.disk.watermark.low: 98%
+                        cluster.max_shards_per_node: 500
+                        """);
+
+
+        final OpensearchPassThroughConfigurationBean cb = new OpensearchPassThroughConfigurationBean(datanodeDirectories, opensearchOverridesFile, Collections::emptyMap);
         final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.properties())
-                .hasSize(1)
-                .containsEntry("cluster.routing.allocation.disk.watermark.low", "98%");
+                .hasSize(2)
+                .containsEntry("cluster.routing.allocation.disk.watermark.low", "98%")
+                .containsEntry("cluster.max_shards_per_node", "500");
 
+    }
+
+    @Test
+    void testLegacyEnvProperties(@TempDir Path tempDir) {
+        final DatanodeDirectories datanodeDirectories = new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir);
+
+
+        final Path opensearchOverridesFile = tempDir.resolve("opensearch.overrides");
+        writePropertiesFile(opensearchOverridesFile,
+                """
+                        cluster.routing.allocation.disk.watermark.low: 98%
+                        """);
+
+
+        final Supplier<Map<String, String>> env = () -> Map.of("opensearch.cluster.max_shards_per_node", "500");
+
+        final OpensearchPassThroughConfigurationBean cb = new OpensearchPassThroughConfigurationBean(datanodeDirectories, opensearchOverridesFile, env);
+        final DatanodeConfigurationPart configurationPart = cb.buildConfigurationPart(emptyBuildParams());
+
+        Assertions.assertThat(configurationPart.properties())
+                .hasSize(2)
+                .containsEntry("cluster.routing.allocation.disk.watermark.low", "98%")
+                .containsEntry("cluster.max_shards_per_node", "500");
+    }
+
+    private void writePropertiesFile(Path file, String passthroughConfig) {
+        try (final OutputStream fos = Files.newOutputStream(file)) {
+            Files.writeString(file, passthroughConfig);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private OpensearchConfigurationParams emptyBuildParams() {

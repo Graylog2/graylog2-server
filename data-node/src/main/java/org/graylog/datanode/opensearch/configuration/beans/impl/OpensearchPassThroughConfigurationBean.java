@@ -16,35 +16,43 @@
  */
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
+import com.google.common.collect.Maps;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.Supplier;
 
 public class OpensearchPassThroughConfigurationBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchSecurityConfigurationBean.class);
-    private final Configuration configuration;
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchPassThroughConfigurationBean.class);
     private final Supplier<Map<String, String>> systemEnvSupplier;
+    private final DatanodeDirectories datanodeDirectories;
+    private final Path overridesFile;
 
     @Inject
-    public OpensearchPassThroughConfigurationBean(Configuration configuration) {
-        this(configuration, System::getenv);
+    public OpensearchPassThroughConfigurationBean(DatanodeConfiguration datanodeConfiguration, Configuration configuration) {
+        this(datanodeConfiguration.datanodeDirectories(), configuration.getOpensearchConfigurationOverridesFile() , System::getenv);
     }
 
-    public OpensearchPassThroughConfigurationBean(Configuration configuration, Supplier<Map<String, String>> systemEnvSupplier) {
-        this.configuration = configuration;
+    public OpensearchPassThroughConfigurationBean(DatanodeDirectories datanodeDirectories, Path overridesFile, Supplier<Map<String, String>> systemEnvSupplier) {
+        this.datanodeDirectories = datanodeDirectories;
+        this.overridesFile = overridesFile;
         this.systemEnvSupplier = systemEnvSupplier;
     }
-
 
     @Override
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
@@ -58,11 +66,33 @@ public class OpensearchPassThroughConfigurationBean implements DatanodeConfigura
         // additionally, the env variables have to be prefixed with opensearch. (e.g. "opensearch.cluster.routing.allocation.disk.threshold_enabled")
         systemEnvSupplier.get().entrySet().stream()
                 .filter(entry -> entry.getKey().matches("^opensearch\\.[a-z0-9_]+(?:\\.[a-z0-9_]+)+"))
-                .peek(entry -> LOG.info("Detected pass-through opensearch property {}:{}", entry.getKey().substring("opensearch.".length()), entry.getValue()))
                 .forEach(entry -> properties.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
 
-        configuration.getOpensearchProperties().forEach((key, value) -> properties.put(key.toLowerCase(Locale.ROOT).replaceAll("_", "."), value));
+        datanodeDirectories.resolveConfigurationSourceFile(overridesFile)
+                .map(this::readPropertiesFile)
+                .ifPresent(properties::putAll);
+
+        logWarnings(properties);
 
         return builder.properties(properties).build();
+    }
+
+    private void logWarnings(Map<String, String> properties) {
+        if (!properties.isEmpty()) {
+            LOG.warn("Your system is overriding opensearch configuration properties. This isn't supported and may break in any future release!");
+            properties.forEach((key, value) -> {
+                LOG.warn("Detected pass-through opensearch property {}: {}", key, value);
+            });
+        }
+    }
+
+    private Map<String, String> readPropertiesFile(Path file) {
+        final Properties properties = new Properties();
+        try (final InputStream is = Files.newInputStream(file)) {
+            properties.load(is);
+            return Maps.fromProperties(properties);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

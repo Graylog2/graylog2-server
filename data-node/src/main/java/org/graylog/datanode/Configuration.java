@@ -104,6 +104,19 @@ public class Configuration implements CommonNodeConfiguration {
     @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
     private Path opensearchConfigLocation = Path.of("datanode/config");
 
+    @Documentation("""
+            Path to the file with configuration properties overriding default opensearch parameters.
+            Required format is java properties file.
+
+            If the path is relative, datanode will try to resolve the file relative to the configured "config_location"
+            path.
+
+            Caution! Overriding opensearch configuration parameters is not supported and may break in any future release.
+            Use at your own risk.
+            """)
+    @Parameter(value = "opensearch_configuration_overrides_file")
+    private Path opensearchConfigurationOverridesFile = Path.of("opensearch.overrides");
+
     @Documentation("Source directory of the additional configuration files for the Datanode. Additional certificates can be provided here.")
     @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)
     private Path configLocation = null;
@@ -287,9 +300,6 @@ public class Configuration implements CommonNodeConfiguration {
     @Documentation(visible = false)
     @Parameter(value = "async_eventbus_processors")
     private int asyncEventbusProcessors = 2;
-
-    @AggregatedParameter(prefix = {"opensearch.", "opensearch_"}, stripPrefix = true)
-    private Map<String, String> opensearchProperties = new LinkedHashMap<>();
 
     public int getAsyncEventbusProcessors() {
         return asyncEventbusProcessors;
@@ -682,8 +692,7 @@ public class Configuration implements CommonNodeConfiguration {
         return true;
     }
 
-    public Map<String, String> getOpensearchProperties() {
-        return opensearchProperties;
+    public Path getOpensearchConfigurationOverridesFile() {
+        return opensearchConfigurationOverridesFile;
     }
-
 }

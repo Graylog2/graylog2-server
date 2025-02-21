@@ -21,14 +21,12 @@ import jakarta.annotation.Nonnull;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
+import org.graylog.datanode.process.Environment;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.YamlConfigFile;
-import org.graylog.datanode.process.Environment;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.security.KeyStore;
@@ -41,8 +39,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class OpensearchConfiguration {
-
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfiguration.class);
 
     private final OpensearchDistribution opensearchDistribution;
     private final String hostname;
