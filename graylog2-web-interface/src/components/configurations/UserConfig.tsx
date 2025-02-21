@@ -105,7 +105,7 @@ const UserConfig = () => {
             <dd>{viewConfig.enable_global_session_timeout ? 'Enabled' : 'Disabled'}</dd>
             <dt>Timeout interval:</dt>
             <dd>{viewConfig.enable_global_session_timeout ? viewConfig.global_session_timeout_interval : '-'}</dd>
-            <dt>Allow access token for external users:</dt>
+            <dt>Allow access token for external users:&nbsp;</dt>
             <dd>{viewConfig.allow_access_token_for_external_user ? 'Enabled' : 'Disabled'}</dd>
           </StyledDefList>
 
