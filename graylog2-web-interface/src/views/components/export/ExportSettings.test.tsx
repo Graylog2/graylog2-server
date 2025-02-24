@@ -68,6 +68,7 @@ const pluginExports = {
 const fields = Immutable.List([FieldTypeMapping.create('foo', FieldType.create('long'))]);
 const fieldTypes: FieldTypes = {
   all: fields,
+  currentQuery: fields,
   queryFields: Immutable.Map({ 'view-query-id': fields }),
 };
 

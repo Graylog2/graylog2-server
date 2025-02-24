@@ -43,6 +43,7 @@ jest.mock(
 
 const fieldTypes: FieldTypes = {
   all: Immutable.List(),
+  currentQuery: Immutable.List(),
   queryFields: Immutable.Map(),
 };
 const SimpleWidgetGrid = ({ view }: { view?: View }) => (

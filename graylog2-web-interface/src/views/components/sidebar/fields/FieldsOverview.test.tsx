@@ -27,7 +27,11 @@ import FieldsOverview from './FieldsOverview';
 jest.mock('views/hooks/useActiveQueryId');
 
 describe('<FieldsOverview />', () => {
-  const fieldTypesStoreState = { all: simpleFields(), queryFields: simpleQueryFields('aQueryId') };
+  const fieldTypesStoreState = {
+    all: simpleFields(),
+    currentQuery: simpleFields(),
+    queryFields: simpleQueryFields('aQueryId'),
+  };
   const SimpleFieldsOverview = () => (
     <FieldTypesContext.Provider value={fieldTypesStoreState}>
       <FieldsOverview />

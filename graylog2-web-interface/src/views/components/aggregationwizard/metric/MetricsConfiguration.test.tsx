@@ -95,6 +95,7 @@ const SUT = ({ initialValues = {} }: { initialValues: WidgetConfigFormValues }) 
     <FieldTypesContext.Provider
       value={{
         all: Immutable.List(fieldTypes),
+        currentQuery: Immutable.List(fieldTypes),
         queryFields: Immutable.Map({
           queryId: Immutable.List(fieldTypes),
         }),

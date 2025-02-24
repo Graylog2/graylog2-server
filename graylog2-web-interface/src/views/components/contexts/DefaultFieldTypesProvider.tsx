@@ -45,7 +45,10 @@ const DefaultFieldTypesProvider = ({ children }: { children: React.ReactElement 
     [currentFieldTypes, currentQuery?.id],
   );
   const all = useMemo(() => Immutable.List(allFieldTypes ?? []), [allFieldTypes]);
-  const fieldTypes = useMemo(() => ({ all, queryFields }), [all, queryFields]);
+  const fieldTypes = useMemo(
+    () => ({ all, queryFields, currentQuery: Immutable.List(currentFieldTypes) }),
+    [all, currentFieldTypes, queryFields],
+  );
 
   useOnSearchExecution(() => {
     refreshCurrentTypes();

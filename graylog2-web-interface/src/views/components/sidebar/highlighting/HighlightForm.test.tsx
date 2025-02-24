@@ -42,6 +42,7 @@ const ruleWithValueZero = rule.toBuilder().value(0).build();
 describe('HighlightForm', () => {
   const fieldTypes: FieldTypes = {
     all: Immutable.List([FieldTypeMapping.create('foob', FieldType.create('long', [Properties.Numeric]))]),
+    currentQuery: Immutable.List<FieldTypeMapping>(),
     queryFields: Immutable.Map(),
   };
   const SUT = (props: Partial<React.ComponentProps<typeof HighlightForm>>) => (

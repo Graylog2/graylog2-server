@@ -32,7 +32,7 @@ const widgetConfig = AggregationWidgetConfig.builder().visualization(DataTable.t
 
 jest.mock('views/hooks/useAggregationFunctions');
 
-const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
+const fieldTypes = { all: simpleFields(), currentQuery: simpleFields(), queryFields: simpleQueryFields('queryId') };
 
 describe('AggregationWizard', () => {
   const renderSUT = (props: Partial<React.ComponentProps<typeof AggregationWizard>> = {}) =>

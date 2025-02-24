@@ -119,7 +119,8 @@ describe('<WidgetActionsMenu />', () => {
     ...props
   }: DummyWidgetProps) => (
     <TestStoreProvider view={view} initialQuery="query-id">
-      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+      <FieldTypesContext.Provider
+        value={{ all: Immutable.List(), currentQuery: Immutable.List(), queryFields: Immutable.Map() }}>
         <WidgetFocusContext.Provider
           value={{
             setWidgetFocusing,

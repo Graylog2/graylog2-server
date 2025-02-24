@@ -23,6 +23,7 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 type FieldTypeMappingsList = List<FieldTypeMapping>;
 export type FieldTypes = {
   all: FieldTypeMappingsList;
+  currentQuery: FieldTypeMappingsList;
   queryFields: Map<string, FieldTypeMappingsList>;
 };
 

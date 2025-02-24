@@ -51,7 +51,7 @@ const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);
 const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fieldTypeMapping3 = new FieldTypeMapping('timestamp', FieldTypes.DATE());
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2, fieldTypeMapping3]);
-const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
+const fieldTypes = { all: fields, currentQuery: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
@@ -83,6 +83,7 @@ describe('AggregationWizard', () => {
   type Props = Partial<React.ComponentProps<typeof AggregationWizard>> & {
     fieldTypesList?: {
       all: FieldTypeMappingsList;
+      currentQuery: FieldTypeMappingsList;
       queryFields: Map<string, FieldTypeMappingsList>;
     };
   };
@@ -153,7 +154,10 @@ describe('AggregationWizard', () => {
       const onChange = jest.fn();
       const queryFieldTypeMapping = new FieldTypeMapping('status_code', fieldType);
       const queryFields = Immutable.List([queryFieldTypeMapping]);
-      renderSUT({ onChange, fieldTypesList: { all: fields, queryFields: Immutable.Map({ queryId: queryFields }) } });
+      renderSUT({
+        onChange,
+        fieldTypesList: { all: fields, currentQuery: fields, queryFields: Immutable.Map({ queryId: queryFields }) },
+      });
 
       await addGrouping();
       await selectField('status_code');
@@ -179,7 +183,11 @@ describe('AggregationWizard', () => {
 
       renderSUT({
         onChange,
-        fieldTypesList: { all: Immutable.List([]), queryFields: Immutable.Map({ queryId: Immutable.List([]) }) },
+        fieldTypesList: {
+          all: Immutable.List(),
+          currentQuery: Immutable.List(),
+          queryFields: Immutable.Map({ queryId: Immutable.List([]) }),
+        },
         config: initialConfig,
       });
 

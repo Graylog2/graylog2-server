@@ -31,7 +31,7 @@ export const SingleMessageFieldTypesProvider = ({ streams, timestamp, children }
   const types = useMemo(() => {
     const fieldTypesList = Immutable.List(fieldTypes);
 
-    return { all: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) };
+    return { all: fieldTypesList, currentQuery: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) };
   }, [fieldTypes]);
 
   return <FieldTypesContext.Provider value={types}>{children}</FieldTypesContext.Provider>;

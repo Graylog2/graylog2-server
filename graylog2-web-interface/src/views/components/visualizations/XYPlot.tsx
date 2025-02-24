@@ -77,12 +77,12 @@ const XYPlot = ({
   axisType = DEFAULT_AXIS_TYPE,
   config,
   chartData,
-  effectiveTimerange,
+  effectiveTimerange = undefined,
   setChartColor = defaultSetColor,
   height,
   width,
   plotLayout = {},
-  onZoom,
+  onZoom = undefined,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) } as const;
