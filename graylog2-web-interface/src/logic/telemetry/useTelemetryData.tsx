@@ -22,32 +22,33 @@ const TELEMETRY_CLUSTER_INFO_QUERY_KEY = 'telemetry.cluster.info';
 
 export type TelemetryDataType = {
   current_user?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
   user_telemetry_settings?: {
-    [key: string]: boolean,
-  },
+    [key: string]: boolean;
+  };
   cluster?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
   license?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
   plugin?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
   search_cluster?: {
-    [key: string]: string,
-  },
+    [key: string]: string;
+  };
   data_nodes?: {
-    data_nodes_count: number,
-  }
-}
+    data_nodes_count: number;
+  };
+};
 
-const useTelemetryData = () => useQuery([TELEMETRY_CLUSTER_INFO_QUERY_KEY], () => Telemetry.get() as Promise<TelemetryDataType>, {
-  retry: 0,
-  keepPreviousData: true,
-  notifyOnChangeProps: ['data', 'error'],
-});
+const useTelemetryData = () =>
+  useQuery([TELEMETRY_CLUSTER_INFO_QUERY_KEY], () => Telemetry.get() as Promise<TelemetryDataType>, {
+    retry: 0,
+    keepPreviousData: true,
+    notifyOnChangeProps: ['data', 'error'],
+  });
 
 export default useTelemetryData;

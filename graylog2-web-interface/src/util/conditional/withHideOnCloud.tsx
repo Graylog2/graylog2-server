@@ -24,6 +24,12 @@ import HideOnCloud from './HideOnCloud';
  * @param Component
  * @returns Component | null
  */
-const withHideOnCloud = <Props extends {}>(Component: React.ComponentType<Props>): React.ComponentType<Props> => (props) => <HideOnCloud><Component {...props} /></HideOnCloud>;
+const withHideOnCloud =
+  <Props extends {}>(Component: React.ComponentType<Props>): React.ComponentType<Props> =>
+  (props) => (
+    <HideOnCloud>
+      <Component {...props} />
+    </HideOnCloud>
+  );
 
 export default withHideOnCloud;

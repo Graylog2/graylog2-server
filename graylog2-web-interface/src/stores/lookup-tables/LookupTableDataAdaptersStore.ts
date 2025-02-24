@@ -23,19 +23,18 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Actions = {
-  create: (dataAdapter: LookupTableAdapter) => Promise<unknown>,
-  delete: (idOrName: string) => Promise<unknown>,
-  get: (idOrName: string) => Promise<unknown>,
-  getTypes: () => Promise<unknown>,
-  lookup: (idOrName: string, key: string) => Promise<unknown>,
-  reloadPage: () => Promise<unknown>,
-  searchPaginated: (page: number, perPage: number, query?: string) => Promise<unknown>,
-  update: (dataAdapter: LookupTableAdapter) => Promise<unknown>,
-  validate: (dataAdapter: LookupTableAdapter) => Promise<unknown>,
-}
-export const LookupTableDataAdaptersActions = singletonActions(
-  'core.LookupTableDataAdapters',
-  () => Reflux.createActions<Actions>({
+  create: (dataAdapter: LookupTableAdapter) => Promise<unknown>;
+  delete: (idOrName: string) => Promise<unknown>;
+  get: (idOrName: string) => Promise<unknown>;
+  getTypes: () => Promise<unknown>;
+  lookup: (idOrName: string, key: string) => Promise<unknown>;
+  reloadPage: () => Promise<unknown>;
+  searchPaginated: (page: number, perPage: number, query?: string) => Promise<unknown>;
+  update: (dataAdapter: LookupTableAdapter) => Promise<unknown>;
+  validate: (dataAdapter: LookupTableAdapter) => Promise<unknown>;
+};
+export const LookupTableDataAdaptersActions = singletonActions('core.LookupTableDataAdapters', () =>
+  Reflux.createActions<Actions>({
     searchPaginated: { asyncResult: true },
     reloadPage: { asyncResult: true },
     get: { asyncResult: true },
@@ -49,19 +48,18 @@ export const LookupTableDataAdaptersActions = singletonActions(
 );
 
 type StoreState = {
-  dataAdapters: LookupTableAdapter[],
-  dataAdapter: LookupTableAdapter,
+  dataAdapters: LookupTableAdapter[];
+  dataAdapter: LookupTableAdapter;
   pagination: {
-    page: number,
-    per_page: number,
-    total: number,
-    count: number,
-    query: string | null
-  }
-}
-export const LookupTableDataAdaptersStore = singletonStore(
-  'core.LookupTableDataAdapters',
-  () => Reflux.createStore<StoreState>({
+    page: number;
+    per_page: number;
+    total: number;
+    count: number;
+    query: string | null;
+  };
+};
+export const LookupTableDataAdaptersStore = singletonStore('core.LookupTableDataAdapters', () =>
+  Reflux.createStore<StoreState>({
     listenables: [LookupTableDataAdaptersActions],
     dataAdapter: null,
     dataAdapters: undefined,
@@ -114,18 +112,21 @@ export const LookupTableDataAdaptersStore = singletonStore(
 
       const promise = fetch('GET', url);
 
-      promise.then((response) => {
-        this.pagination = {
-          count: response.count,
-          total: response.total,
-          page: response.page,
-          per_page: response.per_page,
-          query: response.query,
-        };
+      promise.then(
+        (response) => {
+          this.pagination = {
+            count: response.count,
+            total: response.total,
+            page: response.page,
+            per_page: response.per_page,
+            query: response.query,
+          };
 
-        this.dataAdapters = response.data_adapters;
-        this.propagateChanges();
-      }, this._errorHandler('Fetching lookup table data adapters failed', 'Could not retrieve the lookup dataAdapters'));
+          this.dataAdapters = response.data_adapters;
+          this.propagateChanges();
+        },
+        this._errorHandler('Fetching lookup table data adapters failed', 'Could not retrieve the lookup dataAdapters'),
+      );
 
       LookupTableDataAdaptersActions.searchPaginated.promise(promise);
 
@@ -136,10 +137,16 @@ export const LookupTableDataAdaptersStore = singletonStore(
       const url = this._url(`adapters/${idOrName}`);
       const promise = fetch('GET', url);
 
-      promise.then((response) => {
-        this.dataAdapter = response;
-        this.propagateChanges();
-      }, this._errorHandler(`Fetching lookup table data adapter ${idOrName} failed`, 'Could not retrieve lookup table data adapter'));
+      promise.then(
+        (response) => {
+          this.dataAdapter = response;
+          this.propagateChanges();
+        },
+        this._errorHandler(
+          `Fetching lookup table data adapter ${idOrName} failed`,
+          'Could not retrieve lookup table data adapter',
+        ),
+      );
 
       LookupTableDataAdaptersActions.get.promise(promise);
 
@@ -150,10 +157,16 @@ export const LookupTableDataAdaptersStore = singletonStore(
       const url = this._url('adapters');
       const promise = fetch('POST', url, dataAdapter);
 
-      promise.then((response) => {
-        this.dataAdapter = response;
-        this.propagateChanges();
-      }, this._errorHandler('Creating lookup table data adapter failed', `Could not create lookup table data adapter "${dataAdapter.name}"`));
+      promise.then(
+        (response) => {
+          this.dataAdapter = response;
+          this.propagateChanges();
+        },
+        this._errorHandler(
+          'Creating lookup table data adapter failed',
+          `Could not create lookup table data adapter "${dataAdapter.name}"`,
+        ),
+      );
 
       LookupTableDataAdaptersActions.create.promise(promise);
 
@@ -164,10 +177,16 @@ export const LookupTableDataAdaptersStore = singletonStore(
       const url = this._url(`adapters/${dataAdapter.id}`);
       const promise = fetch('PUT', url, dataAdapter);
 
-      promise.then((response) => {
-        this.dataAdapter = response;
-        this.propagateChanges();
-      }, this._errorHandler('Updating lookup table data adapter failed', `Could not update lookup table data adapter "${dataAdapter.name}"`));
+      promise.then(
+        (response) => {
+          this.dataAdapter = response;
+          this.propagateChanges();
+        },
+        this._errorHandler(
+          'Updating lookup table data adapter failed',
+          `Could not update lookup table data adapter "${dataAdapter.name}"`,
+        ),
+      );
 
       LookupTableDataAdaptersActions.update.promise(promise);
 
@@ -178,10 +197,16 @@ export const LookupTableDataAdaptersStore = singletonStore(
       const url = this._url('types/adapters');
       const promise = fetch('GET', url);
 
-      promise.then((response) => {
-        this.types = response;
-        this.propagateChanges();
-      }, this._errorHandler('Fetching available types failed', 'Could not fetch the available lookup table data adapter types'));
+      promise.then(
+        (response) => {
+          this.types = response;
+          this.propagateChanges();
+        },
+        this._errorHandler(
+          'Fetching available types failed',
+          'Could not fetch the available lookup table data adapter types',
+        ),
+      );
 
       LookupTableDataAdaptersActions.getTypes.promise(promise);
 
@@ -192,7 +217,12 @@ export const LookupTableDataAdaptersStore = singletonStore(
       const url = this._url(`adapters/${idOrName}`);
       const promise = fetch('DELETE', url);
 
-      promise.catch(this._errorHandler('Deleting lookup table data adapter failed', `Could not delete lookup table data adapter "${idOrName}"`));
+      promise.catch(
+        this._errorHandler(
+          'Deleting lookup table data adapter failed',
+          `Could not delete lookup table data adapter "${idOrName}"`,
+        ),
+      );
 
       LookupTableDataAdaptersActions.delete.promise(promise);
 
@@ -202,10 +232,16 @@ export const LookupTableDataAdaptersStore = singletonStore(
     lookup(adapterName, key) {
       const promise = fetch('GET', this._url(`adapters/${adapterName}/query?key=${encodeURIComponent(key)}`));
 
-      promise.then((response) => {
-        this.lookupResult = response;
-        this.propagateChanges();
-      }, this._errorHandler('Lookup failed', `Could not lookup value for key "${key}" in lookup table data adapter "${adapterName}"`));
+      promise.then(
+        (response) => {
+          this.lookupResult = response;
+          this.propagateChanges();
+        },
+        this._errorHandler(
+          'Lookup failed',
+          `Could not lookup value for key "${key}" in lookup table data adapter "${adapterName}"`,
+        ),
+      );
 
       LookupTableDataAdaptersActions.lookup.promise(promise);
 
@@ -216,10 +252,16 @@ export const LookupTableDataAdaptersStore = singletonStore(
       const url = this._url('adapters/validate');
       const promise = fetch('POST', url, adapter);
 
-      promise.then((response) => {
-        this.validationErrors = response.errors;
-        this.propagateChanges();
-      }, this._errorHandler('Lookup table data adapter validation failed', `Could not validate lookup table data adapter "${adapter.name}"`));
+      promise.then(
+        (response) => {
+          this.validationErrors = response.errors;
+          this.propagateChanges();
+        },
+        this._errorHandler(
+          'Lookup table data adapter validation failed',
+          `Could not validate lookup table data adapter "${adapter.name}"`,
+        ),
+      );
 
       LookupTableDataAdaptersActions.validate.promise(promise);
 

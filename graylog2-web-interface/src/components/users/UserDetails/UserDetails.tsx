@@ -33,7 +33,7 @@ import TeamsSection from './TeamsSection';
 import PermissionsUpdateInfo from '../PermissionsUpdateInfo';
 
 type Props = {
-  user: User | null | undefined,
+  user: User | null | undefined;
 };
 
 const UserDetails = ({ user }: Props) => {
@@ -63,12 +63,12 @@ const UserDetails = ({ user }: Props) => {
             <IfPermitted permissions={`teams:edit:${user.username}`}>
               <TeamsSection user={user} />
             </IfPermitted>
-            {(currentUser.id === user.id) && !isLocalAdmin && (
+            {currentUser.id === user.id && !isLocalAdmin && (
               <IfPermitted permissions={`users:edit:${user.username}`}>
                 <TelemetrySettingsDetails />
               </IfPermitted>
             )}
-            {(currentUser.id === user.id) && isLocalAdmin && (
+            {currentUser.id === user.id && isLocalAdmin && (
               <IfPermitted permissions={`users:edit:${user.username}`}>
                 <TelemetrySettingsConfig />
               </IfPermitted>

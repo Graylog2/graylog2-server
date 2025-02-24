@@ -36,9 +36,9 @@ import EventsTable from './EventsTable';
 import { PAGINATION } from '../Constants';
 
 type Pagination = {
-  pageErrors: Array<{ description: string }>,
-  currentPage: number
-}
+  pageErrors: Array<{ description: string }>;
+  currentPage: number;
+};
 
 const Container = styled.div`
   display: flex;
@@ -57,38 +57,50 @@ const useResetPaginationOnSearchExecution = (setPagination: (pagination: Paginat
   useOnSearchExecution(resetPagination);
 };
 
-const useHandlePageChange = (searchTypeId: string, setLoadingState: (loading: boolean) => void, setPagination: (pagination: Pagination) => void) => {
+const useHandlePageChange = (
+  searchTypeId: string,
+  setLoadingState: (loading: boolean) => void,
+  setPagination: (pagination: Pagination) => void,
+) => {
   const dispatch = useAppDispatch();
   const { stopAutoRefresh } = useAutoRefresh();
 
-  return useCallback((pageNo: number) => {
-    // execute search with new offset
-    const searchTypePayload: SearchTypeOptions<{
-      page: number,
-      per_page: number,
-    }> = {
-      [searchTypeId]: {
-        page: pageNo,
-        per_page: PAGINATION.PER_PAGE,
-      },
-    };
+  return useCallback(
+    (pageNo: number) => {
+      // execute search with new offset
+      const searchTypePayload: SearchTypeOptions<{
+        page: number;
+        per_page: number;
+      }> = {
+        [searchTypeId]: {
+          page: pageNo,
+          per_page: PAGINATION.PER_PAGE,
+        },
+      };
 
-    stopAutoRefresh();
-    setLoadingState(true);
+      stopAutoRefresh();
+      setLoadingState(true);
 
-    return dispatch(reexecuteSearchTypes(searchTypePayload)).then((response) => {
-      const { result } = response.payload;
-      setLoadingState(false);
+      return dispatch(reexecuteSearchTypes(searchTypePayload)).then((response) => {
+        const { result } = response.payload;
+        setLoadingState(false);
 
-      setPagination({
-        pageErrors: result.errors,
-        currentPage: pageNo,
+        setPagination({
+          pageErrors: result.errors,
+          currentPage: pageNo,
+        });
       });
-    });
-  }, [dispatch, searchTypeId, setLoadingState, setPagination, stopAutoRefresh]);
+    },
+    [dispatch, searchTypeId, setLoadingState, setPagination, stopAutoRefresh],
+  );
 };
 
-const EventsList = ({ data, config, onConfigChange, setLoadingState }: WidgetComponentProps<EventsWidgetConfig, EventsListResult>) => {
+const EventsList = ({
+  data,
+  config,
+  onConfigChange,
+  setLoadingState,
+}: WidgetComponentProps<EventsWidgetConfig, EventsListResult>) => {
   const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
     pageErrors: [],
     currentPage: PAGINATION.INITIAL_PAGE,
@@ -98,11 +110,14 @@ const EventsList = ({ data, config, onConfigChange, setLoadingState }: WidgetCom
 
   const handlePageChange = useHandlePageChange(data.id, setLoadingState, setPagination);
 
-  const onSortChange = useCallback((newSort: EventsWidgetSortConfig) => {
-    const newConfig = config.toBuilder().sort(newSort).build();
+  const onSortChange = useCallback(
+    (newSort: EventsWidgetSortConfig) => {
+      const newConfig = config.toBuilder().sort(newSort).build();
 
-    return onConfigChange(newConfig);
-  }, [config, onConfigChange]);
+      return onConfigChange(newConfig);
+    },
+    [config, onConfigChange],
+  );
   const onRenderComplete = useContext(RenderCompletionCallback);
 
   useEffect(() => {
@@ -111,18 +126,23 @@ const EventsList = ({ data, config, onConfigChange, setLoadingState }: WidgetCom
 
   return (
     <Container>
-      <PaginatedList onChange={handlePageChange}
-                     useQueryParameter={false}
-                     activePage={currentPage}
-                     pageSize={PAGINATION.PER_PAGE}
-                     showPageSizeSelect={false}
-                     totalItems={data.totalResults ?? 0}>
+      <PaginatedList
+        onChange={handlePageChange}
+        useQueryParameter={false}
+        activePage={currentPage}
+        pageSize={PAGINATION.PER_PAGE}
+        showPageSizeSelect={false}
+        totalItems={data.totalResults ?? 0}>
         {!pageErrors?.length ? (
-          <EventsTable config={config}
-                       setLoadingState={setLoadingState}
-                       onSortChange={onSortChange}
-                       events={data.events} />
-        ) : <ErrorWidget errors={pageErrors} />}
+          <EventsTable
+            config={config}
+            setLoadingState={setLoadingState}
+            onSortChange={onSortChange}
+            events={data.events}
+          />
+        ) : (
+          <ErrorWidget errors={pageErrors} />
+        )}
       </PaginatedList>
     </Container>
   );

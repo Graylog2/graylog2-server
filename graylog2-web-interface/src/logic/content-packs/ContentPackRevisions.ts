@@ -48,7 +48,8 @@ export default class ContentPackRevisions {
   }
 
   createNewVersionFromRev(rev) {
-    return this.contentPack(parseInt(rev, 10)).toBuilder()
+    return this.contentPack(parseInt(rev, 10))
+      .toBuilder()
       .rev(this.latestRevision + 1)
       .build();
   }

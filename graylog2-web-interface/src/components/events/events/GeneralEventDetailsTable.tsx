@@ -21,16 +21,21 @@ import useColumnRenderers from 'components/events/events/ColumnRenderers';
 import EventDetailsTable from 'components/events/events/EventDetailsTable';
 
 type Props = {
-  attributesList: Array<{ id: string, title: string}>,
-  event: Event,
-  meta: EventsAdditionalData,
-}
+  attributesList: Array<{ id: string; title: string }>;
+  event: Event;
+  meta: EventsAdditionalData;
+};
 
 const GeneralEventDetailsTable = ({ event, attributesList, meta }: Props) => {
   const { attributes: attributesRenderers } = useColumnRenderers();
 
   return (
-    <EventDetailsTable<Event> event={event} meta={meta} attributesRenderers={attributesRenderers} attributesList={attributesList} />
+    <EventDetailsTable<Event>
+      event={event}
+      meta={meta}
+      attributesRenderers={attributesRenderers}
+      attributesList={attributesList}
+    />
   );
 };
 

@@ -21,26 +21,37 @@ import { AuthenticationActions } from 'stores/authentication/AuthenticationStore
 
 import type { WizardFormValues } from './BackendWizard/BackendWizardContext';
 
-export default (payload: WizardSubmitPayload, formValues: WizardFormValues, backendId: string, backendGroupSyncIsActive: boolean, serviceType: string, shouldUpdateGroupSync: boolean | undefined = true) => {
+export default (
+  payload: WizardSubmitPayload,
+  formValues: WizardFormValues,
+  backendId: string,
+  backendGroupSyncIsActive: boolean,
+  serviceType: string,
+  shouldUpdateGroupSync: boolean | undefined = true,
+) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const notifyOnSuccess = () => UserNotification.success('Authentication service was updated successfully.', 'Success');
-  const notifyOnError = (error) => UserNotification.error(`Updating authentication service failed with status: ${error}`, 'Error');
+  const notifyOnError = (error) =>
+    UserNotification.error(`Updating authentication service failed with status: ${error}`, 'Error');
 
   return AuthenticationActions.update(backendId, {
     ...payload,
     id: backendId,
-  }).then((result) => {
-    if (enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
-      return enterpriseGroupSyncPlugin.actions.onDirectoryServiceBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType)
-        .then(notifyOnSuccess)
-        .then(() => result);
-    }
+  })
+    .then((result) => {
+      if (enterpriseGroupSyncPlugin && shouldUpdateGroupSync) {
+        return enterpriseGroupSyncPlugin.actions
+          .onDirectoryServiceBackendUpdate(backendGroupSyncIsActive, formValues, backendId, serviceType)
+          .then(notifyOnSuccess)
+          .then(() => result);
+      }
 
-    notifyOnSuccess();
+      notifyOnSuccess();
 
-    return result;
-  }).catch((error) => {
-    notifyOnError(error);
-    throw error;
-  });
+      return result;
+    })
+    .catch((error) => {
+      notifyOnError(error);
+      throw error;
+    });
 };

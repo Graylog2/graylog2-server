@@ -35,7 +35,7 @@ const NeutralLink = styled.a`
   align-items: center;
   color: inherit;
   text-decoration: none;
-  
+
   &:hover {
     text-decoration: none;
   }
@@ -72,29 +72,61 @@ const buildSearchLink = (
   return searchLink;
 };
 
-export const ReplaySearchButtonComponent = ({ searchLink, children, onClick }: { children?: React.ReactNode, searchLink: string, onClick?: () => void }) => {
+const iconName = 'play_arrow' as const;
+
+type CustomComponentProps = React.PropsWithChildren<{
+  href?: string;
+  title?: string;
+  onClick?: React.MouseEventHandler<unknown>;
+  target?: string;
+  rel?: string;
+}>;
+
+export const ReplaySearchButtonComponent = ({
+  searchLink,
+  children = undefined,
+  onClick = undefined,
+  component: Component = NeutralLink,
+}: {
+  children?: React.ReactNode;
+  searchLink: string;
+  onClick?: () => void;
+  component?: React.ComponentType<CustomComponentProps>;
+}) => {
   const title = 'Replay search';
 
   return (
-    <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title={title} onClick={onClick}>
-      {children
-        ? <>{children} <StyledIcon name="play_arrow" /></>
-        : <IconButton name="play_arrow" focusable={false} title={title} />}
-    </NeutralLink>
+    <Component href={searchLink} target="_blank" rel="noopener noreferrer" title={title} onClick={onClick}>
+      {children ? (
+        <>
+          {children} <StyledIcon name={iconName} />
+        </>
+      ) : (
+        <IconButton name={iconName} focusable={false} title={title} />
+      )}
+    </Component>
   );
 };
 
 type Props = {
-  queryString?: string | undefined,
-  timerange?: TimeRange | undefined,
-  streams?: string[] | undefined,
-  streamCategories?: string[] | undefined,
-  parameters?: Immutable.Set<Parameter>,
-  children?: React.ReactNode,
-  parameterBindings?: ParameterBindings,
+  queryString?: string | undefined;
+  timerange?: TimeRange | undefined;
+  streams?: string[] | undefined;
+  streamCategories?: string[] | undefined;
+  parameters?: Immutable.Set<Parameter>;
+  children?: React.ReactNode;
+  parameterBindings?: ParameterBindings;
 };
 
-const ReplaySearchButton = ({ queryString, timerange, streams, streamCategories, parameters, children, parameterBindings }: Props) => {
+const ReplaySearchButton = ({
+  queryString = undefined,
+  timerange = undefined,
+  streams = undefined,
+  streamCategories = undefined,
+  parameters = undefined,
+  children = undefined,
+  parameterBindings = undefined,
+}: Props) => {
   const sessionId = useMemo(() => `replay-search-${generateId()}`, []);
   const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, streamCategories, parameters);
 

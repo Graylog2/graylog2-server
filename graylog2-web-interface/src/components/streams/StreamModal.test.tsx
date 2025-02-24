@@ -32,13 +32,15 @@ const exampleStream = {
 };
 
 const SUT = (props: Partial<React.ComponentProps<typeof StreamModal>>) => (
-  <StreamModal onSubmit={() => Promise.resolve()}
-               onClose={() => {}}
-               indexSets={indexSets}
-               submitButtonText="Submit"
-               submitLoadingText="Submitting..."
-               title="Bach"
-               {...props} />
+  <StreamModal
+    onSubmit={() => Promise.resolve()}
+    onClose={() => {}}
+    indexSets={indexSets}
+    submitButtonText="Submit"
+    submitLoadingText="Submitting..."
+    title="Bach"
+    {...props}
+  />
 );
 
 describe('StreamModal', () => {
@@ -104,11 +106,13 @@ describe('StreamModal', () => {
       await userEvent.click(submitButton);
     });
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({
-      description: 'Stream Description and further description',
-      index_set_id: 'index-set-id-2',
-      remove_matches_from_default_stream: false,
-      title: 'Stream Title and further title',
-    }));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({
+        description: 'Stream Description and further description',
+        index_set_id: 'index-set-id-2',
+        remove_matches_from_default_stream: false,
+        title: 'Stream Title and further title',
+      }),
+    );
   });
 });

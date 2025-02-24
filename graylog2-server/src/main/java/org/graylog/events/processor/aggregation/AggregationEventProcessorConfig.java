@@ -86,6 +86,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     @JsonProperty(FIELD_QUERY)
     public abstract String query();
 
+    @Nullable
     @JsonProperty(FIELD_QUERY_PARAMETERS)
     public abstract ImmutableSet<Parameter> queryParameters();
 
@@ -332,6 +333,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         return AggregationEventProcessorConfigEntity.builder()
                 .type(type())
                 .query(ValueReference.of(query()))
+                .queryParameters(queryParameters())
                 .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .streams(streamRefs)
                 .streamCategories(streamCategories())
@@ -356,6 +358,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .build();
             mutableGraph.putEdge(entityDescriptor, depStream);
         });
+        // attribute is tagged @Nullable, so do a null check first
+        if(queryParameters() != null) {
+            queryParameters().forEach(parameter -> parameter.resolveNativeEntity(entityDescriptor, mutableGraph));
+        }
         filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 

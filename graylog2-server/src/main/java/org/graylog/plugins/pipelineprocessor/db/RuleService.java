@@ -22,7 +22,11 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface RuleService {
-    RuleDao save(RuleDao rule);
+    default RuleDao save(RuleDao rule) {
+        return save(rule, true);
+    }
+
+    RuleDao save(RuleDao rule, boolean checkMutability);
 
     RuleDao load(String id) throws NotFoundException;
 

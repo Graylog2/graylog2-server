@@ -19,6 +19,7 @@ package org.graylog2.plugin;
 import com.codahale.metrics.Meter;
 import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -155,6 +156,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * Will be set to the message receive time at the input.
      */
     public static final String FIELD_GL2_RECEIVE_TIMESTAMP = "gl2_receive_timestamp";
+
+    /**
+     * Will be set to the original timestamp of the message, if the timestamp was normalized.
+     */
+    public static final String FIELD_GL2_ORIGINAL_TIMESTAMP = "gl2_original_timestamp";
 
     /**
      * Reflects the time span from receiving the message till sending it to the output in milliseconds.
@@ -489,6 +495,37 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         addField(FIELD_TIMESTAMP, dateTime);
     }
 
+    /**
+     * Normalize the timestamp of the message if it is (significantly) in the future:
+     * - use the receive time, if it is available and viable
+     * - otherwise clamp to current time
+     * Default behavior is do nothing.
+     *
+     * @param gracePeriod do nothing if the timestamp is within this grace period
+     */
+    public void normalizeTimestamp(Duration gracePeriod) {
+        if (gracePeriod == null) {
+            return;
+        }
+        final DateTime timeStamp = getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
+        final DateTime nowUTC = Tools.nowUTC();
+        final DateTime threshold = nowUTC.plus(gracePeriod.toMillis());
+        if (threshold.isBefore(timeStamp)) {
+            DateTime receiveTimeStamp = getReceiveTime();
+            if (receiveTimeStamp != null && threshold.isAfter(receiveTimeStamp)) {
+                updateTimeStamp(timeStamp, receiveTimeStamp);
+            } else {
+                updateTimeStamp(timeStamp, nowUTC);
+            }
+        }
+    }
+
+    @VisibleForTesting
+    public void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
+        addTimestampField(FIELD_TIMESTAMP, newTimeStamp);
+        addTimestampField(FIELD_GL2_ORIGINAL_TIMESTAMP, oldTimeStamp);
+    }
+
     private DateTime convertToDateTime(@Nonnull Object value) {
         try {
             return DateTimeConverter.convertToDateTime(value);
@@ -505,9 +542,6 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     private DateTime fallbackForNullTimestamp() {
         final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
         LOG.trace(error);
-        addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
-                "Replaced invalid timestamp value in message <" + getId() + "> with current time",
-                "<null> value provided"));
         return Tools.nowUTC();
     }
 
@@ -529,7 +563,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         final StringBuilder sb = new StringBuilder();
         sb.append("source: ").append(getField(FIELD_SOURCE)).append(" | ");
 
-        final String message = getField(FIELD_MESSAGE).toString().replaceAll("\\n", "").replaceAll("\\t", "");
+        final String message = getField(FIELD_MESSAGE).toString().replace("\\n", "").replace("\\t", "");
         sb.append("message: ");
 
         if (truncate && message.length() > 225) {
@@ -566,6 +600,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     public void addField(final String key, final Object value) {
         addField(key, value, false);
+    }
+
+    private void addTimestampField(final String key, final DateTime value) {
+        addField(key, buildElasticSearchTimeFormat(value.withZone(UTC)), false);
     }
 
     private void addRequiredField(final String key, final Object value) {
@@ -877,7 +915,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public void setReceiveTime(DateTime receiveTime) {
         if (receiveTime != null) {
             this.receiveTime = receiveTime;
-            addField(FIELD_GL2_RECEIVE_TIMESTAMP, buildElasticSearchTimeFormat(receiveTime.withZone(UTC)));
+            addTimestampField(FIELD_GL2_RECEIVE_TIMESTAMP, receiveTime);
         }
     }
 
@@ -896,7 +934,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public void setProcessingTime(DateTime processingTime) {
         if (processingTime != null) {
             this.processingTime = processingTime;
-            addField(FIELD_GL2_PROCESSING_TIMESTAMP, buildElasticSearchTimeFormat(processingTime.withZone(UTC)));
+            addTimestampField(FIELD_GL2_PROCESSING_TIMESTAMP, processingTime);
             if (getReceiveTime() != null) {
                 final long duration = processingTime.getMillis() - getReceiveTime().getMillis();
                 addField(FIELD_GL2_PROCESSING_DURATION_MS, Ints.saturatedCast(duration));
@@ -930,7 +968,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     public boolean hasRecordings() {
-        return recordings != null && recordings.size() > 0;
+        return recordings != null && recordings.isEmpty();
     }
 
     private void lazyInitRecordings() {
@@ -980,7 +1018,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return true;
     }
 
-    public static abstract class Recording {
+    public abstract static class Recording {
         static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }

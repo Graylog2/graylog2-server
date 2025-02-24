@@ -24,13 +24,13 @@ import type { ParameterJson } from './Parameter';
 type InternalBuilderState = Immutable.Map<string, any>;
 
 type InternalState = {
-  lookupTable: string,
-  key: string,
+  lookupTable: string;
+  key: string;
 };
 
 export type LookupTableParameterJson = ParameterJson & {
-  lookup_table: string,
-  key: string,
+  lookup_table: string;
+  key: string;
 };
 
 export default class LookupTableParameter extends Parameter {
@@ -40,13 +40,31 @@ export default class LookupTableParameter extends Parameter {
 
   static Builder: typeof Builder;
 
-  constructor(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, lookupTable: string, key: string) {
+  constructor(
+    name: string,
+    title: string,
+    description: string,
+    dataType: string,
+    defaultValue: any,
+    optional: boolean,
+    lookupTable: string,
+    key: string,
+  ) {
     super(LookupTableParameter.type, name, title, description, dataType, defaultValue, optional);
     this._value2 = { lookupTable, key };
   }
 
-  static create(_type: string, name: string, title: string, description: string, dataType: string, defaultValue: any,
-    optional: boolean, lookupTable: string, key: string): LookupTableParameter {
+  static create(
+    _type: string,
+    name: string,
+    title: string,
+    description: string,
+    dataType: string,
+    defaultValue: any,
+    optional: boolean,
+    lookupTable: string,
+    key: string,
+  ): LookupTableParameter {
     return new LookupTableParameter(name, title, description, dataType, defaultValue, optional, lookupTable, key);
   }
 
@@ -55,17 +73,19 @@ export default class LookupTableParameter extends Parameter {
     const { lookupTable, key } = this._value2;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      type,
-      name,
-      title,
-      description,
-      dataType,
-      defaultValue,
-      optional,
-      lookupTable,
-      key,
-    }));
+    return new Builder(
+      Immutable.Map({
+        type,
+        name,
+        title,
+        description,
+        dataType,
+        defaultValue,
+        optional,
+        lookupTable,
+        key,
+      }),
+    );
   }
 
   // screw you eslint, using param.constructor.needsBinding() is ugly
@@ -109,10 +129,7 @@ export default class LookupTableParameter extends Parameter {
 
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .type(LookupTableParameter.type)
-      .optional(false)
-      .dataType('any');
+    return new Builder().type(LookupTableParameter.type).optional(false).dataType('any');
   }
 }
 

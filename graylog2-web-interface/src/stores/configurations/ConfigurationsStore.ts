@@ -24,22 +24,21 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type ConfigurationsActionsType = {
-  list: (configType: any) => Promise<unknown>,
-  listSearchesClusterConfig: () => Promise<unknown>,
-  listMessageProcessorsConfig: (configType: any) => Promise<unknown>,
-  listEventsClusterConfig: () => Promise<unknown>,
-  listIndexSetsDefaultsClusterConfig: () => Promise<unknown>,
-  listWhiteListConfig: (configType: any) => Promise<unknown>,
-  listPermissionsConfig: (configType: string) => Promise<unknown>,
-  listUserConfig: (configType: string) => Promise<unknown>,
-  update: (configType: any, config: any) => Promise<void>,
-  updateWhitelist: (configType: any, config: any) => Promise<void>,
-  updateIndexSetDefaults: (configType: any, config: any) => Promise<void>,
-  updateMessageProcessorsConfig: (configType: any, config: any) => Promise<void>,
-}
-export const ConfigurationsActions = singletonActions(
-  'core.Configuration',
-  () => Reflux.createActions<ConfigurationsActionsType>({
+  list: (configType: any) => Promise<unknown>;
+  listSearchesClusterConfig: () => Promise<unknown>;
+  listMessageProcessorsConfig: (configType: any) => Promise<unknown>;
+  listEventsClusterConfig: () => Promise<unknown>;
+  listIndexSetsDefaultsClusterConfig: () => Promise<unknown>;
+  listWhiteListConfig: (configType: any) => Promise<unknown>;
+  listPermissionsConfig: (configType: string) => Promise<unknown>;
+  listUserConfig: (configType: string) => Promise<unknown>;
+  update: (configType: any, config: any) => Promise<void>;
+  updateWhitelist: (configType: any, config: any) => Promise<void>;
+  updateIndexSetDefaults: (configType: any, config: any) => Promise<void>;
+  updateMessageProcessorsConfig: (configType: any, config: any) => Promise<void>;
+};
+export const ConfigurationsActions = singletonActions('core.Configuration', () =>
+  Reflux.createActions<ConfigurationsActionsType>({
     list: { asyncResult: true },
     listSearchesClusterConfig: { asyncResult: true },
     listMessageProcessorsConfig: { asyncResult: true },
@@ -57,34 +56,34 @@ export const ConfigurationsActions = singletonActions(
 
 const urlPrefix = ApiRoutes.ClusterConfigResource.config().url;
 export type Url = {
-  id: string,
-  value: string,
-  title: string,
-  type: string,
+  id: string;
+  value: string;
+  title: string;
+  type: string;
 };
 
 export type WhiteListConfig = {
-  entries: Array<Url>,
-  disabled: boolean,
+  entries: Array<Url>;
+  disabled: boolean;
 };
 export type PermissionsConfigType = {
-  allow_sharing_with_everyone: boolean,
-  allow_sharing_with_users: boolean,
-}
+  allow_sharing_with_everyone: boolean;
+  allow_sharing_with_users: boolean;
+};
 export type UserConfigType = {
-  enable_global_session_timeout: boolean,
-  global_session_timeout_interval: string,
-}
+  enable_global_session_timeout: boolean;
+  global_session_timeout_interval: string;
+  allow_access_token_for_external_user: boolean;
+};
 export type ConfigurationsStoreState = {
-  configuration: Record<string, any>,
-  searchesClusterConfig: SearchesConfig,
-  eventsClusterConfig: {},
-  indexSetsDefaultConfig: {},
+  configuration: Record<string, any>;
+  searchesClusterConfig: SearchesConfig;
+  eventsClusterConfig: {};
+  indexSetsDefaultConfig: {};
 };
 
-export const ConfigurationsStore = singletonStore(
-  'core.Configuration',
-  () => Reflux.createStore<ConfigurationsStoreState>({
+export const ConfigurationsStore = singletonStore('core.Configuration', () =>
+  Reflux.createStore<ConfigurationsStoreState>({
     listenables: [ConfigurationsActions],
 
     configuration: {},
@@ -126,12 +125,14 @@ export const ConfigurationsStore = singletonStore(
     },
 
     listSearchesClusterConfig() {
-      const promise = fetch('GET', this._url('/org.graylog2.indexer.searches.SearchesClusterConfig')).then((response) => {
-        this.searchesClusterConfig = response;
-        this.propagateChanges();
+      const promise = fetch('GET', this._url('/org.graylog2.indexer.searches.SearchesClusterConfig')).then(
+        (response) => {
+          this.searchesClusterConfig = response;
+          this.propagateChanges();
 
-        return response;
-      });
+          return response;
+        },
+      );
 
       ConfigurationsActions.listSearchesClusterConfig.promise(promise);
     },
@@ -197,23 +198,27 @@ export const ConfigurationsStore = singletonStore(
     },
 
     listEventsClusterConfig() {
-      const promise = fetch('GET', this._url('/org.graylog.events.configuration.EventsConfiguration')).then((response) => {
-        this.eventsClusterConfig = response;
-        this.propagateChanges();
+      const promise = fetch('GET', this._url('/org.graylog.events.configuration.EventsConfiguration')).then(
+        (response) => {
+          this.eventsClusterConfig = response;
+          this.propagateChanges();
 
-        return response;
-      });
+          return response;
+        },
+      );
 
       ConfigurationsActions.listEventsClusterConfig.promise(promise);
     },
 
     listIndexSetsDefaultsClusterConfig() {
-      const promise = fetch('GET', this._url('/org.graylog2.configuration.IndexSetsDefaultConfiguration')).then((response) => {
-        this.indexSetsDefaultConfig = response;
-        this.propagateChanges();
+      const promise = fetch('GET', this._url('/org.graylog2.configuration.IndexSetsDefaultConfiguration')).then(
+        (response) => {
+          this.indexSetsDefaultConfig = response;
+          this.propagateChanges();
 
-        return response;
-      });
+          return response;
+        },
+      );
       ConfigurationsActions.listIndexSetsDefaultsClusterConfig.promise(promise);
     },
 
@@ -248,7 +253,10 @@ export const ConfigurationsStore = singletonStore(
           return response;
         },
         (error) => {
-          UserNotification.error(`Search config update failed: ${error}`, `Could not update search config: ${configType}`);
+          UserNotification.error(
+            `Search config update failed: ${error}`,
+            `Could not update search config: ${configType}`,
+          );
         },
       );
 
@@ -267,7 +275,10 @@ export const ConfigurationsStore = singletonStore(
           return config;
         },
         (error) => {
-          UserNotification.error(`Url Whitelist config update failed: ${error}`, `Could not update Url Whitelist: ${configType}`);
+          UserNotification.error(
+            `Url Whitelist config update failed: ${error}`,
+            `Could not update Url Whitelist: ${configType}`,
+          );
         },
       );
 
@@ -286,7 +297,10 @@ export const ConfigurationsStore = singletonStore(
           return response;
         },
         (error) => {
-          UserNotification.error(`Message processors config update failed: ${error}`, `Could not update config: ${configType}`);
+          UserNotification.error(
+            `Message processors config update failed: ${error}`,
+            `Could not update config: ${configType}`,
+          );
         },
       );
 

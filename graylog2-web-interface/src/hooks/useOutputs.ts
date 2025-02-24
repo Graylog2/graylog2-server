@@ -24,9 +24,9 @@ import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 
 type OutputRequestResponse = {
-  outputs: Array<Output>,
-    total: number,
-}
+  outputs: Array<Output>;
+  total: number;
+};
 export const KEY_PREFIX = ['outputs', 'overview'];
 export const keyFn = () => [...KEY_PREFIX];
 
@@ -37,13 +37,15 @@ export const fetchOutputs = () => {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useOutputs = ({ enabled }: Options = { enabled: true }): {
-  data: OutputRequestResponse,
-  refetch: () => void,
-  isInitialLoading: boolean,
+const useOutputs = (
+  { enabled }: Options = { enabled: true },
+): {
+  data: OutputRequestResponse;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     keyFn(),
@@ -54,11 +56,11 @@ const useOutputs = ({ enabled }: Options = { enabled: true }): {
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useOutputs;

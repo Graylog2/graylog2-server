@@ -27,46 +27,58 @@ import events from './events.fixtures';
 
 import BulkEventReplay from '../BulkEventReplay';
 
-const initialEventIds = [
-  '01JH007XPDF710TPJZT8K2CN3W',
-  '01JH006340WP7HQ5E7P71Q9HHX',
-  '01JH0029TS9PX5ED87TZ1RVRT2',
-];
+const initialEventIds = ['01JH007XPDF710TPJZT8K2CN3W', '01JH006340WP7HQ5E7P71Q9HHX', '01JH0029TS9PX5ED87TZ1RVRT2'];
 
-jest.mock('components/events/ReplaySearch', () => ({ alertId }: { alertId: string }) => <span>Replaying search for event {alertId}</span>);
+jest.mock('components/events/ReplaySearch', () => ({ alertId }: { alertId: string }) => (
+  <span>Replaying search for event {alertId}</span>
+));
 
 const markEventAsReviewed = async (eventId: string) => {
-  const markAsReviewedButton = await screen.findByRole('button', { name: new RegExp(`mark event "${eventId}" as reviewed`, 'i') });
+  const markAsReviewedButton = await screen.findByRole('button', {
+    name: new RegExp(`mark event "${eventId}" as reviewed`, 'i'),
+  });
 
   return userEvent.click(markAsReviewedButton);
 };
 
 const removeEvent = async (eventId: string) => {
-  const removeEventButton = await screen.findByRole('button', { name: new RegExp(`remove event "${eventId}" from list`, 'i') });
+  const removeEventButton = await screen.findByRole('button', {
+    name: new RegExp(`remove event "${eventId}" from list`, 'i'),
+  });
 
   return userEvent.click(removeEventButton);
 };
 
-const expectReplayingEvent = (eventId: string) => screen.findByText(new RegExp(`replaying search for event ${eventId}`, 'i'));
+const expectReplayingEvent = (eventId: string) =>
+  screen.findByText(new RegExp(`replaying search for event ${eventId}`, 'i'));
 
 const eventByIndex = (index: number) => events[initialEventIds[index]].event;
 const eventMessage = (index: number) => eventByIndex(index).message;
 
 const SUT = (props: Partial<React.ComponentProps<typeof BulkEventReplay>>) => (
-  <BulkEventReplay events={events} initialEventIds={initialEventIds} onClose={() => {}} BulkActions={RemainingBulkActions} {...props} />
+  <BulkEventReplay
+    events={events}
+    initialEventIds={initialEventIds}
+    onClose={() => {}}
+    BulkActions={RemainingBulkActions}
+    {...props}
+  />
 );
 
 const bulkAction = jest.fn();
-const testPlugin = new PluginManifest({}, {
-  'views.components.eventActions': [{
-    key: 'test-bulk-action',
-    component: ({ events: _events }) => (
-      <MenuItem onClick={() => bulkAction(_events)}>Test Action</MenuItem>
-    ),
-    useCondition: () => true,
-    isBulk: true,
-  }],
-});
+const testPlugin = new PluginManifest(
+  {},
+  {
+    'views.components.eventActions': [
+      {
+        key: 'test-bulk-action',
+        component: ({ events: _events }) => <MenuItem onClick={() => bulkAction(_events)}>Test Action</MenuItem>,
+        useCondition: () => true,
+        isBulk: true,
+      },
+    ],
+  },
+);
 
 describe('BulkEventReplay', () => {
   usePlugin(testPlugin);
@@ -111,7 +123,9 @@ describe('BulkEventReplay', () => {
     await expectReplayingEvent(initialEventIds[2]);
 
     await markEventAsReviewed(initialEventIds[2]);
-    await screen.findByText('You are done reviewing all events. You can now select a bulk action to apply to all remaining events, or close the page to return to the events list.');
+    await screen.findByText(
+      'You are done reviewing all events. You can now select a bulk action to apply to all remaining events, or close the page to return to the events list.',
+    );
   });
 
   it('allows jumping to specific events', async () => {

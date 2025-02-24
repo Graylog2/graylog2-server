@@ -34,10 +34,9 @@ const fetchContentPackRevisions = async (id: string) => {
   };
 };
 
-const defaultErrorHandler = (error: Error) => UserNotification.error(`Error while fetching content pack revisions: ${error}`, 'Unable to fetch content pack');
+const defaultErrorHandler = (error: Error) =>
+  UserNotification.error(`Error while fetching content pack revisions: ${error}`, 'Unable to fetch content pack');
 
-const useContentPackRevisions = (id: string, onFetchError: (e: Error) => void = defaultErrorHandler) => useQuery(
-  ['content-packs', 'revisions', id],
-  () => onError(fetchContentPackRevisions(id), onFetchError),
-);
+const useContentPackRevisions = (id: string, onFetchError: (e: Error) => void = defaultErrorHandler) =>
+  useQuery(['content-packs', 'revisions', id], () => onError(fetchContentPackRevisions(id), onFetchError));
 export default useContentPackRevisions;

@@ -25,9 +25,12 @@ type SyslogPriFacilityConverterConfigurationProps = {
   onChange: (...args: any[]) => void;
 };
 
-class SyslogPriFacilityConverterConfiguration extends React.Component<SyslogPriFacilityConverterConfigurationProps, {
-  [key: string]: any;
-}> {
+class SyslogPriFacilityConverterConfiguration extends React.Component<
+  SyslogPriFacilityConverterConfigurationProps,
+  {
+    [key: string]: any;
+  }
+> {
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
   }
@@ -47,12 +50,14 @@ class SyslogPriFacilityConverterConfiguration extends React.Component<SyslogPriF
   render() {
     return (
       <div className="xtrc-converter">
-        <Input type="checkbox"
-               id={`enable-${this.props.type}-converter`}
-               label="Convert from PRI to syslog facility"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked
-               onChange={this._toggleConverter} />
+        <Input
+          type="checkbox"
+          id={`enable-${this.props.type}-converter`}
+          label="Convert from PRI to syslog facility"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked
+          onChange={this._toggleConverter}
+        />
       </div>
     );
   }

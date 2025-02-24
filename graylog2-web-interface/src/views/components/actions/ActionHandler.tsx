@@ -24,11 +24,11 @@ import generateId from 'logic/generateId';
 import type { AppDispatch } from 'stores/useAppDispatch';
 
 export type ActionComponentProps = {
-  onClose: () => void,
-  queryId: QueryId,
-  field: FieldName,
-  type: FieldType,
-  value: FieldValue | undefined | null,
+  onClose: () => void;
+  queryId: QueryId;
+  field: FieldName;
+  type: FieldType;
+  value: FieldValue | undefined | null;
 };
 
 export type ActionComponentType = React.ComponentType<ActionComponentProps>;
@@ -38,58 +38,66 @@ export type ActionComponents = { [key: string]: React.ReactElement<ActionCompone
 export type SetActionComponents = (fn: (component: ActionComponents) => ActionComponents) => void;
 
 export type ActionHandlerArguments<Contexts = ActionContexts> = {
-  queryId: QueryId,
-  field: FieldName,
-  value?: FieldValue,
-  type: FieldType,
-  contexts: Contexts,
+  queryId: QueryId;
+  field: FieldName;
+  value?: FieldValue;
+  type: FieldType;
+  contexts: Contexts;
 };
 
 export type ActionHandler<Contexts> = (args: ActionHandlerArguments<Contexts>) => Promise<unknown>;
 export type ActionHandlerCondition<Contexts> = (args: ActionHandlerArguments<Contexts>, getState: GetState) => boolean;
 
 export type ActionConditions<Contexts> = {
-  isEnabled?: ActionHandlerCondition<Contexts>,
-  isHidden?: ActionHandlerCondition<Contexts>,
+  isEnabled?: ActionHandlerCondition<Contexts>;
+  isHidden?: ActionHandlerCondition<Contexts>;
 };
 
 type ActionDefinitionBase<Contexts> = {
-  type: string,
-  title: string,
-  resetFocus?: boolean,
-  help?: (args: ActionHandlerArguments<Contexts>) => { title: string, description: React.ReactNode } | undefined,
-  condition?: () => boolean,
+  type: string;
+  title: string;
+  resetFocus?: boolean;
+  help?: (args: ActionHandlerArguments<Contexts>) => { title: string; description: React.ReactNode } | undefined;
+  condition?: () => boolean;
 };
 
-export type ThunkActionHandler<T> = (args: ActionHandlerArguments<T>) => (dispatch: AppDispatch, getState: GetState) => unknown | Promise<unknown>;
+export type ThunkActionHandler<T> = (
+  args: ActionHandlerArguments<T>,
+) => (dispatch: AppDispatch, getState: GetState) => unknown | Promise<unknown>;
 
 type FunctionHandlerAction<Contexts> = {
-  handler: ActionHandler<Contexts>,
+  handler: ActionHandler<Contexts>;
 };
 type ThunkHandlerAction<Contexts> = {
-  thunk: ThunkActionHandler<Contexts>,
-}
+  thunk: ThunkActionHandler<Contexts>;
+};
 type ComponentsHandlerAction = {
-  component: ActionComponentType,
+  component: ActionComponentType;
 };
 
-export type HandlerAction<Contexts> =
-  (FunctionHandlerAction<Contexts> | ComponentsHandlerAction | ThunkHandlerAction<Contexts>)
-  & ActionDefinitionBase<Contexts>;
+export type HandlerAction<Contexts> = (
+  | FunctionHandlerAction<Contexts>
+  | ComponentsHandlerAction
+  | ThunkHandlerAction<Contexts>
+) &
+  ActionDefinitionBase<Contexts>;
 
 export type ExternalLinkAction<Contexts> = {
-  linkTarget: (args: ActionHandlerArguments<Contexts>) => string,
+  linkTarget: (args: ActionHandlerArguments<Contexts>) => string;
 } & ActionDefinitionBase<Contexts>;
 
-export type ActionDefinition<Contexts = ActionContexts> =
-  (HandlerAction<Contexts> | ExternalLinkAction<Contexts>)
-  & ActionConditions<Contexts>;
+export type ActionDefinition<Contexts = ActionContexts> = (HandlerAction<Contexts> | ExternalLinkAction<Contexts>) &
+  ActionConditions<Contexts>;
 
 export function isExternalLinkAction<T>(action: ActionDefinition<T>): action is ExternalLinkAction<T> {
   return 'linkTarget' in action;
 }
 
-export function createHandlerFor<T>(dispatch: AppDispatch, action: ActionDefinitionBase<T> & HandlerAction<T>, setActionComponents: SetActionComponents): ActionHandler<T> {
+export function createHandlerFor<T>(
+  dispatch: AppDispatch,
+  action: ActionDefinitionBase<T> & HandlerAction<T>,
+  setActionComponents: SetActionComponents,
+): ActionHandler<T> {
   if ('handler' in action) {
     return action.handler;
   }
@@ -106,15 +114,17 @@ export function createHandlerFor<T>(dispatch: AppDispatch, action: ActionDefinit
 
       const onClose = () => setActionComponents(({ [id]: _, ...rest }) => rest);
       const renderedComponent = (
-        <ActionComponent key={action.title}
-                         onClose={onClose}
-                         queryId={queryId}
-                         field={field}
-                         value={value}
-                         type={type} />
+        <ActionComponent
+          key={action.title}
+          onClose={onClose}
+          queryId={queryId}
+          field={field}
+          value={value}
+          type={type}
+        />
       );
 
-      setActionComponents((actionComponents) => ({ [id]: renderedComponent, ...actionComponents } as ActionComponents));
+      setActionComponents((actionComponents) => ({ [id]: renderedComponent, ...actionComponents }) as ActionComponents);
 
       return Promise.resolve();
     };

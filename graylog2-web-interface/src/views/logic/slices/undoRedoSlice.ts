@@ -25,12 +25,12 @@ const REVISIONS_MAX_SIZE = 10;
 
 type RevisionItemType = 'view';
 
-export type RevisionItem = { type: RevisionItemType, state: any }
+export type RevisionItem = { type: RevisionItemType; state: any };
 
 export type UndoRedoState = {
-  revisions: Array<RevisionItem>,
-  currentRevision: number
-}
+  revisions: Array<RevisionItem>;
+  currentRevision: number;
+};
 
 const undoRedoSlice = createSlice({
   name: 'undoRedo',
@@ -53,13 +53,18 @@ const undoRedoSlice = createSlice({
 export const undoRedoSliceReducer = undoRedoSlice.reducer;
 export const { setRevisions, setCurrentRevision } = undoRedoSlice.actions;
 
-export const pushIntoRevisions = (revisionItem: RevisionItem, setAsLastRevision: boolean = true) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const { revisions, currentRevision } = selectRootUndoRedo(getState());
-  const isLast = currentRevision === revisions.length;
-  // if we are in the middle of the buffer, we have to remove all items after current;
-  const cutRevisions = isLast ? revisions : revisions.slice(0, currentRevision);
-  // if we reach max size of the buffer we have to remove first item;
-  const newRevisions: Array<RevisionItem> = (cutRevisions.length < REVISIONS_MAX_SIZE) ? [...cutRevisions, revisionItem] : [...cutRevisions.slice(1), revisionItem];
-  const newRevision = setAsLastRevision ? newRevisions.length : currentRevision;
-  dispatch(setRevisions({ revisions: newRevisions, currentRevision: newRevision }));
-};
+export const pushIntoRevisions =
+  (revisionItem: RevisionItem, setAsLastRevision: boolean = true) =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+    const { revisions, currentRevision } = selectRootUndoRedo(getState());
+    const isLast = currentRevision === revisions.length;
+    // if we are in the middle of the buffer, we have to remove all items after current;
+    const cutRevisions = isLast ? revisions : revisions.slice(0, currentRevision);
+    // if we reach max size of the buffer we have to remove first item;
+    const newRevisions: Array<RevisionItem> =
+      cutRevisions.length < REVISIONS_MAX_SIZE
+        ? [...cutRevisions, revisionItem]
+        : [...cutRevisions.slice(1), revisionItem];
+    const newRevision = setAsLastRevision ? newRevisions.length : currentRevision;
+    dispatch(setRevisions({ revisions: newRevisions, currentRevision: newRevision }));
+  };

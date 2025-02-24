@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 type Options = {
-  signDisplay?: 'auto' | 'always' | 'exceptZero',
-  digits?: number,
-  minimumDigits?: number,
+  signDisplay?: 'auto' | 'always' | 'exceptZero';
+  digits?: number;
+  minimumDigits?: number;
 };
 
 const desiredFractionDigits = 1;
@@ -32,17 +32,27 @@ const exponent = (s: string | number) => Number(Number(s).toExponential().split(
 const fractionDigitsFor = (s: string | number, defaultDigits: number) => {
   const e = exponent(s);
 
-  return e <= (-1 * defaultDigits)
-    ? (-1 * e) + 1
-    : defaultDigits;
+  return e <= -1 * defaultDigits ? -1 * e + 1 : defaultDigits;
 };
 
-const format = (num: number, options: Intl.NumberFormatOptions) => new Intl.NumberFormat(undefined, options).format(num);
+const format = (num: number, options: Intl.NumberFormatOptions) =>
+  new Intl.NumberFormat(undefined, options).format(num);
 
-export const formatNumber = (num: number, { digits, ...options }: Options = {}) => format(num, { minimumFractionDigits: options.minimumDigits, maximumFractionDigits: fractionDigitsFor(num, digits ?? desiredFractionDigits), ...options });
-export const formatPercentage = (num: number, { digits, ...options }: Options = {}) => format(num, { ...defaultPercentageOptions, maximumFractionDigits: fractionDigitsFor(num * 100, digits ?? desiredFractionDigits), ...options });
+export const formatNumber = (num: number, { digits, ...options }: Options = {}) =>
+  format(num, {
+    minimumFractionDigits: options.minimumDigits,
+    maximumFractionDigits: fractionDigitsFor(num, digits ?? desiredFractionDigits),
+    ...options,
+  });
+export const formatPercentage = (num: number, { digits, ...options }: Options = {}) =>
+  format(num, {
+    ...defaultPercentageOptions,
+    maximumFractionDigits: fractionDigitsFor(num * 100, digits ?? desiredFractionDigits),
+    ...options,
+  });
 
 type TrendOptions = {
-  percentage?: boolean,
-}
-export const formatTrend = (num: number, options: TrendOptions = {}) => (options.percentage === true ? formatPercentage : formatNumber)(num, { signDisplay: 'exceptZero' });
+  percentage?: boolean;
+};
+export const formatTrend = (num: number, options: TrendOptions = {}) =>
+  (options.percentage === true ? formatPercentage : formatNumber)(num, { signDisplay: 'exceptZero' });

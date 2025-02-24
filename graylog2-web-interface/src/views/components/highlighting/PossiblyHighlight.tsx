@@ -28,19 +28,23 @@ import { formatNumber } from 'util/NumberFormatting';
 import isNumeric from '../messagelist/IsNumeric';
 
 export type HighlightRange = {
-  start: number,
-  length: number,
+  start: number;
+  length: number;
 };
 
 type Ranges = { [key: string]: Array<HighlightRange> };
 
-const highlight = (value: any, idx: number, style: React.CSSProperties = {}) => <span key={`highlight-${idx}`} style={style}>{value}</span>;
+const highlight = (value: any, idx: number, style: React.CSSProperties = {}) => (
+  <span key={`highlight-${idx}`} style={style}>
+    {value}
+  </span>
+);
 
 type Props = {
-  color?: HighlightingColor
-  field: string,
-  value: string | number,
-  highlightRanges?: Ranges
+  color?: HighlightingColor;
+  field: string;
+  value: string | number;
+  highlightRanges?: Ranges;
 };
 
 function highlightCompleteValue(ranges: Array<HighlightRange>, value) {
@@ -64,9 +68,7 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   }
 
   if (!highlightRanges || !highlightRanges[field]) {
-    return shouldBeFormatted(field, value)
-      ? formatNumber(value)
-      : value;
+    return shouldBeFormatted(field, value) ? formatNumber(value) : value;
   }
 
   const backgroundColor = color.colorFor(value);
@@ -78,9 +80,7 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   };
 
   if (highlightCompleteValue(highlightRanges[field], value)) {
-    const formattedValue = shouldBeFormatted(field, value)
-      ? formatNumber(value)
-      : value;
+    const formattedValue = shouldBeFormatted(field, value) ? formatNumber(value) : value;
 
     return highlight(formattedValue, 0, style);
   }
@@ -93,15 +93,20 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
   const rest = (pos: number) => origValue.substring(pos, origValue.length);
 
   const highlights = ranges
-    .filter(({ start }) => (start >= 0))
-    .filter(({ length }) => (length >= 0))
-    .reduce(([acc, i], cur, idx) => [
-      [...acc,
-        subst(i, Math.max(0, cur.start - i)), // non-highlighted string before this range
-        highlight(subst(Math.max(cur.start, i), Math.max(0, cur.length - Math.max(0, i - cur.start))), idx, style), // highlighted string in range
-      ],
-      cur.start + cur.length,
-    ] as [Array<React.ReactNode>, number], [[], 0] as [Array<React.ReactNode>, number])[0];
+    .filter(({ start }) => start >= 0)
+    .filter(({ length }) => length >= 0)
+    .reduce(
+      ([acc, i], cur, idx) =>
+        [
+          [
+            ...acc,
+            subst(i, Math.max(0, cur.start - i)), // non-highlighted string before this range
+            highlight(subst(Math.max(cur.start, i), Math.max(0, cur.length - Math.max(0, i - cur.start))), idx, style), // highlighted string in range
+          ],
+          cur.start + cur.length,
+        ] as [Array<React.ReactNode>, number],
+      [[], 0] as [Array<React.ReactNode>, number],
+    )[0];
 
   const lastRange = last(sortBy(ranges, (r) => r.start + r.length));
 

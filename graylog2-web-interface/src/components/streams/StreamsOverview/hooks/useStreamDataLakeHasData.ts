@@ -14,15 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Well as BootstrapWell } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import { useQuery } from '@tanstack/react-query';
 
-const Well = styled(BootstrapWell)(({ theme }) => css`
-  background-color: ${theme.colors.variant.lightest.default};
-  border-color: ${theme.colors.variant.light.default};
-  color: ${theme.colors.variant.darker.default};
-`);
+import usePluginEntities from 'hooks/usePluginEntities';
 
-/** @component */
-export default Well;
+const useStreamDataLakeHasData = (streamId: string, enabled: boolean) => {
+  const { fetchStreamDataLake } = usePluginEntities('dataLake')[0] ?? {};
+  const {
+    data: dataLake,
+    isError,
+    isLoading,
+  } = useQuery(['stream', 'data-lake', streamId], () => fetchStreamDataLake(streamId), {
+    enabled: fetchStreamDataLake && enabled,
+  });
+
+  return isLoading || isError ? undefined : dataLake?.message_count > 1 || dataLake?.restore_history?.length > 0;
+};
+
+export default useStreamDataLakeHasData;

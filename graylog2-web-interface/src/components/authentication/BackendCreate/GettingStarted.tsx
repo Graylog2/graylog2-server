@@ -22,7 +22,7 @@ import { EmptyEntity } from 'components/common';
 import ServiceSelect from './ServiceSelect';
 
 type Props = {
-  title?: string,
+  title?: string;
 };
 
 const GettingStarted = ({ title }: Props) => (
@@ -31,8 +31,8 @@ const GettingStarted = ({ title }: Props) => (
       <EmptyEntity title={title}>
         <p>
           Beside the built-in authentication mechanisms like its internal user database or LDAP/Active Directory,
-          authentication services can also be extended by plugins to support other authentication mechanisms.
-          Select an authentication service to setup a new one.
+          authentication services can also be extended by plugins to support other authentication mechanisms. Select an
+          authentication service to setup a new one.
         </p>
         <ServiceSelect />
       </EmptyEntity>

@@ -18,17 +18,18 @@ import { fetchFile } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { createLinkAndDownload } from 'util/FileDownloadUtils';
+import type { QueryString } from 'views/logic/queries/types';
 
 export type ExportPayload = {
-  timerange?: TimeRange | undefined | null,
-  query_string?: QueryString,
-  streams?: string[],
-  fields_in_order: string[] | undefined | null,
-  execution_state?: SearchExecutionState,
-  limit?: number,
+  timerange?: TimeRange | undefined | null;
+  query_string?: QueryString;
+  streams?: string[];
+  fields_in_order: string[] | undefined | null;
+  execution_state?: SearchExecutionState;
+  limit?: number;
 };
 
 const downloadFile = (exportJobId: string, filename: string) => {
@@ -36,7 +37,12 @@ const downloadFile = (exportJobId: string, filename: string) => {
   createLinkAndDownload(href, filename);
 };
 
-export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string, mimeType: string, filename?: string) => {
+export const exportSearchMessages = (
+  exportPayload: ExportPayload,
+  searchId: string,
+  mimeType: string,
+  filename?: string,
+) => {
   const { url } = ApiRoutes.ExportJobsController.exportSearch(searchId);
 
   return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
@@ -46,7 +52,13 @@ export const exportSearchMessages = (exportPayload: ExportPayload, searchId: str
     });
 };
 
-export const exportSearchTypeMessages = (exportPayload: ExportPayload, searchId: string, searchTypeId: string, mimeType: string, filename?: string) => {
+export const exportSearchTypeMessages = (
+  exportPayload: ExportPayload,
+  searchId: string,
+  searchTypeId: string,
+  mimeType: string,
+  filename?: string,
+) => {
   const { url } = ApiRoutes.ExportJobsController.exportSearchType(searchId, searchTypeId);
 
   return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)

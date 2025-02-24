@@ -23,25 +23,25 @@ import { singleton } from 'logic/singleton';
 import type { ParameterBindingJsonRepresentation } from './ParameterBinding';
 
 type InternalState = {
-  type: string,
-  name: string,
-  title: string,
-  description: string,
-  dataType: string,
-  defaultValue: any,
-  optional: boolean,
-  binding: ParameterBinding | undefined | null,
+  type: string;
+  name: string;
+  title: string;
+  description: string;
+  dataType: string;
+  defaultValue: any;
+  optional: boolean;
+  binding: ParameterBinding | undefined | null;
 };
 
 export type ParameterJson = {
-  type: string,
-  name: string,
-  title: string,
-  description: string,
-  data_type: string,
-  default_value: any,
-  optional: boolean,
-  binding: ParameterBindingJsonRepresentation | undefined | null,
+  type: string;
+  name: string;
+  title: string;
+  description: string;
+  data_type: string;
+  default_value: any;
+  optional: boolean;
+  binding: ParameterBindingJsonRepresentation | undefined | null;
 };
 
 type ParameterSubClass = {
@@ -53,7 +53,16 @@ class Parameter {
 
   static __registrations: { [key: string]: ParameterSubClass } = {};
 
-  constructor(type: string, name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding?: ParameterBinding) {
+  constructor(
+    type: string,
+    name: string,
+    title: string,
+    description: string,
+    dataType: string,
+    defaultValue: any,
+    optional: boolean,
+    binding?: ParameterBinding,
+  ) {
     this._value = { type, name, title, description, dataType, defaultValue, optional, binding };
   }
 
@@ -111,7 +120,9 @@ class Parameter {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  toJSON() { throw new Error('Method toJSON has no implementation'); }
+  toJSON() {
+    throw new Error('Method toJSON has no implementation');
+  }
 }
 
 const SingletonParameter = singleton('views.logic.parameters.Parameter', () => Parameter);

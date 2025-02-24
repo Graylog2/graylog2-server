@@ -19,6 +19,7 @@ package org.graylog.plugins.views;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.favorites.FavoritesResource;
 import org.graylog.plugins.views.migrations.V20181220133700_AddViewsAdminRole;
@@ -58,6 +59,7 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamCategoryFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.jobs.periodical.SearchJobStateCleanupPeriodical;
 import org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService;
 import org.graylog.plugins.views.search.querystrings.MongoLastUsedQueryStringsService;
 import org.graylog.plugins.views.search.rest.DashboardsResource;
@@ -85,6 +87,7 @@ import org.graylog.plugins.views.search.rest.remote.SearchJobsStatusResource;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
@@ -191,6 +194,11 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(Pivot.class);
         registerJacksonSubtype(EventList.class);
 
+        //search type results
+        registerJacksonSubtype(PivotResult.class);
+        registerJacksonSubtype(MessageList.Result.class);
+        registerJacksonSubtype(EventList.Result.class);
+
         // pivot specs
         registerJacksonSubtype(Values.class);
         registerJacksonSubtype(Time.class);
@@ -214,7 +222,9 @@ public class ViewsBindings extends ViewsModule {
 
         bind(RecentActivityUpdatesListener.class).asEagerSingleton();
 
-        bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
+        OptionalBinder.newOptionalBinder(binder(), SearchJobService.class)
+                .setDefault().to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
+
         bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);
         bind(FieldTypeValidation.class).to(FieldTypeValidationImpl.class).in(Scopes.SINGLETON);
 
@@ -233,6 +243,7 @@ public class ViewsBindings extends ViewsModule {
         registerVisualizationConfigSubtypes();
 
         addPeriodical(SearchesCleanUpJob.class);
+        addPeriodical(SearchJobStateCleanupPeriodical.class);
 
         addMigration(V20181220133700_AddViewsAdminRole.class);
         addMigration(V20190304102700_MigrateMessageListStructure.class);
