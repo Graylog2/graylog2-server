@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.otel.input.grpc;
+package org.graylog.inputs.grpc;
 
 import com.google.common.io.Resources;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -24,9 +24,10 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.KeyValue;
-import org.graylog.plugins.otel.input.OTelGrpcInput;
-import org.graylog.plugins.otel.input.OTelJournal;
-import org.graylog.plugins.otel.input.OTelJournalRecordFactory;
+import org.graylog.inputs.otel.OTelGrpcInput;
+import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.inputs.otel.OTelJournalRecordFactory;
+import org.graylog.inputs.otel.transport.OTelLogsService;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.junit.jupiter.api.BeforeEach;

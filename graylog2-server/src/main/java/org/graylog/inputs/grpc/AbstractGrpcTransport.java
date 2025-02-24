@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.grpc;
+package org.graylog.inputs.grpc;
 
 import com.codahale.metrics.MetricSet;
 import com.google.common.eventbus.EventBus;

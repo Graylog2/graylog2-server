@@ -14,14 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.otel.input;
+package org.graylog.inputs.otel.codec;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
-import org.graylog.plugins.otel.input.codec.OTelLogsCodec;
+import org.graylog.inputs.otel.OTelGrpcInput;
+import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.ResolvableInetSocketAddress;

@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.otel.bindings;
+package org.graylog.inputs.otel.bindings;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import org.graylog.plugins.otel.input.OTelGrpcInput;
-import org.graylog.plugins.otel.input.codec.OTelCodec;
-import org.graylog.plugins.otel.input.grpc.OTelGrpcTransport;
-import org.graylog.plugins.otel.input.grpc.OTelLogsService;
+import org.graylog.inputs.otel.OTelGrpcInput;
+import org.graylog.inputs.otel.codec.OTelCodec;
+import org.graylog.inputs.otel.transport.OTelGrpcTransport;
+import org.graylog.inputs.otel.transport.OTelLogsService;
 import org.graylog2.plugin.PluginModule;
 
 public class OTelModule extends PluginModule {

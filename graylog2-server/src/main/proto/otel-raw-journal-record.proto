@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package org.graylog.plugins.otel.input;
+package org.graylog.inputs.otel;
 
-option java_package = "org.graylog.plugins.otel.input";
+option java_package = "org.graylog.inputs.otel";
 option java_outer_classname = "OTelJournal";
 
 import "opentelemetry/proto/resource/v1/resource.proto";

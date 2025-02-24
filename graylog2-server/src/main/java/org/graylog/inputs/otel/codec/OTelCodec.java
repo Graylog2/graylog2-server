@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.otel.input.codec;
+package org.graylog.inputs.otel.codec;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.protobuf.InvalidProtocolBufferException;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import org.graylog.plugins.otel.input.OTelJournal;
+import org.graylog.inputs.otel.OTelJournal;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;

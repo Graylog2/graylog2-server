@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.otel.input;
+package org.graylog.inputs.otel;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import org.graylog.plugins.otel.input.codec.OTelCodec;
-import org.graylog.plugins.otel.input.grpc.OTelGrpcTransport;
+import org.graylog.inputs.otel.codec.OTelCodec;
+import org.graylog.inputs.otel.transport.OTelGrpcTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;

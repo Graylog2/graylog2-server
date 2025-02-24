@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.otel.input.grpc;
+package org.graylog.inputs.otel.transport;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import io.grpc.ServerServiceDefinition;
 import jakarta.inject.Inject;
-import org.graylog.grpc.AbstractGrpcTransport;
+import org.graylog.inputs.grpc.AbstractGrpcTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;

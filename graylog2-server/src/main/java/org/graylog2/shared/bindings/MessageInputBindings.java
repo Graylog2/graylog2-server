@@ -17,8 +17,8 @@
 package org.graylog2.shared.bindings;
 
 import com.google.inject.multibindings.MapBinder;
+import org.graylog.inputs.otel.bindings.OTelModule;
 import org.graylog.plugins.beats.BeatsInputPluginModule;
-import org.graylog.plugins.otel.bindings.OTelModule;
 import org.graylog2.inputs.beats.kafka.BeatsKafkaInput;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.inputs.gelf.amqp.GELFAMQPInput;
