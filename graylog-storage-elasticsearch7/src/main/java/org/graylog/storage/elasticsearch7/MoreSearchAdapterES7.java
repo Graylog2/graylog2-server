@@ -32,11 +32,10 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.ToXCo
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.AutoDateHistogramAggregationBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ParsedAutoDateHistogram;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
@@ -56,6 +55,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +63,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
@@ -155,7 +154,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         final var termsAggregation = AggregationBuilders.terms(termsAggregationName)
                 .field(EventDto.FIELD_ALERT);
 
-        searchSourceBuilder.aggregation(termsAggregation.subAggregation(histogramAggregation));
+        searchSourceBuilder.aggregation(histogramAggregation.subAggregation(termsAggregation));
 
         final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
         final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
@@ -169,26 +168,22 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
 
-        final ParsedTerms termsResult = searchResult.getAggregations().get(termsAggregationName);
+        final ParsedAutoDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
+        final var histogramBuckets = histogramResult.getBuckets();
 
-        final var alerts = extractBuckets(termsResult, "true");
-        final var events = extractBuckets(termsResult, "false");
+        final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
+        final var events = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
+
+        histogramBuckets.forEach(bucket -> {
+            final var parsedTerms = (ParsedTerms) bucket.getAggregations().get(termsAggregationName);
+            final var dateTime = (ZonedDateTime) bucket.getKey();
+            final var alertCount = Optional.ofNullable(parsedTerms.getBucketByKey("true")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
+            final var eventCount = Optional.ofNullable(parsedTerms.getBucketByKey("false")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
+            alerts.add(new MoreSearch.Histogram.Bucket(dateTime, alertCount));
+            events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
+        });
 
         return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
-    }
-
-    private List<MoreSearch.Histogram.Bucket> extractBuckets(ParsedTerms termsResult, String key) {
-        return Optional.ofNullable(termsResult.getBucketByKey(key))
-                .map(Terms.Bucket::getAggregations)
-                .map(b -> (ParsedAutoDateHistogram) b.get(histogramAggregationName))
-                .map(b -> b.getBuckets().stream())
-                .orElse(Stream.empty())
-                .map(this::createBucket)
-                .toList();
-    }
-
-    private MoreSearch.Histogram.Bucket createBucket(Histogram.Bucket bucket) {
-        return new MoreSearch.Histogram.Bucket((ZonedDateTime) bucket.getKey(), bucket.getDocCount());
     }
 
     private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams) {
