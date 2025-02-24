@@ -195,49 +195,43 @@ public abstract class AbstractGrpcTransport extends ThrottleableTransport2 {
                     TextField.Attribute.IS_PASSWORD
             ));
 
-            request.addField(
-                    new BooleanField(
-                            CK_INSECURE,
-                            "Allow Insecure Connections",
-                            false,
-                            "Disable TLS encryption to allow insecure connections to the server"
-                    )
-            );
-
-            request.addField(
-                    new InlineBinaryField(
-                            CK_TLS_CERT,
-                            "TLS Server Certificate Chain",
-                            "PEM-encoded certificate chain used by the input to authenticate itself to " +
-                                    "clients.",
-                            ConfigurationField.Optional.OPTIONAL,
-                            false,
-                            ""
-                    )
-            );
-
-            request.addField(
-                    new InlineBinaryField(
-                            CK_TLS_KEY,
-                            "TLS Server Private Key",
-                            "PEM-encoded PKCS8 private key used by the server for TLS encryption. " +
-                                    "Please note, that if you run this input on a Forwarder, the key will also be " +
-                                    "stored in the local filesystem of the Forwarder.",
-                            ConfigurationField.Optional.OPTIONAL,
-                            true,
-                            "")
-            );
+            request.addField(new BooleanField(
+                    CK_INSECURE,
+                    "Allow Insecure Connections",
+                    false,
+                    "Disable TLS encryption to allow insecure connections to the server"
+            ));
 
             request.addField(new InlineBinaryField(
-                            CK_TLS_CLIENT_CA,
-                            "TLS Client Certificate Chain",
-                    "PEM-encoded certificate chain used to validate client certificates during mutual TLS " +
-                            "authentication. Clients that fail to provide a trusted certificate will be rejected.",
-                            ConfigurationField.Optional.OPTIONAL,
+                    CK_TLS_CERT,
+                    "TLS Server Certificate Chain",
+                    "PEM-encoded certificate chain used by the input to authenticate itself to " +
+                            "clients.",
+                    ConfigurationField.Optional.OPTIONAL,
                     false,
                     ""
-                    )
-            );
+            ));
+
+            request.addField(new InlineBinaryField(
+                    CK_TLS_KEY,
+                    "TLS Server Private Key",
+                    "PEM-encoded PKCS8 private key used by the server for TLS encryption. " +
+                            "Please note, that if you run this input on a Forwarder, the key will also be " +
+                            "stored in the local filesystem of the Forwarder.",
+                    ConfigurationField.Optional.OPTIONAL,
+                    true,
+                    ""
+            ));
+
+            request.addField(new InlineBinaryField(
+                    CK_TLS_CLIENT_CA,
+                    "TLS Client Certificate Chain",
+                    "PEM-encoded certificate chain used to validate client certificates during mutual TLS " +
+                            "authentication. Clients that fail to provide a trusted certificate will be rejected.",
+                    ConfigurationField.Optional.OPTIONAL,
+                    false,
+                    ""
+            ));
 
             request.addField(new NumberField(
                     CK_MAX_INBOUND_MSG_SIZE,
