@@ -63,14 +63,21 @@ const useCheckboxStatus = <Entity extends EntityBase>(
   };
 };
 
+const getDefaultTitle = (checkboxStatus: CheckboxStatus) =>
+  `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'Select'} all visible entities`;
+
 type Props<Entity extends EntityBase> = {
   data: Readonly<Array<Entity>>;
+  getTitle?: (checkboxStatus: CheckboxStatus) => string;
 };
 
-export const BulkSelectHeadContent = <Entity extends EntityBase>({ data }: Props<Entity>) => {
+export const BulkSelectHeadContent = <Entity extends EntityBase>({
+  data,
+  getTitle = getDefaultTitle,
+}: Props<Entity>) => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
-  const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'Select'} all visible entities`;
+  const title = getTitle(checkboxStatus);
 
   const onBulkSelect = () => {
     setSelectedEntities((cur) => {
@@ -85,22 +92,22 @@ export const BulkSelectHeadContent = <Entity extends EntityBase>({ data }: Props
   };
 
   return (
-      <RowCheckbox
-        inputRef={(ref) => {
-          checkboxRef.current = ref;
-        }}
-        onChange={onBulkSelect}
-        checked={checkboxStatus === 'CHECKED'}
-        title={title}
-        disabled={!data?.length}
-        aria-label={title}
-      />
+    <RowCheckbox
+      inputRef={(ref) => {
+        checkboxRef.current = ref;
+      }}
+      onChange={onBulkSelect}
+      checked={checkboxStatus === 'CHECKED'}
+      title={title}
+      disabled={!data?.length}
+      aria-label={title}
+    />
   );
 };
 
-const BulkSelectHead = <Entity extends EntityBase>({ data }: Props<Entity>) => (
+const BulkSelectHead = <Entity extends EntityBase>({ data, getTitle = getDefaultTitle }: Props<Entity>) => (
   <Th $width={BULK_SELECT_COLUMN_WIDTH}>
-    <BulkSelectHeadContent<Entity> data={data} />
+    <BulkSelectHeadContent<Entity> data={data} getTitle={getTitle} />
   </Th>
-)
+);
 export default BulkSelectHead;
