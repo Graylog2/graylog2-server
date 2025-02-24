@@ -47,12 +47,14 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -137,8 +139,8 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     }
 
     @Override
-    public MoreSearch.Histogram eventHistogram(int buckets, String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                               Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams) {
+    public MoreSearch.Histogram eventHistogram(int buckets, String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
+                                               Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, ZoneId timeZone) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
@@ -148,6 +150,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
         final var histogramAggregation = new AutoDateHistogramAggregationBuilder(histogramAggregationName)
                 .field(EventDto.FIELD_EVENT_TIMESTAMP)
+                .timeZone(timeZone)
                 .setNumBuckets(buckets);
 
         final var termsAggregation = AggregationBuilders.terms(termsAggregationName)

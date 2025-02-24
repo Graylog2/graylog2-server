@@ -36,10 +36,13 @@ import org.graylog.events.search.EventsSearchResult;
 import org.graylog.events.search.EventsSearchService;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.joda.time.DateTimeZone;
 
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +78,12 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @ApiOperation("Build histogram of events over time")
     @NoAuditEvent("Doesn't change any data, only searches for events")
     public EventsHistogramResult histogram(@ApiParam(name = "JSON body") final EventsSearchParameters request) {
-        return searchService.histogram(firstNonNull(request, EventsSearchParameters.empty()), getSubject());
+        final var timezone = Optional.ofNullable(getCurrentUser())
+                .map(User::getTimeZone)
+                .map(DateTimeZone::getID)
+                .map(ZoneId::of)
+                .orElse(ZoneId.of("UTC"));
+        return searchService.histogram(firstNonNull(request, EventsSearchParameters.empty()), getSubject(), timezone);
     }
 
     @GET

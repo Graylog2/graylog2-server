@@ -30,6 +30,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -155,11 +156,11 @@ public class EventsSearchService {
                 .build();
     }
 
-    public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject) {
+    public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
         final var filter = buildFilter(parameters);
 
         final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
-        final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
+        final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
 
         return EventsHistogramResult.fromResult(result);
     }
