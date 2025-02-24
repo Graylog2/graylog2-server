@@ -20,20 +20,26 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface MoreSearchAdapter {
-    MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting, int page, int perPage, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams);
+    MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices, Sorting sorting,
+                                  int page, int perPage, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams);
 
-    MoreSearch.Histogram eventHistogram(int buckets, String queryString, TimeRange timerange, Set<String> affectedIndices, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams);
+    MoreSearch.Histogram eventHistogram(int buckets, String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
+                                        Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                        ZoneId timeZone);
 
     interface ScrollEventsCallback {
         void accept(List<ResultMessage> results, AtomicBoolean requestContinue) throws EventProcessorException;
     }
 
-    void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
+    void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams,
+                      List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
 }
