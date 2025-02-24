@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.jobs;
 
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
@@ -33,7 +32,6 @@ import org.graylog2.database.utils.MongoUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
