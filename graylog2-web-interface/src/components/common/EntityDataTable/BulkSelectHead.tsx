@@ -24,7 +24,7 @@ import type { EntityBase } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { Th } from 'components/common/EntityDataTable/TableHead';
 
-type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
+export type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
 const useCheckboxStatus = <Entity extends EntityBase>(
   data: Readonly<Array<Entity>>,
