@@ -17,17 +17,15 @@
 import React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import * as Immutable from 'immutable';
 
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
-import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import { SimpleFieldTypesContextProvider } from 'views/components/contexts/TestFieldTypesContextProvider';
 
 const rule = HighlightingRule.builder()
   .color(StaticColor.create('#333333'))
@@ -40,16 +38,12 @@ const ruleWithValueFalse = rule.toBuilder().value(false).build();
 const ruleWithValueZero = rule.toBuilder().value(0).build();
 
 describe('HighlightForm', () => {
-  const fieldTypes: FieldTypes = {
-    all: Immutable.List([FieldTypeMapping.create('foob', FieldType.create('long', [Properties.Numeric]))]),
-    currentQuery: Immutable.List<FieldTypeMapping>(),
-    queryFields: Immutable.Map(),
-  };
+  const fields = [FieldTypeMapping.create('foob', FieldType.create('long', [Properties.Numeric]))];
   const SUT = (props: Partial<React.ComponentProps<typeof HighlightForm>>) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={fieldTypes}>
+      <SimpleFieldTypesContextProvider fields={fields}>
         <HighlightForm onClose={() => {}} rule={undefined} onSubmit={() => Promise.resolve()} {...props} />
-      </FieldTypesContext.Provider>
+      </SimpleFieldTypesContextProvider>
     </TestStoreProvider>
   );
 

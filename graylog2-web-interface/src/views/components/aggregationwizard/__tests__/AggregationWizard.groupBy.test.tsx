@@ -22,7 +22,6 @@ import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import type { Map } from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -84,7 +83,6 @@ describe('AggregationWizard', () => {
     fieldTypesList?: {
       all: FieldTypeMappingsList;
       currentQuery: FieldTypeMappingsList;
-      queryFields: Map<string, FieldTypeMappingsList>;
     };
   };
 
@@ -153,10 +151,10 @@ describe('AggregationWizard', () => {
     async () => {
       const onChange = jest.fn();
       const queryFieldTypeMapping = new FieldTypeMapping('status_code', fieldType);
-      const queryFields = Immutable.List([queryFieldTypeMapping]);
+      const queryFields = fields.push(queryFieldTypeMapping);
       renderSUT({
         onChange,
-        fieldTypesList: { all: fields, currentQuery: fields, queryFields: Immutable.Map({ queryId: queryFields }) },
+        fieldTypesList: { all: fields, currentQuery: queryFields },
       });
 
       await addGrouping();
@@ -186,7 +184,6 @@ describe('AggregationWizard', () => {
         fieldTypesList: {
           all: Immutable.List(),
           currentQuery: Immutable.List(),
-          queryFields: Immutable.Map({ queryId: Immutable.List([]) }),
         },
         config: initialConfig,
       });

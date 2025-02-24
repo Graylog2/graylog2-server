@@ -4,14 +4,18 @@ import * as Immutable from 'immutable';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
-const fieldTypes = {
-  all: Immutable.List<FieldTypeMapping>(),
-  currentQuery: Immutable.List<FieldTypeMapping>(),
-  queryFields: Immutable.Map<string, Immutable.List<FieldTypeMapping>>(),
+export const SimpleFieldTypesContextProvider = ({
+  children = undefined,
+  fields,
+}: React.PropsWithChildren<{ fields: FieldTypeMapping[] }>) => {
+  const fieldList = Immutable.List(fields);
+  const value = { all: fieldList, currentQuery: fieldList };
+
+  return <FieldTypesContext.Provider value={value}>{children}</FieldTypesContext.Provider>;
 };
 
-const TestFieldTypesContextProvider = ({ children }: React.PropsWithChildren<{}>) => (
-  <FieldTypesContext.Provider value={fieldTypes}>{children}</FieldTypesContext.Provider>
+const TestFieldTypesContextProvider = ({ children = undefined }: React.PropsWithChildren<{}>) => (
+  <SimpleFieldTypesContextProvider fields={[]}>{children}</SimpleFieldTypesContextProvider>
 );
 
 export default TestFieldTypesContextProvider;

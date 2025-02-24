@@ -82,12 +82,8 @@ const _hasOwnEditSubmitButton = (type: string) => widgetDefinition(type).hasEdit
 
 const useQueryFieldTypes = () => {
   const fieldTypes = useContext(FieldTypesContext);
-  const queryId = useActiveQueryId();
 
-  return useMemo(
-    () => fieldTypes.queryFields.get(queryId, fieldTypes.all),
-    [fieldTypes.all, fieldTypes.queryFields, queryId],
-  );
+  return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
 };
 
 const WidgetFooter = styled.div`

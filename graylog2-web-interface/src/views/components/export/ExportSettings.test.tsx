@@ -25,12 +25,11 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import { asMock } from 'helpers/mocking';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { usePlugin } from 'views/test/testPlugins';
+import { SimpleFieldTypesContextProvider } from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import { viewWithoutWidget, stateWithOneWidget } from './Fixtures';
 import ExportSettings from './ExportSettings';
@@ -65,20 +64,15 @@ const pluginExports = {
   },
 };
 
-const fields = Immutable.List([FieldTypeMapping.create('foo', FieldType.create('long'))]);
-const fieldTypes: FieldTypes = {
-  all: fields,
-  currentQuery: fields,
-  queryFields: Immutable.Map({ 'view-query-id': fields }),
-};
+const fields = [FieldTypeMapping.create('foo', FieldType.create('long'))];
 
 const SimpleExportSettings = (props: Omit<React.ComponentProps<typeof ExportSettings>, 'fields'>) => (
   <TestStoreProvider>
-    <FieldTypesContext.Provider value={fieldTypes}>
+    <SimpleFieldTypesContextProvider fields={fields}>
       <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
         {() => <ExportSettings {...props} />}
       </Formik>
-    </FieldTypesContext.Provider>
+    </SimpleFieldTypesContextProvider>
   </TestStoreProvider>
 );
 const customWidget = Widget.builder().id('widget-id-1').type('custom').build();

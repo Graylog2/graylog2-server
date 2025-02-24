@@ -32,7 +32,6 @@ import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { loadDashboard } from 'views/logic/views/Actions';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -41,6 +40,7 @@ import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions'
 import useViewType from 'views/hooks/useViewType';
 import fetchSearch from 'views/logic/views/fetchSearch';
 import useWidgetResults from 'views/components/useWidgetResults';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -119,8 +119,7 @@ describe('<WidgetActionsMenu />', () => {
     ...props
   }: DummyWidgetProps) => (
     <TestStoreProvider view={view} initialQuery="query-id">
-      <FieldTypesContext.Provider
-        value={{ all: Immutable.List(), currentQuery: Immutable.List(), queryFields: Immutable.Map() }}>
+      <TestFieldTypesContextProvider>
         <WidgetFocusContext.Provider
           value={{
             setWidgetFocusing,
@@ -140,7 +139,7 @@ describe('<WidgetActionsMenu />', () => {
             />
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
-      </FieldTypesContext.Provider>
+      </TestFieldTypesContextProvider>
     </TestStoreProvider>
   );
 

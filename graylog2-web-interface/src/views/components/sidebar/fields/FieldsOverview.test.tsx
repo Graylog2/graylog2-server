@@ -15,25 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
-import { simpleFields, simpleQueryFields } from 'fixtures/fields';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import { simpleFields } from 'fixtures/fields';
 import { asMock } from 'helpers/mocking';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 import FieldsOverview from './FieldsOverview';
 
 jest.mock('views/hooks/useActiveQueryId');
 
+const fields = simpleFields();
+const fieldTypes = {
+  all: fields,
+  currentQuery: fields.shift(),
+};
+
+const searchFor = async (term: string) => {
+  const searchInput = await screen.findByPlaceholderText('Filter fields');
+  await userEvent.type(searchInput, term);
+};
+
 describe('<FieldsOverview />', () => {
-  const fieldTypesStoreState = {
-    all: simpleFields(),
-    currentQuery: simpleFields(),
-    queryFields: simpleQueryFields('aQueryId'),
-  };
   const SimpleFieldsOverview = () => (
-    <FieldTypesContext.Provider value={fieldTypesStoreState}>
+    <FieldTypesContext.Provider value={fieldTypes}>
       <FieldsOverview />
     </FieldTypesContext.Provider>
   );
@@ -42,62 +49,56 @@ describe('<FieldsOverview />', () => {
     asMock(useActiveQueryId).mockReturnValue('aQueryId');
   });
 
-  it('should render a FieldsOverview', () => {
-    const wrapper = mount(<SimpleFieldsOverview />);
+  it('should render a FieldsOverview', async () => {
+    render(<SimpleFieldsOverview />);
 
-    expect(wrapper.find('span.field-element').text()).toBe('http_method');
+    await screen.findByText('http_method');
   });
 
-  it('should render all fields in FieldsOverview after click', () => {
-    const wrapper = mount(<SimpleFieldsOverview />);
+  it('should render all fields in FieldsOverview after click', async () => {
+    render(<SimpleFieldsOverview />);
 
-    expect(wrapper.find('span.field-element').length).toBe(1);
+    const allFields = await screen.findByRole('button', { name: /this shows all fields, but no reserved/i });
 
-    wrapper.find('a[children="all"]').simulate('click');
+    expect(screen.queryByText('date')).not.toBeInTheDocument();
 
-    expect(wrapper.find('span.field-element').length).toBe(2);
-    expect(wrapper.find('span.field-element').at(0).text()).toBe('date');
-    expect(wrapper.find('span.field-element').at(1).text()).toBe('http_method');
+    userEvent.click(allFields);
 
-    wrapper.find('a[children="current query"]').simulate('click');
+    await screen.findByText('date');
+    await screen.findByText('http_method');
 
-    expect(wrapper.find('span.field-element').length).toBe(1);
-    expect(wrapper.find('span.field-element').text()).toBe('http_method');
+    const currentQuery = await screen.findByRole('button', { name: /fields which occur in your current query/i });
+    userEvent.click(currentQuery);
+
+    await waitFor(() => {
+      expect(screen.queryByText('date')).not.toBeInTheDocument();
+    });
+    await screen.findByText('http_method');
   });
 
-  it('should search in the field list', () => {
-    const wrapper = mount(<SimpleFieldsOverview />);
+  it('should search in the field list', async () => {
+    render(<SimpleFieldsOverview />);
 
-    expect(wrapper.find('span.field-element').length).toBe(1);
+    await searchFor('http');
+    const allFields = await screen.findByRole('button', { name: /this shows all fields, but no reserved/i });
+    userEvent.click(allFields);
 
-    wrapper.find('a[children="all"]').simulate('click');
-
-    expect(wrapper.find('span.field-element').length).toBe(2);
-
-    wrapper.find('input#common-search-form-query-input').simulate('change', { target: { value: 'http_method' } });
-
-    expect(wrapper.find('span.field-element').length).toBe(1);
-    expect(wrapper.find('span.field-element').text()).toBe('http_method');
+    await screen.findByText('http_method');
+    await waitFor(() => {
+      expect(screen.queryByText('date')).not.toBeInTheDocument();
+    });
   });
 
-  it('should show hint when field types are `undefined`', () => {
-    const hint = <span>No field information available.</span>;
-    const wrapper = mount(<FieldsOverview />);
-
-    expect(wrapper).toContainReact(hint);
+  it('should show hint when field types are `undefined`', async () => {
+    render(<FieldsOverview />);
+    await screen.findByText(/no field information available/i);
   });
 
-  it('should show hint when no fields are returned after filtering', () => {
-    const hint = <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
-    const wrapper = mount(<SimpleFieldsOverview />);
+  it('should show hint when no fields are returned after filtering', async () => {
+    render(<SimpleFieldsOverview />);
 
-    expect(wrapper).not.toContainReact(hint);
-
-    wrapper
-      .find('input#common-search-form-query-input')
-      .simulate('change', { target: { value: 'non_existing_field' } });
-
-    expect(wrapper.find('span.field-element').length).toBe(0);
-    expect(wrapper).toContainReact(hint);
+    await searchFor('non_existing_field');
+    await screen.findByText(/no fields to show/i);
+    await screen.findByText(/Try changing your filter term/i);
   });
 });
