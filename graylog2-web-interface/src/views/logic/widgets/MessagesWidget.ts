@@ -19,12 +19,13 @@ import { Map } from 'immutable';
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
 import type { FiltersType } from 'views/types';
+import type { QueryString } from 'views/logic/queries/types';
 
 import Widget from './Widget';
 import MessagesWidgetConfig from './MessagesWidgetConfig';
 import type { WidgetState } from './Widget';
 
-import type { QueryString, TimeRange } from '../queries/Query';
+import type { TimeRange } from '../queries/Query';
 
 export default class MessagesWidget extends Widget {
   constructor(

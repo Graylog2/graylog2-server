@@ -20,7 +20,7 @@ import { Button, Row } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 
-import { StepWrapper, DescriptionCol, ButtonCol } from './components/StepWrapper'
+import { StepWrapper, DescriptionCol, ButtonCol } from './components/StepWrapper';
 
 type Props = {
   onClose: () => void;
@@ -39,7 +39,10 @@ const InputDiagnosisStep = ({ onClose }: Props) => {
         </DescriptionCol>
       </Row>
       {input?.id && (
-        <Button bsSize="xs" bsStyle="primary" onClick={() => window.open(Routes.SYSTEM.INPUT_DIAGNOSIS(input?.id), '_blank')}>
+        <Button
+          bsSize="xs"
+          bsStyle="primary"
+          onClick={() => window.open(Routes.SYSTEM.INPUT_DIAGNOSIS(input?.id), '_blank')}>
           Go to Input Diagnosis
         </Button>
       )}

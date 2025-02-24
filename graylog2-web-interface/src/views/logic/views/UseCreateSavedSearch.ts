@@ -17,15 +17,16 @@
 import { useMemo } from 'react';
 
 import View from 'views/logic/views/View';
-import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
 import type Parameter from 'views/logic/parameters/Parameter';
+import type { QueryString } from 'views/logic/queries/types';
 
 type Props = {
   streamId?: string | string[];
   streamCategory?: string | string[];
   timeRange?: TimeRange;
-  queryString?: ElasticsearchQueryString;
+  queryString?: QueryString;
   parameters?: Array<Parameter>;
 };
 
