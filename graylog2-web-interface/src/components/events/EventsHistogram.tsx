@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
@@ -25,51 +25,9 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import Spinner from 'components/common/Spinner';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot, { DateType } from 'views/logic/aggregationbuilder/Pivot';
-import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import Series from 'views/logic/aggregationbuilder/Series';
-import type { Row } from 'views/logic/searchtypes/pivot/PivotHandler';
-import { fetchEventsHistogram } from 'components/events/fetchEvents';
-
-/*
-{
-  "key": [
-    "2025-02-21T15:07:20.000Z"
-  ],
-  "values": [
-    {
-      "key": [
-        "count()"
-      ],
-      "value": 17058,
-      "rollup": true,
-      "source": "row-leaf"
-    },
-    {
-      "key": [
-        "example.org",
-        "count()"
-      ],
-      "value": 17058,
-      "rollup": false,
-      "source": "col-leaf"
-    }
-  ],
-  "source": "leaf"
-}
-*/
-
-const createLeaf = (date: string, row: string, count: number): Row => ({
-  'key': [date],
-  'values': [
-    {
-      'key': [row, 'count()'],
-      'value': count,
-      'rollup': false,
-      'source': 'col-leaf',
-    },
-  ],
-  'source': 'leaf',
-});
+import { fetchEventsHistogram, parseTypeFilter } from 'components/events/fetchEvents';
+import XYPlot from 'views/components/visualizations/XYPlot';
 
 const config = AggregationWidgetConfig.builder()
   .visualization('line')
@@ -85,10 +43,38 @@ const GraphContainer = styled.div`
   margin: 20px 0;
 `;
 
+type ResultPromise = ReturnType<typeof fetchEventsHistogram>;
+type PromiseType<T> = T extends Promise<infer R> ? R : never;
+
+const generateChart = (
+  type: 'Alerts' | 'Events',
+  buckets: PromiseType<ResultPromise>['results']['buckets']['alerts' | 'events'],
+) => {
+  const x = buckets.map((b) => b.start_date);
+  const y = buckets.map((b) => b.count);
+
+  return {
+    type: 'scatter',
+    name: type,
+    x,
+    y,
+    originalName: type,
+    line: {
+      shape: 'linear',
+      color: type === 'Alerts' ? '#4478b3' : '#fd9e48',
+    },
+    yaxis: 'y',
+    fullPath: `${type}⸱count()`,
+  };
+};
+
 const EventsGraph = ({
-  data,
-  effectiveTimerange,
-}: Pick<React.ComponentProps<typeof LineVisualization>, 'data' | 'effectiveTimerange'>) => {
+  data: { results, timerange },
+  alerts,
+}: {
+  data: PromiseType<ResultPromise>;
+  alerts: 'include' | 'exclude' | 'only';
+}) => {
   const store = useMemo(
     () =>
       configureStore({
@@ -97,11 +83,20 @@ const EventsGraph = ({
       }),
     [],
   );
+  const onZoom = useCallback(() => true, []);
+
+  const chartData = useMemo(
+    () => [
+      ...(['include', 'exclude'].includes(alerts) ? [generateChart('Events', results.buckets.events)] : []),
+      ...(['include', 'only'].includes(alerts) ? [generateChart('Alerts', results.buckets.alerts)] : []),
+    ],
+    [alerts, results.buckets.alerts, results.buckets.events],
+  );
 
   return (
     <Provider store={store}>
       <GraphContainer>
-        <LineVisualization height={80} config={config} data={data} effectiveTimerange={effectiveTimerange} />
+        <XYPlot config={config} chartData={chartData} onZoom={onZoom} />
       </GraphContainer>
     </Provider>
   );
@@ -116,16 +111,9 @@ const EventsHistogram = ({ searchParams }: Props) => {
     fetchEventsHistogram(searchParams),
   );
 
-  const chartData = data?.results
-    ? {
-        chart: [
-          ...data.results.buckets.events.map((bucket) => createLeaf(bucket.start_date, 'Events', bucket.count)),
-          ...data.results.buckets.alerts.map((bucket) => createLeaf(bucket.start_date, 'Alerts', bucket.count)),
-        ],
-      }
-    : {};
+  const alerts = parseTypeFilter(searchParams?.filters?.get('alert')?.[0]);
 
-  return isInitialLoading ? <Spinner /> : <EventsGraph data={chartData} />;
+  return isInitialLoading ? <Spinner /> : <EventsGraph data={data} alerts={alerts} />;
 };
 
 export default EventsHistogram;
