@@ -23,6 +23,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.ConnectionFactory;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -249,6 +250,8 @@ public class AmqpTransport extends ThrottleableTransport2 {
             if (consumer != null) {
                 consumer.stop();
             }
+        } catch (AlreadyClosedException e) {
+            LOG.warn("AMQP channel already closed");
         } catch (IOException e) {
             LOG.warn("Unable to stop consumer", e);
         }
