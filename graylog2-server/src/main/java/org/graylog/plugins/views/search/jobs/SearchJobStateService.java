@@ -26,21 +26,27 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
+import org.bson.Document;
+import org.graylog.plugins.views.search.QueryResult;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Filters.ne;
+import static com.mongodb.client.model.Projections.include;
 import static org.graylog.plugins.views.search.SearchJobIdentifier.OWNER_FIELD;
 import static org.graylog.plugins.views.search.SearchJobIdentifier.SEARCH_ID_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.CREATED_AT_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.STATUS_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.TYPE_FIELD;
+import static org.graylog.plugins.views.search.jobs.SearchJobStatus.RESET;
 import static org.graylog.plugins.views.search.jobs.SearchJobType.DATA_LAKE;
 
 public class SearchJobStateService {
@@ -71,6 +77,26 @@ public class SearchJobStateService {
         );
     }
 
+    /**
+     * Reset latest/active search job for a given user.
+     *
+     * @param user Current user
+     * @return {@link Optional<SearchJobState>} object representing state of latest/active search job before the reset.
+     */
+    public Optional<SearchJobState> resetLatestForUser(final String user) {
+        return getLatestForUser(user).map(activeQuerySearchJobState -> {
+                    update(
+                            activeQuerySearchJobState.toBuilder()
+                                    .status(RESET)
+                                    .result(null)
+                                    .errors(Set.of())
+                                    .build()
+                    );
+                    return activeQuerySearchJobState;
+                }
+        );
+    }
+
     public boolean delete(final String id) {
         return mongoUtils.deleteById(id);
     }
@@ -84,7 +110,7 @@ public class SearchJobStateService {
         final UpdateResult updateResult = collection.updateMany(
                 and(
                         eq(TYPE_FIELD, DATA_LAKE),
-                        //eq(STATUS_FIELD, DONE) //TODO: should all jobs be expired, or only DONE ones?
+                        ne(STATUS_FIELD, RESET),
                         lte(CREATED_AT_FIELD, dateTime)
                 ),
                 Updates.set(STATUS_FIELD, SearchJobStatus.EXPIRED)
@@ -102,12 +128,18 @@ public class SearchJobStateService {
         if (searchJobState.identifier().id() == null) {
             throw new IllegalStateException("Missing ID of SearchJobState to update");
         }
-        final UpdateResult updateResult = collection.replaceOne(
-                MongoUtils.idEq(searchJobState.identifier().id()),
-                searchJobState.toBuilder().updatedAt(DateTime.now(DateTimeZone.UTC)).build(),
-                new ReplaceOptions().upsert(true)
-        );
-        return updateResult.getModifiedCount() > 0;
+        final Optional<SearchJobStatus> status = getStatus(searchJobState.identifier().id());
+        if (status.isPresent() && status.get() == RESET) {
+            //RESET search jobs should not be changed anymore, are immutable
+            return false;
+        } else {
+            final UpdateResult updateResult = collection.replaceOne(
+                    MongoUtils.idEq(searchJobState.identifier().id()),
+                    searchJobState.toBuilder().updatedAt(DateTime.now(DateTimeZone.UTC)).build(),
+                    new ReplaceOptions().upsert(true)
+            );
+            return updateResult.getModifiedCount() > 0;
+        }
     }
 
     public boolean changeStatus(final String searchJobStateID,
@@ -119,6 +151,42 @@ public class SearchJobStateService {
                         .build())
                 .map(this::update)
                 .orElse(false);
+    }
 
+    public boolean changeProgress(final String searchJobStateID,
+                                  final int progress) {
+        return changeProgress(searchJobStateID, progress, null, null);
+    }
+
+    public boolean changeProgress(final String searchJobStateID,
+                                  final int progress,
+                                  final QueryResult updatedResults,
+                                  final SearchJobStatus updatedStatus) {
+        return get(searchJobStateID)
+                .map(searchJobState -> {
+                    final SearchJobState.Builder builder = searchJobState.toBuilder()
+                            .progress(progress)
+                            .updatedAt(DateTime.now(DateTimeZone.UTC));
+                    if (updatedResults != null) {
+                        builder.result(updatedResults);
+                    }
+                    if (updatedStatus != null) {
+                        builder.status(updatedStatus);
+                    }
+                    return builder.build();
+                })
+                .map(this::update)
+                .orElse(false);
+    }
+
+    public Optional<SearchJobStatus> getStatus(final String searchJobStateID) {
+        final Document doc = collection.find(MongoUtils.idEq(searchJobStateID), Document.class)
+                .projection(include(STATUS_FIELD))
+                .first();
+        if (doc != null) {
+            return Optional.of(SearchJobStatus.valueOf(doc.get(STATUS_FIELD, String.class)));
+        } else {
+            return Optional.empty();
+        }
     }
 }
