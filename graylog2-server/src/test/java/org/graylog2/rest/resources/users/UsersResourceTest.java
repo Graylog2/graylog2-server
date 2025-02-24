@@ -215,7 +215,7 @@ public class UsersResourceTest {
         when(userManagementService.loadById(USERNAME)).thenReturn(userImplFactory.create(userProps));
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(true);
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), allowExternalUser, false));
+                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), allowExternalUser, false, Duration.ofDays(30)));
         if (accessToken != null) {
             when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME)).thenReturn(accessToken);
         }
