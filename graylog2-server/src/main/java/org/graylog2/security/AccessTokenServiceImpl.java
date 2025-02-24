@@ -34,9 +34,11 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.users.UserConfiguration;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,13 +67,15 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     private static final SecureRandom RANDOM = new SecureRandom();
     private final PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
     private final AccessTokenCipher cipher;
+    private final ClusterConfigService configService;
     private LoadingCache<String, DateTime> lastAccessCache;
 
     @Inject
-    public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService, AccessTokenCipher accessTokenCipher) {
+    public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService, AccessTokenCipher accessTokenCipher, ClusterConfigService configService) {
         super(mongoConnection);
         this.paginatedAccessTokenEntityService = paginatedAccessTokenEntityService;
         this.cipher = accessTokenCipher;
+        this.configService = configService;
         setLastAccessCache(30, TimeUnit.SECONDS);
 
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN_TYPE, 1));
@@ -79,7 +84,6 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public AccessToken load(String token) {
         DBObject query = new BasicDBObject();
         query.put(AccessTokenImpl.TOKEN, cipher.encrypt(token));
@@ -111,7 +115,6 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<AccessToken> loadAll(String username) {
         DBObject query = new BasicDBObject();
         query.put(AccessTokenImpl.USERNAME, username);
@@ -123,6 +126,12 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public AccessToken create(String username, String name) {
+        final Duration defaultTTL = configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens();
+        return create(username, name, defaultTTL);
+    }
+
+    @Override
+    public AccessToken create(String username, String name, Duration ttl) {
         Map<String, Object> fields = Maps.newHashMap();
         AccessTokenImpl accessToken;
         String id = null;
@@ -132,9 +141,12 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         do {
             // 256 bits of randomness should be plenty hard to guess, no?
             final String token = new BigInteger(256, RANDOM).toString(32);
+            final DateTime nowUTC = Tools.nowUTC();
             fields.put(AccessTokenImpl.TOKEN, token);
             fields.put(AccessTokenImpl.USERNAME, username);
             fields.put(AccessTokenImpl.NAME, name);
+            fields.put(AccessTokenImpl.CREATED_AT, nowUTC);
+            fields.put(AccessTokenImpl.EXPIRES_AT, nowUTC.plus(ttl.toMillis()));
             fields.put(AccessTokenImpl.LAST_ACCESS, Tools.dateTimeFromDouble(0)); // aka never.
             accessToken = new AccessTokenImpl(fields);
             try {
