@@ -28,6 +28,8 @@ import Pivot, { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { fetchEventsHistogram, parseTypeFilter } from 'components/events/fetchEvents';
 import XYPlot from 'views/components/visualizations/XYPlot';
+import FullSizeContainer from 'views/components/aggregationbuilder/FullSizeContainer';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 const config = AggregationWidgetConfig.builder()
   .visualization('line')
@@ -37,8 +39,10 @@ const config = AggregationWidgetConfig.builder()
   .rollup(false)
   .build();
 
+const height = 180;
+
 const GraphContainer = styled.div`
-  height: 180px;
+  height: ${height}px;
   width: 100%;
   margin: 20px 0;
 `;
@@ -69,7 +73,7 @@ const generateChart = (
 };
 
 const EventsGraph = ({
-  data: { results, timerange },
+  data: { results },
   alerts,
 }: {
   data: PromiseType<ResultPromise>;
@@ -96,7 +100,13 @@ const EventsGraph = ({
   return (
     <Provider store={store}>
       <GraphContainer>
-        <XYPlot config={config} chartData={chartData} onZoom={onZoom} />
+        <InteractiveContext.Provider value={false}>
+          <FullSizeContainer>
+            {(dimensions) => (
+              <XYPlot config={config} chartData={chartData} onZoom={onZoom} height={height} width={dimensions.width} />
+            )}
+          </FullSizeContainer>
+        </InteractiveContext.Provider>
       </GraphContainer>
     </Provider>
   );
