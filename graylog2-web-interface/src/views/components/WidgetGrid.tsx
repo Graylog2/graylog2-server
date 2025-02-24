@@ -127,7 +127,7 @@ type GridProps = {
   width: number;
 };
 
-const Grid = ({ children, locked, onPositionsChange, onSyncLayout, positions, width }: GridProps) => {
+const Grid = ({ children, locked, onPositionsChange, onSyncLayout = undefined, positions, width }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return (

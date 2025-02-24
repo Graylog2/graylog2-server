@@ -21,7 +21,7 @@ import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 const TestStoreProvider = ({
-  children,
+  children = undefined,
   undoRedoState,
   ...rest
 }: React.PropsWithChildren<Partial<React.ComponentProps<typeof ViewsStoreProvider>>>) => {

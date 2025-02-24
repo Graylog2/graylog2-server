@@ -26,7 +26,7 @@ type Props = {
   tabs?: Array<number> | undefined | null;
 };
 
-const CycleQueryTab = ({ interval, tabs }: Props) => {
+const CycleQueryTab = ({ interval, tabs = undefined }: Props) => {
   const view = useView();
   const activeQuery = useActiveQueryId();
   const dispatch = useViewsDispatch();
