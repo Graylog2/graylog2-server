@@ -55,7 +55,7 @@
     "@tanstack/query-sync-storage-persister": "^4.33.0",
     "@tanstack/react-query-persist-client": "^4.33.0",
     "@yornaath/batshit": "^0.10.1",
-    "ace-builds": "1.38.0",
+    "ace-builds": "1.39.0",
     "bootstrap": "3.4.1",
     "bson-objectid": "^2.0.3",
     "chroma-js": "^2.0.3",
