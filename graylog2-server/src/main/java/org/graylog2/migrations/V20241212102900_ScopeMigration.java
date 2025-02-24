@@ -16,15 +16,25 @@
  */
 package org.graylog2.migrations;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
-import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.NonDeletableSystemScope;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
+import java.util.Objects;
+
+import static com.mongodb.client.model.Filters.eq;
+import static org.graylog.events.processor.DBEventDefinitionService.COLLECTION_NAME;
+import static org.graylog.events.processor.DBEventDefinitionService.SYSTEM_NOTIFICATION_EVENT_DEFINITION;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_TITLE;
+import static org.graylog2.database.utils.MongoUtils.idEq;
 
 /**
  * Make system index sets (regular==false) non-deletable by assigning NonDeletableSystemScope
@@ -33,13 +43,13 @@ public class V20241212102900_ScopeMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20241212102900_ScopeMigration.class);
 
     private final IndexSetService indexSetService;
-    private final DBEventDefinitionService dbService;
+    private final MongoCollection<EventDefinitionDto> collection;
 
     @Inject
     public V20241212102900_ScopeMigration(final IndexSetService indexSetService,
-                                          DBEventDefinitionService dbService) {
+                                          MongoCollections mongoCollections) {
         this.indexSetService = indexSetService;
-        this.dbService = dbService;
+        this.collection = mongoCollections.collection(COLLECTION_NAME, EventDefinitionDto.class);
     }
 
     @Override
@@ -63,13 +73,16 @@ public class V20241212102900_ScopeMigration extends Migration {
     }
 
     private void updateSystemEventScopes() {
-        try (java.util.stream.Stream<EventDefinitionDto> eventDefinitionStream = dbService.streamSystemEventDefinitions()) {
-            eventDefinitionStream.forEach(eventDefinition -> {
-                if (!eventDefinition.scope().equalsIgnoreCase(NonDeletableSystemScope.NAME)) {
-                    dbService.save(eventDefinition.toBuilder().scope(NonDeletableSystemScope.NAME).build());
-                    LOG.info("Successfully updated scope for event definition: {}", eventDefinition.title());
-                }
-            });
-        }
+        collection.find(
+                        Filters.or(
+                                eq(FIELD_TITLE, SYSTEM_NOTIFICATION_EVENT_DEFINITION),
+                                eq(ScopedEntity.FIELD_SCOPE, NonDeletableSystemScope.NAME)))
+                .forEach(eventDefinition -> {
+                    if (!eventDefinition.scope().equalsIgnoreCase(NonDeletableSystemScope.NAME)) {
+                        final EventDefinitionDto entity = eventDefinition.toBuilder().scope(NonDeletableSystemScope.NAME).build();
+                        collection.replaceOne(idEq(Objects.requireNonNull(entity.id())), entity);
+                        LOG.info("Successfully updated scope for event definition: {}", entity.title());
+                    }
+                });
     }
 }
