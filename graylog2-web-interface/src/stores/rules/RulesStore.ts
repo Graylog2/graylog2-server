@@ -101,7 +101,7 @@ export const RulesActions = singletonActions('core.Rules', () =>
 );
 
 export const RulesStore = singletonStore('core.Rules', () =>
-  Reflux.createStore<{ rules: RuleType[]; metricsConfig: {} }>({
+  Reflux.createStore<RulesStoreState>({
     listenables: [RulesActions],
     rules: undefined,
     rulesContext: undefined,
