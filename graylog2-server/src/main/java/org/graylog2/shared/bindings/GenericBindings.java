@@ -30,6 +30,7 @@ import org.graylog.failure.DefaultFailureHandlingConfiguration;
 import org.graylog.failure.FailureHandler;
 import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog.failure.FailureHandlingService;
+import org.graylog.inputs.events.InputEventQueue;
 import org.graylog2.indexer.EventIndexTemplateProvider;
 import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
@@ -84,6 +85,7 @@ public class GenericBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(new TypeLiteral<IOState.Factory<MessageInput>>() {}));
 
         bind(InputRegistry.class).asEagerSingleton();
+        serviceBinder().addBinding().to(InputEventQueue.class).asEagerSingleton();
 
         bind(InputLauncher.class).asEagerSingleton();
 
