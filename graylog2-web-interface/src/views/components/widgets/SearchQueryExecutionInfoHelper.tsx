@@ -26,7 +26,7 @@ import { Icon, Timestamp } from 'components/common';
 import { Table } from 'components/bootstrap';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import type { SearchTypeResult } from 'views/types';
+import type { SearchTypeResult, MessageResult, GenericResult } from 'views/types';
 import type { SearchTypeIds } from 'views/logic/views/types';
 import Popover from 'components/common/Popover';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
@@ -124,7 +124,7 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
     () => ({
       effectiveTimerange:
         (currentWidgetSearchType as MessageResult)?.effectiveTimerange ||
-        (currentWidgetSearchType as SearchTypeResult)?.effective_timerange,
+        (currentWidgetSearchType as GenericResult)?.effective_timerange,
       total: currentWidgetSearchType?.total,
       duration: result?.duration,
       timestamp: result?.timestamp,
