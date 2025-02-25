@@ -28,7 +28,6 @@ import org.graylog.plugins.views.search.jobs.SearchJobStatus;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +89,6 @@ public class SearchJobStateCleanupOnStartup extends Periodical {
         return 0;
     }
 
-    @NotNull
     @Override
     protected Logger getLogger() {
         return LOG;
