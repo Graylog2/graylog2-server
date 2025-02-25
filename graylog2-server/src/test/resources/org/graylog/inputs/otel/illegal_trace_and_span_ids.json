@@ -1,0 +1,15 @@
+{"resourceLogs": [
+    {
+      "scopeLogs": [
+        {
+          "logRecords": [
+            {
+              "traceId": "AAAAAAAAAAAAAAAAAAAAAA==",
+              "spanId": "AAAAAAAAAAA="
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

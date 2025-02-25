@@ -27,6 +27,7 @@ import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
 import org.bson.Document;
+import org.graylog.plugins.views.search.QueryResult;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.joda.time.DateTime;
@@ -150,7 +151,32 @@ public class SearchJobStateService {
                         .build())
                 .map(this::update)
                 .orElse(false);
+    }
 
+    public boolean changeProgress(final String searchJobStateID,
+                                  final int progress) {
+        return changeProgress(searchJobStateID, progress, null, null);
+    }
+
+    public boolean changeProgress(final String searchJobStateID,
+                                  final int progress,
+                                  final QueryResult updatedResults,
+                                  final SearchJobStatus updatedStatus) {
+        return get(searchJobStateID)
+                .map(searchJobState -> {
+                    final SearchJobState.Builder builder = searchJobState.toBuilder()
+                            .progress(progress)
+                            .updatedAt(DateTime.now(DateTimeZone.UTC));
+                    if (updatedResults != null) {
+                        builder.result(updatedResults);
+                    }
+                    if (updatedStatus != null) {
+                        builder.status(updatedStatus);
+                    }
+                    return builder.build();
+                })
+                .map(this::update)
+                .orElse(false);
     }
 
     public Optional<SearchJobStatus> getStatus(final String searchJobStateID) {

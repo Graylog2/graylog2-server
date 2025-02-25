@@ -30,7 +30,7 @@ import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextPro
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { NodesActions } from 'stores/nodes/NodesStore';
 import { isLocalNode } from 'views/hooks/useIsLocalNode';
-import PluggableStoreProvider from 'components/PluggableStoreProvider';
+import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import View from 'views/logic/views/View';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import SingleMessageFieldTypesProvider from 'views/components/fieldtypes/SingleMessageFieldTypesProvider';
@@ -98,7 +98,7 @@ const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) =>
     const fieldTypesStreams = messageStreams.filter((streamId) => streamsMap.has(streamId));
 
     return (
-      <PluggableStoreProvider view={view} initialQuery="none" isNew={false} executionState={executionState}>
+      <ViewsStoreProvider view={view} initialQuery="none" isNew={false} executionState={executionState}>
         <DocumentTitle title={`Message ${messageId} on ${index}`}>
           <Row className="content" id="sticky-augmentations-container">
             <Col md={12}>
@@ -123,7 +123,7 @@ const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) =>
             </Col>
           </Row>
         </DocumentTitle>
-      </PluggableStoreProvider>
+      </ViewsStoreProvider>
     );
   }
 

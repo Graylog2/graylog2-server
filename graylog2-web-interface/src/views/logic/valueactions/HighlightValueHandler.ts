@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { ActionHandlerCondition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { createHighlightingRule } from 'views/logic/slices/highlightActions';
 import type { GetState } from 'views/types';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 
 const HighlightValueHandler =
   ({ field, value }: ActionHandlerArguments) =>
-  (dispatch: AppDispatch) => {
+  (dispatch: ViewsDispatch) => {
     if (value === undefined) {
       return Promise.reject(new Error('Unable to add highlighting for missing value.'));
     }

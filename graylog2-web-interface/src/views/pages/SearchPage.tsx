@@ -27,7 +27,7 @@ import { DocumentTitle, Spinner } from 'components/common';
 import type View from 'views/logic/views/View';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useQuery from 'routing/useQuery';
-import PluggableStoreProvider from 'components/PluggableStoreProvider';
+import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import useViewTitle from 'views/hooks/useViewTitle';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { HistoryFunction } from 'routing/useHistory';
@@ -81,7 +81,7 @@ const SearchPage = ({
   const { view, executionState } = result;
 
   return view ? (
-    <PluggableStoreProvider
+    <ViewsStoreProvider
       view={view}
       executionState={executionState}
       isNew={isNew}
@@ -101,7 +101,7 @@ const SearchPage = ({
           </NewViewLoaderContext.Provider>
         </DashboardPageContextProvider>
       </SearchPageTitle>
-    </PluggableStoreProvider>
+    </ViewsStoreProvider>
   ) : (
     <Spinner />
   );

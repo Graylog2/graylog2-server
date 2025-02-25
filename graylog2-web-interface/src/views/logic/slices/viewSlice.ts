@@ -18,7 +18,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import * as Immutable from 'immutable';
 
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { ViewState, RootState, GetState } from 'views/types';
 import type { QueryId, TimeRange } from 'views/logic/queries/Query';
 import type ViewStateType from 'views/logic/views/ViewState';
@@ -102,7 +102,7 @@ const _recreateSearch = async (newView: View) => {
   return updatedView.toBuilder().search(updatedSearch).build();
 };
 
-export const selectQuery = (activeQuery: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const selectQuery = (activeQuery: string) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
   const currentActiveQuery = selectActiveQuery(getState());
   dispatch(setActiveQuery(activeQuery));
 
@@ -113,7 +113,7 @@ export const selectQuery = (activeQuery: string) => async (dispatch: AppDispatch
 
 export const loadView =
   (newView: View, recreateSearch: boolean = false) =>
-  async (dispatch: AppDispatch, getState: () => RootState) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const view = selectView(getState());
 
     if (recreateSearch || !isViewWidgetsEqualForSearch(view, newView)) {
@@ -132,7 +132,7 @@ const defaultUpdateViewOptions = { hasToPushRevision: true };
 
 export const updateView =
   (newView: View, recreateSearch: boolean = false, options: UpdateViewOptions = defaultUpdateViewOptions) =>
-  async (dispatch: AppDispatch, getState: () => RootState) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const state = getState();
     const view = selectView(state);
 
@@ -158,7 +158,7 @@ export const updateView =
   };
 
 export const updateQueries =
-  (newQueries: Immutable.OrderedSet<Query>) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  (newQueries: Immutable.OrderedSet<Query>) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const view = selectView(getState());
     const { search } = view;
     const newSearch = search.toBuilder().newId().queries(newQueries).build();
@@ -174,7 +174,7 @@ export const updateQueries =
   };
 
 export const addQuery =
-  (query: Query, viewState: ViewStateType) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  (query: Query, viewState: ViewStateType) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const state = getState();
     const view = selectView(state);
     const { search } = view;
@@ -192,7 +192,7 @@ export const addQuery =
   };
 
 export const updateQuery =
-  (queryId: QueryId, query: Query) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  (queryId: QueryId, query: Query) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const state = getState();
     const view = selectView(state);
     const { queries } = view.search;
@@ -203,7 +203,7 @@ export const updateQuery =
     return dispatch(updateView(newView, true));
   };
 
-export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const removeQuery = (queryId: string) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
   const state = getState();
   const view = selectView(state);
   const activeQuery = selectActiveQuery(state);
@@ -219,14 +219,14 @@ export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, ge
   await dispatch(updateView(newView, true));
 };
 
-export const createQuery = () => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const createQuery = () => async (dispatch: ViewsDispatch, getState: () => RootState) => {
   const viewType = selectViewType(getState());
   const [query, state] = await NewQueryActionHandler(viewType);
 
   return dispatch(addQuery(query, state));
 };
 
-export const duplicateQuery = (queryId: string) => async (dispatch: AppDispatch, getState: GetState) => {
+export const duplicateQuery = (queryId: string) => async (dispatch: ViewsDispatch, getState: GetState) => {
   const newId = generateId();
   const viewState = selectViewState(queryId)(getState());
   const newViewState = viewState.duplicate();
@@ -240,7 +240,7 @@ export const duplicateQuery = (queryId: string) => async (dispatch: AppDispatch,
 };
 
 export const setQueriesOrder =
-  (queryIds: Immutable.OrderedSet<string>) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  (queryIds: Immutable.OrderedSet<string>) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const queries = selectSearchQueries(getState());
     const newQueries = queryIds.map((id) => queries.find((q) => q.id === id)).toOrderedSet();
 
@@ -249,7 +249,7 @@ export const setQueriesOrder =
 
 export const mergeQueryTitles =
   (newQueryTitles: { queryId: QueryId; titlesMap: TitlesMap }[]) =>
-  async (dispatch: AppDispatch, getState: () => RootState) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const view = selectView(getState());
     let newState = view.state;
 
@@ -272,7 +272,7 @@ export const mergeQueryTitles =
   };
 
 export const setQueryString =
-  (queryId: QueryId, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
+  (queryId: QueryId, newQueryString: string) => (dispatch: ViewsDispatch, getState: () => RootState) => {
     const query = selectQueryById(queryId)(getState());
     const newQuery = query.toBuilder().query(createElasticsearchQueryString(newQueryString)).build();
 
@@ -280,7 +280,7 @@ export const setQueryString =
   };
 
 export const setTimerange =
-  (queryId: QueryId, timerange: TimeRange) => (dispatch: AppDispatch, getState: () => RootState) => {
+  (queryId: QueryId, timerange: TimeRange) => (dispatch: ViewsDispatch, getState: () => RootState) => {
     const query = selectQueryById(queryId)(getState());
     const newQuery = query.toBuilder().timerange(timerange).build();
 
@@ -288,7 +288,7 @@ export const setTimerange =
   };
 
 export const updateQueryString =
-  (queryId: string, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
+  (queryId: string, newQueryString: string) => (dispatch: ViewsDispatch, getState: () => RootState) => {
     const viewType = selectViewType(getState());
 
     if (viewType === View.Type.Search) {
@@ -299,7 +299,7 @@ export const updateQueryString =
   };
 
 export const updateViewState =
-  (id: QueryId, newViewState: ViewStateType) => (dispatch: AppDispatch, getState: () => RootState) => {
+  (id: QueryId, newViewState: ViewStateType) => (dispatch: ViewsDispatch, getState: () => RootState) => {
     const view = selectView(getState());
     const newState = view.state.set(id, newViewState);
     const newView = view.toBuilder().state(newState).build();
@@ -308,7 +308,7 @@ export const updateViewState =
   };
 
 export const setParameters =
-  (newParameters: Array<Parameter>) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  (newParameters: Array<Parameter>) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const view = selectView(getState());
     const search = selectSearch(getState());
     const newSearch = search.toBuilder().parameters(newParameters).build();

@@ -23,7 +23,7 @@ import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useWidgets from 'views/hooks/useWidgets';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { execute, setWidgetsToSearch } from 'views/logic/slices/searchExecutionSlice';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
@@ -86,7 +86,7 @@ const emptyFocusContext: FocusContextState = {
 };
 
 const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocusedWidget, widgetIds }: SyncStateArgs) => {
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   useEffect(() => {
     const nextFocusedWidget = {

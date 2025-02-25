@@ -28,7 +28,7 @@ import ChartColorContext from '../visualizations/ChartColorContext';
 import type { ChangeColorFunction, ChartColorMap } from '../visualizations/ChartColorContext';
 
 jest.mock('views/components/widgets/useColorRules');
-jest.mock('stores/useAppDispatch', () => () => jest.fn());
+jest.mock('views/stores/useViewsDispatch', () => () => jest.fn());
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   setChartColor: jest.fn(),

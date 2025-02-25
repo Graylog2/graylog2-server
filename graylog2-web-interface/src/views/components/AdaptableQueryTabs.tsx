@@ -35,8 +35,8 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import CopyPageToDashboard from 'views/logic/views/CopyPageToDashboard';
 import { loadAsDashboard, loadDashboard } from 'views/logic/views/Actions';
 import createSearch from 'views/logic/slices/createSearch';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import type { GetState } from 'views/types';
 import { selectView, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import fetchSearch from 'views/logic/views/fetchSearch';
@@ -251,7 +251,7 @@ const addPageToDashboard =
   };
 
 const _onCopyToDashboard =
-  (selectedDashboardId: string | undefined | null) => async (_dispatch: AppDispatch, getState: GetState) => {
+  (selectedDashboardId: string | undefined | null) => async (_dispatch: ViewsDispatch, getState: GetState) => {
     const view = selectView(getState());
     const queryId = selectActiveQuery(getState());
 
@@ -291,7 +291,7 @@ const AdaptableQueryTabs = ({
   const [lockedTab, setLockedTab] = useState<QueryId>();
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
   const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
   const queriesConfigBtn = useRef(null);

@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectHasUndeclaredParameters } from 'views/logic/slices/searchMetadataSelectors';
 
-const useHasUndeclaredParameters = () => useAppSelector(selectHasUndeclaredParameters);
+const useHasUndeclaredParameters = () => useViewsSelector(selectHasUndeclaredParameters);
 
 export default useHasUndeclaredParameters;

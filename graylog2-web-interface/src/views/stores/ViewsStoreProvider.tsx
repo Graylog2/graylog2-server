@@ -53,7 +53,7 @@ const useInitialState = (
   undoRedoState: UndoRedoState,
   view: View,
   isNew: boolean,
-  activeQuery,
+  activeQuery: string,
   executionState: SearchExecutionState,
   result?: Props['result'],
 ): Partial<RootState> =>
@@ -81,25 +81,25 @@ const useInitialState = (
     [executionState, isNew, view],
   );
 
-const PluggableStoreProvider = ({
+const ViewsStoreProvider = ({
   initialQuery,
-  children,
+  children = undefined,
   isNew,
   view,
   executionState,
-  undoRedoState,
-  result,
+  undoRedoState = undefined,
+  result = undefined,
 }: React.PropsWithChildren<Props>) => {
   const reducers = usePluginEntities('views.reducers');
   const activeQuery = useActiveQuery(initialQuery, view);
   const initialState = useInitialState(undoRedoState, view, isNew, activeQuery, executionState, result);
   const searchExecutors = useSearchExecutors();
   const store = useMemo(
-    () => createStore(reducers, initialState, searchExecutors),
+    () => createStore<RootState>(reducers, initialState, { searchExecutors }),
     [initialState, reducers, searchExecutors],
   );
 
   return <Provider store={store}>{children}</Provider>;
 };
 
-export default PluggableStoreProvider;
+export default ViewsStoreProvider;

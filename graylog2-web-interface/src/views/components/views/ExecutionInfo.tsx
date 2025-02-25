@@ -18,12 +18,12 @@ import React from 'react';
 import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import { Timestamp } from 'components/common';
 
 const ExecutionInfo = () => {
-  const result = useAppSelector(selectCurrentQueryResults);
+  const result = useViewsSelector(selectCurrentQueryResults);
 
   if (isEmpty(result)) {
     return <i>No query executed yet.</i>;

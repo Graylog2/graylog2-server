@@ -33,7 +33,7 @@ import type {
 } from 'views/components/actions/ActionHandler';
 import { createHandlerFor, isExternalLinkAction } from 'views/components/actions/ActionHandler';
 import HoverForHelp from 'components/common/HoverForHelp';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -139,7 +139,7 @@ const ActionHandlerItem = ({
   onMenuToggle,
 }: ActionHandlerItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
 
@@ -191,7 +191,7 @@ const ActionMenuItem = ({
   onMenuToggle,
 }: Props) => {
   const { isEnabled = () => true } = action;
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const actionDisabled = dispatch((_dispatch, getState) => !isEnabled(handlerArgs, getState));
   const { field } = handlerArgs;
 

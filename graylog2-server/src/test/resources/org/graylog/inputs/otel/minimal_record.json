@@ -1,0 +1,16 @@
+{"resourceLogs": [
+    {
+      "scopeLogs": [
+        {
+          "logRecords": [
+            {
+              "body": {
+                "stringValue": "Example log record"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

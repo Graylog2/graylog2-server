@@ -21,7 +21,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { createSearch } from 'fixtures/searches';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
@@ -67,13 +67,13 @@ const plugin = {
   },
 };
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 describe('AddWidgetButton', () => {
   beforeEach(() => {
     const view = createSearch();
     const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     PluginStore.register(plugin);
   });
 

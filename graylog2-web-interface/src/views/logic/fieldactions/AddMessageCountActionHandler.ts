@@ -19,7 +19,7 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 
 export const CreateMessageCount = () => {
@@ -31,6 +31,6 @@ export const CreateMessageCount = () => {
     .build();
 };
 
-const AddMessageCountActionHandler = () => (dispatch: AppDispatch) => dispatch(addWidget(CreateMessageCount()));
+const AddMessageCountActionHandler = () => (dispatch: ViewsDispatch) => dispatch(addWidget(CreateMessageCount()));
 
 export default AddMessageCountActionHandler;

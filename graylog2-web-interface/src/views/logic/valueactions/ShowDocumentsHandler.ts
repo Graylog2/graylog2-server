@@ -17,7 +17,7 @@
 import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import { escape, addToQuery, predicate } from 'views/logic/queries/QueryHelper';
 import TitleTypes from 'views/stores/TitleTypes';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { GetState } from 'views/types';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import { setTitle } from 'views/logic/slices/titlesActions';
@@ -48,7 +48,7 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> =>
 
 const ShowDocumentsHandler =
   ({ contexts: { valuePath, widget } }: Arguments) =>
-  (dispatch: AppDispatch, getState: GetState) => {
+  (dispatch: ViewsDispatch, getState: GetState) => {
     const activeQuery = selectActiveQuery(getState());
     const mergedObject = Object.fromEntries(valuePath.flatMap(Object.entries));
     const widgetQuery = widget && widget.query ? widget.query.query_string : '';

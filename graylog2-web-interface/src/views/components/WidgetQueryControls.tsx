@@ -51,10 +51,10 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { SEARCH_BAR_GAP, TimeRangeRow, SearchQueryRow } from 'views/components/searchbar/SearchBarLayout';
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 import { execute, setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useHandlerContext from 'views/components/useHandlerContext';
 import useView from 'views/hooks/useView';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
@@ -99,7 +99,7 @@ export const updateWidgetSearchControls = (widget, { timerange, streams, streamC
     .build();
 
 const onSubmit = async (
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   values: CombinedSearchBarFormValues,
   pluggableSearchBarControls: Array<() => SearchBarControl>,
   widget: Widget,
@@ -125,9 +125,9 @@ const onSubmit = async (
   return dispatch(execute());
 };
 
-const resetTimeRangeOverride = (dispatch: AppDispatch) =>
+const resetTimeRangeOverride = (dispatch: ViewsDispatch) =>
   dispatch(setGlobalOverrideTimerange(undefined)).then(() => dispatch(execute()));
-const resetQueryOverride = (dispatch: AppDispatch) =>
+const resetQueryOverride = (dispatch: ViewsDispatch) =>
   dispatch(setGlobalOverrideQuery(undefined)).then(() => dispatch(execute()));
 
 const useBindApplySearchControlsChanges = (formRef) => {
@@ -214,7 +214,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
     [globalOverride, pluggableSearchBarControls, userTimezone, handlerContext],
   );
   const initialValues = useInitialFormValues(widget);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const _onSubmit = useCallback(
     (values: CombinedSearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, widget),
     [dispatch, pluggableSearchBarControls, widget],

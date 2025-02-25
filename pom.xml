@@ -159,6 +159,7 @@
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.32.0</opentelemetry.version>
+        <opentelemetry-proto.version>1.3.2-alpha</opentelemetry-proto.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.10</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
@@ -208,6 +209,8 @@
         <!-- Plugin versions -->
         <license-maven.version>4.6</license-maven.version>
         <download-maven-plugin.version>1.6.8.1</download-maven-plugin.version>
+        <os-maven-plugin.version>1.7.0</os-maven-plugin.version>
+        <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
     </properties>
 
 
@@ -531,6 +534,11 @@
                 <artifactId>auto-value-javabean</artifactId>
                 <version>${auto-value-javabean.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.opentelemetry.proto</groupId>
+                <artifactId>opentelemetry-proto</artifactId>
+                <version>${opentelemetry-proto.version}</version>
+            </dependency>
 
             <!-- Explicitly manage mina-core to fix CVE-2024-52046. We are only using mina-core as a transitive
                  dependency for the Apache DS server in our tests. Remove once its usages are updated and the fixed
@@ -544,6 +552,13 @@
     </dependencyManagement>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>${os-maven-plugin.version}</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -665,6 +680,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.xolstice.maven.plugins</groupId>
+                    <artifactId>protobuf-maven-plugin</artifactId>
+                    <version>${protobuf-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

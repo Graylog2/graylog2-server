@@ -51,9 +51,9 @@ public class InputProcessingException extends RuntimeException {
     }
 
     public static InputProcessingException create(@Nonnull String errorMessage,
-                                                  @Nullable Exception exception,
+                                                  @Nullable Throwable throwable,
                                                   @Nonnull RawMessage rawMessage) {
-        return new InputProcessingException(new InputProcessingFailure(errorMessage, exception, rawMessage, null));
+        return new InputProcessingException(new InputProcessingFailure(errorMessage, throwable, rawMessage, null));
     }
 
     public static InputProcessingException create(@Nonnull String errorMessage,

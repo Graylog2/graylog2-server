@@ -18,12 +18,12 @@ import { createSelector } from '@reduxjs/toolkit';
 
 import { selectView } from 'views/logic/slices/viewSelectors';
 import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 
 const selectHandlerContext = createSelector(selectView, selectSearchExecutionState, (view, executionState) => ({
   view,
   executionState,
 }));
 
-const useHandlerContext = () => useAppSelector(selectHandlerContext);
+const useHandlerContext = () => useViewsSelector(selectHandlerContext);
 export default useHandlerContext;

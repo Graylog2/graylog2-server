@@ -112,22 +112,18 @@ const ConfigurationFormField = ({
         />
       );
     case 'inline_binary':
-      if (configField.is_encrypted) {
-        return (
-          <EncryptedInlineBinaryField
-            key={elementKey}
-            typeName={typeName}
-            title={configKey}
-            field={configField}
-            value={configValue as EncryptedFieldValue<string>}
-            dirty={dirty}
-            onChange={onChange}
-            autoFocus={autoFocus}
-          />
-        );
-      }
-
-      return null;
+      return (
+        <EncryptedInlineBinaryField
+          key={elementKey}
+          typeName={typeName}
+          title={configKey}
+          field={configField}
+          value={configValue as EncryptedFieldValue<string>}
+          dirty={dirty}
+          onChange={onChange}
+          autoFocus={autoFocus}
+        />
+      );
 
     default:
       return null;

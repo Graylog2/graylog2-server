@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 
 import HighlightingRulesContext from './HighlightingRulesContext';
 
-const useHighlightingRules = () => useAppSelector(selectHighlightingRules);
+const useHighlightingRules = () => useViewsSelector(selectHighlightingRules);
 
 const HighlightingRulesProvider = ({ children }: { children: React.ReactElement }): React.ReactElement => {
   const highlightingRules = useHighlightingRules();

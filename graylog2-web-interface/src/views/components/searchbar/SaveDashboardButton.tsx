@@ -20,7 +20,7 @@ import { useCallback } from 'react';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
 import useHotkey from 'hooks/useHotkey';
 import useView from 'views/hooks/useView';
@@ -36,7 +36,7 @@ const SaveDashboardButton = ({ userIsAllowedToEdit, openSaveAsModal }: Props) =>
   const view = useView();
   const isNewView = useIsNew();
   const sendTelemetry = useSendTelemetry();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const hasUndeclaredParameters = useHasUndeclaredParameters();
   const _onSaveView = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_SAVED, {

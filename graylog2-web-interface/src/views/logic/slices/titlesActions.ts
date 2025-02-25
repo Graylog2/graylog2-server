@@ -15,22 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { TitleType, TitlesMap } from 'views/stores/TitleTypes';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { GetState } from 'views/types';
 import { selectViewState } from 'views/logic/slices/viewSelectors';
 import { updateViewState } from 'views/logic/slices/viewSlice';
 import { selectTitles } from 'views/logic/slices/titlesSelectors';
 
-export const updateTitles = (id: string, newTitles: TitlesMap) => async (dispatch: AppDispatch, getState: GetState) => {
-  const viewState = selectViewState(id)(getState());
-  const newViewState = viewState.toBuilder().titles(newTitles).build();
+export const updateTitles =
+  (id: string, newTitles: TitlesMap) => async (dispatch: ViewsDispatch, getState: GetState) => {
+    const viewState = selectViewState(id)(getState());
+    const newViewState = viewState.toBuilder().titles(newTitles).build();
 
-  return dispatch(updateViewState(id, newViewState));
-};
+    return dispatch(updateViewState(id, newViewState));
+  };
 
 export const setTitle =
   (queryId: string, type: TitleType, id: string, title: string) =>
-  async (dispatch: AppDispatch, getState: GetState) => {
+  async (dispatch: ViewsDispatch, getState: GetState) => {
     const viewState = selectViewState(queryId)(getState());
     const titles = selectTitles(queryId)(getState());
     const newTitles = titles.setIn([type, id], title);

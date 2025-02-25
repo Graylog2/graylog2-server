@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event';
 
 import { events as eventsFixtures } from 'fixtures/events';
 import asMock from 'helpers/mocking/AsMock';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { finishedLoading } from 'views/logic/slices/searchExecutionSlice';
 import SearchResult from 'views/logic/SearchResult';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
@@ -44,7 +44,7 @@ const dummySearchJobResults = {
   results: {},
 };
 jest.mock('views/components/widgets/reexecuteSearchTypes');
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 describe('EventsList', () => {
   const config = EventsWidgetConfig.createDefault();
@@ -115,7 +115,7 @@ describe('EventsList', () => {
         widgetMapping: Immutable.Map(),
       }),
     );
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     const searchTypePayload = { [data.id]: { page: 2, per_page: 10 } };
     const secondPageSize = 10;
 
@@ -143,7 +143,7 @@ describe('EventsList', () => {
         widgetMapping: Immutable.Map(),
       }),
     );
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     const secondPageSize = 10;
 
     render(<SimpleEventsList data={{ ...data, totalResults: 10 + secondPageSize }} />);
@@ -167,7 +167,7 @@ describe('EventsList', () => {
         widgetMapping: Immutable.Map(),
       }),
     );
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     const secondPageSize = 10;
 

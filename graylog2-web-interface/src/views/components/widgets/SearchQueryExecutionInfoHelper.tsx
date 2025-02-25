@@ -23,7 +23,7 @@ import isEmpty from 'lodash/isEmpty';
 
 import { Icon, Timestamp } from 'components/common';
 import { Table } from 'components/bootstrap';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import type { MessageResult, SearchTypeResult, SearchTypeResultTypes } from 'views/types';
 import type { SearchTypeIds } from 'views/logic/views/types';
@@ -112,7 +112,7 @@ const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecu
 const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Props) => {
   const [open, setOpen] = useState(false);
   const interactive = useContext(InteractiveContext);
-  const result = useAppSelector(selectCurrentQueryResults);
+  const result = useViewsSelector(selectCurrentQueryResults);
   const currentWidgetSearchType = useMemo<SearchTypeResultTypes[keyof SearchTypeResultTypes]>(() => {
     const searchTypeId = currentWidgetMapping?.toJS()?.[0];
 

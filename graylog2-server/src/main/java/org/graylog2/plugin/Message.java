@@ -34,6 +34,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
@@ -563,7 +564,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         final StringBuilder sb = new StringBuilder();
         sb.append("source: ").append(getField(FIELD_SOURCE)).append(" | ");
 
-        final String message = getField(FIELD_MESSAGE).toString().replace("\\n", "").replace("\\t", "");
+        final String message = ObjectUtils.defaultIfNull(getField(FIELD_MESSAGE), "").toString()
+                .replace("\\n", "").replace("\\t", "");
         sb.append("message: ");
 
         if (truncate && message.length() > 225) {

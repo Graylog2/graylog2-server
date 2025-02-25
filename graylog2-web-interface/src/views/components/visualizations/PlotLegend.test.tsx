@@ -30,7 +30,7 @@ import asMock from 'helpers/mocking/AsMock';
 import ChartColorContext from './ChartColorContext';
 
 jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'active-query-id');
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/hooks/useExternalValueActions');
 
 const colors = ColorMapper.create();

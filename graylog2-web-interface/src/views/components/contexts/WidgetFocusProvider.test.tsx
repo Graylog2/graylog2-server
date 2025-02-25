@@ -26,7 +26,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { allMessagesTable } from 'views/logic/Widgets';
 import { createViewWithWidgets } from 'fixtures/searches';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { Button } from 'components/bootstrap';
 
 const mockNavigate = jest.fn();
@@ -40,7 +40,7 @@ jest.mock('react-router-dom', () => ({
   })),
 }));
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 const emptyLocation = {
   pathname: '',
@@ -63,7 +63,7 @@ describe('WidgetFocusProvider', () => {
 
   beforeEach(() => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     asMock(useLocation).mockReturnValue(emptyLocation);
   });
 
@@ -204,7 +204,7 @@ describe('WidgetFocusProvider', () => {
 
   it('does not trigger setting widgets to search initially', () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     asMock(useLocation).mockReturnValue(emptyLocation);
     renderSUT(jest.fn());
 
