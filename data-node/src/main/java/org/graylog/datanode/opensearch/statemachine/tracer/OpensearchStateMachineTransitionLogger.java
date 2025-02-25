@@ -14,18 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.opensearch.statemachine.tracer;
 
-public interface ManagableProcess<T, EVENT, STATE> {
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTransitionLogger;
 
-    void configure(T configuration);
-
-    void start();
-
-    void stop();
-
-    void onEvent(EVENT event);
-
-    boolean isInState(STATE state);
-
+public class OpensearchStateMachineTransitionLogger extends StateMachineTransitionLogger<OpensearchState, OpensearchEvent> {
 }

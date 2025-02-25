@@ -14,19 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.statemachine.tracer;
+package org.graylog.datanode.process.statemachine.tracer;
 
+import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.delegates.Trace;
-import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
-import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 
-/**
- * The tracer allows to observe triggered event (before) and transitions (after) of the {@link OpensearchStateMachine}
- */
-public interface StateMachineTracer extends Trace<OpensearchState, OpensearchEvent> {
+public interface StateMachineTracer<STATE, EVENT> extends Trace<STATE, EVENT> {
 
-    default void setStateMachine(OpensearchStateMachine stateMachine) {
+    default void setStateMachine(StateMachine<STATE, EVENT> stateMachine) {
     }
-
 }
