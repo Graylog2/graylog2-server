@@ -88,7 +88,7 @@ public class InputEventListener {
     }
 
     public void inputSetup(String inputId) {
-        LOG.info("Input setup: {}", inputId);
+        LOG.debug("Input setup: {}", inputId);
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
             inputRegistry.setup(inputState);
