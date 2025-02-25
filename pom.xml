@@ -951,6 +951,10 @@
                             org.jetbrains.annotations.Nullable @ Use jakarta.annotation.Nullable
 
                             com.mongodb.DuplicateKeyException @ Use org.graylog2.database.utils.MongoUtil#isDuplicateKeyError(MongoException)
+
+                            @defaultMessage Use org.apache.lucene.
+                            org.graylog.shaded.opensearch2.org.apache.lucene.index.**
+                            org.graylog.shaded.opensearch2.org.apache.lucene.store.**
                         ]]>
 
                     </signatures>
