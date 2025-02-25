@@ -361,20 +361,6 @@ public abstract class MessageInput implements Stoppable {
         return getClass().getName() + "." + getId();
     }
 
-    @Override
-    public int hashCode() {
-        return getPersistId().hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj instanceof MessageInput input) {
-            return this.getPersistId().equals(input.getPersistId());
-        } else {
-            return false;
-        }
-    }
-
     public Codec getCodec() {
         return codec;
     }
