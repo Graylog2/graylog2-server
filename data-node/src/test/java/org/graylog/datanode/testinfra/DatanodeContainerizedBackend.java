@@ -26,8 +26,14 @@ import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.JwtSecret;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class DatanodeContainerizedBackend {
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
@@ -91,6 +97,16 @@ public class DatanodeContainerizedBackend {
                 .passwordSecret(ContainerizedGraylogBackend.PASSWORD_SECRET)
                 .customizer(customizer)
                 .build();
+    }
+
+    public DatanodeContainerizedBackend loadPlugins(List<Path> plugins) {
+        plugins.forEach(hostPath -> {
+            if (Files.exists(hostPath)) {
+                final Path containerPath = Paths.get(IMAGE_WORKING_DIR, "plugin", hostPath.getFileName().toString());
+                datanodeContainer.addFileSystemBind(hostPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
+            }
+        });
+        return this;
     }
 
     public DatanodeContainerizedBackend start() {
