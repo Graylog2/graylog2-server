@@ -21,11 +21,12 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon, Timestamp } from 'components/common';
 import { Table } from 'components/bootstrap';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import type { MessageResult, GenericResult, SearchTypeResult } from 'views/types';
+import type { SearchTypeResult } from 'views/types';
 import type { SearchTypeIds } from 'views/logic/views/types';
 import Popover from 'components/common/Popover';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
@@ -56,7 +57,7 @@ type WidgetExecutionData = {
   total: number;
   duration: number;
   timestamp: string;
-  effectiveTimerange: GenericResult['effective_timerange'] | MessageResult['effectiveTimerange'];
+  effectiveTimerange: AbsoluteTimeRange;
 };
 
 const StyledIcon = styled(Icon)(
@@ -121,9 +122,7 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
 
   const widgetExecutionData = useMemo<WidgetExecutionData>(
     () => ({
-      effectiveTimerange:
-        (currentWidgetSearchType as MessageResult)?.effectiveTimerange ||
-        (currentWidgetSearchType as GenericResult)?.effective_timerange,
+      effectiveTimerange: AbsoluteTimeRange,
       total: currentWidgetSearchType?.total,
       duration: result?.duration,
       timestamp: result?.timestamp,
