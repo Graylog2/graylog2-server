@@ -67,9 +67,8 @@ public class InputFailureRecorder {
      * Call this once the error has resolved itself.
      */
     public void setRunning() {
-        if (inputState.getState() == IOState.Type.RUNNING) {
-            return;
+        if (inputState.getState() == IOState.Type.FAILING) {
+            inputState.setState(IOState.Type.RUNNING);
         }
-        inputState.setState(IOState.Type.RUNNING);
     }
 }
