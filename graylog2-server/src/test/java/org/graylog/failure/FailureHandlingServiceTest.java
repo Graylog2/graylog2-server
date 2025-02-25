@@ -26,6 +26,7 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.messageq.Acknowledgeable;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -209,8 +210,8 @@ public class FailureHandlingServiceTest {
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
-        verify(acknowledger, times(1)).acknowledge(argThat((List<Message> arg) ->
-                arg.size() == 1 && arg.get(0) == processingFailureWithAck.failedMessage()));
+        verify(acknowledger, times(1)).acknowledge(argThat((List<? extends Acknowledgeable> arg) ->
+                arg.size() == 1 && arg.get(0) == processingFailureWithAck));
     }
 
     @Test
@@ -273,9 +274,11 @@ public class FailureHandlingServiceTest {
     }
 
     private ProcessingFailure createProcessingFailure(boolean ack) {
+        Message message = messageFactory.createMessage(ImmutableMap.of("_id", "1234"));
+        message.setMessageQueueId("message-queue-id");
         return new ProcessingFailure(
                 ProcessingFailureCause.UNKNOWN, "Failure Message", "Failure Details",
-                Tools.nowUTC(), messageFactory.createMessage(ImmutableMap.of("_id", "1234")), ack);
+                Tools.nowUTC(), message, ack);
     }
 
     private FailureBatch indexingFailureBatch(IndexingFailure indexingFailure) {
