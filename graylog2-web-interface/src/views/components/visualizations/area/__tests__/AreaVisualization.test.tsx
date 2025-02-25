@@ -24,9 +24,8 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import AppConfig from 'util/AppConfig';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import { effectiveTimerange, simpleChartData } from './AreaVisualization.fixtures';
 
@@ -41,15 +40,12 @@ jest.mock('util/AppConfig', () => ({
   isCloud: jest.fn(() => false),
 }));
 
+// eslint-disable-next-line react/require-default-props
 const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisualization>) => (
   <TestStoreProvider>
-    <FieldTypesContext.Provider
-      value={{
-        all: Immutable.List(),
-        queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }),
-      }}>
+    <TestFieldTypesContextProvider>
       <OriginalAreaVisualization {...props} />
-    </FieldTypesContext.Provider>
+    </TestFieldTypesContextProvider>
   </TestStoreProvider>
 );
 

@@ -45,7 +45,7 @@ const fieldType = new FieldType('field_type', ['numeric'], []);
 const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);
 const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
-const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
+const fieldTypes = { all: fields, currentQuery: fields };
 
 jest.mock('views/hooks/useAggregationFunctions');
 

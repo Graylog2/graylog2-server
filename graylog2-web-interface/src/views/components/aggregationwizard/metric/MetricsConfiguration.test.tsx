@@ -15,11 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { asMock } from 'helpers/mocking';
@@ -31,6 +29,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useFeature from 'hooks/useFeature';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import MetricsConfiguration from 'views/components/aggregationwizard/metric/MetricsConfiguration';
+import { SimpleFieldTypesContextProvider } from 'views/components/contexts/TestFieldTypesContextProvider';
 
 jest.mock('hooks/useFeature');
 jest.mock('views/hooks/useAggregationFunctions');
@@ -78,33 +77,23 @@ const generateNotAllowedMetricsWithoutField = (): Array<MetricFormValues> =>
 
 const fieldTypes = [
   FieldTypeMapping.create('field-allowed-0', FieldType.create('number', [Properties.Numeric])),
-
   FieldTypeMapping.create('field-allowed-1', FieldType.create('number', [Properties.Numeric])),
-
   FieldTypeMapping.create('field-allowed-2', FieldType.create('number', [Properties.FullTextSearch])),
-
   FieldTypeMapping.create('field-allowed-3', FieldType.create('number', [Properties.FullTextSearch])),
-
   FieldTypeMapping.create('field-not-allowed-0', FieldType.create('number', [Properties.Numeric])),
-
   FieldTypeMapping.create('field-not-allowed-1', FieldType.create('number', [Properties.FullTextSearch])),
 ];
 
+// eslint-disable-next-line react/require-default-props
 const SUT = ({ initialValues = {} }: { initialValues: WidgetConfigFormValues }) => (
   <TestStoreProvider>
-    <FieldTypesContext.Provider
-      value={{
-        all: Immutable.List(fieldTypes),
-        queryFields: Immutable.Map({
-          queryId: Immutable.List(fieldTypes),
-        }),
-      }}>
+    <SimpleFieldTypesContextProvider fields={fieldTypes}>
       <Formik initialValues={initialValues} onSubmit={() => {}}>
         <Form>
           <MetricsConfiguration />
         </Form>
       </Formik>
-    </FieldTypesContext.Provider>
+    </SimpleFieldTypesContextProvider>
   </TestStoreProvider>
 );
 

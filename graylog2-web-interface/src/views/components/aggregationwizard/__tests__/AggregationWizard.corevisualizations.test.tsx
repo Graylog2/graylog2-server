@@ -26,21 +26,15 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
-import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import { createSearch } from 'fixtures/searches';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
 const widgetConfig = AggregationWidgetConfig.builder().visualization('table').build();
-
-const fieldTypes: FieldTypes = {
-  all: Immutable.List([]),
-  queryFields: Immutable.Map(),
-};
 
 const selectEventConfig = { container: document.body };
 
@@ -50,7 +44,7 @@ const view = createSearch();
 
 const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof AggregationWizard>>) => (
   <TestStoreProvider view={view} isNew initialQuery="query-id-1">
-    <FieldTypesContext.Provider value={fieldTypes}>
+    <TestFieldTypesContextProvider>
       <AggregationWizard
         config={widgetConfig}
         editing
@@ -62,7 +56,7 @@ const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof Aggr
         {...props}>
         <span>The visualization</span>
       </AggregationWizard>
-    </FieldTypesContext.Provider>
+    </TestFieldTypesContextProvider>
   </TestStoreProvider>
 );
 
