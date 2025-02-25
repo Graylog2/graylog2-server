@@ -21,11 +21,12 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import { Icon, Timestamp } from 'components/common';
 import { Table } from 'components/bootstrap';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import type { MessageResult, SearchTypeResult, SearchTypeResultTypes } from 'views/types';
+import type { SearchTypeResult, MessageResult, GenericResult } from 'views/types';
 import type { SearchTypeIds } from 'views/logic/views/types';
 import Popover from 'components/common/Popover';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
@@ -56,7 +57,7 @@ type WidgetExecutionData = {
   total: number;
   duration: number;
   timestamp: string;
-  effectiveTimerange: SearchTypeResult['effective_timerange'] | MessageResult['effectiveTimerange'];
+  effectiveTimerange: AbsoluteTimeRange;
 };
 
 const StyledIcon = styled(Icon)(
@@ -113,7 +114,7 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
   const [open, setOpen] = useState(false);
   const interactive = useContext(InteractiveContext);
   const result = useViewsSelector(selectCurrentQueryResults);
-  const currentWidgetSearchType = useMemo<SearchTypeResultTypes[keyof SearchTypeResultTypes]>(() => {
+  const currentWidgetSearchType = useMemo<SearchTypeResult>(() => {
     const searchTypeId = currentWidgetMapping?.toJS()?.[0];
 
     return result?.searchTypes?.[searchTypeId];
@@ -123,7 +124,7 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
     () => ({
       effectiveTimerange:
         (currentWidgetSearchType as MessageResult)?.effectiveTimerange ||
-        (currentWidgetSearchType as SearchTypeResult)?.effective_timerange,
+        (currentWidgetSearchType as GenericResult)?.effective_timerange,
       total: currentWidgetSearchType?.total,
       duration: result?.duration,
       timestamp: result?.timestamp,
