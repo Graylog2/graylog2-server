@@ -21,6 +21,7 @@ import { runStartJob, runPollJob, runCancelJob } from 'views/stores/SearchJobs';
 import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
 import type Search from 'views/logic/search/Search';
+import type { WidgetMapping } from 'views/logic/views/types';
 
 const delay = (ms: number) =>
   new Promise((resolve) => {
@@ -77,9 +78,13 @@ export const pollJob = (jobIds: JobIds, result: SearchJobType | null, depth: num
     }
   });
 
-export const executeJobResult = async ({ asyncSearchId, nodeId }: JobIds): Promise<SearchExecutionResult> =>
+export const executeJobResult = async (
+  { asyncSearchId, nodeId }: JobIds,
+  widgetMapping?: WidgetMapping,
+): Promise<SearchExecutionResult> =>
   pollJob({ asyncSearchId, nodeId }, null).then((result) => ({
     result: new SearchResult(result),
+    widgetMapping,
   }));
 
 export const cancelJob = (jobIds: JobIds) => runCancelJob(jobIds);

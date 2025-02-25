@@ -61,6 +61,7 @@ import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
 import type { Event } from 'components/events/events/types';
 import type { PluggableReducer } from 'store';
+import type { WidgetMapping } from 'views/logic/views/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -446,6 +447,7 @@ export interface ViewState {
 
 export type SearchExecutionResult = {
   result: SearchResult;
+  widgetMapping?: WidgetMapping;
 };
 
 export type JobIdsState = JobIds | null;

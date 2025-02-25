@@ -48,6 +48,7 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type Search from 'views/logic/search/Search';
 import { setParameters } from 'views/logic/slices/viewSlice';
+import type { WidgetMapping } from 'views/logic/views/types';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
@@ -141,7 +142,7 @@ export type SearchExecutors = {
     executionStateParam: SearchExecutionState,
     keepQueries?: string[],
   ) => Promise<JobIds>;
-  executeJobResult: (jobIds: JobIds) => Promise<SearchExecutionResult>;
+  executeJobResult: (jobIds: JobIds, widgetMapping?: WidgetMapping) => Promise<SearchExecutionResult>;
   cancelJob: (jobIds: JobIds) => Promise<null>;
 };
 
@@ -165,6 +166,7 @@ export const executeWithExecutionState =
     searchTypesToSearch: Array<string>,
     executionState: SearchExecutionState,
     searchExecutors: SearchExecutors,
+    widgetMapping?: WidgetMapping,
   ) =>
   (dispatch: ViewsDispatch) =>
     dispatch(parseSearch(search, searchExecutors.parse))
@@ -178,7 +180,7 @@ export const executeWithExecutionState =
         dispatch(setJobIds(jobIds));
 
         return searchExecutors
-          .executeJobResult(jobIds)
+          .executeJobResult(jobIds, widgetMapping)
           .then(searchExecutors.resultMapper)
           .then((result) => {
             dispatch(setJobIds(null));
@@ -190,14 +192,21 @@ export const executeWithExecutionState =
       });
 
 export const execute =
-  (search: Search, activeQuery: string) =>
+  (search: Search, activeQuery: string, widgetMapping?: WidgetMapping) =>
   (dispatch: ViewsDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
     const state = getState();
     const executionState = selectSearchExecutionState(state);
     const searchTypesToSearch = selectSearchTypesToSearch(state);
 
     return dispatch(
-      executeWithExecutionState(search, activeQuery, searchTypesToSearch, executionState, searchExecutors),
+      executeWithExecutionState(
+        search,
+        activeQuery,
+        searchTypesToSearch,
+        executionState,
+        searchExecutors,
+        widgetMapping,
+      ),
     );
   };
 

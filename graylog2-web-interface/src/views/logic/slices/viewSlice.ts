@@ -104,9 +104,10 @@ const _recreateSearch = async (newView: View) => {
 
 export const executeSearch = () => (dispatch: ViewsDispatch, getState: () => RootState) => {
   const view = selectView(getState());
+  const search = selectSearch(getState());
   const activeQuery = selectActiveQuery(getState());
 
-  return dispatch(execute(view.search, activeQuery));
+  return dispatch(execute(search, activeQuery, view.widgetMapping));
 };
 
 export const selectQuery = (activeQuery: string) => async (dispatch: ViewsDispatch, getState: () => RootState) => {

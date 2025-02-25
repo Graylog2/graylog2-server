@@ -38,7 +38,6 @@ const reexecuteSearchTypes =
     const parameterBindings = selectParameterBindings(state);
     const view = selectView(state);
     const searchTypeIds = Object.keys(searchTypes);
-
     const newGlobalOverride: GlobalOverride = new GlobalOverride(
       effectiveTimerange,
       globalQuery,
@@ -53,14 +52,21 @@ const reexecuteSearchTypes =
       const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
       const { result } = selectSearchExecutionResult(getState());
 
-      return { result: result.updateSearchTypes(updatedSearchTypes) };
+      return { result: result.updateSearchTypes(updatedSearchTypes), widgetMapping: view.widgetMapping };
     };
 
     return dispatch(
-      executeWithExecutionState(view.search, activeQuery, [], executionState, {
-        ...searchExecutors,
-        resultMapper: handleSearchResult,
-      }),
+      executeWithExecutionState(
+        view.search,
+        activeQuery,
+        [],
+        executionState,
+        {
+          ...searchExecutors,
+          resultMapper: handleSearchResult,
+        },
+        view.widgetMapping,
+      ),
     );
   };
 
