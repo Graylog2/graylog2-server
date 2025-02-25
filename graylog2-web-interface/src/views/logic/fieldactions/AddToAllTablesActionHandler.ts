@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { updateWidgets } from 'views/logic/slices/widgetActions';
 import type { GetState } from 'views/types';
 import { selectWidgets } from 'views/logic/slices/viewSelectors';
@@ -23,7 +23,7 @@ import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 
 const AddToAllTablesActionHandler =
   ({ field }: ActionHandlerArguments<{}>) =>
-  async (dispatch: AppDispatch, getState: GetState) => {
+  async (dispatch: ViewsDispatch, getState: GetState) => {
     const widgets = selectWidgets(getState());
     const newWidgets = widgets
       .map((widget) => {
