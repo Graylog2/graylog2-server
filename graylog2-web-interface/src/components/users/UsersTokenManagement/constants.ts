@@ -21,17 +21,10 @@ export const ENTITY_TABLE_ID = 'token_usage';
 export const DEFAULT_LAYOUT = {
   entityTableId: 'token_usage',
   defaultPageSize: 20,
-  defaultSort: { attributeId: 'token_name', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ["token_id", "username", "user_id", "token_name", "created_at", "last_access", "user_is_external", "auth_backend"],
+  defaultSort: { attributeId: 'NAME', direction: 'asc' } as Sort,
+  defaultDisplayedAttributes: ["id", "username", "user_id", "NAME", "created_at", "last_access", "external_user", "title"],
 };
-export const COLUMNS_ORDER = ["token_id", "username", "user_id", "token_name", "created_at", "last_access", "user_is_external", "auth_backend"];
+export const COLUMNS_ORDER = ["id", "username", "user_id", "NAME", "created_at", "last_access", "external_user", "title"];
 
 export const ADDITIONAL_ATTRIBUTES = [
-  { id: 'user_is_external', title: 'External User', hidden: false },
-  { id: 'token_id', title: 'Token ID', hidden: false },
-  { id: 'username', title: 'Username', hidden: false },
-  { id: 'token_name', title: 'Name', hidden: false },
-  { id: 'created_at', title: 'Created', hidden: false },
-  { id: 'last_access', title: 'Last Accessed', hidden: false },
-  { id: 'auth_backend', title: 'Authentication Backend', hidden: false },
 ];

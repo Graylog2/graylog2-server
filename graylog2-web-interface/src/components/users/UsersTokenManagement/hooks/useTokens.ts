@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import type {SearchParams, Attributes} from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import {qualifyUrl} from 'util/URLUtils';
@@ -6,14 +22,14 @@ import fetch from 'logic/rest/FetchProvider';
 
 export type Token = {
   id: string,
-  token_id: string,
+  _id: string,
   username: string,
   user_id: string,
-  token_name: string,
+  NAME: string,
   created_at: string,
   last_access: string,
-  user_is_external: boolean,
-  auth_backend: string
+  external_user: boolean,
+  title: string
 };
 
 type PaginatedResponse = {
@@ -23,7 +39,7 @@ type PaginatedResponse = {
   page: number;
   query: string,
   attributes: Attributes,
-  token_usage: Array<Token>,
+  elements: Array<Token>,
 };
 
 export const fetchTokens = (searchParams: SearchParams) => {
@@ -40,7 +56,7 @@ export const fetchTokens = (searchParams: SearchParams) => {
 
   return fetch('GET', qualifyUrl(url)).then((response: PaginatedResponse) => {
     const {
-      token_usage,
+      elements,
       query,
       attributes,
       count,
@@ -50,7 +66,7 @@ export const fetchTokens = (searchParams: SearchParams) => {
     } = response;
 
     return {
-      list: token_usage,
+      list: elements.map(el => ({...el, id: el._id})),
       attributes,
       pagination: {
         count,

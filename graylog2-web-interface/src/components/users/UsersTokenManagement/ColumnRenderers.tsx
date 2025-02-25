@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import * as React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
@@ -19,12 +35,8 @@ const customColumnRenderers = (): ColumnRenderers<Token> => ({
       renderCell: (_username: string, token) => token.username,
       width: 0.2,
     },
-    token_id: {
-      renderCell: (_token_id: string, token) => token.token_id,
-      width: 0.3,
-    },
-    token_name: {
-      renderCell: (_token_name: string, token) => token.token_name,
+    NAME: {
+      renderCell: (_NAME: string, token) => token.NAME,
       width: 0.2,
     },
     created_at: {
@@ -37,12 +49,12 @@ const customColumnRenderers = (): ColumnRenderers<Token> => ({
         && <Timestamp dateTime={token.last_access}/>,
       width: 0.2,
     },
-    user_is_external: {
-      renderCell: (_user_is_external: boolean, token) => <IsExternalUserCell token={token}/>,
+    external_user: {
+      renderCell: (_external_user: boolean, token) => <IsExternalUserCell token={token}/>,
       width: 0.2,
     },
-    auth_backend: {
-      renderCell: (_auth_backend: string, token) => token.auth_backend ? token.auth_backend : "N/A",
+    title: {
+      renderCell: (_title: string, token) => token.title ? token.title : "N/A",
       width: 0.2,
     },
   },

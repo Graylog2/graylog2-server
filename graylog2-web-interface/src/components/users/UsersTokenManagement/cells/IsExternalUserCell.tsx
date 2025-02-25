@@ -34,7 +34,7 @@ const Wrapper = styled.div<{ $enabled: boolean }>(
 );
 
 const IsExternalUserCell = ({ token }: Props) => {
-  const isExternal = token?.user_is_external;
+  const isExternal = token?.external_user;
 
   return (
     <Tooltip withArrow position="right" label={`User is ${isExternal ? 'external' : 'internal'}`}>

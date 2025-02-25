@@ -32,10 +32,14 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.security.authservice.DBAuthServiceBackendService;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tokenusage.TokenUsageDTO;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -43,8 +47,12 @@ import org.graylog2.security.AccessTokenEntity;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.tokenusage.TokenUsageService;
+import org.graylog2.users.UserImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Locale;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -55,6 +63,23 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "Token-Usage", description = "Listing usage of Tokens", tags = {CLOUD_VISIBLE})
 public class TokenUsageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(TokenUsageResource.class);
+    private static final String DEFAULT_SORT_FIELD = AccessTokenEntity.FIELD_NAME;
+    private static final String DEFAULT_SORT_DIRECTION = "asc";
+    private static final List<EntityAttribute> attributes = List.of(
+            EntityAttribute.builder().id(TokenUsageDTO.FIELD_TOKEN_ID).title("Token ID").type(SearchQueryField.Type.OBJECT_ID).hidden(false).searchable(true).build(),
+            EntityAttribute.builder().id(TokenUsageDTO.FIELD_USERNAME).title("Username").searchable(true).sortable(true).build(),
+            EntityAttribute.builder().id(TokenUsageDTO.FIELD_USER_ID).title("User ID").hidden(true).build(),
+            EntityAttribute.builder().id(TokenUsageDTO.FIELD_TOKEN_NAME).title("Token Name").searchable(true).sortable(true).build(),
+            EntityAttribute.builder().id(TokenUsageDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).searchable(true).sortable(true).build(),
+            EntityAttribute.builder().id(TokenUsageDTO.FIELD_LAST_ACCESS).title("Last Accessed").type(SearchQueryField.Type.DATE).searchable(true).sortable(true).build(),
+            EntityAttribute.builder().id(TokenUsageDTO.FIELD_USER_IS_EXTERNAL).title("External User")
+                    .relatedCollection(UserImpl.COLLECTION_NAME).type(SearchQueryField.Type.BOOLEAN).sortable(true).filterable(true).build(),
+            EntityAttribute.builder().id(TokenUsageDTO.FIELD_AUTH_BACKEND).title("Authentication Backend")
+                    .relatedCollection(DBAuthServiceBackendService.COLLECTION_NAME).searchable(true).sortable(true).filterable(true).build()
+    );
+    private static final EntityDefaults settings = EntityDefaults.builder()
+            .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
+            .build();
 
     private final TokenUsageService tokenUsageService;
     private final SearchQueryParser searchQueryParser;
@@ -77,7 +102,7 @@ public class TokenUsageResource extends RestResource {
     @ApiOperation(value = "Get paginated list of tokens")
     @RequiresPermissions(RestPermissions.TOKEN_USAGE_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public PaginatedResponse<TokenUsageDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PageListResponse<TokenUsageDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                     @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                     @ApiParam(name = "sort",
@@ -96,7 +121,8 @@ public class TokenUsageResource extends RestResource {
         }
         final PaginatedList<TokenUsageDTO> tokenUsages = tokenUsageService.loadTokenUsage(page, perPage, searchQuery, sort, order);
         LOG.debug("Found {} token usages for incoming request. Converting to response.", tokenUsages.size());
-        return PaginatedResponse.create("token_usage", tokenUsages, query);
+        final int total = tokenUsages.pagination().total();
+        return PageListResponse.create(query, tokenUsages.pagination(), total, sort, order, tokenUsages.stream().toList(), attributes, settings);
     }
 
 }
