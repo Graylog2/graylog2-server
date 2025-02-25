@@ -16,9 +16,7 @@
  */
 package org.graylog2.shared.inputs;
 
-import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderElectionService;
@@ -31,11 +29,6 @@ import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class InputLauncher {
@@ -44,7 +37,6 @@ public class InputLauncher {
     private final InputBuffer inputBuffer;
     private final PersistedInputs persistedInputs;
     private final InputRegistry inputRegistry;
-    private final ExecutorService executor;
     private final Configuration configuration;
     private final LeaderElectionService leaderElectionService;
     private final FeatureFlags featureFlags;
@@ -57,18 +49,9 @@ public class InputLauncher {
         this.inputBuffer = inputBuffer;
         this.persistedInputs = persistedInputs;
         this.inputRegistry = inputRegistry;
-        this.executor = executorService(metricRegistry);
         this.configuration = configuration;
         this.leaderElectionService = leaderElectionService;
         this.featureFlags = featureFlags;
-    }
-
-    private ExecutorService executorService(final MetricRegistry metricRegistry) {
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("inputs-%d").build();
-        return new InstrumentedExecutorService(
-                Executors.newCachedThreadPool(threadFactory),
-                metricRegistry,
-                name(this.getClass(), "executor-service"));
     }
 
     public IOState<MessageInput> launch(final MessageInput input) {
@@ -97,22 +80,17 @@ public class InputLauncher {
             return inputState;
         }
 
-        executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                LOG.debug("Starting [{}] input {}", input.getClass().getCanonicalName(), input.toIdentifier());
-                try {
-                    input.checkConfiguration();
-                    inputState.setState(IOState.Type.STARTING);
-                    input.launch(inputBuffer, new InputFailureRecorder(inputState));
-                    inputState.setState(IOState.Type.RUNNING);
-                    String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input " + input.toIdentifier();
-                    LOG.debug(msg);
-                } catch (Exception e) {
-                    handleLaunchException(e, inputState);
-                }
-            }
-        });
+        LOG.debug("Starting [{}] input {}", input.getClass().getCanonicalName(), input.toIdentifier());
+        try {
+            input.checkConfiguration();
+            inputState.setState(IOState.Type.STARTING);
+            input.launch(inputBuffer, new InputFailureRecorder(inputState));
+            inputState.setState(IOState.Type.RUNNING);
+            String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input " + input.toIdentifier();
+            LOG.debug(msg);
+        } catch (Exception e) {
+            handleLaunchException(e, inputState);
+        }
 
         return inputState;
     }
