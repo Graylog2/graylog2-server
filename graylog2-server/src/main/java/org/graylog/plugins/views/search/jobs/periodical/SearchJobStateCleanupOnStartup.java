@@ -107,9 +107,11 @@ public class SearchJobStateCleanupOnStartup extends Periodical {
             if(searchJobService.getFromCache(job.id()) == null) {
                 searchJobStateService.update(job.toBuilder()
                         .status(SearchJobStatus.ERROR)
-                        .errors(Sets.union(
-                                job.errors(),
-                                Set.of(new SimpleSearchError("Job has been canceled because this Graylog node restarted.", true)))
+                        .errors(
+                                Sets.union(
+                                        job.errors(),
+                                        Set.of(new SimpleSearchError("Job has been canceled because this Graylog node restarted.", true))
+                                )
                         )
                         .build()
                 );
