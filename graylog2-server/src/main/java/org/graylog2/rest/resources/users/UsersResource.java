@@ -104,6 +104,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.URI;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -116,6 +117,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -711,6 +713,12 @@ public class UsersResource extends RestResource {
         return TokenList.create(tokenList.build());
     }
 
+    public record GenerateTokenTTL(Optional<Duration> tokenTTL) {
+        public Duration getTTL(Supplier<Duration> defaultSupplier) {
+            return this.tokenTTL.orElseGet(defaultSupplier);
+        }
+    }
+
     @POST
     @Path("{userId}/tokens/{name}")
     @ApiOperation("Generates a new access token for a user")
@@ -718,14 +726,14 @@ public class UsersResource extends RestResource {
     public Token generateNewToken(
             @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
-            @ApiParam(name = "JSON Body", value = "Placeholder because POST requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body) {
+            @ApiParam(name = "JSON Body", value = "Placeholder because POST requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{\"token_ttl\":null}") GenerateTokenTTL body) {
         final User user = loadUserById(userId);
         final String username = user.getName();
 
         if (!isAccessAllowed(user)) {
             throw new ForbiddenException("Not allowed to create tokens for user " + username);
         }
-        final AccessToken accessToken = accessTokenService.create(user.getName(), name);
+        final AccessToken accessToken = accessTokenService.create(user.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
 
         return Token.create(accessToken.getId(), accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }

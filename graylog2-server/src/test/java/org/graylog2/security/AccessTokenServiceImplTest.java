@@ -25,7 +25,8 @@ import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.utils.MongoUtils;
-import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.users.UserConfiguration;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
@@ -33,7 +34,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -44,14 +48,22 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class AccessTokenServiceImplTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
+
     @Mock
     private PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
+
+    @Mock
+    private ClusterConfigService configService;
 
     private AccessTokenService accessTokenService;
 
@@ -62,7 +74,7 @@ public class AccessTokenServiceImplTest {
         when(accessTokenCipher.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
         when(accessTokenCipher.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
 
-        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher);
+        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService);
     }
 
     @After
@@ -71,29 +83,32 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    public void testLoadNoToken() throws Exception {
+    public void testLoadNoToken() {
         final AccessToken accessToken = accessTokenService.load("foobar");
         assertNull("No token should have been returned", accessToken);
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
     @Test
     @MongoDBFixtures("accessTokensSingleToken.json")
-    public void testLoadSingleToken() throws Exception {
+    public void testLoadSingleToken() {
         final AccessToken accessToken = accessTokenService.load("foobar");
         assertNotNull("Matching token should have been returned", accessToken);
         assertEquals("foobar", accessToken.getToken());
         assertEquals("web", accessToken.getName());
         assertEquals("admin", accessToken.getUserName());
         assertEquals(DateTime.parse("2015-03-14T15:09:26.540Z"), accessToken.getLastAccess());
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
     @Test
     @MongoDBFixtures("accessTokensMultipleTokens.json")
-    public void testLoadAll() throws Exception {
+    public void testLoadAll() {
         final List<AccessToken> tokens = accessTokenService.loadAll("admin");
 
         assertNotNull("Should have returned token list", tokens);
         assertEquals(2, tokens.size());
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
     @Test
@@ -116,14 +131,37 @@ public class AccessTokenServiceImplTest {
         assertThat(accessTokenService.loadById("54f9deadbeefdeadbeef0000"))
                 .as("check that loading a non-existent token returns null")
                 .isNull();
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
     @Test
-    public void testCreate() throws Exception {
+    public void testCreate() {
+        final String username = "admin";
+        final String tokenname = "web";
+        final int ttlInDays = 30;
+
+        assertEquals(0, accessTokenService.loadAll(username).size());
+        final AccessToken token = accessTokenService.create(username, tokenname, Duration.ofDays(ttlInDays));
+
+        assertEquals(1, accessTokenService.loadAll(username).size());
+        assertNotNull("Should have returned token", token);
+        assertEquals("Username before and after saving should be equal", username, token.getUserName());
+        assertEquals("Token before and after saving should be equal", tokenname, token.getName());
+        assertNotNull("Token should not be null", token.getToken());
+        assertNotNull("\"CreatedAt\" should not be null", token.getCreatedAt());
+        assertNotNull("\"ExpiresAt\" should not be null", token.getExpiresAt());
+        assertEquals("Expiration-timestamp should be " + ttlInDays + " days after creation-timestamp", token.getCreatedAt().plusDays(ttlInDays), token.getExpiresAt());
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void testCreateWithoutTtl() {
         final String username = "admin";
         final String tokenname = "web";
 
         assertEquals(0, accessTokenService.loadAll(username).size());
+        when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         final AccessToken token = accessTokenService.create(username, tokenname);
 
         assertEquals(1, accessTokenService.loadAll(username).size());
@@ -131,16 +169,19 @@ public class AccessTokenServiceImplTest {
         assertEquals("Username before and after saving should be equal", username, token.getUserName());
         assertEquals("Token before and after saving should be equal", tokenname, token.getName());
         assertNotNull("Token should not be null", token.getToken());
+
+        verify(configService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
     @Test
-    public void testCreateEncryptsToken() throws Exception {
+    public void testCreateEncryptsToken() {
         final String username = "jane";
         final String tokenName = "very-secret";
 
         assertThat(accessTokenService.loadAll(username)).isEmpty();
 
-        final AccessToken token = accessTokenService.create(username, tokenName);
+        final AccessToken token = accessTokenService.create(username, tokenName, Duration.ofDays(30));
 
         assertThat(accessTokenService.loadAll(username)).hasSize(1);
 
@@ -165,6 +206,7 @@ public class AccessTokenServiceImplTest {
                             .as("check that token type is set for %s/%s", token.getId(), token.getName())
                             .isEqualTo(AccessTokenImpl.Type.AES_SIV.getIntValue());
                 });
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
     @Test
@@ -177,6 +219,7 @@ public class AccessTokenServiceImplTest {
         Thread.sleep(1,0);
         final DateTime secondAccess = accessTokenService.touch(token);
         assertThat(secondAccess).isGreaterThan(firstAccess);
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
     @Test
@@ -188,7 +231,7 @@ public class AccessTokenServiceImplTest {
         assertNull(accessTokenService.load(tokenString));
         assertEquals(0, accessTokenService.loadAll(username).size());
 
-        final AccessToken token = accessTokenService.create(username, tokenname);
+        final AccessToken token = accessTokenService.create(username, tokenname, Duration.ofDays(30));
         token.setToken(tokenString);
 
         accessTokenService.save(token);
@@ -200,17 +243,19 @@ public class AccessTokenServiceImplTest {
         assertEquals(token.getUserName(), newToken.getUserName());
         assertEquals(token.getName(), newToken.getName());
         assertEquals(token.getToken(), newToken.getToken());
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
     @Test
     @MongoDBFixtures("accessTokensSingleToken.json")
-    public void testExceptionForMultipleTokens() throws ValidationException {
+    public void testExceptionForMultipleTokens() {
         final AccessToken existingToken = accessTokenService.load("foobar");
-        final AccessToken newToken = accessTokenService.create("user", "foobar");
+        final AccessToken newToken = accessTokenService.create("user", "foobar", Duration.ofDays(30));
         newToken.setToken(existingToken.getToken());
         assertThatThrownBy(() -> accessTokenService.save(newToken))
                 .isInstanceOfSatisfying(MongoException.class, e ->
                         assertThat(MongoUtils.isDuplicateKeyError(e)).isTrue()
                 );
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 }

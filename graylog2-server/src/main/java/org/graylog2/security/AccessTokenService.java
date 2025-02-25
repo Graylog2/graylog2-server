@@ -24,6 +24,7 @@ import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +39,16 @@ public interface AccessTokenService extends PersistedService {
 
     List<AccessToken> loadAll(String username);
 
+    /**
+     * Please use {@link #create(String, String, Duration)} instead.
+     * Internally, the above-mentioned method is called with the currently configured default ttl.
+     *
+     * @deprecated
+     */
+    @Deprecated(since = "6.2.0")
     AccessToken create(String username, String name);
+
+    AccessToken create(String username, String name, Duration ttl);
 
     DateTime touch(AccessToken accessToken) throws ValidationException;
 
