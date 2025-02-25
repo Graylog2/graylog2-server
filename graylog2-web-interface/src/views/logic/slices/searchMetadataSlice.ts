@@ -18,7 +18,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type Search from 'views/logic/search/Search';
 
 const searchMetadataSlice = createSlice({
@@ -47,7 +47,7 @@ export const searchMetadataSliceReducer = searchMetadataSlice.reducer;
 
 export type SearchParser = (search: Search) => Promise<SearchMetadata>;
 
-export const parseSearch = (search: Search, parse: SearchParser) => async (dispatch: AppDispatch) => {
+export const parseSearch = (search: Search, parse: SearchParser) => async (dispatch: ViewsDispatch) => {
   dispatch(loading());
 
   return parse(search).then((result) => dispatch(finishedLoading(result)));

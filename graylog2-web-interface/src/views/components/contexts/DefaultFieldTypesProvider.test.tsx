@@ -28,7 +28,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import type { SearchExecutionResult } from 'views/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import executeSearch from 'views/logic/slices/executeJobResult';
 import generateId from 'logic/generateId';
 
@@ -101,7 +101,7 @@ describe('DefaultFieldTypesProvider', () => {
     );
 
     const TriggerRefresh = () => {
-      const dispatch = useAppDispatch();
+      const dispatch = useViewsDispatch();
 
       return (
         <button type="button" onClick={() => dispatch(execute())}>
