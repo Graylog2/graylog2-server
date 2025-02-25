@@ -26,6 +26,7 @@ import type { DateTime } from 'util/DateTime';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useSearchResult from 'views/hooks/useSearchResult';
 import SearchQueryExecutionInfoHelper from 'views/components/widgets/SearchQueryExecutionInfoHelper';
+import useView from 'views/hooks/useView';
 
 type Props = {
   className?: string;
@@ -55,9 +56,16 @@ const StyledIcon = styled(Icon)(
 const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) =>
   result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
 
-const TimerangeInfo = ({ className, widget, activeQuery, widgetId, returnsAllRecords }: Props) => {
+const TimerangeInfo = ({
+  className = undefined,
+  widget,
+  activeQuery = undefined,
+  widgetId = undefined,
+  returnsAllRecords = undefined,
+}: Props) => {
   const { formatTime } = useUserDateTime();
-  const { result, widgetMapping } = useSearchResult() ?? {};
+  const { result } = useSearchResult() ?? {};
+  const { widgetMapping } = useView();
   const globalOverride = useGlobalOverride();
 
   const toLocalTimeWithMS = (dateTime: DateTime) => formatTime(dateTime, 'complete');

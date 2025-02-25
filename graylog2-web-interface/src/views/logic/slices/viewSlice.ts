@@ -102,12 +102,20 @@ const _recreateSearch = async (newView: View) => {
   return updatedView.toBuilder().search(updatedSearch).build();
 };
 
+export const executeActiveQuery = () => (dispatch: ViewsDispatch, getState: () => RootState) => {
+  const view = selectView(getState());
+  const search = selectSearch(getState());
+  const activeQuery = selectActiveQuery(getState());
+
+  return dispatch(execute(search, activeQuery, view.widgetMapping));
+};
+
 export const selectQuery = (activeQuery: string) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
   const currentActiveQuery = selectActiveQuery(getState());
   dispatch(setActiveQuery(activeQuery));
 
   if (currentActiveQuery !== activeQuery) {
-    dispatch(execute());
+    dispatch(executeActiveQuery());
   }
 };
 
@@ -121,7 +129,7 @@ export const loadView =
 
       await dispatch(setView(updatedViewWithSearch));
 
-      return dispatch(execute());
+      return dispatch(executeActiveQuery());
     }
 
     return dispatch(setView(newView));
@@ -151,7 +159,7 @@ export const updateView =
       const updatedViewWithSearch = await _recreateSearch(newView);
       await dispatch(setView(updatedViewWithSearch, true));
 
-      return dispatch(execute());
+      return dispatch(executeActiveQuery());
     }
 
     return dispatch(setView(newView, true));
@@ -295,7 +303,7 @@ export const updateQueryString =
       return dispatch(setQueryString(queryId, newQueryString));
     }
 
-    return dispatch(setGlobalOverrideQuery(newQueryString)).then(() => dispatch(execute()));
+    return dispatch(setGlobalOverrideQuery(newQueryString)).then(() => dispatch(executeActiveQuery()));
   };
 
 export const updateViewState =

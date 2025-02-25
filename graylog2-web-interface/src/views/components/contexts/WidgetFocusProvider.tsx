@@ -24,9 +24,13 @@ import useQuery from 'routing/useQuery';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useWidgets from 'views/hooks/useWidgets';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
-import { execute, setWidgetsToSearch } from 'views/logic/slices/searchExecutionSlice';
+import { setSearchTypesToSearch } from 'views/logic/slices/searchExecutionSlice';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
+import useView from 'views/hooks/useView';
+import useAppSelector from 'stores/useAppSelector';
+import { selectSearchTypesToSearch } from 'views/logic/slices/searchExecutionSelectors';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import type { FocusContextState } from './WidgetFocusContext';
 import WidgetFocusContext from './WidgetFocusContext';
@@ -87,6 +91,8 @@ const emptyFocusContext: FocusContextState = {
 
 const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocusedWidget, widgetIds }: SyncStateArgs) => {
   const dispatch = useViewsDispatch();
+  const { widgetMapping } = useView();
+  const searchTypesToSearch = useAppSelector(selectSearchTypesToSearch);
 
   useEffect(() => {
     const nextFocusedWidget = {
@@ -101,12 +107,26 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       }
 
       setFocusedWidget(nextFocusedWidget);
-      const filter = nextFocusedWidget?.id ? [nextFocusedWidget.id] : undefined;
-      dispatch(setWidgetsToSearch(filter));
+      const searchTypeIds = widgetMapping.get(nextFocusedWidget.id);
 
-      dispatch(execute());
+      dispatch(setSearchTypesToSearch(searchTypeIds?.toArray()));
+      dispatch(executeActiveQuery());
     }
-  }, [focusedWidget, setFocusedWidget, widgetIds, focusUriParams, dispatch]);
+  }, [focusedWidget, setFocusedWidget, widgetIds, focusUriParams, dispatch, widgetMapping]);
+
+  useEffect(() => {
+    if (focusedWidget) {
+      const searchTypeIds = widgetMapping.get(focusedWidget.id)?.toArray() ?? [];
+      const searchTypesToSearchIsUpToDate =
+        searchTypeIds.length === 0 ||
+        !searchTypesToSearch ||
+        searchTypesToSearch.length === 0 ||
+        searchTypeIds.every((id) => searchTypesToSearch?.includes(id));
+      if (!searchTypesToSearchIsUpToDate) {
+        dispatch(setSearchTypesToSearch(searchTypeIds));
+      }
+    }
+  }, [dispatch, focusedWidget, searchTypesToSearch, widgetMapping]);
 };
 
 type CleanupArgs = {
