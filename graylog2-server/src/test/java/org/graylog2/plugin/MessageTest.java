@@ -797,4 +797,15 @@ public class MessageTest {
 
         assertThat(message.processingErrors()).isEmpty();
     }
+
+    // Arguably, a message should not allow null values for basic fields, but it is what it is. Here we are checking
+    // that at least basic operations can deal with null values in the 'message' field without failing with e.g. an
+    // NPE.
+    @Test
+    public void emptyMessage() {
+        final var msg = new Message(new UUID().toString(), Map.of());
+        assertThat(msg).isNotEmpty();
+        assertThat(msg.getMessage()).isNull();
+        assertThat(msg.toString()).isNotEmpty();
+    }
 }
