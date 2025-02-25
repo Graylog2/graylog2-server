@@ -196,7 +196,10 @@ const InteractiveLegend = ({ config, fieldTypes, labelFields, labels }: LegendCo
     .sort(stringLenSort)
     .map((value) => <TableCell key={value} value={value} labelFields={_labelFields} fieldTypes={fieldTypes} />);
 
-  const result = chunk(tableCells, 5).map((cells, index) => <LegendRow key={index}>{cells}</LegendRow>);
+  const result = chunk(tableCells, 5).map((cells, index) => (
+    // eslint-disable-next-line react/no-array-index-key
+    <LegendRow key={index}>{cells}</LegendRow>
+  ));
 
   return (
     <LegendContainer>

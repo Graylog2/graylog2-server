@@ -40,6 +40,7 @@ jest.mock('util/AppConfig', () => ({
   isCloud: jest.fn(() => false),
 }));
 
+// eslint-disable-next-line react/require-default-props
 const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisualization>) => (
   <TestStoreProvider>
     <TestFieldTypesContextProvider>

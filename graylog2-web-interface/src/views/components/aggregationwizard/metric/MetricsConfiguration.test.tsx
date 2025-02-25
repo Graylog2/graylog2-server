@@ -84,6 +84,7 @@ const fieldTypes = [
   FieldTypeMapping.create('field-not-allowed-1', FieldType.create('number', [Properties.FullTextSearch])),
 ];
 
+// eslint-disable-next-line react/require-default-props
 const SUT = ({ initialValues = {} }: { initialValues: WidgetConfigFormValues }) => (
   <TestStoreProvider>
     <SimpleFieldTypesContextProvider fields={fieldTypes}>

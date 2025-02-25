@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import * as Immutable from 'immutable';
 
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -24,8 +25,11 @@ export const SimpleFieldTypesContextProvider = ({
   children = undefined,
   fields,
 }: React.PropsWithChildren<{ fields: FieldTypeMapping[] }>) => {
-  const fieldList = Immutable.List(fields);
-  const value = { all: fieldList, currentQuery: fieldList };
+  const value = useMemo(() => {
+    const fieldList = Immutable.List(fields);
+
+    return { all: fieldList, currentQuery: fieldList };
+  }, [fields]);
 
   return <FieldTypesContext.Provider value={value}>{children}</FieldTypesContext.Provider>;
 };

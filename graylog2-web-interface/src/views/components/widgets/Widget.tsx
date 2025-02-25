@@ -21,7 +21,6 @@ import styled from 'styled-components';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
-import type WidgetModel from 'views/logic/widgets/Widget';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
@@ -61,7 +60,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 
 export type Props = {
   id: string;
-  widget: WidgetModel;
+  widget: WidgetType;
   editing?: boolean;
   title: string;
   position: WidgetPosition;
@@ -171,7 +170,7 @@ export const EditWrapper = ({
   onCancelEdit,
   onWidgetConfigChange,
   type,
-  showQueryControls,
+  showQueryControls = undefined,
 }: EditWrapperProps) => {
   const EditComponent = useMemo(() => _editComponentForType(type), [type]);
   const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);

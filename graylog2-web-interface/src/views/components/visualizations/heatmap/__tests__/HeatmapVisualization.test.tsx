@@ -34,6 +34,7 @@ import HeatmapVisualization from '../HeatmapVisualization';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
+// eslint-disable-next-line react/require-default-props
 const WrappedHeatMap = (props: React.ComponentProps<typeof HeatmapVisualization>) => (
   <TestStoreProvider>
     <TestFieldTypesContextProvider>
