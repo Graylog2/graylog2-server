@@ -44,7 +44,6 @@ import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
@@ -80,8 +79,6 @@ public class AggregationEventProcessor implements EventProcessor {
     private final EventStreamService eventStreamService;
     private final Messages messages;
     private final PermittedStreams permittedStreams;
-    private final Set<EventQuerySearchTypeSupplier> eventQueryModifiers;
-    private final MessageFactory messageFactory;
     private final AggregationSearchUtils aggregationSearchUtils;
 
     @Inject
@@ -91,7 +88,7 @@ public class AggregationEventProcessor implements EventProcessor {
                                      DBEventProcessorStateService stateService,
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
-                                     Messages messages, NotificationService notificationService,
+                                     Messages messages,
                                      PermittedStreams permittedStreams,
                                      Set<EventQuerySearchTypeSupplier> eventQueryModifiers,
                                      MessageFactory messageFactory) {
@@ -103,8 +100,6 @@ public class AggregationEventProcessor implements EventProcessor {
         this.eventStreamService = eventStreamService;
         this.messages = messages;
         this.permittedStreams = permittedStreams;
-        this.eventQueryModifiers = eventQueryModifiers;
-        this.messageFactory = messageFactory;
         // If this is a simple Filter search there is no need to initialize aggregationSearchUtils
         this.aggregationSearchUtils = config.series().isEmpty() ? null : new AggregationSearchUtils(
                 eventDefinition,
