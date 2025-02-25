@@ -19,8 +19,6 @@ package org.graylog.failure;
 import com.codahale.metrics.Meter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
@@ -30,12 +28,8 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-import static org.graylog2.plugin.Message.FIELD_MESSAGE;
 import static org.graylog2.plugin.Message.FIELD_SOURCE;
 import static org.graylog2.plugin.Message.FIELD_STREAMS;
-import static org.graylog2.plugin.Message.FIELD_TIMESTAMP;
-import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
-import static org.graylog2.plugin.streams.Stream.FAILURES_STREAM_ID;
 
 public class ProcessingFailure implements Failure {
 
@@ -111,31 +105,22 @@ public class ProcessingFailure implements Failure {
 
     @Nonnull
     @Override
-    public Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,
+    public FailureObjectBuilder failureObjectBuilder(ObjectMapper objectMapper,
                                                      @NonNull Meter invalidTimestampMeter,
                                                      boolean includeFailedMessage) {
         Map<String, Object> fields = failedMessage.toElasticSearchObject(objectMapper, invalidTimestampMeter);
         fields.put(Message.FIELD_ID, failedMessage.getId());
         fields.remove(Message.FIELD_GL2_PROCESSING_ERROR);
-        final ImmutableMap.Builder<String, Object> esObject = ImmutableMap.<String, Object>builder()
-                .put(FIELD_MESSAGE, message())
-                .put(FIELD_STREAMS, ImmutableList.of(FAILURES_STREAM_ID))
-                .put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(failureTimestamp()))
 
-                .put(FIELD_FAILURE_TYPE, failureType().toString())
-                .put(FIELD_FAILURE_CAUSE, failureCause().label())
-                .put(FIELD_FAILURE_DETAILS, failureDetails())
-
-                .put(FIELD_FAILED_MESSAGE_ID, messageId())
-                .put(FIELD_FAILED_MESSAGE_TIMESTAMP, buildElasticSearchTimeFormat(failedMessage.getTimestamp()))
+        FailureObjectBuilder builder = new FailureObjectBuilder(this)
                 .put(FIELD_FAILED_MESSAGE_STREAMS, fields.get(FIELD_STREAMS))
                 .put(FIELD_SOURCE, fields.get(FIELD_SOURCE));
 
         if (includeFailedMessage) {
-            esObject.put(FIELD_FAILED_MESSAGE, fields);
+            builder.put(FIELD_FAILED_MESSAGE, fields);
         }
 
-        return esObject.build();
+        return builder;
     }
 
     @Nullable

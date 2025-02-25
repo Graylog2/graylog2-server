@@ -25,8 +25,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog2.shared.messageq.Acknowledgeable;
 import org.joda.time.DateTime;
 
-import java.util.Map;
-
 /**
  * A failure occurring at different stages of message processing
  * (e.g. pipeline processing, extraction, Elasticsearch indexing)
@@ -98,7 +96,7 @@ public interface Failure extends Acknowledgeable {
     DateTime messageTimestamp();
 
     @Nonnull
-    Map<String, Object> toElasticSearchObject(ObjectMapper objectMapper,
+    FailureObjectBuilder failureObjectBuilder(ObjectMapper objectMapper,
                                               @NonNull Meter invalidTimestampMeter,
                                               boolean includeFailedMessage);
 
