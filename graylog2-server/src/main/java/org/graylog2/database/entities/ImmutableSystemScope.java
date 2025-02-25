@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.events.processor.systemnotification;
+package org.graylog2.database.entities;
 
-import org.graylog2.database.entities.EntityScope;
-
-public final class SystemNotificationEventEntityScope extends EntityScope {
-    public static final String NAME = "SYSTEM_NOTIFICATION_EVENT";
+public class ImmutableSystemScope extends EntityScope {
+    public static final String NAME = "GRAYLOG_IMMUTABLE_SCOPE";
 
     @Override
     public String getName() {
@@ -28,7 +26,7 @@ public final class SystemNotificationEventEntityScope extends EntityScope {
 
     @Override
     public boolean isMutable() {
-        return true;
+        return false;
     }
 
     @Override
