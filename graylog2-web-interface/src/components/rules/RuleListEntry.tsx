@@ -53,7 +53,7 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
   const { id, title, description, created_at, modified_at } = rule;
   const pipelinesLength = usingPipelines.length;
   const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
-  const isManaged = !scopePermissions?.is_mutable;
+  const isManaged = scopePermissions && !scopePermissions?.is_mutable;
   const actions = (
     <ButtonToolbar>
       <LinkContainer to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
