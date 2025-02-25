@@ -26,9 +26,9 @@ public record SearchJobIdentifier(@JsonProperty("id")
                                   String id,
                                   @JsonProperty(SEARCH_ID_FIELD) String searchId,
                                   @JsonProperty(OWNER_FIELD) String owner,
-                                  @JsonProperty(NODEID_FIELD) String executingNodeId) {
+                                  @JsonProperty(NODE_ID_FIELD) String executingNodeId) {
     public static final String SEARCH_ID_FIELD = "search_id";
     public static final String OWNER_FIELD = "owner";
-    public static final String NODEID_FIELD = "executing_node";
+    public static final String NODE_ID_FIELD = "executing_node";
 }
 

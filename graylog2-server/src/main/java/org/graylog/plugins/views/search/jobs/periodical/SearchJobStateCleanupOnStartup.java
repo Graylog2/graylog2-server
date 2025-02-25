@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
-import static org.graylog.plugins.views.search.SearchJobIdentifier.NODEID_FIELD;
+import static org.graylog.plugins.views.search.SearchJobIdentifier.NODE_ID_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.STATUS_FIELD;
 
 /**
@@ -100,7 +100,7 @@ public class SearchJobStateCleanupOnStartup extends Periodical {
         collection.find(
                 Filters.and(
                         Filters.eq(STATUS_FIELD, SearchJobStatus.RUNNING),
-                        Filters.eq(NODEID_FIELD, nodeId.getNodeId())
+                        Filters.eq(NODE_ID_FIELD, nodeId.getNodeId())
                 )
         ).forEach(job -> {
             // if this job is supposed to run on this node and it is not in the cache, it can't be a running job and should be moved to error state
