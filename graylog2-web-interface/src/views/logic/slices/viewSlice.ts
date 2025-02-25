@@ -102,7 +102,7 @@ const _recreateSearch = async (newView: View) => {
   return updatedView.toBuilder().search(updatedSearch).build();
 };
 
-export const executeSearch = () => (dispatch: AppDispatch, getState: () => RootState) => {
+export const executeSearch = () => (dispatch: ViewsDispatch, getState: () => RootState) => {
   const view = selectView(getState());
   const activeQuery = selectActiveQuery(getState());
 
