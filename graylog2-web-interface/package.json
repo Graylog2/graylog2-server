@@ -80,7 +80,7 @@
     "mousetrap": "^1.6.5",
     "numeral": "^2.0.6",
     "p-debounce": "^4.0.0",
-    "plotly.js": "3.0.0",
+    "plotly.js": "3.0.1",
     "posthog-js": "^1.52.0",
     "qs": "^6.3.0",
     "react-ace": "14.0.1",
