@@ -65,7 +65,7 @@ public class TokenUsageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(TokenUsageResource.class);
     private static final String DEFAULT_SORT_FIELD = AccessTokenEntity.FIELD_NAME;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
-    private static final List<EntityAttribute> attributes = List.of(
+    static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(TokenUsageDTO.FIELD_TOKEN_ID).title("Token ID").type(SearchQueryField.Type.OBJECT_ID).hidden(false).searchable(true).build(),
             EntityAttribute.builder().id(TokenUsageDTO.FIELD_USERNAME).title("Username").searchable(true).sortable(true).build(),
             EntityAttribute.builder().id(TokenUsageDTO.FIELD_USER_ID).title("User ID").hidden(true).build(),
@@ -77,7 +77,7 @@ public class TokenUsageResource extends RestResource {
             EntityAttribute.builder().id(TokenUsageDTO.FIELD_AUTH_BACKEND).title("Authentication Backend")
                     .relatedCollection(DBAuthServiceBackendService.COLLECTION_NAME).searchable(true).sortable(true).filterable(true).build()
     );
-    private static final EntityDefaults settings = EntityDefaults.builder()
+    static final EntityDefaults SETTINGS = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
 
@@ -121,8 +121,8 @@ public class TokenUsageResource extends RestResource {
         }
         final PaginatedList<TokenUsageDTO> tokenUsages = tokenUsageService.loadTokenUsage(page, perPage, searchQuery, sort, order);
         LOG.debug("Found {} token usages for incoming request. Converting to response.", tokenUsages.size());
-        final int total = tokenUsages.pagination().total();
-        return PageListResponse.create(query, tokenUsages.pagination(), total, sort, order, tokenUsages.stream().toList(), attributes, settings);
+        final PaginatedList.PaginationInfo pagination = tokenUsages.pagination();
+        return PageListResponse.create(query, pagination, pagination.total(), sort, order, tokenUsages, ATTRIBUTES, SETTINGS);
     }
 
 }
