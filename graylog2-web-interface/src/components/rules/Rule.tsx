@@ -44,11 +44,11 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
   const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
   const { rule } = useContext(PipelineRulesContext);
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(rule);
-  const isManaged = !scopePermissions?.is_mutable;
+  const isManaged = scopePermissions && !scopePermissions?.is_mutable;
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
-
+  
   if (loadingScopePermissions) {
     return <Spinner text="Loading Rule" />;
   }
@@ -105,7 +105,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
           <Col md={6}>
             {isManaged && (
               <Alert bsStyle="warning">
-                Managed by Application
+                This Rule is managed by Application
               </Alert>
             )}
             <RuleForm create={create} isManaged={isManaged} />
