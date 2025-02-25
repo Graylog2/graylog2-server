@@ -37,8 +37,8 @@ import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 import useView from 'views/hooks/useView';
 import createSearch from 'views/logic/slices/createSearch';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectQuery, updateView } from 'views/logic/slices/viewSlice';
 import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
 import fetchSearch from 'views/logic/views/fetchSearch';
@@ -103,7 +103,7 @@ const _onCreateNewDashboard = async (view: View, widgetId: string, history: Hist
 };
 
 const _onMoveWidgetToPage = async (
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   view: View,
   setShowMoveWidgetToTab: (show: boolean) => void,
   widgetId: string,
@@ -129,7 +129,7 @@ const defaultOnDeleteWidget = async (_widget: Widget, _view: View, title: string
   // eslint-disable-next-line no-alert
   window.confirm(`Are you sure you want to remove the widget "${title}"?`);
 
-const _onDelete = (widget: Widget, view: View, title: string) => async (dispatch: AppDispatch) => {
+const _onDelete = (widget: Widget, view: View, title: string) => async (dispatch: ViewsDispatch) => {
   const pluggableWidgetDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingWidget');
 
   const result = await iterateConfirmationHooks(
@@ -142,7 +142,7 @@ const _onDelete = (widget: Widget, view: View, title: string) => async (dispatch
   return result === true ? dispatch(removeWidget(widget.id)) : Promise.resolve();
 };
 
-const _onDuplicate = (widgetId: string, unsetWidgetFocusing: () => void, title: string) => (dispatch: AppDispatch) =>
+const _onDuplicate = (widgetId: string, unsetWidgetFocusing: () => void, title: string) => (dispatch: ViewsDispatch) =>
   dispatch(duplicateWidget(widgetId, title)).then(() => unsetWidgetFocusing());
 
 type Props = {
@@ -161,7 +161,7 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
