@@ -18,7 +18,6 @@
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
-import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 
 import type { ExportPayload } from 'util/MessagesExportUtils';
 import type { IconName } from 'components/common/Icon';
@@ -53,7 +52,7 @@ import type { CustomCommand, CustomCommandContext } from 'views/components/searc
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type SearchResult from 'views/logic/SearchResult';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
@@ -61,6 +60,7 @@ import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
 import type { Event } from 'components/events/events/types';
+import type { PluggableReducer } from 'store';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -394,12 +394,12 @@ export interface SearchBarControl {
   id: string;
   onSearchSubmit?: <T extends Query | undefined>(
     values: CombinedSearchBarFormValues,
-    dispatch: AppDispatch,
+    dispatch: ViewsDispatch,
     currentQuery?: T,
   ) => Promise<T>;
   onDashboardWidgetSubmit: (
     values: CombinedSearchBarFormValues,
-    dispatch: AppDispatch,
+    dispatch: ViewsDispatch,
     currentWidget: Widget,
   ) => Promise<Widget | void>;
   onValidate?: (values: CombinedSearchBarFormValues, context?: HandlerContext) => FormikErrors<{}>;
@@ -475,10 +475,7 @@ export interface ExtraArguments {
 
 export type GetState = () => RootState;
 
-export type ViewsReducer = {
-  key: keyof RootState;
-  reducer: Reducer<RootState[keyof RootState], AnyAction>;
-};
+export type ViewsReducer = PluggableReducer<RootState>;
 
 export type Widgets = Immutable.OrderedMap<string, Widget>;
 

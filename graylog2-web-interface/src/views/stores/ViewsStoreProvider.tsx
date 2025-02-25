@@ -81,7 +81,7 @@ const useInitialState = (
     [executionState, isNew, view],
   );
 
-const PluggableStoreProvider = ({
+const ViewsStoreProvider = ({
   initialQuery,
   children = undefined,
   isNew,
@@ -95,11 +95,11 @@ const PluggableStoreProvider = ({
   const initialState = useInitialState(undoRedoState, view, isNew, activeQuery, executionState, result);
   const searchExecutors = useSearchExecutors();
   const store = useMemo(
-    () => createStore(reducers, initialState, searchExecutors),
+    () => createStore<RootState>(reducers, initialState, { searchExecutors }),
     [initialState, reducers, searchExecutors],
   );
 
   return <Provider store={store}>{children}</Provider>;
 };
 
-export default PluggableStoreProvider;
+export default ViewsStoreProvider;

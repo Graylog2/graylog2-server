@@ -18,14 +18,14 @@ import * as React from 'react';
 import { useCallback } from 'react';
 
 import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
-import useAppDispatch from 'stores/useAppDispatch';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectJobIds } from 'views/logic/slices/searchExecutionSelectors';
 import { executeSearch } from 'views/logic/slices/viewSlice';
 
 const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
-  const dispatch = useAppDispatch();
-  const jobIds = useAppSelector(selectJobIds);
+  const dispatch = useViewsDispatch();
+  const jobIds = useViewsSelector(selectJobIds);
 
   const onRefresh = useCallback(() => {
     if (!jobIds) {

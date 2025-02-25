@@ -347,9 +347,11 @@ describe('<EntityFilters />', () => {
 
       const timeRangeForm = await screen.findByTestId('time-range-form');
 
-      const fromInput = within(timeRangeForm).getByRole('textbox', { name: /from/i });
-      userEvent.clear(fromInput);
-      userEvent.paste(fromInput, '2020-01-01 00:55:00.000');
+      const fromPicker = await screen.findByTestId('date-picker-from');
+      userEvent.click(await within(fromPicker).findByRole('gridcell', { name: /Jan 13 2020/i }));
+      userEvent.type(await screen.findByRole('spinbutton', { name: /from hour/i }), '{selectall}13');
+      userEvent.type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '{selectall}42');
+      userEvent.type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '{selectall}23');
 
       const submitButton = within(timeRangeForm).getByRole('button', {
         name: /create filter/i,
@@ -361,18 +363,18 @@ describe('<EntityFilters />', () => {
           OrderedMap({
             created_at: [
               {
-                title: '2020-01-01 00:55:00.000 - Now',
-                value: '2019-12-31T23:55:00.000+00:00><',
+                title: '2020-01-13 13:42:23 - Now',
+                value: '2020-01-13T12:42:23.000+00:00><',
               },
             ],
           }),
-          OrderedMap({ created_at: ['2019-12-31T23:55:00.000+00:00><'] }),
+          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
         ),
       );
 
       await waitFor(() =>
         expect(setUrlQueryFilters).toHaveBeenCalledWith(
-          OrderedMap({ created_at: ['2019-12-31T23:55:00.000+00:00><'] }),
+          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
         ),
       );
       await waitFor(() => dropdownIsHidden('create created filter'));
@@ -401,7 +403,11 @@ describe('<EntityFilters />', () => {
       });
       userEvent.click(toggleFilterButton);
 
-      userEvent.type(await screen.findByRole('textbox', { name: /from/i }), '{backspace}1');
+      const fromPicker = await screen.findByTestId('date-picker-from');
+      userEvent.click(await within(fromPicker).findByRole('gridcell', { name: /Jan 13 2020/i }));
+      userEvent.type(await screen.findByRole('spinbutton', { name: /from hour/i }), '{selectall}13');
+      userEvent.type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '{selectall}42');
+      userEvent.type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '{selectall}23');
 
       const timeRangeForm = await screen.findByTestId('time-range-form');
       const submitButton = within(timeRangeForm).getByRole('button', {
@@ -414,18 +420,18 @@ describe('<EntityFilters />', () => {
           OrderedMap({
             created_at: [
               {
-                title: '2020-01-01 00:55:00.001 - Now',
-                value: '2019-12-31T23:55:00.001+00:00><',
+                title: '2020-01-13 13:42:23 - Now',
+                value: '2020-01-13T12:42:23.000+00:00><',
               },
             ],
           }),
-          OrderedMap({ created_at: ['2019-12-31T23:55:00.001+00:00><'] }),
+          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
         ),
       );
 
       await waitFor(() =>
         expect(setUrlQueryFilters).toHaveBeenCalledWith(
-          OrderedMap({ created_at: ['2019-12-31T23:55:00.001+00:00><'] }),
+          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
         ),
       );
       await waitFor(() => dropdownIsHidden('edit created filter'));

@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 import type { SearchExplainContextType, WidgetExplain } from 'views/components/contexts/SearchExplainContext';
 import { buildSearchExecutionState } from 'views/logic/slices/executeJobResult';
@@ -32,8 +32,8 @@ import useView from 'views/hooks/useView';
 
 const SearchExplainContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const view = useView();
-  const executionState = useAppSelector(selectSearchExecutionState);
-  const searchTypesToSearch = useAppSelector(selectSearchTypesToSearch);
+  const executionState = useViewsSelector(selectSearchExecutionState);
+  const searchTypesToSearch = useViewsSelector(selectSearchTypesToSearch);
   const [searchExplain, setSearchExplain] = useState<SearchExplainContextType['explainedSearch'] | undefined>(
     undefined,
   );

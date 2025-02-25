@@ -28,7 +28,7 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { finishedLoading } from 'views/logic/slices/searchExecutionSlice';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import SearchResult from 'views/logic/SearchResult';
@@ -75,7 +75,7 @@ const dummySearchJobResults = {
 jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/components/widgets/useCurrentSearchTypesResults');
 jest.mock('views/components/widgets/reexecuteSearchTypes');
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 describe('MessageList', () => {
   const config = MessagesWidgetConfig.builder().fields([]).build();
@@ -198,7 +198,7 @@ describe('MessageList', () => {
         result: new SearchResult(dummySearchJobResults),
       }),
     );
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
     const secondPageSize = 10;
 
@@ -225,7 +225,7 @@ describe('MessageList', () => {
         result: new SearchResult(dummySearchJobResults),
       }),
     );
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     const secondPageSize = 10;
 
     render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
@@ -248,7 +248,7 @@ describe('MessageList', () => {
         }),
       }),
     );
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     const secondPageSize = 10;
 

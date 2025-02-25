@@ -35,8 +35,8 @@ import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualiza
 import { Alert, Button, Row, Col } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import { TIMESTAMP_FIELD } from 'views/Constants';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateViewState, executeSearch } from 'views/logic/slices/viewSlice';
 import type { WidgetPositions, GetState } from 'views/types';
 import { selectActiveViewState, selectActiveQuery } from 'views/logic/slices/viewSelectors';
@@ -146,7 +146,7 @@ const _updateExistingWidgetPos = (existingPositions: WidgetPositions, rowOffset:
 };
 
 const _migrateWidgets =
-  (legacyCharts: Array<LegacyFieldChart>) => async (_dispatch: AppDispatch, getState: GetState) => {
+  (legacyCharts: Array<LegacyFieldChart>) => async (_dispatch: ViewsDispatch, getState: GetState) => {
     const { defaultHeight } = widgetDefinition(AggregationWidget.type);
     const currentView = selectActiveViewState(getState());
     const activeQuery = selectActiveQuery(getState());
@@ -197,7 +197,7 @@ const _migrateWidgets =
   };
 
 const _onMigrate = async (
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   legacyCharts: Array<LegacyFieldChart>,
   setMigrating: (migrating: boolean) => void,
   setMigrationFinished: (finished: boolean) => void,
@@ -222,7 +222,7 @@ const MigrateFieldCharts = () => {
   const [migrationFinished, setMigrationFinished] = useState(!!Store.get(FIELD_CHARTS_MIGRATED_KEY));
   const legacyCharts: Array<LegacyFieldChart> = values(Store.get(FIELD_CHARTS_KEY));
   const chartAmount = legacyCharts.length;
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const onMigrate = useCallback(
     () => _onMigrate(dispatch, legacyCharts, setMigrating, setMigrationFinished),
     [dispatch, legacyCharts],
