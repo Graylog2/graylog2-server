@@ -19,15 +19,12 @@ package org.graylog2.inputs;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.cluster.leader.LeaderElectionService;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +34,6 @@ public class InputEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(InputEventListener.class);
     private final InputLauncher inputLauncher;
     private final InputRegistry inputRegistry;
-    private final InputService inputService;
-    private final NodeId nodeId;
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
@@ -46,15 +41,11 @@ public class InputEventListener {
     @Inject
     public InputEventListener(InputLauncher inputLauncher,
                               InputRegistry inputRegistry,
-                              InputService inputService,
-                              NodeId nodeId,
                               LeaderElectionService leaderElectionService,
                               PersistedInputs persistedInputs,
                               ServerStatus serverStatus) {
         this.inputLauncher = inputLauncher;
         this.inputRegistry = inputRegistry;
-        this.inputService = inputService;
-        this.nodeId = nodeId;
         this.leaderElectionService = leaderElectionService;
         this.persistedInputs = persistedInputs;
         this.serverStatus = serverStatus;
@@ -62,33 +53,17 @@ public class InputEventListener {
 
     public void inputCreated(String inputId) {
         LOG.debug("Input created: {}", inputId);
-        final Input input;
-        try {
-            input = inputService.find(inputId);
-        } catch (NotFoundException e) {
-            LOG.warn("Received InputCreated event but could not find input {}", inputId, e);
-            return;
-        }
 
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
             inputRegistry.remove(inputState);
         }
 
-        if (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId())) {
-            startInput(input);
-        }
+        inputLauncher.launch(inputId);
     }
 
     public void inputUpdated(String inputId) {
         LOG.debug("Input updated: {}", inputId);
-        final Input input;
-        try {
-            input = inputService.find(inputId);
-        } catch (NotFoundException e) {
-            LOG.warn("Received InputUpdated event but could not find input {}", inputId, e);
-            return;
-        }
 
         final boolean startInput;
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
@@ -99,32 +74,9 @@ public class InputEventListener {
             startInput = false;
         }
 
-        if (startInput && (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId()))) {
-            startInput(input);
+        if (startInput) {
+            inputLauncher.launch(inputId);
         }
-    }
-
-    private void startInput(Input input) {
-        final MessageInput messageInput;
-        try {
-            messageInput = inputService.getMessageInput(input);
-        } catch (NoSuchInputTypeException e) {
-            LOG.warn("Input {} is of invalid type {}", input.toIdentifier(), input.getType(), e);
-            return;
-        }
-        if (!inputLauncher.leaderStatusInhibitsLaunch(messageInput)) {
-            startMessageInput(messageInput);
-        } else {
-            LOG.info("Not launching 'onlyOnePerCluster' input {} because this node is not the leader.",
-                    input.toIdentifier());
-        }
-    }
-
-    private void startMessageInput(MessageInput messageInput) {
-        messageInput.initialize();
-
-        final IOState<MessageInput> newInputState = inputLauncher.launch(messageInput);
-        inputRegistry.add(newInputState);
     }
 
     public void inputDeleted(String inputId) {
@@ -142,17 +94,7 @@ public class InputEventListener {
             inputRegistry.setup(inputState);
         } else {
             LOG.debug("Input created for setup: {}", inputId);
-            final Input input;
-            try {
-                input = inputService.find(inputId);
-            } catch (NotFoundException e) {
-                LOG.warn("Received InputSetupEvent event but could not find input {}", inputId, e);
-                return;
-            }
-
-            if (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId())) {
-                startInput(input);
-            }
+            inputLauncher.launch(inputId);
         }
     }
 
@@ -167,7 +109,7 @@ public class InputEventListener {
                 if (input.onlyOnePerCluster() && input.isGlobal() && (inputState == null || inputState.canBeStarted())
                         && inputLauncher.shouldStartAutomatically(input)) {
                     LOG.info("Got leader role. Starting input {}", input.toIdentifier());
-                    startMessageInput(input);
+                    inputLauncher.launch(input.getId());
                 }
             }
         } else {

@@ -17,7 +17,6 @@
 package org.graylog2.inputs;
 
 import org.graylog2.cluster.leader.LeaderElectionService;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -39,7 +38,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class InputEventListenerTest {
@@ -72,16 +70,7 @@ public class InputEventListenerTest {
 
     @Before
     public void setUp() throws Exception {
-        listener = new InputEventListener(inputLauncher, inputRegistry, inputService, nodeId, leaderElectionService, persistedInputs, serverStatus);
-    }
-
-    @Test
-    public void inputCreatedDoesNothingIfInputDoesNotExist() throws Exception {
-        when(inputService.find(INPUT_ID)).thenThrow(NotFoundException.class);
-
-        listener.inputCreated(INPUT_ID);
-
-        verifyNoMoreInteractions(inputLauncher, inputRegistry);
+        listener = new InputEventListener(inputLauncher, inputRegistry, leaderElectionService, persistedInputs, serverStatus);
     }
 
     @Test
@@ -115,21 +104,7 @@ public class InputEventListenerTest {
 
         listener.inputCreated(INPUT_ID);
 
-        verify(inputLauncher, times(1)).launch(messageInput);
-    }
-
-    @Test
-    public void inputCreatedDoesNotStartLocalInputOnAnyNode() throws Exception {
-        when(inputService.find(INPUT_ID)).thenReturn(input);
-        when(input.getNodeId()).thenReturn(OTHER_NODE_ID);
-        when(input.isGlobal()).thenReturn(false);
-
-        final MessageInput messageInput = mock(MessageInput.class);
-        when(inputService.getMessageInput(input)).thenReturn(messageInput);
-
-        listener.inputCreated(INPUT_ID);
-
-        verify(inputLauncher, never()).launch(messageInput);
+        verify(inputLauncher, times(1)).launch(INPUT_ID);
     }
 
     @Test
@@ -143,16 +118,7 @@ public class InputEventListenerTest {
 
         listener.inputCreated(INPUT_ID);
 
-        verify(inputLauncher, times(1)).launch(messageInput);
-    }
-
-    @Test
-    public void inputUpdatedDoesNothingIfInputDoesNotExist() throws Exception {
-        when(inputService.find(INPUT_ID)).thenThrow(NotFoundException.class);
-
-        listener.inputUpdated(INPUT_ID);
-
-        verifyNoMoreInteractions(inputLauncher, inputRegistry);
+        verify(inputLauncher, times(1)).launch(INPUT_ID);
     }
 
     @Test
@@ -188,7 +154,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(INPUT_ID);
 
-        verify(inputLauncher, times(1)).launch(messageInput);
+        verify(inputLauncher, times(1)).launch(INPUT_ID);
     }
 
     @Test
@@ -204,7 +170,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(INPUT_ID);
 
-        verify(inputLauncher, times(1)).launch(messageInput);
+        verify(inputLauncher, times(1)).launch(INPUT_ID);
     }
 
     @Test
@@ -219,7 +185,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(INPUT_ID);
 
-        verify(inputLauncher, never()).launch(messageInput);
+        verify(inputLauncher, never()).launch(INPUT_ID);
     }
 
     @Test
@@ -235,7 +201,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(INPUT_ID);
 
-        verify(inputLauncher, times(1)).launch(messageInput);
+        verify(inputLauncher, times(1)).launch(INPUT_ID);
     }
 
     @Test
@@ -251,7 +217,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(INPUT_ID);
 
-        verify(inputLauncher, never()).launch(messageInput);
+        verify(inputLauncher, never()).launch(INPUT_ID);
     }
 
     @Test
