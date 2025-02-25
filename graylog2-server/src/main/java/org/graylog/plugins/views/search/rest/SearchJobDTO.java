@@ -42,7 +42,8 @@ public record SearchJobDTO(
         @JsonUnwrapped @JsonProperty(access = JsonProperty.Access.READ_ONLY) SearchJobIdentifier searchJobIdentifier,
         @JsonProperty("errors") @JsonInclude(JsonInclude.Include.NON_EMPTY) Set<SearchError> errors,
         @JsonProperty Map<String, QueryResult> results,
-        @JsonProperty ExecutionInfo execution) {
+        @JsonProperty ExecutionInfo execution,
+        @JsonProperty("progress") int progress) {
 
 
     public static SearchJobDTO fromSearchJob(final SearchJob searchJob) {
@@ -51,7 +52,21 @@ public record SearchJobDTO(
                 searchJob.getSearchJobIdentifier(),
                 searchJob.getErrors(),
                 searchJob.results(),
-                executionInfo);
+                executionInfo,
+                0);
+    }
+
+    public static SearchJobDTO fromSearchJob(final SearchJob searchJob,
+                                             final int progress,
+                                             final QueryResult dbResults) {
+        final ExecutionInfo executionInfo = searchJob.execution();
+        final Map<String, QueryResult> inMemoryResults = searchJob.results();
+        return new SearchJobDTO(
+                searchJob.getSearchJobIdentifier(),
+                searchJob.getErrors(),
+                inMemoryResults.isEmpty() ? Map.of(dbResults.query().id(), dbResults) : inMemoryResults,
+                executionInfo,
+                progress);
     }
 
     public static SearchJobDTO fromSearchJobState(final SearchJobState searchJob, final Optional<Search> loadedSearch) {
@@ -70,7 +85,8 @@ public record SearchJobDTO(
                 searchJob.identifier(),
                 searchJob.errors(),
                 Map.of(searchJob.result().query().id(), searchJob.result()),
-                executionInfo);
+                executionInfo,
+                searchJob.progress());
     }
 
 }

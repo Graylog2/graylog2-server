@@ -23,8 +23,8 @@ import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashb
 import useQueryIds from 'views/hooks/useQueryIds';
 import useQueryTitles from 'views/hooks/useQueryTitles';
 import useViewMetadata from 'views/hooks/useViewMetadata';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectQuery, createQuery, removeQuery } from 'views/logic/slices/viewSlice';
 import useWidgetIds from 'views/components/useWidgetIds';
 import { setTitle } from 'views/logic/slices/titlesActions';
@@ -37,7 +37,7 @@ const onRemovePage = async (
   activeQueryId: string,
   queries: Immutable.OrderedSet<string>,
   widgetIds: Immutable.Map<string, Immutable.List<string>>,
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
 ) => {
   if (queries.size === 1) {
     return Promise.resolve();
@@ -58,7 +58,7 @@ const QueryBar = () => {
   const { activeQuery: activeQueryId, id: dashboardId } = useViewMetadata();
   const { setDashboardPage } = useContext(DashboardPageContext);
   const widgetIds = useWidgetIds();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   const onSelectPage = useCallback(
     (pageId: string) => {

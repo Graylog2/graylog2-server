@@ -24,12 +24,12 @@ import { testView2, undoRedoTestStore } from 'fixtures/undoRedo';
 import RedoNavItem from 'views/components/sidebar/redo/RedoNavItem';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { redo } from 'views/logic/slices/undoRedoActions';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/logic/slices/undoRedoActions', () => ({
   ...jest.requireActual('views/logic/slices/undoRedoActions'),
@@ -48,7 +48,7 @@ describe('<RedoNavItem />', () => {
   const dispatch = mockDispatch({ view: { view: testView2, activeQuery: 'query-id-1' } } as RootState);
 
   beforeEach(() => {
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     jest.clearAllMocks();
   });
 
