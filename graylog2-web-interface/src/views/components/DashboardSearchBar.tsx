@@ -62,7 +62,7 @@ import useView from 'views/hooks/useView';
 import useIsLoading from 'views/hooks/useIsLoading';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
-import { executeSearch } from 'views/logic/slices/viewSlice';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import TimeRangeFilter from './searchbar/time-range-filter';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -136,7 +136,7 @@ const DashboardSearchBar = () => {
       await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls);
 
       dispatch(setGlobalOverride(newQueryString, newTimerange));
-      dispatch(executeSearch());
+      dispatch(executeActiveQuery());
     },
     [dispatch, pluggableSearchBarControls, restartAutoRefresh],
   );

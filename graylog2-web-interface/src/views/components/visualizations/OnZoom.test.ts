@@ -27,7 +27,7 @@ import OnZoom from './OnZoom';
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   setTimerange: jest.fn(),
-  executeSearch: jest.fn(() => async () => {}),
+  executeActiveQuery: jest.fn(() => async () => {}),
 }));
 
 describe('OnZoom', () => {

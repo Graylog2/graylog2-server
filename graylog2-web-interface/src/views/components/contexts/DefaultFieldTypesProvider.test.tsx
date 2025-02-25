@@ -30,7 +30,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import executeSearchJobResult from 'views/logic/slices/executeJobResult';
 import generateId from 'logic/generateId';
-import { executeSearch } from 'views/logic/slices/viewSlice';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import type { FieldTypes } from './FieldTypesContext';
 import FieldTypesContext from './FieldTypesContext';
@@ -104,7 +104,7 @@ describe('DefaultFieldTypesProvider', () => {
       const dispatch = useViewsDispatch();
 
       return (
-        <button type="button" onClick={() => dispatch(executeSearch())}>
+        <button type="button" onClick={() => dispatch(executeActiveQuery())}>
           Refresh search
         </button>
       );

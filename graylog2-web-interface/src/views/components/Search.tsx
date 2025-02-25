@@ -52,7 +52,7 @@ import useViewsSelector from 'views/stores/useViewsSelector';
 import useParameters from 'views/hooks/useParameters';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useViewTitle from 'views/hooks/useViewTitle';
-import { executeSearch } from 'views/logic/slices/viewSlice';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
@@ -139,7 +139,7 @@ type Props = {
 
 const Search = ({ forceSideBarPinned = false }: Props) => {
   const dispatch = useViewsDispatch();
-  const refreshSearch = useCallback(() => dispatch(executeSearch()), [dispatch]);
+  const refreshSearch = useCallback(() => dispatch(executeActiveQuery()), [dispatch]);
   const {
     sidebar: { isShown: showSidebar },
     searchAreaContainer,

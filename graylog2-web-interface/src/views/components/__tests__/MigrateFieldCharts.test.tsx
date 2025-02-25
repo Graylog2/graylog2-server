@@ -29,7 +29,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import createSearch from 'views/logic/slices/createSearch';
-import { updateViewState, executeSearch } from 'views/logic/slices/viewSlice';
+import { updateViewState, executeActiveQuery } from 'views/logic/slices/viewSlice';
 import Query from 'views/logic/queries/Query';
 
 import { mockFieldCharts, viewState as mockViewState } from './MigrateFieldCharts.fixtures';
@@ -57,7 +57,7 @@ jest.mock('logic/local-storage/Store', () => ({
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
   updateViewState: jest.fn(() => async () => {}),
-  executeSearch: jest.fn(() => async () => {}),
+  executeActiveQuery: jest.fn(() => async () => {}),
 }));
 
 jest.mock('views/logic/slices/createSearch');
@@ -123,7 +123,7 @@ describe('MigrateFieldCharts', () => {
     it('execute search, when finished', async () => {
       Store.get.mockImplementation(mockStoreGet());
       renderAndMigrate();
-      await waitFor(() => expect(executeSearch).toHaveBeenCalled());
+      await waitFor(() => expect(executeActiveQuery).toHaveBeenCalled());
     });
 
     it('hide alert, when finished', async () => {

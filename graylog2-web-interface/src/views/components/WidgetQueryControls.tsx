@@ -64,7 +64,7 @@ import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
-import { executeSearch } from 'views/logic/slices/viewSlice';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
@@ -123,13 +123,13 @@ const onSubmit = async (
     return dispatch(updateWidget(widget.id, newWidget));
   }
 
-  return dispatch(executeSearch());
+  return dispatch(executeActiveQuery());
 };
 
 const resetTimeRangeOverride = (dispatch: ViewsDispatch) =>
-  dispatch(setGlobalOverrideTimerange(undefined)).then(() => dispatch(executeSearch()));
+  dispatch(setGlobalOverrideTimerange(undefined)).then(() => dispatch(executeActiveQuery()));
 const resetQueryOverride = (dispatch: ViewsDispatch) =>
-  dispatch(setGlobalOverrideQuery(undefined)).then(() => dispatch(executeSearch()));
+  dispatch(setGlobalOverrideQuery(undefined)).then(() => dispatch(executeActiveQuery()));
 
 const useBindApplySearchControlsChanges = (formRef) => {
   const { bindApplySearchControlsChanges } = useContext(WidgetEditApplyAllChangesContext);
