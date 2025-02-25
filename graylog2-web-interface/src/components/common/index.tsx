@@ -120,6 +120,7 @@ export { default as TimeUnitInput } from './TimeUnitInput';
 export { default as Timestamp } from './Timestamp';
 export { default as TimezoneSelect } from './TimezoneSelect';
 export { default as Text } from './Text';
+export { default as TextEditor } from './TextEditor';
 export { default as Tooltip } from './Tooltip';
 export { default as TypeAheadDataFilter } from './TypeAheadDataFilter';
 export { default as TypeAheadFieldInput } from './TypeAheadFieldInput';
