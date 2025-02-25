@@ -136,7 +136,7 @@ public class AggregationEventProcessorTest {
                 .build();
 
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory,
-                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams, Set.of(), messageFactory);
+                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, permittedStreams, Set.of(), messageFactory);
 
         assertThatCode(() -> eventProcessor.createEvents(eventFactory, parameters, (events) -> {})).doesNotThrowAnyException();
 
@@ -172,7 +172,7 @@ public class AggregationEventProcessorTest {
                 .build();
 
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory,
-                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, notificationService, permittedStreams, Set.of(), messageFactory);
+                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, permittedStreams, Set.of(), messageFactory);
 
         // If the dependency check returns true, there should be no exception raised and the state service should be called
         when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange)).thenReturn(true);
@@ -287,7 +287,7 @@ public class AggregationEventProcessorTest {
         final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(series), null, filters);
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(
                 eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch,
-                eventStreamService, messages, notificationService, permittedStreams, Set.of(), messageFactory);
+                eventStreamService, messages, permittedStreams, Set.of(), messageFactory);
 
         eventProcessor.sourceMessagesForEvent(event, messageConsumer, batchLimit);
     }
