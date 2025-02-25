@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState, ViewState } from 'views/types';
 import { selectRootUndoRedo, selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { isViewWidgetsEqualForSearch, selectQuery, updateView } from 'views/logic/slices/viewSlice';
@@ -34,7 +34,7 @@ const viewHandler = (
     currentView,
   }: {
     hasToPushRevision: boolean;
-    dispatch: AppDispatch;
+    dispatch: ViewsDispatch;
     currentView: View;
   },
 ): Promise<unknown> =>
@@ -46,7 +46,7 @@ const viewHandler = (
     return dispatch(updateView(state.view, shouldRecreateSearch, { hasToPushRevision }));
   });
 
-export const undo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const undo = () => async (dispatch: ViewsDispatch, getState: () => RootState) => {
   const rootState = getState();
   const { revisions, currentRevision } = selectRootUndoRedo(rootState);
   const { isUndoAvailable } = selectUndoRedoAvailability(rootState);
@@ -62,7 +62,7 @@ export const undo = () => async (dispatch: AppDispatch, getState: () => RootStat
   }
 };
 
-export const redo = () => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const redo = () => async (dispatch: ViewsDispatch, getState: () => RootState) => {
   const rootState = getState();
   const { revisions, currentRevision } = selectRootUndoRedo(rootState);
   const { view: currentView } = selectRootView(rootState);
