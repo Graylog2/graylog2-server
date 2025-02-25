@@ -25,8 +25,8 @@ import type {
   ActionHandlerArguments,
   ActionComponents,
 } from 'views/components/actions/ActionHandler';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { Spinner } from 'components/common';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
 
@@ -44,7 +44,7 @@ const StyledListItem = styled.li`
 `;
 
 const filterVisibleActions = (
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   handlerArgs: Props['handlerArgs'],
   actions: Array<ActionDefinition> | undefined = [],
 ) =>
@@ -57,7 +57,7 @@ const filterVisibleActions = (
 const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
   const valueActions = usePluginEntities('valueActions');
   const fieldActions = usePluginEntities('fieldActions');
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   if (type === 'value') {
     return filterVisibleActions(dispatch, handlerArgs, valueActions);
@@ -72,7 +72,7 @@ const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs
 
 const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
   const { isLoading, isError, externalValueActions } = useExternalValueActions();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   if (type !== 'value') {
     return { isLoading, isError, externalValueActions: [] };

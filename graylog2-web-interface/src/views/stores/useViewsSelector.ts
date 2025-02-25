@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useViewsSelector from 'views/stores/useViewsSelector';
-import { selectIsDirty } from 'views/logic/slices/viewSelectors';
+import type { RootState } from 'views/types';
+import useAppSelector from 'stores/useAppSelector';
 
-const useIsDirty = () => useViewsSelector(selectIsDirty);
-
-export default useIsDirty;
+const useViewsSelector = <R>(fn: (state: RootState) => R) => useAppSelector<R, RootState>(fn);
+export default useViewsSelector;

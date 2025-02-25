@@ -25,7 +25,7 @@ import {
 import HighlightingRules from 'views/components/sidebar/highlighting/HighlightingRules';
 import type { Value, Condition, Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 
 const DESCRIPTION =
   'Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the graylog server config.\n' +
@@ -33,7 +33,7 @@ const DESCRIPTION =
   'If a term or a value has more than one rule, the first matching rule is used.';
 
 const ViewsHighlightingRules = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const onUpdateRules = useCallback(
     (newRules: Array<HighlightingRule>) => dispatch(updateHighlightingRules(newRules)).then(() => {}),
     [dispatch],
