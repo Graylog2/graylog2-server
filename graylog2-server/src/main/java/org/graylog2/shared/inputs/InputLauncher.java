@@ -16,7 +16,6 @@
  */
 package org.graylog2.shared.inputs;
 
-import com.codahale.metrics.MetricRegistry;
 import jakarta.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderElectionService;
@@ -30,6 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class InputLauncher {
     private static final Logger LOG = LoggerFactory.getLogger(InputLauncher.class);
@@ -43,7 +44,7 @@ public class InputLauncher {
 
     @Inject
     public InputLauncher(IOState.Factory<MessageInput> inputStateFactory, InputBuffer inputBuffer, PersistedInputs persistedInputs,
-                         InputRegistry inputRegistry, MetricRegistry metricRegistry, Configuration configuration, LeaderElectionService leaderElectionService,
+                         InputRegistry inputRegistry, Configuration configuration, LeaderElectionService leaderElectionService,
                          FeatureFlags featureFlags) {
         this.inputStateFactory = inputStateFactory;
         this.inputBuffer = inputBuffer;
@@ -66,7 +67,7 @@ public class InputLauncher {
             }
             inputRegistry.add(inputState);
         } else {
-            inputState = inputRegistry.getInputState(input.getId());
+            inputState = requireNonNull(inputRegistry.getInputState(input.getId()), f("inputState for input %s cannot be null", input.toString()));
             switch (inputState.getState()) {
                 case RUNNING, STARTING, FAILING -> {
                     return inputState;
