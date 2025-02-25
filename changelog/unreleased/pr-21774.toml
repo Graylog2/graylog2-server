@@ -1,0 +1,5 @@
+type = "changed"
+message = "Improve in-memory input state handling to fix multiple input state handling issues."
+
+issues = ["Graylog2/architecture#40"]
+pulls = ["21774"]
