@@ -122,7 +122,9 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
 
   const widgetExecutionData = useMemo<WidgetExecutionData>(
     () => ({
-      effectiveTimerange: AbsoluteTimeRange,
+      effectiveTimerange:
+        (currentWidgetSearchType as MessageResult)?.effectiveTimerange ||
+        (currentWidgetSearchType as SearchTypeResult)?.effective_timerange,
       total: currentWidgetSearchType?.total,
       duration: result?.duration,
       timestamp: result?.timestamp,
