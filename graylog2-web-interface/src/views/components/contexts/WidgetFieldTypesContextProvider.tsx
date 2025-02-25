@@ -38,7 +38,6 @@ const WidgetFieldTypesContextProvider = ({ children }: Props) => {
     return {
       all: fieldTypesList,
       currentQuery: fieldTypesList,
-      queryFields: Immutable.Map({ [query.id]: fieldTypesList }),
     };
   }, [fieldTypes, query.id]);
 
