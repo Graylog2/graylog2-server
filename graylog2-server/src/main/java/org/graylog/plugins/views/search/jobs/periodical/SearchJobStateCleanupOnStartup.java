@@ -21,7 +21,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.db.SearchJobService;
-import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.errors.SimpleSearchError;
 import org.graylog.plugins.views.search.jobs.SearchJobState;
 import org.graylog.plugins.views.search.jobs.SearchJobStateService;
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static org.graylog.plugins.views.search.SearchJobIdentifier.NODEID_FIELD;
