@@ -190,7 +190,8 @@ public class FailureSubmissionService {
         }
     }
 
-    public void submitInputFailure(InputProcessingException inputProcessingException) {
+    public void submitInputFailure(InputProcessingException inputProcessingException, String inputId) {
+        inputDiagnosisMetrics.incCount(name("org.graylog2.inputs", inputId, "failures.input"));
         try {
             RawMessage rawMessage = inputProcessingException.getRawMessage();
             final String messageId = rawMessage.getId().toString();
