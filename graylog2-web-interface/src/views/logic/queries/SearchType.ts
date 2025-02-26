@@ -42,7 +42,7 @@ type SearchTypePivot = {
   interval?: Interval;
 };
 
-type SearchTypeBase = {
+export type SearchTypeBase = {
   filter: string | undefined | null;
   filters: Array<SearchFilter> | undefined;
   id: string;
@@ -69,4 +69,9 @@ export type MessagesSearchType = SearchTypeBase & {
   offset: number;
 };
 
-export type SearchType = AggregationSearchType | MessagesSearchType;
+export interface PluggableSearchType {
+  'aggregation': AggregationSearchType;
+  'messages': MessagesSearchType;
+}
+
+export type SearchType = PluggableSearchType[keyof PluggableSearchType];
