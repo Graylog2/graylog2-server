@@ -68,6 +68,7 @@ public interface Stream extends Persisted {
      * A list of all streams that are provided by Graylog
      */
     ImmutableSet<String> ALL_SYSTEM_STREAM_IDS = ImmutableSet.of(DEFAULT_STREAM_ID, DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID, FAILURES_STREAM_ID);
+    String ILLUMINATE_TITLE_PREFIX = "Illuminate:";
 
     enum MatchingType {
         AND,
@@ -126,6 +127,10 @@ public interface Stream extends Persisted {
     String getIndexSetId();
 
     void setIndexSetId(String indexSetId);
+
+    default boolean isIlluminateStream() {
+        return getTitle().startsWith(ILLUMINATE_TITLE_PREFIX);
+    }
 
     static boolean isSystemStreamId(String id) {
         return ALL_SYSTEM_STREAM_IDS.contains(id);
