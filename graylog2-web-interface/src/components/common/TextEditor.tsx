@@ -19,17 +19,34 @@ import { RichTextEditor } from '@mantine/tiptap';
 import { useEditor, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
+type Props = {
+  onChange: (value: string) => void,
+  customControl?: boolean;
+  customControlOnClick?: () => void,
+  customControlItem?: React.ReactNode,
+};
+
 /**
  * This component is used for the event procedures feature and renders different
  * text controls such as bold and underline. It also supports custom controls.
  */
-const TextEditor = () => {
+const TextEditor = ({ onChange, customControl = false, customControlOnClick = undefined, customControlItem, ...props }: Props) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
     ],
-    content: '',
+    onUpdate({ editor }) {
+      onChange(editor.getHTML());
+    },
   });
+
+  const renderCustomControl = () => {
+    return (
+      <RichTextEditor.Control onClick={customControlOnClick}>
+        {customControlItem}
+      </RichTextEditor.Control>
+    );
+  };
 
   return (
     <RichTextEditor editor={editor}>
@@ -39,19 +56,11 @@ const TextEditor = () => {
           <RichTextEditor.Italic />
           <RichTextEditor.Underline />
           <RichTextEditor.Strikethrough />
-          <RichTextEditor.Code />
         </RichTextEditor.ControlsGroup>
 
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.H1 />
           <RichTextEditor.H2 />
-          <RichTextEditor.H3 />
-          <RichTextEditor.H4 />
-        </RichTextEditor.ControlsGroup>
-
-        <RichTextEditor.ControlsGroup>
-          <RichTextEditor.Link />
-          <RichTextEditor.Unlink />
         </RichTextEditor.ControlsGroup>
 
         <RichTextEditor.ControlsGroup>
@@ -68,6 +77,10 @@ const TextEditor = () => {
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.Undo />
           <RichTextEditor.Redo />
+        </RichTextEditor.ControlsGroup>
+
+        <RichTextEditor.ControlsGroup>
+          {customControl && renderCustomControl()}
         </RichTextEditor.ControlsGroup>
       </RichTextEditor.Toolbar>
 
