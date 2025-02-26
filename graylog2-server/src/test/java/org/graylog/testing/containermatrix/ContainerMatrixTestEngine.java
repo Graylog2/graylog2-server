@@ -204,7 +204,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                     public Path getRootDirectory() {
                         try {
                             if (root == null) {
-                                root = Files.createTempDirectory("container-matrix-tests");
+                                root = Files.createTempDirectory(Paths.get("target"), "container-matrix-tests");
                             }
                             return root;
                         } catch (IOException e) {
