@@ -34,8 +34,6 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * Buffers and serializes input events to avoid concurrent execution of input events.
  */
@@ -117,12 +115,11 @@ public class InputEventQueue extends AbstractExecutionThreadService {
 
             LOG.debug("Dispatch event: {} (on thread {})", event, Thread.currentThread().getName());
 
-            final var inputId = requireNonNull(event.inputId(), "inputId cannot be null");
             switch (event.type()) {
-                case CREATED -> inputEventListener.inputCreated(inputId);
-                case UPDATED -> inputEventListener.inputUpdated(inputId);
-                case SETUP -> inputEventListener.inputSetup(inputId);
-                case DELETED -> inputEventListener.inputDeleted(inputId);
+                case CREATED -> inputEventListener.inputCreated(event.inputId());
+                case UPDATED -> inputEventListener.inputUpdated(event.inputId());
+                case SETUP -> inputEventListener.inputSetup(event.inputId());
+                case DELETED -> inputEventListener.inputDeleted(event.inputId());
                 case LEADER_CHANGED -> inputEventListener.leaderChanged();
                 default -> throw new IllegalArgumentException("Unhandled event type: " + event.type());
             }
