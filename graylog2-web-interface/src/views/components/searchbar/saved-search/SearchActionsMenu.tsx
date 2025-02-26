@@ -40,7 +40,7 @@ import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useIsDirty from 'views/hooks/useIsDirty';
 import useIsNew from 'views/hooks/useIsNew';
 import useView from 'views/hooks/useView';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 import useHistory from 'routing/useHistory';
@@ -117,7 +117,7 @@ const SearchActionsMenu = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState(false);
   const [showShareSearch, setShowShareSearch] = useState(false);
   const currentTitle = view?.title ?? '';
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
 
   const loaded = isNew === false;

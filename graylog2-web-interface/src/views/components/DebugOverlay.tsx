@@ -18,7 +18,7 @@ import React from 'react';
 
 import { Modal, Button } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 
 type Props = {
   onClose: () => void;
@@ -26,7 +26,7 @@ type Props = {
 };
 
 const DebugOverlay = ({ show, onClose }: Props) => {
-  const fullState = useAppSelector((state) => state);
+  const fullState = useViewsSelector((state) => state);
 
   return (
     <BootstrapModalWrapper showModal={show} onHide={onClose}>

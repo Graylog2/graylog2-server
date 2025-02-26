@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { escape, addToQuery, predicate, not } from 'views/logic/queries/QueryHelper';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
@@ -34,7 +34,7 @@ type Args = {
 
 const ExcludeFromQueryHandler =
   ({ queryId, field, value }: Args) =>
-  (dispatch: AppDispatch, getState: () => RootState) => {
+  (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
     const newQuery = formatNewQuery(oldQuery, field, value);
 

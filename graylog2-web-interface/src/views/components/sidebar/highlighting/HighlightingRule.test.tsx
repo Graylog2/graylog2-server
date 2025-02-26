@@ -24,7 +24,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import HighlightingRule from './HighlightingRule';
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/logic/slices/highlightActions', () => ({
   updateHighlightingRule: jest.fn(() => Promise.resolve()),
