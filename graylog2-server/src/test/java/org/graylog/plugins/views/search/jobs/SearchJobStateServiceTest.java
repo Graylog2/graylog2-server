@@ -33,9 +33,13 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -58,7 +62,7 @@ public class SearchJobStateServiceTest {
     public void testSaveAndGet() {
         final SearchJobState toBeSaved = SearchJobState.builder()
                 .identifier(new SearchJobIdentifier("777fd86ae6db8b71a8e10000", "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .result(noResult())
+                .result(noResult("0000000000000042"))
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -73,10 +77,26 @@ public class SearchJobStateServiceTest {
     }
 
     @Test
+    public void testGetStatus() {
+        final SearchJobState toBeSaved = SearchJobState.builder()
+                .identifier(new SearchJobIdentifier("777fd86ae6db8b71a8e10000", "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(noResult("0000000000000042"))
+                .status(SearchJobStatus.RUNNING)
+                .progress(42)
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build();
+        toTest.create(toBeSaved);
+        final Optional<SearchJobStatus> retrieved = toTest.getStatus("777fd86ae6db8b71a8e10000");
+        assertTrue(retrieved.isPresent());
+        assertEquals(toBeSaved.status(), retrieved.get());
+    }
+
+    @Test
     public void testSaveAndDelete() {
         final SearchJobState toBeSaved = SearchJobState.builder()
                 .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .result(noResult())
+                .result(noResult("0000000000000042"))
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -93,7 +113,7 @@ public class SearchJobStateServiceTest {
     public void testSaveAndUpdate() {
         final SearchJobState toBeSaved = SearchJobState.builder()
                 .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .result(noResult())
+                .result(noResult("0000000000000042"))
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -115,7 +135,7 @@ public class SearchJobStateServiceTest {
     public void testChangeStatus() {
         final SearchJobState toBeSaved = SearchJobState.builder()
                 .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .result(noResult())
+                .result(noResult("0000000000000042"))
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -134,6 +154,50 @@ public class SearchJobStateServiceTest {
     }
 
     @Test
+    public void testResetJobsAreImmuneToUpdates() {
+        final SearchJobState toBeSaved = SearchJobState.builder()
+                .identifier(new SearchJobIdentifier(null, "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(noResult("0000000000000042"))
+                .status(SearchJobStatus.RESET)
+                .progress(42)
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build();
+        final SearchJobState saved = toTest.create(toBeSaved);
+
+        assertFalse(toTest.changeStatus(saved.id(), SearchJobStatus.ERROR));
+        assertFalse(toTest.update(saved.toBuilder().progress(13).build()));
+    }
+
+    @Test
+    public void testReset() {
+        final SearchJobState savedSearchJobState = toTest.create(SearchJobState.builder()
+                .identifier(new SearchJobIdentifier(null,
+                        "677fd86ae6db8b71a8e10001",
+                        "john",
+                        "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(createSimpleQueryResult("0000000000000042"))
+                .errors(Set.of())
+                .status(SearchJobStatus.RUNNING)
+                .progress(42)
+                .createdAt(DateTime.parse("1999-01-01T11:11:11"))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build());
+
+        assertTrue(toTest.resetLatestForUser("jose").isEmpty()); //no active query for Jose
+
+        final Optional<SearchJobState> previousState = toTest.resetLatestForUser("john");
+        assertTrue(previousState.isPresent());
+        assertEquals(savedSearchJobState, previousState.get());
+        final Optional<SearchJobState> latestForJohn = toTest.getLatestForUser("john");
+        assertTrue(latestForJohn.isPresent());
+        assertEquals(SearchJobStatus.RESET, latestForJohn.get().status());
+        assertEquals(savedSearchJobState.identifier(), latestForJohn.get().identifier());
+        assertNull(latestForJohn.get().result());
+        assertEquals(Set.of(), latestForJohn.get().errors());
+    }
+
+    @Test
     public void testGetLatestForUser() {
 
         toTest.create(SearchJobState.builder()
@@ -141,7 +205,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10001",
                         "john",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .result(noResult())
+                .result(noResult("0000000000000042"))
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.parse("1999-01-01T11:11:11"))
@@ -153,7 +217,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10002",
                         "john",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .result(noResult())
+                .result(noResult("0000000000000042"))
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.parse("2000-01-01T11:11:11"))
@@ -165,7 +229,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10003",
                         "bob",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .result(noResult())
+                .result(noResult("0000000000000042"))
                 .status(SearchJobStatus.RUNNING)
                 .progress(42)
                 .createdAt(DateTime.parse("2020-01-01T11:11:11"))
@@ -185,10 +249,21 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10001",
                         "john",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .result(noResult())
+                .result(noResult("0000000000000042"))
                 .status(SearchJobStatus.DONE)
                 .progress(42)
                 .createdAt(DateTime.parse("1999-01-01T11:11:11"))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build());
+        final SearchJobState alreadyExpiredJob = toTest.create(SearchJobState.builder()
+                .identifier(new SearchJobIdentifier("7777786ae6db8b71a8e10002",
+                        "677fd86ae6db8b71a8e10002",
+                        "john",
+                        "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(createSimpleQueryResult("0000000000000042"))
+                .status(SearchJobStatus.EXPIRED)
+                .progress(100)
+                .createdAt(DateTime.now(DateTimeZone.UTC).minusDays(1))
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build());
         final SearchJobState jobThatNeedsToBeExpired = toTest.create(SearchJobState.builder()
@@ -196,7 +271,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10002",
                         "john",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .result(noResult())
+                .result(noResult("0000000000000042"))
                 .status(SearchJobStatus.DONE)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC).minusDays(1))
@@ -207,7 +282,7 @@ public class SearchJobStateServiceTest {
                         "677fd86ae6db8b71a8e10003",
                         "john",
                         "dcae52e4-777e-4e3f-8e69-61df7a607016"))
-                .result(noResult())
+                .result(noResult("0000000000000042"))
                 .status(SearchJobStatus.DONE)
                 .progress(42)
                 .createdAt(DateTime.now(DateTimeZone.UTC))
@@ -217,24 +292,87 @@ public class SearchJobStateServiceTest {
         long numRemoved = toTest.deleteOlderThan(DateTime.now(DateTimeZone.UTC).minusDays(2));
         assertEquals(1, numRemoved);
         assertTrue(toTest.get(oldJob.id()).isEmpty());
+        assertTrue(toTest.get(alreadyExpiredJob.id()).isPresent());
         assertTrue(toTest.get(jobThatNeedsToBeExpired.id()).isPresent());
         assertTrue(toTest.get(freshJob.id()).isPresent());
 
         long numExpired = toTest.expireOlderThan(DateTime.now(DateTimeZone.UTC).minusHours(7));
         assertEquals(1, numExpired);
-        assertSame(toTest.get(jobThatNeedsToBeExpired.id()).get().status(), SearchJobStatus.EXPIRED);
+        final SearchJobState expiredSearchJobState = toTest.get(jobThatNeedsToBeExpired.id()).get();
+        assertSame(expiredSearchJobState.status(), SearchJobStatus.EXPIRED);
+        assertTrue(expiredSearchJobState.result() == null || expiredSearchJobState.result().searchTypes() == null || expiredSearchJobState.result().searchTypes().isEmpty());
         assertSame(toTest.get(freshJob.id()).get().status(), SearchJobStatus.DONE);
 
         numRemoved = toTest.deleteOlderThan(DateTime.now(DateTimeZone.UTC).minusDays(2));
         assertEquals(0, numRemoved);
-
     }
 
-    private QueryResult noResult() {
+    @Test
+    public void testChangeProgress() {
+        final SearchJobState newJob = toTest.create(SearchJobState.builder()
+                .identifier(new SearchJobIdentifier(null,
+                        "677fd86ae6db8b71a8e10001",
+                        "john",
+                        "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(noResult("0000000000000042"))
+                .status(SearchJobStatus.RUNNING)
+                .progress(0)
+                .createdAt(DateTime.parse("1999-01-01T11:11:11"))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build());
+
+        boolean done = toTest.changeProgress(newJob.identifier().id(), 1);
+        assertTrue(done);
+        Optional<SearchJobState> retrieved = toTest.get(newJob.identifier().id());
+        assertTrue(retrieved.isPresent());
+        assertEquals(SearchJobStatus.RUNNING, retrieved.get().status());
+        assertEquals(1, retrieved.get().progress());
+        assertEquals("0000000000000042", retrieved.get().result().query().id());
+
+        done = toTest.changeProgress(newJob.identifier().id(), 2);
+        assertTrue(done);
+        retrieved = toTest.get(newJob.identifier().id());
+        assertTrue(retrieved.isPresent());
+        assertEquals(SearchJobStatus.RUNNING, retrieved.get().status());
+        assertEquals(2, retrieved.get().progress());
+        assertEquals("0000000000000042", retrieved.get().result().query().id());
+
+        final QueryResult simpleQueryResult = createSimpleQueryResult("0000000000000077");
+        done = toTest.changeProgress(newJob.identifier().id(), 50, simpleQueryResult, null);
+        assertTrue(done);
+        retrieved = toTest.get(newJob.identifier().id());
+        assertTrue(retrieved.isPresent());
+        assertEquals(SearchJobStatus.RUNNING, retrieved.get().status());
+        assertEquals(50, retrieved.get().progress());
+        assertEquals("0000000000000077", retrieved.get().result().query().id());
+
+        final QueryResult finalSimpleQueryResult = createSimpleQueryResult("0000000000000099");
+        done = toTest.changeProgress(newJob.identifier().id(), 100, finalSimpleQueryResult, SearchJobStatus.DONE);
+        assertTrue(done);
+        retrieved = toTest.get(newJob.identifier().id());
+        assertTrue(retrieved.isPresent());
+        assertEquals(SearchJobStatus.DONE, retrieved.get().status());
+        assertEquals(100, retrieved.get().progress());
+        assertEquals("0000000000000099", retrieved.get().result().query().id());
+    }
+
+    private QueryResult createSimpleQueryResult(final String id) {
+        return QueryResult.builder()
+                .query(Query.builder()
+                        .id(id)
+                        .timerange(KeywordRange.create("last year", "UTC"))
+                        .query(ElasticsearchQueryString.empty())
+                        .searchTypes(Set.of())
+                        .build())
+                .searchTypes(Map.of())
+                .build();
+    }
+
+    private QueryResult noResult(final String id) {
         return QueryResult.builder()
                 .searchTypes(Collections.emptyMap())
                 .query(Query.builder()
-                        .id("0000000000000042")
+                        .id(id)
                         .timerange(KeywordRange.create("last year", "UTC"))
                         .query(ElasticsearchQueryString.empty())
                         .build()).build();

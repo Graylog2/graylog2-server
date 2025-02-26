@@ -17,6 +17,7 @@
 module.exports = [
   '@emotion/react',
   '@mantine/core',
+  '@reduxjs/toolkit',
   '@tanstack/react-query',
   'chroma-js',
   'formik',

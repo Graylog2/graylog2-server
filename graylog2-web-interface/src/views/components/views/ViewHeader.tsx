@@ -27,7 +27,7 @@ import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';
 import useViewTitle from 'views/hooks/useViewTitle';
 import useView from 'views/hooks/useView';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
@@ -146,7 +146,7 @@ const ViewHeader = () => {
 
   const { alertId, definitionId, type } = useReplaySearchContext();
   const { definitionTitle } = useAlertAndEventDefinitionData(alertId, definitionId);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const _onSaveView = useCallback(
     async (updatedView: View) => {
       await dispatch(onSaveView(updatedView));
