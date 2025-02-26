@@ -17,6 +17,13 @@
 
 import type { Input } from 'components/messageloaders/Types';
 
+export const INPUT_WIZARD_FLOWS = {
+  ILLUMINATE: 'ILLUMINATE',
+  NON_ILLUMINATE: 'NON_ILLUMINATE',
+} as const;
+
+export type InputSetupWizardFlow = (typeof INPUT_WIZARD_FLOWS)[keyof typeof INPUT_WIZARD_FLOWS];
+
 export const INPUT_WIZARD_STEPS = {
   INSTALL_ILLUMINATE: 'INSTALL_ILLUMINATE',
   SELECT_ILLUMINATE: 'SELECT_ILLUMINATE',
@@ -33,4 +40,5 @@ export type StepsData = {
 
 export type WizardData = {
   input?: Input;
+  flow: InputSetupWizardFlow;
 };

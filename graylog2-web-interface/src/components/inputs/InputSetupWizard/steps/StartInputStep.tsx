@@ -26,7 +26,7 @@ import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Button, Row, Col } from 'components/bootstrap';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/useInputSetupWizardSteps';
-import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
+import { INPUT_WIZARD_STEPS, INPUT_WIZARD_FLOWS } from 'components/inputs/InputSetupWizard/types';
 import {
   checkHasPreviousStep,
   checkHasNextStep,
@@ -55,6 +55,8 @@ const StartInputStep = () => {
 
   const navigateTo = useNavigate();
   const { goToPreviousStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
+  const isIlluminateFlow = wizardData.flow === INPUT_WIZARD_FLOWS.ILLUMINATE;
+
   const { stepsData } = useInputSetupWizardSteps();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
@@ -138,6 +140,12 @@ const StartInputStep = () => {
   };
 
   const setupInput = async () => {
+    if (isIlluminateFlow) {
+      startInput();
+
+      return;
+    }
+
     const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
     const { input } = wizardData;
     const inputId = input?.id;
@@ -250,6 +258,10 @@ const StartInputStep = () => {
   };
 
   const isInputStartable = () => {
+    if (isIlluminateFlow) {
+      return true;
+    }
+
     const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
 
     if (!routingStepData) return false;
@@ -368,7 +380,7 @@ const StartInputStep = () => {
                     isError={startInputStatus === 'FAILED'}
                   />
                 )}
-                {startInputStatus === 'SUCCESS' && StartIlluminate && <StartIlluminate />}
+                {isIlluminateFlow && startInputStatus === 'SUCCESS' && <StartIlluminate />}
               </>
             ))}
 
