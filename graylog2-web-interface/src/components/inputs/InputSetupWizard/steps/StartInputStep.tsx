@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
@@ -48,6 +49,10 @@ export type ProcessingSteps =
   | 'result';
 
 const StartInputStep = () => {
+  const StartIlluminate = PluginStore.exports('inputSetupWizard').find(
+    (plugin) => !!plugin.StartIlluminate,
+  )?.StartIlluminate;
+
   const navigateTo = useNavigate();
   const { goToPreviousStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
   const { stepsData } = useInputSetupWizardSteps();
@@ -363,6 +368,7 @@ const StartInputStep = () => {
                     isError={startInputStatus === 'FAILED'}
                   />
                 )}
+                {startInputStatus === 'SUCCESS' && StartIlluminate && <StartIlluminate />}
               </>
             ))}
 

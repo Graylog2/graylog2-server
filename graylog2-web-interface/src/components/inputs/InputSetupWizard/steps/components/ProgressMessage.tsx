@@ -22,12 +22,14 @@ import { Spinner, Icon } from 'components/common';
 import type { ProcessingSteps } from 'components/inputs/InputSetupWizard/steps/StartInputStep';
 
 type Props = {
-  stepName: ProcessingSteps;
+  stepName?: ProcessingSteps;
   isLoading: boolean;
   isSuccess: boolean;
   name?: string;
   isError: boolean;
   errorMessage?: FetchError;
+  title?: string;
+  details?: string;
 };
 
 const SuccessIcon = styled(Icon)(
@@ -43,12 +45,14 @@ const ErrorIcon = styled(Icon)(
 );
 
 const ProgressMessage = ({
-  stepName,
+  stepName = undefined,
   isLoading,
   isSuccess,
   isError,
   name = undefined,
   errorMessage = undefined,
+  title = undefined,
+  details = undefined,
 }: Props) => {
   const loadingText: { [key in ProcessingSteps]: (entityName?: string) => string } = {
     createStream: (entityName) => `Creating Stream${entityName !== undefined ? ` "${entityName}"` : ''}...`,
@@ -86,7 +90,7 @@ const ProgressMessage = ({
   if (isLoading) {
     return (
       <p>
-        <Spinner text={loadingText[stepName](name)} />
+        <Spinner text={title ?? loadingText[stepName](name)} />
       </p>
     );
   }
@@ -95,13 +99,15 @@ const ProgressMessage = ({
     return (
       <>
         <p>
-          <ErrorIcon name="close" title={errorText[stepName](name)} /> {errorText[stepName](name)}
+          <ErrorIcon name="close" title={title ?? errorText[stepName](name)} />
+          {title ?? errorText[stepName](name)}
         </p>
-        {errorMessage && (
-          <p>
-            <strong>Details:</strong> {errorMessage.message}
-          </p>
-        )}
+        {details ||
+          (errorMessage && (
+            <p>
+              <strong>Details:</strong> {details ?? errorMessage.message}
+            </p>
+          ))}
       </>
     );
   }
@@ -109,7 +115,8 @@ const ProgressMessage = ({
   if (isSuccess) {
     return (
       <p>
-        <SuccessIcon name="check" title={successText[stepName](name)} /> {successText[stepName](name)}
+        <SuccessIcon name="check" title={title ?? successText[stepName](name)} />
+        {title ?? successText[stepName](name)}
       </p>
     );
   }
