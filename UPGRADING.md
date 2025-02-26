@@ -3,11 +3,6 @@ Upgrading to Graylog 6.2.x
 
 ## Breaking Changes
 
-* The `files:read` and `files:create` permissions have been removed. These permissions were used in the Graylog
-  Enterprise plugin for the generic `/plugins/org.graylog.plugins.files/*` REST API endpoints, which have also been
-  removed. Existing Graylog users would only have these permissions assigned if explicitly granted through custom,
-  user-initiated calls to the "Users" REST API.
-
 ### Plugins
 * This release includes Java API changes which might require plugin authors to adjust their code. Please check
   [Java API Changes](#java-api-changes) for details.
