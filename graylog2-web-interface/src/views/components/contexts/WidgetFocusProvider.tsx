@@ -24,13 +24,13 @@ import useQuery from 'routing/useQuery';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useWidgets from 'views/hooks/useWidgets';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
-import { setSearchTypesToSearch } from 'views/logic/slices/searchExecutionSlice';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
-import useView from 'views/hooks/useView';
-import useAppSelector from 'stores/useAppSelector';
+import { executeActiveQuery, setWidgetToSearch } from 'views/logic/slices/viewSlice';
 import { selectSearchTypesToSearch } from 'views/logic/slices/searchExecutionSelectors';
-import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import useAppSelector from 'stores/useAppSelector';
+import useView from 'views/hooks/useView';
+import { setSearchTypesToSearch } from 'views/logic/slices/searchExecutionSlice';
 
 import type { FocusContextState } from './WidgetFocusContext';
 import WidgetFocusContext from './WidgetFocusContext';
@@ -107,12 +107,10 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       }
 
       setFocusedWidget(nextFocusedWidget);
-      const searchTypeIds = widgetMapping.get(nextFocusedWidget.id);
-
-      dispatch(setSearchTypesToSearch(searchTypeIds?.toArray()));
+      dispatch(setWidgetToSearch(nextFocusedWidget.id));
       dispatch(executeActiveQuery());
     }
-  }, [focusedWidget, setFocusedWidget, widgetIds, focusUriParams, dispatch, widgetMapping]);
+  }, [focusedWidget, setFocusedWidget, widgetIds, focusUriParams, dispatch]);
 
   useEffect(() => {
     if (focusedWidget) {

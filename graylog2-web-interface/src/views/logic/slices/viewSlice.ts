@@ -26,7 +26,7 @@ import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import type Query from 'views/logic/queries/Query';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
 import View from 'views/logic/views/View';
-import { setGlobalOverrideQuery, execute } from 'views/logic/slices/searchExecutionSlice';
+import { setGlobalOverrideQuery, execute, setSearchTypesToSearch } from 'views/logic/slices/searchExecutionSlice';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import {
@@ -325,3 +325,10 @@ export const setParameters =
 
     return dispatch(updateView(newView, true));
   };
+
+export const setWidgetToSearch = (widgetId: string) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
+  const { widgetMapping } = selectView(getState());
+  const searchTypeIds = widgetMapping.get(widgetId);
+
+  return dispatch(setSearchTypesToSearch(searchTypeIds?.toArray()));
+};
