@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
 
-import { GraylogNode } from './useClusterNodes';
+import type { GraylogNode } from './useClusterNodes';
 
 const StatusLabel = styled(Label)`
   display: inline-flex;

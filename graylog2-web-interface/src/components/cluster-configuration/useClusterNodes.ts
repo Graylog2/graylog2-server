@@ -18,8 +18,8 @@ import { useStore } from 'stores/connect';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import type { NodeInfo } from 'stores/nodes/NodesStore';
+import type { SystemOverview } from 'stores/cluster/types';
 import type { DataNode } from 'components/datanode/Types';
-import type { SystemOverview } from 'src/stores/cluster/types';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
 
 export type GraylogNode = NodeInfo & SystemOverview;

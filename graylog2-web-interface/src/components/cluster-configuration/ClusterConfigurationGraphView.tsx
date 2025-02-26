@@ -16,11 +16,8 @@
  */
 import React from 'react';
 
-type Props = {
-}
-
-const ClusterConfigurationClusterView = ({}: Props) => (
+const ClusterConfigurationGraphView = () => (
   <>TODO</>
 );
 
-export default ClusterConfigurationClusterView;
+export default ClusterConfigurationGraphView;

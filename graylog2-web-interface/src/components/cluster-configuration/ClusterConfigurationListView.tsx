@@ -35,7 +35,7 @@ const getRoleLabels = (roles: string) => roles.split(',').map((role) => (
   </span>
 ));
 
-const ClusterConfigurationTableView = ({ clusterNodes }: Props) => (
+const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
   <Table>
     <thead>
       <tr>
@@ -69,4 +69,4 @@ const ClusterConfigurationTableView = ({ clusterNodes }: Props) => (
   </Table>
 );
 
-export default ClusterConfigurationTableView;
+export default ClusterConfigurationListView;

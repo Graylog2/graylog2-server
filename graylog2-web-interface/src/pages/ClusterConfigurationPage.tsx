@@ -20,8 +20,8 @@ import styled from 'styled-components';
 import { DocumentTitle, Icon, PageHeader } from 'components/common';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
-import ClusterConfigurationClusterView from 'components/cluster-configuration/ClusterConfigurationClusterView';
-import ClusterConfigurationTableView from 'components/cluster-configuration/ClusterConfigurationTableView';
+import ClusterConfigurationGraphView from 'components/cluster-configuration/ClusterConfigurationGraphView';
+import ClusterConfigurationListView from 'components/cluster-configuration/ClusterConfigurationListView';
 
 const ViewTypeSwitchContainer = styled(Col)`
   display: flex;
@@ -68,10 +68,10 @@ const ClusterConfigurationPage = () => {
           </ViewTypeSwitchContainer>
           <Col md={12}>
             {viewType === 'list' && (
-              <ClusterConfigurationTableView clusterNodes={clusterNodes} />
+              <ClusterConfigurationListView clusterNodes={clusterNodes} />
             )}
             {viewType === 'cards' && (
-              <ClusterConfigurationClusterView />
+              <ClusterConfigurationGraphView />
             )}
           </Col>
         </Row>
