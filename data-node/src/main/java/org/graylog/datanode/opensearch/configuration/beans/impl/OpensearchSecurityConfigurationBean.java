@@ -29,7 +29,6 @@ import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBea
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
 import org.graylog.datanode.process.configuration.files.OpensearchSecurityConfigurationFile;
-import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog2.security.JwtSecret;
 import org.graylog2.security.TruststoreCreator;
@@ -132,7 +131,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
         });
 
         return configurationBuilder
-                .properties(properties(httpCert, transportCert))
+                .properties(properties(opensearchCertificates))
                 .keystoreItems(keystoreItems(truststorePassword, httpCert, transportCert))
                 .javaOpts(javaOptions(truststorePassword))
                 .trustStore(truststoreCreator.getTruststore())
@@ -142,7 +141,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
     }
 
 
-    private Map<String, String> properties(Optional<KeystoreInformation> httpCert, Optional<KeystoreInformation> transportCert) {
+    private Map<String, String> properties(Optional<OpensearchCertificates> opensearchCertificates) {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
 
         if (localConfiguration.getOpensearchAuditLog() != null && !localConfiguration.getOpensearchAuditLog().isBlank()) {
@@ -153,12 +152,14 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
         config.put("plugins.security.restapi.admin.enabled", "true");
 
 
-        if (httpCert.isPresent() && transportCert.isPresent()) {
+        if (opensearchCertificates.map(OpensearchCertificates::hasBothCertificates).orElse(false)) {
             config.putAll(commonSecurityConfig());
 
             config.put("plugins.security.ssl.transport.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.keystore_filepath", TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME);
-            //config.put("plugins.security.ssl.transport.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
+
+            opensearchCertificates.map(OpensearchCertificates::getTransportKeyAlias)
+                    .ifPresent(alias -> config.put("plugins.security.ssl.transport.keystore_alias", alias));
 
             config.put("plugins.security.ssl.transport.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILE.toString());
@@ -167,7 +168,9 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
 
             config.put("plugins.security.ssl.http.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.http.keystore_filepath", TARGET_DATANODE_HTTP_KEYSTORE_FILENAME);
-            //config.put("plugins.security.ssl.http.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
+
+            opensearchCertificates.map(OpensearchCertificates::getHttpKeyAlias)
+                    .ifPresent(alias -> config.put("plugins.security.ssl.http.keystore_alias", alias));
 
             config.put("plugins.security.ssl.http.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILE.toString());
