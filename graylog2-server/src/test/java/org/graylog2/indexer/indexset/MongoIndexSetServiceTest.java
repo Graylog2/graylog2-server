@@ -171,7 +171,7 @@ public class MongoIndexSetServiceTest {
 
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void findOne() throws Exception {
+    public void findOne() {
         final Optional<IndexSetConfig> config3 = indexSetService.findOne(Filters.eq("title", "Test 2"));
         assertThat(config3).isPresent();
         assertThat(config3.get().id()).isEqualTo("57f3d721a43c2d59cb750002");
