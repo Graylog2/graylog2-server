@@ -21,30 +21,36 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
-import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
 import org.bson.Document;
+import org.graylog.plugins.views.search.QueryResult;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.lte;
-import static com.mongodb.client.model.Filters.ne;
+import static com.mongodb.client.model.Filters.nin;
 import static com.mongodb.client.model.Projections.include;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
+import static org.graylog.plugins.views.search.QueryResult.SEARCH_TYPES_FIELD;
 import static org.graylog.plugins.views.search.SearchJobIdentifier.OWNER_FIELD;
 import static org.graylog.plugins.views.search.SearchJobIdentifier.SEARCH_ID_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.CREATED_AT_FIELD;
+import static org.graylog.plugins.views.search.jobs.SearchJobState.RESULT_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.STATUS_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.TYPE_FIELD;
+import static org.graylog.plugins.views.search.jobs.SearchJobStatus.EXPIRED;
 import static org.graylog.plugins.views.search.jobs.SearchJobStatus.RESET;
 import static org.graylog.plugins.views.search.jobs.SearchJobType.DATA_LAKE;
 
@@ -109,10 +115,13 @@ public class SearchJobStateService {
         final UpdateResult updateResult = collection.updateMany(
                 and(
                         eq(TYPE_FIELD, DATA_LAKE),
-                        ne(STATUS_FIELD, RESET),
+                        nin(STATUS_FIELD, RESET, EXPIRED),
                         lte(CREATED_AT_FIELD, dateTime)
                 ),
-                Updates.set(STATUS_FIELD, SearchJobStatus.EXPIRED)
+                combine(
+                        set(STATUS_FIELD, SearchJobStatus.EXPIRED),
+                        set(RESULT_FIELD + "." + SEARCH_TYPES_FIELD, Map.of())
+                )
 
         );
         return updateResult.getModifiedCount();
@@ -150,7 +159,32 @@ public class SearchJobStateService {
                         .build())
                 .map(this::update)
                 .orElse(false);
+    }
 
+    public boolean changeProgress(final String searchJobStateID,
+                                  final int progress) {
+        return changeProgress(searchJobStateID, progress, null, null);
+    }
+
+    public boolean changeProgress(final String searchJobStateID,
+                                  final int progress,
+                                  final QueryResult updatedResults,
+                                  final SearchJobStatus updatedStatus) {
+        return get(searchJobStateID)
+                .map(searchJobState -> {
+                    final SearchJobState.Builder builder = searchJobState.toBuilder()
+                            .progress(progress)
+                            .updatedAt(DateTime.now(DateTimeZone.UTC));
+                    if (updatedResults != null) {
+                        builder.result(updatedResults);
+                    }
+                    if (updatedStatus != null) {
+                        builder.status(updatedStatus);
+                    }
+                    return builder.build();
+                })
+                .map(this::update)
+                .orElse(false);
     }
 
     public Optional<SearchJobStatus> getStatus(final String searchJobStateID) {

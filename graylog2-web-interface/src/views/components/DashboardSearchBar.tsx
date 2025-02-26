@@ -51,7 +51,7 @@ import {
   SearchInputAndValidationContainer,
 } from 'views/components/searchbar/SearchBarLayout';
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { setGlobalOverride, execute } from 'views/logic/slices/searchExecutionSlice';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useHandlerContext from 'views/components/useHandlerContext';
@@ -125,7 +125,7 @@ const DashboardSearchBar = () => {
   const { config } = useSearchConfiguration();
   const { timerange, query: { query_string: queryString = '' } = {} } = useGlobalOverride() ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const handlerContext = useHandlerContext();
   const { restartAutoRefresh } = useAutoRefresh();
   const submitForm = useCallback(
