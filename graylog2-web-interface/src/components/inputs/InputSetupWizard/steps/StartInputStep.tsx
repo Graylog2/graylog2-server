@@ -42,6 +42,7 @@ export type ProcessingSteps =
   | 'createStream'
   | 'startStream'
   | 'createPipeline'
+  | 'connectPipeline'
   | 'setupRouting'
   | 'deleteStream'
   | 'deletePipeline'
@@ -75,6 +76,7 @@ const StartInputStep = () => {
     deleteStreamMutation,
     deletePipelineMutation,
     deleteRoutingRuleMutation,
+    connectPipelineMutation,
   } = useSetupInputMutations();
 
   const stepMutations = useMemo<{ [key in ProcessingSteps]?: UseMutationResult }>(
@@ -83,8 +85,9 @@ const StartInputStep = () => {
       startStream: startStreamMutation,
       createPipeline: createPipelineMutation,
       setupRouting: updateRoutingMutation,
+      connectPipeline: connectPipelineMutation,
     }),
-    [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation],
+    [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation, connectPipelineMutation],
   );
 
   const rollBackMutations = useMemo<{ [key in ProcessingSteps]?: UseMutationResult }>(
@@ -154,17 +157,24 @@ const StartInputStep = () => {
 
     switch (routingStepData.streamType) {
       case 'NEW':
-        if (routingStepData.shouldCreateNewPipeline) {
-          createPipeline(routingStepData.newStream);
-        }
-
         createStreamMutation.mutateAsync(routingStepData.newStream, {
-          onSuccess: (response) => {
-            startStreamMutation.mutateAsync(response.stream_id);
+          onSuccess: (streamResponse) => {
+            startStreamMutation.mutateAsync(streamResponse.stream_id);
 
-            updateRoutingMutation.mutateAsync({ input_id: inputId, stream_id: response.stream_id }).finally(() => {
-              startInput();
-            });
+            if (routingStepData.shouldCreateNewPipeline) {
+              createPipeline(routingStepData.newStream).then((pipelineResponse) => {
+                connectPipelineMutation.mutateAsync({
+                  streamId: streamResponse.stream_id,
+                  pipelineId: pipelineResponse.id,
+                });
+              });
+            }
+
+            updateRoutingMutation
+              .mutateAsync({ input_id: inputId, stream_id: streamResponse.stream_id })
+              .finally(() => {
+                startInput();
+              });
           },
         });
 
