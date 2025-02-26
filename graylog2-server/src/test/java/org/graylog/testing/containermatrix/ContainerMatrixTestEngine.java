@@ -48,6 +48,7 @@ import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -197,9 +198,18 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
         JupiterConfiguration configuration = new CachingJupiterConfiguration(
                 new DefaultJupiterConfiguration(discoveryRequest.getConfigurationParameters(), new OutputDirectoryProvider() {
+                    private static Path root;
+
                     @Override
                     public Path getRootDirectory() {
-                        return Path.of("./tmp");
+                        try {
+                            if (root == null) {
+                                root = Files.createTempDirectory("container-matrix-tests");
+                            }
+                            return root;
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
 
                     @Override
