@@ -131,7 +131,7 @@ public class AggregationEventProcessor implements EventProcessor {
             if (config.series().isEmpty()) {
                 filterSearch(eventFactory, parameters, eventsConsumer);
             } else {
-                aggregationSearchUtils.aggregatedSearch(eventFactory, parameters, eventsConsumer);
+                aggregationSearchUtils.aggregatedSearch(eventFactory, parameters, eventsConsumer, null);
             }
         } catch (SearchException e) {
             if (e.error() instanceof ParameterExpansionError) {
