@@ -14,22 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react'
+import React from 'react';
 import styled, { css } from 'styled-components';
 
-import {Link, LinkContainer} from "components/common/router";
-import Routes from "routing/Routes";
-import {CounterRate, MetricContainer} from "components/metrics";
-import PipelineConnectionsList from "components/pipelines/PipelineConnectionsList";
-import {Button} from "components/bootstrap";
-import {isPermitted} from "util/PermissionsMixin";
-import type { PipelineType} from "stores/pipelines/PipelinesStore";
-import type {PipelineConnectionsType} from "stores/pipelines/PipelineConnectionsStore";
-import type {Stream} from "logic/streams/types";
-import {defaultCompare as naturalSort} from "logic/DefaultCompare";
-import useCurrentUser from "hooks/useCurrentUser";
+import { isPermitted } from 'util/PermissionsMixin';
+import { Link, LinkContainer } from 'components/common/router';
+import Routes from 'routing/Routes';
+import { CounterRate, MetricContainer } from 'components/metrics';
+import PipelineConnectionsList from 'components/pipelines/PipelineConnectionsList';
+import { Button, Label } from 'components/bootstrap';
+import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
+import type { Stream } from 'logic/streams/types';
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
-import ButtonToolbar from "../bootstrap/ButtonToolbar";
+import ButtonToolbar from '../bootstrap/ButtonToolbar';
+import { Spinner } from '../common';
 
 type Props = {
   pipeline: PipelineType;
@@ -61,17 +63,25 @@ const PipelineStage = styled.div<{ $idle?: boolean }>(
     text-align: center;
     width: 120px;
     background-color: ${$idle
-    ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10)
-    : theme.colors.global.contentBackground};
+      ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10)
+      : theme.colors.global.contentBackground};
   `,
 );
-
+const DefaultLabel = styled(Label)`
+  display: inline-flex;
+  margin-left: 5px;
+  vertical-align: inherit;
+`;
 
 const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeletePipeline }: Props) => {
   const currentUser = useCurrentUser();
+  const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(pipeline);
   const { id, title, description, stages } = pipeline;
-  const _formatConnectedStreams = (streamsUsingPipeline: Array<Stream>) => streamsUsingPipeline.map((s) => s.title).join(', ');
-  const _formatStages = ( ) => {
+  const isManaged = scopePermissions && !scopePermissions?.is_mutable;
+  const isNotDeletable = scopePermissions && !scopePermissions?.is_deletable;
+  const _formatConnectedStreams = (streamsUsingPipeline: Array<Stream>) =>
+    streamsUsingPipeline.map((s) => s.title).join(', ');
+  const _formatStages = () => {
     const stageNumbers = stages.map((stage) => stage.stage);
 
     return pipelines
@@ -95,6 +105,9 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
         return <PipelineStage key={`${pipeline.id}-stage${usedStage}`}>Stage {usedStage}</PipelineStage>;
       });
   };
+  if (loadingScopePermissions) {
+    return <Spinner text="Loading pipeline..." />;
+  }
 
   return (
     <tr key={id}>
@@ -102,11 +115,16 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
         <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(id)} title={title}>
           {title}
         </Link>
-        <br/>
+        {isManaged && (
+          <DefaultLabel bsStyle="default" bsSize="xsmall">
+            System managed
+          </DefaultLabel>
+        )}
+        <br />
         {description}
-        <br/>
+        <br />
         <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${id}.executed`}>
-          <CounterRate prefix="Throughput:" suffix="msg/s"/>
+          <CounterRate prefix="Throughput:" suffix="msg/s" />
         </MetricContainer>
       </PipelineNameTD>
       <StreamListTD>
@@ -127,7 +145,7 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
             </Button>
           </LinkContainer>
           <Button
-            disabled={!isPermitted(currentUser.permissions, 'pipeline:delete')}
+            disabled={!isPermitted(currentUser.permissions, 'pipeline:delete') || isNotDeletable}
             bsStyle="danger"
             bsSize="xsmall"
             onClick={() => onDeletePipeline()}>
@@ -139,4 +157,4 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
   );
 };
 
-export default PipelineListItem
+export default PipelineListItem;
