@@ -18,13 +18,13 @@ import React from 'react';
 
 import { Table, Label } from 'components/bootstrap';
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
+import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 
-import ClusterConfigurationStatusLabel from './ClusterConfigurationStatusLabel';
-import type { ClusterNode } from './useClusterNodes';
+import type { ClusterNodes } from './useClusterNodes';
+import ClusterStatusLabel from './ClusterStatusLabel';
 
 type Props = {
-  graylogNodes: ClusterNode[],
-  dataNodes: ClusterNode[],
+  clusterNodes: ClusterNodes,
 }
 
 const getRoleLabels = (roles: string) => roles.split(',').map((role) => (
@@ -33,7 +33,7 @@ const getRoleLabels = (roles: string) => roles.split(',').map((role) => (
   </span>
 ));
 
-const ClusterConfigurationTableView = ({ graylogNodes, dataNodes }: Props) => (
+const ClusterConfigurationTableView = ({ clusterNodes }: Props) => (
   <Table>
     <thead>
       <tr>
@@ -45,21 +45,21 @@ const ClusterConfigurationTableView = ({ graylogNodes, dataNodes }: Props) => (
       </tr>
     </thead>
     <tbody>
-      {graylogNodes.map((graylogNode) => (
+      {clusterNodes.graylogNodes.map((graylogNode) => (
         <tr key={graylogNode.nodeName}>
           <td>{graylogNode.nodeName}</td>
           <td>{graylogNode.type}</td>
           <td>{getRoleLabels(graylogNode.role)}</td>
-          <td><ClusterConfigurationStatusLabel status={graylogNode.state} /></td>
+          <td><ClusterStatusLabel node={graylogNode.nodeInfo} /></td>
           <td align='right'><MoreActions /></td>
         </tr>
       ))}
-      {dataNodes.map((dataNode) => (
+      {clusterNodes.dataNodes.map((dataNode) => (
         <tr key={dataNode.nodeName}>
           <td>{dataNode.nodeName}</td>
           <td>{dataNode.type}</td>
           <td>{getRoleLabels(dataNode.role)}</td>
-          <td><ClusterConfigurationStatusLabel status={dataNode.state} /></td>
+          <td><DataNodeStatusCell dataNode={dataNode.nodeInfo} /></td>
           <td align='right'><MoreActions /></td>
         </tr>
       ))}

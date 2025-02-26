@@ -15,34 +15,46 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useStore } from 'stores/connect';
-import useDataNodes from 'components/datanode/hooks/useDataNodes';
+import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
 import { NodesStore } from 'stores/nodes/NodesStore';
+import type { NodeInfo } from 'stores/nodes/NodesStore';
+import type { DataNode } from 'components/datanode/Types';
+import type { SystemOverview } from 'src/stores/cluster/types';
+import useDataNodes from 'components/datanode/hooks/useDataNodes';
 
-export type ClusterNode = {
+export type GraylogNode = NodeInfo & SystemOverview;
+
+export type ClusterNode<NodeType = GraylogNode | DataNode> = {
   nodeName: string,
   type: string,
   role: string,
-  state: string,
+  nodeInfo: NodeType,
 }
 
-const useClusterNodes = () : {
-  graylogNodes: ClusterNode[],
-  dataNodes: ClusterNode[],
-} => {
+export type ClusterNodes = {
+  graylogNodes: ClusterNode<GraylogNode>[],
+  dataNodes: ClusterNode<DataNode>[],
+}
+
+const useClusterNodes = (): ClusterNodes => {
   const { nodes: _graylogNodes } = useStore(NodesStore);
+  const { clusterOverview: systemInfo  } = useStore(ClusterOverviewStore);
   const graylogNodes = Object.values(_graylogNodes || {}).map((graylogNode) => ({
     nodeName: `${graylogNode.short_node_id} / ${graylogNode.hostname}`,
     type: 'Graylog',
     role: graylogNode.is_leader ? 'Leader' : 'Non-Leader',
-    state: 'Available',
+    nodeInfo: {
+      ...graylogNode,
+      ...systemInfo[graylogNode.node_id]
+    },
   }));
 
-  const { data: _dataNodes } = useDataNodes();
+  const { data: _dataNodes } = useDataNodes({ query: '', page: 1, pageSize: 0, sort: { attributeId: 'hostname', direction: 'asc' } });
   const dataNodes = (_dataNodes?.list || []).map((dataNode) => ({
     nodeName: dataNode.hostname,
     type: 'Data Node - OpenSearch',
     role: 'Cluster-manager-eligible,Data,Ingest,Coordinator',
-    state: 'Available',
+    nodeInfo: dataNode,
   }));
 
   return ({

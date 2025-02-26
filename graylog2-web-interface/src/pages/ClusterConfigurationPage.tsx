@@ -43,7 +43,7 @@ type ViewTypesSegments = 'list' | 'cards';
 
 const ClusterConfigurationPage = () => {
   const [viewType, setViewType] = useState<ViewTypesSegments>('list');
-  const { graylogNodes, dataNodes } = useClusterNodes();
+  const clusterNodes = useClusterNodes();
 
   return (
     <DocumentTitle title="Cluster Configuration">
@@ -68,10 +68,10 @@ const ClusterConfigurationPage = () => {
           </ViewTypeSwitchContainer>
           <Col md={12}>
             {viewType === 'list' && (
-              <ClusterConfigurationTableView graylogNodes={graylogNodes} dataNodes={dataNodes} />
+              <ClusterConfigurationTableView clusterNodes={clusterNodes} />
             )}
             {viewType === 'cards' && (
-              <ClusterConfigurationClusterView graylogNodes={graylogNodes} dataNodes={dataNodes} />
+              <ClusterConfigurationClusterView />
             )}
           </Col>
         </Row>
