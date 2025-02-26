@@ -20,7 +20,9 @@ import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstances;
+import org.junit.jupiter.api.parallel.ResourceLocksProvider;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
+import org.junit.jupiter.engine.execution.ExtensionContextSupplier;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistrar;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
@@ -34,6 +36,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.util.Collections.emptyList;
@@ -95,15 +98,13 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
     // --- Node ----------------------------------------------------------------
 
     @Override
-    protected TestInstances instantiateTestClass(JupiterEngineExecutionContext parentExecutionContext,
-                                                 ExtensionRegistry registry, ExtensionRegistrar registrar, ExtensionContext extensionContext,
-                                                 ThrowableCollector throwableCollector) {
-        return instantiateTestClass(Optional.empty(), registry, extensionContext);
+    public JupiterEngineExecutionContext prepare(JupiterEngineExecutionContext context) {
+        return super.prepare(context);
     }
 
     @Override
-    public JupiterEngineExecutionContext prepare(JupiterEngineExecutionContext context) {
-        return super.prepare(context);
+    protected TestInstances instantiateTestClass(JupiterEngineExecutionContext parentExecutionContext, ExtensionContextSupplier extensionContext, ExtensionRegistry registry, JupiterEngineExecutionContext context) {
+        return instantiateTestClass(Optional.empty(), registry, extensionContext);
     }
 
     public SearchVersion getEsVersion() {
@@ -120,5 +121,10 @@ public class ContainerMatrixTestClassDescriptor extends ClassBasedTestDescriptor
 
     public boolean isPreImportLicense() {
         return preImportLicense;
+    }
+
+    @Override
+    public Function<ResourceLocksProvider, Set<ResourceLocksProvider.Lock>> getResourceLocksProviderEvaluator() {
+        return f -> Set.of();
     }
 }
