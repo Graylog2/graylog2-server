@@ -19,6 +19,8 @@ import React from 'react';
 import { Table, Label } from 'components/bootstrap';
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 import type { ClusterNodes } from './useClusterNodes';
 import ClusterStatusLabel from './ClusterStatusLabel';
@@ -47,7 +49,7 @@ const ClusterConfigurationTableView = ({ clusterNodes }: Props) => (
     <tbody>
       {clusterNodes.graylogNodes.map((graylogNode) => (
         <tr key={graylogNode.nodeName}>
-          <td>{graylogNode.nodeName}</td>
+          <td><Link to={Routes.SYSTEM.NODES.SHOW(graylogNode.nodeInfo.node_id)}>{graylogNode.nodeName}</Link></td>
           <td>{graylogNode.type}</td>
           <td>{getRoleLabels(graylogNode.role)}</td>
           <td><ClusterStatusLabel node={graylogNode.nodeInfo} /></td>
@@ -56,7 +58,7 @@ const ClusterConfigurationTableView = ({ clusterNodes }: Props) => (
       ))}
       {clusterNodes.dataNodes.map((dataNode) => (
         <tr key={dataNode.nodeName}>
-          <td>{dataNode.nodeName}</td>
+          <td><Link to={Routes.SYSTEM.DATANODES.SHOW(dataNode.nodeInfo.node_id)}>{dataNode.nodeName}</Link></td>
           <td>{dataNode.type}</td>
           <td>{getRoleLabels(dataNode.role)}</td>
           <td><DataNodeStatusCell dataNode={dataNode.nodeInfo} /></td>
