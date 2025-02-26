@@ -209,7 +209,7 @@
         <!-- Plugin versions -->
         <license-maven.version>4.6</license-maven.version>
         <download-maven-plugin.version>1.6.8.1</download-maven-plugin.version>
-        <os-maven-plugin.version>1.7.0</os-maven-plugin.version>
+        <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
     </properties>
 
