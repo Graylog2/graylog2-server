@@ -1,0 +1,5 @@
+type = "f"
+message = "Added value sanitation to MarkdownEditor component"
+
+issues = ["Graylog2/graylog-plugin-enterprise#9778"]
+pulls = [""]
