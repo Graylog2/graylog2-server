@@ -193,7 +193,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
         JupiterConfiguration configuration = new CachingJupiterConfiguration(
-                new DefaultJupiterConfiguration(discoveryRequest.getConfigurationParameters()));
+                new DefaultJupiterConfiguration(discoveryRequest.getConfigurationParameters(), null));
         final ContainerMatrixEngineDescriptor engineDescriptor = new ContainerMatrixEngineDescriptor(uniqueId, "Graylog Container Matrix Tests", configuration);
 
         if (testAgainstRunningESMongoDB()) {
