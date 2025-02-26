@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Table } from 'components/bootstrap';
+import { Table, Label } from 'components/bootstrap';
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 import ClusterConfigurationStatusLabel from './ClusterConfigurationStatusLabel';
@@ -26,6 +26,12 @@ type Props = {
   graylogNodes: ClusterNode[],
   dataNodes: ClusterNode[],
 }
+
+const getRoleLabels = (roles: string) => roles.split(',').map((role) => (
+  <span key={role}>
+    <Label bsSize="xs">{role}</Label>&nbsp;
+  </span>
+));
 
 const ClusterConfigurationTableView = ({ graylogNodes, dataNodes }: Props) => (
   <Table>
@@ -40,19 +46,19 @@ const ClusterConfigurationTableView = ({ graylogNodes, dataNodes }: Props) => (
     </thead>
     <tbody>
       {graylogNodes.map((graylogNode) => (
-        <tr>
+        <tr key={graylogNode.nodeName}>
           <td>{graylogNode.nodeName}</td>
           <td>{graylogNode.type}</td>
-          <td>{graylogNode.role}</td>
+          <td>{getRoleLabels(graylogNode.role)}</td>
           <td><ClusterConfigurationStatusLabel status={graylogNode.state} /></td>
           <td align='right'><MoreActions /></td>
         </tr>
       ))}
       {dataNodes.map((dataNode) => (
-        <tr>
+        <tr key={dataNode.nodeName}>
           <td>{dataNode.nodeName}</td>
           <td>{dataNode.type}</td>
-          <td>{dataNode.role}</td>
+          <td>{getRoleLabels(dataNode.role)}</td>
           <td><ClusterConfigurationStatusLabel status={dataNode.state} /></td>
           <td align='right'><MoreActions /></td>
         </tr>
