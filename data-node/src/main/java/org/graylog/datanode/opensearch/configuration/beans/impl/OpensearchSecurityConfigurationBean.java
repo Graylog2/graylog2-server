@@ -113,7 +113,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
             try {
                 configurationBuilder.httpCertificate(cert);
                 configurationBuilder.withConfigFile(new KeystoreConfigFile(Path.of(TARGET_DATANODE_HTTP_KEYSTORE_FILENAME), cert));
-                truststoreCreator.addFromKeystore(cert, CertConstants.DATANODE_KEY_ALIAS);
+                truststoreCreator.addCertificates(cert);
                 logCertificateInformation("HTTP certificate", cert);
             } catch (GeneralSecurityException | IOException e) {
                 throw new OpensearchConfigurationException(e);
@@ -124,7 +124,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
             try {
                 configurationBuilder.transportCertificate(cert);
                 configurationBuilder.withConfigFile(new KeystoreConfigFile(Path.of(TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME), cert));
-                truststoreCreator.addFromKeystore(cert, CertConstants.DATANODE_KEY_ALIAS);
+                truststoreCreator.addCertificates(cert);
                 logCertificateInformation("Transport certificate", cert);
             } catch (GeneralSecurityException | IOException e) {
                 throw new OpensearchConfigurationException(e);
@@ -158,7 +158,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
 
             config.put("plugins.security.ssl.transport.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.keystore_filepath", TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME);
-            config.put("plugins.security.ssl.transport.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
+            //config.put("plugins.security.ssl.transport.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.transport.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILE.toString());
@@ -167,7 +167,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
 
             config.put("plugins.security.ssl.http.keystore_type", KEYSTORE_FORMAT);
             config.put("plugins.security.ssl.http.keystore_filepath", TARGET_DATANODE_HTTP_KEYSTORE_FILENAME);
-            config.put("plugins.security.ssl.http.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
+            //config.put("plugins.security.ssl.http.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.http.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILE.toString());
