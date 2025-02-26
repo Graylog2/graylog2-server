@@ -129,7 +129,8 @@ public interface Stream extends Persisted {
     void setIndexSetId(String indexSetId);
 
     default boolean isIlluminateStream() {
-        return getTitle().startsWith(ILLUMINATE_TITLE_PREFIX);
+        final String title = getTitle();
+        return title != null && title.startsWith(ILLUMINATE_TITLE_PREFIX);
     }
 
     static boolean isSystemStreamId(String id) {
