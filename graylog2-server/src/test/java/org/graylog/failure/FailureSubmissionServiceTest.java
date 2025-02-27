@@ -19,6 +19,8 @@ package org.graylog.failure;
 import org.graylog2.indexer.messages.IndexingError;
 import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
+import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -374,5 +376,44 @@ class FailureSubmissionServiceTest {
             assertThat(fb.getFailures().get(0)).satisfies(processingFailure ->
                     assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'msg-uuid': Encountered an unrecognizable processing error"));
         });
+    }
+
+    @Test
+    void submitInputError_inputErrorTransformedAndSubmittedToFailureQueue() throws Exception {
+        RawMessage rawMessage = new RawMessage(new byte[]{});
+        InputProcessingException inputException = InputProcessingException.create("error1", rawMessage);
+
+        underTest.submitInputFailure(inputException, "1234");
+
+        verify(failureSubmissionQueue, times(1)).submitBlocking(failureBatchCaptor.capture());
+        assertThat(failureBatchCaptor.getValue()).satisfies(fb -> {
+            assertThat(fb.containsInputFailures()).isTrue();
+            assertThat(fb.size()).isEqualTo(1);
+
+            assertThat(fb.getFailures().get(0)).satisfies(indexingFailure -> {
+                assertThat(indexingFailure.failureType()).isEqualTo(FailureType.INPUT);
+                assertThat(indexingFailure.failureCause().label()).isEqualTo("InputParseError");
+                assertThat(indexingFailure.message()).isEqualTo("Failed to process message with id '%s' from input with id '1234': %s"
+                        .formatted(rawMessage.getId().toString(), inputException.getMessage()));
+                assertThat(indexingFailure.failureDetails()).isEqualTo(inputException.getMessage());
+                assertThat(indexingFailure.failureTimestamp()).isNotNull();
+                assertThat(indexingFailure.messageTimestamp()).isEqualTo(rawMessage.getTimestamp());
+                assertThat(indexingFailure.messageId()).isEqualTo(rawMessage.getId().toString());
+                assertThat(indexingFailure.requiresAcknowledgement()).isFalse();
+            });
+        });
+    }
+
+    @Test
+    void submitInputError_rootCauseMessageIsUsedForFailureDetails() throws Exception {
+        InputProcessingException inputException = InputProcessingException.create("error1",
+                new IllegalArgumentException("rootCauseMessage"), new RawMessage(new byte[]{}));
+
+        underTest.submitInputFailure(inputException, "1234");
+
+        verify(failureSubmissionQueue, times(1)).submitBlocking(failureBatchCaptor.capture());
+        assertThat(failureBatchCaptor.getValue()).satisfies(fb ->
+                assertThat(fb.getFailures().get(0)).satisfies(indexingFailure ->
+                        assertThat(indexingFailure.failureDetails()).isEqualTo("IllegalArgumentException: rootCauseMessage")));
     }
 }

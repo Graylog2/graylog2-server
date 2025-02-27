@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.indexer.messages.IndexingError.Type.MappingError;
@@ -196,16 +195,17 @@ public class FailureSubmissionService {
             RawMessage rawMessage = inputProcessingException.getRawMessage();
             final String messageId = rawMessage.getId().toString();
 
-            final String message = String.format(Locale.ENGLISH,
-                    "Failed to process message with id '%s': %s",
+            final String message = "Failed to process message with id '%s' from input with id '%s': %s".formatted(
                     StringUtils.isBlank(messageId) ? "UNKNOWN" : messageId,
-                    inputProcessingException.getMessage());
+                    inputId,
+                    inputProcessingException.getMessage()
+            );
 
-            Throwable throwable = Optional.ofNullable(inputProcessingException.getCause()).orElse(inputProcessingException);
+            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(inputProcessingException.getCause());
             final InputFailure processingFailure = new InputFailure(
                     InputFailureCause.INPUT_PARSE,
                     message,
-                    ExceptionUtils.getStackTrace(throwable),
+                    rootCauseMessage.isBlank() ? inputProcessingException.getMessage() : rootCauseMessage,
                     Tools.nowUTC(),
                     rawMessage,
                     inputProcessingException.inputMessage().orElse("")
