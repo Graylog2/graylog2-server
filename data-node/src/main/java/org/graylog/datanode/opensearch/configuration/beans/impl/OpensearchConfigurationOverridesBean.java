@@ -32,9 +32,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class OpensearchConfigurationOverridesBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
@@ -45,7 +47,7 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
 
     @Inject
     public OpensearchConfigurationOverridesBean(DatanodeConfiguration datanodeConfiguration, Configuration configuration) {
-        this(datanodeConfiguration.datanodeDirectories(), configuration.getOpensearchConfigurationOverridesFile() , System::getenv);
+        this(datanodeConfiguration.datanodeDirectories(), configuration.getOpensearchConfigurationOverridesFile(), System::getenv);
     }
 
     public OpensearchConfigurationOverridesBean(DatanodeDirectories datanodeDirectories, Path overridesFile, Supplier<Map<String, String>> systemEnvSupplier) {
@@ -72,18 +74,27 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
                 .map(this::readPropertiesFile)
                 .ifPresent(properties::putAll);
 
-        logWarnings(properties);
-
-        return builder.properties(properties).build();
+        return builder
+                .properties(properties)
+                .withWarnings(collectWarnings(properties))
+                .build();
     }
 
-    private void logWarnings(Map<String, String> properties) {
-        if (!properties.isEmpty()) {
-            LOG.warn("Your system is overriding opensearch configuration properties. This isn't supported and may break in any future release!");
-            properties.forEach((key, value) -> {
-                LOG.warn("Detected pass-through opensearch property {}: {}", key, value);
-            });
-        }
+    private List<String> collectWarnings(Map<String, String> properties) {
+        return properties.entrySet().stream()
+                .filter(this::shouldPrintWarning)
+                .map(this::formatWarning)
+                .collect(Collectors.toList());
+    }
+
+    protected String formatWarning(Map.Entry<String, String> entry) {
+        return String.format("Your system is overriding opensearch configuration properties. " +
+                        "This isn't supported and may break in any future release! Detected pass-through opensearch property %s: %s)",
+                entry.getKey(), entry.getValue());
+    }
+
+    private boolean shouldPrintWarning(Map.Entry<String, String> property) {
+        return true;
     }
 
     private Map<String, String> readPropertiesFile(Path file) {

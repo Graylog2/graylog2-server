@@ -22,6 +22,7 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationPara
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -77,10 +78,16 @@ class OpensearchConfigurationOverridesBeanTest {
                 .hasSize(2)
                 .containsEntry("cluster.routing.allocation.disk.watermark.low", "98%")
                 .containsEntry("cluster.max_shards_per_node", "500");
+
+        Assertions.assertThat(configurationPart.warnings())
+                .hasSize(2)
+                .anySatisfy(warning -> Assertions.assertThat(warning).contains("Detected pass-through opensearch property cluster.routing.allocation.disk.watermark.low"))
+                .anySatisfy(warning -> Assertions.assertThat(warning).contains("Detected pass-through opensearch property cluster.max_shards_per_node"));
     }
 
+
     private void writePropertiesFile(Path file, String passthroughConfig) {
-        try (final OutputStream fos = Files.newOutputStream(file)) {
+        try {
             Files.writeString(file, passthroughConfig);
         } catch (IOException e) {
             throw new RuntimeException(e);

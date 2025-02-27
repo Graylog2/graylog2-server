@@ -160,4 +160,10 @@ public class OpensearchConfiguration {
     public DatanodeDirectories getDatanodeDirectories() {
         return datanodeDirectories;
     }
+
+    public List<String> warnings() {
+        return configurationParts.stream()
+                .flatMap(part -> part.warnings().stream())
+                .collect(Collectors.toList());
+    }
 }
