@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.inputs;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
@@ -70,6 +71,7 @@ class InputLauncherTest {
                 inputBuffer,
                 persistedInputs,
                 inputRegistry,
+                new MetricRegistry(),
                 new Configuration(),
                 leaderElectionService,
                 featureFlags,
