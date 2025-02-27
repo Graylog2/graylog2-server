@@ -1751,7 +1751,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
       $(".request_url", $(this.el)).html("<pre>" + data.request.url + "</pre>");
       $(".response_code", $(this.el)).html("<pre>" + data.status + "</pre>");
       $(".response_body", $(this.el)).html(response_body);
-      $(".response_headers", $(this.el)).html("<pre>" + JSON.stringify(data.getHeaders()) + "</pre>");
+      $(".response_headers", $(this.el)).html("<pre>" + Handlebars.Utils.escapeExpression(JSON.stringify(data.getHeaders())) + "</pre>");
       $(".response", $(this.el)).slideDown();
       $(".response_hider", $(this.el)).show();
       $(".response_throbber", $(this.el)).hide();
