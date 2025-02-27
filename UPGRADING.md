@@ -52,6 +52,6 @@ DBService classes' new streaming methods require streams to be closed after usin
 
 The following REST API changes have been made.
 
-| Endpoint                                         | Description                                                                                                                     |
-|--------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| `GET /tbd`                                       | tbd                                                                                                                             |
+| Endpoint                               | Description                         |
+|----------------------------------------|-------------------------------------|
+| `/plugins/org.graylog.plugins.files/*` | removed (Graylog Enterprise plugin) |
