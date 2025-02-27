@@ -39,7 +39,6 @@ import {
   viewWithoutWidget,
 } from 'views/components/export/Fixtures';
 import { createWidget } from 'views/logic/WidgetTestHelpers';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useViewType from 'views/hooks/useViewType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
@@ -47,6 +46,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import { usePlugin } from 'views/test/testPlugins';
 import startDownload from 'views/components/export/startDownload';
 import type { QueryString } from 'views/logic/queries/types';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import type { Props as ExportModalProps } from './ExportModal';
 import ExportModal from './ExportModal';
@@ -114,13 +114,13 @@ describe('ExportModal', () => {
     ...props
   }: SimpleExportModalProps) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+      <TestFieldTypesContextProvider>
         <ExportModal
           view={view ?? viewWithoutWidget(viewType)}
           closeModal={closeModal}
           {...(props as ExportModalProps)}
         />
-      </FieldTypesContext.Provider>
+      </TestFieldTypesContextProvider>
     </TestStoreProvider>
   );
 
