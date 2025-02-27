@@ -24,7 +24,7 @@ import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import usePluginEntities from 'hooks/usePluginEntities';
 import generateId from 'logic/generateId';
 import useView from 'views/hooks/useView';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -74,7 +74,7 @@ type Props = {
 const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
   const view = useView();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
 

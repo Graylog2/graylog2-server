@@ -28,7 +28,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import type { SearchExecutionResult } from 'views/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import executeSearch from 'views/logic/slices/executeJobResult';
 import generateId from 'logic/generateId';
 
@@ -65,27 +65,28 @@ describe('DefaultFieldTypesProvider', () => {
 
     expect(consume).toHaveBeenCalledWith({
       all: Immutable.List(),
-      queryFields: Immutable.Map({ foobar: Immutable.List() }),
+      currentQuery: Immutable.List(),
     });
   });
 
   it('provides field types of field types store', () => {
+    const fields = simpleFields();
+
     asMock(useCurrentQuery).mockReturnValue(
       Query.builder()
         .id('queryId')
         .filter(filtersForQuery(['dummyStream']))
         .build(),
     );
+    const queryFields = simpleQueryFields('foo').get('foo');
 
     asMock(useFieldTypes).mockImplementation((streams) =>
-      streams.length === 0
-        ? { data: simpleFields().toArray(), refetch }
-        : { data: simpleQueryFields('foo').get('foo').toArray(), refetch },
+      streams.length === 0 ? { data: fields.toArray(), refetch } : { data: queryFields.toArray(), refetch },
     );
 
     const consume = renderSUT();
 
-    const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
+    const fieldTypes = { all: fields, currentQuery: queryFields };
 
     expect(consume).toHaveBeenCalledWith(fieldTypes);
   });
@@ -101,7 +102,7 @@ describe('DefaultFieldTypesProvider', () => {
     );
 
     const TriggerRefresh = () => {
-      const dispatch = useAppDispatch();
+      const dispatch = useViewsDispatch();
 
       return (
         <button type="button" onClick={() => dispatch(execute())}>
