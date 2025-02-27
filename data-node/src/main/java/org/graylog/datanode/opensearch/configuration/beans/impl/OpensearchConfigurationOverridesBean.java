@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -88,7 +89,7 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
     }
 
     protected String formatWarning(Map.Entry<String, String> entry) {
-        return String.format("Your system is overriding opensearch configuration properties. " +
+        return String.format(Locale.ENGLISH, "Your system is overriding opensearch configuration properties. " +
                         "This isn't supported and may break in any future release! Detected pass-through opensearch property %s: %s)",
                 entry.getKey(), entry.getValue());
     }
