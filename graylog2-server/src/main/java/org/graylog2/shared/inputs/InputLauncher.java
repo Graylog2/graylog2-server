@@ -16,6 +16,9 @@
  */
 package org.graylog2.shared.inputs;
 
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.MetricRegistry;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderElectionService;
@@ -32,6 +35,11 @@ import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
+import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
@@ -42,6 +50,7 @@ public class InputLauncher {
     private final InputBuffer inputBuffer;
     private final PersistedInputs persistedInputs;
     private final InputRegistry inputRegistry;
+    private final ExecutorService executor;
     private final Configuration configuration;
     private final LeaderElectionService leaderElectionService;
     private final FeatureFlags featureFlags;
@@ -50,17 +59,26 @@ public class InputLauncher {
 
     @Inject
     public InputLauncher(IOState.Factory<MessageInput> inputStateFactory, InputBuffer inputBuffer, PersistedInputs persistedInputs,
-                         InputRegistry inputRegistry, Configuration configuration, LeaderElectionService leaderElectionService,
+                         InputRegistry inputRegistry, MetricRegistry metricRegistry, Configuration configuration, LeaderElectionService leaderElectionService,
                          FeatureFlags featureFlags, InputService inputService, NodeId nodeId) {
         this.inputStateFactory = inputStateFactory;
         this.inputBuffer = inputBuffer;
         this.persistedInputs = persistedInputs;
         this.inputRegistry = inputRegistry;
+        this.executor = executorService(metricRegistry);
         this.configuration = configuration;
         this.leaderElectionService = leaderElectionService;
         this.featureFlags = featureFlags;
         this.inputService = inputService;
         this.nodeId = nodeId;
+    }
+
+    private ExecutorService executorService(final MetricRegistry metricRegistry) {
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("inputs-%d").build();
+        return new InstrumentedExecutorService(
+                Executors.newCachedThreadPool(threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     public void launch(final String inputId) {
@@ -116,17 +134,22 @@ public class InputLauncher {
             return;
         }
 
-        LOG.debug("Starting input {}", messageInput.toIdentifier());
-        try {
-            messageInput.checkConfiguration();
-            inputState.setState(IOState.Type.STARTING);
-            messageInput.initialize();
-            messageInput.launch(inputBuffer, new InputFailureRecorder(inputState));
-            inputState.setState(IOState.Type.RUNNING);
-            LOG.debug("Completed starting input {}", messageInput.toIdentifier());
-        } catch (Exception e) {
-            handleLaunchException(e, inputState);
-        }
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                LOG.debug("Starting input {}", messageInput.toIdentifier());
+                try {
+                    messageInput.checkConfiguration();
+                    inputState.setState(IOState.Type.STARTING);
+                    messageInput.initialize();
+                    messageInput.launch(inputBuffer, new InputFailureRecorder(inputState));
+                    inputState.setState(IOState.Type.RUNNING);
+                    LOG.debug("Completed starting input {}", messageInput.toIdentifier());
+                } catch (Exception e) {
+                    handleLaunchException(e, inputState);
+                }
+            }
+        });
     }
 
     protected void handleLaunchException(Throwable e, IOState<MessageInput> inputState) {
