@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.Configuration;
@@ -135,9 +136,15 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
                 .keystoreItems(keystoreItems(truststorePassword, httpCert, transportCert))
                 .javaOpts(javaOptions(truststorePassword))
                 .trustStore(truststoreCreator.getTruststore())
-                .withConfigFile(new KeystoreConfigFile(TRUSTSTORE_FILE, truststoreCreator.toKeystoreInformation(truststorePassword.toCharArray())))
+                .withConfigFile(truststoreFile(truststoreCreator, truststorePassword))
                 .withConfigFile(new OpensearchSecurityConfigurationFile(jwtSecret))
                 .build();
+    }
+
+    @Nonnull
+    private KeystoreConfigFile truststoreFile(TruststoreCreator truststoreCreator, String truststorePassword) {
+        final InMemoryKeystoreInformation keystore = new InMemoryKeystoreInformation(truststoreCreator.getTruststore(), truststorePassword.toCharArray());
+        return new KeystoreConfigFile(TRUSTSTORE_FILE, keystore);
     }
 
 
