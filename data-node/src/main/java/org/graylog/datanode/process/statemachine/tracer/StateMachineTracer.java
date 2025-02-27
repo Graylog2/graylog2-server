@@ -14,18 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog.datanode.process.statemachine.tracer;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog2.storage.SearchVersion;
+import com.github.oxo42.stateless4j.StateMachine;
+import com.github.oxo42.stateless4j.delegates.Trace;
 
-public class DatanodeDevInstanceBuilder extends SearchServerBuilder<DatanodeDevInstance> {
-    public DatanodeDevInstanceBuilder(SearchVersion version) {
-        super(version);
-    }
+public interface StateMachineTracer<STATE, EVENT> extends Trace<STATE, EVENT> {
 
-    @Override
-    protected DatanodeDevInstance instantiate() {
-        return new DatanodeDevInstance(getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getHeapSize(), getFeatureFlags(), getEnv(), getDatanodePluginJarsProvider()).init();
+    default void setStateMachine(StateMachine<STATE, EVENT> stateMachine) {
     }
 }

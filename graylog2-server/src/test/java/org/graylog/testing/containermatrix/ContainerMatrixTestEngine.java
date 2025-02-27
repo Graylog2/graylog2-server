@@ -20,12 +20,12 @@ import com.google.common.io.Resources;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
+import jakarta.annotation.Nonnull;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.storage.SearchVersion;
-import jakarta.annotation.Nonnull;
 import org.junit.jupiter.engine.config.CachingJupiterConfiguration;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
@@ -220,9 +220,11 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         final ContainerMatrixTestsConfiguration annotation = clazz.getAnnotation(ContainerMatrixTestsConfiguration.class);
         final Class<? extends MavenProjectDirProvider> mavenProjectDirProvider = annotation.mavenProjectDirProvider();
         final Class<? extends PluginJarsProvider> pluginJarsProvider = annotation.pluginJarsProvider();
+        final Class<? extends PluginJarsProvider> datanodePluginJarsProvider = annotation.datanodePluginJarsProvider();
         final Lifecycle lifecycle = annotation.serverLifecycle();
         final String mavenProjectDirProviderID = instantiateFactory(mavenProjectDirProvider).getUniqueId();
         final String pluginJarsProviderID = instantiateFactory(pluginJarsProvider).getUniqueId();
+        final String datanodePluginJarsProviderID = instantiateFactory(datanodePluginJarsProvider).getUniqueId();
         final List<URL> mongoFixtures = getMongoDBFixtures(Lifecycle.VM, clazz);
         final Map<String, String> additionalParams = getAdditionalConfigurationParameters(Collections.singleton(clazz));
         return Arrays.stream(annotation.searchVersions()).flatMap(searchServer ->
@@ -240,7 +242,9 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                 Arrays.stream(annotation.enabledFeatureFlags()).collect(Collectors.toList()),
                                 annotation.withMailServerEnabled(),
                                 annotation.withWebhookServerEnabled(),
-                                additionalParams)
+                                additionalParams,
+                                datanodePluginJarsProvider,
+                                datanodePluginJarsProviderID)
                 )
         ).distinct();
     }
