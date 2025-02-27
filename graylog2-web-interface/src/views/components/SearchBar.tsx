@@ -64,8 +64,8 @@ import {
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useQueryFilters from 'views/logic/queries/useQueryFilters';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { updateQuery } from 'views/logic/slices/viewSlice';
 import useHandlerContext from 'views/components/useHandlerContext';
@@ -92,7 +92,7 @@ const StreamsAndRefresh = styled.div`
 `;
 
 const defaultOnSubmit = async (
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   values: SearchBarFormValues,
   pluggableSearchBarControls: Array<() => SearchBarControl>,
   currentQuery: Query,
@@ -162,7 +162,7 @@ const _validateQueryString = (
 
 type Props = {
   onSubmit?: (
-    dispatch: AppDispatch,
+    dispatch: ViewsDispatch,
     update: SearchBarFormValues,
     pluggableSearchBarControls: Array<() => SearchBarControl>,
     query: Query,
@@ -198,7 +198,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const queryFilters = useQueryFilters();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const { restartAutoRefresh } = useAutoRefresh();
   const _onSubmit = useCallback(
     (values: SearchBarFormValues) =>

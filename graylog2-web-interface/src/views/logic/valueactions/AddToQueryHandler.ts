@@ -18,7 +18,7 @@ import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { escape, addToQuery, formatTimestamp, predicate } from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
 
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
@@ -36,7 +36,7 @@ type Arguments = {
 
 const AddToQueryHandler =
   ({ queryId, field, value = '', type }: Arguments) =>
-  async (dispatch: AppDispatch, getState: () => RootState) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
     const newQuery = formatNewQuery(oldQuery, field, value, type);
 

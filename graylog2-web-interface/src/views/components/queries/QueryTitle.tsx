@@ -22,7 +22,7 @@ import { MenuItem } from 'components/bootstrap';
 import type { QueryId } from 'views/logic/queries/Query';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import type ViewState from 'views/logic/views/ViewState';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { duplicateQuery } from 'views/logic/slices/viewSlice';
 
 import QueryActionDropdown from './QueryActionDropdown';
@@ -59,7 +59,7 @@ const QueryTitle = ({
 }: Props) => {
   const [titleValue, setTitleValue] = useState(title);
   const { setDashboardPage } = useContext(DashboardPageContext);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   useEffect(() => {
     setTitleValue(title);
