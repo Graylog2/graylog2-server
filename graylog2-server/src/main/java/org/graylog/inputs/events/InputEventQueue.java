@@ -31,7 +31,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,14 +41,14 @@ import java.util.concurrent.TimeUnit;
 public class InputEventQueue extends AbstractExecutionThreadService {
     private static final Logger LOG = LoggerFactory.getLogger(InputEventQueue.class);
 
-    private final LinkedBlockingDeque<InputEvent> queue;
+    private final LinkedBlockingQueue<InputEvent> queue;
     private final EventBus eventBus;
     private final InputEventListener inputEventListener;
 
     @Inject
     public InputEventQueue(EventBus eventBus, InputEventListener inputEventListener) {
         this.inputEventListener = inputEventListener;
-        this.queue = new LinkedBlockingDeque<>(512);
+        this.queue = new LinkedBlockingQueue<>(512);
         this.eventBus = eventBus;
     }
 
