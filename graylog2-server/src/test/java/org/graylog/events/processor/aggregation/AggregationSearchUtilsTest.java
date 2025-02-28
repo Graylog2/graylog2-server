@@ -146,7 +146,7 @@ public class AggregationSearchUtilsTest {
                 ))
                 .build();
 
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, null);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> null);
 
         assertThat(eventsWithContext).hasSize(1);
 
@@ -264,7 +264,7 @@ public class AggregationSearchUtilsTest {
                 ))
                 .build();
 
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, null);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> null);
 
         assertThat(eventsWithContext).hasSize(1);
         assertThat(eventsWithContext.get(0).eventModifierState()).hasSize(1);
@@ -357,7 +357,7 @@ public class AggregationSearchUtilsTest {
                 ))
                 .build();
 
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, null);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> null);
 
         assertThat(eventsWithContext).hasSize(1);
 
@@ -515,7 +515,7 @@ public class AggregationSearchUtilsTest {
                 permittedStreams
         );
         final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, null);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> null);
 
         assertThat(eventsWithContext).hasSize(1);
 
@@ -578,7 +578,7 @@ public class AggregationSearchUtilsTest {
                 permittedStreams
         );
         final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, null);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> null);
 
         assertThat(eventsWithContext).hasSize(1);
 
