@@ -42,8 +42,8 @@ const shouldRender = (
   return true;
 };
 
-const renderTitle = (description: string, Badge: React.ReactNode | undefined) =>
-  Badge ? <Badge text={title} /> : title;
+const renderTitle = (description: string, Badge: PluginNavigation['BadgeComponent'] | undefined) =>
+  Badge ? <Badge text={description} /> : description;
 
 type PluginNavDropdownProps = {
   description: PluginNavigation['description'];
@@ -67,7 +67,10 @@ const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }:
   const renderBadge = menuItems.some((menuItem) => menuItem?.BadgeComponent);
 
   return (
-    <NavDropdown key={title} title={title} badge={renderBadge ? BadgeComponent : null} inactiveTitle={description}>
+    <NavDropdown
+      key={title}
+      title={renderTitle(title, renderBadge ? BadgeComponent : null)}
+      inactiveTitle={description}>
       {accessibleMenuItems.map((menuItem) => (
         <NavigationLink
           key={menuItem.description}
@@ -84,21 +87,24 @@ type Props = {
   navigationItem: PluginNavigation;
 };
 
-const NavigationItem = ({ navigationItem, pathname }: Props) => {
+const NavigationItem = ({
+  navigationItem: { requiredFeatureFlag, permissions, children, BadgeComponent, description, path },
+  pathname,
+}: Props) => {
   const currentUser = useCurrentUser();
 
-  if (!shouldRender(navigationItem.requiredFeatureFlag, navigationItem.permissions, currentUser.permissions)) {
+  if (!shouldRender(requiredFeatureFlag, permissions, currentUser.permissions)) {
     return null;
   }
 
-  if (navigationItem.children) {
+  if (children) {
     return (
       <PluginNavDropdown
-        menuItems={navigationItem.children}
-        description={navigationItem.description}
-        BadgeComponent={navigationItem.BadgeComponent}
+        menuItems={children}
+        description={description}
+        BadgeComponent={BadgeComponent}
         pathname={pathname}
-        key={navigationItem.description}
+        key={description}
       />
     );
   }
