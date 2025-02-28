@@ -34,11 +34,7 @@ import java.util.Enumeration;
 public class DatanodeSecurityTestUtils {
     public static KeyStore buildTruststore(KeystoreInformation ca) throws IOException, GeneralSecurityException {
         final TruststoreCreator truststoreCreator = TruststoreCreator.newEmpty();
-        final Enumeration<String> aliases = ca.loadKeystore().aliases();
-        while (aliases.hasMoreElements()) {
-            final String alias = aliases.nextElement();
-            truststoreCreator.addFromKeystore(ca, alias);
-        }
+        truststoreCreator.addCertificates(ca);
         return truststoreCreator.getTruststore();
     }
 

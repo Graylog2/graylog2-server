@@ -21,16 +21,29 @@ import org.graylog.security.certutil.csr.KeystoreInformation;
 
 public class OpensearchCertificates {
 
+    @Nullable
     private final KeystoreInformation transportCertificate;
+    @Nullable
+    private final String transportKeyAlias;
+    @Nullable
     private final KeystoreInformation httpCertificate;
+    @Nullable
+    private final String httpKeyAlias;
+
+    public OpensearchCertificates(@Nullable KeystoreInformation transportCertificate, @Nullable String transportKeyAlias, @Nullable KeystoreInformation httpCertificate, @Nullable String httpKeyAlias) {
+        this.transportCertificate = transportCertificate;
+        this.transportKeyAlias = transportKeyAlias;
+        this.httpCertificate = httpCertificate;
+        this.httpKeyAlias = httpKeyAlias;
+    }
 
     public OpensearchCertificates(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
-        this.transportCertificate = transportCertificate;
-        this.httpCertificate = httpCertificate;
+        // null aliases mean autodetection - first alias will be used
+        this(transportCertificate, null, httpCertificate, null);
     }
 
     public static OpensearchCertificates none() {
-        return new OpensearchCertificates(null, null);
+        return new OpensearchCertificates(null, null, null, null);
     }
 
     @Nullable
@@ -41,5 +54,19 @@ public class OpensearchCertificates {
     @Nullable
     public KeystoreInformation getHttpCertificate() {
         return httpCertificate;
+    }
+
+    @Nullable
+    public String getTransportKeyAlias() {
+        return transportKeyAlias;
+    }
+
+    @Nullable
+    public String getHttpKeyAlias() {
+        return httpKeyAlias;
+    }
+
+    public boolean hasBothCertificates() {
+        return getHttpCertificate() != null && getTransportCertificate() != null;
     }
 }

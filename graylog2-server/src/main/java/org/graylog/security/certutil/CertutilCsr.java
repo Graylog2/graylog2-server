@@ -18,6 +18,7 @@ package org.graylog.security.certutil;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
@@ -66,10 +67,13 @@ public class CertutilCsr implements CliCommand {
     public void run() {
         console.printLine("This tool will generate a CSR for the datanode");
         char[] privKeyPassword = this.console.readPassword(PROMPT_ENTER_PASSWORD_TO_PROTECT_YOUR_PRIVATE_KEY);
-        try {
-            final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(CertConstants.DATANODE_KEY_ALIAS).isCA(false).validity(Duration.ofDays(99 * 365)));
 
-            final KeyStore keystore = keyPair.toKeystore(CertConstants.DATANODE_KEY_ALIAS, privKeyPassword);
+        final String alias = createKeyAlias();
+
+        try {
+            final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(alias).isCA(false).validity(Duration.ofDays(99 * 365)));
+
+            final KeyStore keystore = keyPair.toKeystore(alias, privKeyPassword);
             try (FileOutputStream fos = new FileOutputStream(this.keystore.toFile())) {
                 keystore.store(fos, privKeyPassword);
             }
@@ -79,12 +83,20 @@ public class CertutilCsr implements CliCommand {
             console.printLine("Generating CSR for the datanode");
             final PKCS10CertificationRequest csr = CsrGenerator.generateCSR(
                     keystoreInformation,
-                    CertConstants.DATANODE_KEY_ALIAS,
+                    alias,
                     "localhost",
                     List.of("data-node"));
             csrStorage.writeCsr(csr);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * This will be the only key in the keystore, we don't care much about the alias. To make sure we are
+     * not dependent on a specific alias, we can generate a random alphabetic sequence.
+     */
+    private static String createKeyAlias() {
+        return RandomStringUtils.randomAlphabetic(10);
     }
 }
