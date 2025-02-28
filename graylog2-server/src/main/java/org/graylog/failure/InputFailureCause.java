@@ -14,14 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin.inputs.failure;
+package org.graylog.failure;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import org.graylog2.plugin.journal.RawMessage;
+public enum InputFailureCause implements FailureCause{
+    INPUT_PARSE("InputParseError"),;
 
-public record InputProcessingFailure(@Nonnull String errorMessage,
-                                     @Nullable Throwable exception,
-                                     @Nonnull RawMessage rawMessage,
-                                     @Nullable String inputMessage) {
+    private final String label;
+
+    InputFailureCause(String label) {
+        this.label = label;
+    }
+
+    @Override
+    public String label() {
+        return label;
+    }
 }
