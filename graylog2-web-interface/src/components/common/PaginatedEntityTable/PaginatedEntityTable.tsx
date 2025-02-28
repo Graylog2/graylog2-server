@@ -42,8 +42,9 @@ const SearchRow = styled.div`
 `;
 
 type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
-type MiddleSectionProps = {
+export type MiddleSectionProps = {
   searchParams: SearchParams;
+  setFilters: (newFilters: UrlQueryFilters) => void;
 };
 type Props<T, M> = {
   actionsCellWidth?: EntityDataTableProps['actionsCellWidth'];
@@ -184,7 +185,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
           </SearchForm>
           {topRightCol}
         </SearchRow>
-        {MiddleSection ? <MiddleSection searchParams={fetchOptions} /> : null}
+        {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={setUrlQueryFilters} /> : null}
         <div>
           {list?.length === 0 ? (
             <NoSearchResult>No {humanName} have been found.</NoSearchResult>

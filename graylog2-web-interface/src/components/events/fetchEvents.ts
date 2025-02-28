@@ -30,7 +30,6 @@ import { extractRangeFromString } from 'components/common/EntityFilters/helpers/
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
 import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
-import Time from 'views/components/aggregationwizard/grouping/configuration/Time';
 
 const url = URLUtils.qualifyUrl('/events/search');
 
@@ -102,13 +101,14 @@ const getConcatenatedQuery = (query: string, streamId: string) => {
   return `(${query}) AND source_streams:${streamId}`;
 };
 
-const defaultTimeRange: RelativeTimeRange = { type: 'relative', range: 6 * 30 * 86400 } as const;
+export const defaultTimeRange: RelativeTimeRange = { type: 'relative', range: 6 * 30 * 86400 } as const;
 export const fetchEventsHistogram = async (searchParams: SearchParams) => {
   const parsedFilters = parseFilters(searchParams.filters, defaultTimeRange);
   const { timerange } = parsedFilters;
 
+  // @ts-expect-error
   return Events.histogram({
-    query: getConcatenatedQuery(searchParams.query),
+    query: searchParams.query,
     page: searchParams.page,
     per_page: searchParams.pageSize,
     sort_by: searchParams.sort.attributeId,
