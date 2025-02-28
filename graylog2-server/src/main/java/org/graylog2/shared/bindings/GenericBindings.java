@@ -30,6 +30,7 @@ import org.graylog.failure.DefaultFailureHandlingConfiguration;
 import org.graylog.failure.FailureHandler;
 import org.graylog.failure.FailureHandlingConfiguration;
 import org.graylog.failure.FailureHandlingService;
+import org.graylog.inputs.MessageInputLifecycle;
 import org.graylog.inputs.events.InputEventQueue;
 import org.graylog2.indexer.EventIndexTemplateProvider;
 import org.graylog2.indexer.IndexTemplateProvider;
@@ -83,6 +84,7 @@ public class GenericBindings extends Graylog2Module {
         bind(Semaphore.class).annotatedWith(Names.named("JournalSignal")).toInstance(new Semaphore(0));
 
         install(new FactoryModuleBuilder().build(new TypeLiteral<IOState.Factory<MessageInput>>() {}));
+        install(new FactoryModuleBuilder().build(new TypeLiteral<MessageInputLifecycle.Factory>() {}));
 
         bind(InputRegistry.class).asEagerSingleton();
         serviceBinder().addBinding().to(InputEventQueue.class).asEagerSingleton();

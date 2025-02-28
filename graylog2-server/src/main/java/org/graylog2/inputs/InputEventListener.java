@@ -54,11 +54,7 @@ public class InputEventListener {
     public void inputCreated(String inputId) {
         LOG.debug("Input created: {}", inputId);
 
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-        if (inputState != null) {
-            inputRegistry.remove(inputState);
-        }
-
+        inputRegistry.remove(inputId);
         inputLauncher.launch(inputId);
     }
 
@@ -81,21 +77,14 @@ public class InputEventListener {
 
     public void inputDeleted(String inputId) {
         LOG.debug("Input deleted: {}", inputId);
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-        if (inputState != null) {
-            inputRegistry.remove(inputState);
-        }
+        inputRegistry.remove(inputId);
     }
 
     public void inputSetup(String inputId) {
         LOG.debug("Input setup: {}", inputId);
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-        if (inputState != null) {
-            inputRegistry.setup(inputState);
-        } else {
-            LOG.debug("Input created for setup: {}", inputId);
-            inputLauncher.launch(inputId);
-        }
+        inputRegistry.setup(inputId);
+        LOG.debug("Input created for setup: {}", inputId);
+        inputLauncher.launch(inputId);
     }
 
     public void leaderChanged() {
