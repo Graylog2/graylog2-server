@@ -51,6 +51,8 @@ public abstract class DatanodeConfigurationPart {
     @Nullable
     public abstract KeyStore trustStore();
 
+    public abstract List<String> warnings();
+
     public abstract List<DatanodeConfigFile> configFiles();
 
     public static Builder builder() {
@@ -119,14 +121,26 @@ public abstract class DatanodeConfigurationPart {
 
         abstract DatanodeConfigurationPart autoBuild(); // not public
 
-        public DatanodeConfigurationPart build() {
-            systemProperties(systemPropertiesBuilder.buildKeepingLast());
-            return autoBuild();
-        }
-
         public Builder systemProperty(String key, String value) {
             systemPropertiesBuilder().put(key, value);
             return this;
+        }
+
+        protected abstract ImmutableList.Builder<String> warningsBuilder();
+
+        public Builder withWarning(String warning) {
+            warningsBuilder().add(warning);
+            return this;
+        }
+
+        public Builder withWarnings(List<String> warnings) {
+            warningsBuilder().addAll(warnings);
+            return this;
+        }
+
+        public DatanodeConfigurationPart build() {
+            systemProperties(systemPropertiesBuilder.buildKeepingLast());
+            return autoBuild();
         }
     }
 }
