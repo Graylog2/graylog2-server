@@ -79,6 +79,11 @@ public class AggregationSearchUtils {
     }
 
     public void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
+                                 EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
+        aggregatedSearch(eventFactory, parameters, eventsConsumer, (event) -> null);
+    }
+
+    public void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
                                  EventConsumer<List<EventWithContext>> eventsConsumer, Function<Event, Void> eventDecorator) throws EventProcessorException {
         final var owner = new AggregationSearch.User("event-processor-" + AggregationEventProcessorConfig.TYPE_NAME + "-" + eventDefinition.id(), DateTimeZone.UTC);
         final List<SearchType> additionalSearchTypes = eventQueryModifiers.stream()
@@ -187,10 +192,8 @@ public class AggregationSearchUtils {
                     .flatMap(modifier -> modifier.eventModifierData(result.additionalResults()).entrySet().stream())
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-            // If an event processor specific event decorator is supplied, apply that decoration to the event
-            if (eventDecorator != null) {
-                eventDecorator.apply(event);
-            }
+            // Apply event processor specific decorator to event
+            eventDecorator.apply(event);
 
             LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
 
