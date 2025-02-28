@@ -15,16 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { List } from 'immutable';
+import { Skeleton as MantineSkeleton } from '@mantine/core';
+import styled, { css } from 'styled-components';
 
-import { singleton } from 'logic/singleton';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+const StyledSkeleton = styled(MantineSkeleton)(
+  ({ theme }) => css`
+    &:after {
+      background-color: ${theme.colors.gray[80]};
+    }
+  `,
+);
 
-type FieldTypeMappingsList = List<FieldTypeMapping>;
-export type FieldTypes = {
-  all: FieldTypeMappingsList;
-  currentQuery: FieldTypeMappingsList;
-};
+const Skeleton = (props: Pick<React.ComponentProps<typeof MantineSkeleton>, 'className' | 'height' | 'width'>) => (
+  <StyledSkeleton {...props} radius="xl" />
+);
 
-const FieldTypesContext = React.createContext<FieldTypes | undefined>(undefined);
-export default singleton('contexts.FieldTypesContext', () => FieldTypesContext);
+export default Skeleton;

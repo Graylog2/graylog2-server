@@ -24,9 +24,11 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.jobs.SearchJobState;
 import org.graylog.plugins.views.search.jobs.SearchJobStatus;
+import org.graylog.plugins.views.search.searchtypes.results.PaginableResults;
 
 import java.util.Map;
 import java.util.Optional;
@@ -44,6 +46,43 @@ public record SearchJobDTO(
         @JsonProperty Map<String, QueryResult> results,
         @JsonProperty ExecutionInfo execution,
         @JsonProperty("progress") int progress) {
+
+    public SearchJobDTO withResultsLimitedTo(final int page, final int perPage) {
+        if (page == 0 || perPage == 0 || !hasOnlyOnePaginableSearchType()) {
+            return this;
+        } else {
+            final QueryResult queryResultLimited = results().values().stream()
+                    .findFirst()
+                    .map(queryResult -> {
+                                final PaginableResults<?> paginableResults = (PaginableResults<?>) queryResult
+                                        .searchTypes()
+                                        .values()
+                                        .stream()
+                                        .findFirst()
+                                        .get();
+                                return queryResult.toBuilder()
+                                        .searchTypes(Map.of(paginableResults.id(), paginableResults.withResultsLimitedTo(page, perPage)))
+                                        .build();
+                            }
+                    )
+                    .get();
+            return new SearchJobDTO(searchJobIdentifier(),
+                    errors(),
+                    Map.of(queryResultLimited.query().id(), queryResultLimited),
+                    execution(),
+                    progress);
+        }
+    }
+
+    private boolean hasOnlyOnePaginableSearchType() {
+        if (results.size() != 1) {
+            return false;
+        }
+
+        final Map<String, SearchType.Result> resultsOfTheOnlyQuery = results().values().iterator().next().searchTypes();
+        return resultsOfTheOnlyQuery.size() == 1 &&
+                resultsOfTheOnlyQuery.values().stream().findFirst().get() instanceof PaginableResults<?>;
+    }
 
 
     public static SearchJobDTO fromSearchJob(final SearchJob searchJob) {
