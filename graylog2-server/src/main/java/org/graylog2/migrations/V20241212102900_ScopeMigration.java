@@ -76,7 +76,7 @@ public class V20241212102900_ScopeMigration extends Migration {
         collection.find(
                         Filters.or(
                                 eq(FIELD_TITLE, SYSTEM_NOTIFICATION_EVENT_DEFINITION),
-                                eq(ScopedEntity.FIELD_SCOPE, NonDeletableSystemScope.NAME)))
+                                eq(ScopedEntity.FIELD_SCOPE, "SYSTEM_NOTIFICATION_EVENT")))
                 .forEach(eventDefinition -> {
                     if (!eventDefinition.scope().equalsIgnoreCase(NonDeletableSystemScope.NAME)) {
                         final EventDefinitionDto entity = eventDefinition.toBuilder().scope(NonDeletableSystemScope.NAME).build();
