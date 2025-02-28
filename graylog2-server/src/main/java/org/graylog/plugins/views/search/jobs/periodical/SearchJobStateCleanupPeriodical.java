@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class SearchJobStateCleanupPeriodical extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchJobStateCleanupPeriodical.class);
-    static final Duration MIN_AGE_TO_REMOVE = Duration.standardDays(2);
+    static final Duration MIN_AGE_TO_REMOVE = Duration.standardDays(7);
     static final Duration MIN_AGE_TO_EXPIRE = Duration.standardDays(1);
 
     private final SearchJobStateService searchJobStateService;

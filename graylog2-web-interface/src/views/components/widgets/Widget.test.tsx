@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 
@@ -26,10 +25,10 @@ import useWidgetResults from 'views/components/useWidgetResults';
 import SearchError from 'views/logic/SearchError';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { duplicateWidget, updateWidgetConfig, updateWidget } from 'views/logic/slices/widgetActions';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { usePlugin } from 'views/test/testPlugins';
 import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -37,7 +36,6 @@ import type { Props as WidgetComponentProps } from './Widget';
 import WidgetContext from '../contexts/WidgetContext';
 import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
-import FieldTypesContext from '../contexts/FieldTypesContext';
 
 jest.mock('../searchbar/queryinput/QueryInput');
 jest.mock('./WidgetHeader', () => 'widget-header');
@@ -118,11 +116,6 @@ describe('<Widget />', () => {
 
   const widget = WidgetModel.builder().newId().type('dummy').config({ queryId: 'query-id-1' }).build();
 
-  const fieldTypes = {
-    all: Immutable.List<FieldTypeMapping>(),
-    queryFields: Immutable.Map<string, Immutable.List<FieldTypeMapping>>(),
-  };
-
   type DummyWidgetProps = Partial<WidgetComponentProps> & {
     focusedWidget?: WidgetFocusContextType['focusedWidget'];
     setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'];
@@ -150,7 +143,7 @@ describe('<Widget />', () => {
   }: DummyWidgetProps) => (
     <TestStoreProvider>
       <SearchExplainContext.Provider value={searchExplainContext(searchedIndices)}>
-        <FieldTypesContext.Provider value={fieldTypes}>
+        <TestFieldTypesContextProvider>
           <WidgetFocusContext.Provider
             value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
             <WidgetContext.Provider value={propsWidget}>
@@ -164,7 +157,7 @@ describe('<Widget />', () => {
               />
             </WidgetContext.Provider>
           </WidgetFocusContext.Provider>
-        </FieldTypesContext.Provider>
+        </TestFieldTypesContextProvider>
       </SearchExplainContext.Provider>
     </TestStoreProvider>
   );
@@ -268,7 +261,7 @@ describe('<Widget />', () => {
     const unknownWidget = WidgetModel.builder().newId().type('i-dont-know-this-widget-type').config({}).build();
     const UnknownWidget = (props: Partial<React.ComponentProps<typeof Widget>>) => (
       <TestStoreProvider>
-        <FieldTypesContext.Provider value={fieldTypes}>
+        <TestFieldTypesContextProvider>
           <WidgetContext.Provider value={unknownWidget}>
             <Widget
               widget={unknownWidget}
@@ -280,7 +273,7 @@ describe('<Widget />', () => {
               {...props}
             />
           </WidgetContext.Provider>
-        </FieldTypesContext.Provider>
+        </TestFieldTypesContextProvider>
       </TestStoreProvider>
     );
 

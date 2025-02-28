@@ -30,8 +30,6 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as ViewsPermissions from 'views/Permissions';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useView from 'views/hooks/useView';
@@ -43,6 +41,7 @@ import useHistory from 'routing/useHistory';
 import mockHistory from 'helpers/mocking/mockHistory';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
@@ -89,11 +88,6 @@ describe('SearchActionsMenu', () => {
 
   const defaultView = createView();
 
-  const fieldTypes = {
-    all: Immutable.List<FieldTypeMapping>(),
-    queryFields: Immutable.Map<string, Immutable.List<FieldTypeMapping>>(),
-  };
-
   type SimpleSearchActionsMenuProps = {
     loadNewView?: NewViewLoaderContextType;
     onLoadView?: ViewLoaderContextType;
@@ -106,13 +100,13 @@ describe('SearchActionsMenu', () => {
   }: SimpleSearchActionsMenuProps) => (
     <TestStoreProvider>
       <HotkeysProvider>
-        <FieldTypesContext.Provider value={fieldTypes}>
+        <TestFieldTypesContextProvider>
           <ViewLoaderContext.Provider value={onLoadView}>
             <NewViewLoaderContext.Provider value={loadNewView}>
               <SearchActionsMenu {...props} />
             </NewViewLoaderContext.Provider>
           </ViewLoaderContext.Provider>
-        </FieldTypesContext.Provider>
+        </TestFieldTypesContextProvider>
       </HotkeysProvider>
     </TestStoreProvider>
   );

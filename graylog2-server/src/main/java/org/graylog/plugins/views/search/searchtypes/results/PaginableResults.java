@@ -14,17 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import type { List } from 'immutable';
+package org.graylog.plugins.views.search.searchtypes.results;
 
-import { singleton } from 'logic/singleton';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import org.graylog.plugins.views.search.SearchType;
 
-type FieldTypeMappingsList = List<FieldTypeMapping>;
-export type FieldTypes = {
-  all: FieldTypeMappingsList;
-  currentQuery: FieldTypeMappingsList;
-};
-
-const FieldTypesContext = React.createContext<FieldTypes | undefined>(undefined);
-export default singleton('contexts.FieldTypesContext', () => FieldTypesContext);
+public interface PaginableResults<T extends PaginableResults<T>> extends SearchType.Result {
+    T withResultsLimitedTo(final int page,
+                           final int perPage);
+}

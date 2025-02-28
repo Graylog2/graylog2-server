@@ -15,31 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import * as Immutable from 'immutable';
 
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import WidgetContext from 'views/components/contexts/WidgetContext';
-import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 
-type Props = {
-  children: React.ReactNode;
+export const SimpleFieldTypesContextProvider = ({
+  children = undefined,
+  fields,
+}: React.PropsWithChildren<{ fields: FieldTypeMapping[] }>) => {
+  const value = useMemo(() => {
+    const fieldList = Immutable.List(fields);
+
+    return { all: fieldList, currentQuery: fieldList };
+  }, [fields]);
+
+  return <FieldTypesContext.Provider value={value}>{children}</FieldTypesContext.Provider>;
 };
 
-const WidgetFieldTypesContextProvider = ({ children }: Props) => {
-  const { timerange, streams } = useContext(WidgetContext);
-  const { data: fieldTypes } = useFieldTypes(streams, timerange);
+const TestFieldTypesContextProvider = ({ children = undefined }: React.PropsWithChildren<{}>) => (
+  <SimpleFieldTypesContextProvider fields={[]}>{children}</SimpleFieldTypesContextProvider>
+);
 
-  const fieldTypesContextValue = useMemo(() => {
-    const fieldTypesList = Immutable.List(fieldTypes);
-
-    return {
-      all: fieldTypesList,
-      currentQuery: fieldTypesList,
-    };
-  }, [fieldTypes]);
-
-  return <FieldTypesContext.Provider value={fieldTypesContextValue}>{children}</FieldTypesContext.Provider>;
-};
-
-export default WidgetFieldTypesContextProvider;
+export default TestFieldTypesContextProvider;

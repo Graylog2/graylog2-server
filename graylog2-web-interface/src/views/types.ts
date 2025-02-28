@@ -221,7 +221,7 @@ export interface SystemConfiguration {
   component: React.ComponentType<SystemConfigurationComponentProps>;
 }
 
-export type SearchTypeResult = {
+export type GenericResult = {
   type: string;
   effective_timerange: AbsoluteTimeRange;
   total: number;
@@ -234,7 +234,7 @@ export type MessageResult = {
 };
 
 export interface SearchTypeResultTypes {
-  generic: SearchTypeResult;
+  generic: GenericResult;
   messages: MessageResult;
 }
 
@@ -250,7 +250,8 @@ export interface ActionContexts {
   parameterBindings?: ParameterBindings;
 }
 
-export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
+export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];
+export type SearchTypeResults = { [id: string]: SearchTypeResult };
 
 export type MessagePreviewOption = {
   title: string;

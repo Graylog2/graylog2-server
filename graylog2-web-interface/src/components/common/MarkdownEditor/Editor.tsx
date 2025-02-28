@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import DOMPurify from 'dompurify';
 
 import { SourceCodeEditor, Icon } from 'components/common';
 
@@ -84,7 +85,7 @@ type Props = {
   onFullMode?: (fullMode: boolean) => void;
 };
 
-function Editor({ id, value, height, readOnly = false, onChange, onFullMode }: Props) {
+function Editor({ id = undefined, value, height, readOnly = false, onChange, onFullMode = () => {} }: Props) {
   const [localValue, setLocalValue] = React.useState<string>(value);
   const [showPreview, setShowPreview] = React.useState<boolean>(false);
   const [fullView, setFullView] = React.useState<boolean>(false);
@@ -96,10 +97,11 @@ function Editor({ id, value, height, readOnly = false, onChange, onFullMode }: P
     if (onFullMode) onFullMode(fullMode);
   };
 
-  const handleOnChange = (newValue: string) => {
-    setLocalValue(newValue);
-    onChange(newValue);
-  };
+  const handleOnChange = React.useCallback((newValue: string) => {
+    const sanitizedValue = DOMPurify.sanitize(newValue);
+    setLocalValue(sanitizedValue);
+    onChange(sanitizedValue);
+  }, [onChange]);
 
   return (
     <>
@@ -128,13 +130,13 @@ function Editor({ id, value, height, readOnly = false, onChange, onFullMode }: P
           </EditorStyles>
         )}
         <Preview value={localValue} height={height} show={showPreview} />
-        <ExpandIcon data-testid="expand-icon" name="expand" onClick={() => handleOnFullMode(true)} />
+        <ExpandIcon data-testid="expand-icon" name="expand_content" size="sm" onClick={() => handleOnFullMode(true)} />
       </div>
       {fullView && (
         <EditorModal
+          show
           value={localValue}
           readOnly={readOnly}
-          show={fullView}
           onChange={handleOnChange}
           onClose={() => handleOnFullMode(false)}
         />

@@ -172,7 +172,7 @@ public class ContainerMatrixClassSelectorResolver implements SelectorResolver {
 
     private NestedClassTestDescriptor newNestedClassTestDescriptor(TestDescriptor parent, Class<?> testClass) {
         return new NestedClassTestDescriptor(
-                parent.getUniqueId().append(NestedClassTestDescriptor.SEGMENT_TYPE, testClass.getSimpleName()), testClass,
+                parent.getUniqueId().append(NestedClassTestDescriptor.SEGMENT_TYPE, testClass.getSimpleName()), testClass, () -> List.of(),
                 configuration);
     }
 

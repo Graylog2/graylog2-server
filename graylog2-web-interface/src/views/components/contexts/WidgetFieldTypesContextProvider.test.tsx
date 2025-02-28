@@ -47,10 +47,10 @@ describe('WidgetFieldTypesContextProvider', () => {
       <WidgetContext.Provider value={widget}>
         <WidgetFieldTypesContextProvider>
           <FieldTypesContext.Consumer>
-            {({ all, queryFields }) => (
+            {({ all, currentQuery }) => (
               <>
                 <span>Got {all.size} field type(s)</span>
-                <span>and {queryFields.get('deadbeef').size} field type(s) for query</span>
+                <span>and {currentQuery.size} field type(s) for query</span>
               </>
             )}
           </FieldTypesContext.Consumer>
