@@ -18,9 +18,10 @@ import * as React from 'react';
 import { RichTextEditor } from '@mantine/tiptap';
 import { useEditor, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useField } from 'formik';
 
 type Props = {
-  onChange: (value: string) => void,
+  field: any,
   customControl?: boolean;
   customControlOnClick?: () => void,
   customControlItem?: React.ReactNode,
@@ -30,13 +31,16 @@ type Props = {
  * This component is used for the event procedures feature and renders different
  * text controls such as bold and underline. It also supports custom controls.
  */
-const TextEditor = ({ onChange, customControl = false, customControlOnClick = undefined, customControlItem, ...props }: Props) => {
+const TextEditor = ({ field, customControl = false, customControlOnClick = undefined, customControlItem }: Props) => {
+  const [{ value }, { }, { setValue }] = useField({ name: field.name });
+
   const editor = useEditor({
     extensions: [
       StarterKit,
     ],
+    content: value,
     onUpdate({ editor }) {
-      onChange(editor.getHTML());
+      setValue(editor.getHTML());
     },
   });
 
