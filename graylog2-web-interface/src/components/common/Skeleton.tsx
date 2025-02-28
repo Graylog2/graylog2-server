@@ -14,26 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  '@emotion/react',
-  '@mantine/core',
-  '@reduxjs/toolkit',
-  '@tanstack/react-query',
-  'chroma-js',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment',
-  'moment-timezone',
-  'react',
-  'react-bootstrap',
-  'react-dom',
-  'react-redux',
-  'react-router',
-  'react-router-bootstrap',
-  'redux',
-  'reflux',
-  'reflux-core',
-  'styled-components',
-  'use-query-params',
-];
+import * as React from 'react';
+import { Skeleton as MantineSkeleton } from '@mantine/core';
+import styled, { css } from 'styled-components';
+
+const StyledSkeleton = styled(MantineSkeleton)(
+  ({ theme }) => css`
+    &:after {
+      background-color: ${theme.colors.gray[80]};
+    }
+  `,
+);
+
+const Skeleton = (props: Pick<React.ComponentProps<typeof MantineSkeleton>, 'className' | 'height' | 'width'>) => (
+  <StyledSkeleton {...props} radius="xl" />
+);
+
+export default Skeleton;

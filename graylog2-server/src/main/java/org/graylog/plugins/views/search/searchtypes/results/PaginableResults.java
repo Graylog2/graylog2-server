@@ -14,26 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  '@emotion/react',
-  '@mantine/core',
-  '@reduxjs/toolkit',
-  '@tanstack/react-query',
-  'chroma-js',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment',
-  'moment-timezone',
-  'react',
-  'react-bootstrap',
-  'react-dom',
-  'react-redux',
-  'react-router',
-  'react-router-bootstrap',
-  'redux',
-  'reflux',
-  'reflux-core',
-  'styled-components',
-  'use-query-params',
-];
+package org.graylog.plugins.views.search.searchtypes.results;
+
+import org.graylog.plugins.views.search.SearchType;
+
+public interface PaginableResults<T extends PaginableResults<T>> extends SearchType.Result {
+    T withResultsLimitedTo(final int page,
+                           final int perPage);
+}
