@@ -22,7 +22,6 @@ import type { List as ImmutableList } from 'immutable';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Button } from 'components/bootstrap';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import List from './List';
 import FieldGroup from './FieldGroup';
@@ -129,20 +128,15 @@ const FieldsOverview = ({ allFields, activeQueryFields }: Props) => {
   );
 };
 
-const FieldsOverviewWithContext = (props) => {
-  const activeQuery = useActiveQueryId();
+const FieldsOverviewWithContext = (props: Omit<Props, 'allFields' | 'activeQueryFields'>) => (
+  <FieldTypesContext.Consumer>
+    {(fieldTypes) => {
+      const allFields = fieldTypes?.all;
+      const activeQueryFields = fieldTypes?.currentQuery;
 
-  return (
-    <FieldTypesContext.Consumer>
-      {(fieldTypes) => {
-        const allFields = fieldTypes?.all;
-        const queryFields = fieldTypes?.queryFields;
-        const activeQueryFields = queryFields?.get(activeQuery, allFields);
-
-        return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
-      }}
-    </FieldTypesContext.Consumer>
-  );
-};
+      return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
+    }}
+  </FieldTypesContext.Consumer>
+);
 
 export default FieldsOverviewWithContext;

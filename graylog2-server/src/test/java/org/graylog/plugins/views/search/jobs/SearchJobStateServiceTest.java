@@ -255,6 +255,17 @@ public class SearchJobStateServiceTest {
                 .createdAt(DateTime.parse("1999-01-01T11:11:11"))
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build());
+        final SearchJobState alreadyExpiredJob = toTest.create(SearchJobState.builder()
+                .identifier(new SearchJobIdentifier("7777786ae6db8b71a8e10002",
+                        "677fd86ae6db8b71a8e10002",
+                        "john",
+                        "dcae52e4-777e-4e3f-8e69-61df7a607016"))
+                .result(createSimpleQueryResult("0000000000000042"))
+                .status(SearchJobStatus.EXPIRED)
+                .progress(100)
+                .createdAt(DateTime.now(DateTimeZone.UTC).minusDays(1))
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build());
         final SearchJobState jobThatNeedsToBeExpired = toTest.create(SearchJobState.builder()
                 .identifier(new SearchJobIdentifier(null,
                         "677fd86ae6db8b71a8e10002",
@@ -281,17 +292,19 @@ public class SearchJobStateServiceTest {
         long numRemoved = toTest.deleteOlderThan(DateTime.now(DateTimeZone.UTC).minusDays(2));
         assertEquals(1, numRemoved);
         assertTrue(toTest.get(oldJob.id()).isEmpty());
+        assertTrue(toTest.get(alreadyExpiredJob.id()).isPresent());
         assertTrue(toTest.get(jobThatNeedsToBeExpired.id()).isPresent());
         assertTrue(toTest.get(freshJob.id()).isPresent());
 
         long numExpired = toTest.expireOlderThan(DateTime.now(DateTimeZone.UTC).minusHours(7));
         assertEquals(1, numExpired);
-        assertSame(toTest.get(jobThatNeedsToBeExpired.id()).get().status(), SearchJobStatus.EXPIRED);
+        final SearchJobState expiredSearchJobState = toTest.get(jobThatNeedsToBeExpired.id()).get();
+        assertSame(expiredSearchJobState.status(), SearchJobStatus.EXPIRED);
+        assertTrue(expiredSearchJobState.result() == null || expiredSearchJobState.result().searchTypes() == null || expiredSearchJobState.result().searchTypes().isEmpty());
         assertSame(toTest.get(freshJob.id()).get().status(), SearchJobStatus.DONE);
 
         numRemoved = toTest.deleteOlderThan(DateTime.now(DateTimeZone.UTC).minusDays(2));
         assertEquals(0, numRemoved);
-
     }
 
     @Test

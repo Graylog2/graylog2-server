@@ -55,6 +55,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.graylog2.shared.utilities.ExceptionUtils.getRootCause;
+
 public class AmqpTransport extends ThrottleableTransport2 {
     public static final String CK_HOSTNAME = "broker_hostname";
     public static final String CK_PORT = "broker_port";
@@ -215,7 +217,7 @@ public class AmqpTransport extends ThrottleableTransport2 {
             } catch (TimeoutException e) {
                 inputFailureRecorder.setFailing(getClass(), "Timeout while opening new AMQP connection", e);
             } catch (IOException e) {
-                inputFailureRecorder.setFailing(getClass(), "Error while opening new AMQP connection", e);
+                inputFailureRecorder.setFailing(getClass(), "Error while opening new AMQP connection", getRootCause(e));
             } catch (Exception e) {
                 inputFailureRecorder.setFailing(getClass(), "Could not launch AMQP consumer.", e);
             }
