@@ -44,7 +44,7 @@ const DropdownTrigger = styled.button<{ $active: boolean }>(
     ${$active ? activeIndicatorStyles(theme) : ''}
 
     &:hover,
-  &:focus {
+    &:focus {
       color: ${theme.colors.variant.darker.default};
       background-color: transparent;
     }
