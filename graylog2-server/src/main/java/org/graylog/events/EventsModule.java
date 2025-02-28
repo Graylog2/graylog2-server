@@ -57,7 +57,6 @@ import org.graylog.events.processor.aggregation.AggregationSearch;
 import org.graylog.events.processor.aggregation.PivotAggregationSearch;
 import org.graylog.events.processor.storage.EventStorageHandlerEngine;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessor;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorParameters;
@@ -96,8 +95,6 @@ public class EventsModule extends PluginModule {
 
         OptionalBinder.newOptionalBinder(binder(), EventResolver.class)
                 .setDefault().to(DefaultEventResolver.class);
-
-        addEntityScope(SystemNotificationEventEntityScope.class);
 
         addSystemRestResource(AvailableEntityTypesResource.class);
         addSystemRestResource(EventDefinitionsResource.class);

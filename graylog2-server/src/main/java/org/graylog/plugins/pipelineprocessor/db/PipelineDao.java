@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
@@ -71,7 +72,7 @@ public abstract class PipelineDao extends ScopedEntity {
                                      @Nullable @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
                                      @Nullable @JsonProperty(FIELD_MODIFIED_AT) DateTime modifiedAt) {
         if (title.equalsIgnoreCase(GL_INPUT_ROUTING_PIPELINE)) {
-            scope = SystemPipelineScope.NAME;
+            scope = ImmutableSystemScope.NAME;
         } else if (scope == null) {
             scope = DefaultEntityScope.NAME;
         }
