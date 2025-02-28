@@ -183,7 +183,7 @@ public class UnboundLDAPConnector {
                                            String searchBase,
                                            Filter filter,
                                            String uniqueIdAttribute,
-                                           Set<String> attributes, int pageSize) throws LDAPException, IOException {
+                                           Set<String> attributes, int pageSize) throws LDAPException {
         // Pagination cookie to help the LDAP connection manage if more results are present.
         boolean hasMoreResults = true;
         List<SearchResultEntry> entries = new ArrayList<>();
