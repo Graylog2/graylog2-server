@@ -88,18 +88,16 @@ const NavItem = styled.span`
 type Props = {
   title?: React.ReactNode;
   inactiveTitle?: string;
-  badge?: React.ComponentType<{ text: React.ReactNode }>;
   noCaret?: boolean;
   hoverTitle?: string;
 };
 
 const NavDropdown = ({
-  title,
-  inactiveTitle,
-  badge: Badge,
+  title = undefined,
+  inactiveTitle = undefined,
   noCaret = false,
-  children,
-  hoverTitle,
+  children = undefined,
+  hoverTitle = undefined,
 }: React.PropsWithChildren<Props>) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
@@ -108,8 +106,7 @@ const NavDropdown = ({
       <NavItem>
         <Menu.Target>
           <DropdownTrigger $active={isActive} title={hoverTitle}>
-            <NavItemStateIndicator>{Badge ? <Badge text={title} /> : title}</NavItemStateIndicator>{' '}
-            {noCaret ? null : <span className="caret" />}
+            <NavItemStateIndicator>{title}</NavItemStateIndicator> {noCaret ? null : <span className="caret" />}
           </DropdownTrigger>
         </Menu.Target>
       </NavItem>

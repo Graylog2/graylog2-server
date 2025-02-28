@@ -42,21 +42,8 @@ const shouldRender = (
   return true;
 };
 
-type PluginNavLinkProps = {
-  path: string;
-  description: string;
-  BadgeComponent?: React.ComponentType<{ text: string }>;
-  topLevel?: boolean;
-};
-
-const PluginNavLink = ({ path, description, BadgeComponent = undefined, topLevel = false }: PluginNavLinkProps) => (
-  <NavigationLink
-    key={description}
-    description={BadgeComponent ? <BadgeComponent text={description} /> : description}
-    path={path}
-    topLevel={topLevel}
-  />
-);
+const renderTitle = (description: string, Badge: React.ReactNode | undefined) =>
+  Badge ? <Badge text={title} /> : title;
 
 type PluginNavDropdownProps = {
   description: PluginNavigation['description'];
@@ -69,8 +56,8 @@ const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }:
   const currentUser = useCurrentUser();
   const activeMenuItem = menuItems.filter(({ path, end }) => path && isActiveRoute(pathname, path, end));
   const title = activeMenuItem.length > 0 ? `${description} / ${activeMenuItem[0].description}` : description;
-  const accessibleMenuItems = menuItems.filter((menuItem) =>
-    shouldRender(menuItem.requiredFeatureFlag, menuItem.permissions, currentUser.permissions),
+  const accessibleMenuItems = menuItems.filter(({ requiredFeatureFlag, permissions }) =>
+    shouldRender(requiredFeatureFlag, permissions, currentUser.permissions),
   );
 
   if (!accessibleMenuItems.length) {
@@ -82,7 +69,11 @@ const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }:
   return (
     <NavDropdown key={title} title={title} badge={renderBadge ? BadgeComponent : null} inactiveTitle={description}>
       {accessibleMenuItems.map((menuItem) => (
-        <PluginNavLink description={menuItem.description} path={menuItem.path} key={menuItem.description} />
+        <NavigationLink
+          key={menuItem.description}
+          description={renderTitle(menuItem.description, BadgeComponent)}
+          path={menuItem.path}
+        />
       ))}
     </NavDropdown>
   );
@@ -113,12 +104,7 @@ const NavigationItem = ({ navigationItem, pathname }: Props) => {
   }
 
   return (
-    <PluginNavLink
-      path={navigationItem.path}
-      description={navigationItem.description}
-      key={navigationItem.description}
-      topLevel
-    />
+    <NavigationLink key={description} description={renderTitle(description, BadgeComponent)} path={path} topLevel />
   );
 };
 
