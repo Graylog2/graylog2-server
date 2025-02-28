@@ -17,19 +17,21 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
 import styled from 'styled-components';
 
-import type { SearchParams } from 'stores/PaginationTypes';
 import Spinner from 'components/common/Spinner';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot, { DateType } from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import { fetchEventsHistogram, parseTypeFilter } from 'components/events/fetchEvents';
-import XYPlot from 'views/components/visualizations/XYPlot';
 import FullSizeContainer from 'views/components/aggregationbuilder/FullSizeContainer';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import PlotLegend from 'views/components/visualizations/PlotLegend';
+import GenericPlot, { type PlotLayout, type ChartConfig } from 'views/components/visualizations/GenericPlot';
+import type ColorMapper from 'views/components/visualizations/ColorMapper';
+import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
+import useUserDateTime from 'hooks/useUserDateTime';
+import { toUTCFromTz } from 'util/DateTime';
 
 const config = AggregationWidgetConfig.builder()
   .visualization('line')
@@ -72,23 +74,45 @@ const generateChart = (
   };
 };
 
+const yLegendPosition = (containerHeight: number) => {
+  if (containerHeight < 150) {
+    return -0.6;
+  }
+
+  if (containerHeight < 400) {
+    return -0.2;
+  }
+
+  return -0.14;
+};
+const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({
+  line: { color: colors.get(chart.originalName ?? chart.name) },
+});
+const layout: Partial<PlotLayout> = {
+  yaxis: {
+    fixedrange: true,
+    rangemode: 'tozero',
+    tickformat: ',~r',
+    type: 'linear',
+  },
+  dragmode: 'zoom',
+  hovermode: 'x',
+  xaxis: {
+    domain: [0, 1],
+    type: 'date',
+  },
+  legend: { y: yLegendPosition(height) },
+};
+
 const EventsGraph = ({
   data: { results },
   alerts,
+  onZoom,
 }: {
   data: PromiseType<ResultPromise>;
   alerts: 'include' | 'exclude' | 'only';
+  onZoom: (from: string, to: string) => void;
 }) => {
-  const store = useMemo(
-    () =>
-      configureStore({
-        reducer: (state) => state,
-        preloadedState: { view: { activeQuery: 'deadbeef' } },
-      }),
-    [],
-  );
-  const onZoom = useCallback(() => true, []);
-
   const chartData = useMemo(
     () => [
       ...(['include', 'exclude'].includes(alerts) ? [generateChart('Events', results.buckets.events)] : []),
@@ -98,32 +122,39 @@ const EventsGraph = ({
   );
 
   return (
-    <Provider store={store}>
-      <GraphContainer>
-        <InteractiveContext.Provider value={false}>
-          <FullSizeContainer>
-            {(dimensions) => (
-              <XYPlot config={config} chartData={chartData} onZoom={onZoom} height={height} width={dimensions.width} />
-            )}
-          </FullSizeContainer>
-        </InteractiveContext.Provider>
-      </GraphContainer>
-    </Provider>
+    <GraphContainer>
+      <InteractiveContext.Provider value={false}>
+        <FullSizeContainer>
+          {(dimensions) => (
+            <PlotLegend config={config} chartData={chartData} height={height} width={dimensions.width}>
+              <InteractiveContext.Provider value>
+                <GenericPlot chartData={chartData} layout={layout} onZoom={onZoom} setChartColor={defaultSetColor} />
+              </InteractiveContext.Provider>
+            </PlotLegend>
+          )}
+        </FullSizeContainer>
+      </InteractiveContext.Provider>
+    </GraphContainer>
   );
 };
 
-type Props = {
-  searchParams: SearchParams;
-};
-
-const EventsHistogram = ({ searchParams }: Props) => {
+const EventsHistogram = ({ searchParams, setFilters }: MiddleSectionProps) => {
+  const { userTimezone, formatTime } = useUserDateTime();
   const { data, isInitialLoading } = useQuery(['events', 'histogram', searchParams], () =>
     fetchEventsHistogram(searchParams),
   );
 
   const alerts = parseTypeFilter(searchParams?.filters?.get('alert')?.[0]);
+  const onZoom = useCallback(
+    (from: string, to: string) => {
+      const parsedFrom = formatTime(toUTCFromTz(from, userTimezone), 'internal');
+      const parsedTo = formatTime(toUTCFromTz(to, userTimezone), 'internal');
+      setFilters(searchParams.filters.set('timestamp', [`${parsedFrom}><${parsedTo}`]));
+    },
+    [formatTime, searchParams.filters, setFilters, userTimezone],
+  );
 
-  return isInitialLoading ? <Spinner /> : <EventsGraph data={data} alerts={alerts} />;
+  return isInitialLoading ? <Spinner /> : <EventsGraph data={data} alerts={alerts} onZoom={onZoom} />;
 };
 
 export default EventsHistogram;
