@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import type SearchResult from 'src/views/logic/SearchResult';
 
 import { Icon, TextOverflowEllipsis } from 'components/common';
 import type Widget from 'views/logic/widgets/Widget';
@@ -53,8 +54,13 @@ const StyledIcon = styled(Icon)(
     color: ${theme.colors.gray[60]};
   `,
 );
-const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) =>
-  result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
+const getEffectiveWidgetTimerange = (result: SearchResult, activeQuery: string, searchTypeId: string) => {
+  const searchTypeResult = result?.results?.[activeQuery]?.searchTypes[searchTypeId];
+
+  return searchTypeResult && 'effective_timerange' in searchTypeResult
+    ? searchTypeResult.effective_timerange
+    : undefined;
+};
 
 const TimerangeInfo = ({
   className = undefined,
