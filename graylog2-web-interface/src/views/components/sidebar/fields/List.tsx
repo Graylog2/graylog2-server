@@ -65,7 +65,7 @@ const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => 
   }
 
   const fieldFilter = filter
-    ? (field) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())
+    ? (field: { name: string }) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())
     : () => true;
   const fieldsToShow = _fieldsToShow(activeQueryFields, allFields, currentGroup);
   const fieldList = fieldsToShow.filter(fieldFilter).sortBy((field) => field.name.toLocaleUpperCase());
