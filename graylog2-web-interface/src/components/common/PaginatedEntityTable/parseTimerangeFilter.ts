@@ -19,9 +19,7 @@ import trim from 'lodash/trim';
 
 import { extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
 import { adjustFormat } from 'util/DateTime';
-import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
-
-const allTimesRange: RelativeTimeRange = { type: 'relative', range: 0 };
+import type { TimeRange } from 'views/logic/queries/Query';
 
 const isNullOrBlank = (s: string | undefined) => {
   if (!s) {
@@ -31,15 +29,15 @@ const isNullOrBlank = (s: string | undefined) => {
   return trim(s) === '';
 };
 
-const parseTimerangeFilter = (timestamp: string | undefined): TimeRange => {
+const parseTimerangeFilter = (timestamp: string | undefined, defaultTimerange: TimeRange): TimeRange => {
   if (!timestamp) {
-    return allTimesRange;
+    return defaultTimerange;
   }
 
   const [from, to] = extractRangeFromString(timestamp);
 
   if (!from && !to) {
-    return allTimesRange;
+    return defaultTimerange;
   }
 
   return {
