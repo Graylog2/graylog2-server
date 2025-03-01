@@ -42,7 +42,7 @@ const shouldRender = (
   return true;
 };
 
-const renderTitle = (description: string, Badge: PluginNavigation['BadgeComponent'] | undefined) =>
+const renderLinkTitle = (description: string, Badge: PluginNavigation['BadgeComponent'] | undefined) =>
   Badge ? <Badge text={description} /> : description;
 
 type PluginNavDropdownProps = {
@@ -67,14 +67,12 @@ const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }:
   const renderBadge = menuItems.some((menuItem) => menuItem?.BadgeComponent);
 
   return (
-    <NavDropdown
-      key={title}
-      title={renderTitle(title, renderBadge ? BadgeComponent : null)}
-      inactiveTitle={description}>
+    <NavDropdown key={title} title={title} Badge={renderBadge ? BadgeComponent : undefined} inactiveTitle={description}>
       {accessibleMenuItems.map((menuItem) => (
         <NavigationLink
           key={menuItem.description}
-          description={renderTitle(menuItem.description, BadgeComponent)}
+          Badge={BadgeComponent}
+          description={menuItem.description}
           path={menuItem.path}
         />
       ))}
@@ -110,7 +108,7 @@ const NavigationItem = ({
   }
 
   return (
-    <NavigationLink key={description} description={renderTitle(description, BadgeComponent)} path={path} topLevel />
+    <NavigationLink key={description} description={renderLinkTitle(description, BadgeComponent)} path={path} topLevel />
   );
 };
 
