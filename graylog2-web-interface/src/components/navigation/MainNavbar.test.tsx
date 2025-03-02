@@ -50,12 +50,15 @@ describe('MainNavbar', () => {
   });
 
   describe('renders custom navigation elements supplied by plugins', () => {
+    const ARCHIVES_LINK_TITLE = 'Archives';
+
     const plugin = {
       metadata: { name: 'DummyPlugin ' },
       exports: {
         navigation: [
+          { path: '/after/test', description: 'Should be after archives', position: { after: ARCHIVES_LINK_TITLE } },
           { path: '/something', description: 'Perpetuum Mobile' },
-          { path: '/system/archives', description: 'Archives', permissions: 'archive:read' },
+          { path: '/system/archives', description: ARCHIVES_LINK_TITLE, permissions: 'archive:read' },
           {
             description: 'Neat Stuff',
             path: '/',
@@ -221,6 +224,17 @@ describe('MainNavbar', () => {
       await screen.findByRole('menuitem', { name: /Menu item for general perspective/i });
 
       expect(screen.queryByRole('menuitem', { name: /Menu item for specific perspective/i })).not.toBeInTheDocument();
+    });
+
+    describe('uses correct position', () => {
+      it('should render an item after a specified item', async () => {
+        render(<SUT />);
+
+        const targetItem = await screen.findByRole('link', { name: ARCHIVES_LINK_TITLE });
+        const itemWithPosition = await screen.findByRole('link', { name: /Should be after archives/i });
+
+        expect(itemWithPosition.compareDocumentPosition(targetItem)).toBe(2);
+      });
     });
   });
 
