@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
 
 import HighlightingRule from './HighlightingRule';
 
@@ -93,17 +94,9 @@ describe('HighlightingRule', () => {
   });
 
   describe('rule removal:', () => {
-    let oldConfirm = null;
     const findDeleteIcon = () => screen.findByTitle('Remove this Highlighting Rule');
 
-    beforeEach(async () => {
-      oldConfirm = window.confirm;
-      window.confirm = jest.fn(() => false);
-    });
-
-    afterEach(() => {
-      window.confirm = oldConfirm;
-    });
+    useWindowConfirmMock();
 
     it('asks for confirmation before rule is removed', async () => {
       render(<SUT />);

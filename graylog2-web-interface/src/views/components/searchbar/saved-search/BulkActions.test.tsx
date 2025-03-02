@@ -22,6 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { asMock } from 'helpers/mocking';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
 
 import BulkActions from './BulkActions';
 
@@ -36,7 +37,7 @@ jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 describe('SavedSearches BulkActions', () => {
   const openActionsDropdown = async () => {
-    await userEvent.click(
+    userEvent.click(
       await screen.findByRole('button', {
         name: /bulk actions/i,
       }),
@@ -47,9 +48,9 @@ describe('SavedSearches BulkActions', () => {
     userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
   };
 
-  beforeEach(() => {
-    window.confirm = jest.fn(() => true);
+  useWindowConfirmMock();
 
+  beforeEach(() => {
     asMock(useSelectedEntities).mockReturnValue({
       selectedEntities: [],
       setSelectedEntities: () => {},

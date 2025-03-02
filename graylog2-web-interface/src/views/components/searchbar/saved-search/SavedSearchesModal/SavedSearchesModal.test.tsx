@@ -28,6 +28,7 @@ import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { adminUser } from 'fixtures/users';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
 
 import SavedSearchesModal from './SavedSearchesModal';
 
@@ -74,6 +75,7 @@ jest.mock('routing/Routes', () => ({
 }));
 
 describe('SavedSearchesModal', () => {
+  useWindowConfirmMock();
   const defaultPaginatedSearches = createPaginatedSearches();
 
   beforeEach(() => {
@@ -150,7 +152,6 @@ describe('SavedSearchesModal', () => {
     });
 
     it('should call `onDelete` if saved search is deleted', async () => {
-      window.confirm = jest.fn(() => true);
       const onDelete = jest.fn(() => Promise.resolve());
 
       render(

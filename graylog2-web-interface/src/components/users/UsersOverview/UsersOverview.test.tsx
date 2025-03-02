@@ -24,6 +24,7 @@ import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/use
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
 import { UsersActions } from 'stores/users/UsersStore';
+import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
 
 import UsersOverview from './UsersOverview';
 
@@ -110,16 +111,8 @@ describe('UsersOverview', () => {
     const modifiableUsersList = Immutable.List([modifiableUser]);
     const readOnlyUser = alice.toBuilder().readOnly(true).build();
     const readOnlyUsersList = Immutable.List([readOnlyUser]);
-    let oldConfirm;
 
-    beforeEach(() => {
-      oldConfirm = window.confirm;
-      window.confirm = jest.fn(() => true);
-    });
-
-    afterEach(() => {
-      window.confirm = oldConfirm;
-    });
+    useWindowConfirmMock();
 
     it(
       'be able to delete a modifiable user',
