@@ -29,8 +29,6 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { navigation as securityNavigation } from 'components/security/bindings';
 import NavigationItem from 'components/navigation/NavigationItem';
 
-const LAST_POSITION = 'last';
-
 const _existingDropdownItemIndex = (
   existingNavigationItems: Array<PluginNavigation>,
   newNavigationItem: PluginNavigation,
@@ -80,18 +78,28 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
   return menuItem && Object.keys(menuItem).includes('useIsValidLicense') ? menuItem.useIsValidLicense() : true;
 };
 
-const sortItemsByPosition = <T extends { position: typeof LAST_POSITION | undefined }>(navigationItems: Array<T>) =>
-  navigationItems.sort((route1, route2) => {
-    if (route1.position === LAST_POSITION) {
-      return 1;
-    }
+const sortInAfterItem = (targetList: Array<PluginNavigation>, afterItems: Array<PluginNavigation>) => {
+  const result = [...targetList];
 
-    if (route2.position === LAST_POSITION) {
-      return -1;
+  afterItems.forEach((afterItem) => {
+    const index = result.findIndex((targetItem) => targetItem.description === afterItem.position?.after);
+    if (index !== -1) {
+      result.splice(index + 1, 0, afterItem);
+    } else {
+      result.push(afterItem);
     }
-
-    return 0;
   });
+
+  return result;
+};
+
+const sortItemsByPosition = (navigationItems: Array<PluginNavigation>) => {
+  const withoutPositionItems = navigationItems.filter((item) => !item.position);
+  const afterItems = navigationItems.filter((item) => !!item.position?.after);
+  const lastItems = navigationItems.filter((item) => !!item.position?.last);
+
+  return [...sortInAfterItem(withoutPositionItems, afterItems), ...lastItems];
+};
 
 const useNavigationItems = () => {
   const { permissions } = useCurrentUser();
