@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type SearchResult from 'src/views/logic/SearchResult';
 
+import type SearchResult from 'views/logic/SearchResult';
 import { Icon, TextOverflowEllipsis } from 'components/common';
 import type Widget from 'views/logic/widgets/Widget';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
