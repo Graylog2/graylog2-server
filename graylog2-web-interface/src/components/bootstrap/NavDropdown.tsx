@@ -51,7 +51,7 @@ const DropdownTrigger = styled.button<{ $active: boolean }>(
   `,
 );
 
-const NavItem = styled.span`
+const NavItem = styled.li`
   display: inline-flex;
   align-items: center;
   min-height: ${NAV_ITEM_HEIGHT};
