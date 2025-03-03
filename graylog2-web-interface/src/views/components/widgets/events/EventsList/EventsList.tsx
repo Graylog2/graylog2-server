@@ -22,7 +22,7 @@ import type { WidgetComponentProps } from 'views/types';
 import { PaginatedList } from 'components/common';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
 import type { EventsListResult } from 'views/components/widgets/events/types';
 import type EventsWidgetSortConfig from 'views/logic/widgets/events/EventsWidgetSortConfig';
@@ -62,7 +62,7 @@ const useHandlePageChange = (
   setLoadingState: (loading: boolean) => void,
   setPagination: (pagination: Pagination) => void,
 ) => {
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const { stopAutoRefresh } = useAutoRefresh();
 
   return useCallback(

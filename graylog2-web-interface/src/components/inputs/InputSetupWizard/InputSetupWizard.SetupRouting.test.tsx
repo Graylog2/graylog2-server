@@ -368,7 +368,7 @@ describe('InputSetupWizard Setup Routing', () => {
       });
 
       const nextStepButton = await screen.findByRole('button', {
-        name: /Skip & Start Input/i,
+        name: /Next/i,
         hidden: true,
       });
 

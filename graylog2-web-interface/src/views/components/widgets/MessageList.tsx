@@ -31,7 +31,7 @@ import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextPro
 import { InputsActions } from 'stores/inputs/InputsStore';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
 import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
@@ -110,7 +110,7 @@ const MessageList = ({
   const activeQueryId = useActiveQueryId();
   const searchTypes = useCurrentSearchTypesResults();
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   useResetPaginationOnSearchExecution(setPagination, currentPage);
   useRenderCompletionCallback();
 

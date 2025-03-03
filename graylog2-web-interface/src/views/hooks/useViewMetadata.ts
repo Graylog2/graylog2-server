@@ -16,7 +16,7 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectActiveQuery, selectView } from 'views/logic/slices/viewSelectors';
 import type View from 'views/logic/views/View';
 
@@ -32,6 +32,6 @@ const selectViewMetadata = createSelector(selectActiveQuery, selectView, (active
     : {},
 );
 
-const useViewMetadata = () => useAppSelector(selectViewMetadata);
+const useViewMetadata = () => useViewsSelector(selectViewMetadata);
 
 export default useViewMetadata;

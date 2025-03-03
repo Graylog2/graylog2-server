@@ -21,7 +21,6 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
-import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
@@ -33,19 +32,26 @@ import org.graylog2.database.utils.MongoUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.lte;
-import static com.mongodb.client.model.Filters.ne;
+import static com.mongodb.client.model.Filters.nin;
 import static com.mongodb.client.model.Projections.include;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
+import static org.graylog.plugins.views.search.QueryResult.SEARCH_TYPES_FIELD;
 import static org.graylog.plugins.views.search.SearchJobIdentifier.OWNER_FIELD;
 import static org.graylog.plugins.views.search.SearchJobIdentifier.SEARCH_ID_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.CREATED_AT_FIELD;
+import static org.graylog.plugins.views.search.jobs.SearchJobState.PROGRESS_FIELD;
+import static org.graylog.plugins.views.search.jobs.SearchJobState.RESULT_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.STATUS_FIELD;
 import static org.graylog.plugins.views.search.jobs.SearchJobState.TYPE_FIELD;
+import static org.graylog.plugins.views.search.jobs.SearchJobStatus.EXPIRED;
 import static org.graylog.plugins.views.search.jobs.SearchJobStatus.RESET;
 import static org.graylog.plugins.views.search.jobs.SearchJobType.DATA_LAKE;
 
@@ -110,10 +116,13 @@ public class SearchJobStateService {
         final UpdateResult updateResult = collection.updateMany(
                 and(
                         eq(TYPE_FIELD, DATA_LAKE),
-                        ne(STATUS_FIELD, RESET),
+                        nin(STATUS_FIELD, RESET, EXPIRED),
                         lte(CREATED_AT_FIELD, dateTime)
                 ),
-                Updates.set(STATUS_FIELD, SearchJobStatus.EXPIRED)
+                combine(
+                        set(STATUS_FIELD, SearchJobStatus.EXPIRED),
+                        set(RESULT_FIELD + "." + SEARCH_TYPES_FIELD, Map.of())
+                )
 
         );
         return updateResult.getModifiedCount();
@@ -128,8 +137,8 @@ public class SearchJobStateService {
         if (searchJobState.identifier().id() == null) {
             throw new IllegalStateException("Missing ID of SearchJobState to update");
         }
-        final Optional<SearchJobStatus> status = getStatus(searchJobState.identifier().id());
-        if (status.isPresent() && status.get() == RESET) {
+        final Optional<SearchJobExecutionState> executionState = getExecutionState(searchJobState.identifier().id());
+        if (executionState.isPresent() && executionState.get().status() == RESET) {
             //RESET search jobs should not be changed anymore, are immutable
             return false;
         } else {
@@ -179,12 +188,17 @@ public class SearchJobStateService {
                 .orElse(false);
     }
 
-    public Optional<SearchJobStatus> getStatus(final String searchJobStateID) {
+    public Optional<SearchJobExecutionState> getExecutionState(final String searchJobStateID) {
         final Document doc = collection.find(MongoUtils.idEq(searchJobStateID), Document.class)
-                .projection(include(STATUS_FIELD))
+                .projection(include(STATUS_FIELD, PROGRESS_FIELD))
                 .first();
         if (doc != null) {
-            return Optional.of(SearchJobStatus.valueOf(doc.get(STATUS_FIELD, String.class)));
+            return Optional.of(
+                    new SearchJobExecutionState(
+                            SearchJobStatus.valueOf(doc.get(STATUS_FIELD, String.class)),
+                            doc.getInteger(PROGRESS_FIELD, 0)
+                    )
+            );
         } else {
             return Optional.empty();
         }

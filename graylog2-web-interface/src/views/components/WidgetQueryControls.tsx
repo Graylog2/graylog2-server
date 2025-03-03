@@ -51,10 +51,10 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { SEARCH_BAR_GAP, TimeRangeRow, SearchQueryRow } from 'views/components/searchbar/SearchBarLayout';
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { updateWidget } from 'views/logic/slices/widgetActions';
-import { execute, setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
-import useAppDispatch from 'stores/useAppDispatch';
+import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useHandlerContext from 'views/components/useHandlerContext';
 import useView from 'views/hooks/useView';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
@@ -64,6 +64,7 @@ import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { defaultCompare } from 'logic/DefaultCompare';
 import StreamCategoryFilter from 'views/components/searchbar/StreamCategoryFilter';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
@@ -99,7 +100,7 @@ export const updateWidgetSearchControls = (widget, { timerange, streams, streamC
     .build();
 
 const onSubmit = async (
-  dispatch: AppDispatch,
+  dispatch: ViewsDispatch,
   values: CombinedSearchBarFormValues,
   pluggableSearchBarControls: Array<() => SearchBarControl>,
   widget: Widget,
@@ -122,13 +123,13 @@ const onSubmit = async (
     return dispatch(updateWidget(widget.id, newWidget));
   }
 
-  return dispatch(execute());
+  return dispatch(executeActiveQuery());
 };
 
-const resetTimeRangeOverride = (dispatch: AppDispatch) =>
-  dispatch(setGlobalOverrideTimerange(undefined)).then(() => dispatch(execute()));
-const resetQueryOverride = (dispatch: AppDispatch) =>
-  dispatch(setGlobalOverrideQuery(undefined)).then(() => dispatch(execute()));
+const resetTimeRangeOverride = (dispatch: ViewsDispatch) =>
+  dispatch(setGlobalOverrideTimerange(undefined)).then(() => dispatch(executeActiveQuery()));
+const resetQueryOverride = (dispatch: ViewsDispatch) =>
+  dispatch(setGlobalOverrideQuery(undefined)).then(() => dispatch(executeActiveQuery()));
 
 const useBindApplySearchControlsChanges = (formRef) => {
   const { bindApplySearchControlsChanges } = useContext(WidgetEditApplyAllChangesContext);
@@ -214,7 +215,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
     [globalOverride, pluggableSearchBarControls, userTimezone, handlerContext],
   );
   const initialValues = useInitialFormValues(widget);
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const _onSubmit = useCallback(
     (values: CombinedSearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, widget),
     [dispatch, pluggableSearchBarControls, widget],

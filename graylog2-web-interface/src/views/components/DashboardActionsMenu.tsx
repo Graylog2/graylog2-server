@@ -34,7 +34,7 @@ import { executePluggableDashboardDuplicationHandler as executePluggableDuplicat
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useView from 'views/hooks/useView';
 import useIsNew from 'views/hooks/useIsNew';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { updateView } from 'views/logic/slices/viewSlice';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -78,7 +78,7 @@ const DashboardActionsMenu = () => {
       </MenuItem>
     </>
   );
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const history = useHistory();
   const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
   const modalRefs = useRef({});
