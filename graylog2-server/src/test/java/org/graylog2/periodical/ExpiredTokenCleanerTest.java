@@ -111,7 +111,7 @@ public class ExpiredTokenCleanerTest {
     //-----------------
     // Helper methods
 
-    private final DateTime baseDateTime = new DateTime(2020, 1, 1, 0, 0).withZone(DateTimeZone.UTC);
+    private final DateTime baseDateTime = new DateTime(2020, 1, 1, 0, 0, DateTimeZone.UTC);
 
     private AccessTokenService.ExpiredToken mkToken(int id) {
         return new AccessTokenService.ExpiredToken(String.valueOf(id), "token" + id, baseDateTime.plusDays(id), "user" + id);
