@@ -17,7 +17,7 @@ Found a bug? Have an idea for an improvement? Feel free to [add an issue](../../
 
 Help us build the future of log management and be part of a project that is used by thousands of people out there every day.
 
-Follow the [contributors guide](https://www.graylog.org/community) and read [the contributing instructions](CONTRIBUTING.md) to get started.
+Follow the [setup guide](https://github.com/Graylog2/graylog-project) to get started.
 
 Do you want to get paid for developing our free and open product? Apply for one of our [jobs](https://www.graylog.org/careers)!
 
