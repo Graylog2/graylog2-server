@@ -18,9 +18,10 @@ import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { SearchJobType, JobIds } from 'views/stores/SearchJobs';
 import { runStartJob, runPollJob, runCancelJob } from 'views/stores/SearchJobs';
-import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
+import type Search from 'views/logic/search/Search';
+import type { WidgetMapping } from 'views/logic/views/types';
 
 const delay = (ms: number) =>
   new Promise((resolve) => {
@@ -28,13 +29,10 @@ const delay = (ms: number) =>
   });
 
 export const buildSearchExecutionState = (
-  view: View,
-  widgetsToSearch: string[],
+  searchTypesToSearch: string[],
   executionStateParam: SearchExecutionState,
   keepQueries: string[] = [],
 ): SearchExecutionState => {
-  const { widgetMapping } = view;
-
   const globalOverride = (executionStateParam.globalOverride ?? GlobalOverride.empty())
     .toBuilder()
     .keepQueries(keepQueries)
@@ -42,13 +40,8 @@ export const buildSearchExecutionState = (
 
   let executionStateBuilder = executionStateParam.toBuilder().globalOverride(globalOverride);
 
-  if (widgetsToSearch) {
-    const keepSearchTypes = widgetsToSearch
-      .map((widgetId) => widgetMapping.get(widgetId))
-      .reduce(
-        (acc, searchTypeSet) => (searchTypeSet ? [...acc, ...searchTypeSet.toArray()] : acc),
-        globalOverride.keepSearchTypes || [],
-      );
+  if (searchTypesToSearch) {
+    const keepSearchTypes = [...(globalOverride.keepSearchTypes || []), ...searchTypesToSearch];
     const newGlobalOverride = globalOverride.toBuilder().keepSearchTypes(keepSearchTypes).build();
     executionStateBuilder = executionStateBuilder.globalOverride(newGlobalOverride);
   }
@@ -57,14 +50,12 @@ export const buildSearchExecutionState = (
 };
 
 export const startJob = async (
-  view: View,
-  widgetsToSearch: string[],
+  search: Search,
+  searchTypesToSearch: string[],
   executionStateParam: SearchExecutionState,
   keepQueries: string[] = [],
 ): Promise<JobIds> => {
-  const { search } = view;
-
-  const executionState = buildSearchExecutionState(view, widgetsToSearch, executionStateParam, keepQueries);
+  const executionState = buildSearchExecutionState(searchTypesToSearch, executionStateParam, keepQueries);
 
   return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
 };
@@ -89,15 +80,12 @@ export const pollJob = (jobIds: JobIds, result: SearchJobType | null, depth: num
 
 export const executeJobResult = async (
   { asyncSearchId, nodeId }: JobIds,
-  view: View,
-): Promise<SearchExecutionResult> => {
-  const { widgetMapping } = view;
-
-  return pollJob({ asyncSearchId, nodeId }, null).then((result) => ({
-    widgetMapping,
+  widgetMapping?: WidgetMapping,
+): Promise<SearchExecutionResult> =>
+  pollJob({ asyncSearchId, nodeId }, null).then((result) => ({
     result: new SearchResult(result),
+    widgetMapping,
   }));
-};
 
 export const cancelJob = (jobIds: JobIds) => runCancelJob(jobIds);
 

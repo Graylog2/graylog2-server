@@ -228,10 +228,14 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("status/{jobId}")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
-    public Response jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
+    public Response jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId,
+                              @ApiParam(name = "page") @QueryParam("page") @DefaultValue("0") int page,
+                              @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("0") int perPage,
+                              @Context SearchUser searchUser) {
         return Response
                 .ok(
                         searchJobService.load(jobId, searchUser)
+                                .map(searchJobDTO -> searchJobDTO.withResultsLimitedTo(page, perPage))
                                 .orElseThrow(NotFoundException::new)
                 )
                 .build();
