@@ -18,10 +18,10 @@ import * as React from 'react';
 import { useCallback } from 'react';
 
 import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectJobIds } from 'views/logic/slices/searchExecutionSelectors';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
   const dispatch = useViewsDispatch();
@@ -29,7 +29,7 @@ const SearchPageAutoRefreshProvider = ({ children }: React.PropsWithChildren) =>
 
   const onRefresh = useCallback(() => {
     if (!jobIds) {
-      dispatch(execute());
+      dispatch(executeActiveQuery());
     }
   }, [dispatch, jobIds]);
 
