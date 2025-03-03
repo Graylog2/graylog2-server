@@ -48,7 +48,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
-  
+
   if (loadingScopePermissions) {
     return <Spinner text="Loading Rule" />;
   }
@@ -103,11 +103,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
       ) : (
         <Row className="content">
           <Col md={6}>
-            {isManaged && (
-              <Alert bsStyle="warning">
-                This Rule is managed by Application
-              </Alert>
-            )}
+            {isManaged && <Alert bsStyle="warning">This rule is managed by Application. You cannot edit it.</Alert>}
             <RuleForm create={create} isManaged={isManaged} />
           </Col>
           <Col md={6}>
