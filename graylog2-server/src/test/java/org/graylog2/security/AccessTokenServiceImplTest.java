@@ -25,6 +25,7 @@ import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.users.UserConfiguration;
 import org.joda.time.DateTime;
@@ -216,7 +217,7 @@ public class AccessTokenServiceImplTest {
         final AccessToken token = accessTokenService.load("foobar");
         final DateTime firstAccess = accessTokenService.touch(token);
 
-        Thread.sleep(1,0);
+        Thread.sleep(1, 0);
         final DateTime secondAccess = accessTokenService.touch(token);
         assertThat(secondAccess).isGreaterThan(firstAccess);
         verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
@@ -256,6 +257,47 @@ public class AccessTokenServiceImplTest {
                 .isInstanceOfSatisfying(MongoException.class, e ->
                         assertThat(MongoUtils.isDuplicateKeyError(e)).isTrue()
                 );
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("findExpiredTokens_noExpirationField.json")
+    public void findExpiredTokensIgnoresTokensWithoutExpirationField() {
+        final List<AccessTokenService.ExpiredToken> expiredTokens = accessTokenService.findExpiredTokens(Tools.nowUTC());
+
+        assertThat(expiredTokens).isEmpty();
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("findExpiredTokens_severalExpired.json")
+    public void findExpiredTokensReturnsOnlyExpiredTokensSortedByExpirationDate() {
+        final List<AccessTokenService.ExpiredToken> expiredTokens = accessTokenService.findExpiredTokens(Tools.nowUTC());
+        final List<AccessTokenService.ExpiredToken> expected =
+                List.of(
+                        new AccessTokenService.ExpiredToken("54e3deadbeefdeadbeefaffe", "web", DateTime.parse("2015-03-14T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf"),
+                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf")
+                );
+
+        assertThat(expiredTokens).isNotEmpty();
+        assertEquals(expected, expiredTokens);
+
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("accessTokensSingleToken.json")
+    public void deleteByIdReturns0ForNonExistingToken() {
+        final int deletedTokens = accessTokenService.deleteById("aaaaaaaaaaaaaaaaaaaaaaaa");
+        assertEquals(0, deletedTokens);
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("accessTokensSingleToken.json")
+    public void deleteByIdReturns1ForExistingToken() {
+        final int deletedTokens = accessTokenService.deleteById("54e3deadbeefdeadbeefaffe");
+        assertEquals(1, deletedTokens);
         verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 }
