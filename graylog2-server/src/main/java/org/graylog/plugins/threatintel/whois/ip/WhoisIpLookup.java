@@ -128,7 +128,7 @@ public class WhoisIpLookup {
             return new WhoisIpLookupResult(parser.getOrganization(), parser.getCountryCode());
         } catch (IOException e) {
             LOG.error("Could not lookup WHOIS information for [{}] at [{}].", ip, registry.toString());
-            throw e;
+            return null;
         } finally {
             if (whoisClient.isConnected()) {
                 whoisClient.disconnect();
