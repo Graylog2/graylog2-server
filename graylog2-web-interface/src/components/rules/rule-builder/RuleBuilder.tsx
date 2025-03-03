@@ -340,7 +340,7 @@ const RuleBuilder = () => {
                 <StyledPanelBody>
                   {rule.rule_builder.conditions.map((condition, index) => (
                     <RuleBuilderBlock
-                      key={index}
+                      key={condition.id}
                       blockDict={conditionsDict || []}
                       block={condition}
                       order={index}
@@ -375,7 +375,7 @@ const RuleBuilder = () => {
                 <StyledPanelBody>
                   {rule.rule_builder.actions.map((action, index) => (
                     <RuleBuilderBlock
-                      key={index}
+                      key={action.id}
                       blockDict={actionsDict || []}
                       block={action}
                       order={index}
