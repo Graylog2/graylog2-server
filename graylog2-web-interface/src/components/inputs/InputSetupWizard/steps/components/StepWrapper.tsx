@@ -40,6 +40,11 @@ export const StyledHeading = styled.h3(
   `,
 );
 
+export const StyledList = styled.ul`
+  list-style-type: disc;
+  padding-left: 20px;
+`;
+
 const StepCol = styled(Col)(
   ({ theme }) => css`
     padding-left: ${theme.spacings.lg};

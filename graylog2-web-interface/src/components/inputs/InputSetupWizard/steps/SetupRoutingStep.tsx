@@ -35,7 +35,8 @@ import {
 import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
-import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading } from './components/StepWrapper';
+import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading, StyledList } from './components/StepWrapper';
+import InputInUseAlert from './components/InputInUseAlert';
 
 const ExistingStreamCol = styled(Col)(
   ({ theme }) => css`
@@ -61,11 +62,6 @@ const StyledTooltip = styled(Tooltip)(
   `,
 );
 
-const StyledList = styled.ul`
-  list-style-type: disc;
-  padding-left: 20px;
-`;
-
 const StyledLabel = styled.label(
   ({ theme }) => css`
     font-weight: normal;
@@ -86,7 +82,7 @@ export type RoutingStepData = {
 
 const SetupRoutingStep = () => {
   const currentStepName = useMemo(() => INPUT_WIZARD_STEPS.SETUP_ROUTING, []);
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep } = useInputSetupWizard();
+  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
   const { stepsData, setStepsData } = useInputSetupWizardSteps();
   const newStream: StreamFormValues = getStepData(stepsData, currentStepName, 'newStream');
   const [selectedStreamId, setSelectedStreamId] = useState(undefined);
@@ -205,6 +201,7 @@ const SetupRoutingStep = () => {
 
   return (
     <StepWrapper>
+      <InputInUseAlert inputId={wizardData?.input?.id} />
       {!showNewStreamSection && !showSelectStream && (
         <>
           <Row>
