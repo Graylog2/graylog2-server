@@ -56,10 +56,10 @@ const StreamListTD = styled.td`
 const PipelineStage = styled.div<{ $idle?: boolean }>(
   ({ $idle, theme }) => css`
     border: 1px solid ${theme.colors.gray[$idle ? '50px' : '70px']};
-    border-radius: 4px;
+    border-radius: ${theme.spacings.xs};
     display: inline-block;
-    margin-right: 15px;
-    padding: 20px;
+    margin-right: ${theme.spacings.xs};
+    padding: ${theme.spacings.sm};
     text-align: center;
     width: 120px;
     background-color: ${$idle
@@ -67,11 +67,13 @@ const PipelineStage = styled.div<{ $idle?: boolean }>(
       : theme.colors.global.contentBackground};
   `,
 );
-const DefaultLabel = styled(Label)`
+const DefaultLabel = styled(Label)( ({ theme }) => css`
   display: inline-flex;
-  margin-left: 5px;
+  margin-left: ${theme.spacings.xs};
   vertical-align: inherit;
-`;
+`);
+
+const getStagesWithoutDuplicates = (usedStagesAcc: Array<number> = [], pipelineStages: Array<number>) => Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
 
 const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeletePipeline }: Props) => {
   const currentUser = useCurrentUser();
@@ -88,8 +90,7 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
       .map(({ stages: pipelineStages }) => pipelineStages.map(({ stage }) => stage))
       .reduce(
         (usedStagesAcc: number[], pipelineStages: number[]) =>
-          // Concat stages in a single array removing duplicates
-          Array.from(new Set([...usedStagesAcc, ...pipelineStages])),
+          getStagesWithoutDuplicates(usedStagesAcc, pipelineStages),
         [],
       )
       .sort(naturalSort)
