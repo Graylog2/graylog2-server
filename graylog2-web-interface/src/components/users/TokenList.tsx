@@ -51,11 +51,11 @@ const StyledLastAccess = styled.div`
 `;
 
 type Props = {
-  creatingToken?: boolean
-  deletingToken?: string,
-  onCreate: (tokenName: string) => Promise<Token>
-  onDelete: (tokenId: string, tokenName: string) => void
-  tokens?: TokenSummary[]
+  creatingToken?: boolean;
+  deletingToken?: string;
+  onCreate: (tokenName: string) => Promise<Token>;
+  onDelete: (tokenId: string, tokenName: string) => void;
+  tokens?: TokenSummary[];
 };
 
 const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, tokens = [] }: Props) => {
@@ -92,7 +92,9 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
       {createdToken && (
         <StyledTokenPanel bsStyle="success">
           <Panel.Heading>
-            <Panel.Title>Token <em>{createdToken.name}</em> created!</Panel.Title>
+            <Panel.Title>
+              Token <em>{createdToken.name}</em> created!
+            </Panel.Title>
           </Panel.Heading>
           <Panel.Body>
             <p>This is your new token. Make sure to copy it now, you will not be able to see it again.</p>
@@ -100,15 +102,14 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
               {createdToken.token}
               <StyledCopyTokenButton title={<Icon name="content_copy" />} text={createdToken.token} bsSize="xsmall" />
             </pre>
-            <Button bsStyle="primary" onClick={() => setCreatedToken(undefined)}>Done</Button>
+            <Button bsStyle="primary" onClick={() => setCreatedToken(undefined)}>
+              Done
+            </Button>
           </Panel.Body>
         </StyledTokenPanel>
       )}
       <hr />
-      <StyledSearchForm onSearch={updateQuery}
-                        onReset={updateQuery}
-                        label="Filter"
-                        useLoadingState={false} />
+      <StyledSearchForm onSearch={updateQuery} onReset={updateQuery} label="Filter" useLoadingState={false} />
 
       <ControlledTableList>
         <ControlledTableList.Header />
@@ -126,14 +127,21 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
                 <Col md={9}>
                   {token.name}
                   <StyledLastAccess>
-                    {tokenNeverUsed ? 'Never used' : <>Last used <RelativeTime dateTime={token.last_access} /></>}
+                    {tokenNeverUsed ? (
+                      'Never used'
+                    ) : (
+                      <>
+                        Last used <RelativeTime dateTime={token.last_access} />
+                      </>
+                    )}
                   </StyledLastAccess>
                 </Col>
                 <Col md={3} className="text-right">
-                  <Button bsSize="xsmall"
-                          disabled={deletingToken === token.id}
-                          bsStyle="danger"
-                          onClick={deleteToken(token)}>
+                  <Button
+                    bsSize="xsmall"
+                    disabled={deletingToken === token.id}
+                    bsStyle="danger"
+                    onClick={deleteToken(token)}>
                     {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
                   </Button>
                 </Col>

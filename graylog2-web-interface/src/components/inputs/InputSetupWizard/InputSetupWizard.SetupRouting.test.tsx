@@ -35,19 +35,18 @@ const input = {
   name: 'inputName',
   created_at: '',
   creator_user_id: 'creatorId',
-  static_fields: { },
-  attributes: { },
+  static_fields: {},
+  attributes: {},
 };
 
 const onClose = jest.fn();
 
-const renderWizard = () => (
+const renderWizard = () =>
   render(
     <InputSetupWizardProvider>
       <InputSetupWizard show input={input} onClose={onClose} />
     </InputSetupWizardProvider>,
-  )
-);
+  );
 
 jest.mock('components/streams/hooks/useStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
@@ -77,59 +76,58 @@ const pipelinesConnectedMock = (response = []) => ({
 
 const useIndexSetsListResult = {
   data: {
-    indexSets:
-     [
-       {
-         id: 'default_id',
-         title: 'Default',
-         description: 'default index set',
-         index_prefix: 'default',
-         shards: 1,
-         replicas: 1,
-         rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
-         rotation_strategy: {
-           type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
-           max_docs_per_index: 20000000,
-         },
-         retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
-         retention_strategy: {
-           type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
-           max_number_of_indices: 2147483647,
-         },
-         index_analyzer: '',
-         index_optimization_max_num_segments: 0,
-         index_optimization_disabled: false,
-         field_type_refresh_interval: 1,
-         writable: true,
-         default: true,
-         can_be_default: true,
-       },
-       {
-         id: 'nox_id',
-         title: 'Nox',
-         description: 'nox index set',
-         index_prefix: 'nox',
-         shards: 1,
-         replicas: 1,
-         rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
-         rotation_strategy: {
-           type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
-           max_docs_per_index: 20000000,
-         },
-         retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
-         retention_strategy: {
-           type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
-           max_number_of_indices: 2147483647,
-         },
-         index_analyzer: '',
-         index_optimization_max_num_segments: 0,
-         index_optimization_disabled: false,
-         field_type_refresh_interval: 1,
-         writable: true,
-         default: false,
-         can_be_default: true,
-       },
-     ],
+    indexSets: [
+      {
+        id: 'default_id',
+        title: 'Default',
+        description: 'default index set',
+        index_prefix: 'default',
+        shards: 1,
+        replicas: 1,
+        rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+        rotation_strategy: {
+          type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+          max_docs_per_index: 20000000,
+        },
+        retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+        retention_strategy: {
+          type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
+          max_number_of_indices: 2147483647,
+        },
+        index_analyzer: '',
+        index_optimization_max_num_segments: 0,
+        index_optimization_disabled: false,
+        field_type_refresh_interval: 1,
+        writable: true,
+        default: true,
+        can_be_default: true,
+      },
+      {
+        id: 'nox_id',
+        title: 'Nox',
+        description: 'nox index set',
+        index_prefix: 'nox',
+        shards: 1,
+        replicas: 1,
+        rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+        rotation_strategy: {
+          type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+          max_docs_per_index: 20000000,
+        },
+        retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+        retention_strategy: {
+          type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
+          max_number_of_indices: 2147483647,
+        },
+        index_analyzer: '',
+        index_optimization_max_num_segments: 0,
+        index_optimization_disabled: false,
+        field_type_refresh_interval: 1,
+        writable: true,
+        default: false,
+        can_be_default: true,
+      },
+    ],
     indexSetsCount: 2,
     indexSetStats: null,
   },
@@ -191,153 +189,156 @@ describe('InputSetupWizard Setup Routing', () => {
 
     it('should render the Setup Routing step', async () => {
       renderWizard();
-    const routingStepText = await screen.findByText(/Select a destination Stream to route messages from this input to./i);
-
+      const routingStepText = await screen.findByText(
+        /Select a destination Stream to route messages from this input to./i,
+      );
 
       expect(routingStepText).toBeInTheDocument();
     });
-   
-  describe('Stream Selection', () => {
-    it('should show the stream select when clicking on choose stream', async () => {
-      renderWizard();
-      const selectStreamButton = await screen.findByRole('button', {
-        name: /Select Stream/i,
-        hidden: true,
+
+    describe('Stream Selection', () => {
+      it('should show the stream select when clicking on choose stream', async () => {
+        renderWizard();
+        const selectStreamButton = await screen.findByRole('button', {
+          name: /Select Stream/i,
+          hidden: true,
+        });
+
+        fireEvent.click(selectStreamButton);
+
+        await screen.findByLabelText(/All messages \(Default\)/i);
       });
 
-      fireEvent.click(selectStreamButton);
+      it('should only show editable existing streams', async () => {
+        asMock(useStreams).mockReturnValue(
+          useStreamsResult([
+            { id: 'alohoid', title: 'Aloho', is_editable: true },
+            { id: 'moraid', title: 'Mora', is_editable: false },
+          ]),
+        );
 
-      await screen.findByLabelText(/All messages \(Default\)/i);
-    });
+        renderWizard();
+        const selectStreamButton = await screen.findByRole('button', {
+          name: /Select Stream/i,
+          hidden: true,
+        });
 
-    it('should only show editable existing streams', async () => {
-      asMock(useStreams).mockReturnValue(useStreamsResult(
-        [
-          { id: 'alohoid', title: 'Aloho', is_editable: true },
-          { id: 'moraid', title: 'Mora', is_editable: false },
-        ],
-      ));
+        fireEvent.click(selectStreamButton);
 
-      renderWizard();
-      const selectStreamButton = await screen.findByRole('button', {
-        name: /Select Stream/i,
-        hidden: true,
+        const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+
+        await selectEvent.openMenu(streamSelect);
+
+        const alohoOption = await screen.findByText(/Aloho/i);
+        const moraOption = screen.queryByText(/Mora/i);
+
+        expect(alohoOption).toBeInTheDocument();
+        expect(moraOption).not.toBeInTheDocument();
       });
 
-      fireEvent.click(selectStreamButton);
+      it('should not show existing default stream in select', async () => {
+        asMock(useStreams).mockReturnValue(
+          useStreamsResult([
+            { id: 'alohoid', title: 'Aloho', is_editable: true, is_default: true },
+            { id: 'moraid', title: 'Mora', is_editable: true },
+          ]),
+        );
 
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+        renderWizard();
 
-      await selectEvent.openMenu(streamSelect);
+        const selectStreamButton = await screen.findByRole('button', {
+          name: /Select Stream/i,
+          hidden: true,
+        });
 
-      const alohoOption = await screen.findByText(/Aloho/i);
-      const moraOption = screen.queryByText(/Mora/i);
+        fireEvent.click(selectStreamButton);
 
-      expect(alohoOption).toBeInTheDocument();
-      expect(moraOption).not.toBeInTheDocument();
-    });
+        const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
-    it('should not show existing default stream in select', async () => {
-      asMock(useStreams).mockReturnValue(useStreamsResult(
-        [
-          { id: 'alohoid', title: 'Aloho', is_editable: true, is_default: true },
-          { id: 'moraid', title: 'Mora', is_editable: true },
-        ],
-      ));
+        await selectEvent.openMenu(streamSelect);
 
-      renderWizard();
+        const moraOption = await screen.findByText(/Mora/i);
+        const alohoOption = screen.queryByText(/Aloho/i);
 
-      const selectStreamButton = await screen.findByRole('button', {
-        name: /Select Stream/i,
-        hidden: true,
+        expect(moraOption).toBeInTheDocument();
+        expect(alohoOption).not.toBeInTheDocument();
       });
 
-      fireEvent.click(selectStreamButton);
+      it('should allow the user to select a stream', async () => {
+        asMock(useStreams).mockReturnValue(
+          useStreamsResult([
+            { id: 'alohoid', title: 'Aloho', is_editable: true },
+            { id: 'moraid', title: 'Mora', is_editable: true },
+          ]),
+        );
 
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+        renderWizard();
 
-      await selectEvent.openMenu(streamSelect);
+        const selectStreamButton = await screen.findByRole('button', {
+          name: /Select Stream/i,
+          hidden: true,
+        });
 
-      const moraOption = await screen.findByText(/Mora/i);
-      const alohoOption = screen.queryByText(/Aloho/i);
+        fireEvent.click(selectStreamButton);
 
-      expect(moraOption).toBeInTheDocument();
-      expect(alohoOption).not.toBeInTheDocument();
-    });
+        const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
-    it('should allow the user to select a stream', async () => {
-      asMock(useStreams).mockReturnValue(useStreamsResult(
-        [
-          { id: 'alohoid', title: 'Aloho', is_editable: true },
-          { id: 'moraid', title: 'Mora', is_editable: true },
-        ],
-      ));
-
-      renderWizard();
-
-      const selectStreamButton = await screen.findByRole('button', {
-        name: /Select Stream/i,
-        hidden: true,
+        await selectEvent.openMenu(streamSelect);
+        await selectEvent.select(streamSelect, 'Aloho');
       });
 
-      fireEvent.click(selectStreamButton);
+      it('should show a warning if the selected stream has connected pipelines', async () => {
+        asMock(useStreams).mockReturnValue(
+          useStreamsResult([
+            { id: 'alohoid', title: 'Aloho', is_editable: true },
+            { id: 'moraid', title: 'Mora', is_editable: true },
+          ]),
+        );
 
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+        asMock(usePipelinesConnectedStream).mockReturnValue(
+          pipelinesConnectedMock([
+            { id: 'pipeline1', title: 'Pipeline1' },
+            { id: 'pipeline2', title: 'Pipeline2' },
+          ]),
+        );
 
-      await selectEvent.openMenu(streamSelect);
-      await selectEvent.select(streamSelect, 'Aloho');
-    });
+        renderWizard();
 
+        const selectStreamButton = await screen.findByRole('button', {
+          name: /Select Stream/i,
+          hidden: true,
+        });
 
-    it('should show a warning if the selected stream has connected pipelines', async () => {
-      asMock(useStreams).mockReturnValue(useStreamsResult(
-        [
-          { id: 'alohoid', title: 'Aloho', is_editable: true },
-          { id: 'moraid', title: 'Mora', is_editable: true },
-        ],
-      ));
+        fireEvent.click(selectStreamButton);
 
-      asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock([
-        { id: 'pipeline1', title: 'Pipeline1' },
-        { id: 'pipeline2', title: 'Pipeline2' },
-      ]));
+        const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
-      renderWizard();
+        await selectEvent.openMenu(streamSelect);
 
-      const selectStreamButton = await screen.findByRole('button', {
-        name: /Select Stream/i,
-        hidden: true,
+        await selectEvent.select(streamSelect, 'Aloho');
+
+        const warning = await screen.findByText(/Pipelines connected to target Stream/i);
+        const warningPipeline1 = await screen.findByText(/Pipeline1/i);
+        const warningPipeline2 = await screen.findByText(/Pipeline2/i);
+
+        expect(warning).toBeInTheDocument();
+        expect(warningPipeline1).toBeInTheDocument();
+        expect(warningPipeline2).toBeInTheDocument();
       });
-
-      fireEvent.click(selectStreamButton);
-
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
-
-      await selectEvent.openMenu(streamSelect);
-
-      await selectEvent.select(streamSelect, 'Aloho');
-
-      const warning = await screen.findByText(/Pipelines connected to target Stream/i);
-      const warningPipeline1 = await screen.findByText(/Pipeline1/i);
-      const warningPipeline2 = await screen.findByText(/Pipeline2/i);
-
-      expect(warning).toBeInTheDocument();
-      expect(warningPipeline1).toBeInTheDocument();
-      expect(warningPipeline2).toBeInTheDocument();
     });
   });
-});
 
   describe('Stream creation', () => {
     beforeEach(() => {
-      asMock(useStreamsByIndexSet).mockReturnValue(useStreamByIndexSetResult(
-        {
+      asMock(useStreamsByIndexSet).mockReturnValue(
+        useStreamByIndexSetResult({
           total: 2,
           streams: [
             { id: 'alohoid', title: 'Aloho', is_editable: true },
             { id: 'moraid', title: 'Mora', is_editable: true },
           ],
-        }));
+        }),
+      );
     });
 
     it('should allow the user to create a new stream', async () => {
@@ -352,7 +353,8 @@ describe('InputSetupWizard Setup Routing', () => {
 
       await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
 
-      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } = await getStreamCreateFormFields();
+      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
+        await getStreamCreateFormFields();
 
       fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
@@ -368,10 +370,11 @@ describe('InputSetupWizard Setup Routing', () => {
       expect(await screen.findByText(/Matches will be removed from the Default stream./i)).toBeInTheDocument();
       expect(await screen.findByText(/A new pipeline will be created./i)).toBeInTheDocument();
 
-      expect(await screen.findByRole('button', {
-        name: /Reset/i,
-        hidden: true,
-      }),
+      expect(
+        await screen.findByRole('button', {
+          name: /Reset/i,
+          hidden: true,
+        }),
       ).toBeInTheDocument();
     });
 
@@ -440,7 +443,8 @@ describe('InputSetupWizard Setup Routing', () => {
 
       await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
 
-      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } = await getStreamCreateFormFields();
+      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
+        await getStreamCreateFormFields();
 
       fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
@@ -469,7 +473,8 @@ describe('InputSetupWizard Setup Routing', () => {
 
       await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
 
-      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } = await getStreamCreateFormFields();
+      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
+        await getStreamCreateFormFields();
 
       fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });

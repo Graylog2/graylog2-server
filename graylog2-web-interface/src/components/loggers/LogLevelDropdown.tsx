@@ -27,36 +27,42 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 
 type Props = {
-  name: string,
-  nodeId: string,
-  subsystem: { level: string },
-}
+  name: string;
+  nodeId: string;
+  subsystem: { level: string };
+};
 
 const LogLevelDropdown = ({ nodeId, name, subsystem }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
   const { setSubsystemLoggerLevel } = useSetSubsystemLoggerLevel();
 
-  const _changeLoglevel = useCallback((loglevel: string) => setSubsystemLoggerLevel(nodeId, name, loglevel), [name, nodeId, setSubsystemLoggerLevel]);
+  const _changeLoglevel = useCallback(
+    (loglevel: string) => setSubsystemLoggerLevel(nodeId, name, loglevel),
+    [name, nodeId, setSubsystemLoggerLevel],
+  );
 
-  const _menuLevelClick = useCallback((loglevel: string) => () => {
-    _changeLoglevel(loglevel);
+  const _menuLevelClick = useCallback(
+    (loglevel: string) => () => {
+      _changeLoglevel(loglevel);
 
-    sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.LOG_LEVEL_EDITED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_action_value: 'log-level-change',
-      event_details: { value: loglevel },
-    });
-  }, [_changeLoglevel, location?.pathname, sendTelemetry]);
+      sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.LOG_LEVEL_EDITED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_action_value: 'log-level-change',
+        event_details: { value: loglevel },
+      });
+    },
+    [_changeLoglevel, location?.pathname, sendTelemetry],
+  );
 
-  const loglevels = availableLoglevels
-    .map((loglevel) => (
-      <MenuItem key={`${subsystem}-${nodeId}-${loglevel}`}
-                active={subsystem.level === loglevel}
-                onClick={_menuLevelClick(loglevel)}>
-        {capitalize(loglevel)}
-      </MenuItem>
-    ));
+  const loglevels = availableLoglevels.map((loglevel) => (
+    <MenuItem
+      key={`${subsystem}-${nodeId}-${loglevel}`}
+      active={subsystem.level === loglevel}
+      onClick={_menuLevelClick(loglevel)}>
+      {capitalize(loglevel)}
+    </MenuItem>
+  ));
 
   return (
     <DropdownButton id="loglevel" bsSize="xsmall" title={capitalize(subsystem.level)}>

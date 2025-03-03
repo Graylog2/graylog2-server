@@ -27,32 +27,38 @@ export const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
 
 const fetchEvent = (eventId: string) => fetch('GET', eventsUrl(eventId)).then((data) => data.event);
 
-const useEventById = (eventId: string, { onErrorHandler }: { onErrorHandler?: (e: FetchError)=>void} = {}): {
-  data: Event,
-  refetch: () => void,
-  isLoading: boolean,
-  isFetched: boolean,
+const useEventById = (
+  eventId: string,
+  { onErrorHandler }: { onErrorHandler?: (e: FetchError) => void } = {},
+): {
+  data: Event;
+  refetch: () => void;
+  isLoading: boolean;
+  isFetched: boolean;
 } => {
   const { data, refetch, isLoading, isFetched } = useQuery<Event>(
     ['event-by-id', eventId],
-    () => onError(fetchEvent(eventId), (errorThrown: FetchError) => {
-      if (onErrorHandler) onErrorHandler(errorThrown);
+    () =>
+      onError(fetchEvent(eventId), (errorThrown: FetchError) => {
+        if (onErrorHandler) onErrorHandler(errorThrown);
 
-      UserNotification.error(`Loading event or alert failed with status: ${errorThrown}`,
-        'Could not load event or alert');
-    }),
+        UserNotification.error(
+          `Loading event or alert failed with status: ${errorThrown}`,
+          'Could not load event or alert',
+        );
+      }),
     {
       keepPreviousData: true,
       enabled: !!eventId,
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isLoading,
     isFetched,
-  });
+  };
 };
 
 export default useEventById;

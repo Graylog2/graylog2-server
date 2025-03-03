@@ -46,12 +46,17 @@ const selectRangePreset = async (optionLabel: string) => {
 
 describe('TimeRangeFilterButtons', () => {
   type SUTProps = Partial<React.ComponentProps<typeof TimeRangeFilterButtons>> & {
-    onSubmit?: () => void
-  }
+    onSubmit?: () => void;
+  };
 
   const SUTTimeRangeFilterButtons = ({ onSubmit = () => {}, ...props }: SUTProps) => (
     <Formik initialValues={{ selectedFields: [] }} onSubmit={onSubmit}>
-      <TimeRangeFilterButtons toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props} />
+      <TimeRangeFilterButtons
+        toggleShow={() => {}}
+        onPresetSelectOpen={() => {}}
+        setCurrentTimeRange={() => {}}
+        {...props}
+      />
     </Formik>
   );
 

@@ -74,7 +74,7 @@ type Props = {
   value: string;
   show: boolean;
   onClose: () => void;
-}
+};
 
 function PreviewModal({ value, show, onClose }: Props) {
   const [height, setHeight] = React.useState<number>(0);
@@ -84,20 +84,26 @@ function PreviewModal({ value, show, onClose }: Props) {
     setHeight(contentHeight);
   }, [show]);
 
-  const Component = React.useMemo(() => (show ? (
-    <Backdrop onClick={() => onClose()}>
-      <Content onClick={(e: React.BaseSyntheticEvent) => e.stopPropagation()}>
-        <Row>
-          <h2 style={{ marginBottom: '1rem' }}>Markdown Preview</h2>
-          <CloseIcon name="close" onClick={() => onClose()} />
-        </Row>
-        <Preview value={value} height={height} show />
-        <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
-          <Button bsStyle="success" role="button" onClick={() => onClose()}>Close</Button>
-        </Row>
-      </Content>
-    </Backdrop>
-  ) : null), [show, value, height, onClose]);
+  const Component = React.useMemo(
+    () =>
+      show ? (
+        <Backdrop onClick={() => onClose()}>
+          <Content onClick={(e: React.BaseSyntheticEvent) => e.stopPropagation()}>
+            <Row>
+              <h2 style={{ marginBottom: '1rem' }}>Markdown Preview</h2>
+              <CloseIcon name="close" onClick={() => onClose()} />
+            </Row>
+            <Preview value={value} height={height} show />
+            <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+              <Button bsStyle="success" role="button" onClick={() => onClose()}>
+                Close
+              </Button>
+            </Row>
+          </Content>
+        </Backdrop>
+      ) : null,
+    [show, value, height, onClose],
+  );
 
   return <>{ReactDom.createPortal(Component, document.body)}</>;
 }

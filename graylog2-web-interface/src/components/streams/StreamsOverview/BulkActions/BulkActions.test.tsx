@@ -52,9 +52,12 @@ describe('StreamsOverview BulkActionsRow', () => {
     toggleEntitySelect: () => {},
   };
 
-  const openActionsDropdown = async () => userEvent.click(await screen.findByRole('button', {
-    name: /bulk actions/i,
-  }));
+  const openActionsDropdown = async () =>
+    userEvent.click(
+      await screen.findByRole('button', {
+        name: /bulk actions/i,
+      }),
+    );
 
   const assignIndexSet = async () => {
     userEvent.click(await screen.findByRole('menuitem', { name: /assign index set/i }));
@@ -101,9 +104,14 @@ describe('StreamsOverview BulkActionsRow', () => {
 
       await assignIndexSet();
 
-      await waitFor(() => expect(Streams.assignToIndexSet).toHaveBeenCalledWith('index-set-id-2', ['stream-id-1', 'stream-id-2']));
+      await waitFor(() =>
+        expect(Streams.assignToIndexSet).toHaveBeenCalledWith('index-set-id-2', ['stream-id-1', 'stream-id-2']),
+      );
 
-      expect(UserNotification.success).toHaveBeenCalledWith('Index set was assigned to 2 streams successfully.', 'Success');
+      expect(UserNotification.success).toHaveBeenCalledWith(
+        'Index set was assigned to 2 streams successfully.',
+        'Success',
+      );
     });
 
     it('should handle errors when assigning index set', async () => {
@@ -120,7 +128,12 @@ describe('StreamsOverview BulkActionsRow', () => {
 
       await assignIndexSet();
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith('Assigning index set failed with status: Error: Unexpected error!', 'Error'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Assigning index set failed with status: Error: Unexpected error!',
+          'Error',
+        ),
+      );
     });
   });
 
@@ -148,24 +161,28 @@ describe('StreamsOverview BulkActionsRow', () => {
       await openActionsDropdown();
       await deleteStreams();
 
-      expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 streams? This action cannot be undone.');
+      expect(window.confirm).toHaveBeenCalledWith(
+        'Do you really want to remove 2 streams? This action cannot be undone.',
+      );
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringContaining(ApiRoutes.StreamsApiController.bulk_delete().url),
-        { entity_ids: ['stream-id-1', 'stream-id-2'] },
-      ));
+      await waitFor(() =>
+        expect(fetch).toHaveBeenCalledWith(
+          'POST',
+          expect.stringContaining(ApiRoutes.StreamsApiController.bulk_delete().url),
+          { entity_ids: ['stream-id-1', 'stream-id-2'] },
+        ),
+      );
 
       expect(UserNotification.success).toHaveBeenCalledWith('2 streams were deleted successfully.', 'Success');
       expect(setSelectedEntities).toHaveBeenCalledWith([]);
     });
 
     it('should display warning and not reset streams which could not be deleted', async () => {
-      asMock(fetch).mockReturnValue(Promise.resolve({
-        failures: [
-          { entity_id: 'stream-id-1', failure_explanation: 'The stream cannot be deleted.' },
-        ],
-      }));
+      asMock(fetch).mockReturnValue(
+        Promise.resolve({
+          failures: [{ entity_id: 'stream-id-1', failure_explanation: 'The stream cannot be deleted.' }],
+        }),
+      );
 
       const setSelectedEntities = jest.fn();
 
@@ -180,13 +197,17 @@ describe('StreamsOverview BulkActionsRow', () => {
       await openActionsDropdown();
       await deleteStreams();
 
-      expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 streams? This action cannot be undone.');
+      expect(window.confirm).toHaveBeenCalledWith(
+        'Do you really want to remove 2 streams? This action cannot be undone.',
+      );
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringContaining(ApiRoutes.StreamsApiController.bulk_delete().url),
-        { entity_ids: ['stream-id-1', 'stream-id-2'] },
-      ));
+      await waitFor(() =>
+        expect(fetch).toHaveBeenCalledWith(
+          'POST',
+          expect.stringContaining(ApiRoutes.StreamsApiController.bulk_delete().url),
+          { entity_ids: ['stream-id-1', 'stream-id-2'] },
+        ),
+      );
 
       expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected streams could not be deleted.');
       expect(setSelectedEntities).toHaveBeenCalledWith(['stream-id-1']);
@@ -213,22 +234,24 @@ describe('StreamsOverview BulkActionsRow', () => {
       await openActionsDropdown();
       await startStreams();
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringContaining(ApiRoutes.StreamsApiController.bulk_resume().url),
-        { entity_ids: ['stream-id-1', 'stream-id-2'] },
-      ));
+      await waitFor(() =>
+        expect(fetch).toHaveBeenCalledWith(
+          'POST',
+          expect.stringContaining(ApiRoutes.StreamsApiController.bulk_resume().url),
+          { entity_ids: ['stream-id-1', 'stream-id-2'] },
+        ),
+      );
 
       expect(UserNotification.success).toHaveBeenCalledWith('2 streams were started successfully.', 'Success');
       expect(setSelectedEntities).toHaveBeenCalledWith([]);
     });
 
     it('should display warning and not reset streams which could not be started', async () => {
-      asMock(fetch).mockReturnValue(Promise.resolve({
-        failures: [
-          { entity_id: 'stream-id-1', failure_explanation: 'The stream cannot be started.' },
-        ],
-      }));
+      asMock(fetch).mockReturnValue(
+        Promise.resolve({
+          failures: [{ entity_id: 'stream-id-1', failure_explanation: 'The stream cannot be started.' }],
+        }),
+      );
 
       const setSelectedEntities = jest.fn();
 
@@ -243,11 +266,13 @@ describe('StreamsOverview BulkActionsRow', () => {
       await openActionsDropdown();
       await startStreams();
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringContaining(ApiRoutes.StreamsApiController.bulk_resume().url),
-        { entity_ids: ['stream-id-1', 'stream-id-2'] },
-      ));
+      await waitFor(() =>
+        expect(fetch).toHaveBeenCalledWith(
+          'POST',
+          expect.stringContaining(ApiRoutes.StreamsApiController.bulk_resume().url),
+          { entity_ids: ['stream-id-1', 'stream-id-2'] },
+        ),
+      );
 
       expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected streams could not be started.');
       expect(setSelectedEntities).toHaveBeenCalledWith(['stream-id-1']);
@@ -274,22 +299,24 @@ describe('StreamsOverview BulkActionsRow', () => {
       await openActionsDropdown();
       await stopStreams();
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringContaining(ApiRoutes.StreamsApiController.bulk_pause().url),
-        { entity_ids: ['stream-id-1', 'stream-id-2'] },
-      ));
+      await waitFor(() =>
+        expect(fetch).toHaveBeenCalledWith(
+          'POST',
+          expect.stringContaining(ApiRoutes.StreamsApiController.bulk_pause().url),
+          { entity_ids: ['stream-id-1', 'stream-id-2'] },
+        ),
+      );
 
       expect(UserNotification.success).toHaveBeenCalledWith('2 streams were stopped successfully.', 'Success');
       expect(setSelectedEntities).toHaveBeenCalledWith([]);
     });
 
     it('should display warning and not reset streams which could not be stopped', async () => {
-      asMock(fetch).mockReturnValue(Promise.resolve({
-        failures: [
-          { entity_id: 'stream-id-1', failure_explanation: 'The stream cannot be stopped.' },
-        ],
-      }));
+      asMock(fetch).mockReturnValue(
+        Promise.resolve({
+          failures: [{ entity_id: 'stream-id-1', failure_explanation: 'The stream cannot be stopped.' }],
+        }),
+      );
 
       const setSelectedEntities = jest.fn();
 
@@ -304,11 +331,13 @@ describe('StreamsOverview BulkActionsRow', () => {
       await openActionsDropdown();
       await stopStreams();
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringContaining(ApiRoutes.StreamsApiController.bulk_pause().url),
-        { entity_ids: ['stream-id-1', 'stream-id-2'] },
-      ));
+      await waitFor(() =>
+        expect(fetch).toHaveBeenCalledWith(
+          'POST',
+          expect.stringContaining(ApiRoutes.StreamsApiController.bulk_pause().url),
+          { entity_ids: ['stream-id-1', 'stream-id-2'] },
+        ),
+      );
 
       expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected streams could not be stopped.');
       expect(setSelectedEntities).toHaveBeenCalledWith(['stream-id-1']);
@@ -326,7 +355,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       render(<BulkActions indexSets={indexSets} />);
 
       await openActionsDropdown();
-      const link = await screen.findByRole('menuitem', { name: /search in streams/i }) as HTMLAnchorElement;
+      const link = (await screen.findByRole('menuitem', { name: /search in streams/i })) as HTMLAnchorElement;
 
       expect(link.href).toContain('/search?rangetype=relative&from=300&streams=stream-id-1%2Cstream-id-2');
     });

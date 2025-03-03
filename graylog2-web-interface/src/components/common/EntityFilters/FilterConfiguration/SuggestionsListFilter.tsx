@@ -24,12 +24,12 @@ import useFilterValueSuggestions from 'components/common/EntityFilters/hooks/use
 import SuggestionsList from './SuggestionsList';
 
 type Props = {
-  allActiveFilters: Filters | undefined,
-  attribute: Attribute,
-  filter: Filter | undefined
-  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: { title: string, value: string }, closeDropdown: boolean) => void,
-}
+  allActiveFilters: Filters | undefined;
+  attribute: Attribute;
+  filter: Filter | undefined;
+  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined;
+  onSubmit: (filter: { title: string; value: string }, closeDropdown: boolean) => void;
+};
 
 const DEFAULT_SEARCH_PARAMS = {
   query: '',
@@ -39,20 +39,25 @@ const DEFAULT_SEARCH_PARAMS = {
 
 const SuggestionsListFilter = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, filter }: Props) => {
   const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
-  const { data: { pagination, suggestions }, isInitialLoading } = useFilterValueSuggestions(attribute.id, attribute.related_collection, searchParams, attribute.related_property);
+  const {
+    data: { pagination, suggestions },
+    isInitialLoading,
+  } = useFilterValueSuggestions(attribute.id, attribute.related_collection, searchParams, attribute.related_property);
 
   return (
-    <SuggestionsList isLoading={isInitialLoading}
-                     total={pagination.total}
-                     pageSize={searchParams.pageSize}
-                     page={searchParams.page}
-                     setSearchParams={setSearchParams}
-                     allActiveFilters={allActiveFilters}
-                     attribute={attribute}
-                     filter={filter}
-                     filterValueRenderer={filterValueRenderer}
-                     onSubmit={onSubmit}
-                     suggestions={suggestions} />
+    <SuggestionsList
+      isLoading={isInitialLoading}
+      total={pagination.total}
+      pageSize={searchParams.pageSize}
+      page={searchParams.page}
+      setSearchParams={setSearchParams}
+      allActiveFilters={allActiveFilters}
+      attribute={attribute}
+      filter={filter}
+      filterValueRenderer={filterValueRenderer}
+      onSubmit={onSubmit}
+      suggestions={suggestions}
+    />
   );
 };
 

@@ -30,8 +30,6 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as ViewsPermissions from 'views/Permissions';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useView from 'views/hooks/useView';
@@ -43,6 +41,7 @@ import useHistory from 'routing/useHistory';
 import mockHistory from 'helpers/mocking/mockHistory';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
@@ -51,9 +50,11 @@ jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 
-jest.mock('bson-objectid', () => jest.fn(() => ({
-  toString: jest.fn(() => 'new-search-id'),
-})));
+jest.mock('bson-objectid', () =>
+  jest.fn(() => ({
+    toString: jest.fn(() => 'new-search-id'),
+  })),
+);
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
@@ -75,25 +76,21 @@ jest.mock('views/logic/slices/viewSlice', () => {
 });
 
 describe('SearchActionsMenu', () => {
-  const createView = (id: string = undefined) => View.builder()
-    .id(id)
-    .title('title')
-    .type(View.Type.Search)
-    .description('description')
-    .state(Immutable.Map())
-    .owner('owningUser')
-    .build();
+  const createView = (id: string = undefined) =>
+    View.builder()
+      .id(id)
+      .title('title')
+      .type(View.Type.Search)
+      .description('description')
+      .state(Immutable.Map())
+      .owner('owningUser')
+      .build();
 
   const defaultView = createView();
 
-  const fieldTypes = {
-    all: Immutable.List<FieldTypeMapping>(),
-    queryFields: Immutable.Map<string, Immutable.List<FieldTypeMapping>>(),
-  };
-
   type SimpleSearchActionsMenuProps = {
-    loadNewView?: NewViewLoaderContextType,
-    onLoadView?: ViewLoaderContextType,
+    loadNewView?: NewViewLoaderContextType;
+    onLoadView?: ViewLoaderContextType;
   };
 
   const SimpleSearchActionsMenu = ({
@@ -103,13 +100,13 @@ describe('SearchActionsMenu', () => {
   }: SimpleSearchActionsMenuProps) => (
     <TestStoreProvider>
       <HotkeysProvider>
-        <FieldTypesContext.Provider value={fieldTypes}>
+        <TestFieldTypesContextProvider>
           <ViewLoaderContext.Provider value={onLoadView}>
             <NewViewLoaderContext.Provider value={loadNewView}>
               <SearchActionsMenu {...props} />
             </NewViewLoaderContext.Provider>
           </ViewLoaderContext.Provider>
-        </FieldTypesContext.Provider>
+        </TestFieldTypesContextProvider>
       </HotkeysProvider>
     </TestStoreProvider>
   );
@@ -140,7 +137,8 @@ describe('SearchActionsMenu', () => {
 
     it('should export current search as dashboard', async () => {
       asMock(useCurrentUser).mockReturnValue(
-        adminUser.toBuilder()
+        adminUser
+          .toBuilder()
           .permissions(Immutable.List(['dashboards:create']))
           .build(),
       );
@@ -155,11 +153,7 @@ describe('SearchActionsMenu', () => {
     });
 
     it('should not allow exporting search as dashboard if user does not have required permissions', async () => {
-      asMock(useCurrentUser).mockReturnValue(
-        adminUser.toBuilder()
-          .permissions(Immutable.List([]))
-          .build(),
-      );
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
 
       render(<SimpleSearchActionsMenu />);
       userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
@@ -181,7 +175,8 @@ describe('SearchActionsMenu', () => {
 
     it('should open search metadata modal', async () => {
       asMock(useCurrentUser).mockReturnValue(
-        adminUser.toBuilder()
+        adminUser
+          .toBuilder()
           .permissions(Immutable.List([ViewsPermissions.View.Edit('some-id')]))
           .build(),
       );
@@ -206,7 +201,9 @@ describe('SearchActionsMenu', () => {
 
       userEvent.click(resetSearch);
 
-      await waitFor(() => { expect(loadNewView).toHaveBeenCalledTimes(1); });
+      await waitFor(() => {
+        expect(loadNewView).toHaveBeenCalledTimes(1);
+      });
     });
 
     it('should loadView after create', async () => {
@@ -225,11 +222,7 @@ describe('SearchActionsMenu', () => {
     it('should duplicate a saved search', async () => {
       asMock(useView).mockReturnValue(defaultView.toBuilder().id('some-id-1').title('title').build());
 
-      asMock(useCurrentUser).mockReturnValue(
-        adminUser.toBuilder()
-          .permissions(Immutable.List([]))
-          .build(),
-      );
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
 
       render(<SimpleSearchActionsMenu />);
 
@@ -237,10 +230,7 @@ describe('SearchActionsMenu', () => {
       userEvent.type(await findTitleInput(), ' and further title');
       userEvent.click(await findCreateNewButton());
 
-      const updatedView = defaultView.toBuilder()
-        .title('title and further title')
-        .id('new-search-id')
-        .build();
+      const updatedView = defaultView.toBuilder().title('title and further title').id('new-search-id').build();
 
       await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
     });
@@ -248,17 +238,16 @@ describe('SearchActionsMenu', () => {
     it('should extend a saved search with plugin data on duplication', async () => {
       asMock(useView).mockReturnValue(defaultView.toBuilder().id('some-id-1').build());
 
-      asMock(useCurrentUser).mockReturnValue(
-        adminUser.toBuilder()
-          .permissions(Immutable.List([]))
-          .build(),
-      );
+      asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
 
-      asMock(useSaveViewFormControls).mockReturnValue([{
-        component: () => <div>Pluggable component!</div>,
-        id: 'example-plugin-component',
-        onSearchDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This search has been extended by a plugin').build()),
-      }]);
+      asMock(useSaveViewFormControls).mockReturnValue([
+        {
+          component: () => <div>Pluggable component!</div>,
+          id: 'example-plugin-component',
+          onSearchDuplication: (view: View) =>
+            Promise.resolve(view.toBuilder().summary('This search has been extended by a plugin').build()),
+        },
+      ]);
 
       render(<SimpleSearchActionsMenu />);
 
@@ -266,7 +255,8 @@ describe('SearchActionsMenu', () => {
       userEvent.type(await findTitleInput(), ' and further title');
       userEvent.click(await findCreateNewButton());
 
-      const updatedView = defaultView.toBuilder()
+      const updatedView = defaultView
+        .toBuilder()
         .title('title and further title')
         .summary('This search has been extended by a plugin')
         .id('new-search-id')
@@ -297,10 +287,7 @@ describe('SearchActionsMenu', () => {
 
       it('which should be disabled if current user is neither owner nor permitted to edit search', async () => {
         asMock(useCurrentUser).mockReturnValue(
-          adminUser.toBuilder()
-            .grnPermissions(Immutable.List())
-            .permissions(Immutable.List())
-            .build(),
+          adminUser.toBuilder().grnPermissions(Immutable.List()).permissions(Immutable.List()).build(),
         );
 
         render(<SimpleSearchActionsMenu />);
@@ -312,7 +299,8 @@ describe('SearchActionsMenu', () => {
 
       it('which should be enabled if current user is permitted to edit search', async () => {
         asMock(useCurrentUser).mockReturnValue(
-          adminUser.toBuilder()
+          adminUser
+            .toBuilder()
             .grnPermissions(Immutable.List([`entity:own:grn::::search:${adminUser.id}`]))
             .permissions(Immutable.List([ViewsPermissions.View.Edit(adminUser.id)]))
             .build(),
@@ -327,7 +315,8 @@ describe('SearchActionsMenu', () => {
 
       it('which should be enabled if current user is owner of search', async () => {
         asMock(useCurrentUser).mockReturnValue(
-          adminUser.toBuilder()
+          adminUser
+            .toBuilder()
             .grnPermissions(Immutable.List([`entity:own:grn::::search:${adminUser.id}`]))
             .permissions(Immutable.List())
             .build(),
@@ -372,13 +361,15 @@ describe('SearchActionsMenu', () => {
     });
 
     it('should render not dirty', async () => {
-      asMock(useView).mockReturnValue(View.builder()
-        .title('title')
-        .description('description')
-        .type(View.Type.Search)
-        .search(Search.create().toBuilder().id('id-beef').build())
-        .id('id-beef')
-        .build());
+      asMock(useView).mockReturnValue(
+        View.builder()
+          .title('title')
+          .description('description')
+          .type(View.Type.Search)
+          .search(Search.create().toBuilder().id('id-beef').build())
+          .id('id-beef')
+          .build(),
+      );
 
       asMock(useIsDirty).mockReturnValue(false);
 
@@ -388,13 +379,15 @@ describe('SearchActionsMenu', () => {
     });
 
     it('should render dirty', async () => {
-      asMock(useView).mockReturnValue(View.builder()
-        .title('title')
-        .type(View.Type.Search)
-        .description('description')
-        .search(Search.create().toBuilder().id('id-beef').build())
-        .id('id-beef')
-        .build());
+      asMock(useView).mockReturnValue(
+        View.builder()
+          .title('title')
+          .type(View.Type.Search)
+          .description('description')
+          .search(Search.create().toBuilder().id('id-beef').build())
+          .id('id-beef')
+          .build(),
+      );
 
       asMock(useIsDirty).mockReturnValue(true);
 

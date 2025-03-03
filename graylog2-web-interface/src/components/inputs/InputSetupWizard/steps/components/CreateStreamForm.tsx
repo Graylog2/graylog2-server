@@ -26,26 +26,28 @@ import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import SelectedIndexSetAlert from 'components/inputs/InputSetupWizard/steps/components/SelectedIndexSetAlert';
 
-export type StreamFormValues = StreamConfiguration
+export type StreamFormValues = StreamConfiguration;
 
 export type FormValues = {
-    create_new_pipeline?: boolean
-} & StreamConfiguration
+  create_new_pipeline?: boolean;
+} & StreamConfiguration;
 
 type Props = {
-    submitForm: (values: FormValues) => void
-}
+  submitForm: (values: FormValues) => void;
+};
 
-const NewIndexSetButton = styled(Button)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
-`);
+const NewIndexSetButton = styled(Button)(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.xs};
+  `,
+);
 
 const SubmitCol = styled(Col)`
   display: flex;
   justify-content: flex-end;
 `;
 
-const CreateStreamForm = ({ submitForm } : Props) => {
+const CreateStreamForm = ({ submitForm }: Props) => {
   const [indexSetsRefetchInterval, setIndexSetsRefetchInterval] = useState<false | number>(false);
   const { data: indexSetsData, isSuccess: isIndexSetsSuccess } = useIndexSetsList(false, indexSetsRefetchInterval);
 
@@ -83,38 +85,46 @@ const CreateStreamForm = ({ submitForm } : Props) => {
   };
 
   return (
-    <Formik<FormValues> initialValues={initialValues}
-                        onSubmit={submitForm}
-                        validate={validate}>
+    <Formik<FormValues> initialValues={initialValues} onSubmit={submitForm} validate={validate}>
       {({ isValid, isValidating, dirty, values }) => (
         <Form>
-          <FormikInput label="Title"
-                       name="title"
-                       id="title"
-                       help="A descriptive name of the new stream" />
-          <FormikInput label={<>Description <InputOptionalInfo /></>}
-                       name="description"
-                       id="description"
-                       help="What kind of messages are routed into this stream?" />
+          <FormikInput label="Title" name="title" id="title" help="A descriptive name of the new stream" />
+          <FormikInput
+            label={
+              <>
+                Description <InputOptionalInfo />
+              </>
+            }
+            name="description"
+            id="description"
+            help="What kind of messages are routed into this stream?"
+          />
           <SelectedIndexSetAlert indexSets={indexSets} selectedIndexSetId={values.index_set_id} />
-          <IndexSetSelect indexSets={indexSets} />
-          <NewIndexSetButton bsSize="xs" onClick={handleNewIndexSetClick}>Create a new Index Set</NewIndexSetButton>
-          <FormikInput label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
-                       help={
-                         <span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>
-}
-                       name="remove_matches_from_default_stream"
-                       id="remove_matches_from_default_stream"
-                       type="checkbox" />
 
-          <FormikInput label={<>Create a new pipeline for this stream</>}
-                       name="create_new_pipeline"
-                       id="create_new_pipeline"
-                       type="checkbox" />
+          <IndexSetSelect indexSets={indexSets} />
+          <NewIndexSetButton bsSize="xs" onClick={handleNewIndexSetClick}>
+            Create a new Index Set
+          </NewIndexSetButton>
+          <FormikInput
+            label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
+            help={<span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>}
+            name="remove_matches_from_default_stream"
+            id="remove_matches_from_default_stream"
+            type="checkbox"
+          />
+
+          <FormikInput
+            label={<>Create a new pipeline for this stream</>}
+            name="create_new_pipeline"
+            id="create_new_pipeline"
+            type="checkbox"
+          />
 
           <Row>
             <SubmitCol md={12}>
-              <Button bsStyle="primary" type="submit" disabled={isValidating || !isValid || !dirty}>Create</Button>
+              <Button bsStyle="primary" type="submit" disabled={isValidating || !isValid || !dirty}>
+                Create
+              </Button>
             </SubmitCol>
           </Row>
         </Form>

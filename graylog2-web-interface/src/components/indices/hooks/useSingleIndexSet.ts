@@ -23,28 +23,36 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { defaultOnError } from 'util/conditional/onError';
 
-const fetchIndexSet = (indexSetId: string) => fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url));
+const fetchIndexSet = (indexSetId: string) =>
+  fetch('GET', qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url));
 
-const useSingleIndexSet = (indexSetId: string) : {
-  data: IndexSet,
-  refetch: () => void,
-  isSuccess: boolean,
-  isInitialLoading: boolean,
+const useSingleIndexSet = (
+  indexSetId: string,
+): {
+  data: IndexSet;
+  refetch: () => void;
+  isSuccess: boolean;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading, isSuccess } = useQuery<IndexSet, FetchError>(
     ['indexSet', indexSetId],
-    () => defaultOnError(fetchIndexSet(indexSetId), `Loading index set with id: ${indexSetId} failed with status`, 'Could not load index set'),
+    () =>
+      defaultOnError(
+        fetchIndexSet(indexSetId),
+        `Loading index set with id: ${indexSetId} failed with status`,
+        'Could not load index set',
+      ),
     {
       keepPreviousData: true,
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isSuccess,
     isInitialLoading,
-  });
+  };
 };
 
 export default useSingleIndexSet;

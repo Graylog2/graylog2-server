@@ -45,33 +45,39 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useView from 'views/hooks/useView';
-import useAppDispatch from 'stores/useAppDispatch';
-import { cancelExecutedJob, execute } from 'views/logic/slices/searchExecutionSlice';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import { cancelExecutedJob } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import useParameters from 'views/hooks/useParameters';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useViewTitle from 'views/hooks/useViewTitle';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
-const GridContainer = styled.div<{ $interactive: boolean }>(({ $interactive }) => ($interactive ? css`
-    display: flex;
-    overflow: auto;
-    height: 100%;
+const GridContainer = styled.div<{ $interactive: boolean }>(({ $interactive }) =>
+  $interactive
+    ? css`
+        display: flex;
+        overflow: auto;
+        height: 100%;
 
-    > *:nth-child(2) {
-      flex-grow: 1;
-    }
-` : css`
-    flex: 1;
-`));
+        > *:nth-child(2) {
+          flex-grow: 1;
+        }
+      `
+    : css`
+        flex: 1;
+      `,
+);
 
 const SearchArea = styled(PageContentLayout)(() => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return css`
-    ${focusedWidget?.id && css`
+    ${focusedWidget?.id &&
+    css`
       .page-content-grid {
         display: flex;
         flex-direction: column;
@@ -81,12 +87,12 @@ const SearchArea = styled(PageContentLayout)(() => {
         /* overflow auto is required to display the message table widget height correctly */
         overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
-`}
-`;
+    `}
+  `;
 });
 
 const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results' | 'title'>) => {
-  const results = useAppSelector(selectCurrentQueryResults);
+  const results = useViewsSelector(selectCurrentQueryResults);
   const title = useViewTitle();
 
   return <Sidebar results={results} title={title} {...props} />;
@@ -97,25 +103,24 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
   const { config: searchesClusterConfig } = useSearchConfiguration();
   const { parameters, parameterBindings } = useParameters();
   const currentUser = useCurrentUser();
-  const contextValue = useMemo(() => ({
-    view,
-    analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,
-    currentUser,
-    parameters,
-    parameterBindings,
-  }), [currentUser, parameterBindings, parameters, searchesClusterConfig?.analysis_disabled_fields, view]);
-
-  return (
-    <AdditionalContext.Provider value={contextValue}>
-      {children}
-    </AdditionalContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      view,
+      analysisDisabledFields: searchesClusterConfig?.analysis_disabled_fields,
+      currentUser,
+      parameters,
+      parameterBindings,
+    }),
+    [currentUser, parameterBindings, parameters, searchesClusterConfig?.analysis_disabled_fields, view],
   );
+
+  return <AdditionalContext.Provider value={contextValue}>{children}</AdditionalContext.Provider>;
 };
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
 const useOnWindowUnload = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   return useEffect(() => {
     const handleLeavePage = () => dispatch(cancelExecutedJob());
@@ -129,13 +134,18 @@ const useOnWindowUnload = () => {
 };
 
 type Props = {
-  forceSideBarPinned?: boolean,
+  forceSideBarPinned?: boolean;
 };
 
 const Search = ({ forceSideBarPinned = false }: Props) => {
-  const dispatch = useAppDispatch();
-  const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
-  const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar, synchronizeUrl = true } = useSearchPageLayout();
+  const dispatch = useViewsDispatch();
+  const refreshSearch = useCallback(() => dispatch(executeActiveQuery()), [dispatch]);
+  const {
+    sidebar: { isShown: showSidebar },
+    searchAreaContainer,
+    infoBar,
+    synchronizeUrl = true,
+  } = useSearchPageLayout();
   const InfoBar = infoBar?.component;
   const SearchAreaContainer = searchAreaContainer?.component;
   const SynchronizationComponent = synchronizeUrl ? SynchronizeUrl : React.Fragment;
@@ -187,18 +197,14 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
                                   <IfInteractive>
                                     <HeaderElements />
                                     {InfoBar && <InfoBar />}
-                                    <IfDashboard>
-                                      {!editingWidget && <DashboardSearchBar />}
-                                    </IfDashboard>
+                                    <IfDashboard>{!editingWidget && <DashboardSearchBar />}</IfDashboard>
                                     <IfSearch>
                                       <SearchBar />
                                     </IfSearch>
 
                                     <QueryBarElements />
 
-                                    <IfDashboard>
-                                      {!focusingWidget && <QueryBar />}
-                                    </IfDashboard>
+                                    <IfDashboard>{!focusingWidget && <QueryBar />}</IfDashboard>
                                   </IfInteractive>
                                   <HighlightMessageInQuery>
                                     <SearchResult />

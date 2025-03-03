@@ -51,7 +51,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
     private final ParameterDescriptor<String, String> duplicateHandlingParam;
     private final ParameterDescriptor<String, CharMatcher> trimCharactersParam;
     private final ParameterDescriptor<String, CharMatcher> trimValueCharactersParam;
-    private final ParameterDescriptor<Boolean, Boolean> useEscapeCharacter;
+    private final ParameterDescriptor<Boolean, Boolean> useEscapeCharacterParam;
 
 
     public KeyValue() {
@@ -72,7 +72,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                 .optional()
                 .description("The characters to trim from values, default is not to trim")
                 .build();
-        useEscapeCharacter = bool("use_escape_char").
+        useEscapeCharacterParam = bool("use_escape_char").
                 optional()
                 .description("Whether to make use of the escape character '\\' or treat it as a normal character, defaults to false treating '\\' as a normal character.")
                 .defaultValue(Optional.of(false))
@@ -88,7 +88,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
         final CharMatcher kvPairsMatcher = splitParam.optional(args, context).orElse(CharMatcher.whitespace());
         final CharMatcher kvDelimMatcher = valueSplitParam.optional(args, context).orElse(CharMatcher.anyOf("="));
 
-        final boolean allowEscaping = useEscapeCharacter.optional(args, context).orElse(false);
+        final boolean allowEscaping = useEscapeCharacterParam.optional(args, context).orElse(false);
         Splitter outerSplitter = Splitter.on(
                         allowEscaping ? DelimiterCharMatcher.withQuoteAndEscapeHandling(kvPairsMatcher) : DelimiterCharMatcher.withQuoteHandling(kvPairsMatcher)
                 )
@@ -122,7 +122,8 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                         allowDupeKeysParam,
                         duplicateHandlingParam,
                         trimCharactersParam,
-                        trimValueCharactersParam
+                        trimValueCharactersParam,
+                        useEscapeCharacterParam
                 )
                 .description("Extracts key/value pairs from a string")
                 .ruleBuilderEnabled()

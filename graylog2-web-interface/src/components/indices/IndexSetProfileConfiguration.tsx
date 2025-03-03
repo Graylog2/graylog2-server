@@ -31,26 +31,39 @@ const StyledSelect = styled(Select)`
   margin-bottom: 10px;
 `;
 
-const IndexSetProfileConfiguration = ({ value, onChange, name }: { name: string, value: string, onChange: (value: string | null) => void }) => {
+const IndexSetProfileConfiguration = ({
+  value,
+  onChange,
+  name,
+}: {
+  name: string;
+  value: string;
+  onChange: (value: string | null) => void;
+}) => {
   const { isLoading, options } = useProfileOptions();
   const _onChange = (val: string) => onChange(val || null);
 
   return (
     <div>
       <StyledAlert>
-        With index set field type <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW}>profiles</Link> you can bundle up custom field types into profiles.
-        You can assign any profile to this index set. To see and use profile setting for index set, you have to rotate indices.
+        With index set field type{' '}
+        <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW}>
+          profiles
+        </Link>{' '}
+        you can bundle up custom field types into profiles. You can assign any profile to this index set. To see and use
+        profile setting for index set, you have to rotate indices.
       </StyledAlert>
       <Row>
         <Col md={12}>
-          <Input id={name}
-                 label="Index field type mapping profile">
-            <StyledSelect placeholder="Select index field type profile"
-                          inputId={name}
-                          options={options}
-                          value={value}
-                          disabled={isLoading}
-                          onChange={_onChange} />
+          <Input id={name} label="Index field type mapping profile">
+            <StyledSelect
+              placeholder="Select index field type profile"
+              inputId={name}
+              options={options}
+              value={value}
+              disabled={isLoading}
+              onChange={_onChange}
+            />
           </Input>
         </Col>
       </Row>

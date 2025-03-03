@@ -34,15 +34,22 @@ const fetchLastOpen = async ({ page }: RequestQuery): Promise<PaginatedLastOpene
   return fetch('GET', qualifyUrl(url));
 };
 
-const useLastOpened = (pagination: RequestQuery): { data: PaginatedLastOpened, isFetching: boolean } => useQuery(
-  [LAST_OPEN_QUERY_KEY, pagination],
-  () => defaultOnError(fetchLastOpen(pagination), 'Loading last opened items failed with status', 'Could not load last opened items'),
-  {
-    retry: 0,
-    initialData: {
-      lastOpened: [],
-      ...DEFAULT_PAGINATION,
+const useLastOpened = (pagination: RequestQuery): { data: PaginatedLastOpened; isFetching: boolean } =>
+  useQuery(
+    [LAST_OPEN_QUERY_KEY, pagination],
+    () =>
+      defaultOnError(
+        fetchLastOpen(pagination),
+        'Loading last opened items failed with status',
+        'Could not load last opened items',
+      ),
+    {
+      retry: 0,
+      initialData: {
+        lastOpened: [],
+        ...DEFAULT_PAGINATION,
+      },
     },
-  });
+  );
 
 export default useLastOpened;

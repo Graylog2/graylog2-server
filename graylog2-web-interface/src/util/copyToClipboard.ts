@@ -31,9 +31,7 @@ const legacyWriteText = (str: string) => {
 
 // Compatibility is sufficient. We not support IE or outdated iOS.
 
-const copyToClipboard = (text: string) => (navigator.clipboard && window.isSecureContext
-
-  ? navigator.clipboard.writeText(text)
-  : legacyWriteText(text));
+const copyToClipboard = (text: string) =>
+  navigator.clipboard && window.isSecureContext ? navigator.clipboard.writeText(text) : legacyWriteText(text);
 
 export default copyToClipboard;

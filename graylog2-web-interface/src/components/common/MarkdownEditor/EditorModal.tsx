@@ -17,6 +17,7 @@
 import * as React from 'react';
 import ReactDom from 'react-dom';
 import styled from 'styled-components';
+import DOMPurify from 'dompurify';
 
 import { Button } from 'components/bootstrap';
 import { Icon, SourceCodeEditor } from 'components/common';
@@ -78,15 +79,16 @@ const EditorWrapper = styled.div`
 `;
 
 type Props = {
-  value: string;
-  readOnly?: boolean;
-  show: boolean;
-  onChange: (newValue: string) => void;
-  onClose: () => void;
-  onDone?: (newValue?: string) => void;
-}
+  value: string,
+  readOnly?: boolean,
+  show: boolean,
+  onChange: (newValue: string) => void,
+  onClose: () => void,
+  onDone?: (newValue?: string) => void,
+  helpBlock?: React.ReactNode,
+};
 
-function EditorModal({ value, readOnly = false, onChange, show, onClose, onDone }: Props) {
+function EditorModal({ value, readOnly = false, onChange, show, onClose, onDone = () => {}, helpBlock = undefined }: Props) {
   const [height, setHeight] = React.useState<number>(0);
   const [localValue, setLocalValue] = React.useState<string>(value);
 
@@ -98,8 +100,9 @@ function EditorModal({ value, readOnly = false, onChange, show, onClose, onDone 
   React.useEffect(() => setLocalValue(value), [value]);
 
   const handleOnChange = React.useCallback((newValue: string) => {
-    setLocalValue(newValue);
-    onChange(newValue);
+    const sanitizedValue = DOMPurify.sanitize(newValue);
+    setLocalValue(sanitizedValue);
+    onChange(sanitizedValue);
   }, [onChange]);
 
   const handleOnDone = React.useCallback(() => {
@@ -107,42 +110,47 @@ function EditorModal({ value, readOnly = false, onChange, show, onClose, onDone 
     onClose();
   }, [localValue, onClose, onDone]);
 
-  const Component = React.useMemo(() => (
-    show ? (
-      <Backdrop onClick={() => onClose()}>
-        <Content onClick={(e: React.BaseSyntheticEvent) => e.stopPropagation()}>
-          <Row>
-            <h2 style={{ marginBottom: '1rem' }}>Markdown Editor</h2>
-            <CloseIcon name="close" onClick={() => onClose()} />
-          </Row>
-          <Row id="editor-body">
-            {height > 0 && (
-              <>
-                <EditorWrapper style={{ width: '50%' }}>
-                  <SourceCodeEditor id="md-editor"
-                                    mode="markdown"
-                                    theme="light"
-                                    toolbar={false}
-                                    resizable={false}
-                                    readOnly={readOnly}
-                                    height={height}
-                                    value={localValue}
-                                    onChange={handleOnChange} />
-                </EditorWrapper>
-                <div style={{ width: '50%' }}>
-                  <Preview show value={localValue} height={height} />
-                </div>
-              </>
-            )}
-          </Row>
-          <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
-            <Button onClick={() => onClose()}>Cancel</Button>
-            <Button bsStyle="success" onClick={handleOnDone}>Done</Button>
-          </Row>
-        </Content>
-      </Backdrop>
-    ) : null
-  ), [show, height, localValue, readOnly, onClose, handleOnDone, handleOnChange]);
+  const Component = React.useMemo(
+    () =>
+      show ? (
+        <Backdrop onClick={() => onClose()}>
+          <Content onClick={(e: React.BaseSyntheticEvent) => e.stopPropagation()}>
+            <Row>
+              <h2 style={{ marginBottom: '1rem' }}>Markdown Editor</h2>
+              <CloseIcon name="close" onClick={() => onClose()} />
+            </Row>
+            {helpBlock && <Row>{helpBlock}</Row>}
+            <Row id="editor-body">
+              {height > 0 && (
+                <>
+                  <EditorWrapper style={{ width: '50%' }}>
+                    <SourceCodeEditor
+                      id="md-editor"
+                      mode="markdown"
+                      theme="light"
+                      toolbar={false}
+                      resizable={false}
+                      readOnly={readOnly}
+                      height={height}
+                      value={localValue}
+                      onChange={handleOnChange}
+                    />
+                  </EditorWrapper>
+                  <div style={{ width: '50%' }}>
+                    <Preview show value={localValue} height={height} />
+                  </div>
+                </>
+              )}
+            </Row>
+            <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+              <Button onClick={() => onClose()}>Cancel</Button>
+              <Button bsStyle="success" onClick={handleOnDone}>Done</Button>
+            </Row>
+          </Content>
+        </Backdrop>
+      ) : null,
+    [show, height, localValue, readOnly, onClose, handleOnDone, handleOnChange, helpBlock],
+  );
 
   return <>{ReactDom.createPortal(Component, document.body)}</>;
 }

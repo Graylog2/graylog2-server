@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import * as Immutable from 'immutable';
 import { render, waitFor, screen, within, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
@@ -36,30 +35,36 @@ import useViewType from 'views/hooks/useViewType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
 
 import WidgetContext from '../contexts/WidgetContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
-import FieldTypesContext from '../contexts/FieldTypesContext';
 
 const testTimeout = applyTimeoutMultiplier(60000);
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('./WidgetHeader', () => 'widget-header');
-jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock(
+  './WidgetColorContext',
+  () =>
+    ({ children }) =>
+      children,
+);
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('views/hooks/useAggregationFunctions');
 
 jest.mock('views/stores/StreamsStore', () => ({
-  StreamsStore: MockStore(['getInitialState', () => ({
-    streams: [
-      { title: 'Stream 1', id: 'stream-id-1' },
-    ],
-  })]),
+  StreamsStore: MockStore([
+    'getInitialState',
+    () => ({
+      streams: [{ title: 'Stream 1', id: 'stream-id-1' }],
+    }),
+  ]),
 }));
 
 jest.mock('views/hooks/useViewType');
@@ -76,16 +81,21 @@ const selectEventConfig = { container: document.body };
 describe('Aggregation Widget', () => {
   useViewsPlugin();
 
-  const dataTableWidget = WidgetModel.builder().newId()
+  const dataTableWidget = WidgetModel.builder()
+    .newId()
     .type('AGGREGATION')
-    .config(AggregationWidgetConfig.builder().visualization(DataTable.type).visualizationConfig(DataTableVisualizationConfig.create([]).toBuilder().build()).build())
+    .config(
+      AggregationWidgetConfig.builder()
+        .visualization(DataTable.type)
+        .visualizationConfig(DataTableVisualizationConfig.create([]).toBuilder().build())
+        .build(),
+    )
     .query(createElasticsearchQueryString(''))
     .timerange({ type: 'relative', from: 300 })
     .build();
 
   beforeEach(() => {
-    jest.useFakeTimers()
-      .setSystemTime(mockedUnixTime);
+    jest.useFakeTimers().setSystemTime(mockedUnixTime);
   });
 
   afterEach(() => {
@@ -103,23 +113,22 @@ describe('Aggregation Widget', () => {
     unsetWidgetEditing: () => {},
   };
 
-  const AggregationWidget = ({
-    widget: propsWidget = dataTableWidget,
-    ...props
-  }: AggregationWidgetProps) => (
+  const AggregationWidget = ({ widget: propsWidget = dataTableWidget, ...props }: AggregationWidgetProps) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+      <TestFieldTypesContextProvider>
         <WidgetFocusContext.Provider value={widgetFocusContextState}>
           <WidgetContext.Provider value={propsWidget}>
-            <Widget widget={propsWidget}
-                    id="widgetId"
-                    onPositionsChange={() => {}}
-                    title="Widget Title"
-                    position={new WidgetPosition(1, 1, 1, 1)}
-                    {...props} />
+            <Widget
+              widget={propsWidget}
+              id="widgetId"
+              onPositionsChange={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              {...props}
+            />
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
-      </FieldTypesContext.Provider>
+      </TestFieldTypesContextProvider>
     </TestStoreProvider>
   );
 
@@ -140,128 +149,137 @@ describe('Aggregation Widget', () => {
       asMock(useViewType).mockReturnValue(View.Type.Dashboard);
     });
 
-    it('should apply not submitted widget search controls and aggregation elements changes when clicking on "Update widget"', async () => {
-      const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
-      const updatedConfig = dataTableWidget.config
-        .toBuilder()
-        .series([newSeries])
-        .build();
+    it(
+      'should apply not submitted widget search controls and aggregation elements changes when clicking on "Update widget"',
+      async () => {
+        const newSeries = Series.create('count')
+          .toBuilder()
+          .config(SeriesConfig.empty().toBuilder().name('Metric name').build())
+          .build();
+        const updatedConfig = dataTableWidget.config.toBuilder().series([newSeries]).build();
 
-      const updatedWidget = dataTableWidget.toBuilder()
-        .config(updatedConfig)
-        .streams(['stream-id-1'])
-        .build();
-      render(<AggregationWidget editing />);
+        const updatedWidget = dataTableWidget.toBuilder().config(updatedConfig).streams(['stream-id-1']).build();
+        render(<AggregationWidget editing />);
 
-      // Change widget aggregation elements
-      const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
-      await userEvent.click(addMetricButton);
+        // Change widget aggregation elements
+        const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
+        await userEvent.click(addMetricButton);
 
-      const nameInput = await screen.findByLabelText(/Name/);
-      await userEvent.type(nameInput, 'Metric name');
+        const nameInput = await screen.findByLabelText(/Name/);
+        await userEvent.type(nameInput, 'Metric name');
 
-      const metricFieldSelect = await screen.findByLabelText('Select a function');
+        const metricFieldSelect = await screen.findByLabelText('Select a function');
 
-      await act(async () => {
-        await selectEvent.openMenu(metricFieldSelect);
-      });
+        await act(async () => {
+          await selectEvent.openMenu(metricFieldSelect);
+        });
 
-      await act(async () => {
-        await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
-      });
+        await act(async () => {
+          await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
+        });
 
-      await findWidgetConfigSubmitButton();
+        await findWidgetConfigSubmitButton();
 
-      // Change widget search controls
-      const streamsSelect = await screen.findByLabelText('Select streams the search should include. Searches in all streams if empty.');
+        // Change widget search controls
+        const streamsSelect = await screen.findByLabelText(
+          'Select streams the search should include. Searches in all streams if empty.',
+        );
 
-      await act(async () => {
-        await selectEvent.openMenu(streamsSelect);
-      });
+        await act(async () => {
+          await selectEvent.openMenu(streamsSelect);
+        });
 
-      await act(async () => {
-        await selectEvent.select(streamsSelect, 'Stream 1', selectEventConfig);
-      });
+        await act(async () => {
+          await selectEvent.select(streamsSelect, 'Stream 1', selectEventConfig);
+        });
 
-      await screen.findByRole('button', {
-        name: /perform search \(changes were made after last search execution\)/i,
-      });
+        await screen.findByRole('button', {
+          name: /perform search \(changes were made after last search execution\)/i,
+        });
 
-      await submitWidgetChanges();
+        await submitWidgetChanges();
 
-      await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
-    }, testTimeout);
+        await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
+      },
+      testTimeout,
+    );
 
-    it('should apply not submitted widget time range changes in correct format when clicking on "Update widget"', async () => {
-      // Displayed times are based on time zone defined in moment-timezone mock.
-      const updatedWidget = dataTableWidget
-        .toBuilder()
-        .timerange({
-          from: '2019-12-31T23:55:00.000+00:00',
-          to: '2020-01-01T00:00:00.000+00:00',
-          type: 'absolute',
-        })
-        .build();
+    it(
+      'should apply not submitted widget time range changes in correct format when clicking on "Update widget"',
+      async () => {
+        // Displayed times are based on time zone defined in moment-timezone mock.
+        const updatedWidget = dataTableWidget
+          .toBuilder()
+          .timerange({
+            from: '2019-12-31T23:55:00.000+00:00',
+            to: '2020-01-01T00:00:00.000+00:00',
+            type: 'absolute',
+          })
+          .build();
 
-      render(<AggregationWidget editing />);
+        render(<AggregationWidget editing />);
 
-      // Change widget time range
-      const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
-      await userEvent.click(timeRangePickerButton);
+        // Change widget time range
+        const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
+        await userEvent.click(timeRangePickerButton);
 
-      const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
-      jest.setSystemTime(mockedUnixTime);
-      await userEvent.click(absoluteTabButton);
+        const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
+        jest.setSystemTime(mockedUnixTime);
+        await userEvent.click(absoluteTabButton);
 
-      const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
-      await waitFor(() => expect(applyTimeRangeChangesButton).not.toBeDisabled());
-      await userEvent.click(applyTimeRangeChangesButton);
+        const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
+        await waitFor(() => expect(applyTimeRangeChangesButton).not.toBeDisabled());
+        await userEvent.click(applyTimeRangeChangesButton);
 
-      const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
-      await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
+        const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
+        await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
 
-      // Submit all changes
-      await submitWidgetChanges();
+        // Submit all changes
+        await submitWidgetChanges();
 
-      await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
-    }, testTimeout);
+        await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
+      },
+      testTimeout,
+    );
   });
 
   describe('on a search', () => {
-    it('should apply not submitted aggregation elements changes when clicking on "Update widget"', async () => {
-      const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
-      const updatedConfig = dataTableWidget.config
-        .toBuilder()
-        .series([newSeries])
-        .build();
+    it(
+      'should apply not submitted aggregation elements changes when clicking on "Update widget"',
+      async () => {
+        const newSeries = Series.create('count')
+          .toBuilder()
+          .config(SeriesConfig.empty().toBuilder().name('Metric name').build())
+          .build();
+        const updatedConfig = dataTableWidget.config.toBuilder().series([newSeries]).build();
 
-      const updatedWidget = dataTableWidget.toBuilder()
-        .config(updatedConfig)
-        .build();
-      render(<AggregationWidget editing />);
+        const updatedWidget = dataTableWidget.toBuilder().config(updatedConfig).build();
+        render(<AggregationWidget editing />);
 
-      // Change widget aggregation elements
-      const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
-      await userEvent.click(addMetricButton);
+        // Change widget aggregation elements
+        const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
+        await userEvent.click(addMetricButton);
 
-      const nameInput = await screen.findByLabelText(/Name/);
-      await userEvent.type(nameInput, 'Metric name');
+        const nameInput = await screen.findByLabelText(/Name/);
+        await userEvent.type(nameInput, 'Metric name');
 
-      const metricFieldSelect = await screen.findByLabelText('Select a function');
+        const metricFieldSelect = await screen.findByLabelText('Select a function');
 
-      await act(async () => {
-        await selectEvent.openMenu(metricFieldSelect);
-      });
+        await act(async () => {
+          await selectEvent.openMenu(metricFieldSelect);
+        });
 
-      await act(async () => {
-        await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
-      });
+        await act(async () => {
+          await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
+        });
 
-      await findWidgetConfigSubmitButton();
+        await findWidgetConfigSubmitButton();
 
-      await submitWidgetChanges();
+        await submitWidgetChanges();
 
-      await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
-    }, testTimeout);
+        await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
+      },
+      testTimeout,
+    );
   });
 });

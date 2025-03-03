@@ -17,18 +17,19 @@
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import PluggableStoreProvider from '../components/PluggableStoreProvider';
+import ViewsStoreProvider from '../views/stores/ViewsStoreProvider';
 
 export default (props) => {
-  const components = PluginStore.exports('pages')
-    .map((c) => c.search || {})
-    .map((c) => c.component)
-    .filter((c) => c) || [];
+  const components =
+    PluginStore.exports('pages')
+      .map((c) => c.search || {})
+      .map((c) => c.component)
+      .filter((c) => c) || [];
   const Component = components[0];
 
   return (
-    <PluggableStoreProvider>
+    <ViewsStoreProvider>
       <Component {...props} />
-    </PluggableStoreProvider>
+    </ViewsStoreProvider>
   );
 };

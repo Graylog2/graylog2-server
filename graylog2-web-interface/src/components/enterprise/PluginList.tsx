@@ -31,7 +31,8 @@ const PluginList = () => {
 
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
-        <Icon name={plugin ? 'check_circle' : 'radio_button_unchecked'} />&nbsp;
+        <Icon name={plugin ? 'check_circle' : 'radio_button_unchecked'} />
+        &nbsp;
         {ENTERPRISE_PLUGINS[pluginName]} is {plugin ? 'installed' : 'not installed'}
       </li>
     );
@@ -42,9 +43,7 @@ const PluginList = () => {
   return (
     <>
       <p>This is the status of Graylog Enterprise modules in this cluster:</p>
-      <ul className={style.enterprisePlugins}>
-        {enterprisePluginList}
-      </ul>
+      <ul className={style.enterprisePlugins}>{enterprisePluginList}</ul>
     </>
   );
 };

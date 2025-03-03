@@ -80,7 +80,10 @@ describe('<ContentPackInstall />', () => {
 
     const wrapper = mount(<ContentPackInstall contentPack={contentPack} onInstall={installFn} />);
 
-    wrapper.find('input').at(1).simulate('change', { target: { value: '' } });
+    wrapper
+      .find('input')
+      .at(1)
+      .simulate('change', { target: { value: '' } });
 
     act(() => {
       (wrapper.instance() as ContentPackInstall).onInstall();

@@ -36,9 +36,12 @@ type CollectorListContainerProps = {
   sendTelemetry?: (...args: any[]) => void;
 };
 
-class CollectorListContainer extends React.Component<CollectorListContainerProps, {
-  [key: string]: any;
-}> {
+class CollectorListContainer extends React.Component<
+  CollectorListContainerProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     collectors: undefined,
     sendTelemetry: () => {},
@@ -56,10 +59,9 @@ class CollectorListContainer extends React.Component<CollectorListContainerProps
       app_section: 'configuration',
     });
 
-    CollectorsActions.copy(collector, name)
-      .then(() => {
-        callback();
-      });
+    CollectorsActions.copy(collector, name).then(() => {
+      callback();
+    });
   };
 
   handleDelete = async (collector) => {
@@ -93,15 +95,17 @@ class CollectorListContainer extends React.Component<CollectorListContainerProps
     }
 
     return (
-      <CollectorList collectors={collectors.paginatedCollectors}
-                     pagination={collectors.pagination}
-                     query={collectors.query}
-                     total={collectors.total}
-                     onPageChange={this.handlePageChange}
-                     onQueryChange={this.handleQueryChange}
-                     onClone={this.handleClone}
-                     onDelete={this.handleDelete}
-                     validateCollector={validateCollector} />
+      <CollectorList
+        collectors={collectors.paginatedCollectors}
+        pagination={collectors.pagination}
+        query={collectors.query}
+        total={collectors.total}
+        onPageChange={this.handlePageChange}
+        onQueryChange={this.handleQueryChange}
+        onClone={this.handleClone}
+        onDelete={this.handleDelete}
+        validateCollector={validateCollector}
+      />
     );
   }
 }

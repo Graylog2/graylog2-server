@@ -31,17 +31,18 @@ const DummyTelemetryContext = ({ children = undefined }: React.PropsWithChildren
 );
 
 describe('useSendTelemetry', () => {
-  const setLocation = (pathname: string) => Object.defineProperty(window, 'location', {
-    value: {
-      pathname,
-    },
-    writable: true,
-  });
+  const setLocation = (pathname: string) =>
+    Object.defineProperty(window, 'location', {
+      value: {
+        pathname,
+      },
+      writable: true,
+    });
 
-  const oldLocation = window.location;
+  const oldLocation = window.location.pathname;
 
   afterEach(() => {
-    window.location = oldLocation;
+    window.location.pathname = oldLocation;
   });
 
   it('should return `sendTelemetry` that retrieves current route', () => {
@@ -54,6 +55,9 @@ describe('useSendTelemetry', () => {
 
     sendTelemetry('$pageview', { app_section: 'welcome section' });
 
-    expect(contextValue.sendTelemetry).toHaveBeenCalledWith('$pageview', { app_path_pattern: undefined, app_section: 'welcome section' });
+    expect(contextValue.sendTelemetry).toHaveBeenCalledWith('$pageview', {
+      app_path_pattern: undefined,
+      app_section: 'welcome section',
+    });
   });
 });

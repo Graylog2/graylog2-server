@@ -25,11 +25,13 @@ import { defaultOnError } from 'util/conditional/onError';
 
 const fetchStream = (streamId: string) => fetch('GET', qualifyUrl(ApiRoutes.StreamsApiController.get(streamId).url));
 
-const useStream = (streamId: string): {
-  data: Stream,
-  refetch: () => void,
-  isInitialLoading: boolean,
-  error: FetchError,
+const useStream = (
+  streamId: string,
+): {
+  data: Stream;
+  refetch: () => void;
+  isInitialLoading: boolean;
+  error: FetchError;
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery<Stream, FetchError>(
     ['stream', streamId],
@@ -39,12 +41,12 @@ const useStream = (streamId: string): {
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
     error,
-  });
+  };
 };
 
 export default useStream;

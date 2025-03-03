@@ -20,8 +20,8 @@ import styled from 'styled-components';
 import { Alert } from 'components/bootstrap';
 
 type Props = {
-  errorMessage: string,
-}
+  errorMessage: string;
+};
 const StyledAlert = styled(Alert)`
   margin-top: 10px;
   margin-bottom: 5px;
@@ -32,11 +32,7 @@ const MigrationError = ({ errorMessage }: Props) => {
     return null;
   }
 
-  return (
-    <StyledAlert bsStyle="danger">
-      {errorMessage}
-    </StyledAlert>
-  );
+  return <StyledAlert bsStyle="danger">{errorMessage}</StyledAlert>;
 };
 
 export default MigrationError;
