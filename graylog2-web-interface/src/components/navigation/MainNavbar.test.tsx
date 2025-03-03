@@ -56,7 +56,7 @@ describe('MainNavbar', () => {
       metadata: { name: 'DummyPlugin ' },
       exports: {
         navigation: [
-          { path: '/after/test', description: 'Should be after archives', position: { after: ARCHIVES_LINK_TITLE } },
+          { path: '/after/test', description: 'After specified item', position: { after: ARCHIVES_LINK_TITLE } },
           { path: '/something', description: 'Perpetuum Mobile' },
           { path: '/system/archives', description: ARCHIVES_LINK_TITLE, permissions: 'archive:read' },
           {
@@ -231,7 +231,7 @@ describe('MainNavbar', () => {
         render(<SUT />);
 
         const targetItem = await screen.findByRole('link', { name: ARCHIVES_LINK_TITLE });
-        const itemWithPosition = await screen.findByRole('link', { name: /Should be after archives/i });
+        const itemWithPosition = await screen.findByRole('link', { name: /After specified item/i });
 
         expect(itemWithPosition.compareDocumentPosition(targetItem)).toBe(2);
       });
