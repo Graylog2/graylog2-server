@@ -14,24 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.pipelineprocessor.events;
+package org.graylog.plugins.views.search.jobs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Set;
+import static org.graylog.plugins.views.search.jobs.SearchJobState.PROGRESS_FIELD;
+import static org.graylog.plugins.views.search.jobs.SearchJobState.STATUS_FIELD;
 
-import static java.util.Collections.emptySet;
-
-public record RulesChangedEvent(
-        @JsonProperty("updated_rules") Set<Reference> updatedRules,
-        @JsonProperty("deleted_rules") Set<Reference> deletedRules) {
-    public record Reference(String id, String title) {}
-
-    public static RulesChangedEvent updatedRule(String id, String title) {
-        return new RulesChangedEvent(Set.of(new Reference(id, title)), emptySet());
-    }
-
-    public static RulesChangedEvent deletedRule(String id, String title) {
-        return new RulesChangedEvent(emptySet(), Set.of(new Reference(id, title)));
-    }
+public record SearchJobExecutionState(@JsonProperty(STATUS_FIELD) SearchJobStatus status,
+                                      @JsonProperty(PROGRESS_FIELD) int progress) {
 }
