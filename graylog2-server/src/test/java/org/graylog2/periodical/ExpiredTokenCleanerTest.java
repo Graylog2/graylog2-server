@@ -22,6 +22,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.AccessTokenService;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -110,7 +111,7 @@ public class ExpiredTokenCleanerTest {
     //-----------------
     // Helper methods
 
-    private final DateTime baseDateTime = new DateTime(2020, 1, 1, 0, 0);
+    private final DateTime baseDateTime = new DateTime(2020, 1, 1, 0, 0).withZone(DateTimeZone.UTC);
 
     private AccessTokenService.ExpiredToken mkToken(int id) {
         return new AccessTokenService.ExpiredToken(String.valueOf(id), "token" + id, baseDateTime.plusDays(id), "user" + id);
