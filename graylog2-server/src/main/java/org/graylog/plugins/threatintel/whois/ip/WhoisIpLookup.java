@@ -59,9 +59,9 @@ public class WhoisIpLookup {
             // Since recursive calls are used to follow redirects, extract the root cause of the exception to find the
             // initial error, and then rethrow it only once.
             final WhoisLookupException rootCause = (WhoisLookupException) e.getCause();
-            final InternetRegistry causeRegistry = rootCause.getRegistry();
-            final String error = f("Could not lookup WHOIS information for [%s] at [%s].", ip, causeRegistry);
-            final WhoisLookupException whoisLookupException = new WhoisLookupException(error, e.getCause(), causeRegistry);
+            final InternetRegistry rootCauseRegistry = rootCause.getRegistry();
+            final String error = f("Could not lookup WHOIS information for [%s] at [%s].", ip, rootCauseRegistry);
+            final WhoisLookupException whoisLookupException = new WhoisLookupException(error, e.getCause(), rootCauseRegistry);
             if (!LOG.isTraceEnabled()) {
                 LOG.error(error);
             }
