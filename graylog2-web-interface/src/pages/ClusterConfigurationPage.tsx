@@ -22,6 +22,8 @@ import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
 import ClusterConfigurationGraphView from 'components/cluster-configuration/ClusterConfigurationGraphView';
 import ClusterConfigurationListView from 'components/cluster-configuration/ClusterConfigurationListView';
+import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
+import type { SearchParams } from 'stores/PaginationTypes';
 
 const ViewTypeSwitchContainer = styled(Col)`
   display: flex;
@@ -44,6 +46,7 @@ type ViewTypesSegments = 'list' | 'cards';
 const ClusterConfigurationPage = () => {
   const [viewType, setViewType] = useState<ViewTypesSegments>('list');
   const clusterNodes = useClusterNodes();
+  const searchParams: SearchParams = { query: '', page: 1, pageSize: 0, sort: { attributeId: 'hostname', direction: 'asc' } };
 
   return (
     <DocumentTitle title="Cluster Configuration">
@@ -60,19 +63,23 @@ const ClusterConfigurationPage = () => {
           <Col xs={6}>
             <h2>Nodes</h2>
           </Col>
-          <ViewTypeSwitchContainer xs={6}>
-            <SegmentedControl data={VIEW_TYPES_SEGMENTS}
-                              radius="sm"
-                              value={viewType}
-                              onChange={(newViewType) => setViewType(newViewType)} />
-          </ViewTypeSwitchContainer>
+          {false && (
+            <ViewTypeSwitchContainer xs={6}>
+              <SegmentedControl data={VIEW_TYPES_SEGMENTS}
+                                radius="sm"
+                                value={viewType}
+                                onChange={(newViewType) => setViewType(newViewType)} />
+            </ViewTypeSwitchContainer>
+          )}
           <Col md={12}>
-            {viewType === 'list' && (
-              <ClusterConfigurationListView clusterNodes={clusterNodes} />
-            )}
-            {viewType === 'cards' && (
-              <ClusterConfigurationGraphView />
-            )}
+            <TableFetchContextProvider refetch={clusterNodes.refetchDatanodes} searchParams={searchParams} attributes={[]}>
+              {viewType === 'list' && (
+                <ClusterConfigurationListView clusterNodes={clusterNodes} />
+              )}
+              {viewType === 'cards' && (
+                <ClusterConfigurationGraphView />
+              )}
+            </TableFetchContextProvider>
           </Col>
         </Row>
       </div>

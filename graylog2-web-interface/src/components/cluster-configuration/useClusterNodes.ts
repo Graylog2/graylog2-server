@@ -34,6 +34,7 @@ export type ClusterNode<NodeType = GraylogNode | DataNode> = {
 export type ClusterNodes = {
   graylogNodes: ClusterNode<GraylogNode>[],
   dataNodes: ClusterNode<DataNode>[],
+  refetchDatanodes: () => void,
 }
 
 const useClusterNodes = (): ClusterNodes => {
@@ -49,7 +50,7 @@ const useClusterNodes = (): ClusterNodes => {
     },
   }));
 
-  const { data: _dataNodes } = useDataNodes({ query: '', page: 1, pageSize: 0, sort: { attributeId: 'hostname', direction: 'asc' } });
+  const { data: _dataNodes, refetch: refetchDatanodes } = useDataNodes({ query: '', page: 1, pageSize: 0, sort: { attributeId: 'hostname', direction: 'asc' } });
   const dataNodes = (_dataNodes?.list || []).map((dataNode) => ({
     nodeName: dataNode.hostname,
     type: 'Data Node - OpenSearch',
@@ -60,6 +61,7 @@ const useClusterNodes = (): ClusterNodes => {
   return ({
     graylogNodes,
     dataNodes,
+    refetchDatanodes,
   });
 };
 

@@ -17,13 +17,14 @@
 import React from 'react';
 
 import { Table, Label } from 'components/bootstrap';
-import MoreActions from 'components/common/EntityDataTable/MoreActions';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 
 import type { ClusterNodes } from './useClusterNodes';
 import ClusterStatusLabel from './ClusterStatusLabel';
+import ClusterActions from './ClusterActions';
 
 type Props = {
   clusterNodes: ClusterNodes,
@@ -53,7 +54,7 @@ const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
           <td>{graylogNode.type}</td>
           <td>{getRoleLabels(graylogNode.role)}</td>
           <td><ClusterStatusLabel node={graylogNode.nodeInfo} /></td>
-          <td align='right'><MoreActions /></td>
+          <td align='right'><ClusterActions node={graylogNode.nodeInfo} /></td>
         </tr>
       ))}
       {clusterNodes.dataNodes.map((dataNode) => (
@@ -62,7 +63,7 @@ const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
           <td>{dataNode.type}</td>
           <td>{getRoleLabels(dataNode.role)}</td>
           <td><DataNodeStatusCell dataNode={dataNode.nodeInfo} /></td>
-          <td align='right'><MoreActions /></td>
+          <td align='right'><DataNodeActions dataNode={dataNode.nodeInfo} /></td>
         </tr>
       ))}
     </tbody>
