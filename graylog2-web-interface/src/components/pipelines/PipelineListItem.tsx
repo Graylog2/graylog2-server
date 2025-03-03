@@ -73,7 +73,7 @@ const DefaultLabel = styled(Label)( ({ theme }) => css`
   vertical-align: inherit;
 `);
 
-const getStagesWithoutDuplicates = (usedStagesAcc: Array<number> = [], pipelineStages: Array<number>) => Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
+const getStagesWithoutDuplicates = (pipelineStages: Array<number>, usedStagesAcc: Array<number> = []) => Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
 
 const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeletePipeline }: Props) => {
   const currentUser = useCurrentUser();
@@ -90,7 +90,7 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
       .map(({ stages: pipelineStages }) => pipelineStages.map(({ stage }) => stage))
       .reduce(
         (usedStagesAcc: number[], pipelineStages: number[]) =>
-          getStagesWithoutDuplicates(usedStagesAcc, pipelineStages),
+          getStagesWithoutDuplicates(pipelineStages, usedStagesAcc),
         [],
       )
       .sort(naturalSort)
