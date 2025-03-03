@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import DOMPurify from 'dompurify';
 
 import { SourceCodeEditor, Icon } from 'components/common';
 
@@ -43,10 +44,12 @@ const Tab = styled.div<{ $active?: boolean }>`
   color: ${({ theme, $active }) => ($active ? theme.colors.global.textDefault : theme.colors.input.placeholder)};
   cursor: pointer;
 
-  ${({ $active }) => $active && css`
-    border: 1px solid ${({ theme }) => theme.colors.input.border};
-    border-bottom-color: ${({ theme }) => theme.colors.global.contentBackground};
-  `}
+  ${({ $active }) =>
+    $active &&
+    css`
+      border: 1px solid ${({ theme }) => theme.colors.input.border};
+      border-bottom-color: ${({ theme }) => theme.colors.global.contentBackground};
+    `}
 `;
 
 const EditorStyles = styled.div`
@@ -55,7 +58,7 @@ const EditorStyles = styled.div`
   }
 
   & .ace_cursor {
-      border-color: ${({ theme }) => theme.colors.global.textDefault};
+    border-color: ${({ theme }) => theme.colors.global.textDefault};
   }
 `;
 
@@ -80,9 +83,9 @@ type Props = {
   readOnly?: boolean;
   onChange: (note: string) => void;
   onFullMode?: (fullMode: boolean) => void;
-}
+};
 
-function Editor({ id, value, height, readOnly = false, onChange, onFullMode }: Props) {
+function Editor({ id = undefined, value, height, readOnly = false, onChange, onFullMode = () => {} }: Props) {
   const [localValue, setLocalValue] = React.useState<string>(value);
   const [showPreview, setShowPreview] = React.useState<boolean>(false);
   const [fullView, setFullView] = React.useState<boolean>(false);
@@ -94,40 +97,49 @@ function Editor({ id, value, height, readOnly = false, onChange, onFullMode }: P
     if (onFullMode) onFullMode(fullMode);
   };
 
-  const handleOnChange = (newValue: string) => {
-    setLocalValue(newValue);
-    onChange(newValue);
-  };
+  const handleOnChange = React.useCallback((newValue: string) => {
+    const sanitizedValue = DOMPurify.sanitize(newValue);
+    setLocalValue(sanitizedValue);
+    onChange(sanitizedValue);
+  }, [onChange]);
 
   return (
     <>
       <div style={{ position: 'relative' }}>
         <TabsRow>
-          <Tab $active={!showPreview} onClick={() => setShowPreview(false)}>Edit</Tab>
-          <Tab $active={showPreview} onClick={() => setShowPreview(true)}>Preview</Tab>
+          <Tab $active={!showPreview} onClick={() => setShowPreview(false)}>
+            Edit
+          </Tab>
+          <Tab $active={showPreview} onClick={() => setShowPreview(true)}>
+            Preview
+          </Tab>
         </TabsRow>
         {!showPreview && (
           <EditorStyles>
-            <SourceCodeEditor id={id ?? 'md-editor'}
-                              mode="markdown"
-                              theme="light"
-                              toolbar={false}
-                              resizable={false}
-                              readOnly={readOnly}
-                              height={height}
-                              value={localValue}
-                              onChange={handleOnChange} />
+            <SourceCodeEditor
+              id={id ?? 'md-editor'}
+              mode="markdown"
+              theme="light"
+              toolbar={false}
+              resizable={false}
+              readOnly={readOnly}
+              height={height}
+              value={localValue}
+              onChange={handleOnChange}
+            />
           </EditorStyles>
         )}
         <Preview value={localValue} height={height} show={showPreview} />
-        <ExpandIcon data-testid="expand-icon" name="expand" onClick={() => handleOnFullMode(true)} />
+        <ExpandIcon data-testid="expand-icon" name="expand_content" size="sm" onClick={() => handleOnFullMode(true)} />
       </div>
       {fullView && (
-        <EditorModal value={localValue}
-                     readOnly={readOnly}
-                     show={fullView}
-                     onChange={handleOnChange}
-                     onClose={() => handleOnFullMode(false)} />
+        <EditorModal
+          show
+          value={localValue}
+          readOnly={readOnly}
+          onChange={handleOnChange}
+          onClose={() => handleOnFullMode(false)}
+        />
       )}
     </>
   );

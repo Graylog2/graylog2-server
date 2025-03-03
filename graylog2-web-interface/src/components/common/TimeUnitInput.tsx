@@ -45,16 +45,8 @@ const unitValues = [
   'MONTHS',
   'YEARS',
 ] as const;
-type UnitValue = typeof unitValues[number];
-const defaultUnits = [
-  'NANOSECONDS',
-  'MICROSECONDS',
-  'MILLISECONDS',
-  'SECONDS',
-  'MINUTES',
-  'HOURS',
-  'DAYS',
-];
+type UnitValue = (typeof unitValues)[number];
+const defaultUnits = ['NANOSECONDS', 'MICROSECONDS', 'MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS'];
 
 const StyledInputGroup = styled(InputGroup)`
   display: flex;
@@ -81,11 +73,12 @@ export const extractDurationAndUnit = (duration, timeUnits) => {
   }
 
   const momentDuration = moment.duration(duration);
-  const timeUnit = timeUnits.find((unit) => {
-    const durationInUnit = momentDuration.as(unit);
+  const timeUnit =
+    timeUnits.find((unit) => {
+      const durationInUnit = momentDuration.as(unit);
 
-    return isInteger(durationInUnit) && durationInUnit !== 0;
-  }) || last(timeUnits);
+      return isInteger(durationInUnit) && durationInUnit !== 0;
+    }) || last(timeUnits);
   const durationInUnit = momentDuration.as(timeUnit);
 
   return {
@@ -107,48 +100,48 @@ type Props = {
    * The function will receive the value, unit, and checked boolean as
    * arguments.
    */
-  update: (value: number, unit: string, checked: boolean) => void,
+  update: (value: number, unit: string, checked: boolean) => void;
   /** Label to use for the field. */
-  label?: string,
+  label?: string;
   /** Help message to use for the field. */
-  help?: React.ReactNode,
+  help?: React.ReactNode;
   /** Specifies if this is a required field or not. */
-  required?: boolean,
+  required?: boolean;
   /** Specifies if the input is enabled or disabled. */
-  enabled?: boolean,
+  enabled?: boolean;
   /** Indicates the default enabled state, in case the consumer does not want to handle the enabled state. */
-  defaultEnabled?: boolean,
+  defaultEnabled?: boolean;
   /** Specifies the value of the input. */
-  value?: number | string,
+  value?: number | string;
   /** Indicates the default value to use, in case value is not provided or set. */
-  defaultValue?: number,
+  defaultValue?: number;
   /** Indicates which unit is used for the value. */
-  unit?: string,
+  unit?: string;
   /** Specifies which units should be available in the form. */
-  units?: Array<string>,
+  units?: Array<string>;
   /** Add an additional class to the label. */
-  labelClassName?: string,
+  labelClassName?: string;
   /** Add an additional class to the input wrapper. */
-  wrapperClassName?: string,
+  wrapperClassName?: string;
   /** Specifies if the input should render a checkbox. Use this if the enabled state is controlled by another input */
-  hideCheckbox?: boolean,
+  hideCheckbox?: boolean;
   /** Align unit dropdown menu to the right. */
-  pullRight?: boolean,
+  pullRight?: boolean;
   /** Lets the user clear the numeric input. */
-  clearable?: boolean,
+  clearable?: boolean;
 
-  name?: string,
-  unitName?: string,
+  name?: string;
+  unitName?: string;
   // TODO: Added to avoid messing with existing code, should be considered for removal
-  id?: string,
+  id?: string;
   // TODO: Added to avoid messing with existing code, should be considered for removal
-  type?: string,
-}
+  type?: string;
+};
 
 type State = {
-  enabled: boolean,
-  unitOptions: Array<{ label: string, value: UnitValue }>
-}
+  enabled: boolean;
+  unitOptions: Array<{ label: string; value: UnitValue }>;
+};
 
 class TimeUnitInput extends React.Component<Props, State> {
   static defaultProps = {
@@ -195,9 +188,8 @@ class TimeUnitInput extends React.Component<Props, State> {
     return clearable ? value : defaultTo(value, defaultValue);
   };
 
-  _getUnitOptions = (units) => unitValues
-    .filter((value) => units.includes(value))
-    .map((value) => ({ value: value, label: value.toLowerCase() }));
+  _getUnitOptions = (units) =>
+    unitValues.filter((value) => units.includes(value)).map((value) => ({ value: value, label: value.toLowerCase() }));
 
   _isChecked = () => {
     const { required, enabled } = this.props;
@@ -252,9 +244,7 @@ class TimeUnitInput extends React.Component<Props, State> {
     const { label, wrapperClassName, help, labelClassName, unit, required, hideCheckbox, pullRight } = this.props;
 
     const options = unitOptions.map((o) => (
-      <MenuItem key={o.value}
-                onSelect={() => this._onUnitSelect(o.value)}
-                active={unit === o.value}>
+      <MenuItem key={o.value} onSelect={() => this._onUnitSelect(o.value)} active={unit === o.value}>
         {o.label}
       </MenuItem>
     ));
@@ -270,18 +260,21 @@ class TimeUnitInput extends React.Component<Props, State> {
         {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
         <InputWrapper className={wrapperClassName}>
           <StyledInputGroup>
-            {(!required && !hideCheckbox) && checkbox}
-            <FormControl type="number"
-                         name={this.props.name}
-                         disabled={!this._isChecked()}
-                         aria-label={label || 'Time unit input'}
-                         onChange={this._onUpdate}
-                         value={defaultTo(this._getEffectiveValue(), '')} />
-            <DropdownButton id="input-dropdown-addon"
-                            name={this.props.unitName}
-                            pullRight={pullRight}
-                            title={unitOptions.filter((o) => o.value === unit)[0].label}
-                            disabled={!this._isChecked()}>
+            {!required && !hideCheckbox && checkbox}
+            <FormControl
+              type="number"
+              name={this.props.name}
+              disabled={!this._isChecked()}
+              aria-label={label || 'Time unit input'}
+              onChange={this._onUpdate}
+              value={defaultTo(this._getEffectiveValue(), '')}
+            />
+            <DropdownButton
+              id="input-dropdown-addon"
+              name={this.props.unitName}
+              pullRight={pullRight}
+              title={unitOptions.filter((o) => o.value === unit)[0].label}
+              disabled={!this._isChecked()}>
               {options}
             </DropdownButton>
           </StyledInputGroup>

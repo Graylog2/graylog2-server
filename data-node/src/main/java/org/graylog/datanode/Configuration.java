@@ -277,9 +277,13 @@ public class Configuration implements CommonNodeConfiguration {
     @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
     private Integer indicesQueryBoolMaxClauseCount = 32768;
 
-    @Documentation("The list of the opensearch node’s roles.")
+    @Documentation("""
+    List of the opensearch node’s roles. If nothing defined, datanode will use cluster_manager,data,ingest,remote_cluster_client.
+    If roles are not defined but configuration contains snapshots configuration (path_repo or s3 credentials), the search
+    role will be automatically added.
+    """)
     @Parameter(value = "node_roles", converter = StringListConverter.class)
-    private List<String> nodeRoles = List.of("cluster_manager", "data", "ingest", "remote_cluster_client");
+    private List<String> nodeRoles;
 
     @Documentation(visible = false)
     @Parameter(value = "async_eventbus_processors")
@@ -670,4 +674,10 @@ public class Configuration implements CommonNodeConfiguration {
     public String getSystemPropertyPrefix() {
         return "graylog.datanode.";
     }
+
+    @Override
+    public boolean withPlugins() {
+        return true;
+    }
+
 }

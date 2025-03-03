@@ -81,7 +81,11 @@ class IndexerFailuresComponent extends React.Component {
         <Col md={12}>
           <Header>
             <h2>Indexer failures</h2>
-            <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text="Indexer failures documentation" displayIcon />
+            <DocumentationLink
+              page={DocsHelper.PAGES.INDEXER_FAILURES}
+              text="Indexer failures documentation"
+              displayIcon
+            />
           </Header>
           <p className="description">
             Every message that was not successfully indexed will be logged as an indexer failure.

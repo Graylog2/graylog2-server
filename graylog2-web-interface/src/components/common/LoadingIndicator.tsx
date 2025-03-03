@@ -23,16 +23,18 @@ import Spinner from 'components/common/Spinner';
 
 import Delayed from './Delayed';
 
-const Container = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  position: fixed;
-  min-width: 200px;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  box-shadow: 0 2px 10px rgb(0 0 0 / 20%);
-  z-index: 2000;
-`);
+const Container = styled.div(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    position: fixed;
+    min-width: 200px;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 2px 10px rgb(0 0 0 / 20%);
+    z-index: 2000;
+  `,
+);
 
 const StyledAlert = styled(Alert)`
   margin: 0;
@@ -42,9 +44,9 @@ const StyledAlert = styled(Alert)`
 `;
 
 type Props = {
-  text?: string
-  longWaitText?: string
-  longWaitTimeout?: number
+  text?: string;
+  longWaitText?: string;
+  longWaitTimeout?: number;
 };
 
 /**
@@ -54,7 +56,11 @@ type Props = {
  * Use this component when you want to load something in the background, but still provide some feedback that
  * an action is happening.
  */
-const LoadingIndicator = ({ text = 'Loading...', longWaitText = 'This is taking a bit longer, please hold on...', longWaitTimeout = 20000 }: Props) => {
+const LoadingIndicator = ({
+  text = 'Loading...',
+  longWaitText = 'This is taking a bit longer, please hold on...',
+  longWaitTimeout = 20000,
+}: Props) => {
   const [indicatorText, setIndicatorText] = useState(text);
 
   useEffect(() => {

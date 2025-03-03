@@ -28,11 +28,13 @@ type PageErrorOverviewProps = {
  * only when the page would make no sense if the information is not available (i.e. a node page where we
  * can't reach the node).
  */
-const PageErrorOverview = ({
-  errors,
-}: PageErrorOverviewProps) => {
-  const formattedErrors = errors ? errors.map((error) => <li key={`key-${error.toString()}`}>{error.toString()}</li>) : [];
-  const description = <p>We had trouble fetching some data required to build this page, so here is a picture instead.</p>;
+const PageErrorOverview = ({ errors }: PageErrorOverviewProps) => {
+  const formattedErrors = errors
+    ? errors.map((error) => <li key={`key-${error.toString()}`}>{error.toString()}</li>)
+    : [];
+  const description = (
+    <p>We had trouble fetching some data required to build this page, so here is a picture instead.</p>
+  );
 
   return (
     <ErrorPage title="Error getting data" description={description} displayPageLayout={false}>

@@ -32,7 +32,13 @@ import { Timestamp } from 'components/common';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 
-const EventDefinitionRenderer = ({ eventDefinitionId, meta }: { eventDefinitionId: string, meta: EventsAdditionalData }) => {
+const EventDefinitionRenderer = ({
+  eventDefinitionId,
+  meta,
+}: {
+  eventDefinitionId: string;
+  meta: EventsAdditionalData;
+}) => {
   const title = meta?.context?.event_definitions?.[eventDefinitionId]?.title;
 
   return <EventDefinitionLink id={eventDefinitionId} title={title} />;
@@ -51,32 +57,26 @@ const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
   return <>{(plugin && plugin.displayName) || type}</>;
 };
 
-const FieldsRenderer = ({ fields }: { fields: { [fieldName: string]: string } }) => (
-  isEmpty(fields)
-    ? <em>No additional Fields added to this Event.</em>
-    : <EventFields fields={fields} />
-);
+const FieldsRenderer = ({ fields }: { fields: { [fieldName: string]: string } }) =>
+  isEmpty(fields) ? <em>No additional Fields added to this Event.</em> : <EventFields fields={fields} />;
 
-const GroupByFieldsRenderer = ({ groupByFields }: {groupByFields: Record<string, string> }) => (
-  isEmpty(groupByFields)
-    ? <em>No group-by fields on this Event.</em>
-    : <EventFields fields={groupByFields} />
-);
+const GroupByFieldsRenderer = ({ groupByFields }: { groupByFields: Record<string, string> }) =>
+  isEmpty(groupByFields) ? <em>No group-by fields on this Event.</em> : <EventFields fields={groupByFields} />;
 
-const RemediationStepRenderer = ({ eventDefinitionId, meta }: { eventDefinitionId: string, meta: EventsAdditionalData }) => {
+const RemediationStepRenderer = ({
+  eventDefinitionId,
+  meta,
+}: {
+  eventDefinitionId: string;
+  meta: EventsAdditionalData;
+}) => {
   const { context: eventsContext } = meta;
   const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
 
-  return (
-    eventDefinitionContext?.remediation_steps ? (
-      <MarkdownPreview show
-                       withFullView
-                       noBorder
-                       noBackground
-                       value={eventDefinitionContext.remediation_steps} />
-    ) : (
-      <em>No remediation steps</em>
-    )
+  return eventDefinitionContext?.remediation_steps ? (
+    <MarkdownPreview show withFullView noBorder noBackground value={eventDefinitionContext.remediation_steps} />
+  ) : (
+    <em>No remediation steps</em>
   );
 };
 
@@ -88,7 +88,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-const MessageRenderer = ({ message, eventId }: { message: string, eventId: string }) => {
+const MessageRenderer = ({ message, eventId }: { message: string; eventId: string }) => {
   const { toggleSection } = useExpandedSections();
 
   const toggleExtraSection = () => toggleSection(eventId, 'restFieldsExpandedSection');
@@ -96,17 +96,21 @@ const MessageRenderer = ({ message, eventId }: { message: string, eventId: strin
   return <StyledDiv onClick={toggleExtraSection}>{message}</StyledDiv>;
 };
 
-const TimeRangeRenderer = ({ eventData }: { eventData: Event}) => (eventData.timerange_start && eventData.timerange_end ? (
-  <div>
-    <Timestamp dateTime={new Date(eventData.timerange_start)} />
+const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
+  eventData.timerange_start && eventData.timerange_end ? (
+    <div>
+      <Timestamp dateTime={new Date(eventData.timerange_start)} />
       &ensp;&mdash;&ensp;
-    <Timestamp dateTime={new Date(eventData.timerange_end)} />
-  </div>
-) : (
-  <em>No time range</em>
-));
+      <Timestamp dateTime={new Date(eventData.timerange_end)} />
+    </div>
+  ) : (
+    <em>No time range</em>
+  );
 
-export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<T, M> => ({
+export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<
+  T,
+  M
+> => ({
   message: {
     minWidth: 300,
     width: 0.5,
@@ -142,14 +146,18 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
     event_definition_id: {
       minWidth: 300,
       width: 0.3,
-      renderCell: (eventDefinitionId: string, _, __, meta: EventsAdditionalData) => <EventDefinitionRenderer meta={meta} eventDefinitionId={eventDefinitionId} />,
+      renderCell: (eventDefinitionId: string, _, __, meta: EventsAdditionalData) => (
+        <EventDefinitionRenderer meta={meta} eventDefinitionId={eventDefinitionId} />
+      ),
     },
     fields: {
       renderCell: (fields: Record<string, string>) => <FieldsRenderer fields={fields} />,
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event, __, meta: EventsAdditionalData) => <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />,
+      renderCell: (_, event: Event, __, meta: EventsAdditionalData) => (
+        <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+      ),
       width: 0.3,
     },
     timerange_start: {

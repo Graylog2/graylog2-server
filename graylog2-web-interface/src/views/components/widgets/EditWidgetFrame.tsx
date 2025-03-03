@@ -48,15 +48,22 @@ const Visualization = styled.div`
 `;
 
 type Props = {
-  children: React.ReactNode,
-  displaySubmitActions?: boolean,
-  onCancel: () => void,
-  showQueryControls?: boolean,
-  onSubmit: (newWidget: Widget, hasChanges: boolean) => Promise<void>,
-  containerComponent?: React.ComponentType<React.PropsWithChildren>
+  children: React.ReactNode;
+  displaySubmitActions?: boolean;
+  onCancel: () => void;
+  showQueryControls?: boolean;
+  onSubmit: (newWidget: Widget, hasChanges: boolean) => Promise<void>;
+  containerComponent?: React.ComponentType<React.PropsWithChildren>;
 };
 
-const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = true, showQueryControls = true, containerComponent: ContainerComponent = WidgetOverrideElements }: Props) => {
+const EditWidgetFrame = ({
+  children,
+  onCancel,
+  onSubmit,
+  displaySubmitActions = true,
+  showQueryControls = true,
+  containerComponent: ContainerComponent = WidgetOverrideElements,
+}: Props) => {
   const widget = useContext(WidgetContext);
 
   if (!widget) {
@@ -67,7 +74,7 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = 
     <WidgetEditApplyAllChangesProvider widget={widget} onSubmit={onSubmit}>
       <DisableSubmissionStateProvider>
         <Container>
-          {(showQueryControls && !widget.returnsAllRecords) && (
+          {showQueryControls && !widget.returnsAllRecords && (
             <QueryControls>
               <QueryEditModeContext.Provider value="widget">
                 <WidgetQueryControls />
@@ -75,9 +82,7 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions = 
             </QueryControls>
           )}
           <Visualization role="presentation">
-            <ContainerComponent>
-              {children}
-            </ContainerComponent>
+            <ContainerComponent>{children}</ContainerComponent>
           </Visualization>
           {displaySubmitActions && (
             <div>

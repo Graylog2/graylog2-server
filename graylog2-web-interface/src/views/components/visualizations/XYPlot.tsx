@@ -25,25 +25,25 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 
 import GenericPlot from './GenericPlot';
 import type { ChartColor, ChartConfig, PlotLayout } from './GenericPlot';
 import OnZoom from './OnZoom';
 
 export type Props = {
-  axisType?: AxisType,
-  config: AggregationWidgetConfig,
-  chartData: any,
+  axisType?: AxisType;
+  config: AggregationWidgetConfig;
+  chartData: any;
   effectiveTimerange?: {
-    from: string,
-    to: string,
-  },
+    from: string;
+    to: string;
+  };
   height: number;
   width: number;
-  setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor,
-  plotLayout?: Partial<PlotLayout>,
-  onZoom?: (from: string, to: string, userTimezone: string) => boolean,
+  setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor;
+  plotLayout?: Partial<PlotLayout>;
+  onZoom?: (from: string, to: string, userTimezone: string) => boolean;
 };
 
 const yLegendPosition = (containerHeight: number) => {
@@ -60,24 +60,29 @@ const yLegendPosition = (containerHeight: number) => {
 
 const mapAxisType = (axisType: AxisType): 'linear' | 'log' => {
   switch (axisType) {
-    case 'linear': return 'linear';
-    case 'logarithmic': return 'log';
-    default: return assertUnreachable(axisType, 'Unable to parse axis type: ');
+    case 'linear':
+      return 'linear';
+    case 'logarithmic':
+      return 'log';
+    default:
+      return assertUnreachable(axisType, 'Unable to parse axis type: ');
   }
 };
 
-const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({ line: { color: colors.get(chart.originalName ?? chart.name) } });
+const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({
+  line: { color: colors.get(chart.originalName ?? chart.name) },
+});
 
 const XYPlot = ({
   axisType = DEFAULT_AXIS_TYPE,
   config,
   chartData,
-  effectiveTimerange,
+  effectiveTimerange = undefined,
   setChartColor = defaultSetColor,
   height,
   width,
   plotLayout = {},
-  onZoom,
+  onZoom = undefined,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) } as const;
@@ -91,11 +96,15 @@ const XYPlot = ({
   }
 
   const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const _onZoom = useCallback(config.isTimeline
-    ? (from: string, to: string) => (onZoom ? onZoom(from, to, userTimezone) : dispatch(OnZoom(from, to, userTimezone)))
-    : () => true, [config.isTimeline, onZoom]);
+  const _onZoom = useCallback(
+    config.isTimeline
+      ? (from: string, to: string) =>
+          onZoom ? onZoom(from, to, userTimezone) : dispatch(OnZoom(from, to, userTimezone))
+      : () => true,
+    [config.isTimeline, onZoom],
+  );
 
   if (config.isTimeline && effectiveTimerange) {
     const normalizedFrom = formatTime(effectiveTimerange.from, 'internal');
@@ -115,10 +124,7 @@ const XYPlot = ({
 
   return (
     <PlotLegend config={config} chartData={chartData} height={height} width={width}>
-      <GenericPlot chartData={chartData}
-                   layout={layout}
-                   onZoom={_onZoom}
-                   setChartColor={setChartColor} />
+      <GenericPlot chartData={chartData} layout={layout} onZoom={_onZoom} setChartColor={setChartColor} />
     </PlotLegend>
   );
 };

@@ -22,11 +22,11 @@ import { StaticColor } from 'views/logic/views/formatting/highlighting/Highlight
 import { ColorPickerPopover, Icon } from 'components/common';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import { conditionToExprMapper, exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 import { updateHighlightingRule, createHighlightingRules } from 'views/logic/slices/highlightActions';
 import { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 
@@ -50,52 +50,63 @@ const ColorComponent = styled.div`
   cursor: pointer;
 `;
 
-const useHighlightingRules = () => useAppSelector(selectHighlightingRules);
+const useHighlightingRules = () => useViewsSelector(selectHighlightingRules);
 
 const AggregationConditions = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const { alertId, definitionId } = useReplaySearchContext();
   const { aggregations } = useAlertAndEventDefinitionData(alertId, definitionId);
   const highlightingRules = useHighlightingRules();
 
-  const aggregationsMap = useMemo(() => Object.fromEntries(aggregations.map((agg) => [
-    `${agg.fnSeries}${agg.expr}${agg.value}`, agg,
-  ])), [aggregations]);
+  const aggregationsMap = useMemo(
+    () => Object.fromEntries(aggregations.map((agg) => [`${agg.fnSeries}${agg.expr}${agg.value}`, agg])),
+    [aggregations],
+  );
 
-  const changeColor = useCallback(({ rule, newColor, condition }) => {
-    if (rule) {
-      dispatch(updateHighlightingRule(rule, { color: StaticColor.create(newColor) }));
-    } else {
-      const { value, fnSeries, expr } = aggregationsMap[condition];
+  const changeColor = useCallback(
+    ({ rule, newColor, condition }) => {
+      if (rule) {
+        dispatch(updateHighlightingRule(rule, { color: StaticColor.create(newColor) }));
+      } else {
+        const { value, fnSeries, expr } = aggregationsMap[condition];
 
-      dispatch(createHighlightingRules([
-        {
-          value,
-          field: fnSeries,
-          color: randomColor(),
-          condition: exprToConditionMapper[expr],
-        },
-      ]));
-    }
-  }, [aggregationsMap, dispatch]);
+        dispatch(
+          createHighlightingRules([
+            {
+              value,
+              field: fnSeries,
+              color: randomColor(),
+              condition: exprToConditionMapper[expr],
+            },
+          ]),
+        );
+      }
+    },
+    [aggregationsMap, dispatch],
+  );
 
   const validAggregations = aggregations.map(({ fnSeries, value, expr }) => `${fnSeries}${expr}${value}`);
 
-  const highlightedAggregations = useMemo(() => Object.fromEntries(highlightingRules
-    .map((rule) => {
-      const { field, value, condition } = rule;
-      const expr = conditionToExprMapper[condition];
+  const highlightedAggregations = useMemo(
+    () =>
+      Object.fromEntries(
+        highlightingRules
+          .map((rule) => {
+            const { field, value, condition } = rule;
+            const expr = conditionToExprMapper[condition];
 
-      if (expr) {
-        const key = `${field}${expr}${value}`;
+            if (expr) {
+              const key = `${field}${expr}${value}`;
 
-        return [key, rule] as const;
-      }
+              return [key, rule] as const;
+            }
 
-      return undefined;
-    })
-    .filter((rule) => rule !== undefined && validAggregations.includes(rule[0]))),
-  [highlightingRules, validAggregations]);
+            return undefined;
+          })
+          .filter((rule) => rule !== undefined && validAggregations.includes(rule[0])),
+      ),
+    [highlightingRules, validAggregations],
+  );
 
   return Object.keys(highlightedAggregations).length ? (
     <List>
@@ -105,25 +116,29 @@ const AggregationConditions = () => {
 
         return (
           <Condition title={condition} key={condition}>
-            <ColorPickerPopover id="formatting-rule-color"
-                                placement="right"
-                                color={hexColor}
-                                colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-                                triggerNode={(
-                                  <ColorComponent style={{ backgroundColor: hexColor }}>
-                                    {!hexColor && <Icon name="colors" size="xs" />}
-                                  </ColorComponent>
-                                )}
-                                onChange={(newColor, _, hidePopover) => {
-                                  hidePopover();
-                                  changeColor({ newColor, rule, condition });
-                                }} />
+            <ColorPickerPopover
+              id="formatting-rule-color"
+              placement="right"
+              color={hexColor}
+              colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
+              triggerNode={
+                <ColorComponent style={{ backgroundColor: hexColor }}>
+                  {!hexColor && <Icon name="colors" size="xs" />}
+                </ColorComponent>
+              }
+              onChange={(newColor, _, hidePopover) => {
+                hidePopover();
+                changeColor({ newColor, rule, condition });
+              }}
+            />
             <span>{condition}</span>
           </Condition>
         );
       })}
     </List>
-  ) : <NoAttributeProvided name="Aggregation conditions" />;
+  ) : (
+    <NoAttributeProvided name="Aggregation conditions" />
+  );
 };
 
 export default AggregationConditions;

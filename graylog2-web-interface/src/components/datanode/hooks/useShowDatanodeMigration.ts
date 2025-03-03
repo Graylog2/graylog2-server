@@ -23,11 +23,8 @@ import useMigrationState from './useMigrationState';
 
 const fetchShowDatanodeMigration = async () => fetch('GET', qualifyUrl('/datanode/configured'));
 
-const useShowDatanodeMigration = () : boolean => {
-  const { data: isDatanodeConfiguredAndUsed } = useQuery(
-    ['show_datanode_migration'],
-    fetchShowDatanodeMigration,
-  );
+const useShowDatanodeMigration = (): boolean => {
+  const { data: isDatanodeConfiguredAndUsed } = useQuery(['show_datanode_migration'], fetchShowDatanodeMigration);
 
   const { currentStep } = useMigrationState();
 

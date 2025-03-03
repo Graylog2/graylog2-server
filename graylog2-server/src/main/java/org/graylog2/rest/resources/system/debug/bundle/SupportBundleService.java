@@ -175,7 +175,7 @@ public class SupportBundleService {
                     nodeManifests.entrySet().stream().map(entry ->
                             CompletableFuture.runAsync(() -> fetchNodeInfos(proxiedResourceHelper, entry.getKey(), entry.getValue(), finalSpoolDir), executor)),
                     datanodeService.allActive().values().stream().map(datanode ->
-                            CompletableFuture.runAsync(() -> fetchDataNodeInfos(proxiedResourceHelper, datanode, dataNodeDir), executor))
+                            CompletableFuture.runAsync(() -> fetchDataNodeInfos(datanode, dataNodeDir), executor))
             ).toList();
             for (CompletableFuture<Void> f : futures) {
                 f.get();
@@ -386,11 +386,11 @@ public class SupportBundleService {
     }
 
 
-    private void fetchDataNodeInfos(ProxiedResourceHelper proxiedResourceHelper, DataNodeDto datanode, Path dataNodeDir) {
+    private void fetchDataNodeInfos(DataNodeDto datanode, Path dataNodeDir) {
         final Path nodeDir = dataNodeDir.resolve(Objects.requireNonNull(datanode.getHostname()));
         var ignored = nodeDir.toFile().mkdirs();
 
-        fetchDataNodeLogs(proxiedResourceHelper, datanode, nodeDir);
+        fetchDataNodeLogs(datanode, nodeDir);
         try (var certificatesFile = new FileOutputStream(nodeDir.resolve("certificates.json").toFile())) {
 
             Map<String, Map<String, KeyStoreDto>> certificates = datanodeProxy.remoteInterface(datanode.getHostname(), RemoteCertificatesResource.class, RemoteCertificatesResource::certificates);
@@ -402,31 +402,21 @@ public class SupportBundleService {
         }
     }
 
-    private void fetchDataNodeLogs(ProxiedResourceHelper proxiedResourceHelper, DataNodeDto datanode, Path nodeDir) {
-        getProxiedLog(datanode, nodeDir, "opensearch.log", RemoteDataNodeStatusResource::opensearchStdOut);
-        getProxiedLog(datanode, nodeDir, "opensearch.err", RemoteDataNodeStatusResource::opensearchStdErr);
+    private void fetchDataNodeLogs(DataNodeDto datanode, Path nodeDir) {
+        getProxiedLog(datanode, nodeDir, "datanode.log", RemoteDataNodeStatusResource::datanodeInternalLogs);
     }
 
-    private void getProxiedLog(DataNodeDto datanode, Path nodeDir, String logfile, Function<RemoteDataNodeStatusResource, Call<List<String>>> function) {
+    private void getProxiedLog(DataNodeDto datanode, Path nodeDir, String logfile, Function<RemoteDataNodeStatusResource, Call<ResponseBody>> function) {
         try (var opensearchLog = new FileOutputStream(nodeDir.resolve(logfile).toFile())) {
-
-            Map<String, List<String>> opensearchOut = datanodeProxy
-                    .remoteInterface(datanode.getHostname(), RemoteDataNodeStatusResource.class, function);
+            Map<String, ResponseBody> opensearchOut = datanodeProxy.remoteInterface(datanode.getHostname(), RemoteDataNodeStatusResource.class, function);
             if (opensearchOut.containsKey(datanode.getHostname())) {
-                opensearchOut.get(datanode.getHostname()).stream()
-                        .map(line -> line + System.lineSeparator())
-                        .forEach(line -> {
-                            try {
-                                opensearchLog.write(line.getBytes(StandardCharsets.UTF_8));
-                            } catch (IOException e) {
-                                LOG.warn("Failed to write line <{}>", line, e);
-                            }
-                        });
+                opensearchLog.write(opensearchOut.get(datanode.getHostname()).bytes());
             }
         } catch (Exception e) {
             LOG.warn("Failed to get logs from data node <{}>", datanode.getHostname(), e);
         }
     }
+
 
     private void fetchDataNodeMigrationInfos(Path dataNodeDir) {
         var ignored = dataNodeDir.toFile().mkdirs();

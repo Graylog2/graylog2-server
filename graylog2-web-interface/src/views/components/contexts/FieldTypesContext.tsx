@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { List, Map } from 'immutable';
+import type { List } from 'immutable';
 
 import { singleton } from 'logic/singleton';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type FieldTypeMappingsList = List<FieldTypeMapping>;
 export type FieldTypes = {
-  all: FieldTypeMappingsList,
-  queryFields: Map<string, FieldTypeMappingsList>,
+  all: FieldTypeMappingsList;
+  currentQuery: FieldTypeMappingsList;
 };
 
 const FieldTypesContext = React.createContext<FieldTypes | undefined>(undefined);

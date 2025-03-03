@@ -24,7 +24,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import HighlightingRule from './HighlightingRule';
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/logic/slices/highlightActions', () => ({
   updateHighlightingRule: jest.fn(() => Promise.resolve()),
@@ -37,10 +37,7 @@ describe('HighlightingRule', () => {
   const rule = Rule.create('response_time', '250', undefined, StaticColor.create('#f44242'));
 
   const SUT = (props: Partial<React.ComponentProps<typeof HighlightingRule>>) => (
-    <HighlightingRule rule={rule}
-                      onUpdate={() => Promise.resolve()}
-                      onDelete={() => Promise.resolve()}
-                      {...props} />
+    <HighlightingRule rule={rule} onUpdate={() => Promise.resolve()} onDelete={() => Promise.resolve()} {...props} />
   );
 
   it('should display field and value of rule', async () => {
@@ -59,7 +56,13 @@ describe('HighlightingRule', () => {
     userEvent.click(await screen.findByTitle(/#fbfdd8/i));
 
     await waitFor(() => {
-      expect(onUpdate).toHaveBeenCalledWith(rule, rule.field, rule.value, rule.condition, StaticColor.create('#fbfdd8'));
+      expect(onUpdate).toHaveBeenCalledWith(
+        rule,
+        rule.field,
+        rule.value,
+        rule.condition,
+        StaticColor.create('#fbfdd8'),
+      );
     });
   });
 

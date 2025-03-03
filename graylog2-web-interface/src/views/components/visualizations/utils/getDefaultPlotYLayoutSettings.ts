@@ -21,14 +21,14 @@ import getDefaultPlotFontSettings from 'views/components/visualizations/utils/ge
 const getDefaultPlotYLayoutSettings = (theme: DefaultTheme) => {
   const fontSettings = getDefaultPlotFontSettings(theme);
 
-  return ({
+  return {
     automargin: true,
     gridcolor: theme.colors.variant.lightest.default,
     tickfont: fontSettings,
     title: {
       font: fontSettings,
     },
-  });
+  };
 };
 
 export default getDefaultPlotYLayoutSettings;

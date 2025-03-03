@@ -26,8 +26,7 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import * as fixtures from './HeatmapVisualization.fixtures';
 
@@ -35,11 +34,12 @@ import HeatmapVisualization from '../HeatmapVisualization';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
+// eslint-disable-next-line react/require-default-props
 const WrappedHeatMap = (props: React.ComponentProps<typeof HeatmapVisualization>) => (
   <TestStoreProvider>
-    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }) }}>
+    <TestFieldTypesContextProvider>
       <HeatmapVisualization {...props} />
-    </FieldTypesContext.Provider>
+    </TestFieldTypesContextProvider>
   </TestStoreProvider>
 );
 
@@ -52,20 +52,38 @@ describe('HeatmapVisualization', () => {
     const series = new Series('count()');
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
-      .columnPivots([columnPivot]).series([series])
+      .columnPivots([columnPivot])
+      .series([series])
       .visualization('heatmap')
       .build();
-    const effectiveTimerange: AbsoluteTimeRange = { type: 'absolute', from: '2019-10-22T11:54:35.850Z', to: '2019-10-29T11:53:50.000Z' };
-    const plotLayout = { yaxis: { type: 'category', fixedrange: true }, xaxis: { type: 'category', fixedrange: true }, margin: { b: 40 } };
+    const effectiveTimerange: AbsoluteTimeRange = {
+      type: 'absolute',
+      from: '2019-10-22T11:54:35.850Z',
+      to: '2019-10-29T11:53:50.000Z',
+    };
+    const plotLayout = {
+      yaxis: { type: 'category', fixedrange: true },
+      xaxis: { type: 'category', fixedrange: true },
+      margin: { b: 40 },
+    };
     const plotChartData = [
       {
         type: 'heatmap',
         name: 'Heatmap Chart',
         x: ['100', '201', '304', '405'],
         y: ['00', '01'],
-        z: [[217, 'None', 213, 'None'], ['None', 217, 'None', 230]],
-        text: [['count()', 'count()', 'count()', 'count()'], ['count()', 'count()', 'count()', 'count()']],
-        customdata: [[217, 'None', 213, 'None'], ['None', 217, 'None', 230]],
+        z: [
+          [217, 'None', 213, 'None'],
+          ['None', 217, 'None', 230],
+        ],
+        text: [
+          ['count()', 'count()', 'count()', 'count()'],
+          ['count()', 'count()', 'count()', 'count()'],
+        ],
+        customdata: [
+          [217, 'None', 213, 'None'],
+          ['None', 217, 'None', 230],
+        ],
         hovertemplate: 'hour: %{y}<br>http_status: %{x}<br>%{text}: %{customdata}<extra></extra>',
         colorscale: 'Viridis',
         reversescale: false,
@@ -74,15 +92,19 @@ describe('HeatmapVisualization', () => {
       },
     ];
 
-    const wrapper = mount(<WrappedHeatMap data={fixtures.validData}
-                                          config={config}
-                                          setLoadingState={() => {}}
-                                          effectiveTimerange={effectiveTimerange}
-                                          fields={Immutable.List()}
-                                          height={1024}
-                                          onChange={() => {}}
-                                          toggleEdit={() => {}}
-                                          width={800} />);
+    const wrapper = mount(
+      <WrappedHeatMap
+        data={fixtures.validData}
+        config={config}
+        setLoadingState={() => {}}
+        effectiveTimerange={effectiveTimerange}
+        fields={Immutable.List()}
+        height={1024}
+        onChange={() => {}}
+        toggleEdit={() => {}}
+        width={800}
+      />,
+    );
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', plotLayout);
@@ -95,7 +117,8 @@ describe('HeatmapVisualization', () => {
     const series = new Series('count()');
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
-      .columnPivots([columnPivot]).series([series])
+      .columnPivots([columnPivot])
+      .series([series])
       .visualization('heatmap')
       .visualizationConfig(HeatmapVisualizationConfig.empty().toBuilder().useSmallestAsDefault(true).build())
       .build();
@@ -122,15 +145,19 @@ describe('HeatmapVisualization', () => {
       },
     ];
 
-    const wrapper = mount(<WrappedHeatMap data={{ chart: [] }}
-                                          config={config}
-                                          setLoadingState={() => {}}
-                                          effectiveTimerange={effectiveTimerange}
-                                          fields={Immutable.List()}
-                                          height={1024}
-                                          onChange={() => {}}
-                                          toggleEdit={() => {}}
-                                          width={800} />);
+    const wrapper = mount(
+      <WrappedHeatMap
+        data={{ chart: [] }}
+        config={config}
+        setLoadingState={() => {}}
+        effectiveTimerange={effectiveTimerange}
+        fields={Immutable.List()}
+        height={1024}
+        onChange={() => {}}
+        toggleEdit={() => {}}
+        width={800}
+      />,
+    );
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', plotLayout);

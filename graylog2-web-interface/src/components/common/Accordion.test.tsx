@@ -51,9 +51,7 @@ describe('Accordion', () => {
 
   it('should render with one item opened', () => {
     render(
-      <Accordion onSelect={jest.fn()}
-                 id="accordion-test"
-                 activeKey="example-a">
+      <Accordion onSelect={jest.fn()} id="accordion-test" activeKey="example-a">
         <AccordionItem name="Example A">
           <h4>A as in Apple</h4>
         </AccordionItem>
@@ -81,9 +79,7 @@ describe('Accordion', () => {
 
   it('should render with activeKey as regular string', () => {
     render(
-      <Accordion onSelect={jest.fn()}
-                 id="accordion-test"
-                 activeKey="Example 2">
+      <Accordion onSelect={jest.fn()} id="accordion-test" activeKey="Example 2">
         <AccordionItem name="Example A">
           <h4>A as in Apple</h4>
         </AccordionItem>

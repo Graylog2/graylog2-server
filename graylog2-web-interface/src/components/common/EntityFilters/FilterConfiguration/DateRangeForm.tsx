@@ -14,44 +14,42 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, useField } from 'formik';
 import moment from 'moment/moment';
 
 import useUserDateTime from 'hooks/useUserDateTime';
-import AbsoluteDateInput from 'views/components/searchbar/time-range-filter/time-range-picker/AbsoluteDateInput';
-import { ModalSubmit } from 'components/common';
+import { ModalSubmit, Icon } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
 import { isValidDate, toUTCFromTz, adjustFormat } from 'util/DateTime';
-import { DATE_SEPARATOR, extractRangeFromString, timeRangeTitle } from 'components/common/EntityFilters/helpers/timeRange';
+import {
+  DATE_SEPARATOR,
+  extractRangeFromString,
+  timeRangeTitle,
+} from 'components/common/EntityFilters/helpers/timeRange';
+import DateTimePicker from 'views/components/searchbar/time-range-filter/time-range-picker/DateTimePicker';
+import StringUtils from 'util/StringUtils';
 
 import type { Filter } from '../types';
 
 type FormValues = {
-  from: string | undefined,
-  until: string | undefined,
-}
+  from: string | undefined;
+  until: string | undefined;
+};
 
 const Container = styled.div`
   padding: 3px 10px;
-  max-width: 250px;
+  max-width: fit-content;
 `;
 
-const Info = styled.p(({ theme }) => css`
-  font-size: ${theme.fonts.size.small};
-  margin: 0 0 10px;
-`);
-
-const Sections = styled.div`
-  margin-bottom: 10px;
-`;
-
-const Section = styled.div`
-  &:not(:last-child) {
-    margin-bottom: 10px;
-  }
-`;
+const Info = styled.p(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.small};
+    margin: 0 0 10px;
+  `,
+);
 
 const SectionHeader = styled.div`
   display: flex;
@@ -70,59 +68,16 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
-const DateTimeFormat = styled.code`
-  padding: 0;
-`;
-
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.small};
-  font-style: italic;
-  padding: 3px 3px 9px;
-  height: 1.5em;
-`);
-
-const DateConfiguration = ({ name: fieldName, label, checkboxLabel }: {
-  name: string,
-  label: string,
-  checkboxLabel: string
-}) => {
-  const { formatTime } = useUserDateTime();
-
-  return (
-    <Field name={fieldName}>
-      {({ field: { value, onChange, name }, meta: { error } }) => {
-        const _onChange = (newValue: string) => onChange({ target: { name, value: newValue } });
-        const onChangeAllTime = () => _onChange(value ? undefined : formatTime(new Date(), 'complete'));
-
-        return (
-          <div>
-            <SectionHeader>
-              <StyledLabel htmlFor={`date-input-${name}`}>{label}</StyledLabel>
-              <StyledCheckbox onChange={onChangeAllTime} checked={!value}>{checkboxLabel}</StyledCheckbox>
-            </SectionHeader>
-            <AbsoluteDateInput name="from"
-                               value={value}
-                               disabled={value === undefined}
-                               onChange={_onChange} />
-            {error && <ErrorMessage>{error}</ErrorMessage>}
-          </div>
-        );
-      }}
-    </Field>
-  );
-};
-
 const useInitialValues = (filter: Filter | undefined) => {
   const { formatTime } = useUserDateTime();
 
   if (filter) {
     const [from, until] = extractRangeFromString(filter.value);
 
-    return ({
+    return {
       from: from ? formatTime(from, 'complete') : undefined,
       until: until ? formatTime(until, 'complete') : undefined,
-    });
+    };
   }
 
   return {
@@ -136,9 +91,9 @@ const rangeError = 'The "Until" date must come after the "From" date.';
 
 const validate = (values: FormValues) => {
   let errors: {
-      from?: string,
-      until?: string,
-    } = {};
+    from?: string;
+    until?: string;
+  } = {};
 
   if (values.from && !isValidDate(values.from)) {
     errors = { ...errors, from: formatError };
@@ -159,10 +114,49 @@ const validate = (values: FormValues) => {
   return errors;
 };
 
+const PickerContainer = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 10px;
+`;
+
+const PickerWrap = styled.div`
+  max-width: 240px;
+`;
+
+type PickerProps = { name: 'from' | 'until' };
+const Picker = ({ name }: PickerProps) => {
+  const { formatTime } = useUserDateTime();
+  const label = StringUtils.capitalizeFirstLetter(name);
+  const [{ onChange, value }, meta] = useField(name);
+  const _onChange = useCallback(
+    (newValue: string) => onChange({ target: { name, value: newValue } }),
+    [onChange, name],
+  );
+  const onChangeAllTime = () => _onChange(value ? undefined : formatTime(new Date(), 'complete'));
+  const checkboxLabel = name === 'from' ? 'All Time' : 'Now';
+  const isChecked = !value;
+
+  return (
+    <PickerWrap data-testid={`date-picker-${name}`}>
+      <SectionHeader>
+        <StyledLabel htmlFor={`date-input-${name}`}>{label}</StyledLabel>
+        <StyledCheckbox onChange={onChangeAllTime} checked={isChecked}>
+          {checkboxLabel}
+        </StyledCheckbox>
+      </SectionHeader>
+      <DateTimePicker disabled={isChecked} error={meta.error} onChange={_onChange} value={value} range={label} />
+    </PickerWrap>
+  );
+};
+const FromPicker = () => <Picker name="from" />;
+const UntilPicker = () => <Picker name="until" />;
+
 type Props = {
-  onSubmit: (filter: { title: string, value: string }) => void,
-  filter: Filter | undefined,
-}
+  onSubmit: (filter: { title: string; value: string }) => void;
+  filter: Filter | undefined;
+};
 
 const DateRangeForm = ({ filter, onSubmit }: Props) => {
   const { userTimezone } = useUserDateTime();
@@ -184,22 +178,22 @@ const DateRangeForm = ({ filter, onSubmit }: Props) => {
       <Formik initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
         {({ isValid }) => (
           <Form>
-            <Sections>
-              <Section>
-                <DateConfiguration name="from" label="From" checkboxLabel="All time" />
-              </Section>
-              <Section>
-                <DateConfiguration name="until" label="Until" checkboxLabel="Now" />
-              </Section>
-            </Sections>
+            <PickerContainer>
+              <FromPicker />
+
+              <Icon name="arrow_right_alt" />
+
+              <UntilPicker />
+            </PickerContainer>
             <Info>
-              Format: <DateTimeFormat>YYYY-MM-DD [HH:mm:ss[.SSS]]</DateTimeFormat>.<br />
               All timezones using: <b>{userTimezone}</b>.
             </Info>
-            <ModalSubmit submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
-                         bsSize="small"
-                         disabledSubmit={!isValid}
-                         displayCancel={false} />
+            <ModalSubmit
+              submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
+              bsSize="small"
+              disabledSubmit={!isValid}
+              displayCancel={false}
+            />
           </Form>
         )}
       </Formik>

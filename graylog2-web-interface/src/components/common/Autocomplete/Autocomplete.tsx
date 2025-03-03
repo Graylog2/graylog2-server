@@ -33,17 +33,17 @@ const HelpText = styled.span`
 `;
 
 export type AutocompleteOption = {
-  value: string | number,
-  label: string
+  value: string | number;
+  label: string;
 };
 
 type autocompleteProps = {
-  fieldName: string,
-  label: string,
-  clearable?: boolean,
-  required?: boolean,
-  helpText?: string,
-  options?: AutocompleteOption[],
+  fieldName: string;
+  label: string;
+  clearable?: boolean;
+  required?: boolean;
+  helpText?: string;
+  options?: AutocompleteOption[];
 };
 
 const Autocomplete = ({
@@ -58,18 +58,20 @@ const Autocomplete = ({
     {({ field: { name, value, onChange } }) => (
       <>
         <StyledLabel>{label}</StyledLabel>
-        <Select id={fieldName}
-                name={name}
-                clearable={clearable}
-                required={required}
-                allowCreate
-                onChange={(index) => onChange({ target: { value: index, name } })}
-                options={options}
-                value={value} />
+        <Select
+          id={fieldName}
+          name={name}
+          clearable={clearable}
+          required={required}
+          allowCreate
+          onChange={(index) => onChange({ target: { value: index, name } })}
+          options={options}
+          value={value}
+        />
         {helpText && (
-        <span className="help-block">
-          <HelpText>{helpText}</HelpText>
-        </span>
+          <span className="help-block">
+            <HelpText>{helpText}</HelpText>
+          </span>
         )}
       </>
     )}

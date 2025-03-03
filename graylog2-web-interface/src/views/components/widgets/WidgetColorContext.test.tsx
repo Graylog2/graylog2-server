@@ -28,15 +28,15 @@ import ChartColorContext from '../visualizations/ChartColorContext';
 import type { ChangeColorFunction, ChartColorMap } from '../visualizations/ChartColorContext';
 
 jest.mock('views/components/widgets/useColorRules');
-jest.mock('stores/useAppDispatch', () => () => jest.fn());
+jest.mock('views/stores/useViewsDispatch', () => () => jest.fn());
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   setChartColor: jest.fn(),
 }));
 
 type ContainerProps = {
-  colors: ChartColorMap,
-  setColor: ChangeColorFunction,
+  colors: ChartColorMap;
+  setColor: ChangeColorFunction;
 };
 
 const Container = ({ colors: _colors, setColor: _setColor }: ContainerProps) => <div>Hello!</div>;
@@ -55,15 +55,13 @@ describe('WidgetColorContext', () => {
   });
 
   const container = () => {
-    const wrapper = mount((
+    const wrapper = mount(
       <WidgetColorContext id="deadbeef">
         <ChartColorContext.Consumer>
-          {({ colors, setColor }) => (
-            <Container colors={colors} setColor={setColor} />
-          )}
+          {({ colors, setColor }) => <Container colors={colors} setColor={setColor} />}
         </ChartColorContext.Consumer>
-      </WidgetColorContext>
-    ));
+      </WidgetColorContext>,
+    );
 
     return wrapper.find(Container);
   };

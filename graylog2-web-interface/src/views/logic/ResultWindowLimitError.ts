@@ -24,11 +24,12 @@ import SearchError from './SearchError';
 type ResultWindowLimitErrorState = SearchErrorState & {};
 
 export type ResultWindowLimitErrorResponse = SearchErrorResponse & {
-  type: 'result_window_limit',
-  result_window_limit: number,
+  type: 'result_window_limit';
+  result_window_limit: number;
 };
 
-export const isResultWindowLimitErrorResponse = (error: SearchErrorResponse): error is ResultWindowLimitErrorResponse => (error?.type === 'result_window_limit');
+export const isResultWindowLimitErrorResponse = (error: SearchErrorResponse): error is ResultWindowLimitErrorResponse =>
+  error?.type === 'result_window_limit';
 
 export default class ResultWindowLimitError extends SearchError {
   protected readonly _state: ResultWindowLimitErrorState;
@@ -41,13 +42,25 @@ export default class ResultWindowLimitError extends SearchError {
 
     this._state = {
       ...this._state,
-      description: ResultWindowLimitError._extendDescription(result, this.description, this.queryId, this.searchTypeId, resultWindowLimit),
+      description: ResultWindowLimitError._extendDescription(
+        result,
+        this.description,
+        this.queryId,
+        this.searchTypeId,
+        resultWindowLimit,
+      ),
     };
 
     this._resultWindowLimit = resultWindowLimit;
   }
 
-  static _extendDescription(result: SearchResult, description: string, queryId: QueryId, searchTypeId: SearchTypeId, resultWindowLimit: number) {
+  static _extendDescription(
+    result: SearchResult,
+    description: string,
+    queryId: QueryId,
+    searchTypeId: SearchTypeId,
+    resultWindowLimit: number,
+  ) {
     const pageSize = ResultWindowLimitError._getPageSizeFromResult(result, queryId, searchTypeId);
     const validPages = Math.floor(resultWindowLimit / pageSize);
     const validPagesMessage = `Elasticsearch limits the search result to ${resultWindowLimit} messages. With a page size of ${pageSize} messages, you can use the first ${validPages} pages.`;
@@ -62,5 +75,7 @@ export default class ResultWindowLimitError extends SearchError {
     return searchType.limit;
   }
 
-  get resultWindowLimit() { return this._resultWindowLimit; }
+  get resultWindowLimit() {
+    return this._resultWindowLimit;
+  }
 }

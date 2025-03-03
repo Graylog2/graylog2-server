@@ -18,9 +18,11 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-type ContextValue = {
-  meta: unknown,
-} | undefined
+type ContextValue =
+  | {
+      meta: unknown;
+    }
+  | undefined;
 
 const EntityTableMetaDataContext = React.createContext<ContextValue>(undefined);
 

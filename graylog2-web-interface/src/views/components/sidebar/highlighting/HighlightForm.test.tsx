@@ -17,17 +17,15 @@
 import React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import * as Immutable from 'immutable';
 
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
-import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import { SimpleFieldTypesContextProvider } from 'views/components/contexts/TestFieldTypesContextProvider';
 
 const rule = HighlightingRule.builder()
   .color(StaticColor.create('#333333'))
@@ -36,23 +34,16 @@ const rule = HighlightingRule.builder()
   .value('noob')
   .build();
 
-const ruleWithValueFalse = rule.toBuilder()
-  .value(false)
-  .build();
-const ruleWithValueZero = rule.toBuilder()
-  .value(0)
-  .build();
+const ruleWithValueFalse = rule.toBuilder().value(false).build();
+const ruleWithValueZero = rule.toBuilder().value(0).build();
 
 describe('HighlightForm', () => {
-  const fieldTypes: FieldTypes = {
-    all: Immutable.List([FieldTypeMapping.create('foob', FieldType.create('long', [Properties.Numeric]))]),
-    queryFields: Immutable.Map(),
-  };
+  const fields = [FieldTypeMapping.create('foob', FieldType.create('long', [Properties.Numeric]))];
   const SUT = (props: Partial<React.ComponentProps<typeof HighlightForm>>) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={fieldTypes}>
+      <SimpleFieldTypesContextProvider fields={fields}>
         <HighlightForm onClose={() => {}} rule={undefined} onSubmit={() => Promise.resolve()} {...props} />
-      </FieldTypesContext.Provider>
+      </SimpleFieldTypesContextProvider>
     </TestStoreProvider>
   );
 
@@ -106,7 +97,14 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(rule.field, rule.value, rule.condition, expect.objectContaining({ type: 'static', color: expect.any(String) })));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        rule.field,
+        rule.value,
+        rule.condition,
+        expect.objectContaining({ type: 'static', color: expect.any(String) }),
+      ),
+    );
   });
 
   it('creates a new gradient when type is selected', async () => {
@@ -121,7 +119,14 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(rule.field, rule.value, rule.condition, expect.objectContaining({ gradient: 'Viridis' })));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        rule.field,
+        rule.value,
+        rule.condition,
+        expect.objectContaining({ gradient: 'Viridis' }),
+      ),
+    );
   });
 
   it('should be able to click submit when has value 0 with type number', async () => {
@@ -129,7 +134,14 @@ describe('HighlightForm', () => {
     render(<SUT rule={ruleWithValueZero} onSubmit={onSubmit} />);
 
     await triggerSaveButtonClick();
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(ruleWithValueZero.field, '0', ruleWithValueZero.condition, ruleWithValueZero.color));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        ruleWithValueZero.field,
+        '0',
+        ruleWithValueZero.condition,
+        ruleWithValueZero.color,
+      ),
+    );
   });
 
   it('should be able to click submit when has value false with type boolean', async () => {
@@ -138,6 +150,13 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(ruleWithValueFalse.field, 'false', ruleWithValueFalse.condition, ruleWithValueFalse.color));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        ruleWithValueFalse.field,
+        'false',
+        ruleWithValueFalse.condition,
+        ruleWithValueFalse.color,
+      ),
+    );
   });
 });

@@ -24,12 +24,15 @@ import AuthenticationDomain from 'domainActions/authentication/AuthenticationDom
 const useActiveBackend = <T extends PromiseProvider>(listenableActions: Array<ListenableAction<T>> = []) => {
   const [loadActiveResponse, setLoadActiveResponse] = useState<LoadActiveResponse | undefined>();
   const [finishedLoading, setFinishedLoading] = useState(false);
-  const _loadActive = () => AuthenticationDomain.loadActive().then((response) => {
-    setFinishedLoading(true);
-    setLoadActiveResponse(response);
-  });
+  const _loadActive = () =>
+    AuthenticationDomain.loadActive().then((response) => {
+      setFinishedLoading(true);
+      setLoadActiveResponse(response);
+    });
 
-  useEffect(() => { _loadActive(); }, []);
+  useEffect(() => {
+    _loadActive();
+  }, []);
 
   useEffect(() => {
     const unlistenActions = listenableActions.map((action) => action.completed.listen(_loadActive));
