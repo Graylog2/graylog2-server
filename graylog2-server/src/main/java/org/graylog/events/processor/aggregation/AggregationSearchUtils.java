@@ -48,7 +48,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class AggregationSearchUtils {
@@ -80,11 +80,11 @@ public class AggregationSearchUtils {
 
     public void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
                                  EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
-        aggregatedSearch(eventFactory, parameters, eventsConsumer, (event) -> null);
+        aggregatedSearch(eventFactory, parameters, eventsConsumer, (event) -> {});
     }
 
     public void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
-                                 EventConsumer<List<EventWithContext>> eventsConsumer, Function<Event, Void> eventDecorator) throws EventProcessorException {
+                                 EventConsumer<List<EventWithContext>> eventsConsumer, Consumer<Event> eventDecorator) throws EventProcessorException {
         final var owner = new AggregationSearch.User("event-processor-" + AggregationEventProcessorConfig.TYPE_NAME + "-" + eventDefinition.id(), DateTimeZone.UTC);
         final List<SearchType> additionalSearchTypes = eventQueryModifiers.stream()
                 .flatMap(e -> e.additionalSearchTypes(eventDefinition).stream())
@@ -106,7 +106,7 @@ public class AggregationSearchUtils {
     ImmutableList<EventWithContext> eventsFromAggregationResult(EventFactory eventFactory,
                                                                 AggregationEventProcessorParameters parameters,
                                                                 AggregationResult result,
-                                                                Function<Event, Void> eventDecorator) throws EventProcessorException {
+                                                                Consumer<Event> eventDecorator) throws EventProcessorException {
         final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
         final Set<String> sourceStreams = eventStreamService.buildEventSourceStreams(getStreams(parameters),
                 result.sourceStreams());
@@ -193,7 +193,7 @@ public class AggregationSearchUtils {
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
             // Apply event processor specific decorator to event
-            eventDecorator.apply(event);
+            eventDecorator.accept(event);
 
             LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
 
