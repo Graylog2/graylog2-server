@@ -52,31 +52,25 @@ public class WhoisIpLookup {
     }
 
     public WhoisIpLookupResult run(String ip) throws Exception {
-        return run(this.defaultRegistry, ip);
+        try {
+            return run(this.defaultRegistry, ip);
+        } catch (IOException e) {
+            LOG.error("Could not lookup WHOIS information for [{}] at [{}].", ip, this.defaultRegistry);
+            throw e;
+        }
     }
 
     public WhoisIpLookupResult run(InternetRegistry registry, String ip) throws Exception {
         // Figure out the right response parser for the registry we are asking.
-        WhoisParser parser;
-        switch(registry) {
-            case AFRINIC:
-                parser = new AFRINICResponseParser();
-                break;
-            case APNIC:
-                parser = new APNICResponseParser();
-                break;
-            case ARIN:
-                parser = new ARINResponseParser();
-                break;
-            case LACNIC:
-                parser = new LACNICResponseParser();
-                break;
-            case RIPENCC:
-                parser = new RIPENCCResponseParser();
-                break;
-            default:
-                throw new RuntimeException("No parser implemented for [" + registry.name() + "] responses.");
-        }
+        WhoisParser parser = switch (registry) {
+            case AFRINIC -> new AFRINICResponseParser();
+            case APNIC -> new APNICResponseParser();
+            case ARIN -> new ARINResponseParser();
+            case LACNIC -> new LACNICResponseParser();
+            case RIPENCC -> new RIPENCCResponseParser();
+            default -> throw new RuntimeException("No parser implemented for [" + registry.name() + "] responses. " +
+                    "This is a bug.");
+        };
 
         final WhoisClient whoisClient = new WhoisClient();
         try {
@@ -97,9 +91,9 @@ public class WhoisIpLookup {
             whoisClient.disconnect();
 
             // Handle registry redirect.
-            if(parser.isRedirect()) {
+            if (parser.isRedirect()) {
                 // STAND BACK FOR STACKOVERFLOWEXCEPTION
-                if(registry.equals(parser.getRegistryRedirect())) {
+                if (registry.equals(parser.getRegistryRedirect())) {
                     /*
                      *                ,--._,--.
                      *              ,'  ,'   ,-`.
@@ -127,8 +121,7 @@ public class WhoisIpLookup {
 
             return new WhoisIpLookupResult(parser.getOrganization(), parser.getCountryCode());
         } catch (IOException e) {
-            LOG.error("Could not lookup WHOIS information for [{}] at [{}].", ip, registry.toString());
-            return null;
+            throw e;
         } finally {
             if (whoisClient.isConnected()) {
                 whoisClient.disconnect();
