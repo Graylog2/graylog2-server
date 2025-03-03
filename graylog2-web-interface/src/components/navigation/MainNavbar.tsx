@@ -78,7 +78,7 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
   return menuItem && Object.keys(menuItem).includes('useIsValidLicense') ? menuItem.useIsValidLicense() : true;
 };
 
-const sortInAfterItem = (targetList: Array<PluginNavigation>, afterItems: Array<PluginNavigation>) => {
+const sortInAfterItems = (targetList: Array<PluginNavigation>, afterItems: Array<PluginNavigation>) => {
   const result = [...targetList];
 
   afterItems.forEach((afterItem) => {
@@ -98,7 +98,7 @@ const sortItemsByPosition = (navigationItems: Array<PluginNavigation>) => {
   const afterItems = navigationItems.filter((item) => !!item.position?.after);
   const lastItems = navigationItems.filter((item) => !!item.position?.last);
 
-  return [...sortInAfterItem(withoutPositionItems, afterItems), ...lastItems];
+  return [...sortInAfterItems(withoutPositionItems, afterItems), ...lastItems];
 };
 
 const useNavigationItems = () => {
