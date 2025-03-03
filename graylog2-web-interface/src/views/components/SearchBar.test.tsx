@@ -26,7 +26,7 @@ import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import OriginalSearchBar from './SearchBar';
@@ -55,7 +55,7 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () =>
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/hooks/useAutoRefresh');
 
 const query = MockQuery.builder()
@@ -91,7 +91,7 @@ describe('SearchBar', () => {
 
   it('should refresh search, when search is performed and there are no changes.', async () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     render(<SearchBar />);
 
