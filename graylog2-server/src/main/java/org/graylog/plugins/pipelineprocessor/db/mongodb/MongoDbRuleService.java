@@ -112,6 +112,18 @@ public class MongoDbRuleService implements RuleService {
     }
 
     @Override
+    public Collection<RuleDao> loadAllFilteredByTitle(String regex) {
+        try {
+            return collection.find(Filters.regex("title", regex))
+                    .sort(Sorts.ascending("title"))
+                    .into(new LinkedHashSet<>());
+        } catch (MongoException e) {
+            log.error("Unable to load processing rules", e);
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
     public void delete(String id) {
         try {
             delete(load(id));

@@ -97,6 +97,13 @@ public class InMemoryRuleService implements RuleService {
     }
 
     @Override
+    public Collection<RuleDao> loadAllFilteredByTitle(String regex) {
+        return store.values().stream()
+                .filter(rule -> rule.title().matches(regex))
+                .toList();
+    }
+
+    @Override
     public void delete(String id) {
         if (id == null) {
             return;
