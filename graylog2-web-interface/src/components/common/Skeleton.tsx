@@ -14,21 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { Skeleton as MantineSkeleton } from '@mantine/core';
+import styled, { css } from 'styled-components';
 
-import {Panel} from 'components/bootstrap';
-import {ExternalLink} from 'components/common';
+const StyledSkeleton = styled(MantineSkeleton)(
+  ({ theme }) => css`
+    &:after {
+      background-color: ${theme.colors.gray[80]};
+    }
+  `,
+);
 
-export default function SidebarPermissions() {
+const Skeleton = (props: Pick<React.ComponentProps<typeof MantineSkeleton>, 'className' | 'height' | 'width'>) => (
+  <StyledSkeleton {...props} radius="xl" />
+);
 
-  return (
-    <Panel bsStyle="info" header={<span>AWS Policy Permissions</span>}>
-      <p>
-        Please refer to the{' '}
-        <ExternalLink href="https://go2docs.graylog.org/current/getting_in_log_data/aws_kinesis_cloudwatch_input.html">official documentation</ExternalLink>
-        {' '}for information on required AWS permissions.<br />
-      </p>
-
-    </Panel>
-  );
-}
+export default Skeleton;

@@ -31,28 +31,29 @@ import type {
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
-import type View from 'views/logic/views/View';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { selectView, selectParameters, selectActiveQuery } from 'views/logic/slices/viewSelectors';
+import { selectParameters } from 'views/logic/slices/viewSelectors';
 import {
   selectGlobalOverride,
-  selectWidgetsToSearch,
+  selectSearchTypesToSearch,
   selectSearchExecutionState,
-  selectParameterBindings,
   selectJobIds,
+  selectParameterBindings,
 } from 'views/logic/slices/searchExecutionSelectors';
 import type { TimeRange } from 'views/logic/queries/Query';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
-import type { ParameterMap } from 'views/logic/parameters/Parameter';
 import type Parameter from 'views/logic/parameters/Parameter';
-import { setParameters } from 'views/logic/slices/viewSlice';
+import type { ParameterMap } from 'views/logic/parameters/Parameter';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { JobIds } from 'views/stores/SearchJobs';
+import type Search from 'views/logic/search/Search';
+import { setParameters } from 'views/logic/slices/viewSlice';
+import type { WidgetMapping } from 'views/logic/views/types';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
   initialState: {
-    widgetsToSearch: undefined,
+    searchTypesToSearch: undefined,
     executionState: SearchExecutionState.empty(),
     isLoading: false,
     result: undefined,
@@ -76,9 +77,9 @@ const searchExecutionSlice = createSlice({
       ...state,
       executionState: state.executionState.toBuilder().globalOverride(action.payload).build(),
     }),
-    setWidgetsToSearch: (state, action: PayloadAction<Array<string>>) => ({
+    setSearchTypesToSearch: (state, action: PayloadAction<Array<string>>) => ({
       ...state,
-      widgetsToSearch: action.payload,
+      searchTypesToSearch: action.payload,
     }),
     setParameterValues: (state, action: PayloadAction<Immutable.Map<string, any>>) => {
       const parameterMap = action.payload;
@@ -124,7 +125,7 @@ export const {
   stopLoading,
   finishedLoading,
   updateGlobalOverride,
-  setWidgetsToSearch,
+  setSearchTypesToSearch,
   setParameterValues,
   setParameterBindings,
   setJobIds,
@@ -136,12 +137,12 @@ export type SearchExecutors = {
   parse: SearchParser;
   resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult;
   startJob: (
-    view: View,
-    widgetsToSearch: string[],
+    search: Search,
+    searchTypesToSearch: string[],
     executionStateParam: SearchExecutionState,
     keepQueries?: string[],
   ) => Promise<JobIds>;
-  executeJobResult: (jobIds: JobIds, view: View) => Promise<SearchExecutionResult>;
+  executeJobResult: (jobIds: JobIds, widgetMapping?: WidgetMapping) => Promise<SearchExecutionResult>;
   cancelJob: (jobIds: JobIds) => Promise<null>;
 };
 
@@ -160,26 +161,26 @@ export const cancelExecutedJob =
 
 export const executeWithExecutionState =
   (
-    view: View,
-    widgetsToSearch: Array<string>,
+    search: Search,
+    activeQuery: string,
+    searchTypesToSearch: Array<string>,
     executionState: SearchExecutionState,
     searchExecutors: SearchExecutors,
+    widgetMapping?: WidgetMapping,
   ) =>
-  (dispatch: ViewsDispatch, getState: GetState) =>
-    dispatch(parseSearch(view.search, searchExecutors.parse))
+  (dispatch: ViewsDispatch) =>
+    dispatch(parseSearch(search, searchExecutors.parse))
       .then(() => {
         dispatch(loading());
         dispatch(cancelExecutedJob());
 
-        const activeQuery = selectActiveQuery(getState());
-
-        return searchExecutors.startJob(view, widgetsToSearch, executionState, [activeQuery]);
+        return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
       })
       .then((jobIds: JobIds) => {
         dispatch(setJobIds(jobIds));
 
         return searchExecutors
-          .executeJobResult(jobIds, view)
+          .executeJobResult(jobIds, widgetMapping)
           .then(searchExecutors.resultMapper)
           .then((result) => {
             dispatch(setJobIds(null));
@@ -191,14 +192,22 @@ export const executeWithExecutionState =
       });
 
 export const execute =
-  () =>
+  (search: Search, activeQuery: string, widgetMapping?: WidgetMapping) =>
   (dispatch: ViewsDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
     const state = getState();
-    const view = selectView(state);
     const executionState = selectSearchExecutionState(state);
-    const widgetsToSearch = selectWidgetsToSearch(state);
+    const searchTypesToSearch = selectSearchTypesToSearch(state);
 
-    return dispatch(executeWithExecutionState(view, widgetsToSearch, executionState, searchExecutors));
+    return dispatch(
+      executeWithExecutionState(
+        search,
+        activeQuery,
+        searchTypesToSearch,
+        executionState,
+        searchExecutors,
+        widgetMapping,
+      ),
+    );
   };
 
 export const setGlobalOverrideQuery =
