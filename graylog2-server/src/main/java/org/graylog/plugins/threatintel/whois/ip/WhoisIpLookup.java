@@ -61,7 +61,14 @@ public class WhoisIpLookup {
             final InternetRegistry causeRegistry = rootCause.getRegistry();
             final String error = f("Could not lookup WHOIS information for [%s] at [%s].", ip, causeRegistry);
             final WhoisLookupException whoisLookupException = new WhoisLookupException(error, e.getCause(), causeRegistry);
-            LOG.error(error, whoisLookupException);
+            if (!LOG.isTraceEnabled()) {
+                LOG.error(error);
+            }
+            else {
+                // Only include stack trace in debug mode. Avoids spamming logs with stack traces, since the stacktrace
+                // was not included in the past.
+                LOG.error(error, whoisLookupException);
+            }
             throw whoisLookupException;
         }
     }
