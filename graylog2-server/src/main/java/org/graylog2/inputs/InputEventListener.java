@@ -43,13 +43,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 
 public class InputEventListener implements GracefulShutdownHook {
     private static final Logger LOG = LoggerFactory.getLogger(InputEventListener.class);
     protected static final int INPUT_START_GRACE_PERIOD_MS = 100;
-    private final LinkedBlockingQueue<Runnable> eventQueue = new LinkedBlockingQueue<>(1000);
     private final InputLauncher inputLauncher;
     private final InputRegistry inputRegistry;
     private final InputService inputService;
@@ -83,8 +81,6 @@ public class InputEventListener implements GracefulShutdownHook {
                 .build();
         this.executorService = Executors.newSingleThreadScheduledExecutor(threadFactory);
 
-        initializeEventQueueTask();
-
         shutdownService.register(this);
         eventBus.register(this);
     }
@@ -94,21 +90,11 @@ public class InputEventListener implements GracefulShutdownHook {
         executorService.shutdown();
     }
 
-    private void initializeEventQueueTask() {
-        executorService.submit(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                Runnable task = eventQueue.take();
-                task.run();
-            }
-            return null;
-        });
-    }
-
     @Subscribe
     public void inputCreated(InputCreated inputCreatedEvent) {
         final String inputId = inputCreatedEvent.id();
         LOG.debug("Input created: {}", inputId);
-        eventQueue.add(() -> doInputCreated(inputId));
+        executorService.submit(() -> doInputCreated(inputId));
     }
 
     private void doInputCreated(String inputId) {
@@ -134,7 +120,7 @@ public class InputEventListener implements GracefulShutdownHook {
     public void inputUpdated(InputUpdated inputUpdatedEvent) {
         final String inputId = inputUpdatedEvent.id();
         LOG.debug("Input updated: {}", inputId);
-        eventQueue.add(() -> doInputUpdated(inputId));
+        executorService.submit(() -> doInputUpdated(inputId));
     }
 
     private void doInputUpdated(final String inputId) {
@@ -192,7 +178,7 @@ public class InputEventListener implements GracefulShutdownHook {
     public void inputDeleted(InputDeleted inputDeletedEvent) {
         final String inputId = inputDeletedEvent.id();
         LOG.debug("Input deleted: {}", inputId);
-        eventQueue.add(() -> doInputDeleted(inputId));
+        executorService.submit(() -> doInputDeleted(inputId));
     }
 
     private void doInputDeleted(String inputId) {
@@ -206,7 +192,7 @@ public class InputEventListener implements GracefulShutdownHook {
     public void inputSetup(InputSetup inputSetupEvent) {
         final String inputId = inputSetupEvent.id();
         LOG.info("Input setup: {}", inputId);
-        eventQueue.add(() -> doInputSetup(inputId));
+        executorService.submit(() -> doInputSetup(inputId));
     }
 
     private void doInputSetup(String inputId) {
@@ -235,7 +221,7 @@ public class InputEventListener implements GracefulShutdownHook {
             LOG.debug("Ignoring LeaderChangedEvent during server startup.");
             return;
         }
-        eventQueue.add(this::doLeaderChanged);
+        executorService.submit(this::doLeaderChanged);
     }
 
     private void doLeaderChanged() {

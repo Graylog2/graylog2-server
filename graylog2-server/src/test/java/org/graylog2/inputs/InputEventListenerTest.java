@@ -51,7 +51,7 @@ public class InputEventListenerTest {
     private static final String THIS_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
     private static final String OTHER_NODE_ID = "c0c0a000-0000-4000-a000-000000000000";
 
-    // Input events will be processed by an asynchronous queue, so we need to wait a bit for the effects to happen
+    // Input events will be processed asynchronously, so we need to wait a bit for the effects to happen
     private static final int EVENT_QUEUE_WAIT_TIME_MS = InputEventListener.INPUT_START_GRACE_PERIOD_MS + 100;
 
     @Rule
