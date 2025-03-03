@@ -22,6 +22,7 @@ import { asMock } from 'helpers/mocking';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import useStreams from 'components/streams/hooks/useStreams';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
+import useInputReferences from 'components/inputs/InputSetupWizard/hooks/useInputReferences';
 
 import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
 import InputSetupWizard from './Wizard';
@@ -50,6 +51,7 @@ const renderWizard = () =>
 jest.mock('components/streams/hooks/useStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
 jest.mock('components/indices/hooks/useIndexSetsList');
+jest.mock('components/inputs/InputSetupWizard/hooks/useInputReferences');
 
 const useStreamsResult = (list = []) => ({
   data: { list: list, pagination: { total: 1 }, attributes: [] },
@@ -66,6 +68,21 @@ const pipelinesConnectedMock = (response = []) => ({
   error: undefined,
   isError: false,
 });
+
+const useInputReferencesResult = {
+  isLoading: false,
+  data: {
+    isInputAlreadyInUse: true,
+    stream_refs: [
+      { name: 'In use stream 1', id: 'stream_1' },
+      { name: 'In use stream 2', id: 'stream_2' },
+    ],
+    pipeline_refs: [
+      { name: 'In use pipeline 1', id: 'pipeline_1' },
+      { name: 'In use pipeline 2', id: 'pipeline_2' },
+    ],
+  },
+};
 
 const useIndexSetsListResult = {
   data: {
@@ -168,13 +185,14 @@ const getStreamCreateFormFields = async () => {
   };
 };
 
-beforeEach(() => {
-  asMock(useStreams).mockReturnValue(useStreamsResult());
-  asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
-  asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
-});
-
 describe('InputSetupWizard Setup Routing', () => {
+  beforeEach(() => {
+    asMock(useStreams).mockReturnValue(useStreamsResult());
+    asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
+    asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
+    asMock(useInputReferences).mockReturnValue(useInputReferencesResult);
+  });
+
   it('should render the Setup Routing step', async () => {
     renderWizard();
 
@@ -183,6 +201,16 @@ describe('InputSetupWizard Setup Routing', () => {
     );
 
     expect(routingStepText).toBeInTheDocument();
+  });
+
+  it('should show a warning if the input is already in use', async () => {
+    renderWizard();
+
+    await screen.findByText('Input already in use');
+    await screen.findByText('In use stream 1');
+    await screen.findByText('In use stream 2');
+    await screen.findByText('In use pipeline 1');
+    await screen.findByText('In use pipeline 2');
   });
 
   describe('Stream Selection', () => {
