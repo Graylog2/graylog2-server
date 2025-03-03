@@ -54,7 +54,7 @@ const mockSearchParams = {
 const mockContextValue = { searchParams: mockSearchParams, refetch: jest.fn(), attributes: [] };
 
 const DashboardActions = ({
-  contextValue,
+  contextValue = undefined,
   ...props
 }: React.ComponentProps<typeof OriginalDashboardActions> & { contextValue?: ContextValue }) => (
   <TableFetchContext.Provider value={contextValue ?? mockContextValue}>
