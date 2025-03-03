@@ -52,7 +52,7 @@ const InputInUseAlert = ({ inputId }: Props = { inputId: undefined }) => {
               This Input is already used in the following Streams:
               <StyledList>
                 {inputReferencesData.stream_refs.map((stream) => (
-                  <li>{stream.name}</li>
+                  <li key={stream.id}>{stream.name}</li>
                 ))}
               </StyledList>
             </StreamListWrapper>
@@ -62,7 +62,7 @@ const InputInUseAlert = ({ inputId }: Props = { inputId: undefined }) => {
               This Input is already used in the following Pipelines:
               <StyledList>
                 {inputReferencesData.pipeline_refs.map((pipeline) => (
-                  <li>{pipeline.name}</li>
+                  <li key={pipeline.id}>{pipeline.name}</li>
                 ))}
               </StyledList>
             </>
