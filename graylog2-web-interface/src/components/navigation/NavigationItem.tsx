@@ -71,7 +71,7 @@ const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }:
       {accessibleMenuItems.map((menuItem) => (
         <NavigationLink
           key={menuItem.description}
-          Badge={BadgeComponent}
+          Badge={menuItem.BadgeComponent}
           description={menuItem.description}
           path={menuItem.path}
         />
