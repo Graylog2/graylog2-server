@@ -29,8 +29,9 @@ import org.graylog.plugins.threatintel.whois.ip.parsers.WhoisParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class WhoisIpLookup {
 
@@ -54,9 +55,14 @@ public class WhoisIpLookup {
     public WhoisIpLookupResult run(String ip) throws Exception {
         try {
             return run(this.defaultRegistry, ip);
-        } catch (IOException e) {
-            LOG.error("Could not lookup WHOIS information for [{}] at [{}].", ip, this.defaultRegistry);
-            throw e;
+        } catch (WhoisLookupException e) {
+            // Find first exception in the chain.
+            final WhoisLookupException rootCause = (WhoisLookupException) e.getCause();
+            final InternetRegistry causeRegistry = rootCause.getRegistry();
+            final String error = f("Could not lookup WHOIS information for [%s] at [%s].", ip, causeRegistry);
+            final WhoisLookupException whoisLookupException = new WhoisLookupException(error, e.getCause(), causeRegistry);
+            LOG.error(error, whoisLookupException);
+            throw whoisLookupException;
         }
     }
 
@@ -120,8 +126,8 @@ public class WhoisIpLookup {
             }
 
             return new WhoisIpLookupResult(parser.getOrganization(), parser.getCountryCode());
-        } catch (IOException e) {
-            throw e;
+        } catch (Exception e) {
+            throw new WhoisLookupException(e, registry);
         } finally {
             if (whoisClient.isConnected()) {
                 whoisClient.disconnect();
