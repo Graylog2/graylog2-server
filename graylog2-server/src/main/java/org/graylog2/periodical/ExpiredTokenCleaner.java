@@ -108,7 +108,7 @@ public class ExpiredTokenCleaner extends Periodical {
     }
 
     @Override
-    protected @NotNull @org.jetbrains.annotations.NotNull Logger getLogger() {
+    protected @NotNull Logger getLogger() {
         return LOG;
     }
 }
