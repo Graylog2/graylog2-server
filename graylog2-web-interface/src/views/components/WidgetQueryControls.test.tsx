@@ -24,7 +24,8 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { asMock } from 'helpers/mocking';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
-import { setGlobalOverrideTimerange, setGlobalOverrideQuery, execute } from 'views/logic/slices/searchExecutionSlice';
+import { setGlobalOverrideTimerange, setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
@@ -41,7 +42,11 @@ jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
   setGlobalOverrideTimerange: jest.fn(() => async () => {}),
   setGlobalOverrideQuery: jest.fn(() => async () => {}),
-  execute: jest.fn(() => async () => {}),
+}));
+
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  executeActiveQuery: jest.fn(() => async () => {}),
 }));
 
 describe('WidgetQueryControls', () => {
@@ -160,7 +165,7 @@ describe('WidgetQueryControls', () => {
 
       const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
       fireEvent.click(resetTimeRangeOverrideButton);
-      await waitFor(() => expect(execute).toHaveBeenCalled());
+      await waitFor(() => expect(executeActiveQuery).toHaveBeenCalled());
     });
 
     it('executes search when reset query filter button is clicked', async () => {
@@ -170,7 +175,7 @@ describe('WidgetQueryControls', () => {
 
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
       fireEvent.click(resetQueryFilterButton);
-      await waitFor(() => expect(execute).toHaveBeenCalled());
+      await waitFor(() => expect(executeActiveQuery).toHaveBeenCalled());
     });
 
     it('emptying `globalOverride` prop removes notifications', async () => {
