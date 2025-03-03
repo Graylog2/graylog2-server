@@ -57,7 +57,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -146,7 +146,7 @@ public class AggregationSearchUtilsTest {
                 ))
                 .build();
 
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> null);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
 
         assertThat(eventsWithContext).hasSize(1);
 
@@ -264,7 +264,7 @@ public class AggregationSearchUtilsTest {
                 ))
                 .build();
 
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> null);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
 
         assertThat(eventsWithContext).hasSize(1);
         assertThat(eventsWithContext.get(0).eventModifierState()).hasSize(1);
@@ -357,7 +357,7 @@ public class AggregationSearchUtilsTest {
                 ))
                 .build();
 
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> null);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
 
         assertThat(eventsWithContext).hasSize(1);
 
@@ -473,9 +473,8 @@ public class AggregationSearchUtilsTest {
                 ))
                 .build();
 
-        final Function<Event, Void> eventDecorator = (event) -> {
+        final Consumer<Event> eventDecorator = (event) -> {
             event.setField("decorated_field", FieldValue.builder().dataType(FieldValueType.STRING).value("decorated value").build());
-            return null;
         };
         final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, eventDecorator);
 
@@ -515,7 +514,7 @@ public class AggregationSearchUtilsTest {
                 permittedStreams
         );
         final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> null);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
 
         assertThat(eventsWithContext).hasSize(1);
 
@@ -578,7 +577,7 @@ public class AggregationSearchUtilsTest {
                 permittedStreams
         );
         final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> null);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
 
         assertThat(eventsWithContext).hasSize(1);
 
