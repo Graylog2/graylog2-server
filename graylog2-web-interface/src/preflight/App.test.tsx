@@ -19,7 +19,7 @@ import { screen, renderPreflight } from 'wrappedTestingLibrary';
 
 import fetch from 'logic/rest/FetchProvider';
 import { asMock } from 'helpers/mocking';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import App from './App';
 

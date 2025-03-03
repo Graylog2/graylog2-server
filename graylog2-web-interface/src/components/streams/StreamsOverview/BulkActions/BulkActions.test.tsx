@@ -28,7 +28,7 @@ import { indexSets } from 'fixtures/indexSets';
 import { asMock } from 'helpers/mocking';
 import ApiRoutes from 'routing/ApiRoutes';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');

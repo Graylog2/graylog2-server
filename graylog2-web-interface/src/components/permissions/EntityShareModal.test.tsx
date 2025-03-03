@@ -33,7 +33,7 @@ import mockEntityShareState, {
 } from 'fixtures/entityShareState';
 import ActiveShare from 'logic/permissions/ActiveShare';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import EntityShareModal from './EntityShareModal';
 

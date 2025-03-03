@@ -30,7 +30,7 @@ import { adminUser } from 'fixtures/users';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import type { ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');

@@ -28,7 +28,7 @@ import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { adminUser } from 'fixtures/users';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import SavedSearchesModal from './SavedSearchesModal';
 

@@ -23,7 +23,7 @@ import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 import { adminUser } from 'fixtures/users';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import ActionsCell from './ActionsCell';
 

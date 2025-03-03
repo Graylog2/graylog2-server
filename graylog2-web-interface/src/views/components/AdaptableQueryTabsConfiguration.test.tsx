@@ -24,7 +24,7 @@ import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabs
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),

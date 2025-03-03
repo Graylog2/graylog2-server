@@ -41,7 +41,7 @@ import useViewType from 'views/hooks/useViewType';
 import fetchSearch from 'views/logic/views/fetchSearch';
 import useWidgetResults from 'views/components/useWidgetResults';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 

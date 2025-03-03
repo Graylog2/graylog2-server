@@ -22,7 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { asMock } from 'helpers/mocking';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import BulkActions from './BulkActions';
 

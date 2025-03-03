@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import HighlightingRule from './HighlightingRule';
 

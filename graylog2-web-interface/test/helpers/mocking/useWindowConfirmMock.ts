@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-// eslint-disable-next-line import/prefer-default-export
-export const useWindowConfirmMock = () => {
+const useWindowConfirmMock = () => {
   let originalWindowConfirm;
 
   beforeEach(() => {
@@ -28,3 +27,5 @@ export const useWindowConfirmMock = () => {
     window.confirm = originalWindowConfirm;
   });
 };
+
+export default useWindowConfirmMock;

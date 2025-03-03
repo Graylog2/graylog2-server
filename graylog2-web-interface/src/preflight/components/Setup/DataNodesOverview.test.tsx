@@ -21,7 +21,7 @@ import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
 import { dataNodes } from 'fixtures/dataNodes';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('preflight/hooks/useDataNodes');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));

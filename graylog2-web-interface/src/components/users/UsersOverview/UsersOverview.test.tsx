@@ -24,7 +24,7 @@ import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/use
 import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
 import { UsersActions } from 'stores/users/UsersStore';
-import { useWindowConfirmMock } from 'helpers/mocking/WindowMock';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import UsersOverview from './UsersOverview';
 
