@@ -14,21 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog.plugins.views.search.jobs;
 
-import {Panel} from 'components/bootstrap';
-import {ExternalLink} from 'components/common';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-export default function SidebarPermissions() {
+import static org.graylog.plugins.views.search.jobs.SearchJobState.PROGRESS_FIELD;
+import static org.graylog.plugins.views.search.jobs.SearchJobState.STATUS_FIELD;
 
-  return (
-    <Panel bsStyle="info" header={<span>AWS Policy Permissions</span>}>
-      <p>
-        Please refer to the{' '}
-        <ExternalLink href="https://go2docs.graylog.org/current/getting_in_log_data/aws_kinesis_cloudwatch_input.html">official documentation</ExternalLink>
-        {' '}for information on required AWS permissions.<br />
-      </p>
-
-    </Panel>
-  );
+public record SearchJobExecutionState(@JsonProperty(STATUS_FIELD) SearchJobStatus status,
+                                      @JsonProperty(PROGRESS_FIELD) int progress) {
 }

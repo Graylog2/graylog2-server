@@ -179,7 +179,7 @@ const newPipelineConfig = {
 };
 
 const goToStartInputStep = async () => {
-  const nextButton = await screen.findByRole('button', { name: /& Start Input/i, hidden: true });
+  const nextButton = await screen.findByRole('button', { name: /Next/i, hidden: true });
 
   fireEvent.click(nextButton);
 };
