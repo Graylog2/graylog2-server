@@ -64,11 +64,11 @@ public class InMemorySearchJobService implements SearchJobService {
 
     @Override
     public Optional<SearchJobDTO> load(final String id,
-                                       final SearchUser searchUser) throws ForbiddenException {
-        final SearchJob searchJob = getFromCache(id);
+                                       final SearchUser searchUser) {
+        final SearchJob searchJob = getFromCache(id, searchUser);
         if (searchJob == null) {
             return Optional.empty();
-        } else if (hasPermissionToAccessJob(searchUser, searchJob.getOwner())) {
+        } else {
             if (searchJob.getResultFuture() != null) {
                 try {
                     // force a "conditional join", to catch fast responses without having to poll
@@ -77,13 +77,34 @@ public class InMemorySearchJobService implements SearchJobService {
                 }
             }
             return Optional.of(SearchJobDTO.fromSearchJob(searchJob));
-        } else {
-            throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
         }
     }
 
     @Override
-    public SearchJob getFromCache(final String id) {
-        return cache.getIfPresent(id);
+    public boolean cancel(final String id, final SearchUser searchUser) {
+        final SearchJob searchJob = getFromCache(id, searchUser);
+        if (searchJob == null) {
+            return false;
+        } else {
+            searchJob.cancel();
+            return true;
+        }
+    }
+
+    public SearchJob getFromCache(final String id, final SearchUser searchUser) {
+        final SearchJob job = cache.getIfPresent(id);
+        if (job != null) {
+            if (hasPermissionToAccessJob(searchUser, job.getOwner())) {
+                return job;
+            } else {
+                throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isInCache(String jobId) {
+        return cache.getIfPresent(jobId) != null;
     }
 }
