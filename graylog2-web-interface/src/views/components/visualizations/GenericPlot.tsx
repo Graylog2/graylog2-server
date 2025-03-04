@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useContext, useMemo, useCallback } from 'react';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css, useTheme, createGlobalStyle } from 'styled-components';
 import merge from 'lodash/merge';
 import type { Layout } from 'plotly.js';
 
@@ -35,10 +35,6 @@ export type PlotLayout = Layout;
 
 const StyledPlot = styled(Plot)(
   ({ theme }) => css`
-    div.plotly-notifier {
-      visibility: hidden;
-    }
-
     .customPopover .popover-content {
       padding: 0;
     }
@@ -59,6 +55,12 @@ const StyledPlot = styled(Plot)(
     }
   `,
 );
+
+const DisableNotifier = createGlobalStyle`
+  div.plotly-notifier {
+    visibility: hidden;
+  }
+`;
 
 export type OnClickMarkerEvent = {
   x: string;
@@ -267,18 +269,21 @@ const GenericPlot = ({
   }, [onRenderComplete, onAfterPlot]);
 
   return (
-    <StyledPlot
-      data={plotChartData}
-      useResizeHandler
-      layout={plotLayout}
-      style={style}
-      onAfterPlot={_onAfterPlot}
-      onClick={interactive ? _onMarkerClick : () => false}
-      onHover={_onHoverMarker}
-      onUnhover={onUnhoverMarker}
-      onRelayout={interactive ? _onRelayout : () => {}}
-      config={config}
-    />
+    <>
+      <DisableNotifier />
+      <StyledPlot
+        data={plotChartData}
+        useResizeHandler
+        layout={plotLayout}
+        style={style}
+        onAfterPlot={_onAfterPlot}
+        onClick={interactive ? _onMarkerClick : () => false}
+        onHover={_onHoverMarker}
+        onUnhover={onUnhoverMarker}
+        onRelayout={interactive ? _onRelayout : () => {}}
+        config={config}
+      />
+    </>
   );
 };
 
