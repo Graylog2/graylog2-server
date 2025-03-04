@@ -85,6 +85,9 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
     @Parameter("disable_native_system_stats_collector")
     private boolean disableNativeSystemStatsCollector = false;
 
+    @Parameter(value = "http_user_agent")
+    private String httpUserAgent = "Graylog";
+
     @Parameter(value = "http_proxy_uri")
     private URI httpProxyUri;
 
@@ -177,6 +180,10 @@ public abstract class BaseConfiguration extends PathConfiguration implements Com
 
     public boolean isDisableNativeSystemStatsCollector() {
         return disableNativeSystemStatsCollector;
+    }
+
+    public String getHttpUserAgent() {
+        return httpUserAgent;
     }
 
     public URI getHttpProxyUri() {
