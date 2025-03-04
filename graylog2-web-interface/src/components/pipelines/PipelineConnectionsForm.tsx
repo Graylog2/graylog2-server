@@ -32,6 +32,7 @@ type Props = {
   connections: PipelineConnectionsType[];
   streams: Stream[];
   save: (newConnection, callback) => void;
+  disableEdit: boolean;
 };
 
 type FormattedStream = {
@@ -42,7 +43,7 @@ type FormattedStream = {
 const formatStreams = (streams: Stream[]): FormattedStream[] =>
   streams.map((s) => ({ value: s.id, label: s.title })).sort((s1, s2) => naturalSort(s1.label, s2.label));
 
-const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props) => {
+const PipelineConnectionsForm = ({ pipeline, connections, streams, save, disableEdit }: Props) => {
   const currentUser = useCurrentUser();
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -94,7 +95,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
   return (
     <span>
       <Button
-        disabled={!isPermitted(currentUser.permissions, 'pipeline_connection:edit')}
+        disabled={!isPermitted(currentUser.permissions, 'pipeline_connection:edit') || disableEdit}
         onClick={_openModal}
         bsStyle="info">
         <span>Edit connections</span>
