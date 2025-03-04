@@ -152,10 +152,6 @@ const GlobalThemeStyles = createGlobalStyle(
       margin-left: 5px;
     }
 
-    button {
-      line-height: ${theme.fonts.lineHeight.body};
-    }
-
     small {
       font-size: ${theme.fonts.size.small};
     }
