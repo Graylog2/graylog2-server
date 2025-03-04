@@ -54,7 +54,6 @@ import type { ParameterBindings } from 'views/logic/search/SearchExecutionState'
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type SearchResult from 'views/logic/SearchResult';
-import type { WidgetMapping } from 'views/logic/views/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
@@ -62,6 +61,7 @@ import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
 import type { Event } from 'components/events/events/types';
 import type { PluggableReducer } from 'store';
+import type { WidgetMapping } from 'views/logic/views/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -448,7 +448,7 @@ export interface ViewState {
 
 export type SearchExecutionResult = {
   result: SearchResult;
-  widgetMapping: WidgetMapping;
+  widgetMapping?: WidgetMapping;
 };
 
 export type JobIdsState = JobIds | null;
@@ -456,7 +456,7 @@ export interface SearchExecution {
   executionState: SearchExecutionState;
   result: SearchExecutionResult;
   isLoading: boolean;
-  widgetsToSearch: Array<string>;
+  searchTypesToSearch: Array<string>;
   jobIds?: JobIds | null;
 }
 

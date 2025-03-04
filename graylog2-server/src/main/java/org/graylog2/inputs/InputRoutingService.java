@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
@@ -192,16 +193,21 @@ public class InputRoutingService {
     public void handleInputDeleted(InputDeletedEvent event) {
         ruleService.loadAll().stream()
                 .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.inputId(), event.inputTitle()))
-                .forEach(ruleDao -> {
-                    ruleService.delete(ruleDao.id());
-                    handleRuleDeleted(ruleDao.title());
-                });
+                .forEach(ruleService::delete);
+    }
+
+    @Subscribe
+    public void handleRuleDeleted(RulesChangedEvent event) {
+        event.deletedRules().stream()
+                .map(RulesChangedEvent.Reference::title)
+                .filter(this::isSystemRulePattern)
+                .forEach(this::deleteFromDefaultPipeline);
     }
 
     /**
      * Update default pipeline when a routing rule is deleted.
      */
-    private void handleRuleDeleted(String ruleTitle) {
+    private void deleteFromDefaultPipeline(String ruleTitle) {
         try {
             PipelineDao pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
             PipelineSource pipelineSource = PipelineSource.fromDao(pipelineRuleParser, pipelineDao);
