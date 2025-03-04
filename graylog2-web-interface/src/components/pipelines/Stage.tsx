@@ -35,9 +35,10 @@ type Props = {
   isLastStage: boolean;
   onUpdate: (nextStage: StageType, callback: () => void) => void;
   onDelete: () => void;
+  disableEdit?: boolean;
 };
 
-const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
+const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit = false }: Props) => {
   const currentUser = useCurrentUser();
   const { rules: allRules }: { rules: RuleType[] } = useStore(RulesStore);
 
@@ -52,13 +53,13 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
 
   const actions = [
     <Button
-      disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
+      disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
       key={`delete-stage-${stage}`}
       bsStyle="danger"
       onClick={onDelete}>
       Delete
     </Button>,
-    <StageForm key={`edit-stage-${stage}`} pipeline={pipeline} stage={stage} save={onUpdate} />,
+    <StageForm key={`edit-stage-${stage}`} pipeline={pipeline} stage={stage} save={onUpdate} disableEdit={disableEdit} />,
   ];
 
   let description;

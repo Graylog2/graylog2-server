@@ -40,12 +40,17 @@ type Props = {
   description: React.ReactNode;
   path: string;
   topLevel?: boolean;
+  Badge?: React.ComponentType<{ text: React.ReactNode }>;
 };
 
-const NavigationLink = ({ description, path, topLevel = false, ...rest }: Props) => (
-  <LinkContainer key={path} to={path} relativeActive {...rest}>
-    {topLevel ? <NavItem>{description}</NavItem> : <DropdownOption component="a">{description}</DropdownOption>}
-  </LinkContainer>
-);
+const NavigationLink = ({ Badge = undefined, description, path, topLevel = false, ...rest }: Props) => {
+  const title = Badge ? <Badge text={description} /> : description;
+
+  return (
+    <LinkContainer key={path} to={path} relativeActive {...rest}>
+      {topLevel ? <NavItem>{title}</NavItem> : <DropdownOption component="a">{title}</DropdownOption>}
+    </LinkContainer>
+  );
+};
 
 export default NavigationLink;
