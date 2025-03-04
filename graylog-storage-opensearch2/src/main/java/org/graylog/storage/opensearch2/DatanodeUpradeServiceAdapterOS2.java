@@ -22,6 +22,7 @@ import jakarta.inject.Inject;
 import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.FlushResponse;
+import org.graylog.plugins.datanode.dto.ManagerNode;
 import org.graylog.plugins.datanode.dto.Node;
 import org.graylog.plugins.datanode.dto.ShardReplication;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -59,8 +60,8 @@ public class DatanodeUpradeServiceAdapterOS2 implements DatanodeUpgradeServiceAd
     @Override
     public ClusterState getClusterState() {
         final ClusterHealthResponse response = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.cluster().health(new ClusterHealthRequest(), requestOptions));
-        final Request nodesRequest = new Request("GET", "_nodes");
         final String shardReplication = queryShardReplication();
+        final ManagerNode managerNode = managerNode();
         return new ClusterState(
                 response.getStatus().name(),
                 response.getClusterName(),
@@ -72,7 +73,8 @@ public class DatanodeUpradeServiceAdapterOS2 implements DatanodeUpgradeServiceAd
                 response.getActivePrimaryShards(),
                 response.getDelayedUnassignedShards(),
                 Optional.ofNullable(shardReplication).map(v -> v.toUpperCase(Locale.ROOT)).map(ShardReplication::valueOf).orElse(ShardReplication.ALL),
-                nodesResponse(nodesRequest));
+                managerNode,
+                nodesResponse());
     }
 
     @Override
@@ -119,11 +121,23 @@ public class DatanodeUpradeServiceAdapterOS2 implements DatanodeUpgradeServiceAd
         }
     }
 
-    private List<Node> nodesResponse(Request nodesRequest) {
-        final Response nodes = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.getLowLevelClient().performRequest(nodesRequest));
+    private List<Node> nodesResponse() {
+        final Response nodes = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.getLowLevelClient().performRequest(new Request("GET", "_nodes")));
         try {
             final JsonNode parsed = objectMapper.readValue(nodes.getEntity().getContent(), JsonNode.class);
             return parseNodes(parsed.path("nodes"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ManagerNode managerNode() {
+        final Response nodes = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.getLowLevelClient().performRequest(new Request("GET", "_cluster/state")));
+        try {
+            final JsonNode parsed = objectMapper.readValue(nodes.getEntity().getContent(), JsonNode.class);
+            final String managerNodeID = parsed.path("cluster_manager_node").asText();
+            final String managerNodeName = parsed.path("nodes").path(managerNodeID).path("name").asText();
+            return new ManagerNode(managerNodeID, managerNodeName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

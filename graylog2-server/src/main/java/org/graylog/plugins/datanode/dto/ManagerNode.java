@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode;
+package org.graylog.plugins.datanode.dto;
 
-public record DataNodeInformation(String nodeName, org.graylog2.cluster.nodes.DataNodeStatus dataNodeStatus, String datanodeVersion,
-                                  String hostname, String ip, String opensearchVersion, java.util.Set<String> roles,
-                                  boolean upgradePossible, boolean isManagerNode) {
+public record ManagerNode(String nodeUid, String name) {
 }

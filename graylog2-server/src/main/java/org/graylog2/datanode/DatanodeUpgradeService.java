@@ -21,6 +21,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
 import org.graylog.plugins.datanode.dto.ClusterState;
+import org.graylog.plugins.datanode.dto.FlushResponse;
 import org.graylog.plugins.datanode.dto.Node;
 import org.graylog.plugins.datanode.dto.ShardReplication;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -47,7 +48,10 @@ public class DatanodeUpgradeService {
     }
 
     public DatanodeUpgradeStatus status() {
-        final Version serverVersion = Version.CURRENT_CLASSPATH;
+        //final Version serverVersion = Version.CURRENT_CLASSPATH;
+        final Version serverVersion = new Version(com.github.zafarkhaja.semver.Version.parse("6.2.0"));
+
+
         final ClusterState clusterState = upgradeService.getClusterState();
         final Collection<DataNodeDto> dataNodes = nodeService.allActive().values();
 
@@ -72,22 +76,36 @@ public class DatanodeUpgradeService {
     private static DataNodeInformation remix(DataNodeDto node, Set<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
         final Optional<Node> opensearchInformation = clusterState.nodes().stream().filter(n -> n.host().equals(node.getHostname())).findFirst();
 
-        final Boolean isManagerNode = opensearchInformation.map(n -> n.roles().contains(CLUSTER_MANAGER_ROLE)).orElse(false);
+        final String nodeName = clusterState.getName(node.getHostname());
+
+        final boolean isManagerNode = clusterState.managerNode().name().equals(nodeName);
         final boolean isLatestVersion = isVersionEqualIgnoreBuildMetadata(node.getDatanodeVersion(), serverVersion);
         boolean upgradePossible = clusterReadyForUpgrade && !isLatestVersion && (!isManagerNode || toUpgradeDataNodes.size() == 1);
 
         return new DataNodeInformation(
+                nodeName,
                 node.getDataNodeStatus(),
                 node.getDatanodeVersion(),
                 node.getHostname(),
                 opensearchInformation.map(Node::ip).orElse(null),
                 opensearchInformation.map(Node::version).orElse(null),
                 opensearchInformation.map(Node::roles).orElse(null),
-                upgradePossible);
+                upgradePossible,
+                isManagerNode);
     }
 
     protected static boolean isVersionEqualIgnoreBuildMetadata(String datanodeVersion, Version serverVersion) {
         final com.github.zafarkhaja.semver.Version datanode = com.github.zafarkhaja.semver.Version.parse(datanodeVersion);
         return serverVersion.getVersion().compareToIgnoreBuildMetadata(datanode) == 0;
+    }
+
+    public FlushResponse stopSync() {
+        upgradeService.disableShardReplication();
+        return upgradeService.flush();
+    }
+
+    public FlushResponse startSync() {
+        upgradeService.enableShardReplication();
+        return upgradeService.flush();
     }
 }

@@ -26,12 +26,13 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.datanode.dto.FlushResponse;
 import org.graylog2.datanode.DatanodeUpgradeService;
 import org.graylog2.datanode.DatanodeUpgradeStatus;
 import org.graylog2.shared.security.RestPermissions;
 
 @RequiresAuthentication
-@Api(value = "DatanodeUpgrade", description = "Endpoint for suppport of rolling upgrade of data nodes")
+@Api(value = "DatanodeUpgrade", description = "Endpoint for support of rolling upgrade of data nodes")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/datanodes/upgrade")
 public class DatanodeUpgradeResource {
@@ -52,4 +53,19 @@ public class DatanodeUpgradeResource {
         return upgradeService.status();
     }
 
+    @GET
+    @Path("/stop-sync")
+    @ApiOperation("Display existing cluster configuration")
+    @RequiresPermissions(RestPermissions.DATANODE_READ)
+    public FlushResponse stopSync() {
+        return upgradeService.stopSync();
+    }
+
+    @GET
+    @Path("/start-sync")
+    @ApiOperation("Display existing cluster configuration")
+    @RequiresPermissions(RestPermissions.DATANODE_READ)
+    public FlushResponse startSync  () {
+        return upgradeService.startSync();
+    }
 }
