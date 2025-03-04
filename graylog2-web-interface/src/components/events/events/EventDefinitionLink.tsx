@@ -21,7 +21,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
-const EventDefinitionLink = ({ title, id }: { title: string | undefined, id: string }) => {
+const EventDefinitionLink = ({ title, id }: { title: string | undefined; id: string }) => {
   const { permissions } = useCurrentUser();
 
   if (!title) {
@@ -29,11 +29,7 @@ const EventDefinitionLink = ({ title, id }: { title: string | undefined, id: str
   }
 
   if (isPermitted(permissions, `eventdefinitions:edit:${id}`)) {
-    return (
-      <Link to={Routes.ALERTS.DEFINITIONS.edit(id)}>
-        {title}
-      </Link>
-    );
+    return <Link to={Routes.ALERTS.DEFINITIONS.edit(id)}>{title}</Link>;
   }
 
   return <>{title}</>;

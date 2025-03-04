@@ -21,10 +21,11 @@ import userEvent from '@testing-library/user-event';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import HighlightingRule from './HighlightingRule';
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/logic/slices/highlightActions', () => ({
   updateHighlightingRule: jest.fn(() => Promise.resolve()),
@@ -37,10 +38,7 @@ describe('HighlightingRule', () => {
   const rule = Rule.create('response_time', '250', undefined, StaticColor.create('#f44242'));
 
   const SUT = (props: Partial<React.ComponentProps<typeof HighlightingRule>>) => (
-    <HighlightingRule rule={rule}
-                      onUpdate={() => Promise.resolve()}
-                      onDelete={() => Promise.resolve()}
-                      {...props} />
+    <HighlightingRule rule={rule} onUpdate={() => Promise.resolve()} onDelete={() => Promise.resolve()} {...props} />
   );
 
   it('should display field and value of rule', async () => {
@@ -59,7 +57,13 @@ describe('HighlightingRule', () => {
     userEvent.click(await screen.findByTitle(/#fbfdd8/i));
 
     await waitFor(() => {
-      expect(onUpdate).toHaveBeenCalledWith(rule, rule.field, rule.value, rule.condition, StaticColor.create('#fbfdd8'));
+      expect(onUpdate).toHaveBeenCalledWith(
+        rule,
+        rule.field,
+        rule.value,
+        rule.condition,
+        StaticColor.create('#fbfdd8'),
+      );
     });
   });
 
@@ -90,17 +94,9 @@ describe('HighlightingRule', () => {
   });
 
   describe('rule removal:', () => {
-    let oldConfirm = null;
     const findDeleteIcon = () => screen.findByTitle('Remove this Highlighting Rule');
 
-    beforeEach(async () => {
-      oldConfirm = window.confirm;
-      window.confirm = jest.fn(() => false);
-    });
-
-    afterEach(() => {
-      window.confirm = oldConfirm;
-    });
+    useWindowConfirmMock();
 
     it('asks for confirmation before rule is removed', async () => {
       render(<SUT />);

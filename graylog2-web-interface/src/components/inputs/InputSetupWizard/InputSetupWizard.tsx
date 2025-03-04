@@ -21,10 +21,10 @@ import Wizard from './Wizard';
 import type { WizardData } from './types';
 
 type Props = {
-  show: boolean,
-  input: WizardData['input'],
-  onClose: () => void,
-}
+  show: boolean;
+  input: WizardData['input'];
+  onClose: () => void;
+};
 
 const InputSetupWizard = ({ show, input, onClose }: Props) => (
   <InputSetupWizardProvider>

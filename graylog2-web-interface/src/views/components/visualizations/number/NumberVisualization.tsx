@@ -35,10 +35,12 @@ import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import AutoFontSizer from './AutoFontSizer';
 import Trend from './Trend';
 
-const Container = styled.div<{ $height: number }>(({ $height }) => css`
-  height: ${$height}px;
-  width: 100%;
-`);
+const Container = styled.div<{ $height: number }>(
+  ({ $height }) => css`
+    height: ${$height}px;
+    width: 100%;
+  `,
+);
 
 const GridContainer = styled(Container)`
   display: grid;
@@ -86,9 +88,7 @@ const _extractValueAndField = (rows: Rows) => {
 const _extractFirstSeriesName = (config) => {
   const { series = [] } = config;
 
-  return series.length === 0
-    ? undefined
-    : series[0].function;
+  return series.length === 0 ? undefined : series[0].function;
 };
 
 const NumberVisualization = ({ config, fields, data, height: heightProp }: VisualizationComponentProps) => {
@@ -96,7 +96,8 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
   const onRenderComplete = useContext(RenderCompletionCallback);
-  const visualizationConfig = (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
+  const visualizationConfig =
+    (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
 
   const field = _extractFirstSeriesName(config);
 
@@ -125,11 +126,13 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
         {({ height, width }) => (
           <AutoFontSizer height={height} width={width} center>
             <CustomHighlighting field={field} value={value}>
-              <Value field={field}
-                     type={fieldTypeFor(field, fields)}
-                     value={value}
-                     render={DecoratedValue}
-                     unit={unit} />
+              <Value
+                field={field}
+                type={fieldTypeFor(field, fields)}
+                value={value}
+                render={DecoratedValue}
+                unit={unit}
+              />
             </CustomHighlighting>
           </AutoFontSizer>
         )}
@@ -138,11 +141,13 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
         <TrendBox>
           {({ height, width }) => (
             <AutoFontSizer height={height} width={width} target={targetRef}>
-              <Trend ref={targetRef}
-                     current={value}
-                     previous={previousValue}
-                     trendPreference={visualizationConfig.trendPreference}
-                     unit={unit} />
+              <Trend
+                ref={targetRef}
+                current={value}
+                previous={previousValue}
+                trendPreference={visualizationConfig.trendPreference}
+                unit={unit}
+              />
             </AutoFontSizer>
           )}
         </TrendBox>

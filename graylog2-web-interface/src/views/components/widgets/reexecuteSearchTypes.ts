@@ -17,9 +17,9 @@
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState, SearchExecutionResult, ExtraArguments } from 'views/types';
-import { selectView } from 'views/logic/slices/viewSelectors';
+import { selectView, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import {
   selectGlobalOverride,
@@ -28,35 +28,46 @@ import {
 } from 'views/logic/slices/searchExecutionSelectors';
 import { executeWithExecutionState } from 'views/logic/slices/searchExecutionSlice';
 
-const reexecuteSearchTypes = (
-  searchTypes: SearchTypeOptions,
-  effectiveTimerange?: TimeRange,
-) => (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
-  const state = getState();
-  const globalOverride = selectGlobalOverride(state);
-  const globalQuery = globalOverride?.query;
-  const parameterBindings = selectParameterBindings(state);
-  const view = selectView(state);
-  const searchTypeIds = Object.keys(searchTypes);
+const reexecuteSearchTypes =
+  (searchTypes: SearchTypeOptions, effectiveTimerange?: TimeRange) =>
+  (dispatch: ViewsDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
+    const state = getState();
+    const activeQuery = selectActiveQuery(state);
+    const globalOverride = selectGlobalOverride(state);
+    const globalQuery = globalOverride?.query;
+    const parameterBindings = selectParameterBindings(state);
+    const view = selectView(state);
+    const searchTypeIds = Object.keys(searchTypes);
+    const newGlobalOverride: GlobalOverride = new GlobalOverride(
+      effectiveTimerange,
+      globalQuery,
+      searchTypeIds,
+      searchTypes,
+    );
 
-  const newGlobalOverride: GlobalOverride = new GlobalOverride(
-    effectiveTimerange,
-    globalQuery,
-    searchTypeIds,
-    searchTypes,
-  );
+    const executionState = new SearchExecutionState(parameterBindings, newGlobalOverride);
 
-  const executionState = new SearchExecutionState(parameterBindings, newGlobalOverride);
+    const handleSearchResult = (searchExecutionResult: SearchExecutionResult): SearchExecutionResult => {
+      const { result: searchResult } = searchExecutionResult;
+      const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
+      const { result } = selectSearchExecutionResult(getState());
 
-  const handleSearchResult = (searchExecutionResult: SearchExecutionResult): SearchExecutionResult => {
-    const { result: searchResult, widgetMapping } = searchExecutionResult;
-    const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
-    const { result } = selectSearchExecutionResult(getState());
+      return { result: result.updateSearchTypes(updatedSearchTypes), widgetMapping: view.widgetMapping };
+    };
 
-    return { result: result.updateSearchTypes(updatedSearchTypes), widgetMapping };
+    return dispatch(
+      executeWithExecutionState(
+        view.search,
+        activeQuery,
+        [],
+        executionState,
+        {
+          ...searchExecutors,
+          resultMapper: handleSearchResult,
+        },
+        view.widgetMapping,
+      ),
+    );
   };
-
-  return dispatch(executeWithExecutionState(view, [], executionState, { ...searchExecutors, resultMapper: handleSearchResult }));
-};
 
 export default reexecuteSearchTypes;

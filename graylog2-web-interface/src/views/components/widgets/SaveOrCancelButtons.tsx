@@ -24,7 +24,7 @@ import DisableSubmissionStateContext from 'views/components/contexts/DisableSubm
 export const UPDATE_WIDGET_BTN_TEXT = 'Update widget';
 
 type Props = {
-  onCancel: () => void,
+  onCancel: () => void;
 };
 
 const SaveOrCancelButtons = ({ onCancel }: Props) => {
@@ -35,23 +35,27 @@ const SaveOrCancelButtons = ({ onCancel }: Props) => {
   const _onSubmit = () => {
     setIsSubmitting(true);
 
-    return applyAllWidgetChanges().then(() => {
-      setIsSubmitting(false);
-    }).catch(() => {
-      setIsSubmitting(false);
-    });
+    return applyAllWidgetChanges()
+      .then(() => {
+        setIsSubmitting(false);
+      })
+      .catch(() => {
+        setIsSubmitting(false);
+      });
   };
 
   return (
-    <ModalSubmit isAsyncSubmit
-                 submitButtonText={UPDATE_WIDGET_BTN_TEXT}
-                 submitLoadingText="Updating widget..."
-                 onSubmit={_onSubmit}
-                 submitButtonType="button"
-                 disabledSubmit={disabledSubmit}
-                 isSubmitting={isSubmitting}
-                 displayCancel
-                 onCancel={onCancel} />
+    <ModalSubmit
+      isAsyncSubmit
+      submitButtonText={UPDATE_WIDGET_BTN_TEXT}
+      submitLoadingText="Updating widget..."
+      onSubmit={_onSubmit}
+      submitButtonType="button"
+      disabledSubmit={disabledSubmit}
+      isSubmitting={isSubmitting}
+      displayCancel
+      onCancel={onCancel}
+    />
   );
 };
 

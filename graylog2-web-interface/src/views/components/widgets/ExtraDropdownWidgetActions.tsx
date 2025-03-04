@@ -20,7 +20,7 @@ import { useContext, useMemo } from 'react';
 import type Widget from 'views/logic/widgets/Widget';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -28,40 +28,48 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 
 type Props = {
-  widget: Widget,
+  widget: Widget;
 };
 
 const ExtraDropdownWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  const extraWidgetActions = useMemo(() => pluginWidgetActions
-    .filter(({ isHidden = () => false, position }) => !isHidden(widget) && (position === 'dropdown' || position === undefined))
-    .map(({ title, action, type, disabled = () => false }) => {
-      const _onSelect = () => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'search-widget',
-          app_action_value: type,
-        });
+  const extraWidgetActions = useMemo(
+    () =>
+      pluginWidgetActions
+        .filter(
+          ({ isHidden = () => false, position }) =>
+            !isHidden(widget) && (position === 'dropdown' || position === undefined),
+        )
+        .map(({ title, action, type, disabled = () => false }) => {
+          const _onSelect = () => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
+              app_pathname: getPathnameWithoutId(pathname),
+              app_section: 'search-widget',
+              app_action_value: type,
+            });
 
-        dispatch(action(widget, { widgetFocusContext }));
-      };
+            dispatch(action(widget, { widgetFocusContext }));
+          };
 
-      return (
-        <MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>{title(widget)}</MenuItem>);
-    }), [dispatch, pathname, pluginWidgetActions, sendTelemetry, widget, widgetFocusContext]);
+          return (
+            <MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>
+              {title(widget)}
+            </MenuItem>
+          );
+        }),
+    [dispatch, pathname, pluginWidgetActions, sendTelemetry, widget, widgetFocusContext],
+  );
 
-  return extraWidgetActions.length > 0
-    ? (
-      <>
-        <MenuItem divider />
-        {extraWidgetActions}
-      </>
-    )
-    : null;
+  return extraWidgetActions.length > 0 ? (
+    <>
+      <MenuItem divider />
+      {extraWidgetActions}
+    </>
+  ) : null;
 };
 
 export default ExtraDropdownWidgetActions;

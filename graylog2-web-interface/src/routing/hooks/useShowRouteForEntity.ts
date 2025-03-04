@@ -75,7 +75,7 @@ const useShowRouteForEntity = (id: string, type: string) => {
     case 'output':
       return Routes.SYSTEM.OUTPUTS;
     default:
-      return assertUnreachable(type as never ?? '(undefined)', 'Can\'t find route for type');
+      return assertUnreachable((type as never) ?? '(undefined)', "Can't find route for type");
   }
 };
 

@@ -17,5 +17,5 @@
 import { useLocation } from 'react-router-dom';
 import type { Location } from 'react-router-dom';
 
-const _useLocation = <T, >(): Location<T> => useLocation();
+const _useLocation = <T>(): Location<T> => useLocation();
 export default _useLocation;

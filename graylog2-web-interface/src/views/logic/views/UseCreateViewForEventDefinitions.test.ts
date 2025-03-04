@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { renderHook } from 'wrappedTestingLibrary/hooks';
-import ObjectID from 'bson-objectid';
 
 import {
-  mockedMappedAggregation, mockedViewWithOneAggregationED, mockedViewWithTwoAggregationsED,
+  mockedMappedAggregation,
+  mockedViewWithOneAggregationED,
+  mockedViewWithTwoAggregationsED,
   mockEventDefinitionOneAggregation,
   mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
@@ -27,6 +28,7 @@ import generateId from 'logic/generateId';
 import asMock from 'helpers/mocking/AsMock';
 import type View from 'views/logic/views/View';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import generateObjectId from 'logic/generateObjectId';
 
 const counter = () => {
   let index = 0;
@@ -45,7 +47,14 @@ const generateIdCounterOneAggregation = counter();
 const objectIdCounterOneAggregations = counter();
 
 const mockedGenerateIdTwoAggregations = () => {
-  const idSet = ['query-id', 'mc-widget-id', 'allm-widget-id', 'field1-widget-id', 'field2-widget-id', 'summary-widget-id'];
+  const idSet = [
+    'query-id',
+    'mc-widget-id',
+    'allm-widget-id',
+    'field1-widget-id',
+    'field2-widget-id',
+    'summary-widget-id',
+  ];
   const index = generateIdCounterTwoAggregations();
 
   return idSet[index];
@@ -77,8 +86,8 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 }));
 
 jest.mock('logic/generateId', () => jest.fn());
+jest.mock('logic/generateObjectId', () => jest.fn());
 
-jest.mock('bson-objectid', () => jest.fn());
 const mock_color = StaticColor.create('#ffffff');
 
 jest.mock('views/logic/views/formatting/highlighting/HighlightingRule', () => ({
@@ -90,10 +99,12 @@ jest.mock('views/logic/views/formatting/highlighting/HighlightingRule', () => ({
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -107,12 +118,14 @@ describe('UseCreateViewForEventDefinition', () => {
 
   it('should create view with 2 aggregation widgets and one summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdTwoAggregations);
+    asMock(generateObjectId).mockImplementation(mockedObjectIdTwoAggregations);
 
-    asMock(ObjectID).mockImplementation(() => (({
-      toString: () => mockedObjectIdTwoAggregations(),
-    }) as ObjectID));
-
-    const { result } = renderHook(() => UseCreateViewForEventDefinition({ eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation }));
+    const { result } = renderHook(() =>
+      UseCreateViewForEventDefinition({
+        eventDefinition: mockEventDefinitionTwoAggregations,
+        aggregations: mockedMappedAggregation,
+      }),
+    );
     const view = await result.current.then((r) => r);
 
     expect(withCurrentDate(view)).toEqual(withCurrentDate(mockedViewWithTwoAggregationsED));
@@ -120,12 +133,14 @@ describe('UseCreateViewForEventDefinition', () => {
 
   it('should create view with 1 aggregation widgets and without summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregation);
+    asMock(generateObjectId).mockImplementation(mockedObjectIdOneAggregation);
 
-    asMock(ObjectID).mockImplementation(() => (({
-      toString: () => mockedObjectIdOneAggregation(),
-    }) as ObjectID));
-
-    const { result } = renderHook(() => UseCreateViewForEventDefinition({ eventDefinition: mockEventDefinitionOneAggregation, aggregations: [mockedMappedAggregation[0]] }));
+    const { result } = renderHook(() =>
+      UseCreateViewForEventDefinition({
+        eventDefinition: mockEventDefinitionOneAggregation,
+        aggregations: [mockedMappedAggregation[0]],
+      }),
+    );
     const view = await result.current.then((r) => r);
 
     expect(withCurrentDate(view)).toEqual(withCurrentDate(mockedViewWithOneAggregationED));

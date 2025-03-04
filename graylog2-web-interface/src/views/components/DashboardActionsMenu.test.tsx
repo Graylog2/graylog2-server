@@ -39,10 +39,7 @@ import DashboardActionsMenu from './DashboardActionsMenu';
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
-
-jest.mock('bson-objectid', () => jest.fn(() => ({
-  toString: jest.fn(() => 'new-dashboard-id'),
-})));
+jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-dashboard-id'));
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
@@ -62,13 +59,22 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
 }));
 
 describe('DashboardActionsMenu', () => {
-  const mockView = View.create().toBuilder().id('view-id').type(View.Type.Dashboard)
+  const mockView = View.create()
+    .toBuilder()
+    .id('view-id')
+    .type(View.Type.Dashboard)
     .search(Search.builder().build())
     .title('View title')
     .createdAt(new Date('2019-10-16T14:38:44.681Z'))
     .build();
 
-  const SUT = ({ providerOverrides, view = mockView }: { providerOverrides?: Partial<LayoutState>, view?: View }) => (
+  const SUT = ({
+    providerOverrides = undefined,
+    view = mockView,
+  }: {
+    providerOverrides?: Partial<LayoutState>;
+    view?: View;
+  }) => (
     <TestStoreProvider view={view}>
       <HotkeysProvider>
         <SearchPageLayoutProvider value={providerOverrides}>
@@ -98,10 +104,13 @@ describe('DashboardActionsMenu', () => {
   };
 
   beforeEach(() => {
-    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-      .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
-      .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
-      .build());
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
+        .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
+        .build(),
+    );
 
     asMock(useSaveViewFormControls).mockReturnValue([]);
   });
@@ -118,19 +127,25 @@ describe('DashboardActionsMenu', () => {
   });
 
   it('should extend a dashboard with plugin data on duplication', async () => {
-    asMock(useSaveViewFormControls).mockReturnValue([{
-      component: () => <div>Pluggable component!</div>,
-      id: 'example-plugin-component',
-      onDashboardDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This dashboard has been extended by a plugin').build()),
-    }],
-    );
+    asMock(useSaveViewFormControls).mockReturnValue([
+      {
+        component: () => <div>Pluggable component!</div>,
+        id: 'example-plugin-component',
+        onDashboardDuplication: (view: View) =>
+          Promise.resolve(view.toBuilder().summary('This dashboard has been extended by a plugin').build()),
+      },
+    ]);
 
     render(<SUT view={mockView} />);
 
     await openDashboardSaveForm();
     await submitDashboardSaveForm();
 
-    const updatedDashboard = mockView.toBuilder().id('new-dashboard-id').summary('This dashboard has been extended by a plugin').build();
+    const updatedDashboard = mockView
+      .toBuilder()
+      .id('new-dashboard-id')
+      .summary('This dashboard has been extended by a plugin')
+      .build();
 
     await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard));
   });
@@ -164,7 +179,9 @@ describe('DashboardActionsMenu', () => {
   });
 
   it('should only render "Save As" button in SAVE_COPY layout option', async () => {
-    const { findByTitle, queryByRole, queryByTitle } = render(<SUT providerOverrides={{ sidebar: { isShown: false }, viewActions: SAVE_COPY }} />);
+    const { findByTitle, queryByRole, queryByTitle } = render(
+      <SUT providerOverrides={{ sidebar: { isShown: false }, viewActions: SAVE_COPY }} />,
+    );
 
     const saveButton = queryByTitle(/Save dashboard/);
     const shareButton = queryByTitle(/Share/);
@@ -178,7 +195,9 @@ describe('DashboardActionsMenu', () => {
   });
 
   it('should render no action menu items in BLANK layout option', () => {
-    const { queryByRole, queryByTitle } = render(<SUT providerOverrides={{ sidebar: { isShown: false }, viewActions: BLANK }} />);
+    const { queryByRole, queryByTitle } = render(
+      <SUT providerOverrides={{ sidebar: { isShown: false }, viewActions: BLANK }} />,
+    );
 
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);

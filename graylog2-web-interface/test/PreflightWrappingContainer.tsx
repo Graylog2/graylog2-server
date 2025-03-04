@@ -23,16 +23,14 @@ import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 import DefaultQueryClientProvider from './DefaultQueryClientProvider';
 
 type Props = {
-  children: React.ReactElement,
-}
+  children: React.ReactElement;
+};
 
 const PreflightWrappingContainer = ({ children }: Props) => (
   <PreflightThemeProvider>
     <DefaultQueryClientProvider>
       <MemoryRouter>
-        <ThemeWrapper>
-          {children}
-        </ThemeWrapper>
+        <ThemeWrapper>{children}</ThemeWrapper>
       </MemoryRouter>
     </DefaultQueryClientProvider>
   </PreflightThemeProvider>

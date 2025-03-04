@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
@@ -26,51 +25,31 @@ import NavItemStateIndicator, {
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
 
-import menuItemStyles from './styles/menuItem';
-
-class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
-  // eslint-disable-next-line class-methods-use-this
-  isActive({ props }, activeKey, activeHref) {
-    // NOTE: had to override library as it doesn't respect setting `active={false}`
-    if (props.active === false) {
-      return false;
-    }
-
-    if (
-      props.active
-      || (activeKey != null && props.eventKey === activeKey)
-      || (activeHref && props.href === activeHref)
-    ) {
-      return true;
-    }
-
-    return props.active;
-  }
-}
-
 const StyledMenuDropdown = styled(Menu.Dropdown)`
   z-index: 1032 !important;
 `;
 
-const DropdownTrigger = styled.button<{ $active: boolean }>(({ theme, $active }) => css`
-  background: transparent;
-  border: 0;
-  padding: 0 15px;
-  min-height: ${NAV_ITEM_HEIGHT};
+const DropdownTrigger = styled.button<{ $active: boolean }>(
+  ({ theme, $active }) => css`
+    background: transparent;
+    border: 0;
+    padding: 0 15px;
+    min-height: ${NAV_ITEM_HEIGHT};
 
-  &:hover, &:focus {
-    ${hoverIndicatorStyles(theme)}
-  }
+    &:hover,
+    &:focus {
+      ${hoverIndicatorStyles(theme)}
+    }
 
-  ${$active ? activeIndicatorStyles(theme) : ''}
+    ${$active ? activeIndicatorStyles(theme) : ''}
 
-
-  &:hover,
-  &:focus {
-    color: ${theme.colors.variant.darker.default};
-    background-color: transparent;
-  }
-`);
+    &:hover,
+    &:focus {
+      color: ${theme.colors.variant.darker.default};
+      background-color: transparent;
+    }
+  `,
+);
 
 const NavItem = styled.span`
   display: inline-flex;
@@ -84,14 +63,21 @@ const NavItem = styled.span`
 `;
 
 type Props = {
-  title?: React.ReactNode,
-  inactiveTitle?: string,
-  badge?: React.ComponentType<{ text: React.ReactNode }>,
-  noCaret?: boolean,
-  hoverTitle?: string,
-}
+  Badge?: React.ComponentType<{ text: React.ReactNode }>;
+  title?: React.ReactNode;
+  inactiveTitle?: string;
+  noCaret?: boolean;
+  hoverTitle?: string;
+};
 
-const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret = false, children, hoverTitle }: React.PropsWithChildren<Props>) => {
+const NavDropdown = ({
+  inactiveTitle = undefined,
+  Badge = undefined,
+  title = undefined,
+  noCaret = false,
+  children = undefined,
+  hoverTitle = undefined,
+}: React.PropsWithChildren<Props>) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
   return (
@@ -99,25 +85,15 @@ const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret = false, chil
       <NavItem>
         <Menu.Target>
           <DropdownTrigger $active={isActive} title={hoverTitle}>
-            <NavItemStateIndicator>
-              {Badge ? <Badge text={title} /> : title}
-            </NavItemStateIndicator>
-            {' '}
+            <NavItemStateIndicator>{Badge ? <Badge text={title} /> : title}</NavItemStateIndicator>{' '}
             {noCaret ? null : <span className="caret" />}
           </DropdownTrigger>
         </Menu.Target>
       </NavItem>
-      <StyledMenuDropdown>
-        {children}
-      </StyledMenuDropdown>
+      <StyledMenuDropdown>{children}</StyledMenuDropdown>
     </Menu>
   );
 };
 
-const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`
-  ${menuItemStyles}
-`;
-
 /** @component */
 export default NavDropdown;
-export { ModifiedNavDropdown };

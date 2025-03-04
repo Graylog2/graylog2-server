@@ -15,18 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from 'views/components/widgets/Widget';
 import _Widget from 'views/logic/widgets/Widget';
-import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type View from 'views/logic/views/View';
 import { createViewWithWidgets } from 'fixtures/searches';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import WidgetGrid from './WidgetGrid';
 
@@ -34,15 +32,18 @@ jest.mock('./widgets/Widget', () => () => 'widget');
 
 jest.mock('components/common/ReactGridContainer', () => ({ children }) => <span>{children}</span>);
 
-jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
+jest.mock(
+  'views/components/contexts/WidgetFieldTypesContextProvider',
+  () =>
+    ({ children }) =>
+      children,
+);
 
-const fieldTypes: FieldTypes = {
-  all: Immutable.List(),
-  queryFields: Immutable.Map(),
-};
-const SimpleWidgetGrid = ({ view }: { view?: View }) => (
+const SimpleWidgetGrid = ({ view = undefined }: { view?: View }) => (
   <TestStoreProvider view={view}>
-    <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid /></FieldTypesContext.Provider>
+    <TestFieldTypesContextProvider>
+      <WidgetGrid />
+    </TestFieldTypesContextProvider>
   </TestStoreProvider>
 );
 

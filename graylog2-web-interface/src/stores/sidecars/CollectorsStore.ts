@@ -25,18 +25,17 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 import type { Collector } from 'components/sidecars/types';
 
 type Actions = {
-  getCollector: (id: string) => Promise<Collector>,
-  all: () => Promise<{ collectors: Array<Collector> }>,
-  list: (opts: { query?: string, page?: number, pageSize?: number }) => Promise<unknown>,
-  create: (collector: Collector) => Promise<unknown>,
-  update: (collector: Collector) => Promise<unknown>,
-  delete: (collector: Collector) => Promise<unknown>,
-  copy: (id: string, name: string) => Promise<unknown>,
-  validate: (collector: Collector) => Promise<{ errors: { name: string[] }, failed: boolean }>,
-}
-export const CollectorsActions = singletonActions(
-  'core.Collectors',
-  () => Reflux.createActions<Actions>({
+  getCollector: (id: string) => Promise<Collector>;
+  all: () => Promise<{ collectors: Array<Collector> }>;
+  list: (opts: { query?: string; page?: number; pageSize?: number }) => Promise<unknown>;
+  create: (collector: Collector) => Promise<unknown>;
+  update: (collector: Collector) => Promise<unknown>;
+  delete: (collector: Collector) => Promise<unknown>;
+  copy: (id: string, name: string) => Promise<unknown>;
+  validate: (collector: Collector) => Promise<{ errors: { name: string[] }; failed: boolean }>;
+};
+export const CollectorsActions = singletonActions('core.Collectors', () =>
+  Reflux.createActions<Actions>({
     getCollector: { asyncResult: true },
     all: { asyncResult: true },
     list: { asyncResult: true },
@@ -49,18 +48,17 @@ export const CollectorsActions = singletonActions(
 );
 
 type StoreState = {
-  query: string | undefined,
-  collectors: Array<Collector>,
+  query: string | undefined;
+  collectors: Array<Collector>;
   pagination: {
-    page: number,
-    pageSize: number,
-    total: number,
-  },
-  total: number,
-}
-export const CollectorsStore = singletonStore(
-  'core.Collectors',
-  () => Reflux.createStore<StoreState>({
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+  total: number;
+};
+export const CollectorsStore = singletonStore('core.Collectors', () =>
+  Reflux.createStore<StoreState>({
     listenables: [CollectorsActions],
     sourceUrl: '/sidecar',
     collectors: undefined,
@@ -120,19 +118,17 @@ export const CollectorsStore = singletonStore(
     all() {
       const promise = this._fetchCollectors({ pageSize: 0 });
 
-      promise
-        .then(
-          (response) => {
-            this.collectors = response.collectors;
-            this.propagateChanges();
+      promise.then(
+        (response) => {
+          this.collectors = response.collectors;
+          this.propagateChanges();
 
-            return response.collectors;
-          },
-          (error) => {
-            UserNotification.error(`Fetching collectors failed with status: ${error}`,
-              'Could not retrieve collectors');
-          },
-        );
+          return response.collectors;
+        },
+        (error) => {
+          UserNotification.error(`Fetching collectors failed with status: ${error}`, 'Could not retrieve collectors');
+        },
+      );
 
       CollectorsActions.all.promise(promise);
     },
@@ -140,29 +136,27 @@ export const CollectorsStore = singletonStore(
     list({ query = '', page = 1, pageSize = 10 }) {
       const promise = this._fetchCollectors({ query: query, page: page, pageSize: pageSize });
 
-      promise
-        .then(
-          (response) => {
-            this.query = response.query;
+      promise.then(
+        (response) => {
+          this.query = response.query;
 
-            this.pagination = {
-              page: response.pagination.page,
-              pageSize: response.pagination.per_page,
-              total: response.pagination.total,
-            };
+          this.pagination = {
+            page: response.pagination.page,
+            pageSize: response.pagination.per_page,
+            total: response.pagination.total,
+          };
 
-            this.total = response.total;
-            this.paginatedCollectors = response.collectors;
+          this.total = response.total;
+          this.paginatedCollectors = response.collectors;
 
-            this.propagateChanges();
+          this.propagateChanges();
 
-            return response.collectors;
-          },
-          (error) => {
-            UserNotification.error(`Fetching collectors failed with status: ${error}`,
-              'Could not retrieve collectors');
-          },
-        );
+          return response.collectors;
+        },
+        (error) => {
+          UserNotification.error(`Fetching collectors failed with status: ${error}`, 'Could not retrieve collectors');
+        },
+      );
 
       CollectorsActions.list.promise(promise);
     },
@@ -174,20 +168,18 @@ export const CollectorsStore = singletonStore(
     create(collector) {
       const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors`), collector);
 
-      promise
-        .then(
-          (response) => {
-            UserNotification.success('', 'Collector successfully created');
-            this.collectors = response.collectors;
-            this.propagateChanges();
+      promise.then(
+        (response) => {
+          UserNotification.success('', 'Collector successfully created');
+          this.collectors = response.collectors;
+          this.propagateChanges();
 
-            return this.collectors;
-          },
-          (error) => {
-            UserNotification.error(`Fetching collectors failed with status: ${error}`,
-              'Could not retrieve collectors');
-          },
-        );
+          return this.collectors;
+        },
+        (error) => {
+          UserNotification.error(`Fetching collectors failed with status: ${error}`, 'Could not retrieve collectors');
+        },
+      );
 
       CollectorsActions.create.promise(promise);
     },
@@ -195,20 +187,18 @@ export const CollectorsStore = singletonStore(
     update(collector) {
       const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/${collector.id}`), collector);
 
-      promise
-        .then(
-          (response) => {
-            UserNotification.success('', 'Collector successfully updated');
-            this.collectors = response.collectors;
-            this.propagateChanges();
+      promise.then(
+        (response) => {
+          UserNotification.success('', 'Collector successfully updated');
+          this.collectors = response.collectors;
+          this.propagateChanges();
 
-            return this.collectors;
-          },
-          (error) => {
-            UserNotification.error(`Fetching collectors failed with status: ${error}`,
-              'Could not retrieve collectors');
-          },
-        );
+          return this.collectors;
+        },
+        (error) => {
+          UserNotification.error(`Fetching collectors failed with status: ${error}`, 'Could not retrieve collectors');
+        },
+      );
 
       CollectorsActions.update.promise(promise);
     },
@@ -217,16 +207,20 @@ export const CollectorsStore = singletonStore(
       const url = URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/${collector.id}`);
       const promise = fetch('DELETE', url);
 
-      promise
-        .then((response) => {
+      promise.then(
+        (response) => {
           UserNotification.success('', `Collector "${collector.name}" successfully deleted`);
           this.refreshList();
 
           return response;
-        }, (error) => {
-          UserNotification.error(`Deleting Collector failed: ${error.status === 400 ? error.responseMessage : error.message}`,
-            `Could not delete Collector "${collector.name}"`);
-        });
+        },
+        (error) => {
+          UserNotification.error(
+            `Deleting Collector failed: ${error.status === 400 ? error.responseMessage : error.message}`,
+            `Could not delete Collector "${collector.name}"`,
+          );
+        },
+      );
 
       CollectorsActions.delete.promise(promise);
     },
@@ -237,22 +231,26 @@ export const CollectorsStore = singletonStore(
 
       const promise = fetch(method, url);
 
-      promise
-        .then((response) => {
+      promise.then(
+        (response) => {
           UserNotification.success('', `Collector "${name}" successfully copied`);
           this.refreshList();
 
           return response;
-        }, (error) => {
-          UserNotification.error(`Saving collector "${name}" failed with status: ${error.message}`,
-            'Could not save Collector');
-        });
+        },
+        (error) => {
+          UserNotification.error(
+            `Saving collector "${name}" failed with status: ${error.message}`,
+            'Could not save Collector',
+          );
+        },
+      );
 
       CollectorsActions.copy.promise(promise);
     },
 
     validate(collector: Collector) {
-    // set minimum api defaults for faster validation feedback
+      // set minimum api defaults for faster validation feedback
       const payload: Partial<Collector> = {
         id: ' ',
         service_type: 'exec',
@@ -264,14 +262,14 @@ export const CollectorsStore = singletonStore(
 
       const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/validate`), payload);
 
-      promise
-        .then(
-          (response) => response,
-          (error) => (
-            UserNotification.error(`Validating collector "${payload.name}" failed with status: ${error.message}`,
-              'Could not validate collector')
+      promise.then(
+        (response) => response,
+        (error) =>
+          UserNotification.error(
+            `Validating collector "${payload.name}" failed with status: ${error.message}`,
+            'Could not validate collector',
           ),
-        );
+      );
 
       CollectorsActions.validate.promise(promise);
     },

@@ -24,14 +24,7 @@ import URI from 'urijs';
 import upperCase from 'lodash/upperCase';
 
 import Routes from 'routing/Routes';
-import {
-  Button,
-  Col,
-  DropdownButton,
-  MenuItem,
-  Row,
-  SegmentedControl,
-} from 'components/bootstrap';
+import { Button, Col, DropdownButton, MenuItem, Row, SegmentedControl } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import { Icon, IfPermitted } from 'components/common';
 import { StreamsStore, type Stream } from 'stores/streams/StreamsStore';
@@ -51,15 +44,18 @@ import StreamModal from '../StreamModal';
 import ThroughputCell from '../StreamsOverview/cells/ThroughputCell';
 
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 
 const INTAKE_SEGMENT = 'intake';
 const PROCESSING_SEGMENT = 'processing';
 const DESTINATIONS_SEGMENT = 'destinations';
-const INTAKE_DESCRIPTION = 'Stream Rules may be used to collect a filtered subset of messages directly from Inputs to this Stream. Note that Stream Rules are now a legacy feature, the recommended device to manage stream routing is now Pipeline Rules.';
-const PROCESSING_DESCRIPTION = 'Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules are evaluated and applied. Messages can go through one or more stages.';
-const DESTINATION_DESCRIPTION = 'The Destinations page lets you define where messages in this stream should be routed. A stream may have multiple destinations. Note that messages routed to only Data Warehouse will not count towards License usage, unless subsequently retrieved. On a per-destination basis, filters may be applied to limit the subset of messages that destination receives.';
+const INTAKE_DESCRIPTION =
+  'Stream Rules may be used to collect a filtered subset of messages directly from Inputs to this Stream. Note that Stream Rules are now a legacy feature, the recommended device to manage stream routing is now Pipeline Rules.';
+const PROCESSING_DESCRIPTION =
+  'Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules are evaluated and applied. Messages can go through one or more stages.';
+const DESTINATION_DESCRIPTION =
+  'The Destinations page lets you define where messages in this stream should be routed. A stream may have multiple destinations. Note that messages routed to only Data Lake will not count towards License usage, unless subsequently retrieved. On a per-destination basis, filters may be applied to limit the subset of messages that destination receives.';
 
 const SEGMENTS_DETAILS = [
   {
@@ -121,24 +117,28 @@ const FullHeightCol = styled(Col)`
   height: 100%;
 `;
 
-const StyledSectionGrid = styled.div(({ theme }) => css`
-  display: flex;
-  align-items: center;
-  align-content: center;
-  gap: ${theme.spacings.md};
-`);
-const StyledSegmentedControl = styled(SegmentedControl)(({ theme }) => css`
-  background-color: ${theme.colors.section.filled.background};
-  border: 1px solid ${theme.colors.section.filled.border};
+const StyledSectionGrid = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    align-content: center;
+    gap: ${theme.spacings.md};
+  `,
+);
+const StyledSegmentedControl = styled(SegmentedControl)(
+  ({ theme }) => css`
+    background-color: ${theme.colors.section.filled.background};
+    border: 1px solid ${theme.colors.section.filled.border};
 
-  .mantine-SegmentedControl-innerLabel {
-    vertical-align: middle;
-  }
+    .mantine-SegmentedControl-innerLabel {
+      vertical-align: middle;
+    }
 
-  .mantine-SegmentedControl-indicator {
-    height: 70% !important;
-  }
-`);
+    .mantine-SegmentedControl-indicator {
+      height: 70% !important;
+    }
+  `,
+);
 const ThroughputCol = styled(Col)`
   display: flex;
   align-items: center;
@@ -158,8 +158,8 @@ const getPageDescription = (segment: DetailsSegment) => (
 const StreamDetails = ({ stream }: Props) => {
   const navigate = useNavigate();
   const { segment } = useQuery();
-  const [currentSegment, setCurrentSegment] = useState<DetailsSegment>(segment as DetailsSegment || INTAKE_SEGMENT);
-  const DataWarehouseJobComponent = PluginStore.exports('dataWarehouse')?.[0]?.DataWarehouseJobs;
+  const [currentSegment, setCurrentSegment] = useState<DetailsSegment>((segment as DetailsSegment) || INTAKE_SEGMENT);
+  const DataLakeJobComponent = PluginStore.exports('dataLake')?.[0]?.DataLakeJobs;
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const { indexSets } = useStore(IndexSetsStore);
   const queryClient = useQueryClient();
@@ -192,16 +192,20 @@ const StreamDetails = ({ stream }: Props) => {
       app_pathname: 'streams',
     });
   }, [sendTelemetry]);
-  const onUpdate = useCallback((newStream: Stream) => StreamsStore.update(stream.id, newStream, (response) => {
-    UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
-    queryClient.invalidateQueries(['stream', stream.id]);
+  const onUpdate = useCallback(
+    (newStream: Stream) =>
+      StreamsStore.update(stream.id, newStream, (response) => {
+        UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
+        queryClient.invalidateQueries(['stream', stream.id]);
 
-    return response;
-  }), [stream.id, queryClient]);
+        return response;
+      }),
+    [stream.id, queryClient],
+  );
 
   return (
     <>
-      {DataWarehouseJobComponent && <DataWarehouseJobComponent permissions={currentUser.permissions} streamId={stream.id} />}
+      {DataLakeJobComponent && <DataLakeJobComponent permissions={currentUser.permissions} streamId={stream.id} />}
       <Container>
         <Header>
           <LeftCol>
@@ -225,10 +229,12 @@ const StreamDetails = ({ stream }: Props) => {
             <StyledSectionGrid>
               <h3>Data Routing</h3>
               <MainDetailsRow>
-                <StyledSegmentedControl<DetailsSegment> data={SEGMENTS_DETAILS}
-                                                        radius="sm"
-                                                        value={currentSegment}
-                                                        onChange={onSegmentChange} />
+                <StyledSegmentedControl<DetailsSegment>
+                  data={SEGMENTS_DETAILS}
+                  radius="sm"
+                  value={currentSegment}
+                  onChange={onSegmentChange}
+                />
               </MainDetailsRow>
             </StyledSectionGrid>
             <p className="description">{getPageDescription(currentSegment)}</p>
@@ -246,15 +252,16 @@ const StreamDetails = ({ stream }: Props) => {
           </FullHeightCol>
         </SegmentContainer>
         {showUpdateModal && (
-        <StreamModal title="Editing Stream"
-                     onSubmit={onUpdate}
-                     onClose={toggleUpdateModal}
-                     submitButtonText="Update stream"
-                     submitLoadingText="Updating stream..."
-                     initialValues={stream}
-                     indexSets={indexSets} />
+          <StreamModal
+            title="Editing Stream"
+            onSubmit={onUpdate}
+            onClose={toggleUpdateModal}
+            submitButtonText="Update stream"
+            submitLoadingText="Updating stream..."
+            initialValues={stream}
+            indexSets={indexSets}
+          />
         )}
-
       </Container>
     </>
   );

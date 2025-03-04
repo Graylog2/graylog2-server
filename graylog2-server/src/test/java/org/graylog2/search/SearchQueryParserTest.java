@@ -32,6 +32,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -291,6 +292,31 @@ public class SearchQueryParserTest {
         assertThat(queryMap.get("name")).containsOnly(new SearchQueryParser.FieldValue("Bobby", false));
         assertThat(queryMap.get("breed")).containsOnly(new SearchQueryParser.FieldValue("terrier", false));
         assertThat(searchQuery.hasDisallowedKeys()).isFalse();
+    }
+
+    @Test
+    void unquotedEmptyFieldPrefixSingleSearchTerm() {
+        final SearchQueryParser parser = new SearchQueryParser("name", Set.of(), "");
+        // Verify unquoted term is split into two search values.
+        final SearchQuery searchQuery = parser.parse("Bobby testerson");
+        final Multimap<String, SearchQueryParser.FieldValue> queryMap = searchQuery.getQueryMap();
+        assertThat(queryMap.keySet().size()).isEqualTo(1);
+        final Collection<SearchQueryParser.FieldValue> values = queryMap.get("name");
+        assertThat(values.size()).isEqualTo(2);
+        assertThat(values).contains(new SearchQueryParser.FieldValue("Bobby", false));
+        assertThat(values).contains(new SearchQueryParser.FieldValue("testerson", false));
+    }
+
+    @Test
+    void quotedEmptyFieldPrefixSingleSearchTerm() {
+        final SearchQueryParser parser = new SearchQueryParser("name", Set.of(), "");
+        // Verify quoted term is maintained as a single search value.
+        final SearchQuery searchQuery = parser.parse("\"Bobby testerson\"");
+        final Multimap<String, SearchQueryParser.FieldValue> queryMap = searchQuery.getQueryMap();
+        assertThat(queryMap.keySet().size()).isEqualTo(1);
+        final Collection<SearchQueryParser.FieldValue> values = queryMap.get("name");
+        assertThat(values.size()).isEqualTo(1);
+        assertThat(values).containsOnly(new SearchQueryParser.FieldValue("Bobby testerson", false));
     }
 
     @Test

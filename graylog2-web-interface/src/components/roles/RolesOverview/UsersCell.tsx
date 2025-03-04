@@ -23,20 +23,24 @@ import { IfPermitted, CountBadge } from 'components/common';
 import type { UserContext } from 'actions/roles/AuthzRolesActions';
 
 type Props = {
-  users: Immutable.Set<UserContext>,
+  users: Immutable.Set<UserContext>;
 };
 
 const MAX_USERS = 10;
 
 const UsersCell = ({ users = Immutable.Set() }: Props) => {
   const usersLength = users.size;
-  const usersComponents = users.take(MAX_USERS).toArray().map(({ id, username }, index) => (
-    <IfPermitted permissions={[`users:read:${username}`]} key={id}>
-      <>
-        <Link to={Routes.SYSTEM.USERS.show(id)}>{username}</Link>{index < (usersLength - 1) && ',  '}
-      </>
-    </IfPermitted>
-  ));
+  const usersComponents = users
+    .take(MAX_USERS)
+    .toArray()
+    .map(({ id, username }, index) => (
+      <IfPermitted permissions={[`users:read:${username}`]} key={id}>
+        <>
+          <Link to={Routes.SYSTEM.USERS.show(id)}>{username}</Link>
+          {index < usersLength - 1 && ',  '}
+        </>
+      </IfPermitted>
+    ));
 
   if (usersLength > MAX_USERS) {
     usersComponents.push(<span key="dots">...</span>);
@@ -44,9 +48,7 @@ const UsersCell = ({ users = Immutable.Set() }: Props) => {
 
   return (
     <td>
-      <CountBadge>{users.size}</CountBadge>
-      {' '}
-      {usersComponents}
+      <CountBadge>{users.size}</CountBadge> {usersComponents}
     </td>
   );
 };

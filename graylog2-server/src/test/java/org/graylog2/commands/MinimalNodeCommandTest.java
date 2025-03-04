@@ -120,6 +120,11 @@ public class MinimalNodeCommandTest {
             }
 
             @Override
+            public boolean isCloud() {
+                return false;
+            }
+
+            @Override
             public boolean isMessageRecordingsEnabled() {
                 return false;
             }

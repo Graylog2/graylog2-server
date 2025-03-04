@@ -23,7 +23,6 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
-import com.mongodb.client.result.DeleteResult;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
@@ -31,7 +30,9 @@ import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 
 import java.util.Collection;
@@ -52,28 +53,35 @@ public class MongoDbRuleService implements RuleService {
     private final MongoCollection<RuleDao> collection;
     private final ClusterEventBus clusterBus;
     private final MongoUtils<RuleDao> mongoUtils;
+    private final ScopedEntityMongoUtils<RuleDao> scopedEntityMongoUtils;
 
     @Inject
-    public MongoDbRuleService(MongoCollections mongoCollections, ClusterEventBus clusterBus) {
+    public MongoDbRuleService(MongoCollections mongoCollections, ClusterEventBus clusterBus, EntityScopeService entityScopeService) {
         this.collection = mongoCollections.collection(COLLECTION, RuleDao.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.clusterBus = clusterBus;
+        this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
 
         collection.createIndex(Indexes.ascending("title"), new IndexOptions().unique(true));
     }
 
     @Override
-    public RuleDao save(RuleDao rule) {
+    public RuleDao save(RuleDao rule, boolean checkMutability) {
+        scopedEntityMongoUtils.ensureValidScope(rule);
+
         final var ruleId = rule.id();
         final RuleDao savedRule;
         if (ruleId != null) {
+            if (checkMutability) {
+                scopedEntityMongoUtils.ensureMutability(rule);
+            }
             collection.replaceOne(MongoUtils.idEq(ruleId), rule, new ReplaceOptions().upsert(true));
             savedRule = rule;
         } else {
             final var insertedId = insertedIdAsString(collection.insertOne(rule));
             savedRule = rule.toBuilder().id(insertedId).build();
         }
-        clusterBus.post(RulesChangedEvent.updatedRuleId(savedRule.id()));
+        clusterBus.post(RulesChangedEvent.updatedRule(savedRule.id(), savedRule.title()));
         return savedRule;
     }
 
@@ -105,11 +113,20 @@ public class MongoDbRuleService implements RuleService {
 
     @Override
     public void delete(String id) {
-        final DeleteResult deleteResult = collection.deleteOne(MongoUtils.idEq(id));
-        if (deleteResult.getDeletedCount() != 1) {
-            log.error("Unable to delete rule {}", id);
+        try {
+            delete(load(id));
+        } catch (NotFoundException e) {
+            log.info("Deleting non-existant rule {}", id);
         }
-        clusterBus.post(RulesChangedEvent.deletedRuleId(id));
+    }
+
+    @Override
+    public void delete(RuleDao ruleDao) {
+        if (!scopedEntityMongoUtils.deleteById(ruleDao.id(), false)) {
+            log.error("Unable to delete rule {}", ruleDao.title());
+        } else {
+            clusterBus.post(RulesChangedEvent.deletedRule(ruleDao.id(), ruleDao.title()));
+        }
     }
 
     @Override

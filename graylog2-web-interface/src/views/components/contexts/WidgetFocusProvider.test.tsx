@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
+import Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
@@ -26,8 +27,11 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { allMessagesTable } from 'views/logic/Widgets';
 import { createViewWithWidgets } from 'fixtures/searches';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { Button } from 'components/bootstrap';
+import useView from 'views/hooks/useView';
+import View from 'views/logic/views/View';
+import ViewState from 'views/logic/views/ViewState';
 
 const mockNavigate = jest.fn();
 
@@ -40,7 +44,7 @@ jest.mock('react-router-dom', () => ({
   })),
 }));
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 const emptyLocation = {
   pathname: '',
@@ -50,24 +54,34 @@ const emptyLocation = {
   key: '',
 };
 
-const ShowFocusedWidget = ({ focusedWidget }: WidgetFocusContextType) => (focusedWidget ? (
-  <span>Focused widget: {JSON.stringify(focusedWidget)}</span>
-) : (
-  <span>No focused widget</span>
-));
+const ShowFocusedWidget = ({ focusedWidget }: WidgetFocusContextType) =>
+  focusedWidget ? <span>Focused widget: {JSON.stringify(focusedWidget)}</span> : <span>No focused widget</span>;
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
   execute: jest.fn(() => async () => {}),
 }));
 
+jest.mock('views/hooks/useView');
+
 describe('WidgetFocusProvider', () => {
   useViewsPlugin();
 
   beforeEach(() => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     asMock(useLocation).mockReturnValue(emptyLocation);
+    asMock(useView).mockReturnValue(
+      View.builder()
+        .type(View.Type.Search)
+        .state({
+          query1: ViewState.create()
+            .toBuilder()
+            .widgetMapping(Immutable.Map({ 'widget-id': Immutable.Set(['search-type-id']) }))
+            .build(),
+        })
+        .build(),
+    );
   });
 
   const renderSUT = (consume: (value: WidgetFocusContextType) => JSX.Element) => {
@@ -77,9 +91,7 @@ describe('WidgetFocusProvider', () => {
     return render(
       <TestStoreProvider view={view}>
         <WidgetFocusProvider>
-          <WidgetFocusContext.Consumer>
-            {consume}
-          </WidgetFocusContext.Consumer>
+          <WidgetFocusContext.Consumer>{consume}</WidgetFocusContext.Consumer>
         </WidgetFocusProvider>
       </TestStoreProvider>,
     );
@@ -209,7 +221,7 @@ describe('WidgetFocusProvider', () => {
 
   it('does not trigger setting widgets to search initially', () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     asMock(useLocation).mockReturnValue(emptyLocation);
     renderSUT(jest.fn());
 

@@ -22,8 +22,8 @@ import { getAuthServicePlugin } from 'util/AuthenticationService';
 
 type Props = {
   params: {
-    name: string,
-  },
+    name: string;
+  };
 };
 
 const AuthenticationBackendCreatePage = ({ params: { name } }: Props) => {

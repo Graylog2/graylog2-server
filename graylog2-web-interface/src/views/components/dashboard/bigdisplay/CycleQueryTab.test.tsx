@@ -24,23 +24,27 @@ import Query from 'views/logic/queries/Query';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { asMock } from 'helpers/mocking';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectQuery } from 'views/logic/slices/viewSlice';
 
 import OriginalCycleQueryTab from './CycleQueryTab';
 
 type AdditionalProps = {
-  view: View,
-  activeQuery: QueryId,
+  view: View;
+  activeQuery: QueryId;
 };
 
-const CycleQueryTab = ({ view, activeQuery, ...props }: AdditionalProps & React.ComponentProps<typeof OriginalCycleQueryTab>) => (
+const CycleQueryTab = ({
+  view,
+  activeQuery,
+  ...props
+}: AdditionalProps & React.ComponentProps<typeof OriginalCycleQueryTab>) => (
   <TestStoreProvider view={view} initialQuery={activeQuery}>
     <OriginalCycleQueryTab {...props} />
   </TestStoreProvider>
 );
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
@@ -48,11 +52,10 @@ jest.mock('views/logic/slices/viewSlice', () => ({
 }));
 
 describe('CycleQueryTab', () => {
-  const search = Search.create().toBuilder().queries([
-    Query.builder().id('foo').build(),
-    Query.builder().id('bar').build(),
-    Query.builder().id('baz').build(),
-  ]).build();
+  const search = Search.create()
+    .toBuilder()
+    .queries([Query.builder().id('foo').build(), Query.builder().id('bar').build(), Query.builder().id('baz').build()])
+    .build();
   const view = View.create().toBuilder().search(search).build();
 
   useViewsPlugin();
@@ -68,7 +71,7 @@ describe('CycleQueryTab', () => {
 
   it('should not switch to anything before interval', () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     render(<CycleQueryTab view={view} activeQuery="bar" interval={1} tabs={[1, 2]} />);
 
@@ -79,7 +82,7 @@ describe('CycleQueryTab', () => {
 
   it('should switch to next tab after interval', () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     render(<CycleQueryTab view={view} activeQuery="bar" interval={1} tabs={[1, 2]} />);
 
@@ -90,7 +93,7 @@ describe('CycleQueryTab', () => {
 
   it('should switch to first tab if current one is the last', () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     render(<CycleQueryTab view={view} activeQuery="baz" interval={1} tabs={[0, 1, 2]} />);
 
@@ -101,7 +104,7 @@ describe('CycleQueryTab', () => {
 
   it('should switch to next tab skipping gaps after interval', () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     render(<CycleQueryTab view={view} activeQuery="foo" interval={1} tabs={[0, 2]} />);
 
@@ -112,7 +115,7 @@ describe('CycleQueryTab', () => {
 
   it('should switch to next tab defaulting to all tabs if `tabs` prop` is left out', () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     render(<CycleQueryTab view={view} activeQuery="foo" tabs={[1]} interval={1} />);
 
@@ -123,7 +126,7 @@ describe('CycleQueryTab', () => {
 
   it('triggers tab change after the correct interval has passed', async () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     render(<CycleQueryTab view={view} activeQuery="foo" interval={42} />);
 
@@ -134,7 +137,7 @@ describe('CycleQueryTab', () => {
 
   it('does not trigger after unmounting', () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     const { unmount } = render(<CycleQueryTab view={view} activeQuery="foo" interval={42} />);
 

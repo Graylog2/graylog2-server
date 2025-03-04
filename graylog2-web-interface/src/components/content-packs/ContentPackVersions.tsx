@@ -24,40 +24,49 @@ import './ContentPackVersions.css';
 import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 
 type Props = {
-  contentPackRevisions: ContentPackRevisions,
-  onDeletePack?: (id: string) => void
-  onChange?: (id: string) => void
-  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void
+  contentPackRevisions: ContentPackRevisions;
+  onDeletePack?: (id: string) => void;
+  onChange?: (id: string) => void;
+  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void;
 };
 
 const headerFormatter = (header: React.ReactNode) => {
   if (header === 'Action') {
-    return (<th className="text-right">{header}</th>);
+    return <th className="text-right">{header}</th>;
   }
 
-  return (<th>{header}</th>);
+  return <th>{header}</th>;
 };
 
-const ContentPackVersions = ({ onDeletePack = () => {}, contentPackRevisions, onInstall = () => {}, onChange = () => {} }: Props) => {
+const ContentPackVersions = ({
+  onDeletePack = () => {},
+  contentPackRevisions,
+  onInstall = () => {},
+  onChange = () => {},
+}: Props) => {
   const { contentPacks } = contentPackRevisions;
   const headers = ['Select', 'Revision', 'Action'];
   const rowFormatter = (item: ContentPackInstallation) => (
-    <ContentPackVersionItem pack={item}
-                            contentPackRevisions={contentPackRevisions}
-                            onDeletePack={onDeletePack}
-                            onChange={onChange}
-                            onInstall={onInstall} />
+    <ContentPackVersionItem
+      pack={item}
+      contentPackRevisions={contentPackRevisions}
+      onDeletePack={onDeletePack}
+      onChange={onChange}
+      onInstall={onInstall}
+    />
   );
 
   return (
-    <DataTable id="content-packs-versions"
-               headers={headers}
-               headerCellFormatter={headerFormatter}
-               useNumericSort
-               sortBy={(c) => c.rev.toString()}
-               dataRowFormatter={rowFormatter}
-               rows={contentPacks}
-               filterKeys={[]} />
+    <DataTable
+      id="content-packs-versions"
+      headers={headers}
+      headerCellFormatter={headerFormatter}
+      useNumericSort
+      sortBy={(c) => c.rev.toString()}
+      dataRowFormatter={rowFormatter}
+      rows={contentPacks}
+      filterKeys={[]}
+    />
   );
 };
 
