@@ -1,0 +1,40 @@
+{
+  "access_tokens": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeefaffe"
+      },
+      "username": "user",
+      "token": "foobar",
+      "NAME": "web",
+      "last_access": {
+        "$date": "2015-03-14T15:09:26.540Z"
+      },
+      "expires_at": {"$date":  "2015-03-14T16:00:00.000Z"}
+    },
+    {
+      "_id": {
+        "$oid": "54f9deadbeefdeadbeefaffe"
+      },
+      "username": "user",
+      "token": "anothertoken",
+      "NAME": "rest",
+      "last_access": {
+        "$date": "2015-03-14T15:09:26.540Z"
+      },
+      "expires_at": {"$date":  "2015-03-15T16:00:00.000Z"}
+    }
+  ],
+  "users": [
+    {
+      "_id": {
+        "$oid": "679918ce5cc8a61bb95c95bf"
+      },
+      "service_account": false,
+      "account_status": "enabled",
+      "first_name": "Some",
+      "email": "user@graylog.com",
+      "username": "user"
+    }
+  ]
+}
