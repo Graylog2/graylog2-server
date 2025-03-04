@@ -16,7 +16,6 @@
  */
 import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import ObjectID from 'bson-objectid';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -27,6 +26,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import generateObjectId from 'logic/generateObjectId';
 
 import RuleBuilderProvider from './RuleBuilderProvider';
 import RuleBuilderBlock from './RuleBuilderBlock';
@@ -171,7 +171,7 @@ const RuleBuilder = () => {
 
   const addBlock = async (type: BlockType, block: RuleBlock, orderIndex?: number) => {
     let ruleToAdd: RuleBuilderRule;
-    const blockId = new ObjectID().toString();
+    const blockId = generateObjectId();
 
     if (type === 'condition') {
       const newConditions = rule.rule_builder.conditions;
@@ -340,7 +340,7 @@ const RuleBuilder = () => {
                 <StyledPanelBody>
                   {rule.rule_builder.conditions.map((condition, index) => (
                     <RuleBuilderBlock
-                      key={index}
+                      key={condition.id}
                       blockDict={conditionsDict || []}
                       block={condition}
                       order={index}
@@ -375,7 +375,7 @@ const RuleBuilder = () => {
                 <StyledPanelBody>
                   {rule.rule_builder.actions.map((action, index) => (
                     <RuleBuilderBlock
-                      key={index}
+                      key={action.id}
                       blockDict={actionsDict || []}
                       block={action}
                       order={index}

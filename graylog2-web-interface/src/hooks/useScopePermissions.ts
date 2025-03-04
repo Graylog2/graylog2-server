@@ -23,8 +23,9 @@ import UserNotification from 'util/UserNotification';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { onError } from 'util/conditional/onError';
 
-type ScopeParams = {
+export type ScopeParams = {
   is_mutable: boolean;
+  is_deletable?: boolean;
 };
 
 type ScopeName = 'DEFAULT' | 'ILLUMINATE';
@@ -57,7 +58,7 @@ const useGetPermissionsByScope = (entity: Partial<GenericEntityType> = undefined
   );
 
   const scope = entity?._scope?.toUpperCase() || 'DEFAULT';
-  const permissions: ScopeParams = isLoading ? { is_mutable: false } : data.entity_scopes[scope];
+  const permissions: ScopeParams = isLoading ? { is_mutable: false, is_deletable: false } : data.entity_scopes[scope];
 
   return {
     loadingScopePermissions: isLoading,

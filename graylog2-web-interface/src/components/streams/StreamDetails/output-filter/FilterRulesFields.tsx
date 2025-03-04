@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useFormikContext } from 'formik';
-import ObjectID from 'bson-objectid';
 
 import Errors from 'components/rules/rule-builder/Errors';
 import { ConfirmDialog } from 'components/common';
@@ -27,6 +26,7 @@ import RuleBuilderBlock from 'components/rules/rule-builder/RuleBuilderBlock';
 import { Panel, Radio } from 'components/bootstrap';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import useStreamOutputRuleBuilder, { fetchValidateRule } from 'components/streams/hooks/useStreamOutputRuleBuilder';
+import generateObjectId from 'logic/generateObjectId';
 
 type Props = {
   type: BlockType;
@@ -84,7 +84,7 @@ const FilterRulesFields = ({ type }: Props) => {
         ...values,
         rule: {
           ...values.rule,
-          conditions: [...(values.rule?.conditions || []), { ...block, id: new ObjectID().toString() }],
+          conditions: [...(values.rule?.conditions || []), { ...block, id: generateObjectId() }],
         },
       };
       validateAndUpdateFormValues(ruleToValidate);

@@ -28,6 +28,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectQuery, removeQuery } from 'views/logic/slices/viewSlice';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
 jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'bar');
@@ -65,21 +66,13 @@ const QueryBar = () => (
 );
 
 describe('QueryBar', () => {
-  let oldWindowConfirm;
-
+  useWindowConfirmMock();
   useViewsPlugin();
 
   beforeEach(() => {
-    oldWindowConfirm = window.confirm;
-    window.confirm = jest.fn(() => true);
-
     asMock(useQueryIds).mockReturnValue(queries);
     asMock(useQueryTitles).mockReturnValue(queryTitles);
     asMock(useViewMetadata).mockReturnValue(viewMetadata);
-  });
-
-  afterEach(() => {
-    window.confirm = oldWindowConfirm;
   });
 
   it('renders existing tabs', async () => {

@@ -49,12 +49,7 @@ jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
-
-jest.mock('bson-objectid', () =>
-  jest.fn(() => ({
-    toString: jest.fn(() => 'new-search-id'),
-  })),
-);
+jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-search-id'));
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {

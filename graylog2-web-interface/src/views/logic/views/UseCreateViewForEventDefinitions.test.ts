@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { renderHook } from 'wrappedTestingLibrary/hooks';
-import ObjectID from 'bson-objectid';
 
 import {
   mockedMappedAggregation,
@@ -29,6 +28,7 @@ import generateId from 'logic/generateId';
 import asMock from 'helpers/mocking/AsMock';
 import type View from 'views/logic/views/View';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import generateObjectId from 'logic/generateObjectId';
 
 const counter = () => {
   let index = 0;
@@ -86,8 +86,8 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 }));
 
 jest.mock('logic/generateId', () => jest.fn());
+jest.mock('logic/generateObjectId', () => jest.fn());
 
-jest.mock('bson-objectid', () => jest.fn());
 const mock_color = StaticColor.create('#ffffff');
 
 jest.mock('views/logic/views/formatting/highlighting/HighlightingRule', () => ({
@@ -118,13 +118,7 @@ describe('UseCreateViewForEventDefinition', () => {
 
   it('should create view with 2 aggregation widgets and one summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdTwoAggregations);
-
-    asMock(ObjectID).mockImplementation(
-      () =>
-        ({
-          toString: () => mockedObjectIdTwoAggregations(),
-        }) as ObjectID,
-    );
+    asMock(generateObjectId).mockImplementation(mockedObjectIdTwoAggregations);
 
     const { result } = renderHook(() =>
       UseCreateViewForEventDefinition({
@@ -139,13 +133,7 @@ describe('UseCreateViewForEventDefinition', () => {
 
   it('should create view with 1 aggregation widgets and without summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregation);
-
-    asMock(ObjectID).mockImplementation(
-      () =>
-        ({
-          toString: () => mockedObjectIdOneAggregation(),
-        }) as ObjectID,
-    );
+    asMock(generateObjectId).mockImplementation(mockedObjectIdOneAggregation);
 
     const { result } = renderHook(() =>
       UseCreateViewForEventDefinition({
