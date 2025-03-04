@@ -199,7 +199,7 @@ public class JerseyService extends AbstractIdleService {
                         configuration.getHttpTlsKeyPassword()) : null;
 
         final HostAndPort bindAddress = configuration.getHttpBindAddress();
-        final String contextPath = configuration.getHttpPublishUri().getPath();
+        final String contextPath = configuration.getHttpExternalUri().getPath();
         final URI listenUri = new URI(
                 configuration.getUriScheme(),
                 null,
