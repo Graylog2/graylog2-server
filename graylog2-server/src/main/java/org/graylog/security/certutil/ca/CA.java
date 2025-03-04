@@ -17,10 +17,13 @@
 package org.graylog.security.certutil.ca;
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class CA {
 
@@ -29,8 +32,8 @@ public class CA {
 
     public CA(List<X509Certificate> certificates, PrivateKey privateKey) {
         this.certificates = certificates;
-        validateCertificates();
         this.privateKey = privateKey;
+        validateCertificates();
     }
 
     private void validateCertificates() {
@@ -43,6 +46,41 @@ public class CA {
         final X509Certificate ca = certificates.get(0);
         if (ca.getBasicConstraints() == -1) {
             throw new IllegalArgumentException("First certificate in certificate chain is no CA. Please make sure that your bundle only contains the CA and necessary intermediate/root certificates");
+        }
+
+        if (!verifyPrivateKey(ca)) {
+            throw new IllegalArgumentException("Private key does not match ca certificate public key");
+        }
+
+    }
+
+    private boolean verifyPrivateKey(X509Certificate certificate) {
+        if (privateKey == null) {
+            return false;
+        }
+
+        try {
+            PublicKey publicKey = certificate.getPublicKey();
+
+            // Generate random data to sign
+            byte[] data = new byte[20];
+            new Random().nextBytes(data);
+
+            // Sign the data using the private key
+            Signature signature = Signature.getInstance(certificate.getSigAlgName());
+            signature.initSign(privateKey);
+            signature.update(data);
+            byte[] signatureBytes = signature.sign();
+
+            // Verify the signature using the public key from the certificate
+            Signature verifier = Signature.getInstance(certificate.getSigAlgName());
+            verifier.initVerify(publicKey);
+            verifier.update(data);
+
+            return verifier.verify(signatureBytes);
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Could not verify private key", e);
         }
     }
 
