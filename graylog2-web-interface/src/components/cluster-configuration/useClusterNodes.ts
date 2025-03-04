@@ -41,18 +41,18 @@ const useClusterNodes = (): ClusterNodes => {
   const { nodes: _graylogNodes } = useStore(NodesStore);
   const { clusterOverview: systemInfo  } = useStore(ClusterOverviewStore);
   const graylogNodes = Object.values(_graylogNodes || {}).map((graylogNode) => ({
-    nodeName: `${graylogNode.short_node_id} / ${graylogNode.hostname}`,
+    nodeName: `${graylogNode?.short_node_id} / ${graylogNode?.hostname}`,
     type: 'Graylog',
-    role: graylogNode.is_leader ? 'Leader' : 'Non-Leader',
+    role: graylogNode?.is_leader ? 'Leader' : 'Non-Leader',
     nodeInfo: {
       ...graylogNode,
-      ...(systemInfo || {})[graylogNode.node_id]
+      ...(systemInfo || {})[graylogNode?.node_id]
     },
   }));
 
   const { data: _dataNodes, refetch: refetchDatanodes } = useDataNodes({ query: '', page: 1, pageSize: 0, sort: { attributeId: 'hostname', direction: 'asc' } });
   const dataNodes = (_dataNodes?.list || []).map((dataNode) => ({
-    nodeName: dataNode.hostname,
+    nodeName: dataNode?.hostname,
     type: 'Data Node - OpenSearch',
     role: 'Cluster-manager-eligible,Data,Ingest,Coordinator',
     nodeInfo: dataNode,

@@ -32,9 +32,9 @@ type Props = {
 };
 
 const ClusterStatusLabel = ({ node }: Props) => {
-  const lifecycleStatus = node.lifecycle.toUpperCase()
-  const loadBalancersStatus = `Load Balancers ${node.lb_status.toUpperCase()}`
-  const messageProcessingStatus = `Message Processing ${node.is_processing ? 'ENABLED' : 'DISABLED'}`
+  const lifecycleStatus = node?.lifecycle?.toUpperCase();
+  const loadBalancersStatus = `Load Balancers ${node?.lb_status?.toUpperCase()}`;
+  const messageProcessingStatus = `Message Processing ${node?.is_processing ? 'ENABLED' : 'DISABLED'}`;
 
   return (
     <>
