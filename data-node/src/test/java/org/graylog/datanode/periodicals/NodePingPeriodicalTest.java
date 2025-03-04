@@ -16,19 +16,18 @@
  */
 package org.graylog.datanode.periodicals;
 
+import io.jsonwebtoken.lang.Collections;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
-import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 
 import java.net.URI;
 import java.util.Date;
@@ -62,7 +61,8 @@ class NodePingPeriodicalTest {
                 () -> cluster,
                 () -> datanodeRestApi,
                 () -> OpensearchState.AVAILABLE,
-                Date::new
+                Date::new,
+                Collections::emptyList
         );
 
         task.doRun();

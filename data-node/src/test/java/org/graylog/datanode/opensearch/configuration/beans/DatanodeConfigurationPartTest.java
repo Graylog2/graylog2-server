@@ -34,6 +34,8 @@ class DatanodeConfigurationPartTest {
                 .properties(Collections.singletonMap("reindex.remote.allowlist", "localhost:9201"))
                 .systemProperty("file.encoding", "utf-8")
                 .systemProperty("java.home", "/jdk")
+                .withWarning("Unsupported property foo")
+                .withWarning("Unsupported property bar")
                 .build();
 
         Assertions.assertThat(configurationPart.nodeRoles())
@@ -52,5 +54,10 @@ class DatanodeConfigurationPartTest {
                 .hasSize(2)
                 .containsEntry("file.encoding", "utf-8")
                 .containsEntry("java.home", "/jdk");
+
+        Assertions.assertThat(configurationPart.warnings())
+                .hasSize(2)
+                .contains("Unsupported property foo")
+                .contains("Unsupported property bar");
     }
 }

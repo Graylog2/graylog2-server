@@ -110,8 +110,13 @@ public class OpensearchCommandLineProcess implements Closeable {
         configureOpensearchKeystoreSecrets(config);
         final Path executable = config.getOpensearchDistribution().getOpensearchExecutable();
         writeOpenSearchConfig(config);
+        logWarnings(config);
         resultHandler = new CommandLineProcessListener(listener);
         commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, config.getEnv());
+    }
+
+    private void logWarnings(OpensearchConfiguration config) {
+        config.warnings().forEach(LOG::warn);
     }
 
     private void configureOpensearchKeystoreSecrets(OpensearchConfiguration config) {

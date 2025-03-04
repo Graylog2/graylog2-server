@@ -114,11 +114,15 @@ public class DatanodeDirectories {
     }
 
     public Optional<Path> resolveConfigurationSourceFile(String filename) {
-        final Path filePath = Path.of(filename);
+        return resolveConfigurationSourceFile(Path.of(filename));
+    }
+
+    @Nonnull
+    public Optional<Path> resolveConfigurationSourceFile(Path filePath) {
         if (filePath.isAbsolute()) {
-            return Optional.of(filePath);
+            return Optional.of(filePath).filter(Files::exists);
         } else {
-            return getConfigurationSourceDir().map(dir -> dir.resolve(filename));
+            return getConfigurationSourceDir().map(dir -> dir.resolve(filePath)).filter(Files::exists);
         }
     }
 
