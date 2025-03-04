@@ -18,9 +18,9 @@ package org.graylog.security.certutil.csr;
 
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.security.certutil.CaKeystore;
-import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
@@ -50,17 +50,27 @@ public class ClientCertGenerator {
                                          final String role,
                                          final char[] privateKeyPassword,
                                          Duration certificateLifetime) throws ClientCertGenerationException {
+
         try {
+            final String alias = createKeyAlias();
             final KeyPair keyPair = CertificateGenerator.generate(getCertRequest(principal, certificateLifetime));
-            final KeyStore keystore = keyPair.toKeystore(CertConstants.DATANODE_KEY_ALIAS, privateKeyPassword);
+            final KeyStore keystore = keyPair.toKeystore(alias, privateKeyPassword);
             final InMemoryKeystoreInformation keystoreInformation = new InMemoryKeystoreInformation(keystore, privateKeyPassword);
-            var csr = CsrGenerator.generateCSR(keystoreInformation, CertConstants.DATANODE_KEY_ALIAS, principal, List.of(principal));
+            var csr = CsrGenerator.generateCSR(keystoreInformation, alias, principal, List.of(principal));
             final CertificateChain certChain = caKeystore.signCertificateRequest(new CertificateSigningRequest(principal, csr), certificateLifetime);
             securityAdapter.addUserToRoleMapping(role, principal);
             return toClientCert(principal, role, certChain, keyPair);
         } catch (Exception e) {
             throw new ClientCertGenerationException("Failed to generate client certificate: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * This will be the only key in the keystore, we don't care much about the alias. To make sure we are
+     * not dependent on a specific alias, we can generate a random alphabetic sequence.
+     */
+    private static String createKeyAlias() {
+        return RandomStringUtils.randomAlphabetic(10);
     }
 
     private static CertRequest getCertRequest(String principal, Duration certificateLifetime) {
