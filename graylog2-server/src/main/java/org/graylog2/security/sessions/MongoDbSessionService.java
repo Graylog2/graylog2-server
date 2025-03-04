@@ -37,7 +37,7 @@ import static org.graylog2.security.sessions.SessionDTO.FIELD_SESSION_ID;
 
 @Singleton
 public class MongoDbSessionService implements SessionService {
-    static final String COLLECTION_NAME = "sessions";
+    public static final String COLLECTION_NAME = "sessions";
     private final ClusterEventBus eventBus;
     private final MongoCollection<SessionDTO> collection;
 
