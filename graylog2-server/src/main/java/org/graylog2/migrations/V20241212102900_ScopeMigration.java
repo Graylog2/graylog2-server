@@ -26,6 +26,7 @@ import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +45,13 @@ import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_REGULAR;
 public class V20241212102900_ScopeMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20241212102900_ScopeMigration.class);
 
+    private final ClusterConfigService configService;
     private final MongoCollection<EventDefinitionDto> eventDefinitionCollection;
     private final MongoCollection<IndexSetConfig> indexSetCollection;
 
     @Inject
-    public V20241212102900_ScopeMigration(MongoCollections mongoCollections) {
+    public V20241212102900_ScopeMigration(ClusterConfigService configService, MongoCollections mongoCollections) {
+        this.configService = configService;
         this.indexSetCollection = mongoCollections.collection(MongoIndexSetService.COLLECTION_NAME, IndexSetConfig.class);
         this.eventDefinitionCollection = mongoCollections.collection(DBEventDefinitionService.COLLECTION_NAME, EventDefinitionDto.class);
     }
@@ -60,8 +63,12 @@ public class V20241212102900_ScopeMigration extends Migration {
 
     @Override
     public void upgrade() {
+        if (migrationAlreadyApplied()) {
+            return;
+        }
         updateSystemIndexScope();
         updateSystemEventScopes();
+        markMigrationApplied();
     }
 
     private void updateSystemIndexScope() {
@@ -89,4 +96,15 @@ public class V20241212102900_ScopeMigration extends Migration {
                     }
                 });
     }
+
+    private boolean migrationAlreadyApplied() {
+        return Objects.nonNull(configService.get(V20241212102900_ScopeMigration.MigrationCompleted.class));
+    }
+
+    private void markMigrationApplied() {
+        configService.write(new V20241212102900_ScopeMigration.MigrationCompleted());
+    }
+
+    // Just a marker class to indicate that the migration has been applied
+    public record MigrationCompleted() {}
 }
