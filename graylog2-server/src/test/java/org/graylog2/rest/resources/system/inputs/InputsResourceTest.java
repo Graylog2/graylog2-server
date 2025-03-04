@@ -22,7 +22,6 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
@@ -46,7 +45,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -154,14 +152,10 @@ class InputsResourceTest {
                 List.of(PipelineDao.builder().id("pipelineId1").title("pipelineTitle1").source("source1").build(),
                         PipelineDao.builder().id("pipelineId2").title("pipelineTitle2").source("source2").build())
         );
-        when(pipelineStreamConnectionsService.loadByPipelineId("pipelineId1")).thenReturn(
-                Set.of(PipelineConnections.create("id1", "streamId1", Set.of("pipelineId1", "pipelineId99")))
-        );
-        when(pipelineStreamConnectionsService.loadByPipelineId("pipelineId2")).thenReturn(Collections.emptySet());
 
         final InputsResource.InputReferences refs = inputsResource.getReferences("inputId");
 
-        assertThat(refs.pipelineRefs()).hasSize(1);
+        assertThat(refs.pipelineRefs()).hasSize(2);
     }
 
     private InputCreateRequest getCR(boolean global) {
