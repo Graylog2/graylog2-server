@@ -49,8 +49,8 @@ import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService
 import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleServiceImpl;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.AccessTokenServiceImpl;
-import org.graylog2.security.MongoDBSessionService;
-import org.graylog2.security.MongoDBSessionServiceImpl;
+import org.graylog2.security.sessions.MongoDbSessionService;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.tokenusage.TokenUsageService;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
@@ -78,7 +78,7 @@ public class PersistenceServicesBindings extends AbstractModule {
                 .setDefault().to(UserManagementServiceImpl.class);
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class).asEagerSingleton();
         bind(TokenUsageService.class).to(TokenUsageServiceImpl.class).asEagerSingleton();
-        bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class).asEagerSingleton();
+        bind(SessionService.class).to(MongoDbSessionService.class).asEagerSingleton();
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
         bind(EntitySuggestionService.class).to(MongoEntitySuggestionService.class);

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.MongoDbSession;
+import org.graylog2.security.sessions.SessionDTO;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -190,12 +190,12 @@ public abstract class UserOverviewDTO implements MongoEntity {
         public abstract Builder authServiceEnabled(boolean authServiceEnabled);
 
         @JsonIgnore
-        public Builder fillSession(Optional<MongoDbSession> session) {
+        public Builder fillSession(Optional<SessionDTO> session) {
             if (session.isPresent()) {
-                MongoDbSession lastSession = session.get();
+                SessionDTO lastSession = session.get();
                 return sessionActive(true)
-                        .lastActivity(lastSession.getLastAccessTime())
-                        .clientAddress(lastSession.getHost());
+                        .lastActivity(Date.from(lastSession.lastAccessTime()))
+                        .clientAddress(lastSession.host());
             }
             return this;
         }

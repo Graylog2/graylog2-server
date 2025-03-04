@@ -14,54 +14,61 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security;
+package org.graylog2.security.sessions;
 
-import com.google.common.collect.ImmutableMap;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_SESSION_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MongoDbSessionTest {
+class SessionDTOTest {
 
     private Map<String, Object> fields;
+    private SessionDTO session;
 
     @BeforeEach
     void setUp() {
-        fields = new HashMap<>();
-        fields.put("session_id", "session-id");
+        session = SessionDTO.builder()
+                .id(new ObjectId().toHexString())
+                .sessionId("session-id")
+                .attributes(Collections.emptyMap())
+                .expired(false)
+                .host("localhost")
+                .startTimestamp(Instant.now())
+                .lastAccessTime(Instant.now())
+                .timeout(10)
+                .build();
     }
 
     @Test
     public void noPrincipal() {
-        assertThat(new MongoDbSession(fields).getUserIdAttribute()).isEmpty();
+        assertThat(session.userId()).isEmpty();
     }
 
     @Test
     public void singlePrincipal() {
-        final MongoDbSession session = new MongoDbSession(fields);
-        session.setAttributes(ImmutableMap.of(PRINCIPALS_SESSION_KEY, "a-user-id"));
-        assertThat(session.getUserIdAttribute()).contains("a-user-id");
+        session = session.toBuilder().attributes(Map.of(PRINCIPALS_SESSION_KEY, "a-user-id")).build();
+        assertThat(session.userId()).contains("a-user-id");
     }
 
     @Test
     public void emptyPrincipalsCollection() {
-        final MongoDbSession session = new MongoDbSession(fields);
-        session.setAttributes(ImmutableMap.of(PRINCIPALS_SESSION_KEY, Collections.emptyList()));
-        assertThat(session.getUserIdAttribute()).isEmpty();
+        session = session.toBuilder().attributes(Map.of(PRINCIPALS_SESSION_KEY, Collections.emptyList())).build();
+        assertThat(session.userId()).isEmpty();
     }
 
     @Test
     public void principalsCollection() {
-        final MongoDbSession session = new MongoDbSession(fields);
-        session.setAttributes(ImmutableMap.of(PRINCIPALS_SESSION_KEY,
-                List.of("a-user-id", "secondary-principal")));
-        assertThat(session.getUserIdAttribute()).contains("a-user-id");
+        session = session.toBuilder()
+                .attributes(Map.of(PRINCIPALS_SESSION_KEY, List.of("a-user-id", "secondary-principal")))
+                .build();
+        assertThat(session.userId()).contains("a-user-id");
     }
 }

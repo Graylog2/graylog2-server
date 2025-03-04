@@ -14,41 +14,39 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security;
+package org.graylog2.security.sessions;
 
 import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.mongodb.MongoException;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.security.SessionDeletedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class MongoDbSessionDAO extends CachingSessionDAO {
-    private static final Logger LOG = LoggerFactory.getLogger(MongoDbSessionDAO.class);
+@Singleton
+public class SessionDAO extends CachingSessionDAO {
+    private static final Logger LOG = LoggerFactory.getLogger(SessionDAO.class);
 
-    private final MongoDBSessionService mongoDBSessionService;
+    private final SessionService sessionService;
 
     @Inject
-    public MongoDbSessionDAO(MongoDBSessionService mongoDBSessionService, EventBus eventBus) {
-        this.mongoDBSessionService = mongoDBSessionService;
+    public SessionDAO(SessionService sessionService, EventBus eventBus) {
+        this.sessionService = sessionService;
         eventBus.register(this);
     }
 
@@ -64,68 +62,57 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
 
     @Override
     protected Serializable doCreate(Session session) {
-        final Serializable id = generateSessionId(session);
-        assignSessionId(session, id);
-
-        Map<String, Object> fields = Maps.newHashMap();
-        fields.put("session_id", id);
-        fields.put("host", session.getHost());
-        fields.put("start_timestamp", session.getStartTimestamp());
-        fields.put("last_access_time", session.getLastAccessTime());
-        fields.put("timeout", session.getTimeout());
-        Map<Object, Object> attributes = Maps.newHashMap();
-        for (Object key : session.getAttributeKeys()) {
-            attributes.put(key.toString(), session.getAttribute(key));
+        if (!(session instanceof SimpleSession)) {
+            throw new RuntimeException("Unsupported session type: " + session.getClass().getCanonicalName());
         }
-        final MongoDbSession dbSession = new MongoDbSession(fields);
-        dbSession.setAttributes(attributes);
-        final String objectId = mongoDBSessionService.saveWithoutValidation(dbSession);
-        LOG.debug("Created session {}", objectId);
+        return doCreate((SimpleSession) session);
+    }
 
-        return id;
+    private String doCreate(SimpleSession session) {
+        final String sessionId = generateSessionId(session).toString();
+
+        assignSessionId(session, sessionId);
+
+        final var primaryKey = sessionService.create(SessionDTO.fromSimpleSession(session));
+        LOG.debug("Created session {}", primaryKey);
+
+        return sessionId;
     }
 
     @Override
     protected Session doReadSession(Serializable sessionId) {
-        final MongoDbSession dbSession = mongoDBSessionService.load(sessionId.toString());
-        if (dbSession == null) {
-            // expired session or it was never there to begin with
-            return null;
-        }
-        return mongoDBSessionService.daoToSimpleSession(dbSession);
+        return sessionService.getBySessionId(sessionId.toString()).map(SessionDTO::toSimpleSession).orElse(null);
     }
 
     @Override
     protected void doUpdate(Session session) {
-        final MongoDbSession dbSession = mongoDBSessionService.load(session.getId().toString());
-
-        if (null == dbSession) {
-            throw new RuntimeException("Couldn't load session");
-        }
-
-        LOG.debug("Updating session");
-        dbSession.setHost(session.getHost());
-        dbSession.setTimeout(session.getTimeout());
-        dbSession.setStartTimestamp(session.getStartTimestamp());
-        dbSession.setLastAccessTime(session.getLastAccessTime());
-
-        if (session instanceof SimpleSession) {
-            final SimpleSession simpleSession = (SimpleSession) session;
-            dbSession.setAttributes(simpleSession.getAttributes());
-            dbSession.setExpired(simpleSession.isExpired());
-        } else {
+        if (!(session instanceof SimpleSession)) {
             throw new RuntimeException("Unsupported session type: " + session.getClass().getCanonicalName());
         }
+        doUpdate((SimpleSession) session);
+    }
+
+    private void doUpdate(SimpleSession session) {
+        final var databaseId = sessionService.getBySessionId(session.getId().toString()).map(SessionDTO::id)
+                .orElseThrow(() -> new RuntimeException("Couldn't load session"));
+
+        LOG.debug("Updating session");
+
+        final var sessionDTO = SessionDTO.fromSimpleSession(session, databaseId);
+
         // Due to https://jira.mongodb.org/browse/SERVER-14322 upserts can fail under concurrency.
         // We need to retry the update, and stagger them a bit, so no all of the retries attempt it at the same time again.
         // Usually this should succeed the first time, though
-        final Retryer<Object> retryer = RetryerBuilder.newBuilder()
+        final var retryer = RetryerBuilder.<Void>newBuilder()
                 .retryIfException(e -> e instanceof MongoException me && MongoUtils.isDuplicateKeyError(me))
                 .withWaitStrategy(WaitStrategies.randomWait(5, TimeUnit.MILLISECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(10))
                 .build();
         try {
-            retryer.call(() -> mongoDBSessionService.saveWithoutValidation(dbSession));
+            retryer.call(() -> {
+                sessionService.update(sessionDTO);
+                return null;
+            });
         } catch (ExecutionException e) {
             LOG.warn("Unexpected exception when saving session to MongoDB. Failed to update session.", e);
             throw new RuntimeException(e.getCause());
@@ -138,11 +125,8 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
     @Override
     protected void doDelete(Session session) {
         LOG.debug("Deleting session");
-        final Serializable id = session.getId();
-        final MongoDbSession dbSession = mongoDBSessionService.load(id.toString());
-        if (dbSession != null) {
-            final int deleted = mongoDBSessionService.destroy(dbSession);
-            LOG.debug("Deleted {} sessions from database", deleted);
+        if (sessionService.deleteBySessionId(session.getId().toString())) {
+            LOG.debug("Deleted session from database");
         } else {
             LOG.debug("Session not found in database");
         }
@@ -152,12 +136,6 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
     public Collection<Session> getActiveSessions() {
         LOG.debug("Retrieving all active sessions.");
 
-        Collection<MongoDbSession> dbSessions = mongoDBSessionService.loadAll();
-        List<Session> sessions = Lists.newArrayList();
-        for (MongoDbSession dbSession : dbSessions) {
-            sessions.add(mongoDBSessionService.daoToSimpleSession(dbSession));
-        }
-
-        return sessions;
+        return sessionService.streamAll().<Session>map(SessionDTO::toSimpleSession).toList();
     }
 }

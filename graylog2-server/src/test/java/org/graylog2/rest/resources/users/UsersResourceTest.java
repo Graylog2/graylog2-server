@@ -36,10 +36,10 @@ import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserManagementService;
@@ -98,7 +98,7 @@ public class UsersResourceTest {
     @Mock
     private RoleService roleService;
     @Mock
-    private MongoDBSessionService sessionService;
+    private SessionService sessionService;
     @Mock
     private Startpage startPage;
     @Mock
@@ -231,7 +231,7 @@ public class UsersResourceTest {
 
         public TestUsersResource(UserManagementService userManagementService, PaginatedUserService paginatedUserService,
                                  AccessTokenService accessTokenService, RoleService roleService,
-                                 MongoDBSessionService sessionService, HttpConfiguration configuration,
+                                 SessionService sessionService, HttpConfiguration configuration,
                                  Subject subject, UserSessionTerminationService sessionTerminationService,
                                  DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig,
                                  ClusterConfigService clusterConfigService) {
