@@ -18,6 +18,7 @@ package org.graylog2.inputs.codecs;
 
 import com.jayway.jsonpath.PathNotFoundException;
 import org.graylog.testing.messages.MessagesExtension;
+import org.graylog2.inputs.codecs.gelf.GELFBulkDroppedMsgService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
@@ -28,7 +29,9 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -38,8 +41,11 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MessagesExtension.class)
+@ExtendWith(MockitoExtension.class)
 class EncodingTest {
     private final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
+    @Mock
+    private GELFBulkDroppedMsgService gelfBulkDroppedMsgService;
     final String MSG_FIELD = "short_message";
     final String MESSAGE = "äöüß";
     final String jsonString = "{"
@@ -54,7 +60,7 @@ class EncodingTest {
 
     @Test
     void GelfCodecTestUTF8(MessageFactory messageFactory) {
-        GelfCodec gelfCodecUTF8 = new GelfCodec(configUTF8, Mockito.mock(GelfChunkAggregator.class), messageFactory);
+        GelfCodec gelfCodecUTF8 = new GelfCodec(configUTF8, Mockito.mock(GelfChunkAggregator.class), messageFactory, gelfBulkDroppedMsgService);
 
         final Message message = gelfCodecUTF8.decodeSafe(rawUTF8).get();
         assertThat(message.getMessage()).isEqualTo(MESSAGE);
@@ -64,7 +70,7 @@ class EncodingTest {
 
     @Test
     void GelfCodecTestUTF16(MessageFactory messageFactory) {
-        GelfCodec gelfCodecUTF16 = new GelfCodec(configUTF16, Mockito.mock(GelfChunkAggregator.class), messageFactory);
+        GelfCodec gelfCodecUTF16 = new GelfCodec(configUTF16, Mockito.mock(GelfChunkAggregator.class), messageFactory, gelfBulkDroppedMsgService);
 
         final Message message = gelfCodecUTF16.decodeSafe(rawUTF16).get();
         assertThat(message.getMessage()).isEqualTo(MESSAGE);

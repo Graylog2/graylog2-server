@@ -19,6 +19,7 @@ package org.graylog2.inputs.codecs;
 import com.fasterxml.jackson.core.JsonParseException;
 import org.glassfish.grizzly.utils.Charsets;
 import org.graylog2.inputs.TestHelper;
+import org.graylog2.inputs.codecs.gelf.GELFBulkDroppedMsgService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
@@ -26,6 +27,9 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
@@ -35,18 +39,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog2.inputs.codecs.GelfCodec.DEFAULT_DECOMPRESS_SIZE_LIMIT;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 public class GelfDecoderTest {
 
     private static final Charset CHARSET = Charsets.UTF8_CHARSET;
     GelfDecoder decoder;
 
     private TestMessageFactory messageFactory;
+    @Mock
+    private GELFBulkDroppedMsgService gelfBulkDroppedMsgService;
 
     @BeforeEach
     void setUp() {
         messageFactory = new TestMessageFactory();
-        decoder = new GelfDecoder(messageFactory, DEFAULT_DECOMPRESS_SIZE_LIMIT, CHARSET);
+        decoder = new GelfDecoder(messageFactory, DEFAULT_DECOMPRESS_SIZE_LIMIT, CHARSET, gelfBulkDroppedMsgService);
     }
 
     @Test
@@ -126,7 +135,7 @@ public class GelfDecoderTest {
         final byte[] payload = TestHelper.zlibCompress(json);
         assumeTrue(payload.length > 100);
         final RawMessage rawMessage = new RawMessage(payload);
-        final GelfDecoder smallerDecompressLimitCodec = new GelfDecoder(messageFactory, 100, CHARSET);
+        final GelfDecoder smallerDecompressLimitCodec = new GelfDecoder(messageFactory, 100, CHARSET, gelfBulkDroppedMsgService);
         assertThatThrownBy(() -> smallerDecompressLimitCodec.decode(rawMessage))
                 .isInstanceOf(InputProcessingException.class)
                 .hasCauseInstanceOf(JsonParseException.class)
@@ -391,5 +400,30 @@ public class GelfDecoderTest {
         final Message message = decoder.decode(rawMessage).get();
         assertThat(message).isNotNull();
         assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2017-07-21T14:23:00.661Z"));
+    }
+
+    @Test
+    public void decodeFailsWhenMultipleMessages() {
+        final String json = "{\"short_message\":\"Bulk message 1\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
+                "\n" +
+                "{\"short_message\":\"Bulk message 2\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
+                "\n" +
+                "{\"short_message\":\"Bulk message 3\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
+                "\n" +
+                "{\"short_message\":\"Bulk message 4\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
+                "\n" +
+                "{\"short_message\":\"Bulk message 5\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        decoder.decode(rawMessage);
+        verify(gelfBulkDroppedMsgService, times(1)).handleDroppedMsgOccurrence(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsOnEmptyNode() {
+        final RawMessage rawMessage = new RawMessage("null".getBytes(StandardCharsets.UTF_8));
+        assertThatThrownBy(() -> decoder.decode(rawMessage))
+                .isInstanceOf(InputProcessingException.class)
+                .hasMessageContaining("JSON is null/could not be parsed (invalid JSON)");
     }
 }
