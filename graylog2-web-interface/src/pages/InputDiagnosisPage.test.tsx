@@ -57,9 +57,11 @@ const inputMetrics = {
   read_bytes_total: 16,
   write_bytes_1sec: 17,
   write_bytes_total: 18,
-  failures_indexing: 19,
-  failures_processing: 20,
-  failures_inputs_codecs: 21,
+  message_errors:{
+    failures_indexing: 19,
+    failures_processing: 20,
+    failures_inputs_codecs: 21,
+  },
   stream_message_count: [
     { stream_name: 'Test Stream 1', stream_id: '1', count: 22 },
     { stream_name: 'Test Stream 2', stream_id: '2', count: 23 },
