@@ -22,6 +22,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.graylog.security.certutil.ca.CA;
 import org.graylog.security.certutil.ca.CAKeyPair;
 import org.graylog.security.certutil.ca.PemCaReader;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
@@ -128,8 +129,8 @@ class CaPersistenceService {
                 // Test, if upload is PEM file, must contain at least a certificate
                 if (pem.contains("-----BEGIN CERTIFICATE")) {
                     LOG.info("Received PEM certificate bundle");
-                    var ca = PemCaReader.readCA(pem, password);
-                    keyStore.setKeyEntry(CA_KEY_ALIAS, ca.privateKey(), providedPassword, ca.certificates().toArray(new Certificate[0]));
+                    CA ca = PemCaReader.readCA(pem, password);
+                    keyStore.setKeyEntry(CA_KEY_ALIAS, ca.getPrivateKey(), providedPassword, ca.getCertificates().toArray(new Certificate[0]));
                 } else {
                     LOG.info("Received java keystore bundle");
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
