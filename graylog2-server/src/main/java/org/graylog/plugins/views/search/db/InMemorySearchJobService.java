@@ -65,7 +65,7 @@ public class InMemorySearchJobService implements SearchJobService {
     @Override
     public Optional<SearchJobDTO> load(final String id,
                                        final SearchUser searchUser) throws ForbiddenException {
-        final SearchJob searchJob = getFromCache(id);
+        final SearchJob searchJob = getFromCache(id, searchUser);
         if (searchJob == null) {
             return Optional.empty();
         } else if (hasPermissionToAccessJob(searchUser, searchJob.getOwner())) {
@@ -83,7 +83,14 @@ public class InMemorySearchJobService implements SearchJobService {
     }
 
     @Override
-    public SearchJob getFromCache(final String id) {
-        return cache.getIfPresent(id);
+    public SearchJob getFromCache(final String id, final SearchUser searchUser) {
+        final SearchJob job = cache.getIfPresent(id);
+        return job != null &&
+                hasPermissionToAccessJob(searchUser, job.getOwner()) ? job : null;
+    }
+
+    @Override
+    public boolean isInCache(String jobId) {
+        return cache.getIfPresent(jobId) != null;
     }
 }

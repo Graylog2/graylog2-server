@@ -32,7 +32,7 @@ public interface SearchJobService {
     Optional<SearchJobDTO> load(String id, SearchUser searchUser) throws ForbiddenException;
 
     default boolean cancel(final String id, final SearchUser searchUser) throws ForbiddenException {
-        final SearchJob searchJob = getFromCache(id);
+        final SearchJob searchJob = getFromCache(id, searchUser);
         if (searchJob == null) {
             return false;
         } else if (hasPermissionToAccessJob(searchUser, searchJob.getOwner())) {
@@ -43,7 +43,16 @@ public interface SearchJobService {
         }
     }
 
-    SearchJob getFromCache(final String id);
+    SearchJob getFromCache(final String id, final SearchUser searchUser);
+
+    /**
+     * Checks if a job of certain ID is in cache.
+     * It does not matter what user that job belongs to.
+     *
+     * @param jobId ID of a search job
+     * @return True if the job is in cache, false otherwise
+     */
+    boolean isInCache(final String jobId);
 
     default boolean hasPermissionToAccessJob(final SearchUser searchUser, final String jobOwner) {
         return jobOwner.equals(searchUser.username()) || searchUser.isAdmin();
