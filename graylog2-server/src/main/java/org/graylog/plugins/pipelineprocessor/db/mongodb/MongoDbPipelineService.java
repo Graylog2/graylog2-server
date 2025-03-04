@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
@@ -26,6 +27,7 @@ import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
@@ -34,6 +36,7 @@ import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -41,6 +44,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
+import static org.graylog.plugins.pipelineprocessor.db.PipelineDao.FIELD_SOURCE;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
@@ -55,15 +59,21 @@ public class MongoDbPipelineService implements PipelineService {
     private final ClusterEventBus clusterBus;
     private final MongoUtils<PipelineDao> mongoUtils;
     private final ScopedEntityMongoUtils<PipelineDao> scopedEntityMongoUtils;
+    private final MongoDbRuleService ruleService;
+    private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
 
     @Inject
     public MongoDbPipelineService(MongoCollections mongoCollections,
                                   EntityScopeService entityScopeService,
-                                  ClusterEventBus clusterBus) {
+                                  ClusterEventBus clusterBus,
+                                  MongoDbRuleService ruleService,
+                                  PipelineStreamConnectionsService pipelineStreamConnectionsService) {
         this.collection = mongoCollections.collection(COLLECTION, PipelineDao.class);
         this.clusterBus = clusterBus;
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
+        this.ruleService = ruleService;
+        this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
 
         collection.createIndex(Indexes.ascending("title"), new IndexOptions().unique(true));
     }
@@ -104,6 +114,21 @@ public class MongoDbPipelineService implements PipelineService {
             throw new NotFoundException("No pipeline with name " + name);
         }
         return pipeline;
+    }
+
+    @Override
+    public Collection<PipelineDao> loadBySourcePattern(String sourcePattern) {
+        try {
+            return ruleService.loadBySourcePattern(sourcePattern).stream()
+                    .flatMap(rule ->
+                            collection.find(Filters.regex(FIELD_SOURCE, rule.title())).into(new ArrayList<>()).stream()
+                    )
+                    .filter(pipelineDao -> !pipelineStreamConnectionsService.loadByPipelineId(pipelineDao.id()).isEmpty())
+                    .collect(Collectors.toSet());
+        } catch (MongoException e) {
+            log.error("Unable to load pipelines", e);
+            return Collections.emptySet();
+        }
     }
 
     @Override

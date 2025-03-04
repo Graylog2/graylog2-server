@@ -34,6 +34,16 @@ public interface PipelineService {
 
     PipelineDao loadByName(String name) throws NotFoundException;
 
+    /**
+     * Returns all pipelines that include rules with the given source pattern, ignoring pipelines
+     * that are not connected to any streams.
+     *
+     * This method is only implemented in the MongoDB implementation.
+     */
+    default Collection<PipelineDao> loadBySourcePattern(String sourcePattern) {
+        throw new UnsupportedOperationException("loadBySourcePattern is not implemented");
+    }
+
     Collection<PipelineDao> loadAll();
 
     void delete(String id);

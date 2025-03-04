@@ -18,15 +18,22 @@ package org.graylog2.rest.resources.system.inputs;
 
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.BadRequestException;
+import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamService;
+import org.graylog2.streams.matchers.StreamRuleMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,11 +41,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,6 +59,18 @@ class InputsResourceTest {
 
     @Mock
     InputService inputService;
+
+    @Mock
+    StreamService streamService;
+
+    @Mock
+    StreamRuleService streamRuleService;
+
+    @Mock
+    PipelineService pipelineService;
+
+    @Mock
+    PipelineStreamConnectionsService pipelineStreamConnectionsService;
 
     @Mock
     MessageInputFactory messageInputFactory;
@@ -62,11 +85,12 @@ class InputsResourceTest {
 
     @BeforeEach
     public void setUp() {
-        inputsResource = new InputsTestResource(inputService, messageInputFactory, configuration);
+        inputsResource = new InputsTestResource(inputService, streamService, streamRuleService,
+                pipelineService, pipelineStreamConnectionsService, messageInputFactory, configuration);
     }
 
     @Test
-    public void testCreateNotGlobalInputInCloud() {
+    void testCreateNotGlobalInputInCloud() {
         when(configuration.isCloud()).thenReturn(true);
 
         assertThatThrownBy(() -> inputsResource.create(getCR(false))).isInstanceOf(BadRequestException.class)
@@ -74,7 +98,7 @@ class InputsResourceTest {
     }
 
     @Test
-    public void testCreateNotCloudCompatibleInputInCloud() throws Exception {
+    void testCreateNotCloudCompatibleInputInCloud() throws Exception {
         when(configuration.isCloud()).thenReturn(true);
         when(messageInput.isCloudCompatible()).thenReturn(false);
         when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
@@ -84,7 +108,7 @@ class InputsResourceTest {
     }
 
     @Test
-    public void testCreateCloudCompatibleInputInCloud() throws Exception {
+    void testCreateCloudCompatibleInputInCloud() throws Exception {
         when(configuration.isCloud()).thenReturn(true);
         when(messageInput.isCloudCompatible()).thenReturn(true);
         when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
@@ -94,12 +118,44 @@ class InputsResourceTest {
     }
 
     @Test
-    public void testCreateInput() throws Exception {
+    void testCreateInput() throws Exception {
         when(configuration.isCloud()).thenReturn(false);
         when(messageInputFactory.create(any(), any(), any())).thenReturn(messageInput);
         when(inputService.save(any())).thenReturn("id");
 
         assertThat(inputsResource.create(getCR(true)).getStatus()).isEqualTo(201);
+    }
+
+    @Test
+    void testStreamReferences() {
+        when(streamRuleService.loadForInput("inputId")).thenReturn(List.of(
+                new StreamRuleMock(Map.of("_id", "ruleId1", "stream_id", "streamId1")),
+                new StreamRuleMock(Map.of("_id", "ruleId2", "stream_id", "streamId2"))
+        ));
+        when(streamService.streamTitleFromCache("streamId1")).thenReturn("streamTitle1");
+        when(streamService.streamTitleFromCache("streamId2")).thenReturn("streamTitle2");
+        when(pipelineService.loadBySourcePattern("inputId")).thenReturn(Collections.emptyList());
+
+        final List<InputsResource.InputReference> expected = List.of(
+                new InputsResource.InputReference("streamId1", "streamTitle1"),
+                new InputsResource.InputReference("streamId2", "streamTitle2"));
+        final InputsResource.InputReferences refs = inputsResource.getReferences("inputId");
+
+        assertThat(refs.streamRefs()).hasSize(2);
+        assertThat(refs.streamRefs()).containsAll(expected);
+    }
+
+    @Test
+    void testPipelineReferences() {
+        when(streamRuleService.loadForInput("inputId")).thenReturn(Collections.emptyList());
+        when(pipelineService.loadBySourcePattern("inputId")).thenReturn(
+                List.of(PipelineDao.builder().id("pipelineId1").title("pipelineTitle1").source("source1").build(),
+                        PipelineDao.builder().id("pipelineId2").title("pipelineTitle2").source("source2").build())
+        );
+
+        final InputsResource.InputReferences refs = inputsResource.getReferences("inputId");
+
+        assertThat(refs.pipelineRefs()).hasSize(2);
     }
 
     private InputCreateRequest getCR(boolean global) {
@@ -114,15 +170,30 @@ class InputsResourceTest {
     static class InputsTestResource extends InputsResource {
 
         private final User user;
+        private final Subject subject;
 
         public InputsTestResource(InputService inputService,
+                                  StreamService streamService,
+                                  StreamRuleService streamRuleService,
+                                  PipelineService pipelineService,
+                                  PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                   MessageInputFactory messageInputFactory,
                                   Configuration config) {
-            super(inputService, mock(InputDiagnosticService.class), messageInputFactory, config, mock(ClusterEventBus.class));
+            super(inputService, mock(InputDiagnosticService.class), streamService, streamRuleService,
+                    pipelineService, messageInputFactory, config, mock(ClusterEventBus.class));
             configuration = mock(HttpConfiguration.class);
+
             this.user = mock(User.class);
             lenient().when(user.getName()).thenReturn("foo");
             lenient().when(configuration.getHttpPublishUri()).thenReturn(URI.create("http://localhost"));
+
+            this.subject = mock(Subject.class);
+            lenient().when(subject.isPermitted(anyString())).thenReturn(true);
+        }
+
+        @Override
+        protected Subject getSubject() {
+            return subject;
         }
 
         @Nullable
