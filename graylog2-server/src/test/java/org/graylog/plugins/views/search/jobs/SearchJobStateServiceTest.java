@@ -77,7 +77,7 @@ public class SearchJobStateServiceTest {
     }
 
     @Test
-    public void testGetStatus() {
+    public void testGetExecutionState() {
         final SearchJobState toBeSaved = SearchJobState.builder()
                 .identifier(new SearchJobIdentifier("777fd86ae6db8b71a8e10000", "677fd86ae6db8b71a8e10e3e", "john", "dcae52e4-777e-4e3f-8e69-61df7a607016"))
                 .result(noResult("0000000000000042"))
@@ -87,9 +87,9 @@ public class SearchJobStateServiceTest {
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
         toTest.create(toBeSaved);
-        final Optional<SearchJobStatus> retrieved = toTest.getStatus("777fd86ae6db8b71a8e10000");
+        final Optional<SearchJobExecutionState> retrieved = toTest.getExecutionState("777fd86ae6db8b71a8e10000");
         assertTrue(retrieved.isPresent());
-        assertEquals(toBeSaved.status(), retrieved.get());
+        assertEquals(new SearchJobExecutionState(toBeSaved.status(), toBeSaved.progress()), retrieved.get());
     }
 
     @Test

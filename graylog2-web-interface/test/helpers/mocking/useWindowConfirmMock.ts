@@ -15,22 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { Input } from 'components/messageloaders/Types';
+const useWindowConfirmMock = () => {
+  let originalWindowConfirm;
 
-export const INPUT_WIZARD_STEPS = {
-  INSTALL_ILLUMINATE: 'INSTALL_ILLUMINATE',
-  SELECT_ILLUMINATE: 'SELECT_ILLUMINATE',
-  SETUP_ROUTING: 'SETUP_ROUTING',
-  INPUT_DIAGNOSIS: 'INPUT_DIAGNOSIS',
-  START_INPUT: 'START_INPUT',
-} as const;
+  beforeEach(() => {
+    originalWindowConfirm = window.confirm;
+    window.confirm = jest.fn(() => true);
+  });
 
-export type InputSetupWizardStep = (typeof INPUT_WIZARD_STEPS)[keyof typeof INPUT_WIZARD_STEPS];
-
-export type StepsData = {
-  [key in InputSetupWizardStep]?: object;
+  afterEach(() => {
+    window.confirm = originalWindowConfirm;
+  });
 };
 
-export type WizardData = {
-  input?: Input;
-};
+export default useWindowConfirmMock;

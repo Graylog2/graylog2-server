@@ -33,6 +33,7 @@ import mockEntityShareState, {
 } from 'fixtures/entityShareState';
 import ActiveShare from 'logic/permissions/ActiveShare';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import EntityShareModal from './EntityShareModal';
 
@@ -155,16 +156,7 @@ describe('EntityShareModal', () => {
   });
 
   describe('grantee selector', () => {
-    let oldConfirm;
-
-    beforeEach(() => {
-      oldConfirm = window.confirm;
-      window.confirm = jest.fn(() => true);
-    });
-
-    afterEach(() => {
-      window.confirm = oldConfirm;
-    });
+    useWindowConfirmMock();
 
     describe('adds new selected grantee', () => {
       const addGrantee = async ({ newGrantee, capability }) => {

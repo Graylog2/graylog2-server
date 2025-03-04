@@ -17,12 +17,12 @@
 import React from 'react';
 import jQuery from 'jquery';
 import styled, { css } from 'styled-components';
-import ObjectID from 'bson-objectid';
 
 import { ConfigurationForm } from 'components/configurationforms';
 import type { ConfigurationFormData } from 'components/configurationforms';
 import { Select } from 'components/common';
 import type { DecoratorType, Decorator } from 'views/components/messagelist/decorators/Types';
+import generateObjectId from 'logic/generateObjectId';
 
 import InlineForm from './InlineForm';
 import PopoverHelp from './PopoverHelp';
@@ -86,7 +86,7 @@ class AddDecoratorButton extends React.Component<Props, State> {
     const { stream, nextOrder, onCreate } = this.props;
 
     const request = {
-      id: new ObjectID().toString(),
+      id: generateObjectId(),
       stream,
       type: data.type,
       config: data.configuration,

@@ -26,12 +26,7 @@ import ValueParameter from '../parameters/ValueParameter';
 import Search from '../search/Search';
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
-
-jest.mock('bson-objectid', () =>
-  jest.fn(() => ({
-    toString: jest.fn(() => 'new-search-id'),
-  })),
-);
+jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-search-id'));
 
 jest.mock('../Widgets', () => ({
   widgetDefinition: () => ({ searchTypes: () => [{ type: 'pivot' }] }),

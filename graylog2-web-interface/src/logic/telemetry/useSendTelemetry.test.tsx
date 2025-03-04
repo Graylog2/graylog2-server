@@ -39,10 +39,10 @@ describe('useSendTelemetry', () => {
       writable: true,
     });
 
-  const oldLocation = window.location;
+  const oldLocation = window.location.pathname;
 
   afterEach(() => {
-    window.location = oldLocation;
+    window.location.pathname = oldLocation;
   });
 
   it('should return `sendTelemetry` that retrieves current route', () => {
