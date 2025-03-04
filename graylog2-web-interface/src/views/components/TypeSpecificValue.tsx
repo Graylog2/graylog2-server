@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import isString from 'lodash/isString';
 import trim from 'lodash/trim';
 import trunc from 'lodash/truncate';
@@ -32,10 +33,20 @@ import useFeature from 'hooks/useFeature';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 import EventDefinition from 'views/components/fieldtypes/EventDefinition';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import EmptyValue from './EmptyValue';
 import type { ValueRendererProps, ValueRenderer } from './messagelist/decoration/ValueRenderer';
 import DecoratorValue from './DecoratorValue';
+
+const usePluggableValueRenderer = () => {
+  const pluggableValueRenderer = usePluginEntities('fieldTypeValueRenderer');
+
+  return useMemo(
+    () => Object.fromEntries(pluggableValueRenderer.map(({ type, render }) => [type, render])),
+    [pluggableValueRenderer],
+  );
+};
 
 const defaultComponent = ({ value }: ValueRendererProps) => value;
 
@@ -89,7 +100,7 @@ const TypeSpecificValue = ({
   truncate = false,
   unit = undefined,
 }: TypeSpecificValueProps) => {
-  const Component = render;
+  const pluggableValueRenderer = usePluggableValueRenderer();
 
   if (value === undefined) {
     return null;
@@ -99,24 +110,11 @@ const TypeSpecificValue = ({
     return <DecoratorValue value={value} field={field} render={render} type={type} truncate={truncate} />;
   }
 
-  switch (type.type) {
-    case 'date':
-      return <Timestamp dateTime={value} render={render} field={field} format="complete" />;
-    case 'boolean':
-      return <Component value={String(value)} field={field} />;
-    case 'input':
-      return <InputField value={String(value)} />;
-    case 'node':
-      return <NodeField value={String(value)} />;
-    case 'streams':
-      return <StreamsField value={value} />;
-    case 'percentage':
-      return <PercentageField value={value} />;
-    case 'event-definition-id':
-      return <EventDefinition value={value} />;
-    default:
-      return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
+  if (pluggableValueRenderer[type.type]) {
+    return pluggableValueRenderer[type.type](value, field, render);
   }
+
+  return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
 };
 
 export default TypeSpecificValue;
