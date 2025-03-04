@@ -44,6 +44,8 @@ public final class LocalConfigurationCertificatesProvider implements OpensearchC
     private final String transportCertificatePassword;
     private final String httpCertificatePassword;
     private final DatanodeConfiguration datanodeConfiguration;
+    private final String transportCertificateAlias;
+    private final String httpCertificateAlias;
 
     @Inject
     public LocalConfigurationCertificatesProvider(final Configuration localConfiguration,
@@ -52,9 +54,11 @@ public final class LocalConfigurationCertificatesProvider implements OpensearchC
 
         this.tranportCertificateFile = localConfiguration.getDatanodeTransportCertificate();
         this.transportCertificatePassword = localConfiguration.getDatanodeTransportCertificatePassword();
+        this.transportCertificateAlias = localConfiguration.getDatanodeTransportCertificateAlias();
 
         this.httpCertificateFile = localConfiguration.getDatanodeHttpCertificate();
         this.httpCertificatePassword = localConfiguration.getDatanodeHttpCertificatePassword();
+        this.httpCertificateAlias = localConfiguration.getDatanodeHttpCertificateAlias();
     }
 
     @Override
@@ -120,7 +124,7 @@ public final class LocalConfigurationCertificatesProvider implements OpensearchC
         final Path httpCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(httpCertificateFile).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
         final InMemoryKeystoreInformation httpKeystore = reencrypt(new FilesystemKeystoreInformation(httpCertPath, httpCertificatePassword.toCharArray()));
 
-        return new OpensearchCertificates(transportKeystore, httpKeystore);
+        return new OpensearchCertificates(transportKeystore, transportCertificateAlias, httpKeystore, httpCertificateAlias);
     }
 
     @Nonnull

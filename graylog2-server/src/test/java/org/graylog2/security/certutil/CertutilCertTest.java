@@ -40,8 +40,7 @@ import java.security.cert.CertPathValidatorException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
-import static org.graylog.security.certutil.CertConstants.DATANODE_KEY_ALIAS;
+import java.util.Enumeration;
 
 class CertutilCertTest {
 
@@ -77,14 +76,19 @@ class CertutilCertTest {
 
         KeyStore nodeKeyStore = KeyStore.getInstance("PKCS12");
         nodeKeyStore.load(new FileInputStream(nodePath.toFile()), "changeme".toCharArray());
-        final Key nodeKey = nodeKeyStore.getKey(DATANODE_KEY_ALIAS, "changeme".toCharArray());
+
+        final Enumeration<String> aliases = nodeKeyStore.aliases();
+        Assertions.assertThat(aliases.hasMoreElements()).isTrue();
+        final String firstAlias = aliases.nextElement();
+
+        final Key nodeKey = nodeKeyStore.getKey(firstAlias, "changeme".toCharArray());
         Assertions.assertThat(nodeKey).isNotNull();
 
-        Assertions.assertThatCode(() -> nodeKeyStore.getCertificate(DATANODE_KEY_ALIAS).verify(caKeyStore.getCertificate("ca").getPublicKey()))
+        Assertions.assertThatCode(() -> nodeKeyStore.getCertificate(firstAlias).verify(caKeyStore.getCertificate("ca").getPublicKey()))
                 .doesNotThrowAnyException();
 
         var hostname = Tools.getLocalCanonicalHostname();
-        final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(DATANODE_KEY_ALIAS);
+        final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(firstAlias);
         Assertions.assertThat(certificateChain)
                 .hasSize(2)
                 .extracting(c -> (X509Certificate) c)
