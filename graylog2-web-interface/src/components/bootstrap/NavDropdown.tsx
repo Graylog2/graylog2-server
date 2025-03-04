@@ -35,6 +35,7 @@ const DropdownTrigger = styled.button<{ $active: boolean }>(
     border: 0;
     padding: 0 15px;
     min-height: ${NAV_ITEM_HEIGHT};
+    line-height: ${theme.fonts.lineHeight.body};
 
     &:hover,
     &:focus {
@@ -51,7 +52,7 @@ const DropdownTrigger = styled.button<{ $active: boolean }>(
   `,
 );
 
-const NavItem = styled.span`
+const NavItem = styled.li`
   display: inline-flex;
   align-items: center;
   min-height: ${NAV_ITEM_HEIGHT};
