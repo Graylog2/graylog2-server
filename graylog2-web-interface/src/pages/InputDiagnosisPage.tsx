@@ -139,7 +139,7 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
     return statesWithShowableInfos.length > 0;
   };
 
-  if (showNodesList(state))
+  if (showNodesList(state)) {
     return (
       <>
         <StyledListGroupItem>
@@ -150,6 +150,7 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
         ))}
       </>
     );
+  }
 
   return (
     <p>
@@ -164,9 +165,9 @@ const InputDiagnosisPage = () => {
   const history = useHistory();
 
   const isInputStateDown = inputNodeStates.total === 0 || ['FAILED', 'STOPPED', 'FAILING'].some((failedState) => Object.keys(inputNodeStates.states).includes(failedState));
-  const hasReceivedMessage = inputMetrics.incomingMessagesTotal > 0;
+  const hasReceivedMessageMetrics = inputMetrics.incomingMessagesTotal > 0;
   const hasError = Object.keys(inputMetrics.message_errors).some((error) => inputMetrics.message_errors[error] > 0);
-
+  const hasReceivedMessage = inputMetrics.stream_message_count?.some((stream) => stream.count > 0 );
   return (
     <>
       <Header>
@@ -212,12 +213,13 @@ const InputDiagnosisPage = () => {
                 {Object.keys(inputNodeStates.states).map((state: InputState) => (
                   <StateListItem key={state} state={state} inputNodeStates={inputNodeStates} />
                 ))}
+                {Object.keys(inputNodeStates.states).length === 0 && <StyledListGroupItem>Input is not running.</StyledListGroupItem>}
               </StyledListGroup>
             </Section>
           </div>
           <Section title="Troubleshooting" />
           <div>
-            <Section headerLeftSection={<StatusColorIndicator bsStyle={hasReceivedMessage ? 'success' : 'gray'}/>} title="Received Traffic">
+            <Section headerLeftSection={<StatusColorIndicator bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'}/>} title="Received Traffic">
               <StyledP className='description'>Messages and network traffic that has reached the input. Note: metrics show the last 15 minutes only.</StyledP>
               {inputMetrics && (
                 <StyledListGroup>
