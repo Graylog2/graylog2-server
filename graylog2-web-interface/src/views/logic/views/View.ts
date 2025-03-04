@@ -16,10 +16,10 @@
  */
 import * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
-import ObjectID from 'bson-objectid';
 
 import type Widget from 'views/logic/widgets/Widget';
 import defaultTitle from 'views/components/defaultTitle';
+import generateObjectId from 'logic/generateObjectId';
 
 import ViewState from './ViewState';
 import type { WidgetMapping } from './types';
@@ -302,7 +302,7 @@ class Builder {
   }
 
   newId(): Builder {
-    return this.id(new ObjectID().toString());
+    return this.id(generateObjectId());
   }
 
   title(value: string): Builder {
