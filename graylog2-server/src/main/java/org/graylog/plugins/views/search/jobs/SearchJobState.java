@@ -45,6 +45,7 @@ public abstract class SearchJobState implements MongoEntity {
     public static final String TYPE_FIELD = "type";
     public static final String RESULT_FIELD = "result";
     public static final String ERRORS_FIELD = "error_message";
+    public static final String PROGRESS_FIELD = "progress";
 
     @JsonUnwrapped
     @Id
@@ -59,7 +60,7 @@ public abstract class SearchJobState implements MongoEntity {
     @JsonProperty(ERRORS_FIELD)
     public abstract Set<SearchError> errors();
 
-    @JsonProperty("progress")
+    @JsonProperty(PROGRESS_FIELD)
     public abstract int progress();
 
     @JsonProperty(RESULT_FIELD)
@@ -93,7 +94,7 @@ public abstract class SearchJobState implements MongoEntity {
         @JsonProperty(ERRORS_FIELD)
         public abstract Builder errors(final Set<SearchError> errors);
 
-        @JsonProperty("progress")
+        @JsonProperty(PROGRESS_FIELD)
         public abstract Builder progress(final int progress);
 
         @JsonProperty(RESULT_FIELD)

@@ -16,51 +16,22 @@
  */
 package org.graylog.plugins.pipelineprocessor.events;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.Sets;
 
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
 
-@AutoValue
-public abstract class RulesChangedEvent {
+public record RulesChangedEvent(
+        @JsonProperty("updated_rules") Set<Reference> updatedRules,
+        @JsonProperty("deleted_rules") Set<Reference> deletedRules) {
+    public record Reference(String id, String title) {}
 
-    @JsonProperty
-    public abstract Set<String> deletedRuleIds();
-
-    @JsonProperty
-    public abstract Set<String> updatedRuleIds();
-
-    public static Builder builder() {
-        return new AutoValue_RulesChangedEvent.Builder().deletedRuleIds(emptySet()).updatedRuleIds(emptySet());
+    public static RulesChangedEvent updatedRule(String id, String title) {
+        return new RulesChangedEvent(Set.of(new Reference(id, title)), emptySet());
     }
 
-    public static RulesChangedEvent updatedRuleId(String id) {
-        return builder().updatedRuleId(id).build();
-    }
-
-    public static RulesChangedEvent deletedRuleId(String id) {
-        return builder().deletedRuleId(id).build();
-    }
-
-    @JsonCreator
-    public static RulesChangedEvent create(@JsonProperty("deleted_rule_ids") Set<String> deletedIds, @JsonProperty("updated_rule_ids") Set<String> updatedIds) {
-        return builder().deletedRuleIds(deletedIds).updatedRuleIds(updatedIds).build();
-    }
-
-    @AutoValue.Builder
-    public abstract static class Builder {
-        public abstract Builder deletedRuleIds(Set<String> ids);
-        public Builder deletedRuleId(String id) {
-            return deletedRuleIds(Sets.newHashSet(id));
-        }
-        public abstract Builder updatedRuleIds(Set<String> ids);
-        public Builder updatedRuleId(String id) {
-            return updatedRuleIds(Sets.newHashSet(id));
-        }
-        public abstract RulesChangedEvent build();
+    public static RulesChangedEvent deletedRule(String id, String title) {
+        return new RulesChangedEvent(emptySet(), Set.of(new Reference(id, title)));
     }
 }

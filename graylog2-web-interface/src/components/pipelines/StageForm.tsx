@@ -33,6 +33,7 @@ type Props = {
   stage?: StageType;
   create?: boolean;
   save: (nextStage: StageType, callback: () => void) => void;
+  disableEdit?: boolean;
 };
 
 const StageForm = ({
@@ -44,6 +45,7 @@ const StageForm = ({
   },
   create = false,
   save,
+  disableEdit = false,
 }: Props) => {
   const currentUser = useCurrentUser();
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -107,7 +109,7 @@ const StageForm = ({
   return (
     <span>
       <Button
-        disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
+        disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
         onClick={openModal}
         bsStyle={create ? 'success' : 'info'}>
         {create ? 'Add new stage' : 'Edit'}

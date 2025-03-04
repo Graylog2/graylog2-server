@@ -53,5 +53,9 @@ public interface RuleService {
 
     void delete(String id);
 
+    default void delete(RuleDao rule) {
+        delete(rule.id());
+    }
+
     Collection<RuleDao> loadNamed(Collection<String> ruleNames);
 }
