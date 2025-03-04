@@ -30,7 +30,9 @@ import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
@@ -56,6 +58,7 @@ public class MongoIndexSetService implements IndexSetService {
     public static final String FIELD_TITLE = "title";
 
     private final MongoCollection<IndexSetConfig> collection;
+    private final ScopedEntityMongoUtils<IndexSetConfig> scopedEntityMongoUtils;
     private final MongoUtils<IndexSetConfig> mongoUtils;
     private final ClusterConfigService clusterConfigService;
     private final ClusterEventBus clusterEventBus;
@@ -65,9 +68,12 @@ public class MongoIndexSetService implements IndexSetService {
     public MongoIndexSetService(MongoCollections mongoCollections,
                                 StreamService streamService,
                                 ClusterConfigService clusterConfigService,
-                                ClusterEventBus clusterEventBus) {
+                                ClusterEventBus clusterEventBus,
+                                EntityScopeService entityScopeService) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, IndexSetConfig.class);
         this.mongoUtils = mongoCollections.utils(this.collection);
+        this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
+
         this.streamService = streamService;
         this.clusterConfigService = clusterConfigService;
         this.clusterEventBus = requireNonNull(clusterEventBus);
@@ -154,8 +160,10 @@ public class MongoIndexSetService implements IndexSetService {
      */
     @Override
     public IndexSetConfig save(IndexSetConfig indexSetConfig) {
+        scopedEntityMongoUtils.ensureValidScope(indexSetConfig);
         String id = indexSetConfig.id();
         if (id != null) {
+            scopedEntityMongoUtils.ensureMutability(indexSetConfig);
             collection.replaceOne(idEq(id), indexSetConfig, new ReplaceOptions().upsert(true));
         } else {
             final InsertOneResult insertOneResult = collection.insertOne(indexSetConfig);
@@ -191,7 +199,12 @@ public class MongoIndexSetService implements IndexSetService {
         if (!isDeletable(id)) {
             return 0;
         }
-        int removedEntries = mongoUtils.deleteById(id) ? 1 : 0;
+        int removedEntries;
+        try {
+            removedEntries = scopedEntityMongoUtils.deleteById(id, true) ? 1 : 0;
+        } catch (IllegalArgumentException e) {
+            return 0;
+        }
         if (removedEntries > 0) {
             final IndexSetDeletedEvent deletedEvent = IndexSetDeletedEvent.create(id.toHexString());
             clusterEventBus.post(deletedEvent);
