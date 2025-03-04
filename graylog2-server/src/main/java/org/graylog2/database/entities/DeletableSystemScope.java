@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.indexset;
+package org.graylog2.database.entities;
 
-import org.graylog2.database.entities.EntityScope;
-
-public class SystemIndexSetScope extends EntityScope {
-    public static final String NAME = "GRAYLOG_SYSTEM_INDEX_SET_SCOPE";
+public class DeletableSystemScope extends EntityScope {
+    public static final String NAME = "GRAYLOG_DELETABLE_SCOPE";
 
     @Override
     public String getName() {
@@ -28,11 +26,11 @@ public class SystemIndexSetScope extends EntityScope {
 
     @Override
     public boolean isMutable() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isDeletable() {
-        return false;
+        return true;
     }
 }
