@@ -59,6 +59,7 @@ public class FieldTypeMapper {
     public static final FieldTypes.Type INPUT_TYPE = createType("input", of(PROP_ENUMERABLE));
     public static final FieldTypes.Type NODE_TYPE = createType("node", of(PROP_ENUMERABLE));
     public static final FieldTypes.Type EVENT_DEFINITION_ID_TYPE = createType("event-definition-id", of(PROP_ENUMERABLE));
+    public static final FieldTypes.Type ASSOCIATED_ASSETS_TYPE = createType("associated-assets", of(PROP_ENUMERABLE));
 
 
     /**
@@ -87,7 +88,8 @@ public class FieldTypeMapper {
             Message.FIELD_FAILED_MESSAGE_STREAMS, STREAMS_TYPE,
             Message.FIELD_GL2_SOURCE_INPUT, INPUT_TYPE,
             Message.FIELD_GL2_SOURCE_NODE, NODE_TYPE,
-            EventDto.FIELD_EVENT_DEFINITION_ID, EVENT_DEFINITION_ID_TYPE
+            EventDto.FIELD_EVENT_DEFINITION_ID, EVENT_DEFINITION_ID_TYPE,
+            "associated_assets", ASSOCIATED_ASSETS_TYPE
     );
 
     /**

@@ -117,6 +117,7 @@ import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
 import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
 import ExportMessageWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportMessageWidgetAction';
 import ExportWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetAction';
+import FieldTypeValueRenderer from 'views/components/fieldtypes/FieldTypeValueRenderer';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -392,6 +393,7 @@ const exports: PluginExports = {
     ],
     ['create-extractor'],
   ),
+  fieldTypeValueRenderer: FieldTypeValueRenderer,
   visualizationTypes: visualizationBindings,
   widgetCreators: [
     {
