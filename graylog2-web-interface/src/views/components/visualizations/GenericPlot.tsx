@@ -33,20 +33,17 @@ import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 export type PlotLayout = Layout
 
-const StyledPlot = styled(Plot)(({ theme }) => css`
-  div.plotly-notifier {
-    visibility: hidden;
-  }
-
-  .customPopover .popover-content {
-    padding: 0;
-  }
-  
-  .hoverlayer .hovertext {
-    rect {
-      fill: ${theme.colors.global.contentBackground} !important;
-      opacity: 0.9 !important;
+const StyledPlot = styled(Plot)(
+  ({ theme }) => css`
+    .customPopover .popover-content {
+      padding: 0;
     }
+
+    .hoverlayer .hovertext {
+      rect {
+        fill: ${theme.colors.global.contentBackground} !important;
+        opacity: 0.9 !important;
+      }
 
     .name {
       fill: ${theme.colors.global.textDefault} !important;
@@ -116,7 +113,7 @@ const nonInteractiveLayout = {
 
 const style = { height: '100%', width: '100%' };
 
-const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
+const config = { displayModeBar: false, doubleClick: false, responsive: true, showTips: false };
 
 const usePlotLayout = (layout: Partial<Layout>) => {
   const theme = useTheme();
@@ -240,16 +237,18 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
   }, [onRenderComplete, onAfterPlot]);
 
   return (
-    <StyledPlot data={plotChartData}
-                useResizeHandler
-                layout={plotLayout}
-                style={style}
-                onAfterPlot={_onAfterPlot}
-                onClick={interactive ? _onMarkerClick : () => false}
-                onHover={_onHoverMarker}
-                onUnhover={onUnhoverMarker}
-                onRelayout={interactive ? _onRelayout : () => {}}
-                config={config} />
+    <StyledPlot
+      data={plotChartData}
+      useResizeHandler
+      layout={plotLayout}
+      style={style}
+      onAfterPlot={_onAfterPlot}
+      onClick={interactive ? _onMarkerClick : () => false}
+      onHover={_onHoverMarker}
+      onUnhover={onUnhoverMarker}
+      onRelayout={interactive ? _onRelayout : () => {}}
+      config={config}
+    />
   );
 };
 
