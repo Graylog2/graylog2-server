@@ -12,6 +12,7 @@ import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory
 
 public class GELFBulkDroppedMsgService {
     private static final RateLimitedLog LOG = createRateLimitedLog(GELFBulkDroppedMsgService.class, 1, Duration.ofSeconds(5));
+    public static final String METRIC_SUFFIX = "dropped.message.occurrence";
 
     private final InputDiagnosisMetrics inputDiagnosisMetrics;
 
@@ -22,7 +23,7 @@ public class GELFBulkDroppedMsgService {
 
     public void handleDroppedMsgOccurrence(RawMessage rawMessage) {
         final String inputIdOnCurrentNode = InputDiagnosisMetrics.getInputIOnCurrentNode(rawMessage);
-        inputDiagnosisMetrics.incCount(name("org.graylog2.inputs", inputIdOnCurrentNode, "dropped.message.occurrence"));
+        inputDiagnosisMetrics.incCount(name("org.graylog2.inputs", inputIdOnCurrentNode, METRIC_SUFFIX));
         LOG.warn("Unexpected additional JSON content encountered after the initial valid JSON for GELF input id: {}. To ensure complete data processing, please enable bulk receiving.", inputIdOnCurrentNode);
     }
 }
