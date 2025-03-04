@@ -248,4 +248,10 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         }
         return searchEntityBuilder.build();
     }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        queries().forEach(query -> query.resolveNativeEntity(entityDescriptor, mutableGraph));
+        parameters().forEach(parameter -> parameter.resolveNativeEntity(entityDescriptor, mutableGraph));
+    }
 }
