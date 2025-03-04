@@ -16,11 +16,10 @@
  */
 import React from 'react';
 
-import {Panel} from 'components/bootstrap';
-import {ExternalLink} from 'components/common';
+import { Panel } from 'components/bootstrap';
+import { ExternalLink } from 'components/common';
 
 export default function SidebarPermissions() {
-
   return (
     <Panel bsStyle="info" header={<span>AWS Policy Permissions</span>}>
       <p>
