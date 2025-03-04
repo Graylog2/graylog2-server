@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React, {useMemo, useCallback} from 'react';
 
 import {
   DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER,
@@ -24,19 +24,24 @@ import type { Token } from 'components/users/UsersTokenManagement/hooks/useToken
 import { PaginatedEntityTable } from 'components/common';
 
 import CustomColumnRenderers from './ColumnRenderers';
+import TokenActions from 'components/users/UsersTokenManagement/TokenManagementActions';
 
 
 const TokenManagement = () => {
-  // const { entityActions } = useTableElements();
+  const tokenAction = useCallback(
+    ({ user_id, NAME:tokenName}: Token) => (
+      <TokenActions userId={user_id} tokenName={tokenName} />
+    ),
+    [],
+  );
   const columnRenderers = useMemo(() => CustomColumnRenderers(), []);
-  const emptyActions = () => (<span/>);
 
   return (
     <PaginatedEntityTable<Token> humanName="token management"
                                     columnsOrder={COLUMNS_ORDER}
                                     additionalAttributes={ADDITIONAL_ATTRIBUTES}
                                     actionsCellWidth={320}
-                                    entityActions={emptyActions}
+                                    entityActions={tokenAction}
                                     tableLayout={DEFAULT_LAYOUT}
                                     fetchEntities={fetchTokens}
                                     keyFn={keyFn}
