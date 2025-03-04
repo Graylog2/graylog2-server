@@ -303,7 +303,6 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         if(queryParameters() != null) {
             queryParameters().forEach(parameter -> parameter.resolveNativeEntity(entityDescriptor, mutableGraph));
         }
-        filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 
     @Override
