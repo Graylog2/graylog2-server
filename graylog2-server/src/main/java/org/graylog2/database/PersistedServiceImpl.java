@@ -42,6 +42,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Legacy implementation of PersistedService.
+ *
+ * <p>This implementation is being phased out in favor of Jackson-based MongoDB serialization.
+ * New code should use MongoCollections instead of this class.</p>
+ *
+ * @see org.graylog2.database.MongoCollections
+ */
+@Deprecated(since = "6.2.0", forRemoval = true)
 public class PersistedServiceImpl implements PersistedService {
     private static final Logger LOG = LoggerFactory.getLogger(PersistedServiceImpl.class);
     public final MongoConnection mongoConnection;
