@@ -46,7 +46,7 @@ const useClusterNodes = (): ClusterNodes => {
     role: graylogNode.is_leader ? 'Leader' : 'Non-Leader',
     nodeInfo: {
       ...graylogNode,
-      ...systemInfo[graylogNode.node_id]
+      ...(systemInfo || {})[graylogNode.node_id]
     },
   }));
 

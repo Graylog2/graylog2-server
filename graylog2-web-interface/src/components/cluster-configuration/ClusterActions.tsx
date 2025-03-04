@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import URI from 'urijs';
 
 import { LinkContainer } from 'components/common/router';
@@ -26,7 +25,7 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
-import { GraylogNode } from './useClusterNodes';
+import type { GraylogNode } from './useClusterNodes';
 
 type Props = {
   node: GraylogNode;

@@ -24,6 +24,9 @@ import ClusterConfigurationGraphView from 'components/cluster-configuration/Clus
 import ClusterConfigurationListView from 'components/cluster-configuration/ClusterConfigurationListView';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
 import type { SearchParams } from 'stores/PaginationTypes';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
 
 const ViewTypeSwitchContainer = styled(Col)`
   display: flex;
@@ -50,6 +53,7 @@ const ClusterConfigurationPage = () => {
 
   return (
     <DocumentTitle title="Cluster Configuration">
+      <ClusterConfigurationPageNavigation />
       <div>
         <PageHeader title="Cluster Configuration">
           <span>
@@ -59,6 +63,9 @@ const ClusterConfigurationPage = () => {
             will be persisted to disk, even when processing is disabled.
           </span>
         </PageHeader>
+        <HideOnCloud>
+          <IndexerClusterHealth minimal />
+        </HideOnCloud>
         <Row className="content">
           <Col xs={6}>
             <h2>Nodes</h2>

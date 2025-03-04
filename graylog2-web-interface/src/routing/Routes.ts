@@ -81,7 +81,12 @@ const Routes = {
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
-    CLUSTER: '/system/cluster',
+    CLUSTER: {
+      NODES: '/system/cluster',
+      DATANODE_DASHBOARD: '/system/cluster/datanode-dashboard',
+      DATANODE_CONFIGURATION: '/system/cluster/datanode-configuration',
+      DATANODE_MIGRATION: '/system/cluster/datanode-migration',
+    },
     CONFIGURATIONS: '/system/configurations',
     configurationsSection: (section: string, pluginSection?: string) =>
       `/system/configurations/${section}${pluginSection ? `/${pluginSection}` : ''}`,
