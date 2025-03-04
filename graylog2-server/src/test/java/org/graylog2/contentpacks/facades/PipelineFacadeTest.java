@@ -109,7 +109,8 @@ public class PipelineFacadeTest {
 
         final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection());
-        pipelineService = new MongoDbPipelineService(mongoCollections, entityScopeService, clusterEventBus, mock(MongoDbRuleService.class));
+        pipelineService = new MongoDbPipelineService(
+                mongoCollections, entityScopeService, clusterEventBus, mock(MongoDbRuleService.class), mock(PipelineStreamConnectionsService.class));
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoCollections, clusterEventBus);
 
         facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService, streamService);

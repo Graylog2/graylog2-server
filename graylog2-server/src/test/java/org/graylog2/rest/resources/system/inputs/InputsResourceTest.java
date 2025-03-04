@@ -26,8 +26,8 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
@@ -186,7 +186,7 @@ class InputsResourceTest {
                                   MessageInputFactory messageInputFactory,
                                   Configuration config) {
             super(inputService, mock(InputDiagnosticService.class), streamService, streamRuleService,
-                    pipelineService, pipelineStreamConnectionsService, messageInputFactory, config, mock(ClusterEventBus.class));
+                    pipelineService, messageInputFactory, config, mock(ClusterEventBus.class));
             configuration = mock(HttpConfiguration.class);
 
             this.user = mock(User.class);

@@ -95,7 +95,7 @@ class MongoDbRuleServiceTest {
     }
 
     @Test
-    void loadBySourcePattern() throws Exception {
+    void loadBySourcePattern() {
         ruleService.save(dummyRule().toBuilder().title("title 1").source("abcdef").build());
         ruleService.save(dummyRule().toBuilder().title("title 2").source("bcd").build());
         assertThat(ruleService.loadBySourcePattern("abc")).hasSize(1);
