@@ -24,6 +24,7 @@ import { FormikInput, InputOptionalInfo, Spinner } from 'components/common';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
+import SelectedIndexSetAlert from 'components/inputs/InputSetupWizard/steps/components/SelectedIndexSetAlert';
 
 export type StreamFormValues = StreamConfiguration;
 
@@ -85,7 +86,7 @@ const CreateStreamForm = ({ submitForm }: Props) => {
 
   return (
     <Formik<FormValues> initialValues={initialValues} onSubmit={submitForm} validate={validate}>
-      {({ isValid, isValidating, dirty }) => (
+      {({ isValid, isValidating, dirty, values }) => (
         <Form>
           <FormikInput label="Title" name="title" id="title" help="A descriptive name of the new stream" />
           <FormikInput
@@ -98,6 +99,7 @@ const CreateStreamForm = ({ submitForm }: Props) => {
             id="description"
             help="What kind of messages are routed into this stream?"
           />
+          <SelectedIndexSetAlert indexSets={indexSets} selectedIndexSetId={values.index_set_id} />
 
           <IndexSetSelect indexSets={indexSets} />
           <NewIndexSetButton bsSize="xs" onClick={handleNewIndexSetClick}>
