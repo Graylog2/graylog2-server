@@ -23,7 +23,7 @@ import UserNotification from 'util/UserNotification';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { onError } from 'util/conditional/onError';
 
-type ScopeParams = {
+export type ScopeParams = {
   is_mutable: boolean;
   is_deletable?: boolean;
 };
