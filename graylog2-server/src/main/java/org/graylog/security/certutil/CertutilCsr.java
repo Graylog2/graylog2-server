@@ -20,6 +20,7 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.checkerframework.common.returnsreceiver.qual.This;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
 import org.graylog.security.certutil.csr.CsrGenerator;
@@ -68,7 +69,9 @@ public class CertutilCsr implements CliCommand {
         console.printLine("This tool will generate a CSR for the datanode");
         char[] privKeyPassword = this.console.readPassword(PROMPT_ENTER_PASSWORD_TO_PROTECT_YOUR_PRIVATE_KEY);
 
-        final String alias = createKeyAlias();
+        // This will be the only key in the keystore, we don't care much about the alias. To make sure we are
+        // not dependent on a specific alias, we can generate a random alphabetic sequence.
+        final String alias = RandomStringUtils.secure().nextAlphabetic(10);
 
         try {
             final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(alias).isCA(false).validity(Duration.ofDays(99 * 365)));
@@ -90,13 +93,5 @@ public class CertutilCsr implements CliCommand {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * This will be the only key in the keystore, we don't care much about the alias. To make sure we are
-     * not dependent on a specific alias, we can generate a random alphabetic sequence.
-     */
-    private static String createKeyAlias() {
-        return RandomStringUtils.randomAlphabetic(10);
     }
 }
