@@ -88,6 +88,7 @@ const UserConfig = () => {
   };
 
   const timeoutIntervalValidator = (milliseconds: number) => milliseconds >= 1000;
+  const defaultTokenTtlValidator = (milliseconds: number) => (milliseconds/3600000) >= 24; /* converting millis to hours | 86400000 millis */
 
   const modalTitle = 'Update User Configuration';
 
@@ -107,6 +108,8 @@ const UserConfig = () => {
             <dd>{viewConfig.enable_global_session_timeout ? viewConfig.global_session_timeout_interval : '-'}</dd>
             <dt>Allow access token for external users:&nbsp;</dt>
             <dd>{viewConfig.allow_access_token_for_external_user ? 'Enabled' : 'Disabled'}</dd>
+            <dt>Default TTL for new tokens:</dt>
+            <dd>{viewConfig.default_ttl_for_new_tokens ? viewConfig.default_ttl_for_new_tokens : '-'}</dd>
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">
@@ -166,6 +169,21 @@ const UserConfig = () => {
                                          <LabelSpan>Allow access token for external users</LabelSpan>
                                        )} />
                           <InputDescription help="If enabled, it will allow external users to use access tokens." />
+                        </Col>
+                        <Col sm={12}>
+                          <fieldset>
+                            <ISODurationInput
+                              id="default_ttl_for_new_tokens"
+                              duration={values.default_ttl_for_new_tokens}
+                              update={(value) => setFieldValue('default_ttl_for_new_tokens', value)}
+                              label="Default TTL for new tokens (as ISO8601 Duration)"
+                              help="Tokens will be automatically invalidated after this amount of time."
+                              validator={defaultTokenTtlValidator}
+                              errorText="invalid (min: 1 day)"
+                              disabled={!values.default_ttl_for_new_tokens}
+                              required
+                            />
+                          </fieldset>
                         </Col>
                       </Row>
                     </div>
