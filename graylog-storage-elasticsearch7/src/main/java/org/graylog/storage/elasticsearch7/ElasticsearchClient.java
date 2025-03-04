@@ -160,8 +160,7 @@ public class ElasticsearchClient {
     }
 
     private ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
-        if (e instanceof ElasticsearchException) {
-            final ElasticsearchException elasticsearchException = (ElasticsearchException) e;
+        if (e instanceof ElasticsearchException elasticsearchException) {
             if (isIndexNotFoundException(elasticsearchException)) {
                 throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }

@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -226,7 +225,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(succeeded.get()).isTrue();
     }
 
-
     private void waitForClusterBlockRelease() throws ExecutionException, RetryException {
         RetryerBuilder.<String>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
@@ -327,10 +325,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().putSetting("cluster.routing.allocation.disk.watermark.low", "85%");
 
         client().resetIndexBlock(index);
-    }
-
-    private Map.Entry<IndexSet, Message> entry(IndexSet indexSet, Message message) {
-        return new AbstractMap.SimpleEntry<>(indexSet, message);
     }
 
     private DateTime now() {

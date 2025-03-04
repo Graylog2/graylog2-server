@@ -80,4 +80,8 @@ public interface Client {
     String getClusterSetting(String setting);
 
     void putFieldMapping(final String index, final String field, final String type);
+
+    default void setRequestCircuitBreakerLimit(String limit) {
+        putSetting("indices.breaker.total.limit", limit);
+    }
 }
