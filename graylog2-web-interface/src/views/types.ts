@@ -125,11 +125,6 @@ export interface WidgetExport {
   exportComponent?: React.ComponentType<{ widget: Widget }>;
 }
 
-export interface VisualizationConfigProps {
-  config: WidgetConfig;
-  onChange: (newConfig: WidgetConfig) => void;
-}
-
 type BaseField = {
   title: string;
   name: string;
