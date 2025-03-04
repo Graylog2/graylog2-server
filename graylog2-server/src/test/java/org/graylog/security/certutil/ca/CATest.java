@@ -101,7 +101,7 @@ public class CATest {
                 List.of(rootCA.certificate(), intermediateCA.certificate(), ca.certificate()),
                 rootCA.privateKey()))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Private key does not match ca certificate public key");
+                .hasMessage("Provided CA private key doesn't correspond to provided CA certificate");
     }
 
     @Test
