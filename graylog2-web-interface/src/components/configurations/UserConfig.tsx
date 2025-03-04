@@ -105,6 +105,8 @@ const UserConfig = () => {
             <dd>{viewConfig.enable_global_session_timeout ? 'Enabled' : 'Disabled'}</dd>
             <dt>Timeout interval:</dt>
             <dd>{viewConfig.enable_global_session_timeout ? viewConfig.global_session_timeout_interval : '-'}</dd>
+            <dt>Restrict access tokens to admins:&nbsp;</dt>
+            <dd>{viewConfig.restrict_access_token_to_admins ? 'Enabled' : 'Disabled'}</dd>
             <dt>Allow access token for external users:&nbsp;</dt>
             <dd>{viewConfig.allow_access_token_for_external_user ? 'Enabled' : 'Disabled'}</dd>
           </StyledDefList>
@@ -157,6 +159,15 @@ const UserConfig = () => {
                               required
                             />
                           </fieldset>
+                        </Col>
+                        <Col sm={12}>
+                          <FormikInput type="checkbox"
+                                       name="restrict_access_token_to_admins"
+                                       id="restrict_access_token_to_admins"
+                                       label={(
+                                         <LabelSpan>Restrict access tokens to admins</LabelSpan>
+                                       )} />
+                          <InputDescription help="If enabled, it will restrict the usage of access tokens to admins." />
                         </Col>
                         <Col sm={12}>
                           <FormikInput type="checkbox"
