@@ -42,15 +42,15 @@ import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_REGULAR;
 /**
  * Make system index sets (regular==false) non-deletable by assigning NonDeletableSystemScope
  */
-public class V20241212102900_ScopeMigration extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20241212102900_ScopeMigration.class);
+public class V20250304102900_ScopeMigration extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20250304102900_ScopeMigration.class);
 
     private final ClusterConfigService configService;
     private final MongoCollection<EventDefinitionDto> eventDefinitionCollection;
     private final MongoCollection<IndexSetConfig> indexSetCollection;
 
     @Inject
-    public V20241212102900_ScopeMigration(ClusterConfigService configService, MongoCollections mongoCollections) {
+    public V20250304102900_ScopeMigration(ClusterConfigService configService, MongoCollections mongoCollections) {
         this.configService = configService;
         this.indexSetCollection = mongoCollections.collection(MongoIndexSetService.COLLECTION_NAME, IndexSetConfig.class);
         this.eventDefinitionCollection = mongoCollections.collection(DBEventDefinitionService.COLLECTION_NAME, EventDefinitionDto.class);
@@ -98,11 +98,11 @@ public class V20241212102900_ScopeMigration extends Migration {
     }
 
     private boolean migrationAlreadyApplied() {
-        return Objects.nonNull(configService.get(V20241212102900_ScopeMigration.MigrationCompleted.class));
+        return Objects.nonNull(configService.get(V20250304102900_ScopeMigration.MigrationCompleted.class));
     }
 
     private void markMigrationApplied() {
-        configService.write(new V20241212102900_ScopeMigration.MigrationCompleted());
+        configService.write(new V20250304102900_ScopeMigration.MigrationCompleted());
     }
 
     // Just a marker class to indicate that the migration has been applied
