@@ -84,7 +84,7 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
     };
   }
 
-  _onTryClick() {
+  _onTryClick = () => {
     this.setState({ trying: true });
 
     const { configuration } = this.state;
@@ -119,7 +119,7 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
     });
 
     promise.finally(() => this.setState({ trying: false }));
-  }
+  };
 
   _isTryButtonDisabled() {
     return this.state.trying || !this.props.exampleMessage;
