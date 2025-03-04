@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.PrivateKey;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -60,7 +59,36 @@ public class PemCaReader {
         }
     }
 
-    public record CA(List<Certificate> certificates, PrivateKey privateKey) {}
+    public record CA(List<X509Certificate> certificates, PrivateKey privateKey) {
+        public CA {
+            validateCertificates(certificates);
+        }
+
+        private void validateCertificates(List<X509Certificate> certificates) {
+            if (certificates == null || certificates.isEmpty()) {
+                throw new IllegalArgumentException("Certificate list is empty");
+            }
+            final X509Certificate ca = certificates.get(0);
+            if (ca.getBasicConstraints() == -1) {
+                throw new IllegalArgumentException("First certificate in list is no CA");
+            }
+            if (certificates.size() > 1 && !isCertPathOrderedCorrectly(certificates)) {
+                throw new IllegalArgumentException("Certficicates must be ordered correctly (signing CA - intermediates - root CA)");
+            }
+        }
+
+        private boolean isCertPathOrderedCorrectly(List<X509Certificate> certPath) {
+            for (int i = 0; i < certPath.size() - 1; i++) {
+                X509Certificate currentCert = certPath.get(i);
+                X509Certificate nextCert = certPath.get(i + 1);
+
+                if (!currentCert.getIssuerX500Principal().equals(nextCert.getSubjectX500Principal())) {
+                    return false; // Issuer of current != subject of next
+                }
+            }
+            return true;
+        }
+    }
 
     // TODO: secure against errors, tests
     public static CA readCA(final String pemFileContent, final String keyPassword) throws CACreationException {
@@ -68,7 +96,7 @@ public class PemCaReader {
             PEMParser pemParser = new PEMParser(bundleReader);
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
 
-            var certificates = new ArrayList<Certificate>();
+            var certificates = new ArrayList<X509Certificate>();
             PrivateKey privateKey = null;
 
             var pemObjects = readPemObjects(pemParser);
