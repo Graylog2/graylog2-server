@@ -23,6 +23,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
@@ -30,13 +32,13 @@ import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.sessions.SessionDAO;
+import org.graylog2.security.sessions.SessionDTO;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.events.UserChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.io.Serializable;
 import java.util.EnumSet;
@@ -71,16 +73,16 @@ public class UserSessionTerminationService extends AbstractIdleService {
             User.AccountStatus.DISABLED
     );
 
-    private final MongoDbSessionDAO sessionDao;
-    private final MongoDBSessionService sessionService;
+    private final SessionDAO sessionDao;
+    private final SessionService sessionService;
     private final DefaultSecurityManager securityManager;
     private final ClusterConfigService clusterConfigService;
     private final UserService userService;
     private final EventBus eventBus;
 
     @Inject
-    public UserSessionTerminationService(MongoDbSessionDAO sessionDao,
-                                         MongoDBSessionService sessionService,
+    public UserSessionTerminationService(SessionDAO sessionDao,
+                                         SessionService sessionService,
                                          DefaultSecurityManager securityManager,
                                          ClusterConfigService clusterConfigService,
                                          UserService userService,
@@ -180,9 +182,9 @@ public class UserSessionTerminationService extends AbstractIdleService {
     private Set<String> getSessionIDsForUser(User user) {
         final String userId = requireNonNull(user.getId(), "user ID cannot be null");
 
-        return sessionService.loadAll().stream()
-                .filter(session -> userId.equals(session.getUserIdAttribute().orElse(null)))
-                .map(MongoDbSession::getSessionId)
+        return sessionService.streamAll()
+                .filter(session -> userId.equals(session.userId().orElse(null)))
+                .map(SessionDTO::sessionId)
                 .collect(Collectors.toSet());
     }
 
@@ -207,7 +209,7 @@ public class UserSessionTerminationService extends AbstractIdleService {
 
         @JsonCreator
         public static GlobalTerminationRevisionConfig create(@JsonProperty("applied_revision") long appliedRevision) {
-            return new AutoValue_UserSessionTerminationService_GlobalTerminationRevisionConfig(appliedRevision);
+            return new org.graylog2.security.AutoValue_UserSessionTerminationService_GlobalTerminationRevisionConfig(appliedRevision);
         }
     }
 }
