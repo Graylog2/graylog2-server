@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { renderHook } from 'wrappedTestingLibrary/hooks';
-import ObjectID from 'bson-objectid';
 
 import {
   mockedMappedAggregation,
@@ -33,6 +32,7 @@ import generateId from 'logic/generateId';
 import asMock from 'helpers/mocking/AsMock';
 import type View from 'views/logic/views/View';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import generateObjectId from 'logic/generateObjectId';
 
 const counter = () => {
   let index = 0;
@@ -105,9 +105,8 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: { exports: jest.fn(() => [{ type: 'aggregation', defaults: {} }]) },
 }));
 
+jest.mock('logic/generateObjectId', () => jest.fn());
 jest.mock('logic/generateId', () => jest.fn());
-
-jest.mock('bson-objectid', () => jest.fn());
 
 const mock_color = StaticColor.create('#ffffff');
 
@@ -139,13 +138,7 @@ describe('UseCreateViewForEvent', () => {
 
   it('should create view with 2 aggregation widgets and one summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdTwoAggregations);
-
-    asMock(ObjectID).mockImplementation(
-      () =>
-        ({
-          toString: () => mockedObjectIdTwoAggregations(),
-        }) as ObjectID,
-    );
+    asMock(generateObjectId).mockImplementation(mockedObjectIdTwoAggregations);
 
     const { result } = renderHook(() =>
       UseCreateViewForEvent({
@@ -161,13 +154,7 @@ describe('UseCreateViewForEvent', () => {
 
   it('should create view with 1 aggregation widgets and without summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregation);
-
-    asMock(ObjectID).mockImplementation(
-      () =>
-        ({
-          toString: () => mockedObjectIdOneAggregation(),
-        }) as ObjectID,
-    );
+    asMock(generateObjectId).mockImplementation(mockedObjectIdOneAggregation);
 
     const { result } = renderHook(() =>
       UseCreateViewForEvent({
@@ -183,13 +170,7 @@ describe('UseCreateViewForEvent', () => {
 
   it('should create view with 1 aggregation widgets when aggregation has no fields and grouping by', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregationNoFields);
-
-    asMock(ObjectID).mockImplementation(
-      () =>
-        ({
-          toString: () => mockedObjectIdOneAggregationNoFields(),
-        }) as ObjectID,
-    );
+    asMock(generateObjectId).mockImplementation(mockedObjectIdOneAggregationNoFields);
 
     const { result } = renderHook(() =>
       UseCreateViewForEvent({

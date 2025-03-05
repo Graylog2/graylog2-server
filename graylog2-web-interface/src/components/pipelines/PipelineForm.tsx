@@ -32,6 +32,7 @@ type Props = {
   modal?: boolean;
   save: (pipeline: PipelineType, callback: () => void) => void;
   onCancel?: () => void;
+  disableEdit?: boolean;
 };
 
 const emptyPipeline: PipelineType = {
@@ -44,7 +45,14 @@ const emptyPipeline: PipelineType = {
   modified_at: '',
 };
 
-const PipelineForm = ({ pipeline = emptyPipeline, create = false, modal = true, save, onCancel = () => {} }: Props) => {
+const PipelineForm = ({
+  pipeline = emptyPipeline,
+  create = false,
+  modal = true,
+  save,
+  onCancel = () => {},
+  disableEdit = false,
+}: Props) => {
   const currentUser = useCurrentUser();
   const [nextPipeline, setNextPipeline] = useState<PipelineType>(cloneDeep(pipeline));
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -107,7 +115,7 @@ const PipelineForm = ({ pipeline = emptyPipeline, create = false, modal = true, 
     return (
       <span>
         <Button
-          disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
+          disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
           onClick={_openModal}
           bsStyle="success">
           {create ? 'Add new pipeline' : 'Edit pipeline details'}

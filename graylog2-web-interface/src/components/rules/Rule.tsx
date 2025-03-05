@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
-import { PageHeader } from 'components/common';
-import { Row, Col, Button, BootstrapModalConfirm } from 'components/bootstrap';
+import { PageHeader, Spinner } from 'components/common';
+import { Row, Col, Button, BootstrapModalConfirm, Alert } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -25,10 +25,12 @@ import useLocation from 'routing/useLocation';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 import RuleBuilder from './rule-builder/RuleBuilder';
 import RuleForm from './RuleForm';
 import RuleHelper from './rule-helper/RuleHelper';
+import { PipelineRulesContext } from './RuleContext';
 
 import PipelinesPageNavigation from '../pipelines/PipelinesPageNavigation';
 
@@ -40,10 +42,16 @@ type Props = {
 
 const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
   const [showConfirmSourceCodeEditor, setShowConfirmSourceCodeEditor] = useState<boolean>(false);
-
+  const { rule } = useContext(PipelineRulesContext);
+  const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(rule);
+  const isManaged = scopePermissions && !scopePermissions?.is_mutable;
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+
+  if (loadingScopePermissions) {
+    return <Spinner text="Loading Rule" />;
+  }
 
   let pageTitle;
 
@@ -90,13 +98,13 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
           satisfied.
         </span>
       </PageHeader>
-
       {isRuleBuilder ? (
         <RuleBuilder />
       ) : (
         <Row className="content">
           <Col md={6}>
-            <RuleForm create={create} />
+            {isManaged && <Alert bsStyle="warning">This rule is managed by Application. You cannot edit it.</Alert>}
+            <RuleForm create={create} isManaged={isManaged} />
           </Col>
           <Col md={6}>
             <RuleHelper />
