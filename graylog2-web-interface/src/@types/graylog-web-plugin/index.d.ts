@@ -160,7 +160,7 @@ type InputSetupWizard = {
   EnterpriseInputSetupWizard: React.ComponentType<{
     openSteps: { [key in InputSetupWizardStep]?: StepType };
   }>;
-  StartIlluminate: React.ComponentType;
+  ExtraSetupWizardStep: React.ComponentType;
 };
 
 type License = {

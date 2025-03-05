@@ -50,9 +50,9 @@ export type ProcessingSteps =
   | 'result';
 
 const StartInputStep = () => {
-  const StartIlluminate = PluginStore.exports('inputSetupWizard').find(
-    (plugin) => !!plugin.StartIlluminate,
-  )?.StartIlluminate;
+  const ExtraSetupWizardStep = PluginStore.exports('inputSetupWizard').find(
+    (plugin) => !!plugin.ExtraSetupWizardStep,
+  )?.ExtraSetupWizardStep;
 
   const navigateTo = useNavigate();
   const { goToPreviousStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
@@ -390,7 +390,7 @@ const StartInputStep = () => {
                     isError={startInputStatus === 'FAILED'}
                   />
                 )}
-                {isIlluminateFlow && startInputStatus === 'SUCCESS' && <StartIlluminate />}
+                {isIlluminateFlow && startInputStatus === 'SUCCESS' && <ExtraSetupWizardStep />}
               </>
             ))}
 
