@@ -31,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptio
 import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.AutoDateHistogramAggregationBuilder;
@@ -58,6 +59,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -99,8 +101,8 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     @Override
     public MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                          Sorting sorting, int page, int perPage, Set<String> eventStreams,
-                                         String filterString, Set<String> forbiddenSourceStreams) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams);
+                                         String filterString, Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
@@ -139,8 +141,9 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
     @Override
     public MoreSearch.Histogram eventHistogram(int buckets, String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
-                                               Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, ZoneId timeZone) {
-        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams);
+                                               Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                               ZoneId timeZone, Map<String, Set<String>> extraFilters) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
@@ -187,7 +190,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
     }
 
-    private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams) {
+    private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
         final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*"))
                 ? matchAllQuery()
                 : queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
@@ -196,6 +199,13 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                 .filter(query)
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
                 .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
+
+        extraFilters.entrySet()
+                .stream()
+                .flatMap(extraFilter -> extraFilter.getValue()
+                        .stream()
+                        .map(value -> buildExtraFilter(extraFilter.getKey(), value)))
+                .forEach(filter::filter);
 
         if (!isNullOrEmpty(filterString)) {
             filter.filter(queryStringQuery(filterString));
@@ -207,6 +217,10 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
             filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
         }
         return filter;
+    }
+
+    private QueryBuilder buildExtraFilter(String field, String value) {
+        return QueryBuilders.multiMatchQuery(value, field);
     }
 
     private List<FieldSortBuilder> createSorting(Sorting sorting) {
