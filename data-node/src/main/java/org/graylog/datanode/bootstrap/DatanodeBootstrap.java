@@ -88,7 +88,7 @@ public abstract class DatanodeBootstrap extends AbstractNodeCommand {
                 new PreflightClusterConfigurationModule(chainingClassLoader),
                 new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
-                new PreflightChecksBindings(),
+                new PreflightChecksBindings(chainingClassLoader),
                 new DatanodeConfigurationBindings(),
         new Module() {
                     @Override
