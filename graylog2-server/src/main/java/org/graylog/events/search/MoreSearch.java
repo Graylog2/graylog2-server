@@ -30,12 +30,15 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -98,7 +101,35 @@ public class MoreSearch {
                     .executedQuery(queryString)
                     .build();
         }
-        return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(), parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams);
+        return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(),
+                parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams, parameters.filter().extraFilters());
+    }
+
+    /**
+     * Creates a histogram over events for the given parameters.
+     *
+     * @param parameters             event search parameters
+     * @param filterString           filter string
+     * @param eventStreams           event streams to search in
+     * @param forbiddenSourceStreams forbidden source streams
+     * @return the result
+     */
+    // TODO: We cannot use Searches#search() at the moment because that method cannot handle multiple streams. (because of Searches#extractStreamId())
+    //       We also cannot use the new search code at the moment because it doesn't do pagination.
+    Histogram histogram(EventsSearchParameters parameters, String filterString, Set<String> eventStreams, Set<String> forbiddenSourceStreams, ZoneId timeZone) {
+        checkArgument(parameters != null, "parameters cannot be null");
+        checkArgument(!eventStreams.isEmpty(), "eventStreams cannot be empty");
+        checkArgument(forbiddenSourceStreams != null, "forbiddenSourceStreams cannot be null");
+
+        final String queryString = parameters.query().trim();
+        final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
+
+        final var effectiveTimeRange = AbsoluteRange.create(parameters.timerange().getFrom(), parameters.timerange().getTo());
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Histogram.empty(effectiveTimeRange);
+        }
+        return moreSearchAdapter.eventHistogram(30, queryString, effectiveTimeRange, affectedIndices, eventStreams,
+                filterString, forbiddenSourceStreams, timeZone, parameters.filter().extraFilters());
     }
 
     private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
@@ -231,4 +262,15 @@ public class MoreSearch {
             public abstract Result build();
         }
     }
+
+    public record Histogram(EventsBuckets buckets) {
+        public static Histogram empty(AbsoluteRange effectiveTimeRange) {
+            return new Histogram(new EventsBuckets(List.of(), List.of()));
+        }
+
+        public record EventsBuckets(List<Bucket> events, List<Bucket> alerts) {}
+
+        public record Bucket(ZonedDateTime startDate, Long count) {}
+    }
+
 }
