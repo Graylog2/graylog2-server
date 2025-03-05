@@ -108,7 +108,7 @@ class InputRoutingServiceTest {
     @Test
     void handleInputDeleted() throws IOException {
         final RuleDao ruleDao = loadFixture("org/graylog2/inputs/routing/InputRoutingRule1.json", RuleDao.class);
-        when(ruleService.loadAll()).thenReturn(List.of(ruleDao));
+        when(ruleService.loadAllFilteredByTitle(anyString())).thenReturn(List.of(ruleDao));
 
         inputRoutingService.handleInputDeleted(new InputDeletedEvent(INPUT_ID, INPUT_NAME));
         verify(ruleService).delete(ruleDao);
