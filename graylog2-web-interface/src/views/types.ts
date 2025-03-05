@@ -62,6 +62,7 @@ import type { FilterComponents, Attributes } from 'views/components/widgets/over
 import type { Event } from 'components/events/events/types';
 import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
+import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -122,11 +123,6 @@ export interface WidgetExport {
   searchTypes: (widget: Widget) => Array<any>;
   titleGenerator?: (widget: { config: Widget['config'] }) => string;
   exportComponent?: React.ComponentType<{ widget: Widget }>;
-}
-
-export interface VisualizationConfigProps {
-  config: WidgetConfig;
-  onChange: (newConfig: WidgetConfig) => void;
 }
 
 type BaseField = {
@@ -509,6 +505,10 @@ declare module 'graylog-web-plugin/plugin' {
     enterpriseWidgets?: Array<WidgetExport>;
     useExternalActions?: Array<() => ExternalActionsHookData>;
     fieldActions?: Array<ActionDefinition>;
+    fieldTypeValueRenderer?: Array<{
+      type: string;
+      render: (value: unknown, field: string, render: React.ComponentType<ValueRendererProps>) => React.ReactNode;
+    }>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
     systemConfigurations?: Array<SystemConfiguration>;
