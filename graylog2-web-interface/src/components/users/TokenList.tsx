@@ -88,7 +88,10 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
 
   return (
     <span>
-      <CreateTokenForm onCreate={handleTokenCreation} creatingToken={creatingToken} />
+      <IfPermitted permissions="users:delete">
+        <Headline>Create And Edit Tokens</Headline>
+        <CreateTokenForm onCreate={handleTokenCreation} creatingToken={creatingToken} />
+      </IfPermitted>
       {createdToken && (
         <StyledTokenPanel bsStyle="success">
           <Panel.Heading>
