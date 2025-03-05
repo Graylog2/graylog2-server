@@ -56,4 +56,4 @@ The following REST API changes have been made.
 |-----------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
 | `GET /plugins/org.graylog.integrations/aws/inputs/available_services` | Remove unused endpoint.                                                                 |
 | `GET /plugins/org.graylog.integrations/aws/inputs/permissions`        | Removed permissions endpoint in favor of maintaining permissions in official docs site. |
-| `GET /tbd`                                                            | tbd                                                                                     |
+| `/plugins/org.graylog.plugins.files/*`                                | Removed (Graylog Enterprise plugin).                                                    |
