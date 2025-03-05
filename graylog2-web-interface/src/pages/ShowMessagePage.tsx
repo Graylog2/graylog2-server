@@ -130,10 +130,9 @@ const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) =>
 };
 
 ShowMessagePage.propTypes = {
-  params: PropTypes.exact({
     index: PropTypes.string.isRequired,
     messageId: PropTypes.string.isRequired,
-  }).isRequired,
+    message: PropTypes.object,
 };
 
 const ErrorPre = styled.pre`
