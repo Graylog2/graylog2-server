@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.pipelineprocessor.db;
+package org.graylog2.database.entities;
 
-import org.graylog2.database.entities.EntityScope;
-
-public class SystemPipelineRuleScope extends EntityScope {
-    public static final String NAME = "GRAYLOG_SYSTEM_PIPELINE_RULE_SCOPE";
+public class ImmutableSystemScope extends EntityScope {
+    public static final String NAME = "GRAYLOG_IMMUTABLE_SCOPE";
 
     @Override
     public String getName() {
@@ -33,6 +31,6 @@ public class SystemPipelineRuleScope extends EntityScope {
 
     @Override
     public boolean isDeletable() {
-        return true;
+        return false;
     }
 }
