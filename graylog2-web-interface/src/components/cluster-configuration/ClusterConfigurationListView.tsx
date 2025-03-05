@@ -17,6 +17,7 @@
 import React from 'react';
 
 import { Table, Label } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -67,6 +68,7 @@ const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
         </tr>
       ))}
     </tbody>
+    {clusterNodes.isLoading && <Spinner />}
   </Table>
 );
 
