@@ -320,12 +320,10 @@ public class UsersResource extends RestResource {
                 builder.roles(userDTO.roles().stream().map(roleNameMap::get).collect(Collectors.toSet()));
             }
             userDTO.authServiceId().ifPresent(
-                    serviceId -> {
-                        builder.authServiceEnabled(activeAuthService.isPresent() && serviceId.equals(activeAuthService.get().id()));
-                    }
+                    serviceId -> builder.authServiceEnabled(activeAuthService.isPresent() && serviceId.equals(activeAuthService.get().id()))
             );
             return builder.build();
-        }).collect(Collectors.toList());
+        }).toList();
 
         final PaginatedList<UserOverviewDTO> userOverviewDTOS = new PaginatedList<>(users, result.pagination().total(),
                 result.pagination().page(), result.pagination().perPage());
@@ -726,12 +724,15 @@ public class UsersResource extends RestResource {
     public Token generateNewToken(
             @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
-            @ApiParam(name = "JSON Body", value = "Placeholder because POST requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{\"token_ttl\":null}") GenerateTokenTTL body) {
+            @ApiParam(name = "JSON Body", value = "Can optionally contain the token's TTL.", defaultValue = "{\"token_ttl\":null}") GenerateTokenTTL body) {
         final User user = loadUserById(userId);
         final String username = user.getName();
 
         if (!isAccessAllowed(user)) {
             throw new ForbiddenException("Not allowed to create tokens for user " + username);
+        }
+        if (body == null) {
+            body = new GenerateTokenTTL(Optional.empty());
         }
         final AccessToken accessToken = accessTokenService.create(user.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
 
@@ -834,8 +835,8 @@ public class UsersResource extends RestResource {
             wildcardPermissions = userManagementService.getWildcardPermissionsForUser(user);
             grnPermissions = userManagementService.getGRNPermissionsForUser(user);
         } else {
-            wildcardPermissions = ImmutableList.of();
-            grnPermissions = ImmutableList.of();
+            wildcardPermissions = List.of();
+            grnPermissions = List.of();
         }
 
         final Optional<AuthServiceBackendDTO> activeAuthService = globalAuthServiceConfig.getActiveBackendConfig();
@@ -885,7 +886,7 @@ public class UsersResource extends RestResource {
 
     private UserOverviewDTO getAdminUserDTO(AllUserSessions sessions) {
         final Optional<User> optionalAdmin = userManagementService.getRootUser();
-        if (!optionalAdmin.isPresent()) {
+        if (optionalAdmin.isEmpty()) {
             return null;
         }
         final User admin = optionalAdmin.get();

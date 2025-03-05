@@ -210,6 +210,22 @@ public class UsersResourceTest {
         }
     }
 
+    @Test
+    public void createTokenSucceedsEvenWithNULLBody() {
+        final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME, UserImpl.EXTERNAL_USER, "FALSE");
+        final Token expected = createTokenAndPrepareMocks(userProps, true);
+
+        try {
+            final Token actual = usersResource.generateNewToken(USERNAME, TOKEN_NAME, null);
+            assertEquals(expected, actual);
+        } finally {
+            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
+            verify(clusterConfigService, times(2)).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
+            verify(accessTokenService).create(USERNAME, TOKEN_NAME, Duration.ofDays(30));
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
     private CreateUserRequest buildCreateUserRequest() {
         return CreateUserRequest.create(USERNAME, PASSWORD, EMAIL,
                 FIRST_NAME, LAST_NAME, Collections.singletonList(""),
