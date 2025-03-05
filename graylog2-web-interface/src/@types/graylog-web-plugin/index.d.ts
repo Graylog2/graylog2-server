@@ -55,7 +55,7 @@ type PluginNavigation = {
   requiredFeatureFlag?: string;
   perspective?: string;
   BadgeComponent?: React.ComponentType<{ text: string }>;
-  position?: 'last' | undefined;
+  position?: { last: true } | { after: string } | undefined;
   permissions?: string | Array<string>;
   useIsValidLicense?: () => boolean;
 } & (PluginNavigationLink | PluginNavigationDropdown);
