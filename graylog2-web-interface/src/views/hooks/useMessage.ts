@@ -20,6 +20,7 @@ import type { Message } from 'views/components/messagelist/Types';
 import { Messages } from '@graylog/server-api';
 import MessageFormatter from 'logic/message/MessageFormatter';
 import UserNotification from 'preflight/util/UserNotification';
+import type FetchError from 'logic/errors/FetchError';
 
 export const fetchMessage = async (index: string, id: string) => {
   const message = await Messages.search(index, id);
@@ -27,9 +28,16 @@ export const fetchMessage = async (index: string, id: string) => {
   return MessageFormatter.formatResultMessage(message);
 };
 
-const useMessage = (index: string, id: string, enabled = true): { data: Message | undefined, isInitialLoading: boolean } => {
-  const { data, isInitialLoading } = useQuery({
+const useMessage = (index: string, id: string, enabled = true): { data: Message | undefined, isInitialLoading: boolean; error?: FetchError; isError?: boolean } => {
+  const { data, isInitialLoading, error, isError } = useQuery({
     queryKey: ['messages', index, id],
+    retry: (count, e: FetchError) => {
+      if (count > 3) {
+        return false;
+      }
+
+      return e.status !== 404;
+    },
     queryFn: () => fetchMessage(index, id),
     onError: (error) => {
       UserNotification.error(`Loading message information failed with status: ${error}`,
@@ -38,7 +46,7 @@ const useMessage = (index: string, id: string, enabled = true): { data: Message 
     enabled,
   });
 
-  return { data, isInitialLoading };
+  return { data, isInitialLoading, error, isError };
 };
 
 export default useMessage;
