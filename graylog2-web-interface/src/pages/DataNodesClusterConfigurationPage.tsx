@@ -20,13 +20,13 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
-import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
 const DataNodesClusterConfigurationPage = () => (
-  <DocumentTitle title="Data Nodes Cluster Configuration">
-    <DataNodesPageNavigation />
+  <DocumentTitle title="Data Node Certificate Management">
+    <ClusterConfigurationPageNavigation />
     <PageHeader
-      title="Data Nodes Cluster Configuration"
+      title="Data Node Certificate Management"
       documentationLink={{
         title: 'Data Nodes documentation',
         path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
