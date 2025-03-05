@@ -209,7 +209,7 @@ const usePlotChartData = (
 const GenericPlot = ({
   chartData,
   layout = {},
-  setChartColor,
+  setChartColor = undefined,
   onClickMarker = () => {},
   onHoverMarker = () => {},
   onUnhoverMarker = () => {},
