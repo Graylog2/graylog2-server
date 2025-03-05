@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.PrivateKey;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -60,15 +59,13 @@ public class PemCaReader {
         }
     }
 
-    public record CA(List<Certificate> certificates, PrivateKey privateKey) {}
-
     // TODO: secure against errors, tests
     public static CA readCA(final String pemFileContent, final String keyPassword) throws CACreationException {
         try (var bundleReader = new StringReader(pemFileContent)) {
             PEMParser pemParser = new PEMParser(bundleReader);
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
 
-            var certificates = new ArrayList<Certificate>();
+            var certificates = new ArrayList<X509Certificate>();
             PrivateKey privateKey = null;
 
             var pemObjects = readPemObjects(pemParser);
