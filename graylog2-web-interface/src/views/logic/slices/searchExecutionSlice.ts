@@ -155,8 +155,10 @@ export const cancelExecutedJob =
     if (jobIds) {
       dispatch(setJobIds(null));
 
-      searchExecutors.cancelJob(jobIds);
+      return searchExecutors.cancelJob(jobIds);
     }
+
+    return Promise.resolve();
   };
 
 export const executeWithExecutionState =
