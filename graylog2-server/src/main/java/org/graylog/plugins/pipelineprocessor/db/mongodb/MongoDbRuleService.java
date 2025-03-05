@@ -39,6 +39,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 
+import static com.mongodb.client.model.Filters.regex;
+import static org.graylog.plugins.pipelineprocessor.db.PipelineDao.FIELD_SOURCE;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
@@ -99,6 +101,16 @@ public class MongoDbRuleService implements RuleService {
             throw new NotFoundException("No rule with name " + name);
         }
         return rule;
+    }
+
+    @Override
+    public Collection<RuleDao> loadBySourcePattern(String sourcePattern) {
+        try {
+            return collection.find(regex(FIELD_SOURCE, sourcePattern)).into(new LinkedHashSet<>());
+        } catch (MongoException e) {
+            log.error("Unable to load processing rules", e);
+            return Collections.emptySet();
+        }
     }
 
     @Override
