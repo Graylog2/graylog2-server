@@ -42,7 +42,10 @@ const SearchRow = styled.div`
 `;
 
 type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
-
+export type MiddleSectionProps = {
+  searchParams: SearchParams;
+  setFilters: (newFilters: UrlQueryFilters) => void;
+};
 type Props<T, M> = {
   actionsCellWidth?: EntityDataTableProps['actionsCellWidth'];
   additionalAttributes?: Array<Attribute>;
@@ -61,6 +64,7 @@ type Props<T, M> = {
   searchPlaceholder?: string;
   tableLayout: DefaultLayout;
   topRightCol?: React.ReactNode;
+  middleSection?: React.ComponentType<MiddleSectionProps>;
 };
 
 const INITIAL_DATA = {
@@ -94,13 +98,14 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   topRightCol = undefined,
   searchPlaceholder = undefined,
   fetchOptions: reactQueryOptions = undefined,
+  middleSection: MiddleSection = undefined,
 }: Props<T, M>) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout(tableLayout);
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
-  const fetchOptions = useMemo(
+  const fetchOptions: SearchParams = useMemo(
     () => ({
       query,
       page: paginationQueryParameter.page,
@@ -180,6 +185,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
           </SearchForm>
           {topRightCol}
         </SearchRow>
+        {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={setUrlQueryFilters} /> : null}
         <div>
           {list?.length === 0 ? (
             <NoSearchResult>No {humanName} have been found.</NoSearchResult>
