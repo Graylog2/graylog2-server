@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import React from 'react';
 
-import { DocumentTitle, Icon, PageHeader } from 'components/common';
-import { Col, Row, SegmentedControl } from 'components/bootstrap';
+import { DocumentTitle, PageHeader } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
 import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
 import ClusterConfigurationListView from 'components/cluster-configuration/ClusterConfigurationListView';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
@@ -27,26 +26,7 @@ import ClusterConfigurationPageNavigation from 'components/cluster-configuration
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
 
-const ViewTypeSwitchContainer = styled(Col)`
-  display: flex;
-  justify-content: right;
-`;
-
-const VIEW_TYPES_SEGMENTS = [
-  {
-    value: 'list' as const,
-    label: (<Icon name="list" />),
-  },
-  {
-    value: 'cards' as const,
-    label: (<Icon name="account_tree" type='regular' />),
-  },
-];
-
-type ViewTypesSegments = 'list' | 'cards';
-
 const ClusterConfigurationPage = () => {
-  const [viewType, setViewType] = useState<ViewTypesSegments>('list');
   const clusterNodes = useClusterNodes();
   const searchParams: SearchParams = { query: '', page: 1, pageSize: 0, sort: { attributeId: 'hostname', direction: 'asc' } };
 
@@ -69,19 +49,9 @@ const ClusterConfigurationPage = () => {
           <Col xs={6}>
             <h2>Nodes</h2>
           </Col>
-          {false && (
-            <ViewTypeSwitchContainer xs={6}>
-              <SegmentedControl data={VIEW_TYPES_SEGMENTS}
-                                radius="sm"
-                                value={viewType}
-                                onChange={(newViewType) => setViewType(newViewType)} />
-            </ViewTypeSwitchContainer>
-          )}
           <Col md={12}>
             <TableFetchContextProvider refetch={clusterNodes.refetchDatanodes} searchParams={searchParams} attributes={[]}>
-              {viewType === 'list' && (
-                <ClusterConfigurationListView clusterNodes={clusterNodes} />
-              )}
+              <ClusterConfigurationListView clusterNodes={clusterNodes} />
             </TableFetchContextProvider>
           </Col>
         </Row>
