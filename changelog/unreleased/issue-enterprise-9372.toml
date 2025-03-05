@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Hide warnings on Graylog enterprise events in Data Node."
+
+issues = ["Graylog2/graylog-plugin-enterprise#9372"]
+pulls = [""]
