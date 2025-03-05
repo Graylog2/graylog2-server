@@ -23,6 +23,7 @@ type Props = Pick<
   | 'offset'
   | 'label'
   | 'children'
+  | 'className'
   | 'size'
   | 'title'
   | 'radius'

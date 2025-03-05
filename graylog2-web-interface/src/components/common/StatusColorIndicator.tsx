@@ -23,6 +23,7 @@ import Indicator from 'components/bootstrap/Indicator';
 type Props = React.PropsWithChildren<{
   bsStyle?: ColorVariant;
   'data-testid'?: string;
+  className?: string;
 }>;
 const StyledIndicator = styled(Indicator)<{ color: ColorVariant }>(
   ({ color, theme }) => css`
@@ -33,11 +34,12 @@ const StyledIndicator = styled(Indicator)<{ color: ColorVariant }>(
 );
 
 
-const StatusColorIndicator = ({ bsStyle = 'gray', 'data-testid': dataTestid, children = undefined }: Props) => (
+const StatusColorIndicator = ({ bsStyle = 'gray', 'data-testid': dataTestid, className = '', children = undefined }: Props) => (
   <StyledIndicator
     color={bsStyle}
     radius={0}
     size={8}
+    className={`${bsStyle} ${className}`}
     data-testid={dataTestid}>
     {children}
   </StyledIndicator>

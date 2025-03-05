@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
@@ -71,8 +71,11 @@ const inputMetrics = {
 const useInputDiagnosisMock = { input, inputNodeStates, inputMetrics };
 
 describe('Input Diagnosis Page', () => {
+  const hasHref = (element: HTMLElement | HTMLAnchorElement): element is HTMLAnchorElement => 'href' in element;
+
   beforeEach(() => {
     asMock(useInputDiagnosis).mockReturnValue(useInputDiagnosisMock);
+    jest.clearAllMocks();
   });
 
   it('renders the page for the given input with its metrics', async () => {
@@ -96,36 +99,42 @@ describe('Input Diagnosis Page', () => {
     expect(await screen.findByText(/22/)).toBeInTheDocument();
     expect(await screen.findByText(/Test Stream 2/)).toBeInTheDocument();
     expect(await screen.findByText(/23/)).toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: /running: 1\/2/ })).toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: /failed: 1\/2/ })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'node id: test-node-id-1' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'node id: test-node-id-2 message: failed for testing' })).toBeInTheDocument();
   });
 
-  it('shows nodes related to state on button click', async () => {
+  it('shows link to nodes related to node state', async () => {
+    render(
+      <InputDiagnosisPage />,
+    );
+    const runningNodeLink = await screen.findByRole('link', { name: 'node id: test-node-id-1' });
+
+    expect(hasHref(runningNodeLink) ? runningNodeLink.href : null).toEqual('http://localhost/system/nodes/test-node-id-1');
+  });
+
+  it('shows node state failed indicator', async () => {
+    render(
+      <InputDiagnosisPage />,
+    );
+    const nodeStateIndicator = await screen.findByTestId('state-indicator');
+
+    expect(nodeStateIndicator).toHaveClass('danger');
+  });
+
+  it('shows node state success indicator', async () => {
+    asMock(useInputDiagnosis).mockReturnValue({ ...useInputDiagnosisMock, inputNodeStates: {
+      total: 1,
+      states: {
+        RUNNING: [{ node_id: 'test-node-id-1', detailed_message: undefined }],
+      },
+    }});
+
     render(
       <InputDiagnosisPage />,
     );
 
-    const runningButton = await screen.findByRole('button', { name: /running: 1\/2/ });
-    const failedButton = await screen.findByRole('button', { name: /failed: 1\/2/ });
+    const nodeStateIndicator = await screen.findByTestId('state-indicator');
 
-    fireEvent.click(runningButton);
-
-    expect(await screen.findByText(/test-node-id-1/)).toBeInTheDocument();
-
-    fireEvent.click(failedButton);
-
-    expect(await screen.findByText(/test-node-id-2/)).toBeInTheDocument();
-  });
-
-  it('shows detailed messages on state nodes related to state on button click', async () => {
-    render(
-      <InputDiagnosisPage />,
-    );
-
-    const failedButton = await screen.findByRole('button', { name: /failed: 1\/2/ });
-
-    fireEvent.click(failedButton);
-
-    expect(await screen.findByText(/failed for testing/)).toBeInTheDocument();
+    expect(nodeStateIndicator).toHaveClass('success');
   });
 });

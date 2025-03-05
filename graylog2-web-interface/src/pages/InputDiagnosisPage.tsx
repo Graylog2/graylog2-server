@@ -168,6 +168,7 @@ const InputDiagnosisPage = () => {
   const hasReceivedMessageMetrics = inputMetrics.incomingMessagesTotal > 0;
   const hasError = Object.keys(inputMetrics.message_errors).some((error) => inputMetrics.message_errors[error] > 0);
   const hasReceivedMessage = inputMetrics.stream_message_count?.some((stream) => stream.count > 0 );
+
   return (
     <>
       <Header>
@@ -207,7 +208,7 @@ const InputDiagnosisPage = () => {
                 )}
               </StyledListGroup>
             </Section>
-            <Section title="State" headerLeftSection={<StatusColorIndicator bsStyle={isInputStateDown ? 'danger' : 'success'}/>}>
+            <Section title="State" headerLeftSection={<StatusColorIndicator data-testid='state-indicator' bsStyle={isInputStateDown ? 'danger' : 'success'}/>}>
               <StyledP className='description'>Number of Graylog nodes the Input is configured to run, and on how many it is running. If any are not running, click to see any associated error messages.</StyledP>
               <StyledListGroup>
                 {Object.keys(inputNodeStates.states).map((state: InputState) => (
