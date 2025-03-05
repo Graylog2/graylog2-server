@@ -79,6 +79,7 @@ type ShowMessagePageProps = {
   messageId: string;
   index: string;
 };
+
 const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) => {
   const streams = useContext(StreamsContext);
   const streamsMap = Immutable.Map(Object.fromEntries(streams.map((stream) => [stream.id, stream])));
@@ -138,16 +139,17 @@ ShowMessagePage.propTypes = {
 const ErrorPre = styled.pre`
   margin: 0 3rem;
 `;
+
 const ShowMessagePageLoader = ({ params: { index, messageId } }: Props) => {
   if (!index || !messageId) {
     throw new Error('index and messageId need to be specified!');
   }
+
   const { data: message, isError, error } = useMessage(index, messageId);
 
   return isError ? (
-    <ErrorPage
-      title="Index/Message not found"
-      description="The index or message specified was not found. The most probable reason for this is that the index containing the
+    <ErrorPage title="Index/Message not found"
+               description="The index or message specified was not found. The most probable reason for this is that the index containing the
       message referenced has been deleted. The full error message is:">
       <ErrorPre>{error.details}</ErrorPre>
     </ErrorPage>
