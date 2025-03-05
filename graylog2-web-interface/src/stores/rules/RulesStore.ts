@@ -37,6 +37,7 @@ export type RuleType = {
   rule_builder: RuleBuilderType;
   errors?: [];
   simulator_message?: string;
+  _scope?: string;
 };
 export type MetricsConfigType = {
   metrics_enabled: boolean;
@@ -101,7 +102,7 @@ export const RulesActions = singletonActions('core.Rules', () =>
 );
 
 export const RulesStore = singletonStore('core.Rules', () =>
-  Reflux.createStore<{ rules: RuleType[]; metricsConfig: {} }>({
+  Reflux.createStore<RulesStoreState>({
     listenables: [RulesActions],
     rules: undefined,
     rulesContext: undefined,

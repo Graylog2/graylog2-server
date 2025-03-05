@@ -28,12 +28,7 @@ import Parameter from '../parameters/Parameter';
 jest.useFakeTimers().setSystemTime(1577836800000); // 2020-01-01 00:00:00.000
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
-
-jest.mock('bson-objectid', () =>
-  jest.fn(() => ({
-    toString: jest.fn(() => 'new-search-id'),
-  })),
-);
+jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-search-id'));
 
 jest.mock('../Widgets', () => ({
   widgetDefinition: () => ({ searchTypes: () => [{ type: 'pivot' }] }),
