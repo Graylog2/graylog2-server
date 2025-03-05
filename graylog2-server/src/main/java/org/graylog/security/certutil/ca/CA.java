@@ -27,21 +27,20 @@ import java.util.List;
 
 public class CA {
 
-    private List<X509Certificate> certificates;
+    private final List<X509Certificate> certificates;
     private final PrivateKey privateKey;
 
     public CA(List<X509Certificate> certificates, PrivateKey privateKey) {
-        this.certificates = certificates;
         this.privateKey = privateKey;
-        validateCertificates();
+        this.certificates = validateAndSortCertificates(certificates);
     }
 
-    private void validateCertificates() {
+    private List<X509Certificate> validateAndSortCertificates(List<X509Certificate> certificates) {
         if (certificates == null || certificates.isEmpty()) {
             throw new IllegalArgumentException("Certificate list is empty");
         }
-        if (certificates.size() > 1 && !isCertPathOrderedCorrectly()) {
-            this.certificates = sortCertificates(certificates);
+        if (certificates.size() > 1 && !isCertPathOrderedCorrectly(certificates)) {
+            certificates = sortCertificates(certificates);
         }
         final X509Certificate ca = certificates.get(0);
         if (ca.getBasicConstraints() == -1) {
@@ -55,9 +54,10 @@ public class CA {
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
+        return certificates;
     }
 
-    private boolean isCertPathOrderedCorrectly() {
+    private boolean isCertPathOrderedCorrectly(List<X509Certificate> certificates) {
         for (int i = 0; i < certificates.size() - 1; i++) {
             X509Certificate currentCert = certificates.get(i);
             X509Certificate nextCert = certificates.get(i + 1);
@@ -71,7 +71,7 @@ public class CA {
     private List<X509Certificate> sortCertificates(List<X509Certificate> certificates) {
         X509Certificate[] sorted = new X509Certificate[certificates.size()];
         certificates.forEach(cert -> {
-            int position = getChainPosition(cert);
+            int position = getChainPosition(cert, certificates);
             if (sorted[position] != null) { // multiple certificates at same position in chain
                 throw new IllegalArgumentException("Corrupt certificate chain. Please make sure that your bundle only contains the CA and necessary intermediate/root certificates");
             }
@@ -82,11 +82,11 @@ public class CA {
         return sortedList;
     }
 
-    private int getChainPosition(X509Certificate cert) {
+    private int getChainPosition(X509Certificate cert, List<X509Certificate> certificates) {
         int position = 0;
         X509Certificate currentCert = cert;
         for (int i = 0; i < certificates.size(); i++) { // loop protection
-            X509Certificate issuerCert = findIssuer(currentCert);
+            X509Certificate issuerCert = findIssuer(currentCert, certificates);
             if (issuerCert == null) {
                 return position;
             }
@@ -96,7 +96,7 @@ public class CA {
         throw new IllegalArgumentException("Corrupt certificate chain containing a signing loop.");
     }
 
-    private X509Certificate findIssuer(X509Certificate cert) {
+    private X509Certificate findIssuer(X509Certificate cert, List<X509Certificate> certificates) {
         return certificates.stream().filter(potentialIssuer ->
                         !potentialIssuer.getSubjectX500Principal().equals(cert.getSubjectX500Principal()) &&
                                 potentialIssuer.getSubjectX500Principal().equals(cert.getIssuerX500Principal()))
