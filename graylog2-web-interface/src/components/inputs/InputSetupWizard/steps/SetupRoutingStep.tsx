@@ -196,7 +196,6 @@ const SetupRoutingStep = () => {
   };
 
   const backButtonText = newStream ? 'Reset' : 'Back';
-  const nextButtonText = showCreateStream || showSelectStream ? 'Finish & Start Input' : 'Skip & Start Input';
   const showNewStreamSection = newStream || showCreateStream;
 
   return (
@@ -317,7 +316,7 @@ const SetupRoutingStep = () => {
             )}
             {hasNextStep && (
               <Button disabled={!isStepValid()} onClick={onNextStep} bsStyle="primary">
-                {nextButtonText}
+                Next
               </Button>
             )}
           </ButtonCol>

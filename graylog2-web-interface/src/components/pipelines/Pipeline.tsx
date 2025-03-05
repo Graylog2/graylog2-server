@@ -18,10 +18,11 @@ import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Row, Col, Alert } from 'components/bootstrap';
-import { EntityList, Pluralize } from 'components/common';
+import { EntityList, Pluralize, Spinner } from 'components/common';
 import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 import type { Stream } from 'stores/streams/StreamsStore';
 import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 import Stage from './Stage';
 import StageForm from './StageForm';
@@ -51,6 +52,9 @@ type Props = {
 };
 
 const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStagesChange, onPipelineChange }: Props) => {
+  const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(pipeline);
+  const isManaged = scopePermissions && !scopePermissions?.is_mutable;
+
   const _connectionsWarning = () => {
     if (connections.length === 0) {
       return (
@@ -122,16 +126,22 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
           isLastStage={stage.stage === maxStage}
           onUpdate={_updateStage(stage)}
           onDelete={_deleteStage(stage)}
+          disableEdit={isManaged}
         />
       ));
-  }, [pipeline, _updateStage, _deleteStage]);
+  }, [pipeline, _updateStage, _deleteStage, isManaged]);
 
   const stageKey = useMemo(() => pipeline.stages.map((s) => s.stage).join('-'), [pipeline.stages]);
 
+  if (loadingScopePermissions) {
+    return <Spinner />;
+  }
+
   return (
     <div>
+      {isManaged && <Alert bsStyle="warning">This pipeline is system managed</Alert>}
       {_connectionsWarning()}
-      <PipelineDetails pipeline={pipeline} onChange={onPipelineChange} />
+      <PipelineDetails pipeline={pipeline} onChange={onPipelineChange} disableEdit={isManaged} />
       <StyledRow className="row-sm">
         <Col md={12}>
           <div className="pull-right">
@@ -140,6 +150,7 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
               connections={connections}
               streams={streams}
               save={onConnectionsChange}
+              disableEdit={isManaged}
             />
           </div>
           <h2>Pipeline connections</h2>
@@ -158,7 +169,7 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
       <StyledRow className="row-sm">
         <Col md={12}>
           <div className="pull-right">
-            <StageForm key={stageKey} pipeline={pipeline} create save={_saveStage} />
+            <StageForm key={stageKey} pipeline={pipeline} create save={_saveStage} disableEdit={isManaged} />
           </div>
           <h2>Pipeline Stages</h2>
           <StyledP>

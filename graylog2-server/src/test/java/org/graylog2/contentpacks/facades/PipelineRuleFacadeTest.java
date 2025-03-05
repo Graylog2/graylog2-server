@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.graph.Graph;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
-import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -41,6 +40,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.shared.SuppressForbidden;
@@ -70,7 +70,7 @@ public class PipelineRuleFacadeTest {
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
-        entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new SystemPipelineRuleScope()));
+        entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new DeletableSystemScope()));
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         ruleService = new MongoDbRuleService(
                 new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection()),

@@ -196,10 +196,10 @@
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.0</junit-jupiter.version>
-        <mockito.version>5.15.2</mockito.version>
+        <mockito.version>5.16.0</mockito.version>
         <restassured.version>5.5.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.20.5</testcontainers.version>
+        <testcontainers.version>1.20.6</testcontainers.version>
         <testcontainers.opensearch.version>2.1.2</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -644,7 +644,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.1.0</version>
+                    <version>4.9.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>

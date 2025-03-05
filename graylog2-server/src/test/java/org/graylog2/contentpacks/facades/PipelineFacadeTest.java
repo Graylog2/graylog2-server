@@ -30,7 +30,6 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
-import org.graylog.plugins.pipelineprocessor.db.SystemPipelineScope;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
@@ -54,6 +53,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
@@ -103,13 +103,14 @@ public class PipelineFacadeTest {
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() {
-        entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new SystemPipelineScope()));
+        entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope()));
 
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
 
         final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection());
-        pipelineService = new MongoDbPipelineService(mongoCollections, entityScopeService, clusterEventBus, mock(MongoDbRuleService.class));
+        pipelineService = new MongoDbPipelineService(
+                mongoCollections, entityScopeService, clusterEventBus, mock(MongoDbRuleService.class), mock(PipelineStreamConnectionsService.class));
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoCollections, clusterEventBus);
 
         facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService, streamService);

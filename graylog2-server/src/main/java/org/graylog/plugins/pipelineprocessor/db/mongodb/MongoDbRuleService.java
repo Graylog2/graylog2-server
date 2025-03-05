@@ -83,7 +83,7 @@ public class MongoDbRuleService implements RuleService {
             final var insertedId = insertedIdAsString(collection.insertOne(rule));
             savedRule = rule.toBuilder().id(insertedId).build();
         }
-        clusterBus.post(RulesChangedEvent.updatedRuleId(savedRule.id()));
+        clusterBus.post(RulesChangedEvent.updatedRule(savedRule.id(), savedRule.title()));
         return savedRule;
     }
 
@@ -125,10 +125,20 @@ public class MongoDbRuleService implements RuleService {
 
     @Override
     public void delete(String id) {
-        if (!scopedEntityMongoUtils.deleteById(id, false)) {
-            log.error("Unable to delete rule {}", id);
+        try {
+            delete(load(id));
+        } catch (NotFoundException e) {
+            log.info("Deleting non-existant rule {}", id);
         }
-        clusterBus.post(RulesChangedEvent.deletedRuleId(id));
+    }
+
+    @Override
+    public void delete(RuleDao ruleDao) {
+        if (!scopedEntityMongoUtils.deleteById(ruleDao.id(), false)) {
+            log.error("Unable to delete rule {}", ruleDao.title());
+        } else {
+            clusterBus.post(RulesChangedEvent.deletedRule(ruleDao.id(), ruleDao.title()));
+        }
     }
 
     @Override

@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -74,7 +73,7 @@ public class InputsResourceMaskingPasswordsTest {
     class InputsTestResource extends InputsResource {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
             super(inputService, mock(InputDiagnosticService.class), mock(StreamService.class), mock(StreamRuleService.class),
-                    mock(PipelineService.class), mock(PipelineStreamConnectionsService.class), messageInputFactory, new Configuration(), mock(ClusterEventBus.class));
+                    mock(PipelineService.class), messageInputFactory, new Configuration(), mock(ClusterEventBus.class));
         }
 
         @Override
