@@ -35,7 +35,7 @@ const StyledForm = styled.form`
 type Props = {
   creatingToken?: boolean;
   disableForm?: boolean;
-  onCreate: (tokenName: string) => void;
+  onCreate: ({tokenName, tokenTtl}: {tokenName:string, tokenTtl: string}) => void;
 };
 
 const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate }: Props) => {
@@ -44,7 +44,7 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
 
   const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    onCreate(tokenName);
+    onCreate({tokenName, tokenTtl});
     setTokenName('');
     setTokenTtl('');
   };
