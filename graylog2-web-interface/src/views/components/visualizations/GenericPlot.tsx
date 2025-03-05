@@ -237,18 +237,16 @@ const GenericPlot = ({ chartData, layout, setChartColor, onClickMarker, onHoverM
   }, [onRenderComplete, onAfterPlot]);
 
   return (
-    <StyledPlot
-      data={plotChartData}
-      useResizeHandler
-      layout={plotLayout}
-      style={style}
-      onAfterPlot={_onAfterPlot}
-      onClick={interactive ? _onMarkerClick : () => false}
-      onHover={_onHoverMarker}
-      onUnhover={onUnhoverMarker}
-      onRelayout={interactive ? _onRelayout : () => {}}
-      config={config}
-    />
+    <StyledPlot data={plotChartData}
+                useResizeHandler
+                layout={plotLayout}
+                style={style}
+                onAfterPlot={_onAfterPlot}
+                onClick={interactive ? _onMarkerClick : () => false}
+                onHover={_onHoverMarker}
+                onUnhover={onUnhoverMarker}
+                onRelayout={interactive ? _onRelayout : () => {}}
+                config={config} />
   );
 };
 
