@@ -126,13 +126,9 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         // for backwards compatibility: the last source node should contain the input we use.
         // this means that extractors etc defined on the prior inputs are silently ignored.
         // TODO fix the above
-        String inputIdOnCurrentNode;
-        try {
-            // .inputId checked during raw message decode!
-            inputIdOnCurrentNode = Iterables.getLast(raw.getSourceNodes()).inputId;
-        } catch (NoSuchElementException e) {
-            inputIdOnCurrentNode = null;
-        }
+
+        //.inputId checked during raw message decode!
+        final String inputIdOnCurrentNode = InputDiagnosisMetrics.getInputIOnCurrentNode(raw);
 
         final Codec.Factory<? extends Codec> factory = codecFactory.get(raw.getCodecName());
         if (factory == null) {

@@ -18,13 +18,16 @@ package org.graylog2.inputs.diagnosis;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.Iterables;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.metrics.MetricUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -62,4 +65,15 @@ public class InputDiagnosisMetrics {
                 .forEach(e -> e.getValue().add(0L));
     }
 
+    public static String getInputIOnCurrentNode(RawMessage rawMessage) {
+        String inputIdOnCurrentNode;
+        try {
+            // .inputId checked during raw message decode!
+            inputIdOnCurrentNode = Iterables.getLast(rawMessage.getSourceNodes()).inputId;
+        } catch (NoSuchElementException e) {
+            inputIdOnCurrentNode = null;
+        }
+
+        return inputIdOnCurrentNode;
+    }
 }

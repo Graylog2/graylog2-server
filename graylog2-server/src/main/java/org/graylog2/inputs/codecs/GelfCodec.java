@@ -18,6 +18,7 @@ package org.graylog2.inputs.codecs;
 
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.graylog2.inputs.codecs.gelf.GELFBulkDroppedMsgService;
 import org.graylog2.inputs.transports.TcpTransport;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
@@ -49,12 +50,16 @@ public class GelfCodec extends AbstractCodec {
     private final GelfDecoder gelfDecoder;
 
     @Inject
-    public GelfCodec(@Assisted Configuration configuration, GelfChunkAggregator aggregator, MessageFactory messageFactory) {
+    public GelfCodec(@Assisted Configuration configuration,
+                     GelfChunkAggregator aggregator,
+                     MessageFactory messageFactory,
+                     GELFBulkDroppedMsgService gelfBulkDroppedMsgService) {
         super(configuration);
         this.aggregator = aggregator;
         this.gelfDecoder = new GelfDecoder(messageFactory,
                 configuration.getInt(CK_DECOMPRESS_SIZE_LIMIT, DEFAULT_DECOMPRESS_SIZE_LIMIT),
-                getCharsetOrDefault(configuration));
+                getCharsetOrDefault(configuration),
+                gelfBulkDroppedMsgService);
     }
 
     @Override

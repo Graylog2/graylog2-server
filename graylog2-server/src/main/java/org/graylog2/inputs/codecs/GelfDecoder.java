@@ -17,11 +17,13 @@
 package org.graylog2.inputs.codecs;
 
 import com.eaio.uuid.UUID;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog2.inputs.codecs.gelf.GELFBulkDroppedMsgService;
 import org.graylog2.inputs.codecs.gelf.GELFMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
@@ -45,15 +47,22 @@ public class GelfDecoder {
     private final MessageFactory messageFactory;
     private final Charset charset;
     private final ObjectMapper objectMapper;
+    private final JsonFactory jsonFactory;
+    private final GELFBulkDroppedMsgService gelfBulkDroppedMsgService;
     private final long decompressSizeLimit;
 
     @Inject
-    public GelfDecoder(MessageFactory messageFactory, long decompressSizeLimit, Charset charset) {
+    public GelfDecoder(MessageFactory messageFactory,
+                       long decompressSizeLimit,
+                       Charset charset,
+                       GELFBulkDroppedMsgService gelfBulkDroppedMsgService) {
         this.messageFactory = messageFactory;
         this.charset = charset;
+        this.gelfBulkDroppedMsgService = gelfBulkDroppedMsgService;
         this.objectMapper = new ObjectMapper().enable(
                 JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS,
                 JsonParser.Feature.ALLOW_TRAILING_COMMA);
+        this.jsonFactory = objectMapper.getFactory();
         this.decompressSizeLimit = decompressSizeLimit;
     }
 
@@ -64,10 +73,17 @@ public class GelfDecoder {
         final JsonNode node;
 
         try {
-            node = objectMapper.readTree(json);
-            if (node == null) {
+            final JsonParser parser = jsonFactory.createParser(json);
+            node = objectMapper.readTree(parser);
+
+            if (node == null || node.isNull()) {
                 throw new IOException("null result");
             }
+
+            if (parser.nextToken() != null) {
+                gelfBulkDroppedMsgService.handleDroppedMsgOccurrence(rawMessage);
+            }
+
         } catch (final Exception e) {
             throw InputProcessingException.create("JSON is null/could not be parsed (invalid JSON)",
                     e, rawMessage, json);
