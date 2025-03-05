@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import * as Immutable from 'immutable';
 import { render, waitFor, screen, within, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
@@ -36,13 +35,13 @@ import useViewType from 'views/hooks/useViewType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
 
 import WidgetContext from '../contexts/WidgetContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
-import FieldTypesContext from '../contexts/FieldTypesContext';
 
 const testTimeout = applyTimeoutMultiplier(60000);
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
@@ -116,7 +115,7 @@ describe('Aggregation Widget', () => {
 
   const AggregationWidget = ({ widget: propsWidget = dataTableWidget, ...props }: AggregationWidgetProps) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+      <TestFieldTypesContextProvider>
         <WidgetFocusContext.Provider value={widgetFocusContextState}>
           <WidgetContext.Provider value={propsWidget}>
             <Widget
@@ -129,7 +128,7 @@ describe('Aggregation Widget', () => {
             />
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
-      </FieldTypesContext.Provider>
+      </TestFieldTypesContextProvider>
     </TestStoreProvider>
   );
 

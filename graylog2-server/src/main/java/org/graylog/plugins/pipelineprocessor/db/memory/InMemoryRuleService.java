@@ -17,22 +17,19 @@
 package org.graylog.plugins.pipelineprocessor.db.memory;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 
-import jakarta.inject.Inject;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 /**
  * A RuleService that does not persist any data, but simply keeps it in memory.
@@ -66,9 +63,14 @@ public class InMemoryRuleService implements RuleService {
         titleToId.put(toSave.title(), toSave.id());
         store.put(toSave.id(), toSave);
 
-        clusterBus.post(RulesChangedEvent.updatedRuleId(toSave.id()));
+        clusterBus.post(RulesChangedEvent.updatedRule(toSave.id(), toSave.title()));
 
         return toSave;
+    }
+
+    @Override
+    public RuleDao save(RuleDao rule, boolean checkMutability) {
+        return save(rule);
     }
 
     @Override
@@ -100,11 +102,12 @@ public class InMemoryRuleService implements RuleService {
             return;
         }
         final RuleDao removed = store.remove(id);
+
         // clean up title index if the rule existed
         if (removed != null) {
             titleToId.remove(removed.title());
+            clusterBus.post(RulesChangedEvent.deletedRule(id, removed.title()));
         }
-        clusterBus.post(RulesChangedEvent.deletedRuleId(id));
     }
 
     @Override
@@ -112,7 +115,7 @@ public class InMemoryRuleService implements RuleService {
         final Set<String> needles = Sets.newHashSet(ruleNames);
         return store.values().stream()
                 .filter(ruleDao -> needles.contains(ruleDao.title()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private String createId() {

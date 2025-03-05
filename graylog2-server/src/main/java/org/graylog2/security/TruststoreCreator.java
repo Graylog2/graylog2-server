@@ -19,8 +19,9 @@ package org.graylog2.security;
 import jakarta.annotation.Nonnull;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,10 +34,13 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TruststoreCreator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TruststoreCreator.class);
 
     private final KeyStore truststore;
 
@@ -64,15 +68,26 @@ public class TruststoreCreator {
      * Originally we added only the root(=selfsigned) certificate to the truststore. But this causes problems with
      * usage of intermediate CAs. There is nothing wrong adding the whole cert chain to the truststore.
      *
-     * @param keystoreInformation access to the keystore, to obtain certificate chains by the given alias
-     * @param alias               which certificate chain should we extract from the provided keystore
+     * @param keystoreInformation access to the keystore, to obtain certificate chains and certificates
      */
-    public TruststoreCreator addFromKeystore(KeystoreInformation keystoreInformation,
-                                             final String alias) throws IOException, GeneralSecurityException {
+    public TruststoreCreator addCertificates(KeystoreInformation keystoreInformation) throws IOException, GeneralSecurityException {
         final KeyStore keystore = keystoreInformation.loadKeystore();
-        final Certificate[] chain = keystore.getCertificateChain(alias);
-        final List<X509Certificate> x509Certs = toX509Certs(chain);
-        return addCertificates(x509Certs);
+        final Enumeration<String> aliases = keystore.aliases();
+        while (aliases.hasMoreElements()) {
+            final String alias = aliases.nextElement();
+            if (keystore.isKeyEntry(alias)) {
+                LOG.info("Adding key certificate chain of alias {} to the truststore", alias);
+                final Certificate[] chain = keystore.getCertificateChain(alias);
+                final List<X509Certificate> x509Certs = toX509Certs(chain);
+                return addCertificates(x509Certs);
+            } else if (keystore.isCertificateEntry(alias)) {
+                LOG.info("Adding certificate of alias {} to the truststore", alias);
+                return addCertificates(toX509Certs(new Certificate[]{keystore.getCertificate(alias)}));
+            } else {
+                LOG.warn("Unsupported keystore alias {}", alias);
+            }
+        }
+        return this;
     }
 
     @Nonnull
@@ -123,27 +138,5 @@ public class TruststoreCreator {
     @Nonnull
     public KeyStore getTruststore() {
         return this.truststore;
-    }
-
-    public KeystoreInformation toKeystoreInformation(final char[] truststorePassword) {
-        return new InMemoryKeystoreInformation(this.truststore, truststorePassword);
-    }
-
-
-    private static X509Certificate findRootCert(KeystoreInformation keystoreInformation,
-                                                final String alias) throws Exception {
-        final KeyStore keystore = keystoreInformation.loadKeystore();
-        final Certificate[] certs = keystore.getCertificateChain(alias);
-
-        return Arrays.stream(certs)
-                .filter(cert -> cert instanceof X509Certificate)
-                .map(cert -> (X509Certificate) cert)
-                .filter(cert -> isRootCaCertificate(cert) || certs.length == 1)
-                .findFirst()
-                .orElseThrow(() -> new KeyStoreException("Keystore does not contain root X509Certificate in the certificate chain!"));
-    }
-
-    private static boolean isRootCaCertificate(X509Certificate cert) {
-        return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
     }
 }

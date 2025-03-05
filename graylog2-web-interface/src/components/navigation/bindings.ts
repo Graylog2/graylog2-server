@@ -22,12 +22,13 @@ import filterMenuItems, { filterCloudMenuItems } from 'util/conditional/filterMe
 import AppConfig from 'util/AppConfig';
 
 export const SYSTEM_DROPDOWN_TITLE = 'System';
+export const SEARCH_LINK_TITLE = 'Search';
 
 const navigationBindings: PluginExports = {
   navigation: [
     {
       path: Routes.SEARCH,
-      description: 'Search',
+      description: SEARCH_LINK_TITLE,
     },
     {
       path: Routes.STREAMS,
@@ -43,7 +44,7 @@ const navigationBindings: PluginExports = {
     },
     {
       description: SYSTEM_DROPDOWN_TITLE,
-      position: 'last' as const,
+      position: { last: true },
       children: filterCloudMenuItems(
         filterMenuItems(
           [

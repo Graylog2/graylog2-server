@@ -220,12 +220,11 @@ class InputThroughput extends React.Component<Props, State> {
     );
   }
 
-  _toggleShowDetails(evt) {
+  _toggleShowDetails = (evt) => {
     evt.preventDefault();
-    const { showDetails } = this.state;
 
-    this.setState({ showDetails: !showDetails });
-  }
+    this.setState(({ showDetails }) => ({ showDetails: !showDetails }));
+  };
 
   render() {
     const { metrics } = this.props;

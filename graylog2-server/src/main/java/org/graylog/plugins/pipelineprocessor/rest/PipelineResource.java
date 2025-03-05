@@ -48,12 +48,15 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.inputs.InputRoutingService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -99,19 +102,22 @@ public class PipelineResource extends RestResource implements PluginRestResource
     private final PipelineRuleParser pipelineRuleParser;
     private final PipelineStreamConnectionsService connectionsService;
     private final InputRoutingService inputRoutingService;
+    private final RuleService ruleService;
 
     @Inject
     public PipelineResource(PipelineService pipelineService,
                             PaginatedPipelineService paginatedPipelineService,
                             PipelineRuleParser pipelineRuleParser,
                             PipelineStreamConnectionsService connectionsService,
-                            InputRoutingService inputRoutingService) {
+                            InputRoutingService inputRoutingService,
+                            RuleService ruleService) {
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.paginatedPipelineService = paginatedPipelineService;
         this.searchQueryParser = new SearchQueryParser(PipelineDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.connectionsService = connectionsService;
         this.inputRoutingService = inputRoutingService;
+        this.ruleService = ruleService;
     }
 
     @ApiOperation(value = "Create a processing pipeline from source")
@@ -133,6 +139,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final PipelineDao pipelineDao = PipelineDao.builder()
                 .title(pipeline.name())
+                .scope(pipelineSource.scope() == null ? DefaultEntityScope.NAME : pipelineSource.scope())
                 .description(pipelineSource.description())
                 .source(pipelineSource.source())
                 .createdAt(now)
@@ -245,7 +252,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                                  @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
         checkReservedName(update);
-        return PipelineUtils.update(pipelineService, pipelineRuleParser, id, update);
+        return PipelineUtils.update(pipelineService, pipelineRuleParser, ruleService, id, update, true);
     }
 
     public record RoutingRequest(
@@ -284,7 +291,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
             pipelineSource = pipelineSource.toBuilder()
                     .source(PipelineUtils.createPipelineString(pipelineSource))
                     .build();
-            update(pipelineDao.id(), pipelineSource);
+            PipelineUtils.update(pipelineService, pipelineRuleParser, ruleService, pipelineDao.id(), pipelineSource, false);
         } else {
             log.info(f("Routing for input <%s> already exists - skipping", request.inputId()));
         }
@@ -297,6 +304,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 0, Stage.Match.EITHER, java.util.List.of(ruleDao.title())));
         final PipelineSource pipelineSource = PipelineSource.builder()
                 .title(GL_INPUT_ROUTING_PIPELINE)
+                .scope(ImmutableSystemScope.NAME)
                 .description("GL generated pipeline")
                 .source("pipeline \"" + GL_INPUT_ROUTING_PIPELINE + "\"\nstage 0 match either\nrule \"" + ruleDao.title() + "\"\nend")
                 .stages(stages)

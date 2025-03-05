@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -59,9 +58,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -232,17 +228,16 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("status/{jobId}")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
-    public Response jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
-        final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
-        if (searchJob.getResultFuture() != null) {
-            try {
-                // force a "conditional join", to catch fast responses without having to poll
-                Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
-            } catch (ExecutionException | TimeoutException ignore) {
-            }
-        }
+    public Response jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId,
+                              @ApiParam(name = "page") @QueryParam("page") @DefaultValue("0") int page,
+                              @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("0") int perPage,
+                              @Context SearchUser searchUser) {
         return Response
-                .ok(SearchJobDTO.fromSearchJob(searchJob))
+                .ok(
+                        searchJobService.load(jobId, searchUser)
+                                .map(searchJobDTO -> searchJobDTO.withResultsLimitedTo(page, perPage))
+                                .orElseThrow(NotFoundException::new)
+                )
                 .build();
     }
 
@@ -252,8 +247,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Produces({MediaType.APPLICATION_JSON})
     public Response cancelJob(@PathParam("jobId") String jobId,
                               @Context SearchUser searchUser) {
-        final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
-        searchJob.cancel();
+
+        if (!searchJobService.cancel(jobId, searchUser)) {
+            throw new NotFoundException();
+        }
         return Response.ok().build();
     }
 

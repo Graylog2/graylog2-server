@@ -19,6 +19,7 @@ import { screen, renderPreflight } from 'wrappedTestingLibrary';
 
 import fetch from 'logic/rest/FetchProvider';
 import { asMock } from 'helpers/mocking';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import App from './App';
 
@@ -58,13 +59,11 @@ jest.mock('preflight/util/UserNotification', () => ({
 }));
 
 describe('App', () => {
-  let windowConfirm;
   let windowLocation;
 
-  beforeAll(() => {
-    windowConfirm = window.confirm;
-    window.confirm = jest.fn(() => true);
+  useWindowConfirmMock();
 
+  beforeAll(() => {
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: { reload: jest.fn() },
@@ -76,7 +75,6 @@ describe('App', () => {
   });
 
   afterAll(() => {
-    window.confirm = windowConfirm;
     Object.defineProperty(window, 'location', { configurable: true, value: windowLocation });
   });
 

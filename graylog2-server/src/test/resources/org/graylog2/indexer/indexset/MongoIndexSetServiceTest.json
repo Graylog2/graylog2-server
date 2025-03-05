@@ -82,6 +82,35 @@
       "index_template_type": "events",
       "index_optimization_max_num_segments": 1,
       "index_optimization_disabled": false
+    },
+    {
+      "_id": {
+        "$oid": "57f3d721a43c2d59cb750004"
+      },
+      "title": "Test 4",
+      "description": "Index with system scope - not deletable",
+      "index_prefix": "test_4",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 2500
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 25
+      },
+      "creation_date": {
+        "$date": "2016-10-04T18:00:00Z"
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "test_4",
+      "index_template_type": "events",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "_scope" : "GRAYLOG_NONDELETEABLE_SCOPE"
     }
   ]
 }
