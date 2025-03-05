@@ -88,7 +88,7 @@ const UserConfig = () => {
   };
 
   const timeoutIntervalValidator = (milliseconds: number) => milliseconds >= 1000;
-  const defaultTokenTtlValidator = (milliseconds: number) => (milliseconds/3600000) >= 24; /* converting millis to hours | 86400000 millis */
+  const defaultTokenTtlValidator = (milliseconds: number) => milliseconds >= 86400000;
 
   const modalTitle = 'Update User Configuration';
 
