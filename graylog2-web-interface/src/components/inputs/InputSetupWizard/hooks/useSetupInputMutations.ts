@@ -52,6 +52,7 @@ const createPipeline = (pipeline: PipelineConfiguration): Promise<PipelineType> 
     created_at: undefined,
     modified_at: undefined,
     stages: [{ stage: 0, rules: [], match: 'EITHER' } as StageType],
+    _scope: undefined,
     ...pipeline,
   };
 
