@@ -27,6 +27,7 @@ import com.google.common.graph.MutableGraph;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
+import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntity;
@@ -53,6 +55,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     public static final String TYPE_NAME = "aggregation-v1";
 
     private static final String FIELD_QUERY = "query";
+    private static final String FIELD_QUERY_PARAMETERS = "query_parameters";
     private static final String FIELD_FILTERS = "filters";
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_GROUP_BY = "group_by";
@@ -64,6 +67,10 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
 
     @JsonProperty(FIELD_QUERY)
     public abstract ValueReference query();
+
+    @Nullable
+    @JsonProperty(FIELD_QUERY_PARAMETERS)
+    public abstract ImmutableSet<Parameter> queryParameters();
 
     @JsonProperty(FIELD_FILTERS)
     public abstract List<UsedSearchFilter> filters();
@@ -108,6 +115,9 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
 
         @JsonProperty(FIELD_QUERY)
         public abstract Builder query(ValueReference query);
+
+        @JsonProperty(FIELD_QUERY_PARAMETERS)
+        public abstract Builder queryParameters(Set<Parameter> queryParameters);
 
         @JsonProperty
         public abstract Builder filters(List<UsedSearchFilter> filters);
@@ -157,6 +167,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
         return AggregationEventProcessorConfig.builder()
                 .type(type())
                 .query(query().asString(parameters))
+                .queryParameters(queryParameters())
                 .streams(streamSet)
                 .filters(ImmutableList.copyOf(filters()))
                 .groupBy(groupBy())
