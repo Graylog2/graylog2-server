@@ -19,7 +19,7 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState, SearchExecutionResult, ExtraArguments } from 'views/types';
-import { selectView } from 'views/logic/slices/viewSelectors';
+import { selectView, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import {
   selectGlobalOverride,
@@ -32,12 +32,12 @@ const reexecuteSearchTypes =
   (searchTypes: SearchTypeOptions, effectiveTimerange?: TimeRange) =>
   (dispatch: ViewsDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
     const state = getState();
+    const activeQuery = selectActiveQuery(state);
     const globalOverride = selectGlobalOverride(state);
     const globalQuery = globalOverride?.query;
     const parameterBindings = selectParameterBindings(state);
     const view = selectView(state);
     const searchTypeIds = Object.keys(searchTypes);
-
     const newGlobalOverride: GlobalOverride = new GlobalOverride(
       effectiveTimerange,
       globalQuery,
@@ -48,15 +48,25 @@ const reexecuteSearchTypes =
     const executionState = new SearchExecutionState(parameterBindings, newGlobalOverride);
 
     const handleSearchResult = (searchExecutionResult: SearchExecutionResult): SearchExecutionResult => {
-      const { result: searchResult, widgetMapping } = searchExecutionResult;
+      const { result: searchResult } = searchExecutionResult;
       const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
       const { result } = selectSearchExecutionResult(getState());
 
-      return { result: result.updateSearchTypes(updatedSearchTypes), widgetMapping };
+      return { result: result.updateSearchTypes(updatedSearchTypes), widgetMapping: view.widgetMapping };
     };
 
     return dispatch(
-      executeWithExecutionState(view, [], executionState, { ...searchExecutors, resultMapper: handleSearchResult }),
+      executeWithExecutionState(
+        view.search,
+        activeQuery,
+        [],
+        executionState,
+        {
+          ...searchExecutors,
+          resultMapper: handleSearchResult,
+        },
+        view.widgetMapping,
+      ),
     );
   };
 
