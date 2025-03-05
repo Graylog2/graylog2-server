@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -29,7 +30,7 @@ import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Button, Row, Col } from 'components/bootstrap';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/useInputSetupWizardSteps';
-import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
+import { INPUT_WIZARD_STEPS, INPUT_WIZARD_FLOWS } from 'components/inputs/InputSetupWizard/types';
 import {
   checkHasPreviousStep,
   checkHasNextStep,
@@ -45,6 +46,7 @@ export type ProcessingSteps =
   | 'createStream'
   | 'startStream'
   | 'createPipeline'
+  | 'connectPipeline'
   | 'setupRouting'
   | 'deleteStream'
   | 'deletePipeline'
@@ -52,11 +54,17 @@ export type ProcessingSteps =
   | 'result';
 
 const StartInputStep = () => {
+  const ExtraSetupWizardStep = PluginStore.exports('inputSetupWizard').find(
+    (plugin) => !!plugin.ExtraSetupWizardStep,
+  )?.ExtraSetupWizardStep;
+
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const navigateTo = useNavigate();
   const { goToPreviousStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
+  const isIlluminateFlow = wizardData.flow === INPUT_WIZARD_FLOWS.ILLUMINATE;
+
   const { stepsData } = useInputSetupWizardSteps();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
@@ -75,6 +83,7 @@ const StartInputStep = () => {
     deleteStreamMutation,
     deletePipelineMutation,
     deleteRoutingRuleMutation,
+    connectPipelineMutation,
   } = useSetupInputMutations();
 
   const stepMutations = useMemo<{ [key in ProcessingSteps]?: UseMutationResult }>(
@@ -83,8 +92,9 @@ const StartInputStep = () => {
       startStream: startStreamMutation,
       createPipeline: createPipelineMutation,
       setupRouting: updateRoutingMutation,
+      connectPipeline: connectPipelineMutation,
     }),
-    [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation],
+    [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation, connectPipelineMutation],
   );
 
   const rollBackMutations = useMemo<{ [key in ProcessingSteps]?: UseMutationResult }>(
@@ -140,6 +150,12 @@ const StartInputStep = () => {
   };
 
   const setupInput = async () => {
+    if (isIlluminateFlow) {
+      startInput();
+
+      return;
+    }
+
     const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUT_SETUP_WIZARD.START_INPUT, {
@@ -154,17 +170,24 @@ const StartInputStep = () => {
 
     switch (routingStepData.streamType) {
       case 'NEW':
-        if (routingStepData.shouldCreateNewPipeline) {
-          createPipeline(routingStepData.newStream);
-        }
-
         createStreamMutation.mutateAsync(routingStepData.newStream, {
-          onSuccess: (response) => {
-            startStreamMutation.mutateAsync(response.stream_id);
+          onSuccess: (streamResponse) => {
+            startStreamMutation.mutateAsync(streamResponse.stream_id);
 
-            updateRoutingMutation.mutateAsync({ input_id: inputId, stream_id: response.stream_id }).finally(() => {
-              startInput();
-            });
+            if (routingStepData.shouldCreateNewPipeline) {
+              createPipeline(routingStepData.newStream).then((pipelineResponse) => {
+                connectPipelineMutation.mutateAsync({
+                  streamId: streamResponse.stream_id,
+                  pipelineId: pipelineResponse.id,
+                });
+              });
+            }
+
+            updateRoutingMutation
+              .mutateAsync({ input_id: inputId, stream_id: streamResponse.stream_id })
+              .finally(() => {
+                startInput();
+              });
           },
         });
 
@@ -258,6 +281,10 @@ const StartInputStep = () => {
   };
 
   const isInputStartable = () => {
+    if (isIlluminateFlow) {
+      return true;
+    }
+
     const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
 
     if (!routingStepData) return false;
@@ -376,6 +403,7 @@ const StartInputStep = () => {
                     isError={startInputStatus === 'FAILED'}
                   />
                 )}
+                {isIlluminateFlow && startInputStatus === 'SUCCESS' && <ExtraSetupWizardStep />}
               </>
             ))}
 
