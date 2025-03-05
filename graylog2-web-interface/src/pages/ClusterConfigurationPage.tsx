@@ -20,7 +20,6 @@ import styled from 'styled-components';
 import { DocumentTitle, Icon, PageHeader } from 'components/common';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
-import ClusterConfigurationGraphView from 'components/cluster-configuration/ClusterConfigurationGraphView';
 import ClusterConfigurationListView from 'components/cluster-configuration/ClusterConfigurationListView';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -82,9 +81,6 @@ const ClusterConfigurationPage = () => {
             <TableFetchContextProvider refetch={clusterNodes.refetchDatanodes} searchParams={searchParams} attributes={[]}>
               {viewType === 'list' && (
                 <ClusterConfigurationListView clusterNodes={clusterNodes} />
-              )}
-              {viewType === 'cards' && (
-                <ClusterConfigurationGraphView />
               )}
             </TableFetchContextProvider>
           </Col>
