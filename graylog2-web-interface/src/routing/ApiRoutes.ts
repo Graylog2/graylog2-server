@@ -287,6 +287,7 @@ const ApiRoutes = {
     pause: (streamId: string) => ({ url: `/streams/${streamId}/pause` }),
     resume: (streamId: string) => ({ url: `/streams/${streamId}/resume` }),
     testMatch: (streamId: string) => ({ url: `/streams/${streamId}/testMatch` }),
+    byIndexSet: (indexSetId: string) => ({ url: `/streams/byIndex/${indexSetId}` }),
   },
   StreamOutputsApiController: {
     add: (streamId: string) => ({ url: `/streams/${streamId}/outputs` }),
