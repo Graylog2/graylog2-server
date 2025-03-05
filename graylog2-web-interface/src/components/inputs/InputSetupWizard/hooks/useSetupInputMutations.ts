@@ -25,6 +25,7 @@ import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 export type RoutingParams = {
   stream_id?: string;
   input_id: string;
+  remove_from_default?: boolean;
 };
 
 export type StreamConfiguration = Pick<Stream, 'index_set_id' | 'title' | 'remove_matches_from_default_stream'> &
