@@ -20,30 +20,48 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 
 /**
- * Data nodes set their status in their own periodical while running. If a data node is stopped/crashed, we want to keep it in the list of data nodes but set their status to `UNAVAILABLE`
+ * Data nodes set their status in their own periodical while running.
+ * If a data node is stopped/crashed, we want to keep it in the list of data nodes but set their status to `UNAVAILABLE`.
+ * We also check if there are data nodes with outdated version running.
  */
 @Singleton
 public class DataNodeHousekeepingPeriodical extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeHousekeepingPeriodical.class);
     private final NodeService<DataNodeDto> nodeService;
+    private final NotificationService notificationService;
 
     @Inject
-    public DataNodeHousekeepingPeriodical(NodeService<DataNodeDto> nodeService) {
+    public DataNodeHousekeepingPeriodical(NodeService<DataNodeDto> nodeService,
+                                          NotificationService notificationService) {
         this.nodeService = nodeService;
+        this.notificationService = notificationService;
     }
 
     @Override
-    // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
-    public synchronized void doRun() {
+    public void doRun() {
+        // drop outdated nodes
         nodeService.dropOutdated();
+
+        Map<String, DataNodeDto> nodes = nodeService.allActive();
+        if (!nodes.isEmpty() && !nodes.values().stream()
+                .allMatch(DataNodeDto::isCompatibleWithVersion)) {
+            final Notification notification = notificationService.buildNow()
+                    .addType(Notification.Type.DATA_NODE_VERSION_MISMATCH)
+                    .addSeverity(Notification.Severity.NORMAL);
+            notificationService.publishIfFirst(notification);
+        }
+
     }
 
     @Override
