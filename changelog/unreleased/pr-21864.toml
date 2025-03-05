@@ -1,0 +1,5 @@
+type = "c"
+message = "Set default User-Agent in HTTP client to 'Graylog'"
+
+issues = [""]
+pulls = ["21864"]
