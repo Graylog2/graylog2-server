@@ -14,25 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.events.processor.systemnotification;
+import ObjectID from 'bson-objectid';
 
-import org.graylog2.database.entities.EntityScope;
+// Returns a new BSON ObjectID, which are used for documents in MongoDB.
+const generateObjectId = () => new ObjectID().toString();
 
-public final class SystemNotificationEventEntityScope extends EntityScope {
-    public static final String NAME = "SYSTEM_NOTIFICATION_EVENT";
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public boolean isMutable() {
-        return true;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return false;
-    }
-}
+export default generateObjectId;
