@@ -23,6 +23,7 @@ import AppConfig from 'util/AppConfig';
 
 export const SYSTEM_DROPDOWN_TITLE = 'System';
 export const SEARCH_LINK_TITLE = 'Search';
+export const DASHBOARDS_LINK_TITLE = 'Dashboards';
 
 const navigationBindings: PluginExports = {
   navigation: [
@@ -40,7 +41,7 @@ const navigationBindings: PluginExports = {
     },
     {
       path: Routes.DASHBOARDS,
-      description: 'Dashboards',
+      description: DASHBOARDS_LINK_TITLE,
     },
     {
       description: SYSTEM_DROPDOWN_TITLE,
