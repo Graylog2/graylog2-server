@@ -24,14 +24,12 @@ import {
   RelativeTime,
   SearchForm,
   Spinner,
-  IfPermitted,
 } from 'components/common';
 import { Button, Col, Panel, Row } from 'components/bootstrap';
 import type { Token, TokenSummary } from 'stores/users/UsersStore';
 import { sortByDate } from 'util/SortUtils';
 
 import CreateTokenForm from './CreateTokenForm';
-import {Headline} from 'components/common/Section/SectionComponent';
 
 const StyledTokenPanel = styled(Panel)`
   &.panel {
