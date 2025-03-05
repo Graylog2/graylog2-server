@@ -20,6 +20,10 @@ import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import Routes from 'routing/Routes';
 import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
@@ -54,6 +58,9 @@ const StartInputStep = () => {
     (plugin) => !!plugin.ExtraSetupWizardStep,
   )?.ExtraSetupWizardStep;
 
+  const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
+  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const navigateTo = useNavigate();
   const { goToPreviousStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
   const isIlluminateFlow = wizardData.flow === INPUT_WIZARD_FLOWS.ILLUMINATE;
@@ -150,6 +157,12 @@ const StartInputStep = () => {
     }
 
     const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUT_SETUP_WIZARD.START_INPUT, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'click-input-setup-wizard-start-input',
+      chosen_routing_option: routingStepData?.streamType ?? 'UNKNOWN',
+    });
     const { input } = wizardData;
     const inputId = input?.id;
 
