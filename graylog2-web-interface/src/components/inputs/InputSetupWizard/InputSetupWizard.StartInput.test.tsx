@@ -362,6 +362,7 @@ describe('InputSetupWizard Start Input', () => {
               source: undefined,
               modified_at: '',
               errors: [],
+              _scope: undefined,
             }),
           );
         });
