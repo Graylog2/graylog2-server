@@ -728,7 +728,7 @@ public class UsersResource extends RestResource {
         final User user = loadUserById(userId);
         final String username = user.getName();
 
-        if (!isAccessAllowed(user)) {
+        if (!isTokenCreationAllowed(user)) {
             throw new ForbiddenException("Not allowed to create tokens for user " + username);
         }
         if (body == null) {
@@ -767,16 +767,16 @@ public class UsersResource extends RestResource {
     }
 
     @VisibleForTesting
-    boolean isAccessAllowed(User user) {
-        final boolean permitted = isPermitted(USERS_TOKENCREATE, user.getName());
+    boolean isTokenCreationAllowed(User user) {
+        final boolean allowed = isPermitted(USERS_TOKENCREATE, user.getName());
         final boolean isAdmin = isAdmin(user);
         if (isAdmin) {
-            return permitted;
+            return allowed;
         }
         final boolean externalAllowed = isExternalUserAllowed(user);
         final boolean adminAllowed = isAllowedAsNoAdmin(user);
 
-        return permitted && externalAllowed && adminAllowed;
+        return allowed && externalAllowed && adminAllowed;
     }
 
     private boolean isAdmin(User user) {

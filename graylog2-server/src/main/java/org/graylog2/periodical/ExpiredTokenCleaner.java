@@ -18,7 +18,6 @@ package org.graylog2.periodical;
 
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
-import jakarta.validation.constraints.NotNull;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.Tools;
@@ -30,6 +29,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 import static org.graylog2.audit.AuditEventTypes.USER_ACCESS_TOKEN_DELETE;
@@ -52,10 +52,12 @@ public class ExpiredTokenCleaner extends Periodical {
     public void doRun() {
         LOG.debug("Start cleaning up expired tokens.");
         final DateTime expireBefore = Tools.nowUTC();
-        final List<AccessTokenService.ExpiredToken> expiredTokenIds = this.tokenService.findExpiredTokens(expireBefore);
-        LOG.info("Found {} tokens expired before {}.", expiredTokenIds.size(), expireBefore);
+        final List<AccessTokenService.ExpiredToken> expiredTokens = this.tokenService.findExpiredTokens(expireBefore);
+        if (!expiredTokens.isEmpty()) {
+            LOG.info("Found {} tokens expired before {}.", expiredTokens.size(), expireBefore);
+        }
 
-        for (AccessTokenService.ExpiredToken token : expiredTokenIds) {
+        for (AccessTokenService.ExpiredToken token : expiredTokens) {
             ImmutableMap.Builder<String, Object> ctxBuilder = ImmutableMap.builder();
             ctxBuilder.put(AccessTokenImpl.NAME, token.tokenName()).put("userId", token.userId());
             try {
@@ -108,7 +110,8 @@ public class ExpiredTokenCleaner extends Periodical {
     }
 
     @Override
-    protected @NotNull Logger getLogger() {
+    @Nonnull
+    protected Logger getLogger() {
         return LOG;
     }
 }
