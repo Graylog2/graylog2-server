@@ -48,6 +48,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesReques
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.utilities.StringUtils;
@@ -103,7 +104,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
 
             //Step 2: execute search as we usually do
             final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
-            postAuditEvent(searchJob);
+            postAuditEvent(searchJob, searchUser.getUser());
 
             //Step 3: take complex response and try to map it to simpler, tabular form
             return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob, searchUser, getSubject());
@@ -158,7 +159,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
 
             //Step 2: execute search as we usually do
             final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
-            postAuditEvent(searchJob);
+            postAuditEvent(searchJob, searchUser.getUser());
 
             //Step 3: take complex response and try to map it to simpler, tabular form
             return aggregationTabularResponseCreator.mapToResponse(aggregationRequestSpec, searchJob, searchUser);
@@ -193,8 +194,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
         }
     }
 
-    private void postAuditEvent(SearchJob searchJob) {
-        final SearchJobExecutionEvent searchJobExecutionEvent = SearchJobExecutionEvent.create(getCurrentUser(), searchJob, DateTime.now(DateTimeZone.UTC));
+    private void postAuditEvent(SearchJob searchJob, User user) {
+        final SearchJobExecutionEvent searchJobExecutionEvent = SearchJobExecutionEvent.create(user, searchJob, DateTime.now(DateTimeZone.UTC));
         this.serverEventBus.post(searchJobExecutionEvent);
     }
 }
