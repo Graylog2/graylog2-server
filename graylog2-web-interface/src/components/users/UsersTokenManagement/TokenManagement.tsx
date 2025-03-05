@@ -22,15 +22,15 @@ import {
 import { fetchTokens, keyFn } from 'components/users/UsersTokenManagement/hooks/useTokens';
 import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
 import { PaginatedEntityTable } from 'components/common';
+import TokenActions from 'components/users/UsersTokenManagement/TokenManagementActions';
 
 import CustomColumnRenderers from './ColumnRenderers';
-import TokenActions from 'components/users/UsersTokenManagement/TokenManagementActions';
 
 
 const TokenManagement = () => {
   const tokenAction = useCallback(
-    ({ user_id, NAME:tokenName}: Token) => (
-      <TokenActions userId={user_id} tokenName={tokenName} />
+    ({ user_id, id:tokenId, NAME:tokenName}: Token) => (
+      <TokenActions userId={user_id} tokenId={tokenId} tokenName={tokenName} />
     ),
     [],
   );

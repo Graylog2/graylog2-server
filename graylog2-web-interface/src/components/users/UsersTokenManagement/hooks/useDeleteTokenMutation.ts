@@ -14,24 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import {useQueryClient} from '@tanstack/react-query';
 import ApiRoutes from 'routing/ApiRoutes';
 
-const deleteToken = async (userId: string, tokenName: string) => {
-  const url = qualifyUrl(ApiRoutes.UsersApiController.delete_token(userId, tokenName).url);
+const deleteToken = async (userId: string, tokenId: string) => {
+  const url = qualifyUrl(ApiRoutes.UsersApiController.delete_token(userId, tokenId).url);
 
   return fetch('DELETE', url);
 };
 
-const useDeleteTokenMutation = (userId: string, tokenName: string) => {
+const useDeleteTokenMutation = (userId: string, tokenId: string) => {
   const queryClient = useQueryClient();
 
-  const remove = useMutation(() => deleteToken(userId, tokenName), {
+  const remove = useMutation(() => deleteToken(userId, tokenId), {
     onError: (errorThrown) => {
       UserNotification.error(`Token deletion failed: ${errorThrown}`, 'Could not delete token');
     },
