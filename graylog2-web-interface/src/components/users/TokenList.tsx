@@ -17,10 +17,19 @@
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { ClipboardButton, ControlledTableList, Icon, RelativeTime, SearchForm, Spinner } from 'components/common';
+import {
+  ClipboardButton,
+  ControlledTableList,
+  Icon,
+  RelativeTime,
+  SearchForm,
+  Spinner,
+  IfPermitted,
+} from 'components/common';
 import { Button, Col, Panel, Row } from 'components/bootstrap';
 import type { Token, TokenSummary } from 'stores/users/UsersStore';
 import { sortByDate } from 'util/SortUtils';
+import {Headline} from 'components/common/Section/SectionComponent';
 
 import CreateTokenForm from './CreateTokenForm';
 
