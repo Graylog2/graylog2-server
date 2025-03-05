@@ -44,11 +44,11 @@ class GELFBulkDroppedMsgServiceTest {
 
     @Test
     void handleDroppedMsgOccurrence() {
-        final String json = "{"
-                + "\"version\": \"1.1\","
-                + "\"host\": \"example.org\","
-                + "\"short_message\": \"A short message that helps you identify what is going on\""
-                + "}";
+        final String json = """
+                {"short_message":"Bulk message 1", "host":"example.org", "facility":"test", "_foo":"bar"}
+
+                {"short_message":"Bulk message 2", "host":"example.org", "facility":"test", "_foo":"bar"}
+                """;
 
         final String gelfInputId = "gelfInputId";
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
@@ -56,6 +56,6 @@ class GELFBulkDroppedMsgServiceTest {
 
         classUnderTest.handleDroppedMsgOccurrence(rawMessage);
 
-        Mockito.verify(inputDiagnosisMetrics, Mockito.times(1)).incCount(name("org.graylog2.inputs", gelfInputId, GELFBulkDroppedMsgService.METRIC_SUFFIX));
+        Mockito.verify(inputDiagnosisMetrics, Mockito.times(1)).incCount(name(GELFBulkDroppedMsgService.METRIC_PREFIX, gelfInputId, GELFBulkDroppedMsgService.METRIC_SUFFIX));
     }
 }

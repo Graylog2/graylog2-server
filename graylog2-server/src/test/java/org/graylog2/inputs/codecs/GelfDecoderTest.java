@@ -404,15 +404,17 @@ public class GelfDecoderTest {
 
     @Test
     public void decodeFailsWhenMultipleMessages() {
-        final String json = "{\"short_message\":\"Bulk message 1\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
-                "\n" +
-                "{\"short_message\":\"Bulk message 2\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
-                "\n" +
-                "{\"short_message\":\"Bulk message 3\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
-                "\n" +
-                "{\"short_message\":\"Bulk message 4\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}\n" +
-                "\n" +
-                "{\"short_message\":\"Bulk message 5\", \"host\":\"example.org\", \"facility\":\"test\", \"_foo\":\"bar\"}";
+        final String json = """
+                {"short_message":"Bulk message 1", "host":"example.org", "facility":"test", "_foo":"bar"}
+
+                {"short_message":"Bulk message 2", "host":"example.org", "facility":"test", "_foo":"bar"}
+
+                {"short_message":"Bulk message 3", "host":"example.org", "facility":"test", "_foo":"bar"}
+
+                {"short_message":"Bulk message 4", "host":"example.org", "facility":"test", "_foo":"bar"}
+
+                {"short_message":"Bulk message 5", "host":"example.org", "facility":"test", "_foo":"bar"}
+                """;
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
         decoder.decode(rawMessage);
