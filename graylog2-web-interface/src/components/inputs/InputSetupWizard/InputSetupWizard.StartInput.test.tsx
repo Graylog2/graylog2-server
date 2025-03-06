@@ -353,15 +353,14 @@ describe('InputSetupWizard Start Input', () => {
 
     it('should show the progress for all steps', async () => {
       renderWizard();
-      await waitFor(() => createStream(true));
+      await waitFor(() => createStream());
       goToStartInputStep();
       startInput();
 
       expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
       expect(await screen.findByText(/Stream "Wingardium" created!/i)).toBeInTheDocument();
-      expect(await screen.findByText(/Pipeline "Wingardium" created!/i)).toBeInTheDocument();
       expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
-      expect(await screen.findByText(/Input started sucessfully!/i)).toBeInTheDocument();
+      expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();
     });
 
     it('should start the input', async () => {
