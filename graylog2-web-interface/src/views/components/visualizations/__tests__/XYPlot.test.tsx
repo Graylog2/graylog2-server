@@ -194,4 +194,13 @@ describe('XYPlot', () => {
       {},
     );
   });
+
+  it('allows passing `onClickMarker` callback', async () => {
+    const onClick = jest.fn();
+    render(<SimpleXYPlot onClickMarker={onClick} />);
+    const { onClickMarker } = asMock(GenericPlot).mock.calls[0][0];
+    onClickMarker({ x: 'Foo', y: '23' });
+
+    expect(onClick).toHaveBeenCalledWith({ x: 'Foo', y: '23' });
+  });
 });
