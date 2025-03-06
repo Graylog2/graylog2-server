@@ -59,7 +59,13 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
       onClick={onDelete}>
       Delete
     </Button>,
-    <StageForm key={`edit-stage-${stage}`} pipeline={pipeline} stage={stage} save={onUpdate} disableEdit={disableEdit} />,
+    <StageForm
+      key={`edit-stage-${stage}`}
+      pipeline={pipeline}
+      stage={stage}
+      save={onUpdate}
+      disableEdit={disableEdit}
+    />,
   ];
 
   let description;

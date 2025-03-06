@@ -134,7 +134,8 @@ const ProcessingTimelineComponent = () => {
       pipelines={pipelines.toJS()}
       connections={connections}
       streams={streams}
-      onDeletePipeline={() => _deletePipeline(pipelineItem)} />
+      onDeletePipeline={() => _deletePipeline(pipelineItem)}
+    />
   );
   const headers = ['Pipeline', 'Connected to Streams', 'Processing Timeline', 'Actions'];
 

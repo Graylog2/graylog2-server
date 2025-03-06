@@ -97,11 +97,14 @@ function Editor({ id = undefined, value, height, readOnly = false, onChange, onF
     if (onFullMode) onFullMode(fullMode);
   };
 
-  const handleOnChange = React.useCallback((newValue: string) => {
-    const sanitizedValue = DOMPurify.sanitize(newValue);
-    setLocalValue(sanitizedValue);
-    onChange(sanitizedValue);
-  }, [onChange]);
+  const handleOnChange = React.useCallback(
+    (newValue: string) => {
+      const sanitizedValue = DOMPurify.sanitize(newValue);
+      setLocalValue(sanitizedValue);
+      onChange(sanitizedValue);
+    },
+    [onChange],
+  );
 
   return (
     <>

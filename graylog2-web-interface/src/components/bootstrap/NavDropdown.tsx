@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-// eslint-disable-next-line no-restricted-imports
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';

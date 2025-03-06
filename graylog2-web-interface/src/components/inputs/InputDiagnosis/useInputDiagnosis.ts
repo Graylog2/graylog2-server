@@ -58,10 +58,10 @@ export type InputNodeStates = {
 };
 
 export type StreamMessageCount = {
-  stream_name : string,
-  stream_id : string,
-  count : number
-}
+  stream_name: string;
+  stream_id: string;
+  count: number;
+};
 
 export type InputDiagnostics = {
   stream_message_count: StreamMessageCount[];
@@ -70,21 +70,21 @@ export type InputDiagnostics = {
 export const metricWithPrefix = (input: Input, metric: string) => `${input?.type}.${input?.id}.${metric}`;
 
 const getValueFromMetric = (metric) => {
-    if (metric === null || metric === undefined) {
-      return undefined;
-    }
-
-    switch (metric.type) {
-      case 'meter':
-        return metric.metric.rate.total;
-      case 'gauge':
-        return metric.metric.value;
-      case 'counter':
-        return metric.metric.count;
-      default:
-        return undefined;
-    }
+  if (metric === null || metric === undefined) {
+    return undefined;
   }
+
+  switch (metric.type) {
+    case 'meter':
+      return metric.metric.rate.total;
+    case 'gauge':
+      return metric.metric.value;
+    case 'counter':
+      return metric.metric.count;
+    default:
+      return undefined;
+  }
+};
 
 export const fetchInputDiagnostics = (inputId: string): Promise<InputDiagnostics> =>
   fetch<InputDiagnostics>('GET', qualifyUrl(`system/inputs/diagnostics/${inputId}`));
@@ -155,7 +155,7 @@ const useInputDiagnosis = (
   const aggregateMetrics = () => {
     const result = {};
 
-    if(!metricsByNode) return result;
+    if (!metricsByNode) return result;
 
     InputDiagnosisMetricNames.forEach((metricName) => {
       result[metricName] = Object.keys(metricsByNode).reduce((previous, nodeId) => {
@@ -171,7 +171,7 @@ const useInputDiagnosis = (
 
         return previous;
       }, NaN);
-    })
+    });
 
     return result;
   };
