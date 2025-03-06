@@ -27,6 +27,8 @@ import org.graylog.plugins.datanode.dto.ShardReplication;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -38,7 +40,8 @@ import java.util.stream.Collectors;
 @Singleton
 public class DatanodeUpgradeService {
 
-    public static final String CLUSTER_MANAGER_ROLE = "cluster_manager";
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeUpgradeService.class);
+
     private final DatanodeUpgradeServiceAdapter upgradeService;
     private final NodeService<DataNodeDto> nodeService;
 
@@ -78,13 +81,13 @@ public class DatanodeUpgradeService {
                 .thenComparing(DataNodeInformation::nodeName);
 
         return toUpgradeDataNodes.stream()
-                .map(n -> remix(n, toUpgradeDataNodes, clusterState, serverVersion, clusterReadyForUpgrade))
+                .map(n -> enrichNodeInformation(n, toUpgradeDataNodes, clusterState, serverVersion, clusterReadyForUpgrade))
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }
 
     @Nonnull
-    private static DataNodeInformation remix(DataNodeDto node, Set<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
+    private static DataNodeInformation enrichNodeInformation(DataNodeDto node, Set<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
         final Optional<Node> opensearchInformation = clusterState.findByHostname(node.getHostname());
 
         final String nodeName = clusterState.getName(node.getHostname());
@@ -111,13 +114,17 @@ public class DatanodeUpgradeService {
         return serverVersion.getVersion().compareToIgnoreBuildMetadata(datanode) == 0;
     }
 
-    public FlushResponse stopSync() {
+    public FlushResponse stopReplication() {
+        LOG.info("Stopping shard replication");
         upgradeService.disableShardReplication();
+        LOG.info("Flushing, storing all in-memory operations to segments on disk");
         return upgradeService.flush();
     }
 
-    public FlushResponse startSync() {
+    public FlushResponse startReplication() {
+        LOG.info("Starting shard replication");
         upgradeService.enableShardReplication();
+        LOG.info("Flushing, storing all in-memory operations to segments on disk");
         return upgradeService.flush();
     }
 }

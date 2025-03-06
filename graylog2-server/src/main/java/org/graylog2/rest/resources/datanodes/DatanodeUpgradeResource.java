@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.datanodes;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -30,6 +31,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.datanode.dto.FlushResponse;
 import org.graylog2.datanode.DatanodeUpgradeService;
 import org.graylog2.datanode.DatanodeUpgradeStatus;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.shared.security.RestPermissions;
 
 @RequiresAuthentication
@@ -55,18 +57,18 @@ public class DatanodeUpgradeResource {
     }
 
     @POST
-    @Path("/stop-sync")
+    @Path("/replication/stop")
     @ApiOperation("Display existing cluster configuration")
     @RequiresPermissions(RestPermissions.DATANODE_READ)
-    public FlushResponse stopSync() {
-        return upgradeService.stopSync();
+    public FlushResponse stopReplication() {
+        return upgradeService.stopReplication();
     }
 
     @POST
-    @Path("/start-sync")
+    @Path("/replication/start")
     @ApiOperation("Display existing cluster configuration")
     @RequiresPermissions(RestPermissions.DATANODE_READ)
-    public FlushResponse startSync  () {
-        return upgradeService.startSync();
+    public FlushResponse startReplication() {
+        return upgradeService.startReplication();
     }
 }
