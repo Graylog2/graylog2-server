@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -53,7 +54,7 @@ public class DatanodeUpgradeResource {
         return upgradeService.status();
     }
 
-    @GET
+    @POST
     @Path("/stop-sync")
     @ApiOperation("Display existing cluster configuration")
     @RequiresPermissions(RestPermissions.DATANODE_READ)
@@ -61,7 +62,7 @@ public class DatanodeUpgradeResource {
         return upgradeService.stopSync();
     }
 
-    @GET
+    @POST
     @Path("/start-sync")
     @ApiOperation("Display existing cluster configuration")
     @RequiresPermissions(RestPermissions.DATANODE_READ)
