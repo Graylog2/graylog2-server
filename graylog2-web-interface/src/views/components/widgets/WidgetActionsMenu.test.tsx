@@ -41,6 +41,7 @@ import useViewType from 'views/hooks/useViewType';
 import fetchSearch from 'views/logic/views/fetchSearch';
 import useWidgetResults from 'views/components/useWidgetResults';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -301,16 +302,7 @@ describe('<WidgetActionsMenu />', () => {
   });
 
   describe('delete action', () => {
-    let oldWindowConfirm;
-
-    beforeEach(() => {
-      oldWindowConfirm = window.confirm;
-      window.confirm = jest.fn();
-    });
-
-    afterEach(() => {
-      window.confirm = oldWindowConfirm;
-    });
+    useWindowConfirmMock();
 
     it('should delete widget when no deletion hook is installed and prompt is confirmed', async () => {
       asMock(window.confirm).mockReturnValue(true);

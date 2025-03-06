@@ -129,7 +129,7 @@ public class PipelineResourceTest {
     @Test
     public void buildPipelineStringNoStage() {
         PipelineSource pipelineSource = PipelineSource.create(
-                "id0", "title0", "description0", "",
+                "id0", "DEFAULT", "title0", "description0", "",
                 Collections.emptyList(),
                 null, null);
         String pipelineString = PipelineUtils.createPipelineString(pipelineSource);
@@ -139,7 +139,7 @@ public class PipelineResourceTest {
     @Test
     public void buildPipelineStringSingleStage() {
         PipelineSource pipelineSource = PipelineSource.create(
-                "id1", "title1", "description1", "",
+                "id1", "DEFAULT", "title1", "description1", "",
                 java.util.List.of(
                         StageSource.builder()
                                 .stage(0).rules(java.util.List.of("rule1", "rule2")).match(EITHER).build()),
@@ -151,7 +151,7 @@ public class PipelineResourceTest {
     @Test
     public void buildPipelineStringMultipleStages() {
         PipelineSource pipelineSource = PipelineSource.create(
-                "id2", "title2", "description2", "",
+                "id2", "DEFAULT", "title2", "description2", "",
                 java.util.List.of(
                         StageSource.builder()
                                 .stage(0).rules(java.util.List.of("rule1", "rule2")).match(EITHER).build(),

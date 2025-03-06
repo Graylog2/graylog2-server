@@ -14,25 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.pipelineprocessor.db;
+import ObjectID from 'bson-objectid';
 
-import org.graylog2.database.entities.EntityScope;
+// Returns a new BSON ObjectID, which are used for documents in MongoDB.
+const generateObjectId = () => new ObjectID().toString();
 
-public class SystemPipelineRuleScope extends EntityScope {
-    public static final String NAME = "GRAYLOG_SYSTEM_PIPELINE_RULE_SCOPE";
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public boolean isMutable() {
-        return false;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return true;
-    }
-}
+export default generateObjectId;
