@@ -29,10 +29,15 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.datanode.dto.FlushResponse;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.datanode.DatanodeUpgradeService;
 import org.graylog2.datanode.DatanodeUpgradeStatus;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.shared.security.RestPermissions;
+
+import static org.graylog2.audit.AuditEventTypes.DATANODE_START;
+import static org.graylog2.audit.AuditEventTypes.DATANODE_START_REPLICATION;
+import static org.graylog2.audit.AuditEventTypes.DATANODE_STOP_REPLICATION;
 
 @RequiresAuthentication
 @Api(value = "DatanodeUpgrade", description = "Endpoint for support of rolling upgrade of data nodes")
@@ -58,16 +63,18 @@ public class DatanodeUpgradeResource {
 
     @POST
     @Path("/replication/stop")
-    @ApiOperation("Display existing cluster configuration")
-    @RequiresPermissions(RestPermissions.DATANODE_READ)
+    @ApiOperation("Stop shard replication for opensearch cluster managed by the data node")
+    @RequiresPermissions(RestPermissions.DATANODE_STOP)
+    @AuditEvent(type = DATANODE_STOP_REPLICATION)
     public FlushResponse stopReplication() {
         return upgradeService.stopReplication();
     }
 
     @POST
     @Path("/replication/start")
-    @ApiOperation("Display existing cluster configuration")
-    @RequiresPermissions(RestPermissions.DATANODE_READ)
+    @ApiOperation("Start shard replication for opensearch cluster managed by the data node")
+    @RequiresPermissions(RestPermissions.DATANODE_START)
+    @AuditEvent(type = DATANODE_START_REPLICATION)
     public FlushResponse startReplication() {
         return upgradeService.startReplication();
     }
