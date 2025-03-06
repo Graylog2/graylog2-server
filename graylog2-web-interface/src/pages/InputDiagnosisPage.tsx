@@ -35,6 +35,7 @@ import type { InputState } from 'stores/inputs/InputStatesStore';
 import useHistory from 'routing/useHistory';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
+import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
 
 const LeftCol = styled.div(
   ({ theme }) => css`
@@ -43,6 +44,7 @@ const LeftCol = styled.div(
     align-items: flex-start;
     align-content: center;
     justify-content: center;
+
     > p {
       color: ${theme.colors.gray[50]};
     }
@@ -166,7 +168,6 @@ const InputDiagnosisPage = () => {
 
   const isInputStateDown = inputNodeStates.total === 0 || ['FAILED', 'STOPPED', 'FAILING'].some((failedState) => Object.keys(inputNodeStates.states).includes(failedState));
   const hasReceivedMessageMetrics = inputMetrics.incomingMessagesTotal > 0;
-  const hasError = Object.keys(inputMetrics.message_errors).some((error) => inputMetrics.message_errors[error] > 0);
   const hasReceivedMessage = inputMetrics.stream_message_count?.some((stream) => stream.count > 0 );
 
   return (
@@ -250,14 +251,7 @@ const InputDiagnosisPage = () => {
                 </StyledListGroup>
               )}
             </Section>
-            <Section title="Message Errors" headerLeftSection={<StatusColorIndicator bsStyle={hasError ? 'danger' : 'gray'}/>}>
-              <StyledP className='description'>Messages can fail to process at the Input, at the processing pipeline, or when being indexed to the Search Cluster. Click on a category to view the associated messages.</StyledP>
-               <StyledListGroup>
-                <StyledListGroupItem>Message Error at Input: {inputMetrics.message_errors.failures_inputs_codecs}</StyledListGroupItem>
-                <StyledListGroupItem>Message failed to process: {inputMetrics.message_errors.failures_processing}</StyledListGroupItem>
-                <StyledListGroupItem>Message failed to index: {inputMetrics.message_errors.failures_indexing}</StyledListGroupItem>
-              </StyledListGroup>
-            </Section>
+            <DiagnosisMessageErrors messageErrors={inputMetrics.message_errors} inputId={inputId}/>
           </div>
           <div>
             <Section
