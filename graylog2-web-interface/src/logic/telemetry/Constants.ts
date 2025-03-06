@@ -270,6 +270,9 @@ export const TELEMETRY_EVENT_TYPE = {
     INPUT_STOP_CLICKED: 'Inputs Input Stop Clicked',
     INPUT_SETUP_CLICKED: 'Inputs Input Setup Clicked',
   },
+  INPUT_SETUP_WIZARD: {
+    START_INPUT: 'Input Setup Wizard Start Input Clicked',
+  },
   OUTPUTS: {
     OUTPUT_CREATED: 'Outputs Output Created',
     OUTPUT_ASSIGNED: 'Outputs Output Assigned',
