@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useEffect, useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -54,9 +54,11 @@ export type ProcessingSteps =
   | 'result';
 
 const StartInputStep = () => {
-  const ExtraSetupWizardStep = PluginStore.exports('inputSetupWizard').find(
-    (plugin) => !!plugin.ExtraSetupWizardStep,
-  )?.ExtraSetupWizardStep;
+  const inputSetupWizards = usePluginEntities('inputSetupWizard');
+  const ExtraSetupWizardStep = useMemo(
+    () => inputSetupWizards?.find((plugin) => !!plugin.ExtraSetupWizardStep)?.ExtraSetupWizardStep,
+    [inputSetupWizards],
+  );
 
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
