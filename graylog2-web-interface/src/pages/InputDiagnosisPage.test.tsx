@@ -61,6 +61,7 @@ const inputMetrics = {
     failures_indexing: 19,
     failures_processing: 20,
     failures_inputs_codecs: 21,
+    dropped_message_occurrence: 10,
   },
   stream_message_count: [
     { stream_name: 'Test Stream 1', stream_id: '1', count: 22 },

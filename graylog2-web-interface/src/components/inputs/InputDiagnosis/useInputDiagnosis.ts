@@ -40,6 +40,7 @@ export type InputDiagnosisMetrics = {
     failures_indexing: number;
     failures_processing: number;
     failures_inputs_codecs: number;
+    dropped_message_occurrence: number;
   }
   stream_message_count: StreamMessageCount[];
 };
@@ -143,8 +144,9 @@ const useInputDiagnosis = (
       failures_indexing,
       failures_processing,
       failures_inputs_codecs,
+      dropped_message_occurrence,
     ],
-    [input, failures_indexing, failures_processing, failures_inputs_codecs],
+    [input, failures_indexing, failures_processing, failures_inputs_codecs, dropped_message_occurrence],
   );
 
   const { metrics: metricsByNode } = useStore(MetricsStore);
@@ -200,6 +202,7 @@ const useInputDiagnosis = (
         failures_indexing: (aggregatedMetrics[failures_indexing]) || 0,
         failures_processing: (aggregatedMetrics[failures_processing]) || 0,
         failures_inputs_codecs: (aggregatedMetrics[failures_inputs_codecs]) || 0,
+        dropped_message_occurrence: aggregatedMetrics[dropped_message_occurrence],
       },
       stream_message_count: messageCountByStream?.stream_message_count || [],
     },
@@ -207,8 +210,4 @@ const useInputDiagnosis = (
 };
 
 export default useInputDiagnosis;
-
-
-
-
 
