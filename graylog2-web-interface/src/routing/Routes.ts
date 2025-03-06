@@ -134,6 +134,7 @@ const Routes = {
       CLUSTER: '/system/datanodes/cluster',
       CONFIGURATION: '/system/datanodes/configuration',
       MIGRATION: '/system/datanodes/migration',
+      UPGRADE: '/system/datanodes/upgrade',
     },
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
