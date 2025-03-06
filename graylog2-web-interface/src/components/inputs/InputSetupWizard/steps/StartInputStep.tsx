@@ -19,6 +19,10 @@ import { useEffect, useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import Routes from 'routing/Routes';
 import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
@@ -48,6 +52,9 @@ export type ProcessingSteps =
   | 'result';
 
 const StartInputStep = () => {
+  const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
+  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const navigateTo = useNavigate();
   const { goToPreviousStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
   const { stepsData } = useInputSetupWizardSteps();
@@ -134,6 +141,12 @@ const StartInputStep = () => {
 
   const setupInput = async () => {
     const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUT_SETUP_WIZARD.START_INPUT, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'click-input-setup-wizard-start-input',
+      chosen_routing_option: routingStepData?.streamType ?? 'UNKNOWN',
+    });
     const { input } = wizardData;
     const inputId = input?.id;
 
@@ -157,9 +170,15 @@ const StartInputStep = () => {
 
         break;
       case 'EXISTING':
-        updateRoutingMutation.mutateAsync({ input_id: inputId, stream_id: routingStepData.streamId }).finally(() => {
-          startInput();
-        });
+        updateRoutingMutation
+          .mutateAsync({
+            input_id: inputId,
+            stream_id: routingStepData.streamId,
+            remove_from_default: routingStepData.removeMatchesFromDefault,
+          })
+          .finally(() => {
+            startInput();
+          });
 
         break;
       case 'DEFAULT':

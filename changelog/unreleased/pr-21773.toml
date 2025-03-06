@@ -1,0 +1,5 @@
+type="a"
+message="Allow specifying a TTL when creating a new API-token. Also, automatically delete expired tokens."
+
+issues=["21440"]
+pulls=["21773"]
