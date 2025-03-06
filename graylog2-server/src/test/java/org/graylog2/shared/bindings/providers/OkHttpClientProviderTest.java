@@ -313,11 +313,20 @@ public class OkHttpClientProviderTest {
     }
 
     @Test
-    public void testUserAgent() throws IOException, InterruptedException {
+    public void testDefaultUserAgent() throws IOException, InterruptedException {
         server.enqueue(successfulMockResponse());
         client(server.url("/").uri()).newCall(request()).execute();
         final RecordedRequest recordedRequest = server.takeRequest();
         assertThat(recordedRequest.getHeader(HttpHeaders.USER_AGENT)).isEqualTo("GraylogTest");
+    }
+
+    @Test
+    public void testCustomUserAgent() throws IOException, InterruptedException {
+        server.enqueue(successfulMockResponse());
+        final var request = request().newBuilder().header(HttpHeaders.USER_AGENT, "foo").build();
+        client(server.url("/").uri()).newCall(request).execute();
+        final RecordedRequest recordedRequest = server.takeRequest();
+        assertThat(recordedRequest.getHeader(HttpHeaders.USER_AGENT)).isEqualTo("foo");
     }
 
     private MockResponse successfulMockResponse() {

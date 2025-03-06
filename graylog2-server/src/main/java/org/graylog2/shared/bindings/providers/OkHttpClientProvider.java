@@ -71,10 +71,14 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
         @Override
         public Response intercept(Chain chain) throws IOException {
             Request originalRequest = chain.request();
-            Request newRequest = originalRequest.newBuilder()
-                    .header(HttpHeaders.USER_AGENT, userAgent)
-                    .build();
-            return chain.proceed(newRequest);
+            // Add our default user agent, but only if none is set
+            if (originalRequest.header(HttpHeaders.USER_AGENT) == null) {
+                final var builder = originalRequest.newBuilder();
+                final var newRequest = builder.header(HttpHeaders.USER_AGENT, userAgent).build();
+                return chain.proceed(newRequest);
+            } else {
+                return chain.proceed(originalRequest);
+            }
         }
     }
 
