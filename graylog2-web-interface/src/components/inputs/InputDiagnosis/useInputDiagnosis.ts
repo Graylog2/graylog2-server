@@ -128,7 +128,8 @@ const useInputDiagnosis = (
   const failures_indexing = `org.graylog2.inputs.${inputId}.failures.indexing`;
   const failures_processing = `org.graylog2.inputs.${inputId}.failures.processing`;
   const failures_inputs_codecs = `org.graylog2.inputs.${inputId}.failures.input`;
-
+  const dropped_message_occurrence = `org.graylog2.inputs.${inputId}.dropped.message.occurrence`;
+  
   const InputDiagnosisMetricNames = useMemo(
     () => [
       metricWithPrefix(input, 'incomingMessages'),
