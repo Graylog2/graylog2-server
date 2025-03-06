@@ -211,6 +211,7 @@ const ApiRoutes = {
     list: () => ({ url: '/system/inputs' }),
     get: (id: string) => ({ url: `/system/inputs/${id}` }),
     globalRecentMessage: (inputId: string) => ({ url: `/${inputId}` }),
+    references: (inputId: string) => ({ url: `/system/inputs/references/${inputId}` }),
   },
   InputStatesController: {
     start: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
