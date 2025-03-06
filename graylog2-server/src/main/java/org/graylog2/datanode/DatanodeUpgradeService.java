@@ -29,6 +29,7 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.Version;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -58,29 +59,40 @@ public class DatanodeUpgradeService {
         final Set<DataNodeDto> upToDateDataNodes = dataNodes.stream().filter(n -> isVersionEqualIgnoreBuildMetadata(n.getDatanodeVersion(), serverVersion)).collect(Collectors.toSet());
         final Set<DataNodeDto> toUpgradeDataNodes = dataNodes.stream().filter(n -> !upToDateDataNodes.contains(n)).collect(Collectors.toSet());
 
-        final boolean clusterReadyForUpgrade = clusterState.status().equals("GREEN") && clusterState.shardReplication() == ShardReplication.ALL && clusterState.relocatingShards() == 0;
+        final boolean clusterHealthy = clusterState.status().equals("GREEN") && clusterState.relocatingShards() == 0;
+        final boolean shardReplicationEnabled = clusterState.shardReplication() == ShardReplication.ALL;
+        final boolean clusterReadyForUpgrade =  clusterHealthy && shardReplicationEnabled;
 
         return new DatanodeUpgradeStatus(serverVersion,
                 clusterState,
-                clusterReadyForUpgrade,
+                clusterHealthy,
+                shardReplicationEnabled,
                 enrichData(upToDateDataNodes, clusterState, serverVersion, clusterReadyForUpgrade),
                 enrichData(toUpgradeDataNodes, clusterState, serverVersion, clusterReadyForUpgrade)
         );
     }
 
     private List<DataNodeInformation> enrichData(Set<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
-        return toUpgradeDataNodes.stream().map(n -> remix(n, toUpgradeDataNodes, clusterState, serverVersion, clusterReadyForUpgrade)).collect(Collectors.toList());
+        final Comparator<DataNodeInformation> comparator = Comparator.comparing(DataNodeInformation::upgradePossible)
+                .reversed()
+                .thenComparing(DataNodeInformation::nodeName);
+
+        return toUpgradeDataNodes.stream()
+                .map(n -> remix(n, toUpgradeDataNodes, clusterState, serverVersion, clusterReadyForUpgrade))
+                .sorted(comparator)
+                .collect(Collectors.toList());
     }
 
     @Nonnull
     private static DataNodeInformation remix(DataNodeDto node, Set<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
-        final Optional<Node> opensearchInformation = clusterState.nodes().stream().filter(n -> n.host().equals(node.getHostname())).findFirst();
+        final Optional<Node> opensearchInformation = clusterState.findByHostname(node.getHostname());
 
         final String nodeName = clusterState.getName(node.getHostname());
 
-        final boolean isManagerNode = clusterState.managerNode().name().equals(nodeName);
+        final boolean managerNode = clusterState.managerNode().name().equals(nodeName);
         final boolean isLatestVersion = isVersionEqualIgnoreBuildMetadata(node.getDatanodeVersion(), serverVersion);
-        boolean upgradePossible = clusterReadyForUpgrade && !isLatestVersion && (!isManagerNode || toUpgradeDataNodes.size() == 1);
+
+        boolean upgradePossible = clusterReadyForUpgrade && !isLatestVersion && (!managerNode || toUpgradeDataNodes.size() == 1);
 
         return new DataNodeInformation(
                 nodeName,
@@ -91,7 +103,7 @@ public class DatanodeUpgradeService {
                 opensearchInformation.map(Node::version).orElse(null),
                 opensearchInformation.map(Node::roles).orElse(null),
                 upgradePossible,
-                isManagerNode);
+                managerNode);
     }
 
     protected static boolean isVersionEqualIgnoreBuildMetadata(String datanodeVersion, Version serverVersion) {

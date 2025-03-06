@@ -155,7 +155,9 @@ public class DatanodeUpradeServiceAdapterOS2 implements DatanodeUpgradeServiceAd
                 .collect(Collectors.toList());
     }
 
-    private Set<String> parseRoles(JsonNode roles) {
-        return StreamSupport.stream(roles.spliterator(), false).map(JsonNode::asText).collect(Collectors.toSet());
+    private List<String> parseRoles(JsonNode roles) {
+        return StreamSupport.stream(roles.spliterator(), false).map(JsonNode::asText)
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.toList());
     }
 }

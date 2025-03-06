@@ -17,6 +17,6 @@
 package org.graylog2.datanode;
 
 public record DataNodeInformation(String nodeName, org.graylog2.cluster.nodes.DataNodeStatus dataNodeStatus, String datanodeVersion,
-                                  String hostname, String ip, String opensearchVersion, java.util.Set<String> roles,
-                                  boolean upgradePossible, boolean isManagerNode) {
+                                  String hostname, String ip, String opensearchVersion, java.util.List<String> roles,
+                                  boolean upgradePossible, boolean mnagerNode) {
 }

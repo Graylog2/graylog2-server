@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.datanode.dto;
 
-import java.util.Set;
+import java.util.List;
 
-public record Node(String host, String ip, String name, String version, Set<String> roles) {
+public record Node(String host, String ip, String name, String version, List<String> roles) {
 }
