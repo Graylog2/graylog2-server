@@ -21,13 +21,13 @@ import type { PluginNavigation } from 'graylog-web-plugin';
 
 import { Nav } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
-import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 import filterByPerspective from 'components/perspectives/util/filterByPerspective';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { navigation as securityNavigation } from 'components/security/bindings';
 import NavigationItem from 'components/navigation/NavigationItem';
+import { DEFAULT_SECURITY_NAV_ITEM } from 'components/security/bindings';
+import DEFAULT_ENTERPRISE_NAV_ITEM from 'components/navigation/DefaultEnterpriseNavItem';
 
 const _existingDropdownItemIndex = (
   existingNavigationItems: Array<PluginNavigation>,
@@ -108,17 +108,14 @@ const useNavigationItems = () => {
 
   return useMemo(() => {
     const navigationItems = mergeDuplicateDropdowns(allNavigationItems);
-    const enterpriseMenuIsMissing = !pluginMenuItemExists(navigationItems, ENTERPRISE_ROUTE_DESCRIPTION);
-    const securityMenuIsMissing = !pluginMenuItemExists(navigationItems, SECURITY_ROUTE_DESCRIPTION);
-    const securityLicenseInvalid = !pluginLicenseValid(navigationItems, SECURITY_ROUTE_DESCRIPTION);
+    const enterpriseMenuIsMissing = !pluginMenuItemExists(navigationItems, DEFAULT_ENTERPRISE_NAV_ITEM.description);
+    const securityMenuIsMissing = !pluginMenuItemExists(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
+    const securityLicenseInvalid = !pluginLicenseValid(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
     const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
 
     if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
       // no enterprise plugin menu, so we will add one
-      navigationItems.push({
-        path: Routes.SYSTEM.ENTERPRISE,
-        description: ENTERPRISE_ROUTE_DESCRIPTION,
-      });
+      navigationItems.push(DEFAULT_ENTERPRISE_NAV_ITEM);
     }
 
     if ((securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) || securityLicenseInvalid) {
@@ -126,12 +123,12 @@ const useNavigationItems = () => {
       if (!securityMenuIsMissing) {
         // remove the existing security menu item
         navigationItems.splice(
-          navigationItems.findIndex((item) => item.description === SECURITY_ROUTE_DESCRIPTION),
+          navigationItems.findIndex((item) => item.description === DEFAULT_SECURITY_NAV_ITEM.description),
           1,
         );
       }
 
-      navigationItems.push(securityNavigation);
+      navigationItems.push(DEFAULT_SECURITY_NAV_ITEM);
     }
 
     const itemsForActivePerspective = filterByPerspective(navigationItems, activePerspective?.id);
