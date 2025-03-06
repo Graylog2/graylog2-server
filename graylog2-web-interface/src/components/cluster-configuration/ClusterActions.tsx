@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import URI from 'urijs';
 
 import { LinkContainer } from 'components/common/router';
-import { ConfirmDialog, DropdownSubmenu, ExternalLink, IfPermitted } from 'components/common';
+import { ConfirmDialog, ExternalLink, IfPermitted } from 'components/common';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -33,7 +33,7 @@ type Props = {
 
 const ClusterActions = ({ node }: Props) => {
   const [showMessageProcessingModal, setShowMessageProcessingModal] = useState<boolean>(false);
-  const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<'ALIVE'|'DEAD'|'THROTTLED'|undefined>(undefined);
+  const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<'ALIVE'|'DEAD'|undefined>(undefined);
 
   const apiBrowserURI = new URI(`${node.transport_address}/api-browser/`).normalizePathname().toString();
   const nodeName = `${node.short_node_id} / ${node.hostname}`;
@@ -47,7 +47,7 @@ const ClusterActions = ({ node }: Props) => {
     setShowMessageProcessingModal(false);
   };
 
-  const updateLoadBalancerStatus = (status: 'ALIVE'|'DEAD'|'THROTTLED') => {
+  const updateLoadBalancerStatus = (status: 'ALIVE'|'DEAD') => {
     SystemLoadBalancerStore.override(node.node_id, status);
     setLoadBalancerStatusToConfirm(undefined);
   };
@@ -61,10 +61,11 @@ const ClusterActions = ({ node }: Props) => {
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions="lbstatus:change">
-          <DropdownSubmenu title="Override LB status" left>
-            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('ALIVE')}>ALIVE</MenuItem>
-            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('DEAD')}>DEAD</MenuItem>
-          </DropdownSubmenu>
+          {node.lb_status === 'alive' ? (
+            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('DEAD')}>Override load Balancer status to DEAD</MenuItem>
+          ) : (
+            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('ALIVE')}>Override load Balancer status to ALIVE</MenuItem>
+          )}
         </IfPermitted>
         <IfPermitted permissions={['processing:changestate', 'lbstatus:change', 'node:shutdown']} anyPermissions>
           <IfPermitted permissions={['inputs:read', 'threads:dump']} anyPermissions>
