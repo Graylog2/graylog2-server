@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs.codecs;
 
+import org.graylog2.inputs.codecs.gelf.GELFBulkDroppedMsgService;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
@@ -35,13 +36,16 @@ public class GelfCodecTest {
     @Mock
     private GelfChunkAggregator aggregator;
 
+    @Mock
+    private GELFBulkDroppedMsgService gelfBulkDroppedMsgService;
+
     private GelfCodec codec;
 
     private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() {
-        codec = new GelfCodec(new Configuration(Collections.emptyMap()), aggregator, messageFactory);
+        codec = new GelfCodec(new Configuration(Collections.emptyMap()), aggregator, messageFactory, gelfBulkDroppedMsgService);
     }
 
     @Test

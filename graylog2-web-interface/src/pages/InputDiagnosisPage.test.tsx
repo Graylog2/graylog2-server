@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import {render, screen, fireEvent} from 'wrappedTestingLibrary';
 
-import { asMock } from 'helpers/mocking';
+import {asMock} from 'helpers/mocking';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 
 import InputDiagnosisPage from './InputDiagnosisPage';
@@ -60,6 +60,7 @@ const inputMetrics = {
   failures_indexing: 19,
   failures_processing: 20,
   failures_inputs_codecs: 21,
+  dropped_message_occurrence: 10,
   stream_message_count: [
     { stream_name: 'Test Stream 1', stream_id: '1', count: 22 },
     { stream_name: 'Test Stream 2', stream_id: '2', count: 23 },
