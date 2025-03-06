@@ -37,7 +37,7 @@ const usePluggableValueRenderer = () => {
   const pluggableValueRenderer = usePluginEntities('fieldTypeValueRenderer');
 
   return useMemo(
-    () => Object.fromEntries(pluggableValueRenderer.map(({ type, render }) => [type, render])),
+    () => Object.fromEntries((pluggableValueRenderer ?? []).map(({ type, render }) => [type, render])),
     [pluggableValueRenderer],
   );
 };
