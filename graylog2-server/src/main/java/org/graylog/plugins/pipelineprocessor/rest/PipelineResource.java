@@ -56,6 +56,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.inputs.InputRoutingService;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -126,6 +127,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CREATE)
     public PipelineSource createFromParser(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         checkReservedName(pipelineSource);
+        checkSystemRuleUsed(pipelineSource);
         return forceCreateFromParser(pipelineSource, DefaultEntityScope.NAME);
     }
 
@@ -252,6 +254,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                                  @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
         checkReservedName(update);
+        checkSystemRuleUsed(update);
         return PipelineUtils.update(pipelineService, pipelineRuleParser, ruleService, id, update, true);
     }
 
@@ -342,5 +345,16 @@ public class PipelineResource extends RestResource implements PluginRestResource
         if (GL_INPUT_ROUTING_PIPELINE.equals(update.title())) {
             throw new BadRequestException("Pipeline name is reserved and cannot be used.");
         }
+    }
+
+    private void checkSystemRuleUsed(@NotNull PipelineSource pipelineSource) {
+        List<String> usedSystemRules = ruleService.loadAllByScope(DeletableSystemScope.NAME).stream()
+                .map(RuleDao::title)
+                .filter(title -> pipelineSource.source().contains(title))
+                .toList();
+        if (!usedSystemRules.isEmpty()) {
+            throw new BadRequestException("Pipeline cannot use system rules: " + usedSystemRules);
+        }
+
     }
 }

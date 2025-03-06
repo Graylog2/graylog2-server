@@ -43,6 +43,7 @@ import static com.mongodb.client.model.Filters.regex;
 import static org.graylog.plugins.pipelineprocessor.db.RuleDao.FIELD_SOURCE;
 import static org.graylog.plugins.pipelineprocessor.db.RuleDao.FIELD_TITLE;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
 /**
@@ -125,9 +126,21 @@ public class MongoDbRuleService implements RuleService {
     }
 
     @Override
-    public Collection<RuleDao> loadAllFilteredByTitle(String regex) {
+    public Collection<RuleDao> loadAllByTitle(String regex) {
         try {
             return collection.find(Filters.regex(FIELD_TITLE, regex))
+                    .sort(Sorts.ascending(FIELD_TITLE))
+                    .into(new LinkedHashSet<>());
+        } catch (MongoException e) {
+            log.error("Unable to load processing rules", e);
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
+    public Collection<RuleDao> loadAllByScope(String scope) {
+        try {
+            return collection.find(Filters.eq(FIELD_SCOPE, scope))
                     .sort(Sorts.ascending(FIELD_TITLE))
                     .into(new LinkedHashSet<>());
         } catch (MongoException e) {

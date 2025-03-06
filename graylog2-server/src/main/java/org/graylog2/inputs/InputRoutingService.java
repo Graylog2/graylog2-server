@@ -154,7 +154,7 @@ public class InputRoutingService {
      */
     @Subscribe
     public void handleInputRenamed(InputRenamedEvent event) {
-        ruleService.loadAllFilteredByTitle(createSystemRuleRegex(event.inputId(), event.oldInputTitle()))
+        ruleService.loadAllByTitle(createSystemRuleRegex(event.inputId(), event.oldInputTitle()))
                 .forEach(ruleDao -> {
                     String oldRuleTitle = ruleDao.title();
                     String newRuleTitle = replaceInputName(oldRuleTitle, event.oldInputTitle(), event.newInputTitle());
@@ -190,7 +190,7 @@ public class InputRoutingService {
      */
     @Subscribe
     public void handleInputDeleted(InputDeletedEvent event) {
-        ruleService.loadAllFilteredByTitle(createSystemRuleRegex(event.inputId(), event.inputTitle()))
+        ruleService.loadAllByTitle(createSystemRuleRegex(event.inputId(), event.inputTitle()))
                 .forEach(ruleService::delete);
     }
 
