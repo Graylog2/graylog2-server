@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Alert, Button, Row, Col } from 'components/bootstrap';
+import { Alert, Button, Row, Col, Input } from 'components/bootstrap';
 import { Select, Tooltip } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
@@ -78,16 +78,20 @@ export type RoutingStepData = {
   newStream?: StreamFormValues;
   shouldCreateNewPipeline?: boolean;
   streamType: 'NEW' | 'EXISTING' | 'DEFAULT';
+  removeMatchesFromDefault?: boolean;
 };
 
 const SetupRoutingStep = () => {
+  const [showSelectStream, setShowSelectStream] = useState<boolean>(false);
+  const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
   const currentStepName = useMemo(() => INPUT_WIZARD_STEPS.SETUP_ROUTING, []);
   const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
   const { stepsData, setStepsData } = useInputSetupWizardSteps();
   const newStream: StreamFormValues = getStepData(stepsData, currentStepName, 'newStream');
-  const [selectedStreamId, setSelectedStreamId] = useState(undefined);
-  const [showSelectStream, setShowSelectStream] = useState<boolean>(false);
-  const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
+  const selectedStreamId = getStepData(stepsData, currentStepName, 'streamId');
+  const isDefaultStream = getStepData(stepsData, currentStepName, 'streamType') === 'DEFAULT';
+  const removeFromDefault = getStepData(stepsData, currentStepName, 'removeMatchesFromDefault');
+  const removeFromDefaultStreamChecked = typeof removeFromDefault === 'undefined' ? true : removeFromDefault;
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
   const { data: streamsData, isInitialLoading: isLoadingStreams } = useStreams({
@@ -144,20 +148,26 @@ const SetupRoutingStep = () => {
   }, [streams]);
 
   const handleStreamSelect = (streamId: string) => {
-    setSelectedStreamId(streamId);
-
     if (streamId) {
-      setStepsData(updateStepData(stepsData, currentStepName, { streamId, streamType: 'EXISTING' } as RoutingStepData));
+      setStepsData(
+        updateStepData(stepsData, currentStepName, {
+          streamId,
+          streamType: 'EXISTING',
+          removeMatchesFromDefault: removeFromDefaultStreamChecked,
+        } as RoutingStepData),
+      );
     } else {
       setStepsData(
-        updateStepData(stepsData, currentStepName, { streamId: undefined, streamType: 'DEFAULT' } as RoutingStepData),
+        updateStepData(stepsData, currentStepName, {
+          streamId: undefined,
+          streamType: 'DEFAULT',
+          removeMatchesFromDefault: undefined,
+        } as RoutingStepData),
       );
     }
   };
 
   const handleCreateStream = () => {
-    setSelectedStreamId(undefined);
-
     updateStepData(stepsData, currentStepName, defaultStepData);
     setShowCreateStream(true);
   };
@@ -173,11 +183,18 @@ const SetupRoutingStep = () => {
   const handleBackClick = () => {
     setStepsData(updateStepData(stepsData, currentStepName, defaultStepData, true));
 
-    setSelectedStreamId(undefined);
     setShowSelectStream(false);
     setShowCreateStream(false);
 
     goToPreviousStep();
+  };
+
+  const handleCheckRemoveFromDefaultStream = () => {
+    setStepsData(
+      updateStepData(stepsData, currentStepName, {
+        removeMatchesFromDefault: !removeFromDefaultStreamChecked,
+      } as RoutingStepData),
+    );
   };
 
   const streamHasConnectedPipelines = streamPipelinesData && streamPipelinesData?.length > 0;
@@ -197,11 +214,12 @@ const SetupRoutingStep = () => {
 
   const backButtonText = newStream ? 'Reset' : 'Back';
   const showNewStreamSection = newStream || showCreateStream;
+  const showSelectStreamSection = selectedStreamId || showSelectStream;
 
   return (
     <StepWrapper>
       <InputInUseAlert inputId={wizardData?.input?.id} />
-      {!showNewStreamSection && !showSelectStream && (
+      {!showNewStreamSection && !showSelectStreamSection && (
         <>
           <Row>
             <DescriptionCol md={12}>
@@ -262,7 +280,7 @@ const SetupRoutingStep = () => {
           </Col>
         </Row>
       )}
-      {showSelectStream && (
+      {showSelectStreamSection && (
         <>
           <Row>
             <DescriptionCol md={12}>
@@ -300,18 +318,34 @@ const SetupRoutingStep = () => {
                   aria-label="All messages (Default)"
                   clearable
                   placeholder="All messages (Default)"
-                  value={selectedStreamId}
+                  value={selectedStreamId ?? getStepData(stepsData, currentStepName, 'streamId')}
                 />
+                {!isDefaultStream && (
+                  <Input
+                    id="existing_remove_matches_from_default_stream"
+                    type="checkbox"
+                    label="Remove matches from &lsquo;Default Stream&rsquo;"
+                    title="Remove matches from &lsquo;Default Stream&rsquo;"
+                    help={
+                      <span>
+                        Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.
+                      </span>
+                    }
+                    name="existing_remove_matches_from_default_stream"
+                    checked={removeFromDefaultStreamChecked}
+                    onChange={handleCheckRemoveFromDefaultStream}
+                  />
+                )}
               </Col>
             </Row>
           )}
         </>
       )}
 
-      {(hasPreviousStep || hasNextStep || showNewStreamSection) && (
+      {(hasPreviousStep || hasNextStep || showNewStreamSection || showSelectStreamSection) && (
         <Row>
           <ButtonCol md={12}>
-            {(hasPreviousStep || showNewStreamSection || showSelectStream) && (
+            {(hasPreviousStep || showNewStreamSection || showSelectStreamSection) && (
               <Button onClick={handleBackClick}>{backButtonText}</Button>
             )}
             {hasNextStep && (
