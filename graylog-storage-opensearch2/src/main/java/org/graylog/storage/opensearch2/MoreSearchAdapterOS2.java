@@ -31,6 +31,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptio
 import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.AutoDateHistogramAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedAutoDateHistogram;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
@@ -41,14 +46,19 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -64,6 +74,9 @@ import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBui
 public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS2.class);
     public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.LENIENT_EXPAND_OPEN;
+    private static final String termsAggregationName = "alert_type";
+    private static final String histogramAggregationName = "histogram";
+
     private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;
@@ -87,24 +100,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     public MoreSearch.Result eventSearch(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                          Sorting sorting, int page, int perPage, Set<String> eventStreams,
                                          String filterString, Set<String> forbiddenSourceStreams) {
-        final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*")) ?
-                matchAllQuery() :
-                queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
-
-        final BoolQueryBuilder filter = boolQuery()
-                .filter(query)
-                .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
-                .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
-
-        if (!isNullOrEmpty(filterString)) {
-            filter.filter(queryStringQuery(filterString));
-        }
-
-        if (!forbiddenSourceStreams.isEmpty()) {
-            // If an event has any stream in "source_streams" that the calling search user is not allowed to access,
-            // the event must not be in the search result.
-            filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
-        }
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
@@ -139,6 +135,78 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                 .usedIndexNames(affectedIndices)
                 .executedQuery(searchSourceBuilder.toString())
                 .build();
+    }
+
+    @Override
+    public MoreSearch.Histogram eventHistogram(int buckets, String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
+                                               Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, ZoneId timeZone) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams);
+
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(filter)
+                .size(0)
+                .trackTotalHits(true);
+
+        final var histogramAggregation = new AutoDateHistogramAggregationBuilder(histogramAggregationName)
+                .field(EventDto.FIELD_EVENT_TIMESTAMP)
+                .timeZone(timeZone)
+                .setNumBuckets(buckets);
+
+        final var termsAggregation = AggregationBuilders.terms(termsAggregationName)
+                .field(EventDto.FIELD_ALERT);
+
+        searchSourceBuilder.aggregation(histogramAggregation.subAggregation(termsAggregation));
+
+        final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
+        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
+                .source(searchSourceBuilder)
+                .indicesOptions(INDICES_OPTIONS);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
+            LOG.debug("Execute search: {}", searchRequest);
+        }
+
+        final var searchResult = client.search(searchRequest, "Unable to perform search query");
+
+        final ParsedAutoDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
+        final var histogramBuckets = histogramResult.getBuckets();
+
+        final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
+        final var events = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
+
+        histogramBuckets.forEach(bucket -> {
+            final var parsedTerms = (ParsedTerms) bucket.getAggregations().get(termsAggregationName);
+            final var dateTime = ((ZonedDateTime) bucket.getKey()).withZoneSameInstant(timeZone);
+            final var alertCount = Optional.ofNullable(parsedTerms.getBucketByKey("true")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
+            final var eventCount = Optional.ofNullable(parsedTerms.getBucketByKey("false")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
+            alerts.add(new MoreSearch.Histogram.Bucket(dateTime, alertCount));
+            events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
+        });
+
+        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
+    }
+
+    private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams) {
+        final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*"))
+                ? matchAllQuery()
+                : queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
+
+        final BoolQueryBuilder filter = boolQuery()
+                .filter(query)
+                .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
+                .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
+
+        if (!isNullOrEmpty(filterString)) {
+            filter.filter(queryStringQuery(filterString));
+        }
+
+        if (!forbiddenSourceStreams.isEmpty()) {
+            // If an event has any stream in "source_streams" that the calling search user is not allowed to access,
+            // the event must not be in the search result.
+            filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
+        }
+        return filter;
     }
 
     private List<FieldSortBuilder> createSorting(Sorting sorting) {

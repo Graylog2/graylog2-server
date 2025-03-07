@@ -28,6 +28,7 @@ import org.graylog2.periodical.ClusterHealthCheckThread;
 import org.graylog2.periodical.ContentPackLoaderPeriodical;
 import org.graylog2.periodical.DataNodeHousekeepingPeriodical;
 import org.graylog2.periodical.ESVersionCheckPeriodical;
+import org.graylog2.periodical.ExpiredTokenCleaner;
 import org.graylog2.periodical.IndexBlockCheck;
 import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.graylog2.periodical.IndexRetentionThread;
@@ -68,5 +69,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
         periodicalBinder.addBinding().to(DataNodeHousekeepingPeriodical.class);
         periodicalBinder.addBinding().to(InputDiagnosisMetricsPeriodical.class);
+        periodicalBinder.addBinding().to(ExpiredTokenCleaner.class);
     }
 }
