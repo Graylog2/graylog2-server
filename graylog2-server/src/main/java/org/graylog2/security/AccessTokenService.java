@@ -24,6 +24,7 @@ import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +39,16 @@ public interface AccessTokenService extends PersistedService {
 
     List<AccessToken> loadAll(String username);
 
+    /**
+     * Please use {@link #create(String, String, Duration)} instead.
+     * Internally, the above-mentioned method is called with the currently configured default ttl.
+     *
+     * @deprecated
+     */
+    @Deprecated(since = "6.2.0")
     AccessToken create(String username, String name);
+
+    AccessToken create(String username, String name, Duration ttl);
 
     DateTime touch(AccessToken accessToken) throws ValidationException;
 
@@ -50,4 +60,33 @@ public interface AccessTokenService extends PersistedService {
 
     PaginatedList<AccessTokenEntity> findPaginated(SearchQuery searchQuery, int page,
                                                    int perPage, String sortField, SortOrder order);
+
+    /**
+     * Determines all expired tokens.
+     * The items contain all information required to delete them via the {@link org.graylog2.periodical.ExpiredTokenCleaner}
+     * and is sorted by the expiration date.
+     *
+     * @param expiredBefore The date/time tokens should have expired before.
+     * @return List of expired token as of now (UTC).
+     */
+    List<ExpiredToken> findExpiredTokens(DateTime expiredBefore);
+
+    /**
+     * Deletes a token by its ID.
+     *
+     * @param id The ID of the token to delete.
+     * @return The number of deleted tokens - hopefully always exactly 1.
+     */
+    int deleteById(String id);
+
+    /**
+     * Represents an expired token.
+     * It carries all required information to delete the token via the {@link org.graylog2.periodical.ExpiredTokenCleaner}.
+     *
+     * @param id        ID of the token.
+     * @param tokenName Name of the token.
+     * @param expiresAt Expiration date/time of the token.
+     * @param userId    ID of the owning user.
+     */
+    record ExpiredToken(String id, String tokenName, DateTime expiresAt, String userId) {}
 }

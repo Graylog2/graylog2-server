@@ -19,11 +19,12 @@ import styled, { css } from 'styled-components';
 
 import { LinkContainer, Link } from 'components/common/router';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import { RelativeTime, OverlayTrigger, CountBadge } from 'components/common';
-import { Button, ButtonToolbar } from 'components/bootstrap';
+import { RelativeTime, OverlayTrigger, CountBadge, Spinner } from 'components/common';
+import { Button, ButtonToolbar, Label } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import type { RuleType, PipelineSummary } from 'stores/rules/RulesStore';
 import StringUtils from 'util/StringUtils';
+import useGetPermissionsByScope from 'hooks/useScopePermissions';
 
 type Props = {
   rule: RuleType;
@@ -42,11 +43,20 @@ const LimitedTd = styled.td(
     }
   `,
 );
+const DefaultLabel = styled(Label)(
+  ({ theme }) => css`
+    display: inline-flex;
+    margin-left: ${theme.spacings.xxs};
+    vertical-align: inherit;
+  `,
+);
 
 const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
+  const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(rule);
   const { id, title, description, created_at, modified_at } = rule;
   const pipelinesLength = usingPipelines.length;
   const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
+  const isManaged = scopePermissions && !scopePermissions?.is_mutable;
   const actions = (
     <ButtonToolbar>
       <LinkContainer to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
@@ -73,11 +83,19 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
         {index < pipelinesLength - 1 && ',  '}
       </React.Fragment>
     ));
+  if (loadingScopePermissions) {
+    return <Spinner text="Loading Rule" />;
+  }
 
   return (
     <tr key={title}>
       <td>
         <Link to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>{title}</Link>
+        {isManaged && (
+          <DefaultLabel bsStyle="default" bsSize="xsmall">
+            Managed by Application
+          </DefaultLabel>
+        )}
       </td>
       <td className="limited">{description}</td>
       <td className="limited">

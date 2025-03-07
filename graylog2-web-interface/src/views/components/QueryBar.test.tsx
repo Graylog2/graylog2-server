@@ -26,8 +26,9 @@ import useQueryTitles from 'views/hooks/useQueryTitles';
 import useViewMetadata from 'views/hooks/useViewMetadata';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectQuery, removeQuery } from 'views/logic/slices/viewSlice';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
 jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'bar');
@@ -50,7 +51,7 @@ const viewMetadata = {
 jest.mock('views/hooks/useQueryIds');
 jest.mock('views/hooks/useQueryTitles');
 jest.mock('views/hooks/useViewMetadata');
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
@@ -65,21 +66,13 @@ const QueryBar = () => (
 );
 
 describe('QueryBar', () => {
-  let oldWindowConfirm;
-
+  useWindowConfirmMock();
   useViewsPlugin();
 
   beforeEach(() => {
-    oldWindowConfirm = window.confirm;
-    window.confirm = jest.fn(() => true);
-
     asMock(useQueryIds).mockReturnValue(queries);
     asMock(useQueryTitles).mockReturnValue(queryTitles);
     asMock(useViewMetadata).mockReturnValue(viewMetadata);
-  });
-
-  afterEach(() => {
-    window.confirm = oldWindowConfirm;
   });
 
   it('renders existing tabs', async () => {
@@ -92,7 +85,7 @@ describe('QueryBar', () => {
 
   it('allows changing tab', async () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     render(<QueryBar />);
 
@@ -105,7 +98,7 @@ describe('QueryBar', () => {
 
   it('allows closing current tab', async () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     const setDashboard = jest.fn();
 
     render(
