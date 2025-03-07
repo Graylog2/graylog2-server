@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.graylog.plugins.views.search.QueryResult;
-import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
 import org.graylog.plugins.views.search.SearchType;
@@ -31,7 +30,6 @@ import org.graylog.plugins.views.search.jobs.SearchJobStatus;
 import org.graylog.plugins.views.search.searchtypes.results.PaginableResults;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.graylog.plugins.views.search.jobs.SearchJobStatus.CANCELLED;
@@ -108,7 +106,7 @@ public record SearchJobDTO(
                 progress);
     }
 
-    public static SearchJobDTO fromSearchJobState(final SearchJobState searchJob, final Optional<Search> loadedSearch) {
+    public static SearchJobDTO fromSearchJobState(final SearchJobState searchJob) {
         //TODO: bring back when deprecated method in DataWarehouseQueryResource is gone
 //        if (loadedSearch.isEmpty()) {
 //            //TODO: less hardcore error handling?
@@ -120,10 +118,13 @@ public record SearchJobDTO(
                 status == CANCELLED || status == TIMEOUT,
                 status == ERROR
         );
+        final boolean hasQuery = searchJob.result() != null
+                && searchJob.result().query() != null
+                && searchJob.result().query().id() != null;
         return new SearchJobDTO(
                 searchJob.identifier(),
                 searchJob.errors(),
-                Map.of(searchJob.result().query().id(), searchJob.result()),
+                hasQuery ? Map.of(searchJob.result().query().id(), searchJob.result()) : Map.of(),
                 executionInfo,
                 searchJob.progress());
     }
