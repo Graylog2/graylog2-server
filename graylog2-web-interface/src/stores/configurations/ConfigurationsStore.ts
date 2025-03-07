@@ -73,7 +73,9 @@ export type PermissionsConfigType = {
 export type UserConfigType = {
   enable_global_session_timeout: boolean;
   global_session_timeout_interval: string;
+  restrict_access_token_to_admins: boolean;
   allow_access_token_for_external_user: boolean;
+  default_ttl_for_new_tokens: string;
 };
 export type ConfigurationsStoreState = {
   configuration: Record<string, any>;

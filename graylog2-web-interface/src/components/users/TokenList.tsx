@@ -17,10 +17,19 @@
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { ClipboardButton, ControlledTableList, Icon, RelativeTime, SearchForm, Spinner } from 'components/common';
+import {
+  ClipboardButton,
+  ControlledTableList,
+  Icon,
+  RelativeTime,
+  SearchForm,
+  Spinner,
+  IfPermitted,
+} from 'components/common';
 import { Button, Col, Panel, Row } from 'components/bootstrap';
 import type { Token, TokenSummary } from 'stores/users/UsersStore';
 import { sortByDate } from 'util/SortUtils';
+import {Headline} from 'components/common/Section/SectionComponent';
 
 import CreateTokenForm from './CreateTokenForm';
 
@@ -58,7 +67,7 @@ type Props = {
   tokens?: TokenSummary[];
 };
 
-const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, tokens = [] }: Props) => {
+const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDelete, tokens = [] }: Props) => {
   const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
 
@@ -88,7 +97,10 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
 
   return (
     <span>
-      <CreateTokenForm onCreate={handleTokenCreation} creatingToken={creatingToken} />
+      <IfPermitted permissions="users:delete">
+        <Headline>Create And Edit Tokens</Headline>
+        <CreateTokenForm onCreate={handleTokenCreation} creatingToken={creatingToken} />
+      </IfPermitted>
       {createdToken && (
         <StyledTokenPanel bsStyle="success">
           <Panel.Heading>
