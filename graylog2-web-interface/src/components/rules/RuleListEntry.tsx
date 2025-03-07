@@ -43,11 +43,13 @@ const LimitedTd = styled.td(
     }
   `,
 );
-const DefaultLabel = styled(Label)(({ theme }) => css`
-  display: inline-flex;
-  margin-left: ${theme.spacings.xxs};
-  vertical-align: inherit;
-`);
+const DefaultLabel = styled(Label)(
+  ({ theme }) => css`
+    display: inline-flex;
+    margin-left: ${theme.spacings.xxs};
+    vertical-align: inherit;
+  `,
+);
 
 const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(rule);

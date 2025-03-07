@@ -91,6 +91,7 @@ const StyledListGroupItem = styled(ListGroupItem)`
 const StyledSpan = styled.span`
   padding-left: ${({ theme }) => theme.spacings.xs}
 `;
+
 const NodeListItem = ({
   detailedMessage,
   nodeId,
