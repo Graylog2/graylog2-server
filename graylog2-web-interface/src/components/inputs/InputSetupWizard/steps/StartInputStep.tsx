@@ -29,14 +29,10 @@ import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/use
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Button, Row, Col } from 'components/bootstrap';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
-import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/useInputSetupWizardSteps';
+import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
+import useInputSetupWizardStepsHelper from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardStepsHelper';
 import { INPUT_WIZARD_STEPS, INPUT_WIZARD_FLOWS } from 'components/inputs/InputSetupWizard/types';
-import {
-  checkHasPreviousStep,
-  checkHasNextStep,
-  getStepData,
-} from 'components/inputs/InputSetupWizard/helpers/stepHelper';
-import type { RoutingStepData } from 'components/inputs/InputSetupWizard/steps/SetupRoutingStep';
+import type { OpenStepsData } from 'components/inputs/InputSetupWizard/types';
 import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import ProgressMessage from 'components/inputs/InputSetupWizard/steps/components/ProgressMessage';
 
@@ -60,6 +56,8 @@ const StartInputStep = () => {
     [inputSetupWizards],
   );
 
+  const { checkHasPreviousStep, checkHasNextStep, getStepData } = useInputSetupWizardStepsHelper<OpenStepsData>();
+
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
@@ -67,7 +65,7 @@ const StartInputStep = () => {
   const { goToPreviousStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
   const isIlluminateFlow = wizardData.flow === INPUT_WIZARD_FLOWS.ILLUMINATE;
 
-  const { stepsData } = useInputSetupWizardSteps();
+  const { stepsData } = useInputSetupWizardSteps<OpenStepsData>();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
   const [startInputStatus, setStartInputStatus] = useState<
@@ -158,7 +156,7 @@ const StartInputStep = () => {
       return;
     }
 
-    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUT_SETUP_WIZARD.START_INPUT, {
       app_pathname: telemetryPathName,
@@ -216,7 +214,7 @@ const StartInputStep = () => {
   };
 
   const rollback = () => {
-    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING);
     const createdStreamId = createStreamMutation.data?.stream_id;
     const createdPipelineId = createPipelineMutation.data?.id;
     const routingRuleId = updateRoutingMutation.data?.rule_id;
@@ -293,7 +291,7 @@ const StartInputStep = () => {
       return true;
     }
 
-    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING);
 
     if (!routingStepData) return false;
     if (routingStepData.newStream || routingStepData.streamId || routingStepData.streamType === 'DEFAULT') return true;
@@ -304,7 +302,7 @@ const StartInputStep = () => {
   const getProgressEntityName = (stepName, mutations) => {
     const mutation = mutations[stepName];
 
-    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING);
 
     const name = mutation.data?.title ?? mutation.data?.name ?? undefined;
 
