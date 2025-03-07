@@ -139,7 +139,7 @@ describe('stepHelper', () => {
           enabled: true,
           foo: 'bar',
         },
-      );
+      });
     });
 
     it('returns updated steps data with overriden data when override=true', () => {
@@ -201,7 +201,10 @@ describe('stepHelper', () => {
           enabled: false,
           foo: 'foo',
         },
-      );
+        [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
+          foo: 'bar',
+        },
+      });
     });
   });
 });
