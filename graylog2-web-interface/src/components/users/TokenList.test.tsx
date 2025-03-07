@@ -64,12 +64,15 @@ describe('<TokenList />', () => {
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
     userEvent.type(nameInput, 'hans');
 
+    const ttlInput = await screen.findByPlaceholderText("What is this token's TTL?");
+    userEvent.type(ttlInput, 'PT72H');
+
     const createToken = await screen.findByRole('button', { name: 'Create Token' });
     createToken.click();
 
     await screen.findByText('beef2003');
 
-    expect(createFn).toHaveBeenCalledWith('hans');
+    expect(createFn).toHaveBeenCalledWith({"tokenName": "hans", "tokenTtl": "PT72H"});
   });
 
   it('should delete a token', async () => {
