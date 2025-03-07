@@ -55,7 +55,7 @@ const useClusterNodes = (): ClusterNodes => {
   const dataNodes = (_dataNodes?.list || []).map((dataNode) => ({
     nodeName: dataNode?.hostname,
     type: 'Data Node - OpenSearch',
-    role: 'Cluster-manager-eligible,Data,Ingest,Coordinator',
+    role: (dataNode?.opensearch_roles || []).join(','),
     nodeInfo: dataNode,
   }));
 
