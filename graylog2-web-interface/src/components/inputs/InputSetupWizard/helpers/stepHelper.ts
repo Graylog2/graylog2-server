@@ -15,9 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { InputSetupWizardStep, StepsData } from 'components/inputs/InputSetupWizard/types';
+import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard/types';
+import type { StepDataInterface } from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardStepsContext';
 
-export const getStepData = (stepsData: StepsData, stepName: InputSetupWizardStep, key?: string) => {
+export const getStepData = <StepsData extends StepDataInterface>(
+  stepsData: StepsData,
+  stepName: InputSetupWizardStep,
+  key?: string,
+) => {
   if (key) return stepsData[stepName] ? stepsData[stepName][key] : undefined;
 
   return stepsData[stepName];
@@ -52,16 +57,12 @@ export const checkHasPreviousStep = (orderedSteps: Array<InputSetupWizardStep>, 
   return true;
 };
 
-export const updateStepData = (
+export const updateStepData = <StepsData extends StepDataInterface>(
   stepsData: StepsData,
   stepName: InputSetupWizardStep,
-  data: object = {},
+  data: {},
   override: boolean = false,
-): StepsData => {
-  if (!stepName) return {};
-
-  if (!stepsData) return { [stepName]: data };
-
+) => {
   if (override) {
     return { ...stepsData, [stepName]: data };
   }

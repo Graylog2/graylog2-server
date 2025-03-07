@@ -23,14 +23,12 @@ import { Button, Col, Row } from 'components/bootstrap';
 import { FormikInput, InputOptionalInfo, Spinner } from 'components/common';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
-import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import SelectedIndexSetAlert from 'components/inputs/InputSetupWizard/steps/components/SelectedIndexSetAlert';
+import type { OpenStepsData } from 'components/inputs/InputSetupWizard/types';
 
-export type StreamFormValues = StreamConfiguration;
-
-export type FormValues = {
+type FormValues = {
   create_new_pipeline?: boolean;
-} & StreamConfiguration;
+} & OpenStepsData['SETUP_ROUTING']['newStream'];
 
 type Props = {
   submitForm: (values: FormValues) => void;
