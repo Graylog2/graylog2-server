@@ -140,8 +140,10 @@ const EventsGraph = ({
 
 const EventsHistogram = ({ searchParams, setFilters }: MiddleSectionProps) => {
   const { userTimezone, formatTime } = useUserDateTime();
-  const { data, isInitialLoading } = useQuery(['events', 'histogram', searchParams], () =>
-    fetchEventsHistogram(searchParams),
+  const { data, isInitialLoading } = useQuery(
+    ['events', 'histogram', searchParams],
+    () => fetchEventsHistogram(searchParams),
+    { keepPreviousData: true },
   );
 
   const alerts = parseTypeFilter(searchParams?.filters?.get('alert')?.[0]);
