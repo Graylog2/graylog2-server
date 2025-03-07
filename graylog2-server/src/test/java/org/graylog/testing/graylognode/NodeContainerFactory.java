@@ -194,7 +194,8 @@ public class NodeContainerFactory {
         if(indexerIsPredefined(env)) { // we have defined an indexer, no preflight will occur, let's wait for the full boot with index ranges
             // To be able to search for data we need the index ranges to be computed. Since this is an async
             // background job, we need to wait until they have been created.
-            final var baseUrl = Optional.ofNullable(env.get("GRAYLOG_HTTP_PUBLISH_URI"))
+            final var baseUrl = Optional.ofNullable(env.get("GRAYLOG_HTTP_EXTERNAL_URI"))
+                    .or(() -> Optional.ofNullable(env.get("GRAYLOG_HTTP_PUBLISH_URI")))
                     .map(URI::create)
                     .map(URI::getPath)
                     .orElse("");
