@@ -101,7 +101,8 @@ public class MoreSearch {
                     .executedQuery(queryString)
                     .build();
         }
-        return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(), parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams);
+        return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(),
+                parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams, parameters.filter().extraFilters());
     }
 
     /**
@@ -127,7 +128,8 @@ public class MoreSearch {
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return Histogram.empty(effectiveTimeRange);
         }
-        return moreSearchAdapter.eventHistogram(30, queryString, effectiveTimeRange, affectedIndices, eventStreams, filterString, forbiddenSourceStreams, timeZone);
+        return moreSearchAdapter.eventHistogram(30, queryString, effectiveTimeRange, affectedIndices, eventStreams,
+                filterString, forbiddenSourceStreams, timeZone, parameters.filter().extraFilters());
     }
 
     private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
