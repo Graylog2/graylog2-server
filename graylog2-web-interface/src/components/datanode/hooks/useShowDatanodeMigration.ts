@@ -33,7 +33,7 @@ const useShowDatanodeMigration = (): {
 
   return {
     isDatanodeConfiguredAndUsed: !!isDatanodeConfiguredAndUsed,
-    showDatanodeMigration: !(isDatanodeConfiguredAndUsed && (!currentStep || currentStep?.state === 'FINISHED')),
+    showDatanodeMigration: !(isDatanodeConfiguredAndUsed && (!currentStep || currentStep?.state === 'NEW' || currentStep?.state === 'FINISHED')),
   };
 };
 
