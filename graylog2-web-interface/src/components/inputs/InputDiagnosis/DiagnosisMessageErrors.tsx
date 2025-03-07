@@ -22,6 +22,9 @@ import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 
+import DiagnosisHelp from './DiagnosisHelp';
+import { DIAGNOSIS_HELP } from './Constants';
+
 type Props = {
   messageErrors: {
     failures_inputs_codecs: number;
@@ -67,15 +70,15 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
         Cluster. Click on a category to view the associated messages.
       </StyledP>
       <StyledListGroup>
-        <StyledListGroupItem>Message Error at Input: {messageErrors.failures_inputs_codecs}</StyledListGroupItem>
+        <StyledListGroupItem>Message Error at Input <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT} />: {messageErrors.failures_inputs_codecs}</StyledListGroupItem>
         <StyledListGroupItem>
-          Message failed to process:{' '}
+          Message failed to process <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS} />:{' '}
           <LinkCompoment failureType="processing" inputId={inputId}>
             {messageErrors.failures_processing}
           </LinkCompoment>
         </StyledListGroupItem>
         <StyledListGroupItem>
-          Message failed to index:{' '}
+          Message failed to index <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_INDEX} />:{' '}
           <LinkCompoment failureType="indexing" inputId={inputId}>
             {messageErrors.failures_indexing}
           </LinkCompoment>
