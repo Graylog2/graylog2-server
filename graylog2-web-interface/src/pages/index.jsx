@@ -32,6 +32,7 @@ const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPag
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
 const DataNodesPage = loadAsync(() => import('./DataNodesPage'));
 const DataNodePage = loadAsync(() => import('./DataNodePage'));
+const DataNodeUpgradePage = loadAsync(() => import('./DataNodeUpgradePage'));
 const DataNodesClusterManagementPage = loadAsync(() => import('./DataNodesClusterManagementPage'));
 const DataNodesClusterConfigurationPage = loadAsync(() => import('./DataNodesClusterConfigurationPage'));
 const DataNodesMigrationPage = loadAsync(() => import('./DataNodesMigrationPage'));
@@ -130,6 +131,7 @@ export {
   CreateExtractorsPage,
   DataNodesPage,
   DataNodePage,
+  DataNodeUpgradePage,
   DataNodesClusterManagementPage,
   DataNodesClusterConfigurationPage,
   DataNodesMigrationPage,

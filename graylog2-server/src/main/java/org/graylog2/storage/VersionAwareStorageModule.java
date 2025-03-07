@@ -19,6 +19,7 @@ package org.graylog2.storage;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
@@ -45,6 +46,7 @@ import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.storage.providers.ClusterAdapterProvider;
 import org.graylog2.storage.providers.CountsAdapterProvider;
 import org.graylog2.storage.providers.DataStreamAdapterProvider;
+import org.graylog2.storage.providers.DatanodeUpgradeAdapterProvider;
 import org.graylog2.storage.providers.ElasticsearchBackendProvider;
 import org.graylog2.storage.providers.IndexFieldTypePollerAdapterProvider;
 import org.graylog2.storage.providers.IndexToolsAdapterProvider;
@@ -91,6 +93,7 @@ public class VersionAwareStorageModule extends AbstractModule {
                 .toProvider(V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider.class);
         bind(ProxyRequestAdapter.class).toProvider(ProxyRequestAdapterProvider.class);
         bind(RemoteReindexingMigrationAdapter.class).toProvider(RemoteReindexingMigrationAdapterProvider.class);
+        bind(DatanodeUpgradeServiceAdapter.class).toProvider(DatanodeUpgradeAdapterProvider.class);
 
         bindQueryBackend();
     }

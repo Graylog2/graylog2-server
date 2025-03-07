@@ -31,6 +31,7 @@ const DataNodesPageNavigation = () => {
     { title: 'Data Nodes', path: Routes.SYSTEM.DATANODES.LIST, exactPathMatch: true },
     { title: 'Cluster Management', path: Routes.SYSTEM.DATANODES.CLUSTER },
     { title: 'Configuration', path: Routes.SYSTEM.DATANODES.CONFIGURATION },
+    { title: 'Data Node Upgrade', path: Routes.SYSTEM.DATANODES.UPGRADE },
     showDatanodeMigration && enableDataNodeMigration && { title: 'Migration', path: Routes.SYSTEM.DATANODES.MIGRATION },
   ];
 

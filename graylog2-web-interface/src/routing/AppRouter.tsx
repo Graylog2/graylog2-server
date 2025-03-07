@@ -35,6 +35,7 @@ import {
   CreateExtractorsPage,
   DataNodesPage,
   DataNodePage,
+  DataNodeUpgradePage,
   DataNodesClusterManagementPage,
   DataNodesClusterConfigurationPage,
   DataNodesMigrationPage,
@@ -297,6 +298,7 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterManagementPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.UPGRADE, element: <DataNodeUpgradePage /> },
             !isCloud && {
               path: RoutePaths.SYSTEM.DATANODES.CONFIGURATION,
               element: <DataNodesClusterConfigurationPage />,
