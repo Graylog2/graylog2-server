@@ -45,7 +45,7 @@ const onDeleteMock = jest.fn();
 const entityScope = {
   is_mutable: false,
 } as unknown as ScopeParams;
-const SUT = ({ rule } : { rule: RuleType }) => (
+const SUT = ({ rule }: { rule: RuleType }) => (
   <table>
     <tbody>
       <RuleListEntry rule={rule} onDelete={onDeleteMock} usingPipelines={[]} />
@@ -59,29 +59,31 @@ describe('Rule', () => {
   beforeEach(() => {
     oldConfirm = window.confirm;
     window.confirm = jest.fn(() => true);
-  })
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
-    window.confirm = oldConfirm
+    window.confirm = oldConfirm;
   });
 
   it('should render ruleListItem', async () => {
     asMock(useGetPermissionsByScope).mockReturnValue({
       loadingScopePermissions: false,
       scopePermissions: undefined,
-      checkPermissions: jest.fn()
+      checkPermissions: jest.fn(),
     });
     render(<SUT rule={ruleMock} />);
 
-    expect(await screen.findByRole('link', {
-      name: /title1/i
-    })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('link', {
+        name: /title1/i,
+      }),
+    ).toBeInTheDocument();
 
     expect(screen.queryByText(/managed by application/i)).not.toBeInTheDocument();
 
     const deleteButton = screen.getByRole('button', {
-      name: /delete rule/i
+      name: /delete rule/i,
     });
 
     userEvent.click(deleteButton);
@@ -93,13 +95,15 @@ describe('Rule', () => {
     asMock(useGetPermissionsByScope).mockReturnValue({
       loadingScopePermissions: false,
       scopePermissions: entityScope,
-      checkPermissions: jest.fn()
+      checkPermissions: jest.fn(),
     });
     render(<SUT rule={ruleMock} />);
 
-    expect(await screen.findByRole('link', {
-      name: /title1/i
-    })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('link', {
+        name: /title1/i,
+      }),
+    ).toBeInTheDocument();
 
     expect(await screen.findByText(/managed by application/i)).toBeInTheDocument();
   });

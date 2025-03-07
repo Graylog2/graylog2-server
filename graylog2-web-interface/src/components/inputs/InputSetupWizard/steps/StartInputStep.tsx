@@ -170,9 +170,15 @@ const StartInputStep = () => {
 
         break;
       case 'EXISTING':
-        updateRoutingMutation.mutateAsync({ input_id: inputId, stream_id: routingStepData.streamId }).finally(() => {
-          startInput();
-        });
+        updateRoutingMutation
+          .mutateAsync({
+            input_id: inputId,
+            stream_id: routingStepData.streamId,
+            remove_from_default: routingStepData.removeMatchesFromDefault,
+          })
+          .finally(() => {
+            startInput();
+          });
 
         break;
       case 'DEFAULT':
