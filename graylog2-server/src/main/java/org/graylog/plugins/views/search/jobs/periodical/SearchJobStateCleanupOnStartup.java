@@ -104,7 +104,7 @@ public class SearchJobStateCleanupOnStartup extends Periodical {
                 )
         ).forEach(job -> {
             // if this job is supposed to run on this node and it is not in the cache, it can't be a running job and should be moved to error state
-            if(searchJobService.getFromCache(job.id()) == null) {
+            if (!searchJobService.isInCache(job.id())) {
                 searchJobStateService.update(job.toBuilder()
                         .status(SearchJobStatus.ERROR)
                         .errors(
