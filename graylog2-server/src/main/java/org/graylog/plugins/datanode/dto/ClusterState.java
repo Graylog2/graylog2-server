@@ -28,24 +28,6 @@ public record ClusterState(String status, String clusterName, int numberOfNodes,
                            List<Node> opensearchNodes) {
 
     @JsonIgnore
-    public String getHostname(String name) {
-        return opensearchNodes.stream().
-                filter(n -> n.name().equals(name))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No node found by name " + name))
-                .host();
-    }
-
-    @JsonIgnore
-    public String getName(String hostname) {
-        return opensearchNodes.stream().
-                filter(n -> n.host().equals(hostname))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No node found by hostname " + hostname + ", available hostnames: " + opensearchNodes.stream().map(Node::host).collect(Collectors.joining(","))))
-                .name();
-    }
-
-    @JsonIgnore
     public Optional<Node> findByHostname(String hostname) {
         return opensearchNodes.stream().
                 filter(n -> n.host().equals(hostname))

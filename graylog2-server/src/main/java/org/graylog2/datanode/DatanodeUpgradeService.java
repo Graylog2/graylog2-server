@@ -65,7 +65,7 @@ public class DatanodeUpgradeService {
 
         final boolean clusterHealthy = clusterState.status().equals("GREEN") && clusterState.relocatingShards() == 0;
         final boolean shardReplicationEnabled = clusterState.shardReplication() == ShardReplication.ALL;
-        final boolean clusterReadyForUpgrade =  clusterHealthy && shardReplicationEnabled;
+        final boolean clusterReadyForUpgrade = clusterHealthy && shardReplicationEnabled;
 
         return new DatanodeUpgradeStatus(serverVersion,
                 clusterState,
@@ -93,9 +93,11 @@ public class DatanodeUpgradeService {
     private static DataNodeInformation enrichNodeInformation(DataNodeDto node, Set<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade, AtomicInteger upgradeableCounter) {
         final Optional<Node> opensearchInformation = clusterState.findByHostname(node.getHostname());
 
-        final String nodeName = clusterState.getName(node.getHostname());
 
-        final boolean managerNode = clusterState.managerNode().name().equals(nodeName);
+        final boolean managerNode = opensearchInformation.map(Node::name)
+                .map(n -> n.equals(clusterState.managerNode().name()))
+                .orElse(false);
+
         final boolean isLatestVersion = isVersionEqualIgnoreBuildMetadata(node.getDatanodeVersion(), serverVersion);
 
         boolean upgradeTechnicallyPossible = clusterReadyForUpgrade && !isLatestVersion && (!managerNode || toUpgradeDataNodes.size() == 1);
@@ -103,7 +105,7 @@ public class DatanodeUpgradeService {
         boolean upgradeEnabled = upgradeTechnicallyPossible && upgradeableCounter.getAndDecrement() == 1;
 
         return new DataNodeInformation(
-                nodeName,
+                opensearchInformation.map(Node::name).orElse(node.getHostname()),
                 node.getDataNodeStatus(),
                 node.getDatanodeVersion(),
                 node.getHostname(),
