@@ -79,16 +79,24 @@ const EditorWrapper = styled.div`
 `;
 
 type Props = {
-  value: string,
-  readOnly?: boolean,
-  show: boolean,
-  onChange: (newValue: string) => void,
-  onClose: () => void,
-  onDone?: (newValue?: string) => void,
-  helpBlock?: React.ReactNode,
+  value: string;
+  readOnly?: boolean;
+  show: boolean;
+  onChange: (newValue: string) => void;
+  onClose: () => void;
+  onDone?: (newValue?: string) => void;
+  helpBlock?: React.ReactNode;
 };
 
-function EditorModal({ value, readOnly = false, onChange, show, onClose, onDone = () => {}, helpBlock = undefined }: Props) {
+function EditorModal({
+  value,
+  readOnly = false,
+  onChange,
+  show,
+  onClose,
+  onDone = () => {},
+  helpBlock = undefined,
+}: Props) {
   const [height, setHeight] = React.useState<number>(0);
   const [localValue, setLocalValue] = React.useState<string>(value);
 
@@ -99,11 +107,14 @@ function EditorModal({ value, readOnly = false, onChange, show, onClose, onDone 
 
   React.useEffect(() => setLocalValue(value), [value]);
 
-  const handleOnChange = React.useCallback((newValue: string) => {
-    const sanitizedValue = DOMPurify.sanitize(newValue);
-    setLocalValue(sanitizedValue);
-    onChange(sanitizedValue);
-  }, [onChange]);
+  const handleOnChange = React.useCallback(
+    (newValue: string) => {
+      const sanitizedValue = DOMPurify.sanitize(newValue);
+      setLocalValue(sanitizedValue);
+      onChange(sanitizedValue);
+    },
+    [onChange],
+  );
 
   const handleOnDone = React.useCallback(() => {
     if (onDone) onDone(localValue);
@@ -144,7 +155,9 @@ function EditorModal({ value, readOnly = false, onChange, show, onClose, onDone 
             </Row>
             <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
               <Button onClick={() => onClose()}>Cancel</Button>
-              <Button bsStyle="success" onClick={handleOnDone}>Done</Button>
+              <Button bsStyle="success" onClick={handleOnDone}>
+                Done
+              </Button>
             </Row>
           </Content>
         </Backdrop>

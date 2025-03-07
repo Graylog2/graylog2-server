@@ -29,7 +29,8 @@ import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 
 import useHistory from '../routing/useHistory';
 
-const getCurrentRule = (ruleStoreState: RulesStoreState, ruleId: string) => ruleStoreState?.rules?.filter((r) => r.id === ruleId)[0];
+const getCurrentRule = (ruleStoreState: RulesStoreState, ruleId: string) =>
+  ruleStoreState?.rules?.filter((r) => r.id === ruleId)[0];
 
 function filterPipelines(pipelines = [], title = '') {
   return pipelines.filter((pipeline) => pipeline.stages.some((stage) => stage.rules.indexOf(title) !== -1));

@@ -73,7 +73,7 @@ const EncryptedInlineBinaryField = ({
     if (field.is_encrypted) {
       onChange(title, { delete_value: true });
     } else {
-      setResettedFieldValue(value)
+      setResettedFieldValue(value);
       onChange(title, '');
     }
   };
@@ -82,7 +82,7 @@ const EncryptedInlineBinaryField = ({
     setIsResetted(false);
     setFileName(undefined);
     if (field.is_encrypted) {
-      onChange(title, {is_set: true}, false);
+      onChange(title, { is_set: true }, false);
     } else {
       onChange(title, resettedFieldValue, false);
     }
@@ -140,30 +140,34 @@ const EncryptedInlineBinaryField = ({
   const readOnlyFileInput = () => {
     if (field.is_encrypted) {
       return (
-        <Input id={fieldId}
-               type="password"
-               name={`configuration[${title}]`}
-               label={optionableLabel(field)}
-               required={isRequired}
-               readOnly
-               help={field.description}
-               value="encrypted value"
-               buttonAfter={resetButton()}
-               autoFocus={autoFocus} />
+        <Input
+          id={fieldId}
+          type="password"
+          name={`configuration[${title}]`}
+          label={optionableLabel(field)}
+          required={isRequired}
+          readOnly
+          help={field.description}
+          value="encrypted value"
+          buttonAfter={resetButton()}
+          autoFocus={autoFocus}
+        />
       );
     }
 
     return (
-      <Input id={fieldId}
-             type="text"
-             name={`configuration[${title}]`}
-             label={optionableLabel(field)}
-             required={isRequired}
-             readOnly
-             help={field.description}
-             value="uploaded file content"
-             buttonAfter={resetButton()}
-             autoFocus={autoFocus} />
+      <Input
+        id={fieldId}
+        type="text"
+        name={`configuration[${title}]`}
+        label={optionableLabel(field)}
+        required={isRequired}
+        readOnly
+        help={field.description}
+        value="uploaded file content"
+        buttonAfter={resetButton()}
+        autoFocus={autoFocus}
+      />
     );
   };
 
