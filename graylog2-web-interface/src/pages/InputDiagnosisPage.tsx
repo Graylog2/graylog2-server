@@ -20,7 +20,11 @@ import styled, { css } from 'styled-components';
 import { DocumentTitle, LinkToNode, PageHeader } from 'components/common';
 import useParams from 'routing/useParams';
 import { Row, Col, DropdownButton, MenuItem } from 'components/bootstrap';
-import type { StreamMessageCount , InputNodeStateInfo, InputNodeStates } from 'components/inputs/InputDiagnosis/useInputDiagnosis';
+import type {
+  StreamMessageCount,
+  InputNodeStateInfo,
+  InputNodeStates,
+} from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 import ShowReceivedMessagesButton from 'components/inputs/InputDiagnosis/ShowReceivedMessagesButton';
 import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
@@ -67,13 +71,16 @@ const InputNodeInfo = styled.div`
   white-space: break-spaces;
 `;
 
-const NodeListItem = ({ detailedMessage, nodeId }: {
-  detailedMessage: InputNodeStateInfo['detailed_message'],
-  nodeId: InputNodeStateInfo['node_id']
+const NodeListItem = ({
+  detailedMessage,
+  nodeId,
+}: {
+  detailedMessage: InputNodeStateInfo['detailed_message'];
+  nodeId: InputNodeStateInfo['node_id'];
 }) => {
-  if(!detailedMessage && !nodeId) return null;
+  if (!detailedMessage && !nodeId) return null;
 
-  if(nodeId) {
+  if (nodeId) {
     return (
       <LinkContainer to={Routes.SYSTEM.NODES.SHOW(nodeId)}>
         <MenuItem>
@@ -89,7 +96,7 @@ const NodeListItem = ({ detailedMessage, nodeId }: {
           )}
         </MenuItem>
       </LinkContainer>
-    )
+    );
   }
 
   return (
@@ -100,35 +107,39 @@ const NodeListItem = ({ detailedMessage, nodeId }: {
         </InputNodeInfo>
       )}
     </MenuItem>
-  )
-}
+  );
+};
 
-const StateListItem = ({ inputNodeStates, state } : { inputNodeStates: InputNodeStates, state: InputState }) => {
+const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeStates; state: InputState }) => {
   const showNodesList = (nodeState) => {
     const statesWithShowableInfos = inputNodeStates.states[nodeState].filter(
-      (stateInfo: InputNodeStateInfo) => stateInfo.detailed_message || stateInfo.node_id
-    )
+      (stateInfo: InputNodeStateInfo) => stateInfo.detailed_message || stateInfo.node_id,
+    );
 
     return statesWithShowableInfos.length > 0;
-  }
+  };
 
-  if(showNodesList(state)) return (
-    <DropdownButton
-      title={
-        <dd>
-          {state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}
-        </dd>
-      }
-      bsSize="xs"
-    >
-      {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
-        <NodeListItem key={node_id} detailedMessage={detailed_message} nodeId={node_id} />)
-      )}
-    </DropdownButton>
-  )
+  if (showNodesList(state))
+    return (
+      <DropdownButton
+        title={
+          <dd>
+            {state.toLowerCase()}: {inputNodeStates.states[state].length}/{inputNodeStates.total}
+          </dd>
+        }
+        bsSize="xs">
+        {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
+          <NodeListItem key={node_id} detailedMessage={detailed_message} nodeId={node_id} />
+        ))}
+      </DropdownButton>
+    );
 
-  return (<p>{state}: {inputNodeStates.states[state].length}/{inputNodeStates.total}</p>)
-}
+  return (
+    <p>
+      {state}: {inputNodeStates.states[state].length}/{inputNodeStates.total}
+    </p>
+  );
+};
 
 const InputDiagnosisPage = () => {
   const { inputId } = useParams();
@@ -239,7 +250,8 @@ const InputDiagnosisPage = () => {
                     {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
                       <span key={stream.stream_id}>
                         <dt>
-                          <Link to={`/search?q=gl2_source_input%3A+${input.id}&rangetype=relative&streams=${stream.stream_id}&from=900`}>
+                          <Link
+                            to={`/search?q=gl2_source_input%3A+${input.id}&rangetype=relative&streams=${stream.stream_id}&from=900`}>
                             {stream.stream_name}
                           </Link>
                         </dt>
