@@ -26,7 +26,7 @@ import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
-import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -65,23 +65,23 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     private final Map<String, Codec.Factory<? extends Codec>> codecFactory;
     private final ServerStatus serverStatus;
     private final MetricRegistry metricRegistry;
-    private final InputDiagnosisMetrics inputDiagnosisMetrics;
     private final MessageQueueAcknowledger acknowledger;
+    private final FailureSubmissionService failureSubmissionService;
     private final Timer parseTime;
 
     @AssistedInject
     public DecodingProcessor(Map<String, Codec.Factory<? extends Codec>> codecFactory,
                              final ServerStatus serverStatus,
                              final MetricRegistry metricRegistry,
-                             final InputDiagnosisMetrics inputDiagnosisMetrics,
                              MessageQueueAcknowledger acknowledger,
+                             FailureSubmissionService failureSubmissionService,
                              @Assisted("decodeTime") Timer decodeTime,
                              @Assisted("parseTime") Timer parseTime) {
         this.codecFactory = codecFactory;
         this.serverStatus = serverStatus;
         this.metricRegistry = metricRegistry;
-        this.inputDiagnosisMetrics = inputDiagnosisMetrics;
         this.acknowledger = acknowledger;
+        this.failureSubmissionService = failureSubmissionService;
 
         // these metrics are global to all processors, thus they are passed in directly to avoid relying on the class name
         this.parseTime = parseTime;
@@ -154,18 +154,20 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                 message = codec.decodeSafe(raw);
             }
         } catch (InputProcessingException e) {
-            if (LOG.isTraceEnabled() && e.inputMessageString().isPresent()) {
-                LOG.error("%s - input message: %s".formatted(e.getMessage(), e.inputMessageString().get()), e.getCause());
+            if (LOG.isTraceEnabled() && e.inputMessage().isPresent()) {
+                LOG.error("{} - input message: {}", e.getMessage(), e.inputMessage().get(), e.getCause());
             } else {
                 LOG.error(e.getMessage(), e.getCause());
             }
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
-            inputDiagnosisMetrics.incCount(name("org.graylog2.inputs", inputIdOnCurrentNode, "failures.input"));
+            failureSubmissionService.submitInputFailure(e, inputIdOnCurrentNode);
             throw e;
         } catch (RuntimeException e) {
             LOG.error("Unable to decode raw message {} on input <{}>.", raw, inputIdOnCurrentNode);
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
-            inputDiagnosisMetrics.incCount(name("org.graylog2.inputs", inputIdOnCurrentNode, "failures.input"));
+            failureSubmissionService.submitInputFailure(
+                    InputProcessingException.create(
+                            "Unable to decode raw message due to an unexpected error.", e, raw), inputIdOnCurrentNode);
             throw e;
         } finally {
             decodeTime = decodeTimeCtx.stop();

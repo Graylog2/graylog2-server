@@ -16,11 +16,20 @@
  */
 package org.graylog.failure;
 
+import com.codahale.metrics.Meter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
-import org.graylog2.indexer.messages.Indexable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
+import java.util.Map;
+
+import static org.graylog2.plugin.Message.FIELD_SOURCE;
+import static org.graylog2.plugin.Message.FIELD_STREAMS;
 
 public class ProcessingFailure implements Failure {
 
@@ -28,7 +37,7 @@ public class ProcessingFailure implements Failure {
     private final String message;
     private final String failureDetails;
     private final DateTime failureTimestamp;
-    private final Indexable failedMessage;
+    private final Message failedMessage;
     private final boolean requiresAcknowledgement;
 
     public ProcessingFailure(
@@ -36,7 +45,7 @@ public class ProcessingFailure implements Failure {
             String message,
             String failureDetails,
             DateTime failureTimestamp,
-            Indexable failedMessage,
+            Message failedMessage,
             boolean requiresAcknowledgement) {
         this.failureCause = failureCause;
         this.message = message;
@@ -71,11 +80,6 @@ public class ProcessingFailure implements Failure {
         return failureTimestamp;
     }
 
-    @Override
-    public Indexable failedMessage() {
-        return failedMessage;
-    }
-
     @Nullable
     @Override
     public String targetIndex() {
@@ -86,6 +90,45 @@ public class ProcessingFailure implements Failure {
     public boolean requiresAcknowledgement() {
         return requiresAcknowledgement;
     }
+
+    @Nonnull
+    @Override
+    public String messageId() {
+        return StringUtils.isBlank(failedMessage.getMessageId()) ? failedMessage.getId() : failedMessage.getMessageId();
+    }
+
+    @Nonnull
+    @Override
+    public DateTime messageTimestamp() {
+        return failedMessage.getTimestamp();
+    }
+
+    @Nonnull
+    @Override
+    public FailureObjectBuilder failureObjectBuilder(ObjectMapper objectMapper,
+                                                     @NonNull Meter invalidTimestampMeter,
+                                                     boolean includeFailedMessage) {
+        Map<String, Object> fields = failedMessage.toElasticSearchObject(objectMapper, invalidTimestampMeter);
+        fields.put(Message.FIELD_ID, failedMessage.getId());
+        fields.remove(Message.FIELD_GL2_PROCESSING_ERROR);
+
+        FailureObjectBuilder builder = new FailureObjectBuilder(this)
+                .put(FIELD_FAILED_MESSAGE_STREAMS, fields.get(FIELD_STREAMS))
+                .put(FIELD_SOURCE, fields.get(FIELD_SOURCE));
+
+        if (includeFailedMessage) {
+            builder.put(FIELD_FAILED_MESSAGE, fields);
+        }
+
+        return builder;
+    }
+
+    @Nullable
+    @Override
+    public Object getMessageQueueId() {
+        return failedMessage.getMessageQueueId();
+    }
+
 
     @Override
     public boolean equals(Object o) {
