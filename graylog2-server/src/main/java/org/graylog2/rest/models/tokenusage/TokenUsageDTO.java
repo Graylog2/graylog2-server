@@ -24,23 +24,32 @@ import javax.annotation.Nullable;
 
 @WithBeanGetter
 public record TokenUsageDTO(
-        @JsonProperty("token_id") String tokenId,
-        @JsonProperty("username") String username,
-        @JsonProperty("user_id") String userId,
-        @JsonProperty("token_name") String tokenName,
-        @Nullable @JsonProperty("created_at") DateTime createdAt,
-        @JsonProperty("last_access") DateTime lastAccess,
-        @JsonProperty("user_is_external") boolean userIsExternal,
-        @JsonProperty("auth_backend") String authBackend) {
+        @JsonProperty(FIELD_TOKEN_ID) String tokenId,
+        @JsonProperty(FIELD_USERNAME) String username,
+        @JsonProperty(FIELD_USER_ID) String userId,
+        @JsonProperty(FIELD_TOKEN_NAME) String tokenName,
+        @Nullable @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
+        @JsonProperty(FIELD_LAST_ACCESS) DateTime lastAccess,
+        @JsonProperty(FIELD_USER_IS_EXTERNAL) boolean userIsExternal,
+        @JsonProperty(FIELD_AUTH_BACKEND) String authBackend) {
 
-    public static TokenUsageDTO create(@JsonProperty("token_id") String tokenId,
-                                       @JsonProperty("username") String username,
-                                       @JsonProperty("user_id") String userId,
-                                       @JsonProperty("token_name") String tokenName,
-                                       @Nullable @JsonProperty("created_at") DateTime createdAt,
-                                       @JsonProperty("last_access") DateTime lastAccess,
-                                       @JsonProperty("user_is_external") boolean userIsExternal,
-                                       @Nullable @JsonProperty("auth_backend") String authBackend) {
+    public static final String FIELD_TOKEN_ID = "_id";
+    public static final String FIELD_USERNAME = "username";
+    public static final String FIELD_USER_ID = "user_id";
+    public static final String FIELD_TOKEN_NAME = "NAME";
+    public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_LAST_ACCESS = "last_access";
+    public static final String FIELD_USER_IS_EXTERNAL = "external_user";
+    public static final String FIELD_AUTH_BACKEND = "title";
+
+    public static TokenUsageDTO create(@JsonProperty(FIELD_TOKEN_ID) String tokenId,
+                                       @JsonProperty(FIELD_USERNAME) String username,
+                                       @JsonProperty(FIELD_USER_ID) String userId,
+                                       @JsonProperty(FIELD_TOKEN_NAME) String tokenName,
+                                       @Nullable @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
+                                       @JsonProperty(FIELD_LAST_ACCESS) DateTime lastAccess,
+                                       @JsonProperty(FIELD_USER_IS_EXTERNAL) boolean userIsExternal,
+                                       @Nullable @JsonProperty(FIELD_AUTH_BACKEND) String authBackend) {
         return new TokenUsageDTO(tokenId, username, userId,
                 tokenName,
                 createdAt,
