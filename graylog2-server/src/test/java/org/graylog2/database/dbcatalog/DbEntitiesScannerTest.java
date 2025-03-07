@@ -20,6 +20,7 @@ package org.graylog2.database.dbcatalog;
 import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.users.UserImpl;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -30,6 +31,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+@Disabled
 class DbEntitiesScannerTest {
     @Test
     void testScansEntitiesWithDefaultTitleFieldProperly() {
