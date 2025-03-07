@@ -52,7 +52,13 @@ type Props = {
   disableEdit?: boolean;
 };
 
-const PipelineDetails = ({ pipeline = undefined, create = false, onChange, onCancel = () => {}, disableEdit = false }: Props) => {
+const PipelineDetails = ({
+  pipeline = undefined,
+  create = false,
+  onChange,
+  onCancel = () => {},
+  disableEdit = false,
+}: Props) => {
   if (create) {
     return <PipelineForm create save={onChange} onCancel={onCancel} modal={false} />;
   }

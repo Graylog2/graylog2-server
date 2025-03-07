@@ -28,9 +28,10 @@ import assertUnreachable from 'logic/assertUnreachable';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 
 import GenericPlot from './GenericPlot';
-import type { ChartColor, ChartConfig, PlotLayout } from './GenericPlot';
+import type { ChartConfig, PlotLayout } from './GenericPlot';
 import OnZoom from './OnZoom';
 
+type GenericPlotProps = React.ComponentProps<typeof GenericPlot>;
 export type Props = {
   axisType?: AxisType;
   config: AggregationWidgetConfig;
@@ -41,9 +42,10 @@ export type Props = {
   };
   height: number;
   width: number;
-  setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor;
+  setChartColor?: GenericPlotProps['setChartColor'];
   plotLayout?: Partial<PlotLayout>;
   onZoom?: (from: string, to: string, userTimezone: string) => boolean;
+  onClickMarker?: GenericPlotProps['onClickMarker'];
 };
 
 const yLegendPosition = (containerHeight: number) => {
@@ -83,6 +85,7 @@ const XYPlot = ({
   width,
   plotLayout = {},
   onZoom = undefined,
+  onClickMarker = undefined,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) } as const;
@@ -124,7 +127,13 @@ const XYPlot = ({
 
   return (
     <PlotLegend config={config} chartData={chartData} height={height} width={width}>
-      <GenericPlot chartData={chartData} layout={layout} onZoom={_onZoom} setChartColor={setChartColor} />
+      <GenericPlot
+        chartData={chartData}
+        layout={layout}
+        onZoom={_onZoom}
+        setChartColor={setChartColor}
+        onClickMarker={onClickMarker}
+      />
     </PlotLegend>
   );
 };

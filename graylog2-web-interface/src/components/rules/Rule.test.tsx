@@ -61,7 +61,7 @@ const entityScope = {
   is_mutable: false,
 } as unknown as ScopeParams;
 
-const SUT = ({ rule } : { rule: RuleType }) => (
+const SUT = ({ rule }: { rule: RuleType }) => (
   <DefaultQueryClientProvider options={{ logger }}>
     <PipelineRulesContext.Provider
       value={{
@@ -91,25 +91,23 @@ describe('Rule', () => {
     asMock(useGetPermissionsByScope).mockReturnValue({
       loadingScopePermissions: false,
       scopePermissions: undefined,
-      checkPermissions: jest.fn()
+      checkPermissions: jest.fn(),
     });
     render(<SUT rule={ruleMock} />);
     await screen.findByText('title1');
 
-    expect(screen.queryByText("this rule is managed by application")).not.toBeInTheDocument();
-
+    expect(screen.queryByText('this rule is managed by application')).not.toBeInTheDocument();
   });
 
   it('should render managed alert for scoped rule', async () => {
     asMock(useGetPermissionsByScope).mockReturnValue({
       loadingScopePermissions: false,
       scopePermissions: entityScope,
-      checkPermissions: jest.fn()
+      checkPermissions: jest.fn(),
     });
-    render(<SUT rule={{ ...ruleMock, _scope: 'GRAYLOG_SYSTEM_PIPELINE_RULE_SCOPE'}}/>);
+    render(<SUT rule={{ ...ruleMock, _scope: 'GRAYLOG_SYSTEM_PIPELINE_RULE_SCOPE' }} />);
     await screen.findByText('title1');
 
     expect(await screen.findByText(/this rule is managed by application/i)).toBeInTheDocument();
-
   });
 });
