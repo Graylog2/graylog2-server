@@ -177,7 +177,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
         histogramBuckets.forEach(bucket -> {
             final var parsedTerms = (ParsedTerms) bucket.getAggregations().get(termsAggregationName);
-            final var dateTime = (ZonedDateTime) bucket.getKey();
+            final var dateTime = ((ZonedDateTime) bucket.getKey()).withZoneSameInstant(timeZone);
             final var alertCount = Optional.ofNullable(parsedTerms.getBucketByKey("true")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
             final var eventCount = Optional.ofNullable(parsedTerms.getBucketByKey("false")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
             alerts.add(new MoreSearch.Histogram.Bucket(dateTime, alertCount));
