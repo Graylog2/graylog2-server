@@ -29,7 +29,7 @@ const isNullOrBlank = (s: string | undefined) => {
   return trim(s) === '';
 };
 
-const parseTimerangeFilter = (timestamp: string | undefined, defaultTimerange: TimeRange): TimeRange => {
+const parseTimerangeFilter = (timestamp: string | undefined, defaultTimerange?: TimeRange): TimeRange => {
   if (!timestamp) {
     return defaultTimerange;
   }
