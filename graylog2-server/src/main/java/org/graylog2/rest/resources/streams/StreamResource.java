@@ -284,6 +284,24 @@ public class StreamResource extends RestResource {
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
 
+    //TODO: remove this method when https://github.com/Graylog2/graylog-plugin-enterprise/issues/8610 is resolved!
+    @GET
+    @Path("/no_security")
+    @Timed
+    @ApiOperation(value = "Get a list of all streams, excluding default security streams")
+    @Deprecated
+    @Produces(MediaType.APPLICATION_JSON)
+    public StreamListResponse getNoSecurity() {
+        final List<Stream> streams = streamService.loadAll()
+                .stream()
+                .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                .filter(stream -> !stream.getTitle().equalsIgnoreCase("All investigation events") &&
+                        !stream.getTitle().equalsIgnoreCase("All investigation messages"))
+                .toList();
+
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
+    }
+
     @GET
     @Path("/byIndex/{indexSetId}")
     @Timed
