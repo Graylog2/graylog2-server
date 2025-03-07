@@ -22,9 +22,11 @@ import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosi
 
 import InputDiagnosisPage from './InputDiagnosisPage';
 
-jest.mock('routing/useParams', () => jest.fn(() => ({
-  inputId: 'test-input-id',
-})));
+jest.mock('routing/useParams', () =>
+  jest.fn(() => ({
+    inputId: 'test-input-id',
+  })),
+);
 
 jest.mock('components/inputs/InputDiagnosis/useInputDiagnosis');
 
@@ -36,8 +38,8 @@ const input = {
   name: 'inputName',
   created_at: '',
   creator_user_id: 'creatorId',
-  static_fields: { },
-  attributes: { },
+  static_fields: {},
+  attributes: {},
 };
 
 const inputNodeStates = {
@@ -60,6 +62,7 @@ const inputMetrics = {
   failures_indexing: 19,
   failures_processing: 20,
   failures_inputs_codecs: 21,
+  dropped_message_occurrence: 10,
   stream_message_count: [
     { stream_name: 'Test Stream 1', stream_id: '1', count: 22 },
     { stream_name: 'Test Stream 2', stream_id: '2', count: 23 },
@@ -74,9 +77,7 @@ describe('Input Diagnosis Page', () => {
   });
 
   it('renders the page for the given input with its metrics', async () => {
-    render(
-      <InputDiagnosisPage />,
-    );
+    render(<InputDiagnosisPage />);
 
     expect(await screen.findByText(/inputTitle/)).toBeInTheDocument();
     expect(await screen.findByText(/11 events/)).toBeInTheDocument();
@@ -99,9 +100,7 @@ describe('Input Diagnosis Page', () => {
   });
 
   it('shows nodes related to state on button click', async () => {
-    render(
-      <InputDiagnosisPage />,
-    );
+    render(<InputDiagnosisPage />);
 
     const runningButton = await screen.findByRole('button', { name: /running: 1\/2/ });
     const failedButton = await screen.findByRole('button', { name: /failed: 1\/2/ });
@@ -116,9 +115,7 @@ describe('Input Diagnosis Page', () => {
   });
 
   it('shows detailed messages on state nodes related to state on button click', async () => {
-    render(
-      <InputDiagnosisPage />,
-    );
+    render(<InputDiagnosisPage />);
 
     const failedButton = await screen.findByRole('button', { name: /failed: 1\/2/ });
 

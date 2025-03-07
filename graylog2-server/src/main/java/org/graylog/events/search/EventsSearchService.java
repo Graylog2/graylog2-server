@@ -30,6 +30,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,7 +68,7 @@ public class EventsSearchService {
         return String.format(Locale.ROOT, "%s:%s", EventDto.FIELD_EVENT_DEFINITION_ID, id);
     }
 
-    public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
+    private String buildFilter(EventsSearchParameters parameters) {
         final var filterBuilder = new ArrayList<String>();
         // Make sure we only filter for actual events and ignore anything else that might be in the event
         // indices. (fixes an issue when users store non-event messages in event indices)
@@ -116,9 +117,14 @@ public class EventsSearchService {
                 break;
         }
 
-        final String filter = filterBuilder.stream()
+        return filterBuilder.stream()
                 .map(query -> "(" + query + ")")
                 .collect(joiningQueriesWithAND);
+    }
+
+    public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
+        final var filter = buildFilter(parameters);
+
         final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
         final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
@@ -148,6 +154,15 @@ public class EventsSearchService {
                 .usedIndices(result.usedIndexNames())
                 .context(context)
                 .build();
+    }
+
+    public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
+        final var filter = buildFilter(parameters);
+
+        final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
+
+        return EventsHistogramResult.fromResult(result);
     }
 
     private String createTimeRangeFilter(TimeRange aggregationTimerange) {

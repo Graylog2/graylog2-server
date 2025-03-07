@@ -95,6 +95,15 @@ class MongoDbRuleServiceTest {
     }
 
     @Test
+    void loadBySourcePattern() {
+        ruleService.save(dummyRule().toBuilder().title("title 1").source("abcdef").build());
+        ruleService.save(dummyRule().toBuilder().title("title 2").source("bcd").build());
+        assertThat(ruleService.loadBySourcePattern("abc")).hasSize(1);
+        assertThat(ruleService.loadBySourcePattern("bcd")).hasSize(2);
+        assertThat(ruleService.loadBySourcePattern("xxx")).hasSize(0);
+    }
+
+    @Test
     void loadAll() {
         final var rule1 = ruleService.save(dummyRule().toBuilder().title("title 3").build());
         final var rule2 = ruleService.save(dummyRule().toBuilder().title("title 2").build());
