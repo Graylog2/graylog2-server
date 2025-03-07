@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 import useParams from 'routing/useParams';
 import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import DocsHelper from 'util/DocsHelper';

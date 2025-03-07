@@ -16,7 +16,8 @@
  */
 import React from 'react';
 
-import type { DataNode, DataNodeStatus } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
+import type { DataNodeStatus } from 'preflight/types';
 import { RelativeTime, PaginatedEntityTable } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';

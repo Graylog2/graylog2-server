@@ -20,7 +20,7 @@ import styled from 'styled-components';
 
 import { ConfirmDialog } from 'components/common';
 import { Button, MenuItem } from 'components/bootstrap';
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import sleep from 'logic/sleep';
@@ -67,7 +67,7 @@ const DIALOG_TEXT = {
   },
 };
 
-const DataNodeActions = ({ dataNode, refetch, displayAs = 'dropdown' }: Props) => {
+const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown' }: Props) => {
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);

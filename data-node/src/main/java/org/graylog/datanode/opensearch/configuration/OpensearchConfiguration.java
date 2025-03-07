@@ -21,10 +21,10 @@ import jakarta.annotation.Nonnull;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
+import org.graylog.datanode.process.Environment;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.YamlConfigFile;
-import org.graylog.datanode.process.Environment;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 import org.slf4j.Logger;
@@ -125,6 +125,12 @@ public class OpensearchConfiguration {
                 .map(DatanodeConfigurationPart::transportCertificate)
                 .filter(Objects::nonNull)
                 .findFirst();
+    }
+
+    public List<String> opensearchRoles() {
+        return configurationParts.stream()
+                .flatMap(cfg -> cfg.nodeRoles().stream())
+                .collect(Collectors.toList());
     }
 
     public List<DatanodeConfigFile> configFiles() {

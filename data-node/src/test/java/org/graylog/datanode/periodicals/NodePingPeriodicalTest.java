@@ -22,16 +22,15 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
-import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 
 @ExtendWith(MongoDBExtension.class)
 class NodePingPeriodicalTest {
@@ -62,7 +61,8 @@ class NodePingPeriodicalTest {
                 () -> cluster,
                 () -> datanodeRestApi,
                 () -> OpensearchState.AVAILABLE,
-                Date::new
+                Date::new,
+                () -> List.of("search", "ingest")
         );
 
         task.doRun();
@@ -76,6 +76,7 @@ class NodePingPeriodicalTest {
                     Assertions.assertThat(nodeDto.getNodeId()).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
                     Assertions.assertThat(nodeDto.getLastSeen()).isNotNull();
                     Assertions.assertThat(nodeDto.getProvisioningInformation().certValidUntil()).isNotNull();
+                    Assertions.assertThat(nodeDto.getOpensearchRoles().containsAll(List.of("search", "ingest"))).isTrue();
                 });
     }
 
