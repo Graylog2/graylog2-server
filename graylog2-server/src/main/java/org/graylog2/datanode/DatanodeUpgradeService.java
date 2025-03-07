@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -75,19 +76,21 @@ public class DatanodeUpgradeService {
         );
     }
 
-    private List<DataNodeInformation> enrichData(Set<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
+    private List<DataNodeInformation> enrichData(Set<DataNodeDto> nodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
         final Comparator<DataNodeInformation> comparator = Comparator.comparing(DataNodeInformation::upgradePossible)
                 .reversed()
                 .thenComparing(DataNodeInformation::nodeName);
 
-        return toUpgradeDataNodes.stream()
-                .map(n -> enrichNodeInformation(n, toUpgradeDataNodes, clusterState, serverVersion, clusterReadyForUpgrade))
+        AtomicInteger upgradeableCounter = new AtomicInteger(1);
+
+        return nodes.stream()
+                .map(n -> enrichNodeInformation(n, nodes, clusterState, serverVersion, clusterReadyForUpgrade, upgradeableCounter))
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }
 
     @Nonnull
-    private static DataNodeInformation enrichNodeInformation(DataNodeDto node, Set<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
+    private static DataNodeInformation enrichNodeInformation(DataNodeDto node, Set<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade, AtomicInteger upgradeableCounter) {
         final Optional<Node> opensearchInformation = clusterState.findByHostname(node.getHostname());
 
         final String nodeName = clusterState.getName(node.getHostname());
@@ -95,7 +98,9 @@ public class DatanodeUpgradeService {
         final boolean managerNode = clusterState.managerNode().name().equals(nodeName);
         final boolean isLatestVersion = isVersionEqualIgnoreBuildMetadata(node.getDatanodeVersion(), serverVersion);
 
-        boolean upgradePossible = clusterReadyForUpgrade && !isLatestVersion && (!managerNode || toUpgradeDataNodes.size() == 1);
+        boolean upgradeTechnicallyPossible = clusterReadyForUpgrade && !isLatestVersion && (!managerNode || toUpgradeDataNodes.size() == 1);
+        // we want to mark only one node as ready for upgrade, guiding the user one by one. The upgradeableCounter keeps the overview
+        boolean upgradeEnabled = upgradeTechnicallyPossible && upgradeableCounter.getAndDecrement() == 1;
 
         return new DataNodeInformation(
                 nodeName,
@@ -105,7 +110,7 @@ public class DatanodeUpgradeService {
                 opensearchInformation.map(Node::ip).orElse(null),
                 opensearchInformation.map(Node::version).orElse(null),
                 opensearchInformation.map(Node::roles).orElse(null),
-                upgradePossible,
+                upgradeEnabled,
                 managerNode);
     }
 
