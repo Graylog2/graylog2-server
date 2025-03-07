@@ -1,0 +1,5 @@
+type = "a"
+message = "Added system notification with link to upgrade page if Graylog server and one of the connected Data Nodes' versions do not match."
+
+issues = ["21701"]
+pulls = ["21887"]
