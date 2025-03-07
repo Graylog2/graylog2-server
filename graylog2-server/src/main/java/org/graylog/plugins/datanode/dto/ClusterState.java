@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public record ClusterState(String status, String clusterName, int numberOfNodes, int activeShards, int relocatingShards,
                            int initializingShards, int unassignedShards, int activePrimaryShards,
@@ -40,7 +41,7 @@ public record ClusterState(String status, String clusterName, int numberOfNodes,
         return opensearchNodes.stream().
                 filter(n -> n.host().equals(hostname))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No node found by hostname " + hostname))
+                .orElseThrow(() -> new IllegalArgumentException("No node found by hostname " + hostname + ", available hostnames: " + opensearchNodes.stream().map(Node::host).collect(Collectors.joining(","))))
                 .name();
     }
 
