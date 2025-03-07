@@ -28,6 +28,7 @@ public class ScriptingApiModule extends ViewsModule {
     @Override
     protected void configure() {
         addSystemRestResource(ScriptingApiResource.class);
+        bind(ScriptingApiService.class).to(ScriptingApiServiceImpl.class).asEagerSingleton();
         jerseyAdditionalComponentsBinder().addBinding().toInstance(TabularResponseWriter.class);
 
         final Multibinder<FieldDecorator> fieldDecoratorBinder = Multibinder.newSetBinder(binder(), FieldDecorator.class);
