@@ -55,6 +55,10 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
 
     @Override
     public DbEntitiesCatalog get() {
+        return new DbEntitiesCatalog(List.of());
+    }
+
+    public DbEntitiesCatalog _deactivated_get() {
         final Stopwatch stopwatch = Stopwatch.createStarted();
         final DbEntitiesCatalog catalog = scan(packagesToScan, packagesToExclude, chainingClassLoader);
         stopwatch.stop();
