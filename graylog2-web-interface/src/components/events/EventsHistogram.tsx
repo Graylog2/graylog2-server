@@ -138,11 +138,16 @@ const EventsGraph = ({
   );
 };
 
-const EventsHistogram = ({ searchParams, setFilters }: MiddleSectionProps) => {
+type EventsHistogramFetcher = typeof fetchEventsHistogram;
+
+type Props = MiddleSectionProps & {
+  eventsHistogramFetcher?: EventsHistogramFetcher;
+};
+const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fetchEventsHistogram }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
   const { data, isInitialLoading } = useQuery(
     ['events', 'histogram', searchParams],
-    () => fetchEventsHistogram(searchParams),
+    () => eventsHistogramFetcher(searchParams),
     { keepPreviousData: true },
   );
 
