@@ -270,6 +270,48 @@ public class StreamResource extends RestResource {
         return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
     }
 
+    //TODO: remove this method when https://github.com/Graylog2/graylog-plugin-enterprise/issues/8610 is resolved!
+    @GET
+    @Timed
+    @Path("/paginated/no-sec")
+    @ApiOperation(value = "Get a paginated list of streams, excluding the default security streams")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PageListResponse<StreamDTO> getPageNoSec(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                    @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                    @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                    @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+                                                    @ApiParam(name = "sort",
+                                                              value = "The field to sort the result on",
+                                                              required = true,
+                                                              allowableValues = "title,description,created_at,updated_at,status")
+                                                    @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                    @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                    @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
+        final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
+        final PaginatedList<StreamDTO> result = paginatedStreamService
+                .findPaginated(dbQueryCreator.createDbQuery(filters, query), permissionFilter, page, perPage, sort, order);
+
+        final List<String> streamIds = result.stream().map(StreamDTO::id).toList();
+        final Map<String, List<StreamRule>> streamRuleMap = streamRuleService.loadForStreamIds(streamIds);
+
+        final List<StreamDTO> streams = result
+                .stream()
+                .filter(streamDTO ->
+                        !streamDTO.title().equalsIgnoreCase("All Investigation events") &&
+                                !streamDTO.title().equalsIgnoreCase("All Investigation messages")
+                )
+                .map(streamDTO -> {
+                    final List<StreamRule> rules = streamRuleMap.getOrDefault(streamDTO.id(), Collections.emptyList());
+                    return streamDTO.toBuilder().rules(rules).build();
+                })
+                .toList();
+        final long total = paginatedStreamService.count();
+        final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(
+                streams, result.pagination().total(), result.pagination().page(), result.pagination().perPage()
+        );
+        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
+    }
+
     @GET
     @Timed
     @ApiOperation(value = "Get a list of all streams")
