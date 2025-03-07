@@ -26,12 +26,8 @@ const TokenManagementPage = () => (
     <UsersPageNavigation />
     <PageHeader
       title="Token Management"
-      // documentationLink={{
-      //   title: 'Token Management documentation',
-      //   path: DocsHelper.PAGES.USERS_ROLES,
-      //}}
     >
-      {/*<span>Overview of Graylog&apos;s registered users.</span>*/}
+      <span>Overview of Graylog&apos;s access tokens.</span>
     </PageHeader>
 
     <TokenManagement />
