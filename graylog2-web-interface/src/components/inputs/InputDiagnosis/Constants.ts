@@ -20,7 +20,7 @@ export const DIAGNOSIS_HELP = {
     'Note that bind address needs to direct to the Graylog service. Note that the selected port needs to be free of port conflict with another input on each node. Remember that a local input on a single node might conflict with a global input that is runs on all nodes, causing the input to fail on a single input',
   INPUT_LISTENING_FOR:
     'Note that UPD traffic sent to a TCP input, or TCP traffic sent to a UDP input will show up as network I/O, but no messages will be received.',
-  EMPTY_MESSAGES_DISCARDED: 'describe the criteria for a mesage to be discarded as empty.',
+  EMPTY_MESSAGES_DISCARDED: 'Messages with a message payload length of 0 will be discarded by the Input.',
   NETWORK_IO: 'Note that this value can be used to detect connection attempts and invalid traffic to an input.',
   INPUT_STATE:
     'An Input in running State is ready to receive messages. An Input in a failed or failing state has encountered a problem; click on the button below to view the associated error message.',
