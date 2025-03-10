@@ -55,13 +55,21 @@ const StyledButton = styled(Button)<{ $dirty: boolean }>(
 );
 
 type Props = {
-  disabled?: boolean;
-  glyph?: IconName;
   dirty?: boolean;
+  disabled?: boolean;
   displaySpinner?: boolean;
+  glyph?: IconName;
+  onClick?: (e: MouseEvent) => void;
 };
 
-const onButtonClick = (e: MouseEvent, disabled: Boolean, triggerTelemetry: () => void) => {
+const onButtonClick = (
+  e: MouseEvent,
+  disabled: Boolean,
+  triggerTelemetry: () => void,
+  onClick?: (e: MouseEvent) => void,
+) => {
+  onClick?.(e);
+
   if (disabled) {
     e.preventDefault();
     QueryValidationActions.displayValidationErrors();
@@ -70,7 +78,13 @@ const onButtonClick = (e: MouseEvent, disabled: Boolean, triggerTelemetry: () =>
   triggerTelemetry();
 };
 
-const SearchButton = ({ dirty = false, disabled = false, glyph = 'search', displaySpinner = false }: Props) => {
+const SearchButton = ({
+  dirty = false,
+  disabled = false,
+  glyph = 'search',
+  displaySpinner = false,
+  onClick = undefined,
+}: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
   const className = disabled ? 'disabled' : '';
@@ -89,7 +103,7 @@ const SearchButton = ({ dirty = false, disabled = false, glyph = 'search', displ
 
   return (
     <StyledButton
-      onClick={(e) => onButtonClick(e, disabled, triggerTelemetry)}
+      onClick={(e) => onButtonClick(e, disabled, triggerTelemetry, onClick)}
       title={title}
       className={className}
       type="submit"

@@ -76,7 +76,7 @@ public class DatanodeKeystore {
     private final String passwordSecret;
 
     public static final Path DATANODE_KEYSTORE_FILE = Path.of("keystore.jks");
-    public static String DATANODE_KEY_ALIAS = CertConstants.DATANODE_KEY_ALIAS;
+    public static String DATANODE_KEY_ALIAS = "datanode";
     private final EventBus eventBus;
 
     @Inject

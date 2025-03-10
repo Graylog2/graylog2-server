@@ -28,6 +28,7 @@ import RuleSimulation from './RuleSimulation';
 
 type Props = {
   create?: boolean;
+  isManaged?: boolean;
 };
 
 const StyledContainer = styled.div`
@@ -48,7 +49,7 @@ const StyledContainer = styled.div`
   }
 `;
 
-const RuleForm = ({ create = false }: Props) => {
+const RuleForm = ({ create = false, isManaged = false }: Props) => {
   const {
     description,
     handleDescription,
@@ -153,9 +154,10 @@ const RuleForm = ({ create = false }: Props) => {
         <Col md={12}>
           <FormSubmit
             submitButtonText={create ? 'Create rule' : 'Update rule & close'}
+            disabledSubmit={isManaged}
             centerCol={
               !create && (
-                <Button type="button" bsStyle="info" onClick={handleApply}>
+                <Button type="button" bsStyle="info" disabled={isManaged} onClick={handleApply}>
                   Update rule
                 </Button>
               )
