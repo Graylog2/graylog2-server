@@ -23,6 +23,7 @@ import AppConfig from 'util/AppConfig';
 
 export const SYSTEM_DROPDOWN_TITLE = 'System';
 export const SEARCH_LINK_TITLE = 'Search';
+export const DASHBOARDS_LINK_TITLE = 'Dashboards';
 
 const navigationBindings: PluginExports = {
   navigation: [
@@ -40,7 +41,7 @@ const navigationBindings: PluginExports = {
     },
     {
       path: Routes.DASHBOARDS,
-      description: 'Dashboards',
+      description: DASHBOARDS_LINK_TITLE,
     },
     {
       description: SYSTEM_DROPDOWN_TITLE,
@@ -49,13 +50,8 @@ const navigationBindings: PluginExports = {
         filterMenuItems(
           [
             { path: Routes.SYSTEM.OVERVIEW, description: 'Overview' },
-            {
-              path: Routes.SYSTEM.CONFIGURATIONS,
-              description: 'Configurations',
-              permissions: ['clusterconfigentry:read'],
-            },
-            { path: Routes.SYSTEM.NODES.LIST, description: 'Nodes' },
-            { path: Routes.SYSTEM.DATANODES.LIST, description: 'Data Nodes', permissions: ['datanodes:read'] },
+            { path: Routes.SYSTEM.CONFIGURATIONS, description: 'Configurations', permissions: ['clusterconfigentry:read'] },
+            { path: Routes.SYSTEM.CLUSTER.NODES, description: 'Cluster Configuration' },
             { path: Routes.SYSTEM.INPUTS, description: 'Inputs', permissions: ['inputs:read'] },
             { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },
             { path: Routes.SYSTEM.INDICES.LIST, description: 'Indices', permissions: ['indices:read'] },

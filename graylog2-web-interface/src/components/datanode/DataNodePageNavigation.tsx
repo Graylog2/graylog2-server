@@ -24,7 +24,7 @@ import { Row } from 'components/bootstrap';
 import useShowDatanodeMigration from './hooks/useShowDatanodeMigration';
 
 const DataNodesPageNavigation = () => {
-  const showDatanodeMigration = useShowDatanodeMigration();
+  const { showDatanodeMigration } = useShowDatanodeMigration();
   const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
 
   const NAV_ITEMS = [
