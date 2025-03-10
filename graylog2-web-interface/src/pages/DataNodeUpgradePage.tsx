@@ -17,10 +17,10 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Row, Col, Button } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { Row, Col, Button, Table, Label } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import useDataNodeUpgradeStatus from 'components/datanode/hooks/useDataNodeUpgradeStatus';
+import useDataNodeUpgradeStatus, { startShardReplication, stopShardReplication } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
 const StyledHorizontalDl = styled.dl(
@@ -44,20 +44,31 @@ const StyledHorizontalDl = styled.dl(
   `,
 );
 
-const NodeListItem = styled.div(
-  ({ theme }) => css`
-    margin: ${theme.spacings.sm} 0;
-  `,
-);
+const Version = styled.b`
+  font-size: 1rem;
+`;
 
 const DataNodeUpgradePage = () => {
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
 
   const confirmUpgradeButton = (
-    <Button onClick={() => {}} bsSize="xsmall" bsStyle="success">
+    <Button onClick={startShardReplication} bsSize="xsmall" bsStyle="primary">
       Confirm Upgrade here
     </Button>
   );
+
+  const getClusterHealthStyle = (status: string) => {
+    switch (status) {
+      case 'GREEN':
+        return 'success';
+      case 'YELLOW':
+        return 'warning';
+      case 'RED':
+        return 'danger';
+      default:
+        return 'info';
+    }
+  }
 
   return (
     <DocumentTitle title="Data Node Upgrade">
@@ -76,10 +87,20 @@ const DataNodeUpgradePage = () => {
       <Row className="content">
         <Col xs={12}>
           {isInitialLoading && <Spinner />}
-          <h2>{data?.cluster_state?.cluster_name} {data?.cluster_healthy ? 'GREEN' : 'RED'}</h2>
+          <h3>
+            <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} bsSize="xs">
+              {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
+            </Label>
+          </h3>
           <StyledHorizontalDl>
             <dt>Shard Replication:</dt>
-            <dd>{data?.shard_replication_enabled ? 'Enabled' : 'Disabled'}</dd>
+            <dd>
+              {data?.shard_replication_enabled ? (
+                <Label bsStyle="success" bsSize="xs">Enabled</Label>
+              ) : (
+                <Label bsStyle="warning" bsSize="xs">Disabled</Label>
+              )}
+            </dd>
             <dt>Cluster Manager:</dt>
             <dd>{data?.cluster_state?.manager_node?.name}</dd>
             <dt>Number of Nodes:</dt>
@@ -93,15 +114,47 @@ const DataNodeUpgradePage = () => {
           <Row>
             <Col xs={6}>
               <h3>Outdated Nodes</h3>
-              {data?.outdated_nodes?.map((outdated_node) => (
-                <NodeListItem>{outdated_node?.hostname}</NodeListItem>
-              ))}
+              <br />
+              <Table>
+                <tbody>
+                  {data?.outdated_nodes?.map((outdated_node) => (
+                    <tr key={outdated_node?.hostname}>
+                      <td>{outdated_node?.hostname} <i>{outdated_node?.ip}</i></td>
+                      <td align="right">
+                        <Button onClick={stopShardReplication} bsSize="xsmall" bsStyle="primary">
+                          Update
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                  {!data?.outdated_nodes?.length && (
+                    <tr>
+                      <td>No outdated nodes found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
             </Col>
             <Col xs={6}>
-              <h3>Updated Nodes</h3>
-              {data?.up_to_date_nodes?.map((updated_node) => (
-                <NodeListItem>{updated_node?.hostname}</NodeListItem>
-              ))}
+              <h3>Updated Nodes <Version>v{data?.server_version?.version}</Version></h3>
+              <br />
+              <Table>
+                <tbody>
+                  {data?.up_to_date_nodes?.map((updated_node) => (
+                    <tr key={updated_node?.hostname}>
+                      <td>{updated_node?.hostname} <i>{updated_node?.ip}</i></td>
+                      <td align="right">
+                        <Label bsStyle="success" bsSize="xs">Updated <Icon name="check" /></Label>
+                      </td>
+                    </tr>
+                  ))}
+                  {!data?.up_to_date_nodes?.length && (
+                    <tr>
+                      <td>No updated nodes found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
             </Col>
           </Row>
         </Col>
