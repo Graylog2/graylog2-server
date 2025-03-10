@@ -20,7 +20,7 @@ import { useContext, useMemo } from 'react';
 import type Widget from 'views/logic/widgets/Widget';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -34,7 +34,7 @@ type Props = {
 const ExtraDropdownWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const extraWidgetActions = useMemo(

@@ -39,6 +39,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 
+import static com.mongodb.client.model.Filters.regex;
+import static org.graylog.plugins.pipelineprocessor.db.PipelineDao.FIELD_SOURCE;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
@@ -81,7 +83,7 @@ public class MongoDbRuleService implements RuleService {
             final var insertedId = insertedIdAsString(collection.insertOne(rule));
             savedRule = rule.toBuilder().id(insertedId).build();
         }
-        clusterBus.post(RulesChangedEvent.updatedRuleId(savedRule.id()));
+        clusterBus.post(RulesChangedEvent.updatedRule(savedRule.id(), savedRule.title()));
         return savedRule;
     }
 
@@ -102,6 +104,16 @@ public class MongoDbRuleService implements RuleService {
     }
 
     @Override
+    public Collection<RuleDao> loadBySourcePattern(String sourcePattern) {
+        try {
+            return collection.find(regex(FIELD_SOURCE, sourcePattern)).into(new LinkedHashSet<>());
+        } catch (MongoException e) {
+            log.error("Unable to load processing rules", e);
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
     public Collection<RuleDao> loadAll() {
         try {
             return collection.find().sort(Sorts.ascending("title")).into(new LinkedHashSet<>());
@@ -113,10 +125,20 @@ public class MongoDbRuleService implements RuleService {
 
     @Override
     public void delete(String id) {
-        if (!scopedEntityMongoUtils.deleteById(id, false)) {
-            log.error("Unable to delete rule {}", id);
+        try {
+            delete(load(id));
+        } catch (NotFoundException e) {
+            log.info("Deleting non-existant rule {}", id);
         }
-        clusterBus.post(RulesChangedEvent.deletedRuleId(id));
+    }
+
+    @Override
+    public void delete(RuleDao ruleDao) {
+        if (!scopedEntityMongoUtils.deleteById(ruleDao.id(), false)) {
+            log.error("Unable to delete rule {}", ruleDao.title());
+        } else {
+            clusterBus.post(RulesChangedEvent.deletedRule(ruleDao.id(), ruleDao.title()));
+        }
     }
 
     @Override

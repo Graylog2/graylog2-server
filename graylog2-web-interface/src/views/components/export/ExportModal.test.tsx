@@ -25,7 +25,7 @@ import type { TitleType } from 'views/stores/TitleTypes';
 import { exportSearchMessages, exportSearchTypeMessages } from 'util/MessagesExportUtils';
 import type { ViewStateMap, ViewType } from 'views/logic/views/View';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import type { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
@@ -39,13 +39,14 @@ import {
   viewWithoutWidget,
 } from 'views/components/export/Fixtures';
 import { createWidget } from 'views/logic/WidgetTestHelpers';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useViewType from 'views/hooks/useViewType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { usePlugin } from 'views/test/testPlugins';
 import startDownload from 'views/components/export/startDownload';
+import type { QueryString } from 'views/logic/queries/types';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import type { Props as ExportModalProps } from './ExportModal';
 import ExportModal from './ExportModal';
@@ -113,13 +114,13 @@ describe('ExportModal', () => {
     ...props
   }: SimpleExportModalProps) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+      <TestFieldTypesContextProvider>
         <ExportModal
           view={view ?? viewWithoutWidget(viewType)}
           closeModal={closeModal}
           {...(props as ExportModalProps)}
         />
-      </FieldTypesContext.Provider>
+      </TestFieldTypesContextProvider>
     </TestStoreProvider>
   );
 
@@ -130,7 +131,7 @@ describe('ExportModal', () => {
       from: '2020-01-01T12:18:17.827Z',
       to: '2020-01-01T12:23:17.827Z',
     };
-    const globalQuery: ElasticsearchQueryString = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
+    const globalQuery: QueryString = { type: 'elasticsearch', query_string: 'source:$mainSource$' };
     const globalOverride = new GlobalOverride(effectiveTimeRange, globalQuery);
     const executionState = new SearchExecutionState(parameterBindings, globalOverride);
 

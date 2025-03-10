@@ -19,31 +19,37 @@ import styled, { css } from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
 
-export const DescriptionCol = styled(Col)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
-`);
+export const DescriptionCol = styled(Col)(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.md};
+  `,
+);
 
-export const ButtonCol = styled(Col)(({ theme }) => css`
-  display: flex;
-  justify-content: flex-end;
-  gap: ${theme.spacings.xs};
-  margin-top: ${theme.spacings.lg};
-`);
+export const ButtonCol = styled(Col)(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: flex-end;
+    gap: ${theme.spacings.xs};
+    margin-top: ${theme.spacings.lg};
+  `,
+);
 
-export const StyledHeading = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
+export const StyledHeading = styled.h3(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
-const StepCol = styled(Col)(({ theme }) => css`
-  padding-left: ${theme.spacings.lg};
-  padding-right: ${theme.spacings.lg};
-  padding-top: ${theme.spacings.sm};
-`);
+const StepCol = styled(Col)(
+  ({ theme }) => css`
+    padding-left: ${theme.spacings.lg};
+    padding-right: ${theme.spacings.lg};
+    padding-top: ${theme.spacings.sm};
+  `,
+);
 
-export const StepWrapper = ({children}: {children: React.ReactNode}) => (
+export const StepWrapper = ({ children }: { children: React.ReactNode }) => (
   <Row>
-    <StepCol md={12}>
-      {children}
-    </StepCol>
+    <StepCol md={12}>{children}</StepCol>
   </Row>
-)
+);

@@ -14,25 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.events.processor.systemnotification;
+package org.graylog.datanode.bootstrap.plugin;
 
-import org.graylog2.database.entities.EntityScope;
+import org.graylog2.plugin.Plugin;
 
-public final class SystemNotificationEventEntityScope extends EntityScope {
-    public static final String NAME = "SYSTEM_NOTIFICATION_EVENT";
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public boolean isMutable() {
-        return true;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return false;
-    }
+/**
+ * Service loader interface for data node specific plugins
+ */
+public interface DatanodePlugin extends Plugin {
 }

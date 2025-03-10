@@ -19,6 +19,10 @@ import { useEffect, useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import Routes from 'routing/Routes';
 import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
@@ -26,12 +30,16 @@ import { Button, Row, Col } from 'components/bootstrap';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/useInputSetupWizardSteps';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
-import { checkHasPreviousStep, checkHasNextStep, getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
+import {
+  checkHasPreviousStep,
+  checkHasNextStep,
+  getStepData,
+} from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import type { RoutingStepData } from 'components/inputs/InputSetupWizard/steps/SetupRoutingStep';
 import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import ProgressMessage from 'components/inputs/InputSetupWizard/steps/components/ProgressMessage';
 
-import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading } from './components/StepWrapper'
+import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading } from './components/StepWrapper';
 
 export type ProcessingSteps =
   | 'createStream'
@@ -44,12 +52,17 @@ export type ProcessingSteps =
   | 'result';
 
 const StartInputStep = () => {
+  const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
+  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const navigateTo = useNavigate();
   const { goToPreviousStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
   const { stepsData } = useInputSetupWizardSteps();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
-  const [startInputStatus, setStartInputStatus] = useState<'NOT_STARTED' | 'RUNNING' | 'SUCCESS' | 'FAILED' | 'ROLLED_BACK' | 'ROLLING_BACK'>('NOT_STARTED');
+  const [startInputStatus, setStartInputStatus] = useState<
+    'NOT_STARTED' | 'RUNNING' | 'SUCCESS' | 'FAILED' | 'ROLLED_BACK' | 'ROLLING_BACK'
+  >('NOT_STARTED');
   const isRunning = startInputStatus === 'RUNNING' || startInputStatus === 'ROLLING_BACK';
   const hasBeenStarted = startInputStatus !== 'NOT_STARTED';
   const isRollback = startInputStatus === 'ROLLING_BACK' || startInputStatus === 'ROLLED_BACK';
@@ -128,6 +141,12 @@ const StartInputStep = () => {
 
   const setupInput = async () => {
     const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUT_SETUP_WIZARD.START_INPUT, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'click-input-setup-wizard-start-input',
+      chosen_routing_option: routingStepData?.streamType ?? 'UNKNOWN',
+    });
     const { input } = wizardData;
     const inputId = input?.id;
 
@@ -151,9 +170,15 @@ const StartInputStep = () => {
 
         break;
       case 'EXISTING':
-        updateRoutingMutation.mutateAsync({ input_id: inputId, stream_id: routingStepData.streamId }).finally(() => {
-          startInput();
-        });
+        updateRoutingMutation
+          .mutateAsync({
+            input_id: inputId,
+            stream_id: routingStepData.streamId,
+            remove_from_default: routingStepData.removeMatchesFromDefault,
+          })
+          .finally(() => {
+            startInput();
+          });
 
         break;
       case 'DEFAULT':
@@ -317,7 +342,13 @@ const StartInputStep = () => {
 
     if (hasNextStep) {
       return (
-        <Button disabled={startInputStatus === 'RUNNING'} onClick={goToInputDiagnosis} bsStyle="primary" data-testid="input-diagnosis-button">Input Diagnosis</Button>
+        <Button
+          disabled={startInputStatus === 'RUNNING'}
+          onClick={goToInputDiagnosis}
+          bsStyle="primary"
+          data-testid="input-diagnosis-button">
+          Input Diagnosis
+        </Button>
       );
     }
 
@@ -328,15 +359,13 @@ const StartInputStep = () => {
     <StepWrapper>
       <Row>
         <DescriptionCol md={12}>
-          <p>
-            Set up and start the Input according to the configuration made.
-          </p>
+          <p>Set up and start the Input according to the configuration made.</p>
         </DescriptionCol>
       </Row>
       <Row>
         <Col md={12}>
-          {hasBeenStarted && (
-            isRollback ? (
+          {hasBeenStarted &&
+            (isRollback ? (
               <>
                 <StyledHeading>Rolling back Input...</StyledHeading>
                 {renderProgressMessages(rollBackMutations)}
@@ -346,27 +375,33 @@ const StartInputStep = () => {
                 <StyledHeading>Setting up Input...</StyledHeading>
                 {renderProgressMessages(stepMutations)}
                 {startInputStatus && (
-                <ProgressMessage stepName="result"
-                                  isLoading={false}
-                                  isSuccess={startInputStatus === 'SUCCESS'}
-                                  isError={startInputStatus === 'FAILED'} />
+                  <ProgressMessage
+                    stepName="result"
+                    isLoading={false}
+                    isSuccess={startInputStatus === 'SUCCESS'}
+                    isError={startInputStatus === 'FAILED'}
+                  />
                 )}
               </>
-            )
+            ))}
 
+          {!hasBeenStarted && !isInputStartable() && (
+            <p>Your Input is not ready to be setup yet. Please complete the previous steps.</p>
           )}
-
-          {!hasBeenStarted && !isInputStartable() && (<p>Your Input is not ready to be setup yet. Please complete the previous steps.</p>)}
         </Col>
       </Row>
 
       {(hasPreviousStep || hasNextStep) && (
-      <Row>
-        <ButtonCol md={12}>
-          {(hasPreviousStep) && (<Button disabled={isRunning} onClick={handleBackClick}>Back</Button>)}
-          {renderNextButton()}
-        </ButtonCol>
-      </Row>
+        <Row>
+          <ButtonCol md={12}>
+            {hasPreviousStep && (
+              <Button disabled={isRunning} onClick={handleBackClick}>
+                Back
+              </Button>
+            )}
+            {renderNextButton()}
+          </ButtonCol>
+        </Row>
       )}
     </StepWrapper>
   );

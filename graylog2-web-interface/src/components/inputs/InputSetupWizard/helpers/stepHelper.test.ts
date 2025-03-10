@@ -18,26 +18,20 @@
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import type { StepsData } from 'components/inputs/InputSetupWizard/types';
 
-import {
-  getStepData,
-  getNextStep,
-  checkHasNextStep,
-  checkHasPreviousStep,
-  updateStepData,
-} from './stepHelper';
+import { getStepData, getNextStep, checkHasNextStep, checkHasPreviousStep, updateStepData } from './stepHelper';
 
 const stepsData = {
   [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
     foo: 'foo1',
     bar: 'bar1',
   },
-  [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+  [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
     aloho: 'aloho1',
     mora: 'mora1',
   },
 };
 
-const orderedSteps = [INPUT_WIZARD_STEPS.SELECT_CATEGORY, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
+const orderedSteps = [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS];
 
 describe('stepHelper', () => {
   describe('getStepData', () => {
@@ -48,15 +42,15 @@ describe('stepHelper', () => {
     });
 
     it('returns undefined if no step data exists', () => {
-      expect(getStepData(stepsData as StepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(
-        undefined,
-      );
+      expect(getStepData(stepsData as StepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING)).toEqual(undefined);
     });
   });
 
   describe('getNextStep', () => {
     it('returns the next step', () => {
-      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY)).toEqual(INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS);
+      expect(getNextStep(orderedSteps, INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE)).toEqual(
+        INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
+      );
     });
 
     it('returns undefined if there is no next step', () => {
@@ -70,7 +64,7 @@ describe('stepHelper', () => {
 
   describe('checkHasNextStep', () => {
     it('returns true when there is a next step', () => {
-      expect(checkHasNextStep(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY)).toBe(true);
+      expect(checkHasNextStep(orderedSteps, INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE)).toBe(true);
     });
 
     it('returns false when there is no next step', () => {
@@ -88,7 +82,7 @@ describe('stepHelper', () => {
     });
 
     it('returns false when there is no previous step', () => {
-      expect(checkHasPreviousStep(orderedSteps, INPUT_WIZARD_STEPS.SELECT_CATEGORY)).toBe(false);
+      expect(checkHasPreviousStep(orderedSteps, INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE)).toBe(false);
     });
 
     it('returns false when the active step is not part of orderedSteps', () => {
@@ -102,7 +96,7 @@ describe('stepHelper', () => {
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
         },
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+        [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
           enabled: false,
         },
       };
@@ -112,7 +106,7 @@ describe('stepHelper', () => {
           enabled: false,
           foo: 'bar',
         },
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+        [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
           enabled: false,
         },
       });
@@ -124,22 +118,24 @@ describe('stepHelper', () => {
           enabled: false,
           foo: 'foo',
         },
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+        [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
           enabled: true,
           foo: 'foo',
         },
       };
 
-      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' })).toEqual({
-        [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
-          enabled: false,
-          foo: 'foo',
+      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE, { foo: 'bar' })).toEqual(
+        {
+          [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
+            enabled: false,
+            foo: 'foo',
+          },
+          [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
+            enabled: true,
+            foo: 'bar',
+          },
         },
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
-          enabled: true,
-          foo: 'bar',
-        },
-      });
+      );
     });
 
     it('returns updated steps data with overriden data when override=true', () => {
@@ -148,18 +144,20 @@ describe('stepHelper', () => {
           enabled: false,
           foo: 'foo',
         },
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+        [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
           enabled: true,
           foo: 'foo',
         },
       };
 
-      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' }, true)).toEqual({
+      expect(
+        updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE, { foo: 'bar' }, true),
+      ).toEqual({
         [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
           enabled: false,
           foo: 'foo',
         },
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+        [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
           foo: 'bar',
         },
       });
@@ -171,13 +169,15 @@ describe('stepHelper', () => {
           enabled: false,
           foo: 'foo',
         },
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+        [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
           enabled: true,
           foo: 'foo',
         },
       };
 
-      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, {})).toEqual(testStepsData);
+      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE, {})).toEqual(
+        testStepsData,
+      );
     });
 
     it('returns updated steps data when no step data existed', () => {
@@ -188,20 +188,22 @@ describe('stepHelper', () => {
         },
       };
 
-      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' })).toEqual({
-        [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
-          enabled: false,
-          foo: 'foo',
+      expect(updateStepData(testStepsData as StepsData, INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE, { foo: 'bar' })).toEqual(
+        {
+          [INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS]: {
+            enabled: false,
+            foo: 'foo',
+          },
+          [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
+            foo: 'bar',
+          },
         },
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
-          foo: 'bar',
-        },
-      });
+      );
     });
 
     it('returns new steps data when no steps data existed', () => {
-      expect(updateStepData(undefined, INPUT_WIZARD_STEPS.SELECT_CATEGORY, { foo: 'bar' })).toEqual({
-        [INPUT_WIZARD_STEPS.SELECT_CATEGORY]: {
+      expect(updateStepData(undefined, INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE, { foo: 'bar' })).toEqual({
+        [INPUT_WIZARD_STEPS.INSTALL_ILLUMINATE]: {
           foo: 'bar',
         },
       });

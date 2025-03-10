@@ -29,11 +29,16 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
-public record KeystoreConfigFile(Path relativePath, KeystoreInformation keystoreInformation) implements DatanodeConfigFile {
+public record KeystoreConfigFile(Path relativePath,
+                                 KeystoreInformation keystoreInformation) implements DatanodeConfigFile {
 
     @Override
     public void write(OutputStream stream) throws IOException {
         try {
+            if (keystoreInformation.password().length == 0) {
+                throw new IllegalArgumentException("Keystore password is empty!");
+            }
+            keystoreInformation().loadKeystore().store(stream, keystoreInformation.password());
             KeyStore keyStore = keystoreInformation().loadKeystore();
 
             Enumeration<String> aliases = keyStore.aliases();
@@ -61,7 +66,7 @@ public record KeystoreConfigFile(Path relativePath, KeystoreInformation keystore
                     keyStore.deleteEntry(alias);
                 }
             }
-            
+
             keyStore.store(stream, keystoreInformation.password());
         } catch (Exception e) {
             throw new OpensearchConfigurationException("Failed to persist opensearch keystore file " + relativePath, e);

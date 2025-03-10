@@ -14,25 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.pipelineprocessor.db;
+package org.graylog.plugins.views.search.errors;
 
-import org.graylog2.database.entities.EntityScope;
+/**
+ * Simple error, to be used where there is not need to precisely define query, search type or similar data describing precisely error location.
+ */
+public record SimpleSearchError(String description, boolean fatal) implements SearchError {
 
-public class SystemPipelineRuleScope extends EntityScope {
-    public static final String NAME = "GRAYLOG_SYSTEM_PIPELINE_RULE_SCOPE";
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public boolean isMutable() {
-        return false;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return true;
-    }
 }

@@ -20,7 +20,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import DataTable from 'views/components/datatable';
 import type { CreatorProps } from 'views/components/sidebar/create/AddWidgetButton';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import type { GetState } from 'views/types';
 import { selectView } from 'views/logic/slices/viewSelectors';
@@ -32,7 +32,7 @@ export const CreateCustomAggregation = ({ view }: CreatorProps) =>
     .config(AggregationWidgetConfig.builder().rowPivots([]).series([]).visualization(DataTable.type).build())
     .build();
 
-export default () => (dispatch: AppDispatch, getState: GetState) => {
+export default () => (dispatch: ViewsDispatch, getState: GetState) => {
   const view = selectView(getState());
 
   return dispatch(addWidget(CreateCustomAggregation({ view })));

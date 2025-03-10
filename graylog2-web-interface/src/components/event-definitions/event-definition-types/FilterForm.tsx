@@ -41,7 +41,7 @@ import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
 import { MultiSelect, TimeUnitInput, SearchFiltersFormControls, TimezoneSelect } from 'components/common';
 import Query from 'views/logic/queries/Query';
-import type { RelativeTimeRangeWithEnd, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
@@ -64,6 +64,7 @@ import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchb
 import type { FiltersType } from 'views/types';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { EventDefinitionValidation } from 'components/event-definitions/types';
+import type { QueryString } from 'views/logic/queries/types';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -144,7 +145,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
 
   const validateQueryString = useCallback(
     (
-      queryString: ElasticsearchQueryString | string,
+      queryString: QueryString | string,
       streamIds: Array<string>,
       timeRange: RelativeTimeRangeWithEnd,
       timezone: string,

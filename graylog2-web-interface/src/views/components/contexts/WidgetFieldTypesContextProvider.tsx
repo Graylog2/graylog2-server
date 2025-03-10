@@ -21,7 +21,6 @@ import * as Immutable from 'immutable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 type Props = {
   children: React.ReactNode;
@@ -29,7 +28,6 @@ type Props = {
 
 const WidgetFieldTypesContextProvider = ({ children }: Props) => {
   const { timerange, streams } = useContext(WidgetContext);
-  const query = useCurrentQuery();
   const { data: fieldTypes } = useFieldTypes(streams, timerange);
 
   const fieldTypesContextValue = useMemo(() => {
@@ -37,9 +35,9 @@ const WidgetFieldTypesContextProvider = ({ children }: Props) => {
 
     return {
       all: fieldTypesList,
-      queryFields: Immutable.Map({ [query.id]: fieldTypesList }),
+      currentQuery: fieldTypesList,
     };
-  }, [fieldTypes, query.id]);
+  }, [fieldTypes]);
 
   return <FieldTypesContext.Provider value={fieldTypesContextValue}>{children}</FieldTypesContext.Provider>;
 };

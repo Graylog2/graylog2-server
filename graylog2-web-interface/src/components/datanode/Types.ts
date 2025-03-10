@@ -45,6 +45,7 @@ export type CompatibilityResponseType = {
   compatibility_errors: Array<string>;
   compatibility_warnings: Array<string>;
 };
+
 export type DataNode = {
   hostname: string;
   id: string;
@@ -61,6 +62,11 @@ export type DataNode = {
   error_msg?: string;
   datanode_version: string;
   version_compatible: boolean;
+  object_id?: string;
+  cluster_address: string;
+  rest_api_address: string;
+  action_queue: string;
+  opensearch_roles?: string[];
 };
 
 export type DataNodes = Array<DataNode>;
