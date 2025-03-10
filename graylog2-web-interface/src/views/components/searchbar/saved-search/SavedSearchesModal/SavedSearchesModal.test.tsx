@@ -85,7 +85,11 @@ describe('SavedSearchesModal', () => {
       isInitialLoading: false,
     });
 
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: layoutPreferences,
+      isInitialLoading: false,
+      refetch: () => {},
+    });
     asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutate: () => {} });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });

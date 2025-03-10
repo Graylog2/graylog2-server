@@ -46,7 +46,11 @@ describe('useUserSearchFilterQuery hook', () => {
   };
 
   beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: layoutPreferences,
+      isInitialLoading: false,
+      refetch: () => {},
+    });
   });
 
   afterEach(() => {
@@ -71,7 +75,7 @@ describe('useUserSearchFilterQuery hook', () => {
   });
 
   it('should return defaults when there are no user layout preferences', async () => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: undefined, isInitialLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: undefined, isInitialLoading: false, refetch: () => {} });
 
     const { result } = renderHook(
       () =>
@@ -93,6 +97,7 @@ describe('useUserSearchFilterQuery hook', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: { perPage: layoutPreferences.perPage },
       isInitialLoading: false,
+      refetch: () => {},
     });
     const { result } = renderHook(
       () =>

@@ -105,7 +105,11 @@ describe('DashboardsOverview', () => {
   );
 
   beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: layoutPreferences,
+      isInitialLoading: false,
+      refetch: () => {},
+    });
     asMock(useFetchEntities).mockReturnValue(loadDashboardsResponse(0));
     asMock(useQueryParam).mockImplementation(() => [undefined, () => {}]);
   });

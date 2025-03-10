@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -22,36 +22,32 @@ import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'compone
 import UserNotification from 'util/UserNotification';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 
-const preferencesToJSON = ({
+const preferencesToJSON = <T>({
   displayedAttributes,
   sort,
   perPage,
-}: TableLayoutPreferences): TableLayoutPreferencesJSON => ({
+  customPreferences,
+}: TableLayoutPreferences<T>): TableLayoutPreferencesJSON<T> => ({
   displayed_attributes: displayedAttributes,
   sort: sort ? { order: sort.direction, field: sort.attributeId } : undefined,
   per_page: perPage,
+  custom_preferences: customPreferences,
 });
 
 const useUpdateUserLayoutPreferences = (entityTableId: string) => {
-  const queryClient = useQueryClient();
-  const { data: userLayoutPreferences = {} } = useUserLayoutPreferences(entityTableId);
-  const action = (newPreferences: TableLayoutPreferences) =>
+  const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId);
+  const mutationFn = (newPreferences: TableLayoutPreferences) =>
     fetch(
       'POST',
       qualifyUrl(`/entitylists/preferences/${entityTableId}`),
       preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }),
     );
   const { mutate } = useMutation({
-    mutationFn: action,
+    mutationFn,
     onError: (error) => {
       UserNotification.error(`Updating table layout preferences failed with error: ${error}`);
     },
-    onMutate: (newTableLayout: TableLayoutPreferences) => {
-      queryClient.setQueriesData(['table-layout', entityTableId], (cur: TableLayoutPreferences) => ({
-        ...(cur ?? {}),
-        ...newTableLayout,
-      }));
-    },
+    onMutate: refetch,
   });
 
   return { mutate };
