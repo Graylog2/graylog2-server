@@ -34,9 +34,9 @@ const preferencesToJSON = <T>({
   custom_preferences: customPreferences,
 });
 
-const useUpdateUserLayoutPreferences = (entityTableId: string) => {
+const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
   const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId);
-  const mutationFn = (newPreferences: TableLayoutPreferences) =>
+  const mutationFn = (newPreferences: TableLayoutPreferences<T>) =>
     fetch(
       'POST',
       qualifyUrl(`/entitylists/preferences/${entityTableId}`),
