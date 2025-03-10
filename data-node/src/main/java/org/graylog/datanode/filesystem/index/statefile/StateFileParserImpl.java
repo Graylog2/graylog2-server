@@ -80,6 +80,7 @@ public class StateFileParserImpl implements StateFileParser {
         // We checksum the entire file before we even go and parse it. If it's corrupted we barf right here.
         CodecUtil.checksumEntireFile(indexInput);
         CodecUtil.checkHeader(indexInput, STATE_FILE_CODEC, MIN_COMPATIBLE_STATE_FILE_VERSION, STATE_FILE_VERSION);
+        final int xcontentTypeValue = indexInput.readInt();
         long filePointer = indexInput.getFilePointer();
         long contentSize = indexInput.length() - CodecUtil.footerLength() - filePointer;
         try (IndexInput slice = indexInput.slice("state_xcontent", filePointer, contentSize)) {
