@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -23,6 +24,10 @@ import Popover from 'components/common/Popover';
 type Props = {
   helpText: string;
 };
+
+const StyledButton = styled(Button)`
+  padding: 1px 0;
+`;
 
 const DiagnosisHelp = ({ helpText }: Props) => {
   const [showHelp, setShowHelp] = useState(false);
@@ -38,9 +43,9 @@ const DiagnosisHelp = ({ helpText }: Props) => {
       closeOnClickOutside
       withinPortal>
       <Popover.Target>
-        <Button bsStyle="transparent" bsSize="xs" onClick={toggleHelp}>
+        <StyledButton bsStyle="transparent" bsSize="xs" onClick={toggleHelp}>
           <Icon name="question_mark" />
-        </Button>
+        </StyledButton>
       </Popover.Target>
       <Popover.Dropdown>{helpText}</Popover.Dropdown>
     </Popover>

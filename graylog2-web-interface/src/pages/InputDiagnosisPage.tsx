@@ -246,7 +246,7 @@ const InputDiagnosisPage = () => {
             <Section
               headerLeftSection={<StatusColorIndicator bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'} />}
               title="Received Traffic">
-              <StyledP className="description">
+              <StyledP>
                 Messages and network traffic that has reached the input. Note: metrics show the last 15 minutes only.
               </StyledP>
               {inputMetrics && (

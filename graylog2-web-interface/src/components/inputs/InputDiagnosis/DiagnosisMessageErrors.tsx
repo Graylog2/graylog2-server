@@ -65,7 +65,7 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
 
   return (
     <Section title="Message Errors" headerLeftSection={<StatusColorIndicator bsStyle={hasError ? 'danger' : 'gray'} />}>
-      <StyledP className="description">
+      <StyledP>
         Messages can fail to process at the Input, at the processing pipeline, or when being indexed to the Search
         Cluster. Click on a category to view the associated messages.
       </StyledP>
