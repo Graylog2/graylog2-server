@@ -6011,10 +6011,10 @@ crypt@0.0.2:
   resolved "https://registry.yarnpkg.com/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
   integrity sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=
 
-csp-header@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/csp-header/-/csp-header-6.0.1.tgz#317583faad1ba7b27a5ac84b09d1af6631ebaa97"
-  integrity sha512-9BZF8JG3t/EcJ9TBjGHGxLryRAFjUL/4QtoM5iH+YKpF+6EMmxoktAv216oW1HeFAPxSKq0+DPF0evOqd2gh1A==
+csp-header@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/csp-header/-/csp-header-6.1.0.tgz#248e36ec8206493103fcdc75233fff222508970a"
+  integrity sha512-vtQIp6C6Pt5vd48fa3wiq3OirDG+Efo3vouLVEeJSJVe+LdpAFZw/IxV77BsDTMtVwzVT78xJ4zRykJoDx+ZeA==
 
 css-box-model@^1.2.0:
   version "1.2.1"
@@ -8184,11 +8184,11 @@ exponential-backoff@^3.1.1:
   integrity sha512-8QxYTVXUkuy7fIIoitQkPwGonB8F3Zj8eEO8Sqg9Zv/bkI7RJAzowee4gr81Hak/dUTpA2Z7VfQgoijjPNlUZA==
 
 express-csp-header@^6.0.0:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/express-csp-header/-/express-csp-header-6.0.1.tgz#52227db8d4dcf54a01ad2e8408520978a2fd1a8e"
-  integrity sha512-D+lE0lesyPUC+ny0A8xnRPpB407mXI1UjRZedNMtykelei0UuUkwR/8fdKCakg88h7nfGVj4GiF2S8z57H1B2Q==
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/express-csp-header/-/express-csp-header-6.1.0.tgz#9f3b4011b09fdab004164b55e89ee69138008621"
+  integrity sha512-H7UMVDyGIbZtPakkUDrKDGkWAeCiSA7o84gNaBI6L8Q7KFVCH5iZ0AgURnQtnQ61LwqLxmuRyUd4dCr6pVeGkg==
   dependencies:
-    csp-header "^6.0.1"
+    csp-header "^6.1.0"
     psl "1.10.0"
 
 express-formidable@^1.2.0:
