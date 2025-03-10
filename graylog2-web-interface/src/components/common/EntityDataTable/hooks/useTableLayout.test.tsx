@@ -45,14 +45,6 @@ describe('useUserSearchFilterQuery hook', () => {
     defaultDisplayedAttributes: ['title'],
   };
 
-  beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({
-      data: layoutPreferences,
-      isInitialLoading: false,
-      refetch: () => {},
-    });
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
   });

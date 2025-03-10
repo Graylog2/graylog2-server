@@ -22,8 +22,6 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { asMock } from 'helpers/mocking';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
-import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
-import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import DashboardsOverview from './DashboardsOverview';
@@ -105,11 +103,6 @@ describe('DashboardsOverview', () => {
   );
 
   beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({
-      data: layoutPreferences,
-      isInitialLoading: false,
-      refetch: () => {},
-    });
     asMock(useFetchEntities).mockReturnValue(loadDashboardsResponse(0));
     asMock(useQueryParam).mockImplementation(() => [undefined, () => {}]);
   });
