@@ -39,6 +39,7 @@ export type InputDiagnosisMetrics = {
   failures_indexing: any;
   failures_processing: any;
   failures_inputs_codecs: any;
+  dropped_message_occurrence: any;
   stream_message_count: StreamMessageCount[];
 };
 
@@ -55,10 +56,10 @@ export type InputNodeStates = {
 };
 
 export type StreamMessageCount = {
-  stream_name : string,
-  stream_id : string,
-  count : number
-}
+  stream_name: string;
+  stream_id: string;
+  count: number;
+};
 
 export type InputDiagnostics = {
   stream_message_count: StreamMessageCount[];
@@ -67,21 +68,21 @@ export type InputDiagnostics = {
 export const metricWithPrefix = (input: Input, metric: string) => `${input?.type}.${input?.id}.${metric}`;
 
 const getValueFromMetric = (metric) => {
-    if (metric === null || metric === undefined) {
-      return undefined;
-    }
-
-    switch (metric.type) {
-      case 'meter':
-        return metric.metric.rate.total;
-      case 'gauge':
-        return metric.metric.value;
-      case 'counter':
-        return metric.metric.count;
-      default:
-        return undefined;
-    }
+  if (metric === null || metric === undefined) {
+    return undefined;
   }
+
+  switch (metric.type) {
+    case 'meter':
+      return metric.metric.rate.total;
+    case 'gauge':
+      return metric.metric.value;
+    case 'counter':
+      return metric.metric.count;
+    default:
+      return undefined;
+  }
+};
 
 export const fetchInputDiagnostics = (inputId: string): Promise<InputDiagnostics> =>
   fetch<InputDiagnostics>('GET', qualifyUrl(`system/inputs/diagnostics/${inputId}`));
@@ -125,6 +126,7 @@ const useInputDiagnosis = (
   const failures_indexing = `org.graylog2.inputs.${inputId}.failures.indexing`;
   const failures_processing = `org.graylog2.inputs.${inputId}.failures.processing`;
   const failures_inputs_codecs = `org.graylog2.inputs.${inputId}.failures.input`;
+  const dropped_message_occurrence = `org.graylog2.inputs.${inputId}.dropped.message.occurrence`;
 
   const InputDiagnosisMetricNames = useMemo(
     () => [
@@ -141,8 +143,9 @@ const useInputDiagnosis = (
       failures_indexing,
       failures_processing,
       failures_inputs_codecs,
+      dropped_message_occurrence,
     ],
-    [input, failures_indexing, failures_processing, failures_inputs_codecs],
+    [input, failures_indexing, failures_processing, failures_inputs_codecs, dropped_message_occurrence],
   );
 
   const { metrics: metricsByNode } = useStore(MetricsStore);
@@ -150,7 +153,7 @@ const useInputDiagnosis = (
   const aggregateMetrics = () => {
     const result = {};
 
-    if(!metricsByNode) return result;
+    if (!metricsByNode) return result;
 
     InputDiagnosisMetricNames.forEach((metricName) => {
       result[metricName] = Object.keys(metricsByNode).reduce((previous, nodeId) => {
@@ -166,7 +169,7 @@ const useInputDiagnosis = (
 
         return previous;
       }, NaN);
-    })
+    });
 
     return result;
   };
@@ -185,18 +188,18 @@ const useInputDiagnosis = (
     input,
     inputNodeStates,
     inputMetrics: {
-      incomingMessagesTotal:
-        (aggregatedMetrics[metricWithPrefix(input, 'incomingMessages')]) || 0,
-      emptyMessages: (aggregatedMetrics[metricWithPrefix(input, 'emptyMessages')]) || 0,
-      open_connections: (aggregatedMetrics[metricWithPrefix(input, 'open_connections')]),
-      total_connections: (aggregatedMetrics[metricWithPrefix(input, 'total_connections')]),
-      read_bytes_1sec: (aggregatedMetrics[metricWithPrefix(input, 'read_bytes_1sec')]),
-      read_bytes_total: (aggregatedMetrics[metricWithPrefix(input, 'read_bytes_total')]),
-      write_bytes_1sec: (aggregatedMetrics[metricWithPrefix(input, 'write_bytes_1sec')]),
-      write_bytes_total: (aggregatedMetrics[metricWithPrefix(input, 'write_bytes_total')]),
-      failures_indexing: (aggregatedMetrics[failures_indexing]) || 0,
-      failures_processing: (aggregatedMetrics[failures_processing]) || 0,
-      failures_inputs_codecs: (aggregatedMetrics[failures_inputs_codecs]) || 0,
+      incomingMessagesTotal: aggregatedMetrics[metricWithPrefix(input, 'incomingMessages')] || 0,
+      emptyMessages: aggregatedMetrics[metricWithPrefix(input, 'emptyMessages')] || 0,
+      open_connections: aggregatedMetrics[metricWithPrefix(input, 'open_connections')],
+      total_connections: aggregatedMetrics[metricWithPrefix(input, 'total_connections')],
+      read_bytes_1sec: aggregatedMetrics[metricWithPrefix(input, 'read_bytes_1sec')],
+      read_bytes_total: aggregatedMetrics[metricWithPrefix(input, 'read_bytes_total')],
+      write_bytes_1sec: aggregatedMetrics[metricWithPrefix(input, 'write_bytes_1sec')],
+      write_bytes_total: aggregatedMetrics[metricWithPrefix(input, 'write_bytes_total')],
+      dropped_message_occurrence: aggregatedMetrics[dropped_message_occurrence],
+      failures_indexing: aggregatedMetrics[failures_indexing] || 0,
+      failures_processing: aggregatedMetrics[failures_processing] || 0,
+      failures_inputs_codecs: aggregatedMetrics[failures_inputs_codecs] || 0,
       stream_message_count: messageCountByStream?.stream_message_count || [],
     },
   };

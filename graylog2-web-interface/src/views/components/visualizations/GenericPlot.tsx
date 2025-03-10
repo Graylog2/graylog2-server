@@ -35,10 +35,6 @@ export type PlotLayout = Layout;
 
 const StyledPlot = styled(Plot)(
   ({ theme }) => css`
-    div.plotly-notifier {
-      visibility: hidden;
-    }
-
     .customPopover .popover-content {
       padding: 0;
     }
@@ -118,7 +114,7 @@ const nonInteractiveLayout = {
 
 const style = { height: '100%', width: '100%' };
 
-const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
+const config = { displayModeBar: false, doubleClick: false, responsive: true, showTips: false } as const;
 
 const usePlotLayout = (layout: Partial<Layout>) => {
   const theme = useTheme();
@@ -213,7 +209,7 @@ const usePlotChartData = (
 const GenericPlot = ({
   chartData,
   layout = {},
-  setChartColor,
+  setChartColor = undefined,
   onClickMarker = () => {},
   onHoverMarker = () => {},
   onUnhoverMarker = () => {},

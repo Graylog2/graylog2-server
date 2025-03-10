@@ -53,7 +53,7 @@ const useInitialState = (
   undoRedoState: UndoRedoState,
   view: View,
   isNew: boolean,
-  activeQuery: string,
+  activeQuery: QueryId,
   executionState: SearchExecutionState,
   result?: Props['result'],
 ): Partial<RootState> =>
@@ -69,7 +69,7 @@ const useInitialState = (
           activeQuery,
         },
         searchExecution: {
-          widgetsToSearch: undefined,
+          searchTypesToSearch: undefined,
           executionState,
           isLoading: false,
           result,
