@@ -23,13 +23,13 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
-import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineUtils;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 import org.junit.Test;
@@ -122,7 +122,7 @@ public class PipelineUtilsTest {
                 .title("ruleDao title")
                 .description("ruleDao description")
                 .source("ruleDao source")
-                .scope(isSystemRule ? SystemPipelineRuleScope.NAME : DefaultEntityScope.NAME)
+                .scope(isSystemRule ? DeletableSystemScope.NAME : DefaultEntityScope.NAME)
                 .build();
         when(ruleService.loadByName(anyString())).thenReturn(ruleDao);
     }

@@ -65,4 +65,6 @@ public interface StreamRuleService extends PersistedService {
      * @return the number of stream rules grouped by stream
      */
     Map<String, Long> streamRuleCountByStream();
+
+    List<StreamRule> loadForInput(String inputId);
 }

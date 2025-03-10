@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { Button, Input } from 'components/bootstrap';
 import { optionableLabel } from 'components/configurationforms/FieldHelpers';
 
-import type { EncryptedFieldValue, InlineBinaryField as InlineBinaryFieldType } from './types';
+import type { FieldValue, EncryptedFieldValue, InlineBinaryField as InlineBinaryFieldType } from './types';
 
 type Props = {
   autoFocus?: boolean;
@@ -29,7 +29,7 @@ type Props = {
   onChange: (title: string, value: any, dirty?: boolean) => void;
   title: string;
   typeName: string;
-  value?: EncryptedFieldValue<string>;
+  value?: FieldValue | EncryptedFieldValue<string>;
 };
 
 const FileContent = styled.span`
@@ -47,7 +47,8 @@ const EncryptedInlineBinaryField = ({
 }: Props) => {
   const [fileName, setFileName] = useState(undefined);
   const [isResetted, setIsResetted] = useState<boolean>(false);
-  const isValuePresent = value.is_set;
+  const [resettedFieldValue, setResettedFieldValue] = useState<FieldValue | EncryptedFieldValue<string>>(undefined);
+  const isValuePresent = field.is_encrypted ? (value as EncryptedFieldValue<string>)?.is_set : !!value;
   const isRequired = !field.is_optional;
   const showReadOnly = !dirty && isValuePresent;
   const fieldId = `${typeName}-${title}`;
@@ -69,13 +70,22 @@ const EncryptedInlineBinaryField = ({
 
   const handleReset = () => {
     setIsResetted(true);
-    onChange(title, { delete_value: true });
+    if (field.is_encrypted) {
+      onChange(title, { delete_value: true });
+    } else {
+      setResettedFieldValue(value);
+      onChange(title, '');
+    }
   };
 
   const handleUndoReset = () => {
     setIsResetted(false);
     setFileName(undefined);
-    onChange(title, { is_set: true }, false);
+    if (field.is_encrypted) {
+      onChange(title, { is_set: true }, false);
+    } else {
+      onChange(title, resettedFieldValue, false);
+    }
   };
 
   const resetButton = () => {
@@ -127,20 +137,39 @@ const EncryptedInlineBinaryField = ({
     }
   };
 
-  const readOnlyFileInput = () => (
-    <Input
-      id={fieldId}
-      type="password"
-      name={`configuration[${title}]`}
-      label={optionableLabel(field)}
-      required={isRequired}
-      readOnly
-      help={field.description}
-      value="encrypted value"
-      buttonAfter={resetButton()}
-      autoFocus={autoFocus}
-    />
-  );
+  const readOnlyFileInput = () => {
+    if (field.is_encrypted) {
+      return (
+        <Input
+          id={fieldId}
+          type="password"
+          name={`configuration[${title}]`}
+          label={optionableLabel(field)}
+          required={isRequired}
+          readOnly
+          help={field.description}
+          value="encrypted value"
+          buttonAfter={resetButton()}
+          autoFocus={autoFocus}
+        />
+      );
+    }
+
+    return (
+      <Input
+        id={fieldId}
+        type="text"
+        name={`configuration[${title}]`}
+        label={optionableLabel(field)}
+        required={isRequired}
+        readOnly
+        help={field.description}
+        value="uploaded file content"
+        buttonAfter={resetButton()}
+        autoFocus={autoFocus}
+      />
+    );
+  };
 
   const fileInput = () =>
     fileName ? (

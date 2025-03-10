@@ -176,7 +176,7 @@ public class UserResourceGenerateTokenAccessTest {
     public void testAccess() {
         final User user = mkUser();
         prepareMocks();
-        final boolean allowed = usersResource.isAccessAllowed(user);
+        final boolean allowed = usersResource.isTokenCreationAllowed(user);
         assertEquals(expectedResult, allowed);
     }
 
@@ -185,7 +185,7 @@ public class UserResourceGenerateTokenAccessTest {
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(isPermitted);
         if (!isAdmin) {
             when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                    .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), confAllowExternal, confDenyNonAdmins));
+                    .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), confAllowExternal, confDenyNonAdmins, Duration.ofDays(30)));
         }
     }
 }
