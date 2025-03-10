@@ -184,6 +184,11 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         return String.format(Locale.ROOT, "%s://%s:%d", protocol, host, port);
     }
 
+    @Override
+    public List<String> getOpensearchRoles() {
+        return opensearchConfiguration.map(OpensearchConfiguration::opensearchRoles).orElse(List.of());
+    }
+
     public void onEvent(OpensearchEvent event) {
         LOG.debug("Process event: " + event);
         this.processState.fire(event);

@@ -21,11 +21,11 @@ import useStreamsByIndexSet from 'components/inputs/InputSetupWizard/hooks/useSt
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 type Props = {
-  selectedIndexSetId?: string,
-  indexSets: Array<IndexSet>,
-}
+  selectedIndexSetId?: string;
+  indexSets: Array<IndexSet>;
+};
 
-const SelectedIndexSetAlert = ({ selectedIndexSetId = undefined, indexSets } : Props) => {
+const SelectedIndexSetAlert = ({ selectedIndexSetId = undefined, indexSets }: Props) => {
   const { data: streamsByIndexSetIdData } = useStreamsByIndexSet(selectedIndexSetId, !!selectedIndexSetId);
 
   const isDefaultIndexSet = () => {
@@ -47,8 +47,11 @@ const SelectedIndexSetAlert = ({ selectedIndexSetId = undefined, indexSets } : P
       <Row>
         <Col md={12}>
           <Alert title="Default Index Set selected" bsStyle="info">
-            You have selected the Default Index Set.<br />
-            We recommend against this: as the potential recipient of messages of many different formats (any message with no routing, via the Default Stream), the Default Index Set is susceptible to reaching the maximum field limit of Opensearch if used extensively.
+            You have selected the Default Index Set.
+            <br />
+            We recommend against this: as the potential recipient of messages of many different formats (any message
+            with no routing, via the Default Stream), the Default Index Set is susceptible to reaching the maximum field
+            limit of Opensearch if used extensively.
           </Alert>
         </Col>
       </Row>
@@ -60,9 +63,12 @@ const SelectedIndexSetAlert = ({ selectedIndexSetId = undefined, indexSets } : P
       <Row>
         <Col md={12}>
           <Alert title="Selected index set already associated with another stream" bsStyle="info">
-            The selected index set is already associated with another stream(s).<br />
-            Note that each Index has a unique field limit, defaulting to 1000.<br />
-            For this reason, we recommend that streams be organised by log format across multiple Index Sets where possible.
+            The selected index set is already associated with another stream(s).
+            <br />
+            Note that each Index has a unique field limit, defaulting to 1000.
+            <br />
+            For this reason, we recommend that streams be organised by log format across multiple Index Sets where
+            possible.
           </Alert>
         </Col>
       </Row>
