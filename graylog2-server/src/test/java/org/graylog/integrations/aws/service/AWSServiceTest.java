@@ -77,7 +77,7 @@ public class AWSServiceTest {
     @Before
     public void setUp() {
 
-        awsService = new AWSService(inputService, messageInputFactory, nodeId, new ObjectMapperProvider().get());
+        awsService = new AWSService(inputService, messageInputFactory, nodeId);
     }
 
     @Test
@@ -122,7 +122,6 @@ public class AWSServiceTest {
 
     @Test
     public void regionTest() {
-
         List<AWSRegion> regions = awsService.getAvailableRegions().regions();
 
         // Use a loop presence check.
@@ -138,45 +137,5 @@ public class AWSServiceTest {
         assertTrue(regions.stream().anyMatch(r -> r.displayValue().equals("Europe (Stockholm): eu-north-1")));
         // AWS periodically adds regions. The number should generally only increase. No need to check exact number.
         assertTrue("There should be at least 34 total regions.", regions.size() >= 34);
-    }
-
-    @Test
-    public void testAvailableServices() {
-
-        AvailableServiceResponse services = awsService.getAvailableServices();
-
-        // There should be one service.
-        assertEquals(1, services.total());
-        assertEquals(1, services.services().size());
-
-        // CloudWatch should be in the list of available services.
-        assertTrue(services.services().stream().anyMatch(s -> s.name().equals("CloudWatch")));
-
-        // Verify that some of the needed actions are present.
-        String policy = services.services().get(0).policy();
-        assertTrue(policy.contains("cloudwatch"));
-        assertTrue(policy.contains("dynamodb"));
-        assertTrue(policy.contains("ec2"));
-        assertTrue(policy.contains("elasticloadbalancing"));
-        assertTrue(policy.contains("kinesis"));
-    }
-
-    @Test
-    public void testPermissions() {
-
-        final KinesisPermissionsResponse permissions = awsService.getPermissions();
-
-        // Verify that the setup policy contains some needed permissions.
-        assertTrue(permissions.setupPolicy().contains("cloudwatch"));
-        assertTrue(permissions.setupPolicy().contains("dynamodb"));
-        assertTrue(permissions.setupPolicy().contains("ec2"));
-        assertTrue(permissions.setupPolicy().contains("elasticloadbalancing"));
-        assertTrue(permissions.setupPolicy().contains("kinesis"));
-
-        // Verify that the auto-setup policy contains some needed permissions.
-        assertTrue(permissions.autoSetupPolicy().contains("CreateStream"));
-        assertTrue(permissions.autoSetupPolicy().contains("DescribeSubscriptionFilters"));
-        assertTrue(permissions.autoSetupPolicy().contains("PutRecord"));
-        assertTrue(permissions.autoSetupPolicy().contains("RegisterStreamConsumer"));
     }
 }
