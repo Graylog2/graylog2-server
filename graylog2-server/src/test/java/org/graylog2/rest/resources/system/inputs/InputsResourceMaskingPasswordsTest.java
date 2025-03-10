@@ -19,12 +19,13 @@ package org.graylog2.rest.resources.system.inputs;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
-import org.graylog2.inputs.InputDiagnosticService;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
@@ -33,6 +34,8 @@ import org.graylog2.rest.models.system.inputs.responses.InputsList;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,7 +72,8 @@ public class InputsResourceMaskingPasswordsTest {
 
     class InputsTestResource extends InputsResource {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
-            super(inputService, mock(InputDiagnosticService.class), messageInputFactory, new Configuration(), mock(ClusterEventBus.class));
+            super(inputService, mock(InputDiagnosticService.class), mock(StreamService.class), mock(StreamRuleService.class),
+                    mock(PipelineService.class), messageInputFactory, new Configuration(), mock(ClusterEventBus.class));
         }
 
         @Override

@@ -22,7 +22,7 @@ import type Widget from 'views/logic/widgets/Widget';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type QueryResult from 'views/logic/QueryResult';
 import type SearchError from 'views/logic/SearchError';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 import { selectActiveQuery, selectWidget } from 'views/logic/slices/viewSelectors';
 
@@ -84,6 +84,6 @@ const selectWidgetResults = (widgetId: string) =>
     },
   );
 
-const useWidgetResults = (widgetId: string) => useAppSelector(selectWidgetResults(widgetId));
+const useWidgetResults = (widgetId: string) => useViewsSelector(selectWidgetResults(widgetId));
 
 export default useWidgetResults;

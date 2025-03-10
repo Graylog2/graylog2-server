@@ -45,13 +45,14 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useView from 'views/hooks/useView';
-import useAppDispatch from 'stores/useAppDispatch';
-import { cancelExecutedJob, execute } from 'views/logic/slices/searchExecutionSlice';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import { cancelExecutedJob } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import useParameters from 'views/hooks/useParameters';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useViewTitle from 'views/hooks/useViewTitle';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
@@ -91,7 +92,7 @@ const SearchArea = styled(PageContentLayout)(() => {
 });
 
 const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results' | 'title'>) => {
-  const results = useAppSelector(selectCurrentQueryResults);
+  const results = useViewsSelector(selectCurrentQueryResults);
   const title = useViewTitle();
 
   return <Sidebar results={results} title={title} {...props} />;
@@ -119,7 +120,7 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
 const useOnWindowUnload = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   return useEffect(() => {
     const handleLeavePage = () => dispatch(cancelExecutedJob());
@@ -137,8 +138,8 @@ type Props = {
 };
 
 const Search = ({ forceSideBarPinned = false }: Props) => {
-  const dispatch = useAppDispatch();
-  const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
+  const dispatch = useViewsDispatch();
+  const refreshSearch = useCallback(() => dispatch(executeActiveQuery()), [dispatch]);
   const {
     sidebar: { isShown: showSidebar },
     searchAreaContainer,

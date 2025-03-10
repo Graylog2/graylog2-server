@@ -26,7 +26,6 @@ import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 
 import FieldTypesContext from './FieldTypesContext';
 
-const defaultId = '';
 const defaultTimeRange: RelativeTimeRange = { type: 'relative', from: 300 };
 
 const DefaultFieldTypesProvider = ({ children }: { children: React.ReactElement }) => {
@@ -40,12 +39,11 @@ const DefaultFieldTypesProvider = ({ children }: { children: React.ReactElement 
     [],
     currentQuery?.timerange || defaultTimeRange,
   );
-  const queryFields = useMemo(
-    () => Immutable.Map({ [currentQuery?.id || defaultId]: Immutable.List(currentFieldTypes) }),
-    [currentFieldTypes, currentQuery?.id],
-  );
   const all = useMemo(() => Immutable.List(allFieldTypes ?? []), [allFieldTypes]);
-  const fieldTypes = useMemo(() => ({ all, queryFields }), [all, queryFields]);
+  const fieldTypes = useMemo(
+    () => ({ all, currentQuery: Immutable.List(currentFieldTypes) }),
+    [all, currentFieldTypes],
+  );
 
   useOnSearchExecution(() => {
     refreshCurrentTypes();

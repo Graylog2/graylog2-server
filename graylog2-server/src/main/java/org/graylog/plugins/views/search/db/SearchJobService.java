@@ -16,15 +16,33 @@
  */
 package org.graylog.plugins.views.search.db;
 
-import jakarta.ws.rs.ForbiddenException;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.SearchJobDTO;
 
 import java.util.Optional;
 
 public interface SearchJobService {
 
     SearchJob create(Search search, String owner, Integer cancelAfterSeconds);
-    Optional<SearchJob> load(String id, SearchUser searchUser) throws ForbiddenException;
+
+    Optional<SearchJobDTO> load(String id, SearchUser searchUser);
+
+    boolean cancel(final String id, final SearchUser searchUser);
+
+    SearchJob getFromCache(final String id, final SearchUser searchUser);
+
+    /**
+     * Checks if a job of certain ID is in cache.
+     * It does not matter what user that job belongs to.
+     *
+     * @param jobId ID of a search job
+     * @return True if the job is in cache, false otherwise
+     */
+    boolean isInCache(final String jobId);
+
+    default boolean hasPermissionToAccessJob(final SearchUser searchUser, final String jobOwner) {
+        return jobOwner.equals(searchUser.username()) || searchUser.isAdmin();
+    }
 }

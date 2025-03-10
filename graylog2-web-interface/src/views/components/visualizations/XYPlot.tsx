@@ -25,12 +25,13 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 
 import GenericPlot from './GenericPlot';
-import type { ChartColor, ChartConfig, PlotLayout } from './GenericPlot';
+import type { ChartConfig, PlotLayout } from './GenericPlot';
 import OnZoom from './OnZoom';
 
+type GenericPlotProps = React.ComponentProps<typeof GenericPlot>;
 export type Props = {
   axisType?: AxisType;
   config: AggregationWidgetConfig;
@@ -41,9 +42,10 @@ export type Props = {
   };
   height: number;
   width: number;
-  setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor;
+  setChartColor?: GenericPlotProps['setChartColor'];
   plotLayout?: Partial<PlotLayout>;
   onZoom?: (from: string, to: string, userTimezone: string) => boolean;
+  onClickMarker?: GenericPlotProps['onClickMarker'];
 };
 
 const yLegendPosition = (containerHeight: number) => {
@@ -77,12 +79,13 @@ const XYPlot = ({
   axisType = DEFAULT_AXIS_TYPE,
   config,
   chartData,
-  effectiveTimerange,
+  effectiveTimerange = undefined,
   setChartColor = defaultSetColor,
   height,
   width,
   plotLayout = {},
-  onZoom,
+  onZoom = undefined,
+  onClickMarker = undefined,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) } as const;
@@ -96,7 +99,7 @@ const XYPlot = ({
   }
 
   const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(
     config.isTimeline
@@ -124,7 +127,13 @@ const XYPlot = ({
 
   return (
     <PlotLegend config={config} chartData={chartData} height={height} width={width}>
-      <GenericPlot chartData={chartData} layout={layout} onZoom={_onZoom} setChartColor={setChartColor} />
+      <GenericPlot
+        chartData={chartData}
+        layout={layout}
+        onZoom={_onZoom}
+        setChartColor={setChartColor}
+        onClickMarker={onClickMarker}
+      />
     </PlotLegend>
   );
 };

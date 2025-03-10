@@ -17,22 +17,22 @@
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import generateId from 'logic/generateId';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
+import type { QueryString } from 'views/logic/queries/types';
 
 export type ValidationQuery = {
-  queryString: ElasticsearchQueryString | string;
+  queryString: QueryString | string;
   timeRange?: TimeRange | undefined;
   streams?: Array<string>;
   streamCategories?: Array<string>;
-  filter?: ElasticsearchQueryString | string;
+  filter?: QueryString | string;
   validation_mode?: 'QUERY' | 'SEARCH_FILTER';
 };
 
-const queryExists = (query: string | ElasticsearchQueryString) =>
-  typeof query === 'object' ? !!query.query_string : !!query;
+const queryExists = (query: string | QueryString) => (typeof query === 'object' ? !!query.query_string : !!query);
 
 export const validateQuery = (
   { queryString, timeRange, streams, streamCategories, filter, ...rest }: ValidationQuery,

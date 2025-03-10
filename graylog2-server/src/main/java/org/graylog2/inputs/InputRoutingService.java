@@ -23,11 +23,13 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineUtils;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
@@ -111,6 +113,7 @@ public class InputRoutingService {
                         + ");\nend\n";
 
         RuleDao ruleDao = RuleDao.builder()
+                .scope(DeletableSystemScope.NAME)
                 .title(ruleName)
                 .description("Input setup wizard routing rule")
                 .source(ruleSource)
@@ -157,7 +160,7 @@ public class InputRoutingService {
                     String oldRuleTitle = ruleDao.title();
                     String newRuleTitle = replaceInputName(oldRuleTitle, event.oldInputTitle(), event.newInputTitle());
                     String newSource = ruleDao.source().replace(oldRuleTitle, newRuleTitle);
-                    ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build());
+                    ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build(), false);
                     handleRuleRenamed(oldRuleTitle, newRuleTitle);
                 });
     }
@@ -190,16 +193,21 @@ public class InputRoutingService {
     public void handleInputDeleted(InputDeletedEvent event) {
         ruleService.loadAll().stream()
                 .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.inputId(), event.inputTitle()))
-                .forEach(ruleDao -> {
-                    ruleService.delete(ruleDao.id());
-                    handleRuleDeleted(ruleDao.title());
-                });
+                .forEach(ruleService::delete);
+    }
+
+    @Subscribe
+    public void handleRuleDeleted(RulesChangedEvent event) {
+        event.deletedRules().stream()
+                .map(RulesChangedEvent.Reference::title)
+                .filter(this::isSystemRulePattern)
+                .forEach(this::deleteFromDefaultPipeline);
     }
 
     /**
      * Update default pipeline when a routing rule is deleted.
      */
-    private void handleRuleDeleted(String ruleTitle) {
+    private void deleteFromDefaultPipeline(String ruleTitle) {
         try {
             PipelineDao pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
             PipelineSource pipelineSource = PipelineSource.fromDao(pipelineRuleParser, pipelineDao);
@@ -211,7 +219,7 @@ public class InputRoutingService {
             pipelineSource = pipelineSource.toBuilder()
                     .source(PipelineUtils.createPipelineString(pipelineSource))
                     .build();
-            PipelineUtils.update(pipelineService, pipelineRuleParser, pipelineDao.id(), pipelineSource, false);
+            PipelineUtils.update(pipelineService, pipelineRuleParser, ruleService, pipelineDao.id(), pipelineSource, false);
         } catch (NotFoundException e) {
             log.warn("Unable to load pipeline {}", GL_INPUT_ROUTING_PIPELINE, e);
         }

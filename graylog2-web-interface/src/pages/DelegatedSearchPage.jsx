@@ -17,7 +17,7 @@
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import PluggableStoreProvider from '../components/PluggableStoreProvider';
+import ViewsStoreProvider from '../views/stores/ViewsStoreProvider';
 
 export default (props) => {
   const components =
@@ -28,8 +28,8 @@ export default (props) => {
   const Component = components[0];
 
   return (
-    <PluggableStoreProvider>
+    <ViewsStoreProvider>
       <Component {...props} />
-    </PluggableStoreProvider>
+    </ViewsStoreProvider>
   );
 };

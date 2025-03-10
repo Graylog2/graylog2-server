@@ -62,6 +62,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -289,48 +290,6 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void update() {
-        final IndexSetConfig indexSetConfig = IndexSetConfig.create(
-                "id",
-                "new title",
-                "description",
-                true, false,
-                "prefix",
-                1,
-                0,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-                "standard",
-                "index-template",
-                null,
-                1,
-                false
-        );
-        final IndexSetConfig updatedIndexSetConfig = indexSetConfig.toBuilder()
-                .title("new title")
-                .build();
-
-        when(indexSetService.get("id")).thenReturn(Optional.of(indexSetConfig));
-        when(indexSetService.save(indexSetConfig)).thenReturn(updatedIndexSetConfig);
-
-        final IndexSetSummary summary = indexSetsResource.update("id", IndexSetUpdateRequest.fromIndexSetConfig(indexSetConfig));
-
-        verify(indexSetService, times(1)).get("id");
-        verify(indexSetService, times(1)).save(indexSetConfig);
-        verify(indexSetService, times(1)).getDefault();
-        verifyNoMoreInteractions(indexSetService);
-
-        // The real update wouldn't replace the index template name…
-        final IndexSetConfig actual = summary.toIndexSetConfig(false).toBuilder()
-                .indexTemplateName("index-template")
-                .build();
-        assertThat(actual).isEqualTo(updatedIndexSetConfig);
-    }
-
-    @Test
     public void updateDenied() {
         notPermitted();
         final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
@@ -388,7 +347,7 @@ public class IndexSetsResourceTest {
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
-        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        lenient().when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetRegistry.get("id")).thenReturn(Optional.of(indexSet));
         when(indexSetCleanupJobFactory.create(indexSet)).thenReturn(mock(IndexSetCleanupJob.class));
         when(indexSetRegistry.getDefault()).thenReturn(null);
@@ -498,7 +457,7 @@ public class IndexSetsResourceTest {
                 false
         );
 
-        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        lenient().when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetService.get(indexSetId)).thenReturn(Optional.of(indexSetConfig));
 
         indexSetsResource.setDefault(indexSetId);
@@ -671,7 +630,7 @@ public class IndexSetsResourceTest {
         protected Subject getSubject() {
             final Subject mockSubject = mock(Subject.class);
             when(mockSubject.isPermitted(anyString())).thenReturn(permitted.get());
-            when(mockSubject.getPrincipal()).thenReturn("test-user");
+            lenient().when(mockSubject.getPrincipal()).thenReturn("test-user");
             return mockSubject;
         }
     }
