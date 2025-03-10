@@ -17,10 +17,11 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
+import {useNavigate} from "react-router-dom";
 
 import { Icon, LinkToNode, Section } from 'components/common';
 import useParams from 'routing/useParams';
-import { MenuItem, Button, ListGroup, ListGroupItem } from 'components/bootstrap';
+import { Button, ListGroup, ListGroupItem } from 'components/bootstrap';
 import type {
   StreamMessageCount,
   InputNodeStateInfo,
@@ -32,7 +33,6 @@ import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
 import type { InputState } from 'stores/inputs/InputStatesStore';
-import useHistory from 'routing/useHistory';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
@@ -112,7 +112,7 @@ const NodeListItem = ({
           <>
             {nodeId && (
               <>
-                <b>Node ID:</b> {nodeId}
+                <strong>Node ID:</strong> {nodeId}
               </>
             )}
             {detailedMessage && (
@@ -127,13 +127,13 @@ const NodeListItem = ({
   }
 
   return (
-    <MenuItem key={detailedMessage}>
+    <StyledListGroupItem key={detailedMessage}>
       {detailedMessage && (
         <InputNodeInfo>
-          <b>Message:</b> {detailedMessage}
+          <strong>Message:</strong> {detailedMessage}
         </InputNodeInfo>
       )}
-    </MenuItem>
+    </StyledListGroupItem>
   );
 };
 
@@ -169,7 +169,7 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
 const InputDiagnosisPage = () => {
   const { inputId } = useParams();
   const { input, inputNodeStates, inputMetrics } = useInputDiagnosis(inputId);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const isInputStateDown =
     inputNodeStates.total === 0 ||
@@ -180,13 +180,13 @@ const InputDiagnosisPage = () => {
   return (
     <>
       <Header>
-        <Button onClick={() => history.goBack()}>
+        <Button onClick={() => navigate(Routes.SYSTEM.INPUTS)}>
           <Icon name="arrow_left_alt" size="sm" /> Back
         </Button>
         <LeftCol>
           <h1>Input Diagnosis: {input?.name}</h1>
 
-          <p className="description">
+          <p>
             Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.
           </p>
         </LeftCol>
@@ -195,7 +195,7 @@ const InputDiagnosisPage = () => {
         <StyledSectionGrid $columns="1fr 1fr" $rows="1fr 1fr">
           <div>
             <Section title="Information" headerLeftSection={<StatusColorIndicator />}>
-              <StyledP className="description">The address on which the Input is being run.</StyledP>
+              <StyledP>The address on which the Input is being run.</StyledP>
               <StyledListGroup>
                 <StyledListGroupItem>Input Title: {input.title}</StyledListGroupItem>
                 <StyledListGroupItem>Input Type: {input.name}</StyledListGroupItem>
@@ -227,7 +227,7 @@ const InputDiagnosisPage = () => {
                   <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_STATE} />
                 </>
               }>
-              <StyledP className="description">
+              <StyledP>
                 Number of Graylog nodes the Input is configured to run, and on how many it is running. If any are not
                 running, click to see any associated error messages.
               </StyledP>
@@ -292,7 +292,7 @@ const InputDiagnosisPage = () => {
                 </>
               }
               actions={<ShowReceivedMessagesButton input={input} />}>
-              <StyledP className="description">
+              <StyledP>
                 Messages successfully ingested into Graylog from this Input in the last 15 minutes. Click on the Stream
                 to inspect the messages.
               </StyledP>
