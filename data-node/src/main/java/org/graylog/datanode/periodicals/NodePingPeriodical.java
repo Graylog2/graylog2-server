@@ -46,8 +46,8 @@ public class NodePingPeriodical extends Periodical {
     private final Supplier<String> datanodeRestApiUri;
     private final Configuration configuration;
     private final Supplier<OpensearchState> processState;
-
     private final Supplier<Date> certValidUntil;
+    private final Supplier<List<String>> opensearchRoles;
     private final Supplier<List<String>> configurationWarnings;
 
     private final Version version = Version.CURRENT_CLASSPATH;
@@ -64,6 +64,7 @@ public class NodePingPeriodical extends Periodical {
                 managedOpenSearch::getDatanodeRestApiUrl,
                 () -> managedOpenSearch.processInfo().state(),
                 datanodeKeystore::getCertificateExpiration,
+                managedOpenSearch::getOpensearchRoles,
                 managedOpenSearch::configurationWarnings
         );
     }
@@ -77,6 +78,7 @@ public class NodePingPeriodical extends Periodical {
             Supplier<String> datanodeRestApiUri,
             Supplier<OpensearchState> processState,
             Supplier<Date> certValidUntil,
+            Supplier<List<String>> opensearchRoles,
             Supplier<List<String>> configurationWarnings
     ) {
         this.nodeService = nodeService;
@@ -87,6 +89,7 @@ public class NodePingPeriodical extends Periodical {
         this.configuration = configuration;
         this.processState = processState;
         this.certValidUntil = certValidUntil;
+        this.opensearchRoles = opensearchRoles;
         this.configurationWarnings = configurationWarnings;
     }
 
@@ -142,6 +145,7 @@ public class NodePingPeriodical extends Periodical {
                 .setRestApiAddress(datanodeRestApiUri.get())
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
+                .setOpensearchRoles(opensearchRoles.get())
                 .setConfigurationWarnings(configurationWarnings.get())
                 .build();
 
@@ -158,6 +162,7 @@ public class NodePingPeriodical extends Periodical {
                 .setDataNodeStatus(DataNodeStatus.STARTING)
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
+                .setOpensearchRoles(opensearchRoles.get())
                 .setConfigurationWarnings(configurationWarnings.get())
                 .build());
 

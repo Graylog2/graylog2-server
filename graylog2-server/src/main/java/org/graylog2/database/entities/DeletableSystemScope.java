@@ -14,14 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin.inputs.failure;
+package org.graylog2.database.entities;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import org.graylog2.plugin.journal.RawMessage;
+public class DeletableSystemScope extends EntityScope {
+    public static final String NAME = "GRAYLOG_DELETABLE_SCOPE";
 
-public record InputProcessingFailure(@Nonnull String errorMessage,
-                                     @Nullable Throwable exception,
-                                     @Nonnull RawMessage rawMessage,
-                                     @Nullable String inputMessage) {
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public boolean isMutable() {
+        return false;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
+    }
 }

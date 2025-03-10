@@ -14,25 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.pipelineprocessor.db;
+package org.graylog.failure;
 
-import org.graylog2.database.entities.EntityScope;
+public enum InputFailureCause implements FailureCause{
+    INPUT_PARSE("InputParseError"),;
 
-public class SystemPipelineRuleScope extends EntityScope {
-    public static final String NAME = "GRAYLOG_SYSTEM_PIPELINE_RULE_SCOPE";
+    private final String label;
 
-    @Override
-    public String getName() {
-        return NAME;
+    InputFailureCause(String label) {
+        this.label = label;
     }
 
     @Override
-    public boolean isMutable() {
-        return false;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return true;
+    public String label() {
+        return label;
     }
 }

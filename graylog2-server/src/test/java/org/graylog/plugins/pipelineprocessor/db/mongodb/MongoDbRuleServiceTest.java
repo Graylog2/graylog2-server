@@ -18,11 +18,11 @@ package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
 import org.bson.types.ObjectId;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
-import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +50,7 @@ class MongoDbRuleServiceTest {
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new SystemPipelineRuleScope()));
+        entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new DeletableSystemScope()));
         ruleService = new MongoDbRuleService(mongoCollections, clusterEventBus, entityScopeService);
     }
 
@@ -92,6 +92,15 @@ class MongoDbRuleServiceTest {
         final var rule = dummyRule();
         final var savedRule = ruleService.save(rule);
         assertThat(ruleService.loadByName(rule.title())).isEqualTo(savedRule);
+    }
+
+    @Test
+    void loadBySourcePattern() {
+        ruleService.save(dummyRule().toBuilder().title("title 1").source("abcdef").build());
+        ruleService.save(dummyRule().toBuilder().title("title 2").source("bcd").build());
+        assertThat(ruleService.loadBySourcePattern("abc")).hasSize(1);
+        assertThat(ruleService.loadBySourcePattern("bcd")).hasSize(2);
+        assertThat(ruleService.loadBySourcePattern("xxx")).hasSize(0);
     }
 
     @Test
@@ -155,7 +164,7 @@ class MongoDbRuleServiceTest {
     }
 
     private static RuleDao systemRule() {
-        return RuleDao.builder().scope(SystemPipelineRuleScope.NAME).title("a sysytem rule").source("a source").build();
+        return RuleDao.builder().scope(DeletableSystemScope.NAME).title("a sysytem rule").source("a source").build();
     }
 
 }

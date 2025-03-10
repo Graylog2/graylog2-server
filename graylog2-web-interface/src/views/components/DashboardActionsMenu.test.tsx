@@ -39,12 +39,7 @@ import DashboardActionsMenu from './DashboardActionsMenu';
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
-
-jest.mock('bson-objectid', () =>
-  jest.fn(() => ({
-    toString: jest.fn(() => 'new-dashboard-id'),
-  })),
-);
+jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-dashboard-id'));
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
@@ -73,7 +68,13 @@ describe('DashboardActionsMenu', () => {
     .createdAt(new Date('2019-10-16T14:38:44.681Z'))
     .build();
 
-  const SUT = ({ providerOverrides, view = mockView }: { providerOverrides?: Partial<LayoutState>; view?: View }) => (
+  const SUT = ({
+    providerOverrides = undefined,
+    view = mockView,
+  }: {
+    providerOverrides?: Partial<LayoutState>;
+    view?: View;
+  }) => (
     <TestStoreProvider view={view}>
       <HotkeysProvider>
         <SearchPageLayoutProvider value={providerOverrides}>

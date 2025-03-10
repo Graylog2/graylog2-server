@@ -164,6 +164,11 @@ public class Configuration implements CommonNodeConfiguration {
     @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
+    @Documentation("Transport keystore alias name. Optional. Default is the first alias.")
+    @Parameter(value = "transport_certificate_alias")
+    private String datanodeTransportCertificateAlias;
+
+
     @Documentation("Relative path (to config_location) to a keystore used for opensearch REST layer TLS")
     @Parameter(value = "http_certificate")
     private String datanodeHttpCertificate = null;
@@ -171,6 +176,11 @@ public class Configuration implements CommonNodeConfiguration {
     @Documentation("Password for a keystore defined in http_certificate")
     @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
+
+    @Documentation("Http keystore alias name. Optional. Default is the first alias.")
+    @Parameter(value = "http_certificate_alias")
+    private String datanodeHttpCertificateAlias;
+
 
     @Documentation("You MUST set a secret to secure/pepper the stored user passwords here. Use at least 16 characters." +
             "Generate one by using for example: pwgen -N 1 -s 96 \n" +
@@ -695,5 +705,12 @@ public class Configuration implements CommonNodeConfiguration {
 
     public Path getOpensearchConfigurationOverridesFile() {
         return opensearchConfigurationOverridesFile;
+    }
+    public String getDatanodeTransportCertificateAlias() {
+        return datanodeTransportCertificateAlias;
+    }
+
+    public String getDatanodeHttpCertificateAlias() {
+        return datanodeHttpCertificateAlias;
     }
 }

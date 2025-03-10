@@ -39,7 +39,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 
+import static com.mongodb.client.model.Filters.regex;
+import static org.graylog.plugins.pipelineprocessor.db.RuleDao.FIELD_SOURCE;
+import static org.graylog.plugins.pipelineprocessor.db.RuleDao.FIELD_TITLE;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
 /**
@@ -62,7 +66,7 @@ public class MongoDbRuleService implements RuleService {
         this.clusterBus = clusterBus;
         this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
 
-        collection.createIndex(Indexes.ascending("title"), new IndexOptions().unique(true));
+        collection.createIndex(Indexes.ascending(FIELD_TITLE), new IndexOptions().unique(true));
     }
 
     @Override
@@ -94,7 +98,7 @@ public class MongoDbRuleService implements RuleService {
 
     @Override
     public RuleDao loadByName(String name) throws NotFoundException {
-        final var rule = collection.find(Filters.eq("title", name)).first();
+        final var rule = collection.find(Filters.eq(FIELD_TITLE, name)).first();
         if (rule == null) {
             throw new NotFoundException("No rule with name " + name);
         }
@@ -102,9 +106,43 @@ public class MongoDbRuleService implements RuleService {
     }
 
     @Override
+    public Collection<RuleDao> loadBySourcePattern(String sourcePattern) {
+        try {
+            return collection.find(regex(FIELD_SOURCE, sourcePattern)).into(new LinkedHashSet<>());
+        } catch (MongoException e) {
+            log.error("Unable to load processing rules", e);
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
     public Collection<RuleDao> loadAll() {
         try {
-            return collection.find().sort(Sorts.ascending("title")).into(new LinkedHashSet<>());
+            return collection.find().sort(Sorts.ascending(FIELD_TITLE)).into(new LinkedHashSet<>());
+        } catch (MongoException e) {
+            log.error("Unable to load processing rules", e);
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
+    public Collection<RuleDao> loadAllByTitle(String regex) {
+        try {
+            return collection.find(Filters.regex(FIELD_TITLE, regex))
+                    .sort(Sorts.ascending(FIELD_TITLE))
+                    .into(new LinkedHashSet<>());
+        } catch (MongoException e) {
+            log.error("Unable to load processing rules", e);
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
+    public Collection<RuleDao> loadAllByScope(String scope) {
+        try {
+            return collection.find(Filters.eq(FIELD_SCOPE, scope))
+                    .sort(Sorts.ascending(FIELD_TITLE))
+                    .into(new LinkedHashSet<>());
         } catch (MongoException e) {
             log.error("Unable to load processing rules", e);
             return Collections.emptySet();
@@ -132,7 +170,7 @@ public class MongoDbRuleService implements RuleService {
     @Override
     public Collection<RuleDao> loadNamed(Collection<String> ruleNames) {
         try {
-            return collection.find(Filters.in("title", ruleNames)).into(new LinkedHashSet<>());
+            return collection.find(Filters.in(FIELD_TITLE, ruleNames)).into(new LinkedHashSet<>());
         } catch (MongoException e) {
             log.error("Unable to bulk load rules", e);
             return Collections.emptySet();

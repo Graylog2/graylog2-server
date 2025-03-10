@@ -123,6 +123,12 @@ public class OpensearchConfiguration {
                 .findFirst();
     }
 
+    public List<String> opensearchRoles() {
+        return configurationParts.stream()
+                .flatMap(cfg -> cfg.nodeRoles().stream())
+                .collect(Collectors.toList());
+    }
+
     public List<DatanodeConfigFile> configFiles() {
 
         final List<DatanodeConfigFile> configFiles = new LinkedList<>();

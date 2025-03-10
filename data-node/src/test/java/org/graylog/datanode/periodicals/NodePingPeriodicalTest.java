@@ -31,6 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 
 @ExtendWith(MongoDBExtension.class)
 class NodePingPeriodicalTest {
@@ -62,6 +63,7 @@ class NodePingPeriodicalTest {
                 () -> datanodeRestApi,
                 () -> OpensearchState.AVAILABLE,
                 Date::new,
+                () -> List.of("search", "ingest"),
                 Collections::emptyList
         );
 
@@ -76,6 +78,7 @@ class NodePingPeriodicalTest {
                     Assertions.assertThat(nodeDto.getNodeId()).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
                     Assertions.assertThat(nodeDto.getLastSeen()).isNotNull();
                     Assertions.assertThat(nodeDto.getProvisioningInformation().certValidUntil()).isNotNull();
+                    Assertions.assertThat(nodeDto.getOpensearchRoles().containsAll(List.of("search", "ingest"))).isTrue();
                 });
     }
 
