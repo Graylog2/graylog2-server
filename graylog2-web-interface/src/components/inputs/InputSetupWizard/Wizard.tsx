@@ -20,7 +20,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Modal } from 'components/bootstrap';
 import { Wizard as CommonWizard } from 'components/common';
-import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
+import { INPUT_WIZARD_STEPS, INPUT_WIZARD_FLOWS } from 'components/inputs/InputSetupWizard/types';
+import { OPEN_FLOW_STEPS } from 'components/inputs/InputSetupWizard/constants';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 
 import InputSetupWizardStepsProvider from './contexts/InputSetupWizardStepsProvider';
@@ -68,12 +69,8 @@ const Wizard = ({ show, input, onClose }: Props) => {
   );
 
   const setInitialSteps = useCallback(() => {
-    setOrderedSteps([
-      INPUT_WIZARD_STEPS.SETUP_ROUTING,
-      INPUT_WIZARD_STEPS.START_INPUT,
-      INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
-    ]);
-    setActiveStep(INPUT_WIZARD_STEPS.SETUP_ROUTING);
+    setOrderedSteps(OPEN_FLOW_STEPS[INPUT_WIZARD_FLOWS.NON_ILLUMINATE]);
+    setActiveStep(OPEN_FLOW_STEPS[INPUT_WIZARD_FLOWS.NON_ILLUMINATE][0]);
   }, [setOrderedSteps, setActiveStep]);
 
   useEffect(() => {

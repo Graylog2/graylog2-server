@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 
 const StatusLabel = styled(Label)`
   display: inline-flex;

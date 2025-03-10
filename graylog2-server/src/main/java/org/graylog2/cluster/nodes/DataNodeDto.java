@@ -33,6 +33,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,6 +46,7 @@ public abstract class DataNodeDto extends NodeDto {
 
     public static final String FIELD_CERT_VALID_UNTIL = "cert_valid_until";
     public static final String FIELD_DATANODE_VERSION = "datanode_version";
+    public static final String FIELD_OPENSEARCH_ROLES = "opensearch_roles";
 
     @Nullable
     @JsonProperty("cluster_address")
@@ -68,6 +70,10 @@ public abstract class DataNodeDto extends NodeDto {
     @Nullable
     @JsonProperty(FIELD_DATANODE_VERSION)
     public abstract String getDatanodeVersion();
+
+    @Nullable
+    @JsonProperty(FIELD_OPENSEARCH_ROLES)
+    public abstract List<String> getOpensearchRoles();
 
     @JsonProperty("version_compatible")
     public boolean isCompatibleWithVersion() {
@@ -124,8 +130,12 @@ public abstract class DataNodeDto extends NodeDto {
             params.put(FIELD_CERT_VALID_UNTIL, getCertValidUntil());
         }
 
-        if(Objects.nonNull(getDatanodeVersion())) {
+        if (Objects.nonNull(getDatanodeVersion())) {
             params.put(FIELD_DATANODE_VERSION, getDatanodeVersion());
+        }
+
+        if (Objects.nonNull(getOpensearchRoles())) {
+            params.put(FIELD_OPENSEARCH_ROLES, getOpensearchRoles());
         }
 
         return params;
@@ -160,6 +170,9 @@ public abstract class DataNodeDto extends NodeDto {
 
         @JsonProperty(FIELD_DATANODE_VERSION)
         public abstract Builder setDatanodeVersion(String datanodeVersion);
+
+        @JsonProperty(FIELD_OPENSEARCH_ROLES)
+        public abstract Builder setOpensearchRoles(List<String> opensearchRoles);
 
         public abstract DataNodeDto build();
     }
