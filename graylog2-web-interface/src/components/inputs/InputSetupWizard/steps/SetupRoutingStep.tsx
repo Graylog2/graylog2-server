@@ -32,7 +32,7 @@ import {
   updateStepData,
   getStepData,
 } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
-import useStreams from 'components/streams/hooks/useStreams';
+import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilteredStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 
 import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading } from './components/StepWrapper';
@@ -98,13 +98,8 @@ const SetupRoutingStep = () => {
   const removeFromDefaultStreamChecked = typeof removeFromDefault === 'undefined' ? true : removeFromDefault;
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
-  const { data: streamsData, isInitialLoading: isLoadingStreams } = useStreams({
-    query: '',
-    page: 1,
-    pageSize: 0,
-    sort: { direction: 'asc', attributeId: 'title' },
-  });
-  const streams = streamsData?.list;
+  const { data: streamsData, isLoading: isLoadingStreams } = useFilteredStreams();
+  const streams = streamsData?.streams;
   const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
 
   const defaultStepData: RoutingStepData = { streamType: 'DEFAULT' };
