@@ -22,18 +22,13 @@ import { Alert, Button, Row, Col, Input } from 'components/bootstrap';
 import { Select, Tooltip } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
+import useInputSetupWizardStepsHelper from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardStepsHelper';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStreamForm from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
-import type { StreamFormValues } from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
-import {
-  checkHasPreviousStep,
-  checkHasNextStep,
-  updateStepData,
-  getStepData,
-} from 'components/inputs/InputSetupWizard/helpers/stepHelper';
 import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
+import type { OpenStepsData } from 'components/inputs/InputSetupWizard/types';
 
 import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading, StyledList } from './components/StepWrapper';
 import InputInUseAlert from './components/InputInUseAlert';
@@ -73,21 +68,15 @@ const StyledLabel = styled.label(
   `,
 );
 
-export type RoutingStepData = {
-  streamId?: string;
-  newStream?: StreamFormValues;
-  shouldCreateNewPipeline?: boolean;
-  streamType: 'NEW' | 'EXISTING' | 'DEFAULT';
-  removeMatchesFromDefault?: boolean;
-};
-
 const SetupRoutingStep = () => {
   const [showSelectStream, setShowSelectStream] = useState<boolean>(false);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
   const currentStepName = useMemo(() => INPUT_WIZARD_STEPS.SETUP_ROUTING, []);
   const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
-  const { stepsData, setStepsData } = useInputSetupWizardSteps();
-  const newStream: StreamFormValues = getStepData(stepsData, currentStepName, 'newStream');
+  const { stepsData, setStepsData } = useInputSetupWizardSteps<OpenStepsData>();
+  const { checkHasPreviousStep, checkHasNextStep, updateStepData, getStepData } =
+    useInputSetupWizardStepsHelper<OpenStepsData>();
+  const newStream: OpenStepsData['SETUP_ROUTING']['newStream'] = getStepData(stepsData, currentStepName, 'newStream');
   const selectedStreamId = getStepData(stepsData, currentStepName, 'streamId');
   const isDefaultStream = getStepData(stepsData, currentStepName, 'streamType') === 'DEFAULT';
   const removeFromDefault = getStepData(stepsData, currentStepName, 'removeMatchesFromDefault');
@@ -103,7 +92,7 @@ const SetupRoutingStep = () => {
   const streams = streamsData?.list;
   const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
 
-  const defaultStepData: RoutingStepData = { streamType: 'DEFAULT' };
+  const defaultStepData = { streamType: 'DEFAULT' };
 
   const isStepValid = useCallback(() => {
     const stepData = getStepData(stepsData, currentStepName);
@@ -126,7 +115,7 @@ const SetupRoutingStep = () => {
       default:
         return false;
     }
-  }, [currentStepName, newStream, showCreateStream, stepsData]);
+  }, [currentStepName, newStream, showCreateStream, stepsData, getStepData]);
 
   useEffect(() => {
     if (orderedSteps && activeStep && stepsData) {
@@ -154,7 +143,7 @@ const SetupRoutingStep = () => {
           streamId,
           streamType: 'EXISTING',
           removeMatchesFromDefault: removeFromDefaultStreamChecked,
-        } as RoutingStepData),
+        }),
       );
     } else {
       setStepsData(
@@ -162,7 +151,7 @@ const SetupRoutingStep = () => {
           streamId: undefined,
           streamType: 'DEFAULT',
           removeMatchesFromDefault: undefined,
-        } as RoutingStepData),
+        }),
       );
     }
   };
@@ -193,7 +182,7 @@ const SetupRoutingStep = () => {
     setStepsData(
       updateStepData(stepsData, currentStepName, {
         removeMatchesFromDefault: !removeFromDefaultStreamChecked,
-      } as RoutingStepData),
+      }),
     );
   };
 
@@ -202,13 +191,13 @@ const SetupRoutingStep = () => {
   const submitStreamCreation = ({
     create_new_pipeline,
     ...stream
-  }: StreamFormValues & { create_new_pipeline?: boolean }) => {
+  }: OpenStepsData['SETUP_ROUTING']['newStream'] & { create_new_pipeline?: boolean }) => {
     setStepsData(
       updateStepData(stepsData, currentStepName, {
         newStream: stream,
         shouldCreateNewPipeline: create_new_pipeline ?? false,
         streamType: 'NEW',
-      } as RoutingStepData),
+      }),
     );
   };
 

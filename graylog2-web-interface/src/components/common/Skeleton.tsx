@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 const StyledSkeleton = styled(MantineSkeleton)(
   ({ theme }) => css`
-    &:after {
+    &::after {
       background-color: ${theme.colors.gray[80]};
     }
   `,
