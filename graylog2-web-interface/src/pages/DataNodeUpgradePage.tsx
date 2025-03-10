@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 import { Row, Col, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import useDataNodeUpgradeStatus from 'components/datanode/hooks/useDataNodeUpgradeStatus';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
 const StyledHorizontalDl = styled.dl(
   ({ theme }) => css`
@@ -61,7 +61,7 @@ const DataNodeUpgradePage = () => {
 
   return (
     <DocumentTitle title="Data Node Upgrade">
-      <DataNodesPageNavigation />
+      <ClusterConfigurationPageNavigation />
       <PageHeader
         title="Data Node Upgrade"
         documentationLink={{
@@ -69,7 +69,7 @@ const DataNodeUpgradePage = () => {
           path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
         }}>
         <span>
-          Graylog Data Node Upgrade s offer a better integration with Graylog and simplify future updates. They allow you to index
+          Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index
           and search through all the messages in your Graylog message database.
         </span>
       </PageHeader>

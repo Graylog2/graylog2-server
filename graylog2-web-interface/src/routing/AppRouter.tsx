@@ -296,6 +296,7 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODES, element: <ClusterConfigurationPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_DASHBOARD, element: <DataNodesClusterManagementPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION, element: <DataNodesClusterConfigurationPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
             !isCloud && enableDataNodeMigration && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION, element: <DataNodesMigrationPage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },

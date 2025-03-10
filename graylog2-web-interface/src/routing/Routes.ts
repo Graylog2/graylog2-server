@@ -86,6 +86,7 @@ const Routes = {
       DATANODE_DASHBOARD: '/system/cluster/datanode-dashboard',
       DATANODE_CONFIGURATION: '/system/cluster/datanode-configuration',
       DATANODE_MIGRATION: '/system/cluster/datanode-migration',
+      DATANODE_UPGRADE: '/system/cluster/datanode-upgrade',
     },
     CONFIGURATIONS: '/system/configurations',
     configurationsSection: (section: string, pluginSection?: string) =>
