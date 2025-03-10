@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {render, screen, fireEvent} from 'wrappedTestingLibrary';
+import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 
-import {asMock} from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
 
 import InputDiagnosisPage from './InputDiagnosisPage';
 
-jest.mock('routing/useParams', () => jest.fn(() => ({
-  inputId: 'test-input-id',
-})));
+jest.mock('routing/useParams', () =>
+  jest.fn(() => ({
+    inputId: 'test-input-id',
+  })),
+);
 
 jest.mock('components/inputs/InputDiagnosis/useInputDiagnosis');
 
@@ -36,8 +38,8 @@ const input = {
   name: 'inputName',
   created_at: '',
   creator_user_id: 'creatorId',
-  static_fields: { },
-  attributes: { },
+  static_fields: {},
+  attributes: {},
 };
 
 const inputNodeStates = {
@@ -75,9 +77,7 @@ describe('Input Diagnosis Page', () => {
   });
 
   it('renders the page for the given input with its metrics', async () => {
-    render(
-      <InputDiagnosisPage />,
-    );
+    render(<InputDiagnosisPage />);
 
     expect(await screen.findByText(/inputTitle/)).toBeInTheDocument();
     expect(await screen.findByText(/11 events/)).toBeInTheDocument();
@@ -100,9 +100,7 @@ describe('Input Diagnosis Page', () => {
   });
 
   it('shows nodes related to state on button click', async () => {
-    render(
-      <InputDiagnosisPage />,
-    );
+    render(<InputDiagnosisPage />);
 
     const runningButton = await screen.findByRole('button', { name: /running: 1\/2/ });
     const failedButton = await screen.findByRole('button', { name: /failed: 1\/2/ });
@@ -117,9 +115,7 @@ describe('Input Diagnosis Page', () => {
   });
 
   it('shows detailed messages on state nodes related to state on button click', async () => {
-    render(
-      <InputDiagnosisPage />,
-    );
+    render(<InputDiagnosisPage />);
 
     const failedButton = await screen.findByRole('button', { name: /failed: 1\/2/ });
 

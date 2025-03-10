@@ -60,7 +60,7 @@ const InlineBinaryField = ({ id, value, name }: { id: string; value: Configurati
   if (value === null || value === undefined || value === '') {
     finalValue = <i>{'<empty>'}</i>;
   } else {
-    finalValue = <i>{'<uploaded file content>'}</i>
+    finalValue = <i>{'<uploaded file content>'}</i>;
   }
 
   return (
