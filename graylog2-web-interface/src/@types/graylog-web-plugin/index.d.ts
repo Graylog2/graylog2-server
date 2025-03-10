@@ -165,6 +165,7 @@ type InputSetupWizard = {
     inputId: string;
     children: React.ReactNode;
   }>;
+  ExtraSetupWizardStep: React.ComponentType;
 };
 
 type License = {
