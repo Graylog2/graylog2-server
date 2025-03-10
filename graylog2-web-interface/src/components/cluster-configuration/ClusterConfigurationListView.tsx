@@ -28,14 +28,15 @@ import ClusterStatusLabel from './ClusterStatusLabel';
 import ClusterActions from './ClusterActions';
 
 type Props = {
-  clusterNodes: ClusterNodes,
-}
+  clusterNodes: ClusterNodes;
+};
 
-const getRoleLabels = (roles: string) => roles.split(',').map((role) => (
-  <span key={role}>
-    <Label bsSize="xs">{role}</Label>&nbsp;
-  </span>
-));
+const getRoleLabels = (roles: string) =>
+  roles.split(',').map((role) => (
+    <span key={role}>
+      <Label bsSize="xs">{role}</Label>&nbsp;
+    </span>
+  ));
 
 const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
   <Table>
@@ -51,20 +52,32 @@ const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
     <tbody>
       {clusterNodes.graylogNodes.map((graylogNode) => (
         <tr key={graylogNode.nodeName}>
-          <td><Link to={Routes.SYSTEM.NODES.SHOW(graylogNode.nodeInfo.node_id)}>{graylogNode.nodeName}</Link></td>
+          <td>
+            <Link to={Routes.SYSTEM.NODES.SHOW(graylogNode.nodeInfo.node_id)}>{graylogNode.nodeName}</Link>
+          </td>
           <td>{graylogNode.type}</td>
           <td>{getRoleLabels(graylogNode.role)}</td>
-          <td><ClusterStatusLabel node={graylogNode.nodeInfo} /></td>
-          <td align='right'><ClusterActions node={graylogNode.nodeInfo} /></td>
+          <td>
+            <ClusterStatusLabel node={graylogNode.nodeInfo} />
+          </td>
+          <td align="right">
+            <ClusterActions node={graylogNode.nodeInfo} />
+          </td>
         </tr>
       ))}
       {clusterNodes.dataNodes.map((dataNode) => (
         <tr key={dataNode.nodeName}>
-          <td><Link to={Routes.SYSTEM.DATANODES.SHOW(dataNode.nodeInfo.node_id)}>{dataNode.nodeName}</Link></td>
+          <td>
+            <Link to={Routes.SYSTEM.DATANODES.SHOW(dataNode.nodeInfo.node_id)}>{dataNode.nodeName}</Link>
+          </td>
           <td>{dataNode.type}</td>
           <td>{getRoleLabels(dataNode.role)}</td>
-          <td><DataNodeStatusCell dataNode={dataNode.nodeInfo} /></td>
-          <td align='right'><DataNodeActions dataNode={dataNode.nodeInfo} /></td>
+          <td>
+            <DataNodeStatusCell dataNode={dataNode.nodeInfo} />
+          </td>
+          <td align="right">
+            <DataNodeActions dataNode={dataNode.nodeInfo} />
+          </td>
         </tr>
       ))}
     </tbody>
