@@ -31,6 +31,7 @@ import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserManagementService;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserConfiguration;
@@ -69,6 +70,8 @@ public class UserResourceGenerateTokenAccessTest {
     @Mock
     private UsersResource usersResource;
     @Mock
+    private UserService userService;
+    @Mock
     private PaginatedUserService paginatedUserService;
     @Mock
     private AccessTokenService accessTokenService;
@@ -97,7 +100,7 @@ public class UserResourceGenerateTokenAccessTest {
                 new Permissions(ImmutableSet.of(new RestPermissions())));
         usersResource = new UsersResourceTest.TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
                 roleService, sessionService, new HttpConfiguration(), subject,
-                sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService);
+                sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, userService);
     }
 
     @Parameterized.Parameters(name = "{index}: permitted: {0}, external: {1}, admin: {2}, confAllowExternals: {3}, confOnlyAdmin: {4} => allowed: {5}")
@@ -176,7 +179,7 @@ public class UserResourceGenerateTokenAccessTest {
     public void testAccess() {
         final User user = mkUser();
         prepareMocks();
-        final boolean allowed = usersResource.isTokenCreationAllowed(user);
+        final boolean allowed = usersResource.isTokenCreationAllowed(user, user);
         assertEquals(expectedResult, allowed);
     }
 
