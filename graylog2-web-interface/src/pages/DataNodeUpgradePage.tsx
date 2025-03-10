@@ -83,9 +83,9 @@ const DataNodeUpgradePage = () => {
             <dt>Cluster Manager:</dt>
             <dd>{data?.cluster_state?.manager_node?.name}</dd>
             <dt>Number of Nodes:</dt>
-            <dd>{data?.outdated_nodes?.length + data?.up_to_date_nodes?.length} ({data?.outdated_nodes?.length} outdated, {data?.up_to_date_nodes?.length} uptodate)</dd> 
+            <dd>{(data?.outdated_nodes?.length || 0) + (data?.up_to_date_nodes?.length || 0)} ({data?.outdated_nodes?.length || 0} outdated, {data?.up_to_date_nodes?.length || 0} updated)</dd> 
             <dt>Number of Shards:</dt>
-            <dd>{data?.cluster_state?.active_shards} ({data?.cluster_state?.unassigned_shards} unassigned)</dd>
+            <dd>{data?.cluster_state?.active_shards || 0} ({data?.cluster_state?.unassigned_shards || 0} unassigned)</dd>
           </StyledHorizontalDl>
           <br />
         </Col>
@@ -98,16 +98,16 @@ const DataNodeUpgradePage = () => {
               ))}
             </Col>
             <Col xs={6}>
-              <h3>Uptodate Nodes</h3>
-              {data?.up_to_date_nodes?.map((uptodate_node) => (
-                <NodeListItem>{uptodate_node?.hostname}</NodeListItem>
+              <h3>Updated Nodes</h3>
+              {data?.up_to_date_nodes?.map((updated_node) => (
+                <NodeListItem>{updated_node?.hostname}</NodeListItem>
               ))}
             </Col>
           </Row>
         </Col>
         <Col xs={12}>
           <br />
-          You are upgrading <b>{'TODO NODE'}</b>, wait until it reconnects and apears in the <b>Uptodate</b> panel,
+          You are upgrading <b>TODO NODE</b>, wait until it reconnects and apears in the <b>Updated Nodes</b> panel,
           then {confirmUpgradeButton} and continue with next node.
         </Col>
       </Row>

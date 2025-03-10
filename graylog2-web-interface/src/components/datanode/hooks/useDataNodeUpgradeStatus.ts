@@ -74,7 +74,7 @@ interface DatanodeUpgradeStatus {
   server_version: Version;
 }
 
-export const stopShardReplication = async (): Promise<void | FlushResponse> => {
+export const stopShardReplication = async (): Promise<FlushResponse> => {
   try {
     const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/stop'));
 
@@ -83,10 +83,12 @@ export const stopShardReplication = async (): Promise<void | FlushResponse> => {
     return response;
   } catch (errorThrown) {
     UserNotification.error(`Stopping shard replication failed with status: ${errorThrown}`, 'Could not stop shard replication.');
+
+    return { total: 0, failed: 0, successful: 0 };
   }
 };
 
-export const startShardReplication = async (): Promise<void | FlushResponse> => {
+export const startShardReplication = async (): Promise<FlushResponse> => {
   try {
     const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/start'));
 
@@ -95,6 +97,8 @@ export const startShardReplication = async (): Promise<void | FlushResponse> => 
     return response;
   } catch (errorThrown) {
     UserNotification.error(`Starting shard replication failed with status: ${errorThrown}`, 'Could not start shard replication.');
+  
+    return { total: 0, failed: 0, successful: 0 };
   }
 };
 
