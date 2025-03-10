@@ -27,7 +27,7 @@ type Props = {
   executionFinished: boolean;
 };
 
-const ExecutionInfo = ({ duration, executedAt, total, showTotal = true, executionFinished }: Props) => {
+const ExecutionInfo = ({ duration, executedAt, total = undefined, showTotal = true, executionFinished }: Props) => {
   if (!executionFinished) {
     return <i>No query executed yet.</i>;
   }
