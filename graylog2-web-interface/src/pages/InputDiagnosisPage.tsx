@@ -154,9 +154,9 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
   }
 
   return (
-    <p>
+    <StyledListGroupItem>
       {state}: {inputNodeStates.states[state].length}/{inputNodeStates.total}
-    </p>
+    </StyledListGroupItem>
   );
 };
 
