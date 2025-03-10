@@ -17,26 +17,82 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
-import type { DataNode } from 'preflight/types';
 import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 import UserNotification from 'util/UserNotification';
 
-export const stopShardReplication = async () => {
+interface DataNodeInformation {
+  data_node_status: 'UNCONFIGURED' | 'PREPARED' | 'STARTING' | 'AVAILABLE' | 'UNAVAILABLE' | 'REMOVING' | 'REMOVED';
+  hostname: string;
+  opensearch_version: string;
+  datanode_version: string;
+  ip: string;
+  roles: string[];
+  node_name: string;
+  upgrade_possible: boolean;
+  mnager_node: boolean;
+}
+interface ManagerNode {
+  readonly node_uid: string;
+  readonly name: string;
+}
+interface ClusterState {
+  cluster_name: string;
+  active_shards: number;
+  active_primary_shards: number;
+  initializing_shards: number;
+  unassigned_shards: number;
+  delayed_unassigned_shards: number;
+  shard_replication: 'ALL' | 'PRIMARIES';
+  manager_node: ManagerNode;
+  status: string;
+  number_of_nodes: number;
+  relocating_shards: number;
+  opensearch_nodes: Node[];
+}
+interface FlushResponse {
+  total: number;
+  failed: number;
+  successful: number;
+}
+interface Version {
+  version: string;
+}
+interface Node {
+  ip: string;
+  roles: string[];
+  host: string;
+  name: string;
+  version: string;
+}
+interface DatanodeUpgradeStatus {
+  cluster_healthy: boolean;
+  outdated_nodes: DataNodeInformation[];
+  up_to_date_nodes: DataNodeInformation[];
+  shard_replication_enabled: boolean;
+  cluster_state: ClusterState;
+  server_version: Version;
+}
+
+export const stopShardReplication = async (): Promise<void | FlushResponse> => {
   try {
-    await fetch('POST', qualifyUrl('datanodes/upgrade/replication/stop'));
+    const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/stop'));
 
     UserNotification.success(`Shard replication stopped successfully`);
+
+    return response;
   } catch (errorThrown) {
     UserNotification.error(`Stopping shard replication failed with status: ${errorThrown}`, 'Could not stop shard replication.');
   }
 };
 
-export const startShardReplication = async () => {
+export const startShardReplication = async (): Promise<void | FlushResponse> => {
   try {
-    await fetch('POST', qualifyUrl('datanodes/upgrade/replication/start'));
+    const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/start'));
 
     UserNotification.success(`Shard replication started successfully`);
+
+    return response;
   } catch (errorThrown) {
     UserNotification.error(`Starting shard replication failed with status: ${errorThrown}`, 'Could not start shard replication.');
   }
@@ -45,7 +101,7 @@ export const startShardReplication = async () => {
 const fetchDataNodeUpgradeStatus = async () => fetch('GET', qualifyUrl('/datanodes/upgrade/status'));
 
 const useDataNodeUpgradeStatus = (): {
-  data: DataNode;
+  data: DatanodeUpgradeStatus;
   refetch: () => void;
   isInitialLoading: boolean;
   error: any;
