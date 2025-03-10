@@ -19,12 +19,10 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 
 import InputSetupWizardStepsContext from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardStepsContext';
-import type { StepsData } from 'components/inputs/InputSetupWizard/types';
-
-const DEFAULT_STEPS_DATA = {};
+import type { StepDataInterface } from 'components/inputs/InputSetupWizard/contexts/InputSetupWizardStepsContext';
 
 const InputSetupWizardStepsProvider = ({ children = null }: React.PropsWithChildren<{}>) => {
-  const [stepsData, setStepsData] = useState<StepsData>(DEFAULT_STEPS_DATA);
+  const [stepsData, setStepsData] = useState<StepDataInterface>({});
 
   const value = useMemo(
     () => ({

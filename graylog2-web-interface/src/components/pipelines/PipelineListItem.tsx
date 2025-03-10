@@ -121,7 +121,7 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
         </Link>
         {isManaged && (
           <DefaultLabel bsStyle="default" bsSize="xsmall">
-            System managed
+            Managed by Application
           </DefaultLabel>
         )}
         <br />
