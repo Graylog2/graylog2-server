@@ -35,6 +35,9 @@ import { Link } from 'components/common/router';
 import type { InputState } from 'stores/inputs/InputStatesStore';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
+import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
+import DiagnosisHelp from 'components/inputs/InputDiagnosis/DiagnosisHelp';
+import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
 
 const LeftCol = styled.div(
   ({ theme }) => css`
@@ -43,6 +46,7 @@ const LeftCol = styled.div(
     align-items: flex-start;
     align-content: center;
     justify-content: center;
+
     > p {
       color: ${theme.colors.gray[50]};
     }
@@ -62,10 +66,10 @@ const Header = styled.div(
 );
 const StyledP = styled.p(
   ({ theme }) => css`
-     &&.description {
+    &&.description {
       color: ${theme.colors.gray[50]};
     }
- `,
+  `,
 );
 const StyledSectionGrid = styled(SectionGrid)<{ $rows?: string }>(
   ({ $rows, theme }) => css`
@@ -78,16 +82,18 @@ const InputNodeInfo = styled.div`
   max-width: 500px;
   white-space: break-spaces;
 `;
-const StyledListGroup = styled(ListGroup)(({ theme }) => css`
-  border: 1px solid ${theme.colors.table.row.divider};
-  background-color: ${theme.colors.global.contentBackground};
-  border-radius: ${theme.spacings.xs};
-`);
+const StyledListGroup = styled(ListGroup)(
+  ({ theme }) => css`
+    border: 1px solid ${theme.colors.table.row.divider};
+    background-color: ${theme.colors.global.contentBackground};
+    border-radius: ${theme.spacings.xs};
+  `,
+);
 const StyledListGroupItem = styled(ListGroupItem)`
   background-color: transparent;
 `;
 const StyledSpan = styled.span`
-  padding-left: ${({ theme }) => theme.spacings.xs}
+  padding-left: ${({ theme }) => theme.spacings.xs};
 `;
 
 const NodeListItem = ({
@@ -165,10 +171,11 @@ const InputDiagnosisPage = () => {
   const { input, inputNodeStates, inputMetrics } = useInputDiagnosis(inputId);
   const navigate = useNavigate();
 
-  const isInputStateDown = inputNodeStates.total === 0 || ['FAILED', 'STOPPED', 'FAILING'].some((failedState) => Object.keys(inputNodeStates.states).includes(failedState));
+  const isInputStateDown =
+    inputNodeStates.total === 0 ||
+    ['FAILED', 'STOPPED', 'FAILING'].some((failedState) => Object.keys(inputNodeStates.states).includes(failedState));
   const hasReceivedMessageMetrics = inputMetrics.incomingMessagesTotal > 0;
-  const hasError = Object.keys(inputMetrics.message_errors).some((error) => inputMetrics.message_errors[error] > 0);
-  const hasReceivedMessage = inputMetrics.stream_message_count?.some((stream) => stream.count > 0 );
+  const hasReceivedMessage = inputMetrics.stream_message_count?.some((stream) => stream.count > 0);
 
   return (
     <>
@@ -193,42 +200,64 @@ const InputDiagnosisPage = () => {
                 <StyledListGroupItem>Input Title: {input.title}</StyledListGroupItem>
                 <StyledListGroupItem>Input Type: {input.name}</StyledListGroupItem>
                 <StyledListGroupItem>
-                  This Input is running on: {input.global ? 'all graylog nodes' : <LinkToNode nodeId={input.node} />}
+                  This Input is running on : {input.global ? 'all graylog nodes' : <LinkToNode nodeId={input.node} />}
                 </StyledListGroupItem>
                 {input.attributes?.bind_address && input.attributes?.port && (
                   <>
                     <StyledListGroupItem>
-                      This Input is listening on: Bind address {input.attributes?.bind_address}, Port{' '}
-                      {input.attributes?.port}.
+                      This Input is listening on <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_LISTENING_ON} />: Bind
+                      address {input.attributes?.bind_address}, Port {input.attributes?.port}.
                     </StyledListGroupItem>
                     <StyledListGroupItem>
-                      This Input is listening for:{' '}
+                      This Input is listening for <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_LISTENING_FOR} />:{' '}
                       {'tcp_keepalive' in (input.attributes || {}) ? 'TCP Traffic.' : 'UDP Traffic.'}
                     </StyledListGroupItem>
                   </>
                 )}
               </StyledListGroup>
             </Section>
-            <Section title="State" headerLeftSection={<StatusColorIndicator data-testid='state-indicator' bsStyle={isInputStateDown ? 'danger' : 'success'}/>}>
-              <StyledP>Number of Graylog nodes the Input is configured to run, and on how many it is running. If any are not running, click to see any associated error messages.</StyledP>
+            <Section
+              title="State"
+              headerLeftSection={
+                <>
+                  <StatusColorIndicator
+                    data-testid="state-indicator"
+                    bsStyle={isInputStateDown ? 'danger' : 'success'}
+                  />
+                  <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_STATE} />
+                </>
+              }>
+              <StyledP>
+                Number of Graylog nodes the Input is configured to run, and on how many it is running. If any are not
+                running, click to see any associated error messages.
+              </StyledP>
               <StyledListGroup>
                 {Object.keys(inputNodeStates.states).map((state: InputState) => (
                   <StateListItem key={state} state={state} inputNodeStates={inputNodeStates} />
                 ))}
-                {Object.keys(inputNodeStates.states).length === 0 && <StyledListGroupItem>Input is not running.</StyledListGroupItem>}
+                {Object.keys(inputNodeStates.states).length === 0 && (
+                  <StyledListGroupItem>Input is not running.</StyledListGroupItem>
+                )}
               </StyledListGroup>
             </Section>
           </div>
           <Section title="Troubleshooting" />
           <div>
-            <Section headerLeftSection={<StatusColorIndicator bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'}/>} title="Received Traffic">
-              <StyledP>Messages and network traffic that has reached the input. Note: metrics show the last 15 minutes only.</StyledP>
+            <Section
+              headerLeftSection={<StatusColorIndicator bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'} />}
+              title="Received Traffic">
+              <StyledP>
+                Messages and network traffic that has reached the input. Note: metrics show the last 15 minutes only.
+              </StyledP>
               {inputMetrics && (
                 <StyledListGroup>
                   <StyledListGroupItem>
                     Total Messages received by Input: {inputMetrics.incomingMessagesTotal} events
                   </StyledListGroupItem>
-                  <StyledListGroupItem>Empty Messages discarded: {inputMetrics.emptyMessages}</StyledListGroupItem>
+                  <StyledListGroupItem>
+                    Empty Messages discarded <DiagnosisHelp helpText={DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED} />:{' '}
+                    {inputMetrics.emptyMessages}
+                  </StyledListGroupItem>
                   {Number.isInteger(inputMetrics.open_connections) &&
                     Number.isInteger(inputMetrics.total_connections) && (
                       <StyledListGroupItem>
@@ -239,7 +268,7 @@ const InputDiagnosisPage = () => {
                   {Number.isInteger(inputMetrics.read_bytes_1sec) &&
                     Number.isInteger(inputMetrics.read_bytes_total) && (
                       <StyledListGroupItem>
-                        Network I/O:
+                        Network I/O <DiagnosisHelp helpText={DIAGNOSIS_HELP.NETWORK_IO} />:
                         <NetworkStats
                           readBytes1Sec={inputMetrics.read_bytes_1sec}
                           readBytesTotal={inputMetrics.read_bytes_total}
@@ -251,21 +280,22 @@ const InputDiagnosisPage = () => {
                 </StyledListGroup>
               )}
             </Section>
-            <Section title="Message Errors" headerLeftSection={<StatusColorIndicator bsStyle={hasError ? 'danger' : 'gray'}/>}>
-              <StyledP>Messages can fail to process at the Input, at the processing pipeline, or when being indexed to the Search Cluster. Click on a category to view the associated messages.</StyledP>
-               <StyledListGroup>
-                <StyledListGroupItem>Message Error at Input: {inputMetrics.message_errors.failures_inputs_codecs}</StyledListGroupItem>
-                <StyledListGroupItem>Message failed to process: {inputMetrics.message_errors.failures_processing}</StyledListGroupItem>
-                <StyledListGroupItem>Message failed to index: {inputMetrics.message_errors.failures_indexing}</StyledListGroupItem>
-              </StyledListGroup>
-            </Section>
+            <DiagnosisMessageErrors messageErrors={inputMetrics.message_errors} inputId={inputId} />
           </div>
           <div>
             <Section
               title="Received Message count by Stream"
-              headerLeftSection={<StatusColorIndicator bsStyle={hasReceivedMessage ? 'success' : 'gray'} />}
+              headerLeftSection={
+                <>
+                  <StatusColorIndicator bsStyle={hasReceivedMessage ? 'success' : 'gray'} />
+                  <DiagnosisHelp helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />
+                </>
+              }
               actions={<ShowReceivedMessagesButton input={input} />}>
-              <StyledP>Messages successfully ingested into Graylog from this Input in the last 15 minutes. Click on the Stream to inspect the messages.</StyledP>
+              <StyledP>
+                Messages successfully ingested into Graylog from this Input in the last 15 minutes. Click on the Stream
+                to inspect the messages.
+              </StyledP>
               {inputMetrics.stream_message_count?.length && (
                 <StyledListGroup>
                   {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
