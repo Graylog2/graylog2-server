@@ -22,11 +22,14 @@ import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.indexer.messages.IndexingError;
 import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
+import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,6 +185,35 @@ public class FailureSubmissionService {
         } catch (InterruptedException ignored) {
             logger.warn("Failed to submit {} indexing errors for failure handling. The thread has been interrupted!",
                     indexingErrors.size());
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public void submitInputFailure(InputProcessingException inputProcessingException, String inputId) {
+        inputDiagnosisMetrics.incCount(name("org.graylog2.inputs", inputId, "failures.input"));
+        try {
+            RawMessage rawMessage = inputProcessingException.getRawMessage();
+            final String messageId = rawMessage.getId().toString();
+
+            final String message = "Failed to process message with id '%s' from input with id '%s': %s".formatted(
+                    StringUtils.isBlank(messageId) ? "UNKNOWN" : messageId,
+                    inputId,
+                    inputProcessingException.getMessage()
+            );
+
+            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(inputProcessingException.getCause());
+            final InputFailure processingFailure = new InputFailure(
+                    InputFailureCause.INPUT_PARSE,
+                    message,
+                    rootCauseMessage.isBlank() ? inputProcessingException.getMessage() : rootCauseMessage,
+                    Tools.nowUTC(),
+                    rawMessage,
+                    inputProcessingException.inputMessage().orElse("")
+            );
+
+            failureSubmissionQueue.submitBlocking(FailureBatch.inputFailureBatch(List.of(processingFailure)));
+        } catch (InterruptedException ignored) {
+            logger.warn("Failed to submit an input failure for failure handling. The thread has been interrupted!");
             Thread.currentThread().interrupt();
         }
     }

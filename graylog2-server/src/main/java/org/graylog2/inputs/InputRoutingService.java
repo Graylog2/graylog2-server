@@ -131,8 +131,8 @@ public class InputRoutingService {
         return matcher.matches();
     }
 
-    private boolean isSystemRulePattern(String ruleName, String inputId, String inputName) {
-        return ruleName.matches(GL_ROUTING_RULE_PREFIX + inputName + "\\[" + inputId + "\\]_to_.*");
+    private String createSystemRuleRegex(String inputId, String inputName) {
+        return GL_ROUTING_RULE_PREFIX + inputName + "\\[" + inputId + "\\]_to_.*";
     }
 
     private String replaceInputName(String ruleName, String oldInputName, String newInputName) {
@@ -154,8 +154,7 @@ public class InputRoutingService {
      */
     @Subscribe
     public void handleInputRenamed(InputRenamedEvent event) {
-        ruleService.loadAll().stream()
-                .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.inputId(), event.oldInputTitle()))
+        ruleService.loadAllByTitle(createSystemRuleRegex(event.inputId(), event.oldInputTitle()))
                 .forEach(ruleDao -> {
                     String oldRuleTitle = ruleDao.title();
                     String newRuleTitle = replaceInputName(oldRuleTitle, event.oldInputTitle(), event.newInputTitle());
@@ -191,8 +190,7 @@ public class InputRoutingService {
      */
     @Subscribe
     public void handleInputDeleted(InputDeletedEvent event) {
-        ruleService.loadAll().stream()
-                .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.inputId(), event.inputTitle()))
+        ruleService.loadAllByTitle(createSystemRuleRegex(event.inputId(), event.inputTitle()))
                 .forEach(ruleService::delete);
     }
 

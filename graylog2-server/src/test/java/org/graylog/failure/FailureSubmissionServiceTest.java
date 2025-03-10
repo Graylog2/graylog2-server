@@ -19,6 +19,8 @@ package org.graylog.failure;
 import org.graylog2.indexer.messages.IndexingError;
 import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
+import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,10 +64,12 @@ class FailureSubmissionServiceTest {
     void submitIndexingErrors_allIndexingErrorsTransformedAndSubmittedToFailureQueue() throws Exception {
         // given
         final Message msg1 = mock(Message.class);
-        when(msg1.getMessageId()).thenReturn("msg-1");
+        String messageId1 = "msg-1";
+        when(msg1.getMessageId()).thenReturn(messageId1);
         when(msg1.supportsFailureHandling()).thenReturn(true);
         final Message msg2 = mock(Message.class);
-        when(msg2.getMessageId()).thenReturn("msg-2");
+        String messageId2 = "msg-2";
+        when(msg2.getMessageId()).thenReturn(messageId2);
         when(msg2.supportsFailureHandling()).thenReturn(true);
 
         final List<IndexingError> indexingErrors = List.of(
@@ -89,7 +93,7 @@ class FailureSubmissionServiceTest {
                 assertThat(indexingFailure.message()).isEqualTo("Failed to index message with id 'msg-1' targeting 'index-1'");
                 assertThat(indexingFailure.failureDetails()).isEqualTo("Error");
                 assertThat(indexingFailure.failureTimestamp()).isNotNull();
-                assertThat(indexingFailure.failedMessage()).isEqualTo(msg1);
+                assertThat(indexingFailure.messageId()).isEqualTo(messageId1);
                 assertThat(indexingFailure.targetIndex()).isEqualTo("index-1");
                 assertThat(indexingFailure.requiresAcknowledgement()).isFalse();
             });
@@ -100,7 +104,7 @@ class FailureSubmissionServiceTest {
                 assertThat(indexingFailure.message()).isEqualTo("Failed to index message with id 'msg-2' targeting 'index-2'");
                 assertThat(indexingFailure.failureDetails()).isEqualTo("Error2");
                 assertThat(indexingFailure.failureTimestamp()).isNotNull();
-                assertThat(indexingFailure.failedMessage()).isEqualTo(msg2);
+                assertThat(indexingFailure.messageId()).isEqualTo(messageId2);
                 assertThat(indexingFailure.targetIndex()).isEqualTo("index-2");
                 assertThat(indexingFailure.requiresAcknowledgement()).isFalse();
             });
@@ -132,7 +136,8 @@ class FailureSubmissionServiceTest {
     void submitProcessingErrors_allProcessingErrorsSubmittedToQueueAndMessageNotFilteredOut_ifSubmissionEnabledAndDuplicatesAreKept() throws Exception {
         // given
         final Message msg = mock(Message.class);
-        when(msg.getMessageId()).thenReturn("msg-x");
+        String messageId = "msg-x";
+        when(msg.getMessageId()).thenReturn(messageId);
         when(msg.supportsFailureHandling()).thenReturn(true);
 
         when(msg.processingErrors()).thenReturn(List.of(
@@ -162,7 +167,7 @@ class FailureSubmissionServiceTest {
                 assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'msg-x': Message 1");
                 assertThat(processingFailure.failureDetails()).isEqualTo("Details 1");
                 assertThat(processingFailure.failureTimestamp()).isNotNull();
-                assertThat(processingFailure.failedMessage()).isEqualTo(msg);
+                assertThat(processingFailure.messageId()).isEqualTo(messageId);
                 assertThat(processingFailure.targetIndex()).isNull();
                 assertThat(processingFailure.requiresAcknowledgement()).isFalse();
             });
@@ -178,7 +183,7 @@ class FailureSubmissionServiceTest {
                 assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'msg-x': Message 2");
                 assertThat(processingFailure.failureDetails()).isEqualTo("Details 2");
                 assertThat(processingFailure.failureTimestamp()).isNotNull();
-                assertThat(processingFailure.failedMessage()).isEqualTo(msg);
+                assertThat(processingFailure.messageId()).isEqualTo(messageId);
                 assertThat(processingFailure.targetIndex()).isNull();
                 assertThat(processingFailure.requiresAcknowledgement()).isFalse();
             });
@@ -275,7 +280,8 @@ class FailureSubmissionServiceTest {
     void submitProcessingErrors_processingErrorSubmittedToQueueAndMessageFilteredOut_ifSubmissionEnabledAndDuplicatesAreNotKept() throws Exception {
         // given
         final Message msg = mock(Message.class);
-        when(msg.getMessageId()).thenReturn("msg-x");
+        String messageId = "msg-x";
+        when(msg.getMessageId()).thenReturn(messageId);
         when(msg.supportsFailureHandling()).thenReturn(true);
         when(msg.processingErrors()).thenReturn(List.of(
                 new Message.ProcessingError(() -> "Cause", "Message", "Details")
@@ -305,7 +311,7 @@ class FailureSubmissionServiceTest {
                 assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'msg-x': Message");
                 assertThat(processingFailure.failureDetails()).isEqualTo("Details");
                 assertThat(processingFailure.failureTimestamp()).isNotNull();
-                assertThat(processingFailure.failedMessage()).isEqualTo(msg);
+                assertThat(processingFailure.messageId()).isEqualTo(messageId);
                 assertThat(processingFailure.targetIndex()).isNull();
                 assertThat(processingFailure.requiresAcknowledgement()).isTrue();
             });
@@ -340,7 +346,6 @@ class FailureSubmissionServiceTest {
                 assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'UNKNOWN': Encountered an unrecognizable processing error");
                 assertThat(processingFailure.failureDetails()).isEqualTo("Details of the unknown error!");
                 assertThat(processingFailure.failureTimestamp()).isNotNull();
-                assertThat(processingFailure.failedMessage()).isEqualTo(msg);
                 assertThat(processingFailure.targetIndex()).isNull();
                 assertThat(processingFailure.requiresAcknowledgement()).isFalse();
             });
@@ -371,5 +376,44 @@ class FailureSubmissionServiceTest {
             assertThat(fb.getFailures().get(0)).satisfies(processingFailure ->
                     assertThat(processingFailure.message()).isEqualTo("Failed to process message with id 'msg-uuid': Encountered an unrecognizable processing error"));
         });
+    }
+
+    @Test
+    void submitInputError_inputErrorTransformedAndSubmittedToFailureQueue() throws Exception {
+        RawMessage rawMessage = new RawMessage(new byte[]{});
+        InputProcessingException inputException = InputProcessingException.create("error1", rawMessage);
+
+        underTest.submitInputFailure(inputException, "1234");
+
+        verify(failureSubmissionQueue, times(1)).submitBlocking(failureBatchCaptor.capture());
+        assertThat(failureBatchCaptor.getValue()).satisfies(fb -> {
+            assertThat(fb.containsInputFailures()).isTrue();
+            assertThat(fb.size()).isEqualTo(1);
+
+            assertThat(fb.getFailures().get(0)).satisfies(indexingFailure -> {
+                assertThat(indexingFailure.failureType()).isEqualTo(FailureType.INPUT);
+                assertThat(indexingFailure.failureCause().label()).isEqualTo("InputParseError");
+                assertThat(indexingFailure.message()).isEqualTo("Failed to process message with id '%s' from input with id '1234': %s"
+                        .formatted(rawMessage.getId().toString(), inputException.getMessage()));
+                assertThat(indexingFailure.failureDetails()).isEqualTo(inputException.getMessage());
+                assertThat(indexingFailure.failureTimestamp()).isNotNull();
+                assertThat(indexingFailure.messageTimestamp()).isEqualTo(rawMessage.getTimestamp());
+                assertThat(indexingFailure.messageId()).isEqualTo(rawMessage.getId().toString());
+                assertThat(indexingFailure.requiresAcknowledgement()).isFalse();
+            });
+        });
+    }
+
+    @Test
+    void submitInputError_rootCauseMessageIsUsedForFailureDetails() throws Exception {
+        InputProcessingException inputException = InputProcessingException.create("error1",
+                new IllegalArgumentException("rootCauseMessage"), new RawMessage(new byte[]{}));
+
+        underTest.submitInputFailure(inputException, "1234");
+
+        verify(failureSubmissionQueue, times(1)).submitBlocking(failureBatchCaptor.capture());
+        assertThat(failureBatchCaptor.getValue()).satisfies(fb ->
+                assertThat(fb.getFailures().get(0)).satisfies(indexingFailure ->
+                        assertThat(indexingFailure.failureDetails()).isEqualTo("IllegalArgumentException: rootCauseMessage")));
     }
 }
