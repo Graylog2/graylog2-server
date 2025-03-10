@@ -542,6 +542,10 @@ public abstract class Graylog2Module extends AbstractModule {
         return Multibinder.newSetBinder(binder(), StreamDeletionGuard.class);
     }
 
+    protected Multibinder<Class<?>> dbEntitiesBinder() {
+        return Multibinder.newSetBinder(binder(), new TypeLiteral<>() {}, Names.named("dbEntities"));
+    }
+
     protected Set<Object> getConfigurationBeans() {
         return Set.of();
     }

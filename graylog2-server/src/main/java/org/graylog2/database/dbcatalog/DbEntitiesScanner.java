@@ -16,92 +16,32 @@
  */
 package org.graylog2.database.dbcatalog;
 
-import com.google.common.base.Stopwatch;
-import io.github.classgraph.AnnotationParameterValueList;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfo;
-import io.github.classgraph.ClassInfoList;
-import io.github.classgraph.ScanResult;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import org.graylog2.database.DbEntity;
-import org.graylog2.shared.plugins.ChainingClassLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Set;
 
 public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
-    private static final Logger LOG = LoggerFactory.getLogger(DbEntitiesScanner.class);
+    private final Set<Class<?>> entityClasses;
 
-    private final String[] packagesToScan;
-    private final String[] packagesToExclude;
-    private final ChainingClassLoader chainingClassLoader;
-
-    @SuppressWarnings("unused")
     @Inject
-    public DbEntitiesScanner(final ChainingClassLoader chainingClassLoader) {
-        this.chainingClassLoader = chainingClassLoader;
-        this.packagesToScan = new String[]{"org.graylog2", "org.graylog"};
-        this.packagesToExclude = new String[]{"org.graylog.shaded", "org.graylog.storage", "org.graylog2.migrations"};
-    }
-
-    DbEntitiesScanner(final String[] packagesToScan, final String[] packagesToExclude) {
-        this.chainingClassLoader = null;
-        this.packagesToScan = packagesToScan;
-        this.packagesToExclude = packagesToExclude;
+    public DbEntitiesScanner(@Named("dbEntities") Set<Class<?>> entityClasses) {
+        this.entityClasses = entityClasses;
     }
 
     @Override
     public DbEntitiesCatalog get() {
-        return new DbEntitiesCatalog(List.of());
-    }
-
-    public DbEntitiesCatalog _deactivated_get() {
-        final Stopwatch stopwatch = Stopwatch.createStarted();
-        final DbEntitiesCatalog catalog = scan(packagesToScan, packagesToExclude, chainingClassLoader);
-        stopwatch.stop();
-        LOG.info("{} entities have been scanned and added to DB Entity Catalog, it took {}", catalog.size(), stopwatch);
-        return catalog;
-    }
-
-    public DbEntitiesCatalog scan(final String[] packagesToScan,
-                                  final String[] packagesToExclude,
-                                  final ChainingClassLoader chainingClassLoader) {
-        List<DbEntityCatalogEntry> dbEntities = new LinkedList<>();
-        ClassGraph classGraph = new ClassGraph()
-                .enableAnnotationInfo()
-                .acceptPackages(packagesToScan)
-                .rejectPackages(packagesToExclude)
-                .filterClasspathElements(classpathElementPathStr -> classpathElementPathStr.contains("graylog"))
-                .disableRuntimeInvisibleAnnotations();
-
-        if (chainingClassLoader != null) {
-            //Unfortunately, ClassGraph does not work correctly if provided with ChainingClassLoader as a whole
-            //You have to manually add all class loaders from ChainingClassLoader
-            for (ClassLoader cl : chainingClassLoader.getClassLoaders()) {
-                classGraph = classGraph.addClassLoader(cl);
-            }
-        }
-
-        try (ScanResult scanResult = classGraph.scan()) {
-            final String annotationName = DbEntity.class.getCanonicalName();
-            ClassInfoList classInfoList = scanResult.getClassesWithAnnotation(annotationName);
-            for (ClassInfo classInfo : classInfoList) {
-                final var annotations = classInfo.getAnnotationInfoRepeatable(annotationName);
-                for (final var annotationInfo : annotations) {
-                    AnnotationParameterValueList paramVals = annotationInfo.getParameterValues();
-                    dbEntities.add(new DbEntityCatalogEntry(
-                            paramVals.get("collection").getValue().toString(),
-                            paramVals.get("titleField").getValue().toString(),
-                            classInfo.loadClass(),
-                            paramVals.get("readPermission").getValue().toString()
-                    ));
-                }
-            }
-
-            return new DbEntitiesCatalog(dbEntities);
-        }
+        final var catalogEntries = entityClasses.stream()
+                .flatMap(clazz ->
+                        Arrays.stream(clazz.getAnnotationsByType(DbEntity.class))
+                                .map(a ->
+                                        new DbEntityCatalogEntry(a.collection(), a.titleField(), clazz,
+                                                a.readPermission()))
+                )
+                .toList();
+        return new DbEntitiesCatalog(catalogEntries);
     }
 }

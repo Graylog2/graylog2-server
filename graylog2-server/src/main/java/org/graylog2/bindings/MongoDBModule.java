@@ -16,13 +16,50 @@
  */
 package org.graylog2.bindings;
 
-import com.google.inject.AbstractModule;
+import org.graylog.events.processor.EventDefinition;
+import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog2.cluster.nodes.DataNodeEntity;
+import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntitiesScanner;
+import org.graylog2.decorators.DecoratorImpl;
+import org.graylog2.indexer.IndexFailureImpl;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.inputs.InputImpl;
+import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.plugin.PluginModule;
+import org.graylog2.security.AccessTokenImpl;
+import org.graylog2.security.MongoDbSession;
+import org.graylog2.streams.OutputImpl;
+import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.filters.StreamDestinationFilterRuleDTO;
+import org.graylog2.system.activities.SystemMessageImpl;
+import org.graylog2.users.UserImpl;
 
-public class MongoDBModule extends AbstractModule {
+public class MongoDBModule extends PluginModule {
     @Override
     protected void configure() {
         bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class).asEagerSingleton();
+
+        addDbEntities(
+                AccessTokenImpl.class,
+                DataNodeEntity.class,
+                DecoratorImpl.class,
+                EventDefinition.class,
+                IndexFailureImpl.class,
+                IndexSetConfig.class,
+                InputImpl.class,
+                MongoDbSession.class,
+                NotificationImpl.class,
+                OutputImpl.class,
+                ServerNodeEntity.class,
+                StreamDestinationFilterRuleDTO.class,
+                StreamImpl.class,
+                StreamRuleImpl.class,
+                SystemMessageImpl.class,
+                UserImpl.class,
+                ViewDTO.class
+        );
     }
 }
