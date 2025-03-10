@@ -20,7 +20,8 @@ import java.util.Locale;
 
 public enum FailureType {
     INDEXING,
-    PROCESSING
+    PROCESSING,
+    INPUT
     ;
 
     @Override

@@ -20,18 +20,18 @@ import AppConfig from 'util/AppConfig';
 import PageNavigation from 'components/common/PageNavigation';
 import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
+import useShowDatanodeMigration from 'components/datanode/hooks/useShowDatanodeMigration';
 
-import useShowDatanodeMigration from './hooks/useShowDatanodeMigration';
 
-const DataNodesPageNavigation = () => {
-  const { showDatanodeMigration } = useShowDatanodeMigration();
+const ClusterConfigurationPageNavigation = () => {
+  const { showDatanodeMigration, isDatanodeConfiguredAndUsed } = useShowDatanodeMigration();
   const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
 
   const NAV_ITEMS = [
-    { title: 'Data Nodes', path: Routes.SYSTEM.DATANODES.LIST, exactPathMatch: true },
-    { title: 'Cluster Management', path: Routes.SYSTEM.DATANODES.CLUSTER },
-    { title: 'Configuration', path: Routes.SYSTEM.DATANODES.CONFIGURATION },
-    showDatanodeMigration && enableDataNodeMigration && { title: 'Migration', path: Routes.SYSTEM.DATANODES.MIGRATION },
+    { title: 'Cluster Configuration', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
+    isDatanodeConfiguredAndUsed && { title: 'Data Node Dashboard', path: Routes.SYSTEM.CLUSTER.DATANODE_DASHBOARD },
+    isDatanodeConfiguredAndUsed && { title: 'Data Node Certificate Management', path: Routes.SYSTEM.CLUSTER.DATANODE_CONFIGURATION },
+    showDatanodeMigration && enableDataNodeMigration && { title: 'Data Node Migration', path: Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION },
   ];
 
   return (
@@ -41,4 +41,4 @@ const DataNodesPageNavigation = () => {
   );
 };
 
-export default DataNodesPageNavigation;
+export default ClusterConfigurationPageNavigation;

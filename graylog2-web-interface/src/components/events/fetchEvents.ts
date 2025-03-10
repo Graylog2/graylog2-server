@@ -57,7 +57,7 @@ export const parseTypeFilter = (alert: string) => {
 };
 
 const allTime = { type: 'relative', range: 0 } as const;
-const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRange = allTime) => {
+export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRange = allTime) => {
   const result: FiltersResult = {
     filter: {
       alerts: parseTypeFilter(filters?.get('alert')?.[0]),
