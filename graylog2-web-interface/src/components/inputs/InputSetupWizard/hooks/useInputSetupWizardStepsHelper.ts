@@ -14,17 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { INPUT_WIZARD_STEPS, INPUT_WIZARD_FLOWS } from 'components/inputs/InputSetupWizard/types';
+import {
+  getStepData,
+  getNextStep,
+  checkHasNextStep,
+  checkHasPreviousStep,
+  updateStepData,
+} from '../helpers/stepHelper';
 
-export const INPUT_SETUP_MODE_FEATURE_FLAG = 'setup_mode';
+const useInputSetupWizardStepsHelper = <StepsData>() => ({
+  getStepData: getStepData<StepsData>,
+  getNextStep,
+  checkHasNextStep,
+  checkHasPreviousStep,
+  updateStepData: updateStepData<StepsData>,
+});
 
-export default INPUT_SETUP_MODE_FEATURE_FLAG;
-
-export const OPEN_FLOW_STEPS = {
-  [INPUT_WIZARD_FLOWS.ILLUMINATE]: [INPUT_WIZARD_STEPS.START_INPUT, INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS],
-  [INPUT_WIZARD_FLOWS.NON_ILLUMINATE]: [
-    INPUT_WIZARD_STEPS.SETUP_ROUTING,
-    INPUT_WIZARD_STEPS.START_INPUT,
-    INPUT_WIZARD_STEPS.INPUT_DIAGNOSIS,
-  ],
-};
+export default useInputSetupWizardStepsHelper;
