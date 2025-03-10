@@ -27,9 +27,9 @@ import { onError } from 'util/conditional/onError';
 export const STREAMS_BY_INDEX_SET_ID = 'streams_by_index_set_id';
 
 type ResponseData = {
-  total: number,
-  streams: Array<Stream>
-}
+  total: number;
+  streams: Array<Stream>;
+};
 
 const fetchStreamsByIndexSet = async (indexSetId: string): Promise<ResponseData> => {
   const url = qualifyUrl(ApiRoutes.StreamsApiController.byIndexSet(indexSetId).url);
@@ -37,23 +37,28 @@ const fetchStreamsByIndexSet = async (indexSetId: string): Promise<ResponseData>
   return fetch('GET', url);
 };
 
-const useStreamsByIndexSet = (indexSetId: string, enabled: boolean = true): {
-  data: ResponseData,
-  isLoading: boolean,
+const useStreamsByIndexSet = (
+  indexSetId: string,
+  enabled: boolean = true,
+): {
+  data: ResponseData;
+  isLoading: boolean;
 } => {
   const { data, isLoading } = useQuery<ResponseData, FetchError>(
     [STREAMS_BY_INDEX_SET_ID],
-    () => onError(fetchStreamsByIndexSet(indexSetId), (errorThrown: FetchError) => {
-      if (!(errorThrown.status === 404)) {
-        UserNotification.error(`Loading streams by index set failed with: ${errorThrown}`);
-      }
-    }),
-    { enabled });
+    () =>
+      onError(fetchStreamsByIndexSet(indexSetId), (errorThrown: FetchError) => {
+        if (!(errorThrown.status === 404)) {
+          UserNotification.error(`Loading streams by index set failed with: ${errorThrown}`);
+        }
+      }),
+    { enabled },
+  );
 
-  return ({
+  return {
     data: data,
     isLoading,
-  });
+  };
 };
 
 export default useStreamsByIndexSet;
