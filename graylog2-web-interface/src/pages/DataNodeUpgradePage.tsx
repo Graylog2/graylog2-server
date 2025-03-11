@@ -45,10 +45,6 @@ const StyledHorizontalDl = styled.dl(
   `,
 );
 
-const Version = styled.b`
-  font-size: 1rem;
-`;
-
 const DataNodeUpgradePage = () => {
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
 
@@ -128,11 +124,18 @@ const DataNodeUpgradePage = () => {
                     {data?.outdated_nodes?.map((outdated_node) => (
                       <tr key={outdated_node?.hostname}>
                         <td>
-                          {outdated_node?.hostname}&nbsp;
-                          <Label bsStyle={outdated_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'} bsSize="xs">{outdated_node?.data_node_status}</Label>&nbsp;
-                          {outdated_node?.manager_node && (<Label bsStyle="info" bsSize="xs">manager</Label>)}
+                          <div>
+                            {outdated_node?.hostname}&nbsp;
+                            <Label bsStyle={outdated_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'} bsSize="xs">
+                              {outdated_node?.data_node_status}
+                            </Label>&nbsp;
+                            {outdated_node?.manager_node && (<Label bsStyle="info" bsSize="xs">manager</Label>)}
+                          </div>
+                          <div>
+                            <i>{outdated_node?.ip}</i>
+                          </div>
                         </td>
-                        <td><i>{outdated_node?.ip}</i></td>
+                        <td><i>{outdated_node?.datanode_version}</i></td>
                         <td align="right">
                           <Button onClick={() => upgradeNode(outdated_node)} disabled={!outdated_node?.upgrade_possible} bsSize="sm" bsStyle="primary">
                             Upgrade
@@ -149,18 +152,25 @@ const DataNodeUpgradePage = () => {
                 </Table>
               </Col>
               <Col sm={6}>
-                <h3>Upgraded Nodes <Version>v{data?.server_version?.version}</Version></h3>
+                <h3>Upgraded Nodes</h3>
                 <br />
                 <Table>
                   <tbody>
                     {data?.up_to_date_nodes?.map((upgraded_node) => (
                       <tr key={upgraded_node?.hostname}>
                         <td>
-                          {upgraded_node?.hostname}&nbsp;
-                          <Label bsStyle={upgraded_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'} bsSize="xs">{upgraded_node?.data_node_status}</Label>&nbsp;
-                          {upgraded_node?.manager_node && (<Label bsStyle="info" bsSize="xs">manager</Label>)}
+                          <div>
+                            {upgraded_node?.hostname}&nbsp;
+                            <Label bsStyle={upgraded_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'} bsSize="xs">
+                              {upgraded_node?.data_node_status}
+                            </Label>&nbsp;
+                            {upgraded_node?.manager_node && (<Label bsStyle="info" bsSize="xs">manager</Label>)}
+                          </div>
+                          <div>
+                            <i>{upgraded_node?.ip}</i>
+                          </div>
                         </td>
-                        <td><i>{upgraded_node?.ip}</i></td>
+                        <td><i>{upgraded_node?.datanode_version}</i></td>
                         <td align="right">
                           <Label bsStyle="success" bsSize="xs">Upgraded <Icon name="check" /></Label>
                         </td>
