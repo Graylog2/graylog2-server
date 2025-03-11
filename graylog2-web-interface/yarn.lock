@@ -7751,7 +7751,7 @@ eslint-config-airbnb@19.0.4:
     "@typescript-eslint/parser" "8.26.0"
     eslint "8.57.0"
     eslint-config-airbnb "19.0.4"
-    eslint-config-prettier "10.0.2"
+    eslint-config-prettier "10.1.1"
     eslint-import-resolver-webpack "0.13.10"
     eslint-plugin-compat "6.0.2"
     eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
@@ -7764,10 +7764,10 @@ eslint-config-airbnb@19.0.4:
     eslint-plugin-react-hooks "5.2.0"
     eslint-plugin-testing-library "7.1.1"
 
-eslint-config-prettier@10.0.2:
-  version "10.0.2"
-  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-10.0.2.tgz#47444de8aa104ce82c2f91ad2a5e96b62c01e20d"
-  integrity sha512-1105/17ZIMjmCOJOPNfVdbXafLCLj3hPmkmB7dLgt7XsQ/zkxSuDerE/xgO3RxoHysR1N1whmquY0lSn2O0VLg==
+eslint-config-prettier@10.1.1:
+  version "10.1.1"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-10.1.1.tgz#cf0ff6e5c4e7e15f129f1f1ce2a5ecba92dec132"
+  integrity sha512-4EQQr6wXwS+ZJSzaR5ZCrYgLxqvUjdXctaEtBqHcbkW944B1NQyO4qpdHQbXBONfwxXdkAY81HH4+LUfrg+zPw==
 
 eslint-import-resolver-node@^0.3.6:
   version "0.3.6"
@@ -13662,9 +13662,9 @@ postcss@^8.5.3:
     source-map-js "^1.2.1"
 
 posthog-js@^1.52.0:
-  version "1.229.5"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.229.5.tgz#e421d5eff5dd4ad2b851378300acea9bfeef5c7a"
-  integrity sha512-M7WewK9nltttOpQ7TVksrTYun+A4MOC3auHQ7IGTEariXfTrRApvWnQFbRTZ1C4kLWFvsvsamotJf9nC+PgCug==
+  version "1.230.1"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.230.1.tgz#3d882a9f41161fe27b9eb925582f400750867580"
+  integrity sha512-H4KYK1O6F6VaKzfhG7FLb4qYUrK/NLi3ENr2Csqhkn3T0zLihZoLixFTDc2Nc98aQcq9K3T3MxKPPkc2EFtHVQ==
   dependencies:
     core-js "^3.38.1"
     fflate "^0.4.8"

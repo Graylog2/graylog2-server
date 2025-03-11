@@ -293,9 +293,19 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.PIPELINES.PIPELINE(':pipelineId'), element: <PipelineDetailsPage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODES, element: <ClusterConfigurationPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_DASHBOARD, element: <DataNodesClusterManagementPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION, element: <DataNodesClusterConfigurationPage /> },
-            !isCloud && enableDataNodeMigration && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION, element: <DataNodesMigrationPage /> },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_DASHBOARD,
+              element: <DataNodesClusterManagementPage />,
+            },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
+              element: <DataNodesClusterConfigurationPage />,
+            },
+            !isCloud &&
+              enableDataNodeMigration && {
+                path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
+                element: <DataNodesMigrationPage />,
+              },
 
             !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
