@@ -116,6 +116,10 @@ public class OpensearchCommandLineProcess implements Closeable {
     }
 
     private void logWarnings(OpensearchConfiguration config) {
+        if (!config.warnings().isEmpty()) {
+            LOG.warn("Your system is overriding forbidden opensearch configuration properties. " +
+                    "This may cause unexpected results and may break in any future release!");
+        }
         config.warnings().forEach(LOG::warn);
     }
 
