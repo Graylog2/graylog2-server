@@ -14,10 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.filesystem.index.indexreader;
+import * as React from 'react';
+import { Indicator as MantineIndicator } from '@mantine/core';
 
-import org.apache.lucene.util.Version;
+type Props = Pick<
+  React.ComponentProps<typeof MantineIndicator>,
+  | 'position'
+  | 'offset'
+  | 'label'
+  | 'children'
+  | 'className'
+  | 'size'
+  | 'title'
+  | 'radius'
+  | 'color'
+  | 'zIndex'
+  | 'withBorder'
+  | 'disabled'
+  | 'processing'
+  | 'autoContrast'
+>;
+const Indicator = ({ ...props }: Props) => (
+  <MantineIndicator {...props} />
+);
 
-public record ShardStats(java.nio.file.Path path, int documentsCount,
-                         Version minSegmentLuceneVersion) {
-}
+export default Indicator;
+

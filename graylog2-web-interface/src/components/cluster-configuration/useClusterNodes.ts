@@ -25,33 +25,37 @@ import useDataNodes from 'components/datanode/hooks/useDataNodes';
 export type GraylogNode = NodeInfo & SystemOverview;
 
 export type ClusterNode<NodeType = GraylogNode | DataNode> = {
-  nodeName: string,
-  type: string,
-  role: string,
-  nodeInfo: NodeType,
-}
+  nodeName: string;
+  type: string;
+  role: string;
+  nodeInfo: NodeType;
+};
 
 export type ClusterNodes = {
-  graylogNodes: ClusterNode<GraylogNode>[],
-  dataNodes: ClusterNode<DataNode>[],
-  refetchDatanodes: () => void,
-  isLoading: boolean,
-}
+  graylogNodes: ClusterNode<GraylogNode>[];
+  dataNodes: ClusterNode<DataNode>[];
+  refetchDatanodes: () => void;
+  isLoading: boolean;
+};
 
 const useClusterNodes = (): ClusterNodes => {
   const { nodes: _graylogNodes } = useStore(NodesStore);
-  const { clusterOverview: systemInfo  } = useStore(ClusterOverviewStore);
+  const { clusterOverview: systemInfo } = useStore(ClusterOverviewStore);
   const graylogNodes = Object.values(_graylogNodes || {}).map((graylogNode) => ({
     nodeName: `${graylogNode?.short_node_id} / ${graylogNode?.hostname}`,
     type: 'Graylog',
     role: graylogNode?.is_leader ? 'Leader' : 'Non-Leader',
     nodeInfo: {
       ...graylogNode,
-      ...(systemInfo || {})[graylogNode?.node_id]
+      ...(systemInfo || {})[graylogNode?.node_id],
     },
   }));
 
-  const { data: _dataNodes, refetch: refetchDatanodes, isInitialLoading: isDatanodeLoading } = useDataNodes({ query: '', page: 1, pageSize: 0, sort: { attributeId: 'hostname', direction: 'asc' } });
+  const {
+    data: _dataNodes,
+    refetch: refetchDatanodes,
+    isInitialLoading: isDatanodeLoading,
+  } = useDataNodes({ query: '', page: 1, pageSize: 0, sort: { attributeId: 'hostname', direction: 'asc' } });
   const dataNodes = (_dataNodes?.list || []).map((dataNode) => ({
     nodeName: dataNode?.hostname,
     type: 'Data Node - OpenSearch',
@@ -59,12 +63,12 @@ const useClusterNodes = (): ClusterNodes => {
     nodeInfo: dataNode,
   }));
 
-  return ({
+  return {
     graylogNodes,
     dataNodes,
     refetchDatanodes,
     isLoading: isDatanodeLoading || !_graylogNodes || !systemInfo,
-  });
+  };
 };
 
 export default useClusterNodes;
