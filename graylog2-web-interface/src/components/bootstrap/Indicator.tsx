@@ -14,14 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin.inputs.failure;
+import * as React from 'react';
+import { Indicator as MantineIndicator } from '@mantine/core';
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import org.graylog2.plugin.journal.RawMessage;
+type Props = Pick<
+  React.ComponentProps<typeof MantineIndicator>,
+  | 'position'
+  | 'offset'
+  | 'label'
+  | 'children'
+  | 'className'
+  | 'size'
+  | 'title'
+  | 'radius'
+  | 'color'
+  | 'zIndex'
+  | 'withBorder'
+  | 'disabled'
+  | 'processing'
+  | 'autoContrast'
+>;
+const Indicator = ({ ...props }: Props) => (
+  <MantineIndicator {...props} />
+);
 
-public record InputProcessingFailure(@Nonnull String errorMessage,
-                                     @Nullable Throwable exception,
-                                     @Nonnull RawMessage rawMessage,
-                                     @Nullable String inputMessage) {
-}
+export default Indicator;
+

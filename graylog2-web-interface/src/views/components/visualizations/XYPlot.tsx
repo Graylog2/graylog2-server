@@ -127,7 +127,13 @@ const XYPlot = ({
 
   return (
     <PlotLegend config={config} chartData={chartData} height={height} width={width}>
-      <GenericPlot chartData={chartData} layout={layout} onZoom={_onZoom} setChartColor={setChartColor} onClickMarker={onClickMarker} />
+      <GenericPlot
+        chartData={chartData}
+        layout={layout}
+        onZoom={_onZoom}
+        setChartColor={setChartColor}
+        onClickMarker={onClickMarker}
+      />
     </PlotLegend>
   );
 };
