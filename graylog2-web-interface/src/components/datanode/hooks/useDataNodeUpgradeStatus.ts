@@ -74,15 +74,15 @@ export interface DatanodeUpgradeStatus {
   server_version: Version;
 }
 
-export const saveNodeToUpdate = (node_name: string) => localStorage.setItem('datanode-to-update', node_name);
+export const saveNodeToUpgrade = (node_name: string) => localStorage.setItem('datanode-to-upgrade', node_name);
 
-export const getNodeToUpdate = () => localStorage.getItem('datanode-to-update');
+export const getNodeToUpgrade = () => localStorage.getItem('datanode-to-upgrade');
 
-export const removeSavedNodeToUpdate = () => localStorage.removeItem('datanode-to-update');
+export const removeSavedNodeToUpgrade = () => localStorage.removeItem('datanode-to-upgrade');
 
 export const stopShardReplication = async (): Promise<FlushResponse> => {
   try {
-    removeSavedNodeToUpdate();
+    removeSavedNodeToUpgrade();
 
     const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/stop'));
 
@@ -98,7 +98,7 @@ export const stopShardReplication = async (): Promise<FlushResponse> => {
 
 export const startShardReplication = async (): Promise<FlushResponse> => {
   try {
-    removeSavedNodeToUpdate();
+    removeSavedNodeToUpgrade();
 
     const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/start'));
 

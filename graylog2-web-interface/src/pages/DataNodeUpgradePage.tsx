@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import { Row, Col, Button, Table, Label } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import useDataNodeUpgradeStatus, { getNodeToUpdate, saveNodeToUpdate, startShardReplication, stopShardReplication } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
+import useDataNodeUpgradeStatus, { getNodeToUpgrade, saveNodeToUpgrade, startShardReplication, stopShardReplication } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
@@ -54,7 +54,7 @@ const DataNodeUpgradePage = () => {
 
   const confirmUpgradeButton = (
     <Button onClick={startShardReplication} bsSize="sm" bsStyle="primary">
-      Confirm Update Here
+      Confirm Upgrade Here
     </Button>
   );
 
@@ -71,12 +71,12 @@ const DataNodeUpgradePage = () => {
     }
   }
 
-  const updateNode = async (node: DataNodeInformation) => {
+  const upgradeNode = async (node: DataNodeInformation) => {
     await stopShardReplication();
-    saveNodeToUpdate(node?.hostname);
+    saveNodeToUpgrade(node?.hostname);
   }
 
-  const nodeInProgress = getNodeToUpdate();
+  const nodeInProgress = getNodeToUpgrade();
 
   return (
     <DocumentTitle title="Data Node Upgrade">
@@ -112,7 +112,7 @@ const DataNodeUpgradePage = () => {
               <dt>Cluster Manager:</dt>
               <dd>{data?.cluster_state?.manager_node?.name}</dd>
               <dt>Number of Nodes:</dt>
-              <dd>{(data?.outdated_nodes?.length || 0) + (data?.up_to_date_nodes?.length || 0)} ({data?.outdated_nodes?.length || 0} outdated, {data?.up_to_date_nodes?.length || 0} updated)</dd> 
+              <dd>{(data?.outdated_nodes?.length || 0) + (data?.up_to_date_nodes?.length || 0)} ({data?.outdated_nodes?.length || 0} outdated, {data?.up_to_date_nodes?.length || 0} upgraded)</dd> 
               <dt>Number of Shards:</dt>
               <dd>{data?.cluster_state?.active_shards || 0} ({data?.cluster_state?.unassigned_shards || 0} unassigned)</dd>
             </StyledHorizontalDl>
@@ -134,8 +134,8 @@ const DataNodeUpgradePage = () => {
                         </td>
                         <td><i>{outdated_node?.ip}</i></td>
                         <td align="right">
-                          <Button onClick={() => updateNode(outdated_node)} disabled={!outdated_node?.upgrade_possible} bsSize="sm" bsStyle="primary">
-                            Update
+                          <Button onClick={() => upgradeNode(outdated_node)} disabled={!outdated_node?.upgrade_possible} bsSize="sm" bsStyle="primary">
+                            Upgrade
                           </Button>
                         </td>
                       </tr>
@@ -149,26 +149,26 @@ const DataNodeUpgradePage = () => {
                 </Table>
               </Col>
               <Col sm={6}>
-                <h3>Updated Nodes <Version>v{data?.server_version?.version}</Version></h3>
+                <h3>Upgraded Nodes <Version>v{data?.server_version?.version}</Version></h3>
                 <br />
                 <Table>
                   <tbody>
-                    {data?.up_to_date_nodes?.map((updated_node) => (
-                      <tr key={updated_node?.hostname}>
+                    {data?.up_to_date_nodes?.map((upgraded_node) => (
+                      <tr key={upgraded_node?.hostname}>
                         <td>
-                          {updated_node?.hostname}&nbsp;
-                          <Label bsStyle={updated_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'} bsSize="xs">{updated_node?.data_node_status}</Label>&nbsp;
-                          {updated_node?.manager_node && (<Label bsStyle="info" bsSize="xs">manager</Label>)}
+                          {upgraded_node?.hostname}&nbsp;
+                          <Label bsStyle={upgraded_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'} bsSize="xs">{upgraded_node?.data_node_status}</Label>&nbsp;
+                          {upgraded_node?.manager_node && (<Label bsStyle="info" bsSize="xs">manager</Label>)}
                         </td>
-                        <td><i>{updated_node?.ip}</i></td>
+                        <td><i>{upgraded_node?.ip}</i></td>
                         <td align="right">
-                          <Label bsStyle="success" bsSize="xs">Updated <Icon name="check" /></Label>
+                          <Label bsStyle="success" bsSize="xs">Upgraded <Icon name="check" /></Label>
                         </td>
                       </tr>
                     ))}
                     {!data?.up_to_date_nodes?.length && (
                       <tr>
-                        <td>No updated nodes found.</td>
+                        <td>No upgraded nodes found.</td>
                       </tr>
                     )}
                   </tbody>
@@ -179,7 +179,7 @@ const DataNodeUpgradePage = () => {
           {nodeInProgress && (
             <Col xs={12}>
               <br />
-              You are updating <b>{nodeInProgress}</b>, wait until it reconnects and apears in the <b>Updated Nodes</b> panel,
+              You are updating <b>{nodeInProgress}</b>, wait until it reconnects and apears in the <b>Upgraded Nodes</b> panel,
               then {confirmUpgradeButton} and continue with next node.
             </Col>
           )}
