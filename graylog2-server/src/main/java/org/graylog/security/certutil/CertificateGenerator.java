@@ -35,6 +35,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
@@ -47,8 +48,7 @@ public class CertificateGenerator {
 
         final X500Name name = getX500Name(request.cnName());
 
-        // TODO: cert serial number?
-        BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+        BigInteger serialNumber = new BigInteger(UUID.randomUUID().toString().replace("-", ""), 16);
         Instant validFrom = Instant.now();
 
         Instant validUntil = validFrom.plus(request.validity());
