@@ -47,7 +47,7 @@ const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
     onError: (error) => {
       UserNotification.error(`Updating table layout preferences failed with error: ${error}`);
     },
-    onMutate: refetch,
+    onSuccess: refetch,
   });
 
   return { mutate };
