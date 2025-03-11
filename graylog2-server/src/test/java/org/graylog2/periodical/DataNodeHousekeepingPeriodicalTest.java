@@ -29,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -59,7 +60,7 @@ class DataNodeHousekeepingPeriodicalTest {
     @Test
     void testVersionMismatchNotificationOnMismatch() {
         DataNodeDto sameVersion = mock(DataNodeDto.class);
-        when(sameVersion.isCompatibleWithVersion()).thenReturn(true);
+        lenient().when(sameVersion.isCompatibleWithVersion()).thenReturn(true); // lenient to avoid race condition in allMatch
         DataNodeDto differentVersion = mock(DataNodeDto.class);
         when(differentVersion.isCompatibleWithVersion()).thenReturn(false);
         when(nodeService.allActive()).thenReturn(Map.of("node1", sameVersion, "node2", differentVersion));
