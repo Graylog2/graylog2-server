@@ -112,7 +112,7 @@ public class Configuration implements CommonNodeConfiguration {
             Use at your own risk.
             """)
     @Parameter(value = "opensearch_configuration_overrides_file")
-    private Path opensearchConfigurationOverridesFile = Path.of("opensearch.overrides");
+    private Path opensearchConfigurationOverridesFile = null;
 
     @Documentation("Source directory of the additional configuration files for the Datanode. Additional certificates can be provided here.")
     @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)

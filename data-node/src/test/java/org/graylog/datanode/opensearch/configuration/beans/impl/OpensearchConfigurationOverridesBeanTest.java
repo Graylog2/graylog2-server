@@ -63,7 +63,7 @@ class OpensearchConfigurationOverridesBeanTest {
         final Path opensearchOverridesFile = tempDir.resolve("opensearch.overrides");
         writePropertiesFile(opensearchOverridesFile,
                 """
-                        cluster.routing.allocation.disk.watermark.low: 98%
+                        cluster.routing.allocation.disk.watermark.low=98%
                         """);
 
 

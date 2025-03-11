@@ -174,6 +174,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                                 cluster.routing.allocation.disk.threshold_enabled=false
                                 """
                 ), IMAGE_WORKING_DIR + "/config/opensearch.overrides")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIGURATION_OVERRIDES_FILE", IMAGE_WORKING_DIR + "/config/opensearch.overrides")
 
                 .withNetworkAliases(nodeName)
                 .waitingFor(new LogMessageWaitStrategy()

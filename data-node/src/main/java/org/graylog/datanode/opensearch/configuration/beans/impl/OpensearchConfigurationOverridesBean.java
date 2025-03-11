@@ -80,9 +80,11 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
                 .filter(entry -> entry.getKey().matches("^opensearch\\.[a-z0-9_]+(?:\\.[a-z0-9_]+)+"))
                 .forEach(entry -> properties.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
 
-        datanodeDirectories.resolveConfigurationSourceFile(overridesFile)
-                .map(this::readPropertiesFile)
-                .ifPresent(properties::putAll);
+        if (overridesFile != null) {
+            datanodeDirectories.resolveConfigurationSourceFile(overridesFile)
+                    .map(this::readPropertiesFile)
+                    .ifPresentOrElse(properties::putAll, () -> LOG.error("Could not read opensearch overrides file {}", overridesFile));
+        }
 
         return builder
                 .properties(properties)
