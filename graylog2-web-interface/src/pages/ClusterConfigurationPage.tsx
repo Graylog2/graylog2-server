@@ -28,7 +28,12 @@ import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
 
 const ClusterConfigurationPage = () => {
   const clusterNodes = useClusterNodes();
-  const searchParams: SearchParams = { query: '', page: 1, pageSize: 0, sort: { attributeId: 'hostname', direction: 'asc' } };
+  const searchParams: SearchParams = {
+    query: '',
+    page: 1,
+    pageSize: 0,
+    sort: { attributeId: 'hostname', direction: 'asc' },
+  };
 
   return (
     <DocumentTitle title="Cluster Configuration">
@@ -36,10 +41,10 @@ const ClusterConfigurationPage = () => {
       <div>
         <PageHeader title="Cluster Configuration">
           <span>
-            This page provides a real-time overview of the nodes in your Graylog cluster.
-            You can pause message processing at any time. The process buffers will not accept any new messages until
-            you resume it. If the message journal is enabled for a node, which it is by default, incoming messages
-            will be persisted to disk, even when processing is disabled.
+            This page provides a real-time overview of the nodes in your Graylog cluster. You can pause message
+            processing at any time. The process buffers will not accept any new messages until you resume it. If the
+            message journal is enabled for a node, which it is by default, incoming messages will be persisted to disk,
+            even when processing is disabled.
           </span>
         </PageHeader>
         <HideOnCloud>
@@ -50,7 +55,11 @@ const ClusterConfigurationPage = () => {
             <h2>Nodes</h2>
           </Col>
           <Col md={12}>
-            <TableFetchContextProvider refetch={clusterNodes.refetchDatanodes} searchParams={searchParams} attributes={[]}>
+            <TableFetchContextProvider
+              refetch={clusterNodes.refetchDatanodes}
+              searchParams={searchParams}
+              attributes={[]}
+              entityTableId="cluster-configuration">
               <ClusterConfigurationListView clusterNodes={clusterNodes} />
             </TableFetchContextProvider>
           </Col>
