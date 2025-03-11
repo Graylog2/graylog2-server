@@ -19,7 +19,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button, Row, Col, Input } from 'components/bootstrap';
-import { Select, Tooltip } from 'components/common';
+import { Select } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
 import useInputSetupWizardStepsHelper from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardStepsHelper';
@@ -30,7 +30,7 @@ import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import type { OpenStepsData } from 'components/inputs/InputSetupWizard/types';
 
-import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading } from './components/StepWrapper';
+import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading, RecommendedTooltip } from './components/StepWrapper';
 
 const ExistingStreamCol = styled(Col)(
   ({ theme }) => css`
@@ -44,15 +44,6 @@ const CreateStreamCol = styled(Col)(
     padding-top: ${theme.spacings.sm};
     padding-bottom: ${theme.spacings.md};
     border-right: 1px solid ${theme.colors.cards.border};
-  `,
-);
-
-const StyledTooltip = styled(Tooltip)(
-  ({ theme }) => css`
-    &.mantine-Tooltip-tooltip {
-      background-color: ${theme.colors.global.background}!important;
-      font-size: ${theme.fonts.size.small}!important;
-    }
   `,
 );
 
@@ -237,11 +228,11 @@ const SetupRoutingStep = () => {
             {!selectedStreamId && (
               <CreateStreamCol md={6}>
                 <StyledHeading>Route to a new Stream</StyledHeading>
-                <StyledTooltip opened withArrow position="bottom" label="Recommended!">
+                <RecommendedTooltip opened withArrow position="bottom" label="Recommended!">
                   <Button onClick={handleCreateStream} bsStyle="primary">
                     Create Stream
                   </Button>
-                </StyledTooltip>
+                </RecommendedTooltip>
               </CreateStreamCol>
             )}
             <ExistingStreamCol md={selectedStreamId ? 12 : 6}>
