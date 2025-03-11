@@ -174,13 +174,15 @@ export const executeSearchJob =
     widgetMapping,
     page,
     perPage,
+    searchExecutors,
   }: {
     jobIds: JobIds;
     widgetMapping?: WidgetMapping;
     page?: number;
     perPage?: number;
+    searchExecutors: SearchExecutors;
   }) =>
-  (dispatch: ViewsDispatch, _getState, { searchExecutors }: { searchExecutors: SearchExecutors }) => {
+  (dispatch: ViewsDispatch, _getState) => {
     dispatch(setJobIds(jobIds));
     dispatch(loading());
 
@@ -224,11 +226,7 @@ export const executeWithExecutionState =
 
         return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery], page, perPage);
       })
-      .then((jobIds: JobIds) => {
-        dispatch(setJobIds(jobIds));
-
-        return dispatch(executeSearchJob({ jobIds, widgetMapping, page, perPage }));
-      });
+      .then((jobIds: JobIds) => dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage })));
 
 export const execute =
   ({
