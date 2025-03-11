@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import {Spinner, ISODurationInput} from 'components/common';
 
 const StyledForm = styled.form`
   margin-top: 10px;
@@ -49,6 +49,8 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
     setTokenTtl('');
   };
 
+  const ttlValidator = (milliseconds: number) => milliseconds >= 60000;
+
   return (
     <StyledForm className="form-inline" onSubmit={createToken}>
       <FormGroup controlId="create-token-input">
@@ -63,12 +65,16 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
       </FormGroup>
       <FormGroup controlId="create-token-input">
         <ControlLabel>Token TTL</ControlLabel>
-        <FormControl
-          type="text"
+        <ISODurationInput
+          id="token_creation_ttl"
+          duration={tokenTtl || "P7D"}
+          update={(value) => setTokenTtl(value)}
+          label=""
+          help=""
+          validator={ttlValidator}
+          errorText="invalid (min: 1 minute)"
           disabled={disableForm}
-          placeholder="What is this token's TTL?"
-          value={tokenTtl}
-          onChange={(event) => setTokenTtl((event.target as HTMLInputElement).value)}
+          required
         />
       </FormGroup>
       <Button
