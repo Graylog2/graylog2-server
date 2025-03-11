@@ -280,7 +280,7 @@ const SetupRoutingStep = () => {
               <StyledList>
                 <li>Route messages from this input to an existing stream is selected.</li>
                 <li>
-                  Pipeline Rules will be created when the <strong>Finish & Start Input</strong> button is pressed.
+                  Pipeline Rules will be created when the <strong>Start Input</strong> button is pressed.
                 </li>
               </StyledList>
             </DescriptionCol>
