@@ -15,29 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import numeral from 'numeral';
+import isEmpty from 'lodash/isEmpty';
 
-import { Timestamp } from 'components/common';
+import useViewsSelector from 'views/stores/useViewsSelector';
+import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import ExecutionInfo from 'views/components/views/ExecutionInfo';
 
-type Props = {
-  duration: number | undefined;
-  executedAt: string | undefined;
-  total?: number | undefined;
-  showTotal?: boolean;
-  executionFinished: boolean;
-};
+const ViewsExecutionInfo = () => {
+  const result = useViewsSelector(selectCurrentQueryResults);
 
-const ExecutionInfo = ({ duration, executedAt, total = undefined, showTotal = true, executionFinished }: Props) => {
-  if (!executionFinished) {
+  if (isEmpty(result)) {
     return <i>No query executed yet.</i>;
   }
 
+  const total = result?.searchTypes && Object.values(result?.searchTypes)?.find((e) => e.total)?.total;
+
   return (
-    <i>
-      Query executed in {numeral(duration).format('0,0')}ms at <Timestamp dateTime={executedAt} />{' '}
-      {showTotal && <>Total results: {numeral(total).format('0,0')}</>}
-    </i>
+    <ExecutionInfo
+      duration={result?.duration}
+      executedAt={result?.timestamp}
+      executionFinished={!isEmpty(result)}
+      total={total}
+    />
   );
 };
 
-export default ExecutionInfo;
+export default ViewsExecutionInfo;
