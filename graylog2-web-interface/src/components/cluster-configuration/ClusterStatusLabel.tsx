@@ -28,7 +28,7 @@ const StatusLabel = styled(Label)`
 `;
 
 type Props = {
-  node: GraylogNode,
+  node: GraylogNode;
 };
 
 const ClusterStatusLabel = ({ node }: Props) => {
@@ -38,20 +38,25 @@ const ClusterStatusLabel = ({ node }: Props) => {
 
   return (
     <>
-      <StatusLabel bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
-                  title={lifecycleStatus}
-                  aria-label={lifecycleStatus}>
+      <StatusLabel
+        bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
+        title={lifecycleStatus}
+        aria-label={lifecycleStatus}>
         {lifecycleStatus}
-      </StatusLabel>&nbsp;
-      <StatusLabel bsStyle={node.lb_status === 'alive' ? 'success' : 'warning'}
-                  title={loadBalancersStatus}
-                  aria-label={loadBalancersStatus}>
-      {loadBalancersStatus}
-      </StatusLabel>&nbsp;
-      <StatusLabel bsStyle={node.is_processing ? 'success' : 'warning'}
-                  title={messageProcessingStatus}
-                  aria-label={messageProcessingStatus}>
-      {messageProcessingStatus}
+      </StatusLabel>
+      &nbsp;
+      <StatusLabel
+        bsStyle={node.lb_status === 'alive' ? 'success' : 'warning'}
+        title={loadBalancersStatus}
+        aria-label={loadBalancersStatus}>
+        {loadBalancersStatus}
+      </StatusLabel>
+      &nbsp;
+      <StatusLabel
+        bsStyle={node.is_processing ? 'success' : 'warning'}
+        title={messageProcessingStatus}
+        aria-label={messageProcessingStatus}>
+        {messageProcessingStatus}
       </StatusLabel>
     </>
   );
