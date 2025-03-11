@@ -22,7 +22,6 @@ import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
 import useShowDatanodeMigration from 'components/datanode/hooks/useShowDatanodeMigration';
 
-
 const ClusterConfigurationPageNavigation = () => {
   const { showDatanodeMigration, isDatanodeConfiguredAndUsed } = useShowDatanodeMigration();
   const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');

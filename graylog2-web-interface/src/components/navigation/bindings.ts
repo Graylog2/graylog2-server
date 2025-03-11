@@ -50,7 +50,11 @@ const navigationBindings: PluginExports = {
         filterMenuItems(
           [
             { path: Routes.SYSTEM.OVERVIEW, description: 'Overview' },
-            { path: Routes.SYSTEM.CONFIGURATIONS, description: 'Configurations', permissions: ['clusterconfigentry:read'] },
+            {
+              path: Routes.SYSTEM.CONFIGURATIONS,
+              description: 'Configurations',
+              permissions: ['clusterconfigentry:read'],
+            },
             { path: Routes.SYSTEM.CLUSTER.NODES, description: 'Cluster Configuration' },
             { path: Routes.SYSTEM.INPUTS, description: 'Inputs', permissions: ['inputs:read'] },
             { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },

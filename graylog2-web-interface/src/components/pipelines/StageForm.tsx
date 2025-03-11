@@ -95,9 +95,11 @@ const StageForm = ({
 
   const _getFormattedOptions = useCallback(() => {
     const chosenRules = nextStage.rules;
-    const defaultScopeRules = rules.filter((rule) => rule._scope === 'DEFAULT')
+    const defaultScopeRules = rules.filter((rule) => rule._scope === 'DEFAULT');
 
-    return defaultScopeRules ? defaultScopeRules.filter((rule) => _filterChosenRules(rule, chosenRules)).map(_formatRuleOption) : [];
+    return defaultScopeRules
+      ? defaultScopeRules.filter((rule) => _filterChosenRules(rule, chosenRules)).map(_formatRuleOption)
+      : [];
   }, [nextStage.rules, rules]);
 
   const rulesHelp = (
