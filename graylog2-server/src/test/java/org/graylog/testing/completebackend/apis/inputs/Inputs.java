@@ -82,4 +82,12 @@ public class Inputs implements GraylogRestApi {
                 .log().ifError()
                 .statusCode(204);
     }
+
+    public void setRunningState(String inputId) {
+        given()
+                .spec(api.requestSpecification())
+                .expect().response().statusCode(200)
+                .when()
+                .put("/system/inputstates/" + inputId);
+    }
 }

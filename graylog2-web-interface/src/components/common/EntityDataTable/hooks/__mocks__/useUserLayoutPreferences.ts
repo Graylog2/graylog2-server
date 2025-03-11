@@ -14,17 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
-import type { SearchParams, Attribute } from 'stores/PaginationTypes';
-import { singleton } from 'logic/singleton';
+import type originalUseUserLayoutPreferences from '../useUserLayoutPreferences';
 
-export type ContextValue = {
-  searchParams: SearchParams;
-  refetch: () => void;
-  attributes: Array<Attribute>;
-  entityTableId: string;
-};
-
-const TableFetchContext = React.createContext<ContextValue | undefined>(undefined);
-export default singleton('contexts.TableFetchContext', () => TableFetchContext);
+const useUserLayoutPreferences = jest.fn(
+  (): ReturnType<typeof originalUseUserLayoutPreferences> => ({
+    data: layoutPreferences,
+    isInitialLoading: false,
+    refetch: () => {},
+  }),
+);
+export default useUserLayoutPreferences;
