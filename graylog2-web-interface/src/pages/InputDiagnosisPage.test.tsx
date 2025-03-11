@@ -22,9 +22,11 @@ import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosi
 
 import InputDiagnosisPage from './InputDiagnosisPage';
 
-jest.mock('routing/useParams', () => jest.fn(() => ({
-  inputId: 'test-input-id',
-})));
+jest.mock('routing/useParams', () =>
+  jest.fn(() => ({
+    inputId: 'test-input-id',
+  })),
+);
 
 jest.mock('components/inputs/InputDiagnosis/useInputDiagnosis');
 
@@ -36,8 +38,8 @@ const input = {
   name: 'inputName',
   created_at: '',
   creator_user_id: 'creatorId',
-  static_fields: { },
-  attributes: { },
+  static_fields: {},
+  attributes: {},
 };
 
 const inputNodeStates = {
@@ -57,7 +59,7 @@ const inputMetrics = {
   read_bytes_total: 16,
   write_bytes_1sec: 17,
   write_bytes_total: 18,
-  message_errors:{
+  message_errors: {
     failures_indexing: 19,
     failures_processing: 20,
     failures_inputs_codecs: 21,
@@ -80,9 +82,7 @@ describe('Input Diagnosis Page', () => {
   });
 
   it('renders the page for the given input with its metrics', async () => {
-    render(
-      <InputDiagnosisPage />,
-    );
+    render(<InputDiagnosisPage />);
 
     expect(await screen.findByText(/inputTitle/)).toBeInTheDocument();
     expect(await screen.findByText(/11 events/)).toBeInTheDocument();
@@ -101,38 +101,39 @@ describe('Input Diagnosis Page', () => {
     expect(await screen.findByText(/Test Stream 2/)).toBeInTheDocument();
     expect(await screen.findByText(/23/)).toBeInTheDocument();
     expect(await screen.findByRole('link', { name: /node id: test-node-id-1/i })).toBeInTheDocument();
-    expect(await screen.findByRole('link', { name: /node id: test-node-id-2 message: failed for testing/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('link', { name: /node id: test-node-id-2 message: failed for testing/i }),
+    ).toBeInTheDocument();
   });
 
   it('shows link to nodes related to node state', async () => {
-    render(
-      <InputDiagnosisPage />,
-    );
+    render(<InputDiagnosisPage />);
     const runningNodeLink = await screen.findByRole('link', { name: /node id: test-node-id-1/i });
 
-    expect(hasHref(runningNodeLink) ? runningNodeLink.href : null).toEqual('http://localhost/system/nodes/test-node-id-1');
+    expect(hasHref(runningNodeLink) ? runningNodeLink.href : null).toEqual(
+      'http://localhost/system/nodes/test-node-id-1',
+    );
   });
 
   it('shows node state failed indicator', async () => {
-    render(
-      <InputDiagnosisPage />,
-    );
+    render(<InputDiagnosisPage />);
     const nodeStateIndicator = await screen.findByTestId('state-indicator');
 
     expect(nodeStateIndicator).toHaveClass('danger');
   });
 
   it('shows node state success indicator', async () => {
-    asMock(useInputDiagnosis).mockReturnValue({ ...useInputDiagnosisMock, inputNodeStates: {
-      total: 1,
-      states: {
-        RUNNING: [{ node_id: 'test-node-id-1', detailed_message: undefined }],
+    asMock(useInputDiagnosis).mockReturnValue({
+      ...useInputDiagnosisMock,
+      inputNodeStates: {
+        total: 1,
+        states: {
+          RUNNING: [{ node_id: 'test-node-id-1', detailed_message: undefined }],
+        },
       },
-    }});
+    });
 
-    render(
-      <InputDiagnosisPage />,
-    );
+    render(<InputDiagnosisPage />);
 
     const nodeStateIndicator = await screen.findByTestId('state-indicator');
 
