@@ -160,6 +160,11 @@ type InputSetupWizard = {
   EnterpriseInputSetupWizard: React.ComponentType<{
     openSteps: { [key in InputSetupWizardStep]?: StepType };
   }>;
+  InputFailureLink: React.ComponentType<{
+    failureType: string;
+    inputId: string;
+    children: React.ReactNode;
+  }>;
   ExtraSetupWizardStep: React.ComponentType;
 };
 

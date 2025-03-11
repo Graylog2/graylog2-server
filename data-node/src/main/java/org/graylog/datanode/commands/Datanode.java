@@ -36,7 +36,6 @@ import org.graylog.datanode.configuration.DatanodeProvisioningBindings;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
-import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
@@ -71,7 +70,6 @@ public class Datanode extends DatanodeBootstrap {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
                 new ConfigurationModule(configuration),
-                new MongoDBModule(),
                 new DatanodeServerBindings(),
                 new RestBindings(),
                 new DatanodeProvisioningBindings(),
