@@ -141,8 +141,6 @@ export type SearchExecutors = {
     searchTypesToSearch: string[],
     executionStateParam: SearchExecutionState,
     keepQueries?: string[],
-    page?: number,
-    perPage?: number,
   ) => Promise<JobIds>;
   executeJobResult: (params: {
     jobIds: JobIds;
@@ -224,7 +222,7 @@ export const executeWithExecutionState =
         dispatch(loading());
         dispatch(cancelExecutedJob());
 
-        return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery], page, perPage);
+        return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
       })
       .then((jobIds: JobIds) => dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage })));
 
