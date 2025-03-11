@@ -81,6 +81,11 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
         return (List<String>) fields.get(DataNodeDto.FIELD_OPENSEARCH_ROLES);
     }
 
+    @SuppressWarnings("unchecked")
+    private List<String> getConfigurationWarnings() {
+        return (List<String>) fields.get(DataNodeDto.FIELD_CONFIGURATION_WARNINGS);
+    }
+
     @Override
     public DataNodeDto toDto() {
         return DataNodeDto.Builder.builder()
@@ -97,6 +102,7 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
                 .setCertValidUntil(this.getCertValidTill())
                 .setDatanodeVersion(this.getDatanodeVersion())
                 .setOpensearchRoles(this.getOpensearchRoles())
+                .setConfigurationWarnings(this.getConfigurationWarnings())
                 .build();
     }
 
