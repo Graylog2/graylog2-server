@@ -142,11 +142,11 @@ public class ParameterizedHttpClientProviderTest {
 
     private OkHttpClientProvider client(URI proxyURI) {
         final OkHttpClientProvider provider = new OkHttpClientProvider(
+                "GraylogTest",
                 Duration.milliseconds(500L),
                 Duration.milliseconds(500L),
                 Duration.milliseconds(500L),
-                proxyURI,
-                null, null);
+                proxyURI, null, null);
 
         return provider;
     }
