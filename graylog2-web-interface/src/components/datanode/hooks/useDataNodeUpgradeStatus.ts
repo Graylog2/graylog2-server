@@ -30,7 +30,7 @@ export interface DataNodeInformation {
   roles: string[];
   node_name: string;
   upgrade_possible: boolean;
-  mnager_node: boolean;
+  manager_node: boolean;
 }
 export interface ManagerNode {
   node_uid: string;
