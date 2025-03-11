@@ -34,9 +34,6 @@ type Props = Pick<
   | 'processing'
   | 'autoContrast'
 >;
-const Indicator = ({ ...props }: Props) => (
-  <MantineIndicator {...props} />
-);
+const Indicator = ({ ...props }: Props) => <MantineIndicator {...props} />;
 
 export default Indicator;
-
