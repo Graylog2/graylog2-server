@@ -178,6 +178,7 @@ describe('ChangeFieldTypeModal', () => {
         displayedAttributes: ['index_set_title', 'stream_titles', 'types'],
       },
       isInitialLoading: false,
+      refetch: () => {},
     });
   });
 

@@ -19,8 +19,13 @@ package org.graylog2.rest.resources.entities.preferences.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.Map;
 
 public record EntityListPreferences(@JsonProperty("displayed_attributes") List<String> displayedAttributes,
                                     @JsonProperty("per_page") Integer perPage,
-                                    @JsonProperty("sort") SortPreferences sort) {
+                                    @JsonProperty("sort") SortPreferences sort,
+                                    @JsonProperty("custom_preferences") Map<String, Object> customPreferences) {
+    public static EntityListPreferences create(List<String> displayedAttributes, Integer perPage, SortPreferences sort) {
+        return new EntityListPreferences(displayedAttributes, perPage, sort, Map.of());
+    }
 }
