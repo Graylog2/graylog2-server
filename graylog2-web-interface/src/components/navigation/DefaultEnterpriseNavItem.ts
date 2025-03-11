@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin.inputs.failure;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import org.graylog2.plugin.journal.RawMessage;
+import { DASHBOARDS_LINK_TITLE } from 'components/navigation/bindings';
+import Routes from 'routing/Routes';
 
-public record InputProcessingFailure(@Nonnull String errorMessage,
-                                     @Nullable Throwable exception,
-                                     @Nonnull RawMessage rawMessage,
-                                     @Nullable String inputMessage) {
-}
+const DefaultEnterpriseNavItem = {
+  description: 'Enterprise',
+  position: { after: DASHBOARDS_LINK_TITLE },
+  path: Routes.SYSTEM.ENTERPRISE,
+};
+
+export default DefaultEnterpriseNavItem;
