@@ -99,7 +99,14 @@ const CreateStreamForm = ({ submitForm, handleBackClick }: Props) => {
 
           <IndexSetSelect
             indexSets={indexSets}
-            help="Messages that match this stream will be written to the configured Index Set. Index Sets are used to rationally partition data to allow faster searches. We recommend creating a new Index Set for each Input type."
+            help={
+              <>
+                Messages that match this stream will be written to the configured Index Set. Index Sets are used to
+                rationally partition data to allow faster searches.
+                <br />
+                We recommend creating a new Index Set for each Input type.
+              </>
+            }
           />
           <RecommendedTooltip opened withArrow position="right" label="Recommended!">
             <NewIndexSetButton onClick={handleNewIndexSetClick}>Create a new Index Set</NewIndexSetButton>
