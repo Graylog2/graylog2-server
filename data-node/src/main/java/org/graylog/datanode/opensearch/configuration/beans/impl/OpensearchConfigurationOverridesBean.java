@@ -53,6 +53,7 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
             "^cluster\\.routing\\.allocation\\.awareness\\..*$",
             "^node\\.attr\\.zone$",
             "^plugins\\.security\\.ssl\\.transport\\.enforce_hostname_verification$",
+            "^index\\.codec$",
     };
 
     @Inject
