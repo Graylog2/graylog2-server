@@ -53,15 +53,13 @@ public class DatanodeUpgradeService {
     }
 
     public DatanodeUpgradeStatus status() {
-        //final Version serverVersion = Version.CURRENT_CLASSPATH;
-        final Version serverVersion = new Version(com.github.zafarkhaja.semver.Version.parse("6.2.0"));
-
+        final Version serverVersion = Version.CURRENT_CLASSPATH;
 
         final ClusterState clusterState = upgradeService.getClusterState();
         final Collection<DataNodeDto> dataNodes = nodeService.allActive().values();
 
-        final Set<DataNodeDto> upToDateDataNodes = dataNodes.stream().filter(n -> isVersionEqualIgnoreBuildMetadata(n.getDatanodeVersion(), serverVersion)).collect(Collectors.toSet());
-        final Set<DataNodeDto> toUpgradeDataNodes = dataNodes.stream().filter(n -> !upToDateDataNodes.contains(n)).collect(Collectors.toSet());
+        final List<DataNodeDto> upToDateDataNodes = dataNodes.stream().filter(n -> isVersionEqualIgnoreBuildMetadata(n.getDatanodeVersion(), serverVersion)).collect(Collectors.toList());
+        final List<DataNodeDto> toUpgradeDataNodes = dataNodes.stream().filter(n -> !upToDateDataNodes.contains(n)).collect(Collectors.toList());
 
         final boolean clusterHealthy = clusterState.status().equals("GREEN") && clusterState.relocatingShards() == 0;
         final boolean shardReplicationEnabled = clusterState.shardReplication() == ShardReplication.ALL;
@@ -76,7 +74,7 @@ public class DatanodeUpgradeService {
         );
     }
 
-    private List<DataNodeInformation> enrichData(Set<DataNodeDto> nodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
+    private List<DataNodeInformation> enrichData(List<DataNodeDto> nodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
         final Comparator<DataNodeInformation> comparator = Comparator.comparing(DataNodeInformation::upgradePossible)
                 .reversed()
                 .thenComparing(DataNodeInformation::nodeName);
@@ -84,13 +82,14 @@ public class DatanodeUpgradeService {
         AtomicInteger upgradeableCounter = new AtomicInteger(1);
 
         return nodes.stream()
+                .sorted(Comparator.nullsLast(Comparator.comparing(DataNodeDto::getHostname)))
                 .map(n -> enrichNodeInformation(n, nodes, clusterState, serverVersion, clusterReadyForUpgrade, upgradeableCounter))
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }
 
     @Nonnull
-    private static DataNodeInformation enrichNodeInformation(DataNodeDto node, Set<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade, AtomicInteger upgradeableCounter) {
+    private static DataNodeInformation enrichNodeInformation(DataNodeDto node, List<DataNodeDto> toUpgradeDataNodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade, AtomicInteger upgradeableCounter) {
         final Optional<Node> opensearchInformation = clusterState.findByHostname(node.getHostname());
 
 
