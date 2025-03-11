@@ -66,7 +66,7 @@ const useInputReferences = (
   const inputReferencesData = data ?? DEFAULT_DATA;
 
   const isInputAlreadyInUse =
-    inputReferencesData.stream_refs.length > 0 || inputReferencesData.pipeline_refs.length > 0;
+    inputReferencesData?.stream_refs?.length > 0 || inputReferencesData?.pipeline_refs?.length > 0;
 
   return {
     data: {
