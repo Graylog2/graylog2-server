@@ -203,9 +203,10 @@ const SetupRoutingStep = () => {
         streamType: 'NEW',
       }),
     );
+
+    onNextStep();
   };
 
-  const backButtonText = newStream ? 'Reset' : 'Back';
   const showNewStreamSection = newStream || showCreateStream;
   const showSelectStreamSection = selectedStreamId || showSelectStream;
 
@@ -255,20 +256,7 @@ const SetupRoutingStep = () => {
         <Row>
           <Col md={12}>
             <StyledHeading>Create new Stream</StyledHeading>
-            {newStream ? (
-              <>
-                <p>This Input will use a new stream: &quot;{newStream.title}&quot;.</p>
-                <p>
-                  Matches will {!newStream.remove_matches_from_default_stream && 'not '}be removed from the Default
-                  Stream.
-                </p>
-                {getStepData(stepsData, currentStepName, 'shouldCreateNewPipeline') && (
-                  <p>A new Pipeline will be created.</p>
-                )}
-              </>
-            ) : (
-              <CreateStreamForm submitForm={submitStreamCreation} />
-            )}
+            <CreateStreamForm submitForm={submitStreamCreation} handleBackClick={handleBackClick} />
           </Col>
         </Row>
       )}
@@ -334,12 +322,10 @@ const SetupRoutingStep = () => {
         </>
       )}
 
-      {(hasPreviousStep || hasNextStep || showNewStreamSection || showSelectStreamSection) && (
+      {(((hasPreviousStep || hasNextStep) && !showNewStreamSection) || showSelectStreamSection) && (
         <Row>
           <ButtonCol md={12}>
-            {(hasPreviousStep || showNewStreamSection || showSelectStreamSection) && (
-              <Button onClick={handleBackClick}>{backButtonText}</Button>
-            )}
+            {(hasPreviousStep || showSelectStreamSection) && <Button onClick={handleBackClick}>Back</Button>}
             {hasNextStep && (
               <Button disabled={!isStepValid()} onClick={onNextStep} bsStyle="primary">
                 Next

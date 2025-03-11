@@ -19,12 +19,14 @@ import { Formik, Form } from 'formik';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Button, Col, Row } from 'components/bootstrap';
+import { Button, Row } from 'components/bootstrap';
 import { FormikInput, InputOptionalInfo, Spinner } from 'components/common';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import SelectedIndexSetAlert from 'components/inputs/InputSetupWizard/steps/components/SelectedIndexSetAlert';
 import type { OpenStepsData } from 'components/inputs/InputSetupWizard/types';
+
+import { ButtonCol } from './StepWrapper';
 
 type FormValues = {
   create_new_pipeline?: boolean;
@@ -32,6 +34,7 @@ type FormValues = {
 
 type Props = {
   submitForm: (values: FormValues) => void;
+  handleBackClick: () => void;
 };
 
 const NewIndexSetButton = styled(Button)(
@@ -40,12 +43,7 @@ const NewIndexSetButton = styled(Button)(
   `,
 );
 
-const SubmitCol = styled(Col)`
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const CreateStreamForm = ({ submitForm }: Props) => {
+const CreateStreamForm = ({ submitForm, handleBackClick }: Props) => {
   const [indexSetsRefetchInterval, setIndexSetsRefetchInterval] = useState<false | number>(false);
   const { data: indexSetsData, isSuccess: isIndexSetsSuccess } = useIndexSetsList(false, indexSetsRefetchInterval);
 
@@ -78,8 +76,8 @@ const CreateStreamForm = ({ submitForm }: Props) => {
     description: undefined,
     title: undefined,
     index_set_id: indexSets?.find((indexSet) => indexSet.default)?.id,
-    remove_matches_from_default_stream: undefined,
-    create_new_pipeline: undefined,
+    remove_matches_from_default_stream: true,
+    create_new_pipeline: true,
   };
 
   return (
@@ -119,11 +117,12 @@ const CreateStreamForm = ({ submitForm }: Props) => {
           />
 
           <Row>
-            <SubmitCol md={12}>
+            <ButtonCol md={12}>
+              <Button onClick={handleBackClick}>Back</Button>
               <Button bsStyle="primary" type="submit" disabled={isValidating || !isValid || !dirty}>
-                Create
+                Next
               </Button>
-            </SubmitCol>
+            </ButtonCol>
           </Row>
         </Form>
       )}

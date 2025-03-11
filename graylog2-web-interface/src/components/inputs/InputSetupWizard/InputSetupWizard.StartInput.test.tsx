@@ -171,7 +171,7 @@ const useIndexSetsListResult = {
 const newStreamConfig = {
   description: 'Wingardium new stream',
   index_set_id: 'default_id',
-  remove_matches_from_default_stream: undefined,
+  remove_matches_from_default_stream: true,
   title: 'Wingardium',
 };
 
@@ -224,7 +224,7 @@ const createStream = async (newPipeline = false, removeFromDefault = true) => {
   });
 
   const submitButton = await screen.findByRole('button', {
-    name: 'Create',
+    name: 'Next',
     hidden: true,
   });
 
@@ -235,7 +235,7 @@ const createStream = async (newPipeline = false, removeFromDefault = true) => {
     fireEvent.click(removeFromDefaultCheckbox);
   }
 
-  if (newPipeline) {
+  if (!newPipeline) {
     fireEvent.click(newPipelineCheckbox);
   }
 

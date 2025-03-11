@@ -161,7 +161,7 @@ const getStreamCreateFormFields = async () => {
   });
 
   const submitButton = await screen.findByRole('button', {
-    name: 'Create',
+    name: 'Next',
     hidden: true,
   });
 
@@ -356,26 +356,17 @@ describe('InputSetupWizard Setup Routing', () => {
       const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
         await getStreamCreateFormFields();
 
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
       await selectEvent.openMenu(indexSetSelect);
       await selectEvent.select(indexSetSelect, 'Nox');
       fireEvent.click(removeMatchesCheckbox);
       fireEvent.click(newPipelineCheckbox);
 
+      expect(submitButton).toBeDisabled();
+
+      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+
       await waitFor(() => expect(submitButton).toBeEnabled());
-      fireEvent.click(submitButton);
-
-      expect(await screen.findByText(/This input will use a new stream: "Wingardium"./i)).toBeInTheDocument();
-      expect(await screen.findByText(/Matches will be removed from the Default stream./i)).toBeInTheDocument();
-      expect(await screen.findByText(/A new pipeline will be created./i)).toBeInTheDocument();
-
-      expect(
-        await screen.findByRole('button', {
-          name: /Reset/i,
-          hidden: true,
-        }),
-      ).toBeInTheDocument();
     });
 
     it('should show a warning when the user selects the default index set', async () => {
@@ -420,83 +411,6 @@ describe('InputSetupWizard Setup Routing', () => {
       await selectEvent.select(indexSetSelect, 'Nox');
 
       await screen.findByText(/Selected index set already associated with another stream/i);
-    });
-
-    it('should disable and enable the next step button', async () => {
-      renderWizard();
-
-      const createStreamButton = await screen.findByRole('button', {
-        name: /Create Stream/i,
-        hidden: true,
-      });
-
-      const nextStepButton = await screen.findByRole('button', {
-        name: /Next/i,
-        hidden: true,
-      });
-
-      expect(nextStepButton).toBeEnabled();
-
-      fireEvent.click(createStreamButton);
-
-      expect(nextStepButton).toBeDisabled();
-
-      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
-
-      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
-        await getStreamCreateFormFields();
-
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
-      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
-      await selectEvent.openMenu(indexSetSelect);
-      await selectEvent.select(indexSetSelect, 'Nox');
-      fireEvent.click(removeMatchesCheckbox);
-      fireEvent.click(newPipelineCheckbox);
-
-      await waitFor(() => expect(submitButton).toBeEnabled());
-      fireEvent.click(submitButton);
-
-      expect(await screen.findByText(/This input will use a new stream: "Wingardium"./i)).toBeInTheDocument();
-
-      expect(nextStepButton).toBeEnabled();
-    });
-
-    it('should allow the user to reset the new stream', async () => {
-      renderWizard();
-
-      const createStreamButton = await screen.findByRole('button', {
-        name: /Create Stream/i,
-        hidden: true,
-      });
-
-      fireEvent.click(createStreamButton);
-
-      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
-
-      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
-        await getStreamCreateFormFields();
-
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
-      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
-      await selectEvent.openMenu(indexSetSelect);
-      await selectEvent.select(indexSetSelect, 'Nox');
-      fireEvent.click(removeMatchesCheckbox);
-      fireEvent.click(newPipelineCheckbox);
-
-      await waitFor(() => expect(submitButton).toBeEnabled());
-      fireEvent.click(submitButton);
-
-      expect(await screen.findByText(/This input will use a new stream: "Wingardium"./i)).toBeInTheDocument();
-
-      const resetButton = await screen.findByRole('button', {
-        name: /Reset/i,
-        hidden: true,
-      });
-
-      fireEvent.click(resetButton);
-
-      expect(screen.queryByRole('heading', { name: /Create new stream/i, hidden: true })).not.toBeInTheDocument();
-      expect(await screen.findByRole('heading', { name: /Route to a new Stream/i, hidden: true })).toBeInTheDocument();
     });
   });
 });
