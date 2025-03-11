@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchValidator;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
@@ -53,7 +54,8 @@ public class QueryEngine {
     private final QueryParser queryParser;
 
     // TODO proper thread pool with tunable settings
-    private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
+    private final Executor indexerJobsQueryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-indexer-jobs-%d").build());
+    private final Executor dataLakeJobsQueryPool = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("query-engine-data-lake-jobs-%d").build());
     private final ElasticsearchBackendProvider elasticsearchBackendProvider;
     private final Map<String, QueryBackend<? extends GeneratedQueryContext>> unversionedBackends;
 
@@ -96,10 +98,12 @@ public class QueryEngine {
                 .filter(query -> !isQueryWithError(validationErrors, query))
                 .collect(Collectors.toSet());
 
+        final Executor properExecutor = DataWarehouseSearchValidator.containsDataWarehouseSearchElements(searchJob.getSearch()) ? dataLakeJobsQueryPool : indexerJobsQueryPool;
+
         validQueries.forEach(query -> searchJob.addQueryResultFuture(query.id(),
                 // generate and run each query, making sure we never let an exception escape
                 // if need be we default to an empty result with a failed state and the wrapped exception
-                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors, timezone), queryPool)
+                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors, timezone), properExecutor)
                         .handle((queryResult, throwable) -> {
                             if (throwable != null) {
                                 final Throwable cause = throwable.getCause();
