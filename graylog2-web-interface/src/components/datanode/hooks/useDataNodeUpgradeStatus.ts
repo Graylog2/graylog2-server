@@ -21,7 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 import UserNotification from 'util/UserNotification';
 
-interface DataNodeInformation {
+export interface DataNodeInformation {
   data_node_status: 'UNCONFIGURED' | 'PREPARED' | 'STARTING' | 'AVAILABLE' | 'UNAVAILABLE' | 'REMOVING' | 'REMOVED';
   hostname: string;
   opensearch_version: string;
@@ -32,11 +32,11 @@ interface DataNodeInformation {
   upgrade_possible: boolean;
   mnager_node: boolean;
 }
-interface ManagerNode {
-  readonly node_uid: string;
-  readonly name: string;
+export interface ManagerNode {
+  node_uid: string;
+  name: string;
 }
-interface ClusterState {
+export interface ClusterState {
   cluster_name: string;
   active_shards: number;
   active_primary_shards: number;
@@ -50,22 +50,22 @@ interface ClusterState {
   relocating_shards: number;
   opensearch_nodes: Node[];
 }
-interface FlushResponse {
+export interface FlushResponse {
   total: number;
   failed: number;
   successful: number;
 }
-interface Version {
+export interface Version {
   version: string;
 }
-interface Node {
+export interface Node {
   ip: string;
   roles: string[];
   host: string;
   name: string;
   version: string;
 }
-interface DatanodeUpgradeStatus {
+export interface DatanodeUpgradeStatus {
   cluster_healthy: boolean;
   outdated_nodes: DataNodeInformation[];
   up_to_date_nodes: DataNodeInformation[];
@@ -74,8 +74,16 @@ interface DatanodeUpgradeStatus {
   server_version: Version;
 }
 
+export const saveNodeToUpdate = (node_name: string) => localStorage.setItem('datanode-to-update', node_name);
+
+export const getNodeToUpdate = () => localStorage.getItem('datanode-to-update');
+
+export const removeSavedNodeToUpdate = () => localStorage.removeItem('datanode-to-update');
+
 export const stopShardReplication = async (): Promise<FlushResponse> => {
   try {
+    removeSavedNodeToUpdate();
+
     const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/stop'));
 
     UserNotification.success(`Shard replication stopped successfully`);
@@ -90,6 +98,8 @@ export const stopShardReplication = async (): Promise<FlushResponse> => {
 
 export const startShardReplication = async (): Promise<FlushResponse> => {
   try {
+    removeSavedNodeToUpdate();
+
     const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/start'));
 
     UserNotification.success(`Shard replication started successfully`);
