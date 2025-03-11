@@ -60,7 +60,7 @@ const InlineBinaryField = ({ id, value, name }: { id: string; value: Configurati
   if (value === null || value === undefined || value === '') {
     finalValue = <i>{'<empty>'}</i>;
   } else {
-    finalValue = <i>{'<uploaded file content>'}</i>
+    finalValue = <i>{'<uploaded file content>'}</i>;
   }
 
   return (
@@ -88,8 +88,7 @@ const EncryptedField = ({ id, value, name }: { id: string; value: EncryptedField
 
 const PasswordField = ({ id, name }: { id: string; name: string }) => (
   <li key={`${id}-${name}`}>
-    <div className="key">{name}:</div>
-    <div className="value">{PASSWORD_PLACEHOLDER}</div>
+    <div className="key">{name}:</div> <div className="value">{PASSWORD_PLACEHOLDER}</div>
   </li>
 );
 
@@ -115,12 +114,12 @@ const Configuration = ({
       const value = config[key];
       const requestedConfiguration = typeDefinition?.requested_configuration?.[key];
 
-      if (isPasswordField(requestedConfiguration)) {
-        return <PasswordField id={_id} name={key} />;
-      }
-
       if (requestedConfiguration && 'is_encrypted' in requestedConfiguration && requestedConfiguration.is_encrypted) {
         return <EncryptedField id={_id} value={value as EncryptedFieldValue<unknown>} name={key} />;
+      }
+
+      if (isPasswordField(requestedConfiguration)) {
+        return <PasswordField id={_id} name={key} />;
       }
 
       if (requestedConfiguration?.type === 'inline_binary') {

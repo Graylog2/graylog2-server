@@ -67,13 +67,16 @@ const PipelineStage = styled.div<{ $idle?: boolean }>(
       : theme.colors.global.contentBackground};
   `,
 );
-const DefaultLabel = styled(Label)( ({ theme }) => css`
-  display: inline-flex;
-  margin-left: ${theme.spacings.xs};
-  vertical-align: inherit;
-`);
+const DefaultLabel = styled(Label)(
+  ({ theme }) => css`
+    display: inline-flex;
+    margin-left: ${theme.spacings.xs};
+    vertical-align: inherit;
+  `,
+);
 
-const getStagesWithoutDuplicates = (pipelineStages: Array<number>, usedStagesAcc: Array<number> = []) => Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
+const getStagesWithoutDuplicates = (pipelineStages: Array<number>, usedStagesAcc: Array<number> = []) =>
+  Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
 
 const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeletePipeline }: Props) => {
   const currentUser = useCurrentUser();
@@ -118,7 +121,7 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
         </Link>
         {isManaged && (
           <DefaultLabel bsStyle="default" bsSize="xsmall">
-            System managed
+            Managed by Application
           </DefaultLabel>
         )}
         <br />

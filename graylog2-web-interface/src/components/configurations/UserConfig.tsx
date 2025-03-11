@@ -159,12 +159,12 @@ const UserConfig = () => {
                           </fieldset>
                         </Col>
                         <Col sm={12}>
-                          <FormikInput type="checkbox"
-                                       name="allow_access_token_for_external_user"
-                                       id="allow_access_token_for_external_user"
-                                       label={(
-                                         <LabelSpan>Allow access token for external users</LabelSpan>
-                                       )} />
+                          <FormikInput
+                            type="checkbox"
+                            name="allow_access_token_for_external_user"
+                            id="allow_access_token_for_external_user"
+                            label={<LabelSpan>Allow access token for external users</LabelSpan>}
+                          />
                           <InputDescription help="If enabled, it will allow external users to use access tokens." />
                         </Col>
                       </Row>
