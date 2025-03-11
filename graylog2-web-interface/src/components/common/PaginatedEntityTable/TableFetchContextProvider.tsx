@@ -28,7 +28,13 @@ type Props = React.PropsWithChildren<{
   entityTableId: string;
 }>;
 
-const TableFetchContextProvider = ({ children, searchParams, refetch, attributes, entityTableId }: Props) => {
+const TableFetchContextProvider = ({
+  children = undefined,
+  searchParams,
+  refetch,
+  attributes,
+  entityTableId,
+}: Props) => {
   const contextValue = useMemo(
     () => ({
       searchParams,
