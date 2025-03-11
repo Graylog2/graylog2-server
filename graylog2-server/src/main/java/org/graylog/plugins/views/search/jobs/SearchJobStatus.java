@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search.jobs;
 public enum SearchJobStatus {
     RUNNING,
     DONE,
-    CANCELLATION_REQUESTED,
     CANCELLED,
     TIMEOUT,
     EXPIRED,
