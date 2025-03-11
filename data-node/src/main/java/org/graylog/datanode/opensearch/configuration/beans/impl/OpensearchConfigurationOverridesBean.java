@@ -34,12 +34,13 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class OpensearchConfigurationOverridesBean implements DatanodeConfigurationBean<OpensearchConfigurationParams> {
 
@@ -97,9 +98,7 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
     }
 
     protected String formatWarning(Map.Entry<String, String> entry) {
-        return String.format(Locale.ENGLISH, "Your system is overriding opensearch configuration properties. " +
-                        "This isn't supported and may break in any future release! Detected pass-through opensearch property %s: %s)",
-                entry.getKey(), entry.getValue());
+        return f("Detected pass-through opensearch property %s", entry.getKey());
     }
 
     private boolean shouldPrintWarning(Map.Entry<String, String> property) {
