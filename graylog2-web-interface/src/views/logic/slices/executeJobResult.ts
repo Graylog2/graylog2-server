@@ -67,24 +67,54 @@ const getDelayTime = (depth: number = 1): number => {
   return Math.ceil(curDepth / 10) * 250;
 };
 
-export const pollJob = (jobIds: JobIds, result: SearchJobType | null, depth: number = 1): Promise<SearchJobType> =>
+export const pollJob = ({
+  jobIds,
+  result,
+  depth = 1,
+  page,
+  perPage,
+}: {
+  jobIds: JobIds;
+  result: SearchJobType | null;
+  depth?: number;
+  page?: number;
+  perPage?: number;
+}): Promise<SearchJobType> =>
   new Promise((resolve) => {
     if (result?.execution?.done || result?.execution?.cancelled) {
       resolve(result);
     } else {
       delay(getDelayTime(depth)).then(() => {
-        resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res, depth + 1)));
+        resolve(
+          runPollJob({ jobIds, page, perPage }).then((res) =>
+            pollJob({ jobIds, result: res, depth: depth + 1, page, perPage }),
+          ),
+        );
       });
     }
   });
 
-export const executeJobResult = async (
-  { asyncSearchId, nodeId }: JobIds,
-  widgetMapping?: WidgetMapping,
-): Promise<SearchExecutionResult> =>
-  pollJob({ asyncSearchId, nodeId }, null).then((result) => ({
+export const executeJobResult = async ({
+  jobIds: { asyncSearchId, nodeId },
+  widgetMapping,
+  page,
+  perPage,
+}: {
+  jobIds: JobIds;
+  widgetMapping?: WidgetMapping;
+  page?: number;
+  perPage?: number;
+}): Promise<SearchExecutionResult> =>
+  pollJob({
+    jobIds: { asyncSearchId, nodeId },
+    result: null,
+    depth: 1,
+    page,
+    perPage,
+  }).then((result) => ({
     result: new SearchResult(result),
     widgetMapping,
+    jobIds: { asyncSearchId, nodeId },
   }));
 
 export const cancelJob = (jobIds: JobIds) => runCancelJob(jobIds);
