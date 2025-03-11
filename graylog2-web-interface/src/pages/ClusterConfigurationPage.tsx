@@ -58,7 +58,8 @@ const ClusterConfigurationPage = () => {
             <TableFetchContextProvider
               refetch={clusterNodes.refetchDatanodes}
               searchParams={searchParams}
-              attributes={[]}>
+              attributes={[]}
+              entityTableId="cluster-configuration">
               <ClusterConfigurationListView clusterNodes={clusterNodes} />
             </TableFetchContextProvider>
           </Col>
