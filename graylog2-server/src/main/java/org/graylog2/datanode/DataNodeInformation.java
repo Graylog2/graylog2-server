@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Graylog, Inc.
+ * CopyrightmnagerNodeGraylog, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Server Side Public License, version 1,
@@ -18,5 +18,5 @@ package org.graylog2.datanode;
 
 public record DataNodeInformation(String nodeName, org.graylog2.cluster.nodes.DataNodeStatus dataNodeStatus, String datanodeVersion,
                                   String hostname, String ip, String opensearchVersion, java.util.List<String> roles,
-                                  boolean upgradePossible, boolean mnagerNode) {
+                                  boolean upgradePossible, boolean managerNode) {
 }
