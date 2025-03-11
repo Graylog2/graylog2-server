@@ -42,6 +42,7 @@ import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 public class CertificateGenerator {
     public static KeyPair generate(CertRequest request) throws Exception {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+        keyGen.initialize(4096);
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
 
         final X500Name name = getX500Name(request.cnName());
