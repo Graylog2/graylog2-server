@@ -33,7 +33,6 @@ import {
   CreateEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
-  DataNodesPage,
   DataNodePage,
   DataNodeUpgradePage,
   DataNodesClusterManagementPage,
@@ -73,7 +72,6 @@ import {
   LUTDataAdaptersPage,
   LUTTablesPage,
   NodeInputsPage,
-  NodesPage,
   NotFoundPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
@@ -299,23 +297,11 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
             !isCloud && enableDataNodeMigration && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION, element: <DataNodesMigrationPage /> },
 
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODE_SHOW(':nodeId'), element: <ShowNodePage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(':dataNodeId'), element: <DataNodePage /> },
+
             !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterManagementPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.UPGRADE, element: <DataNodeUpgradePage /> },
-            !isCloud && {
-              path: RoutePaths.SYSTEM.DATANODES.CONFIGURATION,
-              element: <DataNodesClusterConfigurationPage />,
-            },
-            !isCloud &&
-              enableDataNodeMigration && {
-                path: RoutePaths.SYSTEM.DATANODES.MIGRATION,
-                element: <DataNodesMigrationPage />,
-              },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.SHOW(':dataNodeId'), element: <DataNodePage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 

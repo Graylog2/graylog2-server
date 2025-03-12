@@ -45,7 +45,7 @@ class NotificationsFactory {
       case 'data_node_needs_provisioning':
         return {
           values: {
-            DATA_NODE_CONFIGURATION: Routes.SYSTEM.DATANODES.CONFIGURATION,
+            DATA_NODE_CONFIGURATION: Routes.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
           },
         };
 
@@ -53,7 +53,7 @@ class NotificationsFactory {
       case 'remote_reindex_finished':
         return {
           values: {
-            DATA_NODE_MIGRATION_WIZARD: Routes.SYSTEM.DATANODES.MIGRATION,
+            DATA_NODE_MIGRATION_WIZARD: Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION,
           },
         };
 

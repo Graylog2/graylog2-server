@@ -107,7 +107,7 @@ const NodeListItem = ({
   if (nodeId) {
     return (
       <StyledListGroupItem>
-        <Link to={Routes.SYSTEM.NODES.SHOW(nodeId)}>
+        <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>
           <>
             {nodeId && (
               <>
