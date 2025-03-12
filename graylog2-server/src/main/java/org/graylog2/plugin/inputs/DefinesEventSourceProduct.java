@@ -14,25 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.events.processor.systemnotification;
+package org.graylog2.plugin.inputs;
 
-import org.graylog2.database.entities.EntityScope;
-
-public final class SystemNotificationEventEntityScope extends EntityScope {
-    public static final String NAME = "SYSTEM_NOTIFICATION_EVENT";
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public boolean isMutable() {
-        return true;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return false;
-    }
+public interface DefinesEventSourceProduct {
+    /**
+     * Every codec except the general Syslog/GELF codecs set this attribute and we start to depend on
+     * it in code, so we make this a mandatory getter
+     * @return
+     */
+    String getEventSourceProduct();
 }

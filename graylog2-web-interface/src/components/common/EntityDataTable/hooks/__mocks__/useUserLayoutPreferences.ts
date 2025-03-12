@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin.inputs.failure;
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import org.graylog2.plugin.journal.RawMessage;
+import type originalUseUserLayoutPreferences from '../useUserLayoutPreferences';
 
-public record InputProcessingFailure(@Nonnull String errorMessage,
-                                     @Nullable Throwable exception,
-                                     @Nonnull RawMessage rawMessage,
-                                     @Nullable String inputMessage) {
-}
+const useUserLayoutPreferences = jest.fn(
+  (): ReturnType<typeof originalUseUserLayoutPreferences> => ({
+    data: layoutPreferences,
+    isInitialLoading: false,
+    refetch: () => {},
+  }),
+);
+export default useUserLayoutPreferences;

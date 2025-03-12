@@ -14,15 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bindings;
+package org.graylog2.database.entities;
 
-import com.google.inject.AbstractModule;
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.database.dbcatalog.DbEntitiesScanner;
+public class DeletableSystemScope extends EntityScope {
+    public static final String NAME = "GRAYLOG_DELETABLE_SCOPE";
 
-public class MongoDBModule extends AbstractModule {
     @Override
-    protected void configure() {
-        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class).asEagerSingleton();
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public boolean isMutable() {
+        return false;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
     }
 }

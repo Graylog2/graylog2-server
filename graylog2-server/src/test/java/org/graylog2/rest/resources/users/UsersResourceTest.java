@@ -61,6 +61,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.junit.Assert.assertEquals;
@@ -151,12 +152,29 @@ public class UsersResourceTest {
         final Token expected = createTokenAndPrepareMocks(userProps, false);
 
         try {
-            final Token actual = usersResource.generateNewToken(USERNAME, UsersResourceTest.TOKEN_NAME, "{}");
+            final Token actual = usersResource.generateNewToken(USERNAME, UsersResourceTest.TOKEN_NAME, new UsersResource.GenerateTokenTTL(Optional.of(Duration.ofDays(30))));
             assertEquals(expected, actual);
         } finally {
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
-            verify(accessTokenService).create(USERNAME, UsersResourceTest.TOKEN_NAME);
+            verify(accessTokenService).create(USERNAME, UsersResourceTest.TOKEN_NAME, Duration.ofDays(30));
             verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    @Test
+    public void createTokenForInternalUserWithoutTTLSucceedsAndLoadsConfig() {
+        final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME);
+        final Token expected = createTokenAndPrepareMocks(userProps, false);
+
+        try {
+            final Token actual = usersResource.generateNewToken(USERNAME, UsersResourceTest.TOKEN_NAME, new UsersResource.GenerateTokenTTL(Optional.empty()));
+            assertEquals(expected, actual);
+        } finally {
+            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
+            //Before calling the service, the configuration for the default TTL is already loaded in the resource:
+            verify(accessTokenService).create(USERNAME, UsersResourceTest.TOKEN_NAME, Duration.ofDays(30));
+            verify(clusterConfigService, times(2)).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
         }
     }
@@ -168,7 +186,7 @@ public class UsersResourceTest {
         prepareMocks(userProps, null, false);
 
         try {
-            usersResource.generateNewToken(USERNAME, TOKEN_NAME, "{}");
+            usersResource.generateNewToken(USERNAME, TOKEN_NAME, new UsersResource.GenerateTokenTTL(Optional.empty()));
         } finally {
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verify(clusterConfigService, times(2)).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
@@ -182,12 +200,28 @@ public class UsersResourceTest {
         final Token expected = createTokenAndPrepareMocks(userProps, true);
 
         try {
-            final Token actual = usersResource.generateNewToken(USERNAME, TOKEN_NAME, "{}");
+            final Token actual = usersResource.generateNewToken(USERNAME, TOKEN_NAME, new UsersResource.GenerateTokenTTL(Optional.of(Duration.ofDays(30))));
             assertEquals(expected, actual);
         } finally {
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verify(clusterConfigService, times(2)).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
-            verify(accessTokenService).create(USERNAME, TOKEN_NAME);
+            verify(accessTokenService).create(USERNAME, TOKEN_NAME, Duration.ofDays(30));
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    @Test
+    public void createTokenSucceedsEvenWithNULLBody() {
+        final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME, UserImpl.EXTERNAL_USER, "FALSE");
+        final Token expected = createTokenAndPrepareMocks(userProps, true);
+
+        try {
+            final Token actual = usersResource.generateNewToken(USERNAME, TOKEN_NAME, null);
+            assertEquals(expected, actual);
+        } finally {
+            verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
+            verify(clusterConfigService, times(2)).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
+            verify(accessTokenService).create(USERNAME, TOKEN_NAME, Duration.ofDays(30));
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
         }
     }
@@ -217,7 +251,7 @@ public class UsersResourceTest {
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
                 .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), allowExternalUser, false, Duration.ofDays(30)));
         if (accessToken != null) {
-            when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME)).thenReturn(accessToken);
+            when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, Duration.ofDays(30))).thenReturn(accessToken);
         }
     }
 

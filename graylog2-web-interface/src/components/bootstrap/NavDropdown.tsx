@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-// eslint-disable-next-line no-restricted-imports
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
@@ -51,7 +50,7 @@ const DropdownTrigger = styled.button<{ $active: boolean }>(
   `,
 );
 
-const NavItem = styled.span`
+const NavItem = styled.li`
   display: inline-flex;
   align-items: center;
   min-height: ${NAV_ITEM_HEIGHT};

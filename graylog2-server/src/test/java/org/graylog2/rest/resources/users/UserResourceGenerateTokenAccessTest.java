@@ -176,7 +176,7 @@ public class UserResourceGenerateTokenAccessTest {
     public void testAccess() {
         final User user = mkUser();
         prepareMocks();
-        final boolean allowed = usersResource.isAccessAllowed(user);
+        final boolean allowed = usersResource.isTokenCreationAllowed(user);
         assertEquals(expectedResult, allowed);
     }
 

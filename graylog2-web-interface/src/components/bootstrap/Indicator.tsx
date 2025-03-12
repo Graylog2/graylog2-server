@@ -14,25 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.pipelineprocessor.db;
+import * as React from 'react';
+import { Indicator as MantineIndicator } from '@mantine/core';
 
-import org.graylog2.database.entities.EntityScope;
+type Props = Pick<
+  React.ComponentProps<typeof MantineIndicator>,
+  | 'position'
+  | 'offset'
+  | 'label'
+  | 'children'
+  | 'className'
+  | 'size'
+  | 'title'
+  | 'radius'
+  | 'color'
+  | 'zIndex'
+  | 'withBorder'
+  | 'disabled'
+  | 'processing'
+  | 'autoContrast'
+>;
+const Indicator = ({ ...props }: Props) => <MantineIndicator {...props} />;
 
-public class SystemPipelineRuleScope extends EntityScope {
-    public static final String NAME = "GRAYLOG_SYSTEM_PIPELINE_RULE_SCOPE";
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public boolean isMutable() {
-        return false;
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return true;
-    }
-}
+export default Indicator;

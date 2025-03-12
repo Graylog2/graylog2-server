@@ -81,6 +81,12 @@ const Routes = {
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
+    CLUSTER: {
+      NODES: '/system/cluster',
+      DATANODE_DASHBOARD: '/system/cluster/datanode-dashboard',
+      DATANODE_CONFIGURATION: '/system/cluster/datanode-configuration',
+      DATANODE_MIGRATION: '/system/cluster/datanode-migration',
+    },
     CONFIGURATIONS: '/system/configurations',
     configurationsSection: (section: string, pluginSection?: string) =>
       `/system/configurations/${section}${pluginSection ? `/${pluginSection}` : ''}`,
@@ -464,13 +470,6 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
 };
 
 const getPluginRoute = (routeKey: string) => pluginRoute(routeKey, false);
-
-/**
- * Exported constants for using strings to check if a plugin is registered by its description.
- *
- */
-export const ENTERPRISE_ROUTE_DESCRIPTION = 'Enterprise';
-export const SECURITY_ROUTE_DESCRIPTION = 'Security';
 
 const defaultExport = Object.assign(qualifiedRoutes, { pluginRoute, getPluginRoute, unqualified });
 

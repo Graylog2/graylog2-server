@@ -87,6 +87,7 @@ describe('StreamsOverview', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: { ...layoutPreferences, displayedAttributes: ['title', 'description', 'rules'] },
       isInitialLoading: false,
+      refetch: () => {},
     });
 
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });

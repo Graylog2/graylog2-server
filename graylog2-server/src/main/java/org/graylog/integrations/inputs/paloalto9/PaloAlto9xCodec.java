@@ -28,6 +28,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
+import org.graylog2.plugin.inputs.DefinesEventSourceProduct;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -53,7 +54,7 @@ import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.THREA
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.TRAFFIC;
 import static org.graylog.integrations.inputs.paloalto.PaloAltoMessageType.USERID;
 
-public class PaloAlto9xCodec implements Codec {
+public class PaloAlto9xCodec implements Codec, DefinesEventSourceProduct {
     private static final Logger LOG = LoggerFactory.getLogger(PaloAlto9xCodec.class);
 
     static final String CK_STORE_FULL_MESSAGE = "store_full_message";
@@ -126,7 +127,7 @@ public class PaloAlto9xCodec implements Codec {
                     }
             }
 
-            message.addField(EventFields.EVENT_SOURCE_PRODUCT, "PAN");
+            message.addField(EventFields.EVENT_SOURCE_PRODUCT, getEventSourceProduct());
 
             // Store full message if configured.
             if (configuration.getBoolean(CK_STORE_FULL_MESSAGE)) {
@@ -150,6 +151,11 @@ public class PaloAlto9xCodec implements Codec {
     @Override
     public Configuration getConfiguration() {
         return this.configuration;
+    }
+
+    @Override
+    public String getEventSourceProduct() {
+        return "PAN";
     }
 
     @FactoryClass

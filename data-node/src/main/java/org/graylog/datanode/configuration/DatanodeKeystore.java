@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -48,9 +49,16 @@ import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.CertPath;
+import java.security.cert.CertPathValidator;
+import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertPathValidatorResult;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.PKIXParameters;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -68,7 +76,7 @@ public class DatanodeKeystore {
     private final String passwordSecret;
 
     public static final Path DATANODE_KEYSTORE_FILE = Path.of("keystore.jks");
-    public static String DATANODE_KEY_ALIAS = CertConstants.DATANODE_KEY_ALIAS;
+    public static String DATANODE_KEY_ALIAS = "datanode";
     private final EventBus eventBus;
 
     @Inject
@@ -87,31 +95,23 @@ public class DatanodeKeystore {
     }
 
     public synchronized boolean hasSignedCertificate() throws DatanodeKeystoreException {
-        return isSignedCertificateChain(loadKeystore());
+        return !isSelfSignedDatanodeCert(loadKeystore());
     }
 
     public synchronized static boolean isSignedCertificateChain(KeyStore keystore) throws DatanodeKeystoreException {
+        return !isSelfSignedDatanodeCert(keystore);
+    }
+
+    private static boolean isSelfSignedDatanodeCert(KeyStore keystore) throws DatanodeKeystoreException {
         try {
-
-            final Certificate[] certificateChain = keystore.getCertificateChain(DATANODE_KEY_ALIAS);
-
-            if (certificateChain.length < 2) {
-                // only one cert, it's a self-signed cert!
-                return false;
+            final Certificate certificate = keystore.getCertificate(DATANODE_KEY_ALIAS);
+            if (certificate instanceof X509Certificate nodeCert) {
+                return nodeCert.getIssuerX500Principal().equals(nodeCert.getSubjectX500Principal());
+            } else {
+                throw new DatanodeKeystoreException("Unsupported type of data node certificate: " + certificate.getClass());
             }
-            try {
-                // let's take first cert, which is the datanode. It should be signed by a private key that belongs
-                // to the public key in the second certificate
-                certificateChain[0].verify(certificateChain[1].getPublicKey());
-                return true;
-            } catch (CertificateException | NoSuchAlgorithmException | InvalidKeyException |
-                     NoSuchProviderException | SignatureException e) {
-                LOG.warn("Failed to verify datanode certificate validity", e);
-                return false;
-            }
-
         } catch (KeyStoreException e) {
-            throw new DatanodeKeystoreException(e);
+            throw new DatanodeKeystoreException("Failed to check if datanode certificate is self-signed.", e);
         }
     }
 
