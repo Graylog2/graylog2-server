@@ -37,7 +37,7 @@ type StreamsResponse = {
 export const STREAMS_NO_SECURITY_ID = ['streams_without_security', 'overview'];
 
 const getStreams = (): Promise<StreamsResponse> =>
-  fetch('GET', qualifyUrl(ApiRoutes.StreamsApiController.paginatedWithoutSecurityDefaults().url));
+  fetch('GET', qualifyUrl(ApiRoutes.StreamsApiController.withoutSecurityDefaults().url));
 
 const useStreams = (): {
   data: StreamsResponse;

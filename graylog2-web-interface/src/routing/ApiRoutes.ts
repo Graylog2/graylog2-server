@@ -276,7 +276,7 @@ const ApiRoutes = {
   StreamsApiController: {
     index: () => ({ url: '/streams' }),
     paginated: () => ({ url: '/streams/paginated' }),
-    paginatedWithoutSecurityDefaults: () => ({ url: '/streams/no_security' }),
+    withoutSecurityDefaults: () => ({ url: '/streams/no_security' }),
     get: (streamId: string) => ({ url: `/streams/${streamId}` }),
     bulk_delete: () => ({ url: '/streams/bulk_delete' }),
     bulk_resume: () => ({ url: '/streams/bulk_resume' }),
