@@ -37,7 +37,7 @@ import org.graylog2.streams.filters.StreamDestinationFilterRuleDTO;
 import org.graylog2.system.activities.SystemMessageImpl;
 import org.graylog2.users.UserImpl;
 
-public class MongoDBModule extends PluginModule {
+public class DbEntitiesModule extends PluginModule {
     @Override
     protected void configure() {
         bind(DbEntitiesCatalog.class).toProvider(DbEntitiesCatalogProvider.class).asEagerSingleton();
