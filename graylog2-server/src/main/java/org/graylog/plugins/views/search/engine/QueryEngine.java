@@ -32,6 +32,7 @@ import org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchVal
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog2.Configuration;
 import org.graylog2.storage.providers.ElasticsearchBackendProvider;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -41,33 +42,61 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
 public class QueryEngine {
     private static final Logger LOG = LoggerFactory.getLogger(QueryEngine.class);
 
+    private final Configuration configuration;
     private final Set<QueryMetadataDecorator> queryMetadataDecorators;
     private final QueryParser queryParser;
 
     // TODO proper thread pool with tunable settings
-    private final Executor indexerJobsQueryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-indexer-jobs-%d").build());
-    private final Executor dataLakeJobsQueryPool = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("query-engine-data-lake-jobs-%d").build());
+    private final Executor indexerJobsQueryPool;
+    private final Executor dataLakeJobsQueryPool;
     private final ElasticsearchBackendProvider elasticsearchBackendProvider;
     private final Map<String, QueryBackend<? extends GeneratedQueryContext>> unversionedBackends;
 
     @Inject
-    public QueryEngine(ElasticsearchBackendProvider elasticsearchBackendProvider,
+    public QueryEngine(Configuration configuration,
+                       ElasticsearchBackendProvider elasticsearchBackendProvider,
                        Map<String, QueryBackend<? extends GeneratedQueryContext>> unversionedBackends,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
                        QueryParser queryParser) {
+        this.configuration = configuration;
         this.elasticsearchBackendProvider = elasticsearchBackendProvider;
         this.unversionedBackends = unversionedBackends;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
+
+        this.indexerJobsQueryPool = createThreadPool(
+                configuration.searchQueryEngineIndexerJobsPoolSize(),
+                configuration.searchQueryEngineIndexerJobsQueueSize(),
+                "query-engine-indexer-jobs-%d");
+        this.dataLakeJobsQueryPool = createThreadPool(
+                configuration.searchQueryEngineDataLakeJobsPoolSize(),
+                configuration.searchQueryEngineDataLakeJobsQueueSize(),
+                "query-engine-data-lake-jobs-%d");
+    }
+
+    private Executor createThreadPool(final int poolSize,
+                                      final int queueSize,
+                                      final String nameFormat) {
+        if (queueSize > 0) {
+            return new ThreadPoolExecutor(poolSize, poolSize,
+                    0L, TimeUnit.MILLISECONDS,
+                    new ArrayBlockingQueue<>(queueSize),
+                    new ThreadFactoryBuilder().setNameFormat(nameFormat).build());
+        } else {
+            return Executors.newFixedThreadPool(poolSize, new ThreadFactoryBuilder().setNameFormat(nameFormat).build());
+        }
     }
 
     public QueryMetadata parse(Search search, Query query) {

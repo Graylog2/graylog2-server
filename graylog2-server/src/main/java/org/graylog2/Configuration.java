@@ -254,6 +254,18 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "field_value_suggestion_mode", required = true, converter = FieldValueSuggestionModeConverter.class)
     private FieldValueSuggestionMode fieldValueSuggestionMode = FieldValueSuggestionMode.ON;
 
+    @Parameter(value = "search_query_engine_indexer_jobs_pool_size", validators = PositiveIntegerValidator.class)
+    private int searchQueryEngineIndexerJobsPoolSize = 4;
+
+    @Parameter("search_query_engine_indexer_jobs_queue_size")
+    private int searchQueryEngineIndexerJobsQueueSize = -1;
+
+    @Parameter(value = "search_query_engine_data_lake_jobs_pool_size", validators = PositiveIntegerValidator.class)
+    private int searchQueryEngineDataLakeJobsPoolSize = 4;
+
+    @Parameter("search_query_engine_data_lake_jobs_queue_size")
+    private int searchQueryEngineDataLakeJobsQueueSize = -1;
+
     @Documentation("""
             Enabling this parameter will activate automatic security configuration. Graylog server will
             set a default 30-day automatic certificate renewal policy and create a self-signed CA. This CA
@@ -574,6 +586,22 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     public boolean selfsignedStartupEnabled() {
         return selfsignedStartup;
+    }
+
+    public int searchQueryEngineIndexerJobsPoolSize() {
+        return searchQueryEngineIndexerJobsPoolSize;
+    }
+
+    public int searchQueryEngineIndexerJobsQueueSize() {
+        return searchQueryEngineIndexerJobsQueueSize;
+    }
+
+    public int searchQueryEngineDataLakeJobsPoolSize() {
+        return searchQueryEngineDataLakeJobsPoolSize;
+    }
+
+    public int searchQueryEngineDataLakeJobsQueueSize() {
+        return searchQueryEngineDataLakeJobsQueueSize;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
