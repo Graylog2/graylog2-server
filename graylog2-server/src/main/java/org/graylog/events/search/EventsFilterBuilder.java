@@ -43,6 +43,10 @@ public class EventsFilterBuilder {
         // indices. (fixes an issue when users store non-event messages in event indices)
         filterBuilder.add("_exists_:" + EventDto.FIELD_EVENT_DEFINITION_ID);
 
+        if (!parameters.query().isBlank()) {
+            filterBuilder.add(parameters.query());
+        }
+
         if (!parameters.filter().eventDefinitions().isEmpty()) {
             final String eventDefinitionFilter = parameters.filter().eventDefinitions().stream()
                     .map(this::eventDefinitionFilter)
