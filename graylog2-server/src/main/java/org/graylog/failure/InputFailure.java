@@ -104,8 +104,7 @@ public class InputFailure implements Failure {
     @Nonnull
     @Override
     public FailureObjectBuilder failureObjectBuilder(ObjectMapper objectMapper, @NonNull Meter invalidTimestampMeter, boolean includeFailedMessage) {
-        FailureObjectBuilder builder = new FailureObjectBuilder(this)
-                .put(FIELD_GL2_SOURCE_INPUT, rawMessage.getInputIdOnCurrentNode().orElse(null));
+        FailureObjectBuilder builder = new FailureObjectBuilder(this);
         rawMessage.getLastSourceNode().ifPresent(sourceNode -> builder
                 .put(FIELD_GL2_SOURCE_INPUT, sourceNode.inputId)
                 .put(FIELD_GL2_SOURCE_NODE, sourceNode.nodeId)
