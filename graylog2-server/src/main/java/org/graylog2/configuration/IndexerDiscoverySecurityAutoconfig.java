@@ -47,12 +47,6 @@ public class IndexerDiscoverySecurityAutoconfig implements IndexerDiscoveryListe
     }
 
     public void configureSelfsignedStartup() {
-        final PreflightConfigResult preflightConfigResult = preflightConfigService.getPreflightConfigResult();
-        if (preflightConfigResult == PreflightConfigResult.UNKNOWN) {
-            LOG.info("Setting preflight config to FINISHED");
-            preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
-        }
-
         if (getRenewalPolicy().isEmpty()) {
             LOG.info("Setting renewal policy to " + DEFAULT_CERT_RENEWAL_POLICY);
             clusterConfigService.write(DEFAULT_CERT_RENEWAL_POLICY);
@@ -71,8 +65,13 @@ public class IndexerDiscoverySecurityAutoconfig implements IndexerDiscoveryListe
     @Override
     public void beforeIndexerDiscovery() {
         if (configuration.selfsignedStartupEnabled()) {
-            LOG.info("Self-signed security startup enabled, configuring renewal policy and CA if needed");
-            configureSelfsignedStartup();
+            final PreflightConfigService.ConfigResultState writeResult = preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+            if (writeResult == PreflightConfigService.ConfigResultState.CREATED) {
+                LOG.info("Self-signed security startup enabled, configuring renewal policy and CA");
+                configureSelfsignedStartup();
+            } else {
+                LOG.info("Skipping Self-signed security startup, as it is already configured");
+            }
         }
     }
 
