@@ -82,8 +82,6 @@ export const removeSavedNodeToUpgrade = () => localStorage.removeItem('datanode-
 
 export const stopShardReplication = async (): Promise<FlushResponse> => {
   try {
-    removeSavedNodeToUpgrade();
-
     const response = await fetch('POST', qualifyUrl('datanodes/upgrade/replication/stop'));
 
     UserNotification.success(`Shard replication stopped successfully`);

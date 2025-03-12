@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Row, Col, Button, Table, Label, SegmentedControl, Alert } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner, Icon, ConfirmDialog } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import useDataNodeUpgradeStatus, { getNodeToUpgrade, saveNodeToUpgrade, startShardReplication, stopShardReplication } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
@@ -66,17 +66,6 @@ const getClusterHealthStyle = (status: string) => {
   }
 }
 
-const upgradeNode = async (node: DataNodeInformation) => {
-  await stopShardReplication();
-  saveNodeToUpgrade(node?.hostname);
-}
-
-const confirmUpgradeButton = (
-  <Button onClick={startShardReplication} bsSize="sm" bsStyle="primary">
-    Confirm Upgrade Here
-  </Button>
-);
-
 const upgradeInstructionsDocumentationMessage = (
   <p>
     To upgrade your Data Nodes, please follow the instructions in the <DocumentationLink text="documentation" page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} />.
@@ -86,6 +75,18 @@ const upgradeInstructionsDocumentationMessage = (
 const DataNodeUpgradePage = () => {
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
   const [upgradeMethod, setUpgradeMethod] = useState<DataNodeUpgradeMethodType>('cluster-restart');
+  const [openUpgradeConfirmDialog, setOpenUpgradeConfirmDialog] = useState<boolean>(false);
+
+  const startNodeUpgrade = async (node: DataNodeInformation) => {
+    saveNodeToUpgrade(node?.hostname);
+    setOpenUpgradeConfirmDialog(true);
+    stopShardReplication();
+  }
+
+  const confirmNodeUpgrade = async () => {
+    startShardReplication();
+    setOpenUpgradeConfirmDialog(false);
+  }
 
   const nodeInProgress = getNodeToUpgrade();
 
@@ -131,7 +132,7 @@ const DataNodeUpgradePage = () => {
               {(upgradeMethod === 'rolling-upgrade') && (
                 <>
                   <p>
-                    Rolling upgrades can be performed on a running Data Node cluster with three or more nodes with virtually no downtime.             
+                    Rolling upgrades can be performed on a running Data Node cluster only with <b>three or more nodes</b>, with virtually no downtime.             
                   </p>
                   <p>
                     Data Nodes are individually stopped and upgraded in place. Alternatively, Data Nodes can be stopped and replaced, one at a time, 
@@ -190,8 +191,8 @@ const DataNodeUpgradePage = () => {
                           </td>
                           <td><i>{outdated_node?.datanode_version}</i></td>
                           <td align="right">
-                            <Button onClick={() => upgradeNode(outdated_node)} disabled={!outdated_node?.upgrade_possible} bsSize="sm" bsStyle="primary">
-                              Upgrade
+                            <Button onClick={() => startNodeUpgrade(outdated_node)} disabled={!outdated_node?.upgrade_possible} bsSize="sm" bsStyle="primary">
+                              Start Upgrade Process
                             </Button>
                           </td>
                         </tr>
@@ -240,12 +241,19 @@ const DataNodeUpgradePage = () => {
               </Row>
             </Col>
           )}
-          {nodeInProgress && (
-            <Col xs={12}>
-              <br />
-              Once you are done upgrading <b>{nodeInProgress}</b>, wait until it reconnects and apears in the <b>Upgraded Nodes</b> panel,
-              then {confirmUpgradeButton} and continue with next node.
-            </Col>
+          {openUpgradeConfirmDialog && nodeInProgress && (
+            <ConfirmDialog
+              show
+              onConfirm={confirmNodeUpgrade}
+              onCancel={() => setOpenUpgradeConfirmDialog(false)}
+              title="Start Data Node Upgrade Process"
+              btnConfirmText="Confirm Upgrade"
+            >
+              <>
+                Once you have completed upgrading <b>{nodeInProgress}</b> on the system, wait until it reconnects and apears in the <b>Upgraded Nodes</b> panel,
+                then click on Confirm Upgrade and continue with next node.
+              </>
+            </ConfirmDialog>
           )}
         </Row>
       )}
