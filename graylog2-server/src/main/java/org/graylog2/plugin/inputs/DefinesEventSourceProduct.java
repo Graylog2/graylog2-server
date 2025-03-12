@@ -14,15 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bindings;
+package org.graylog2.plugin.inputs;
 
-import com.google.inject.AbstractModule;
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.database.dbcatalog.DbEntitiesScanner;
-
-public class MongoDBModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class).asEagerSingleton();
-    }
+public interface DefinesEventSourceProduct {
+    /**
+     * Every codec except the general Syslog/GELF codecs set this attribute and we start to depend on
+     * it in code, so we make this a mandatory getter
+     * @return
+     */
+    String getEventSourceProduct();
 }
