@@ -164,7 +164,11 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   } = paginatedEntities;
 
   return (
-    <TableFetchContextProvider refetch={refetch} searchParams={fetchOptions} attributes={attributes}>
+    <TableFetchContextProvider
+      refetch={refetch}
+      searchParams={fetchOptions}
+      attributes={attributes}
+      entityTableId={tableLayout.entityTableId}>
       <PaginatedList pageSize={layoutConfig.pageSize} showPageSizeSelect={false} totalItems={total}>
         <SearchRow>
           <SearchForm

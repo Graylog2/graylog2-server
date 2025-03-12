@@ -32,9 +32,9 @@ import FavoriteIcon from 'views/components/FavoriteIcon';
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
 import { createGRN } from 'logic/permissions/GRN';
-import ExecutionInfo from 'views/components/views/ExecutionInfo';
 import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import ViewsExecutionInfo from 'views/components/views/ViewsExecutionInto';
 
 const links = {
   [View.Type.Dashboard]: ({ id, title }) => [
@@ -86,13 +86,19 @@ const Content = styled.div(
     flex-wrap: nowrap;
     align-items: center;
     margin-bottom: ${theme.spacings.xs};
-    gap: 4px;
+    gap: ${theme.spacings.sm};
+    justify-content: space-between;
   `,
 );
 
-const ExecutionInfoContainer = styled.div`
-  margin-left: auto;
-`;
+const Breadcrumb = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: ${theme.spacings.xxs};
+  `,
+);
 
 const EditButton = styled.div(
   ({ theme }) => css`
@@ -162,7 +168,7 @@ const ViewHeader = () => {
     [dispatch, view],
   );
 
-  const breadCrumbs = useMemo(() => {
+  const breadcrumbs = useMemo(() => {
     switch (type) {
       case 'alert':
       case 'event':
@@ -179,47 +185,45 @@ const ViewHeader = () => {
   return (
     <Row>
       <Content>
-        {breadCrumbs.map(({ label, link, dataTestId }, index) => {
-          const theLast = index === breadCrumbs.length - 1;
+        <Breadcrumb>
+          {breadcrumbs.map(({ label, link, dataTestId }, index) => {
+            const theLast = index === breadcrumbs.length - 1;
 
-          return (
-            <TitleWrapper key={`${label}_${link}`}>
-              <CrumbLink link={link} label={label} dataTestId={dataTestId} />
-              {!theLast && <StyledIcon name="chevron_right" />}
-              {isSavedView && theLast && (
-                <>
-                  <FavoriteIcon
-                    isFavorite={view.favorite}
-                    grn={createGRN(view.type, view.id)}
-                    onChange={onChangeFavorite}
-                  />
-                  <EditButton
-                    onClick={toggleMetadataEdit}
-                    role="button"
-                    title={`Edit ${typeText} ${view.title} metadata`}
-                    tabIndex={0}>
-                    <Icon name="edit_square" />
-                  </EditButton>
-                </>
-              )}
-            </TitleWrapper>
-          );
-        })}
-        {showMetadataEdit && (
-          <ViewPropertiesModal
-            show
-            view={view}
-            title={`Editing saved ${typeText}`}
-            onClose={toggleMetadataEdit}
-            onSave={_onSaveView}
-            submitButtonText={`Save ${typeText}`}
-          />
-        )}
-        {showExecutionInfo && (
-          <ExecutionInfoContainer>
-            <ExecutionInfo />
-          </ExecutionInfoContainer>
-        )}
+            return (
+              <TitleWrapper key={`${label}_${link}`}>
+                <CrumbLink link={link} label={label} dataTestId={dataTestId} />
+                {!theLast && <StyledIcon name="chevron_right" />}
+                {isSavedView && theLast && (
+                  <>
+                    <FavoriteIcon
+                      isFavorite={view.favorite}
+                      grn={createGRN(view.type, view.id)}
+                      onChange={onChangeFavorite}
+                    />
+                    <EditButton
+                      onClick={toggleMetadataEdit}
+                      role="button"
+                      title={`Edit ${typeText} ${view.title} metadata`}
+                      tabIndex={0}>
+                      <Icon name="edit_square" />
+                    </EditButton>
+                  </>
+                )}
+              </TitleWrapper>
+            );
+          })}
+          {showMetadataEdit && (
+            <ViewPropertiesModal
+              show
+              view={view}
+              title={`Editing saved ${typeText}`}
+              onClose={toggleMetadataEdit}
+              onSave={_onSaveView}
+              submitButtonText={`Save ${typeText}`}
+            />
+          )}
+        </Breadcrumb>
+        {showExecutionInfo && <ViewsExecutionInfo />}
       </Content>
     </Row>
   );
