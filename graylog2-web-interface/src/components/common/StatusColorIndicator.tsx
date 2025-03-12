@@ -29,19 +29,21 @@ type Props = React.PropsWithChildren<{
 const StyledIndicator = styled(Indicator)<{ color: ColorVariant }>(
   ({ color, theme }) => css`
     .mantine-Indicator-indicator::before {
-      ${color === 'gray' && css`background-color: ${theme.colors.gray[50]}`}
+      ${color === 'gray' &&
+      css`
+        background-color: ${theme.colors.gray[50]};
+      `}
     }
   `,
 );
 
-
-const StatusColorIndicator = ({ bsStyle = 'gray', 'data-testid': dataTestid, className = '', children = undefined }: Props) => (
-  <StyledIndicator
-    color={bsStyle}
-    radius={0}
-    size={8}
-    className={`${bsStyle} ${className}`}
-    data-testid={dataTestid}>
+const StatusColorIndicator = ({
+  bsStyle = 'gray',
+  'data-testid': dataTestid,
+  className = '',
+  children = undefined,
+}: Props) => (
+  <StyledIndicator color={bsStyle} radius={0} size={8} className={`${bsStyle} ${className}`} data-testid={dataTestid}>
     {children}
   </StyledIndicator>
 );
