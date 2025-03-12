@@ -26,8 +26,8 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.UserSessionTerminationService;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserManagementService;
@@ -75,7 +75,7 @@ public class UserResourceGenerateTokenAccessTest {
     @Mock
     private RoleService roleService;
     @Mock
-    private MongoDBSessionService sessionService;
+    private SessionService sessionService;
     @Mock
     private Subject subject;
     @Mock

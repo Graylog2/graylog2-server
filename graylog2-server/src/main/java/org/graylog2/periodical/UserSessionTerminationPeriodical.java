@@ -16,12 +16,11 @@
  */
 package org.graylog2.periodical;
 
+import jakarta.inject.Inject;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.UserSessionTerminationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 /**
  * Simply calls {@link UserSessionTerminationService#runGlobalSessionTermination()} once on startup.
