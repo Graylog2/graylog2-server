@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 import { Icon, LinkToNode, Section } from 'components/common';
 import useParams from 'routing/useParams';
@@ -44,8 +44,7 @@ const LeftCol = styled.div(
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    align-content: center;
-    justify-content: center;
+    place-content: center center;
 
     > p {
       color: ${theme.colors.gray[50]};
@@ -186,9 +185,7 @@ const InputDiagnosisPage = () => {
         <LeftCol>
           <h1>Input Diagnosis: {input?.name}</h1>
 
-          <p>
-            Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.
-          </p>
+          <p>Input Diagnosis can be used to test inputs and parsing without writing any data to the search cluster.</p>
         </LeftCol>
       </Header>
       {input && (

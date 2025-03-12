@@ -70,7 +70,10 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
         Cluster. Click on a category to view the associated messages.
       </StyledP>
       <StyledListGroup>
-        <StyledListGroupItem>Message Error at Input <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT} />: {messageErrors.failures_inputs_codecs}</StyledListGroupItem>
+        <StyledListGroupItem>
+          Message Error at Input <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT} />:{' '}
+          {messageErrors.failures_inputs_codecs}
+        </StyledListGroupItem>
         <StyledListGroupItem>
           Message failed to process <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS} />:{' '}
           <LinkCompoment failureType="processing" inputId={inputId}>
