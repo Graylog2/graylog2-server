@@ -25,12 +25,14 @@ import org.graylog2.database.DbEntity;
 import java.util.Arrays;
 import java.util.Set;
 
+import static org.graylog2.plugin.inject.Graylog2Module.DB_ENTITIES;
+
 @Singleton
 public class DbEntitiesCatalogProvider implements Provider<DbEntitiesCatalog> {
     private final DbEntitiesCatalog catalog;
 
     @Inject
-    public DbEntitiesCatalogProvider(@Named("dbEntities") Set<Class<?>> entityClasses) {
+    public DbEntitiesCatalogProvider(@Named(DB_ENTITIES) Set<Class<?>> entityClasses) {
         this.catalog = buildCatalog(entityClasses);
     }
 
