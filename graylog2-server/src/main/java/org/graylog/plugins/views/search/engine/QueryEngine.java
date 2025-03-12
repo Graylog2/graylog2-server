@@ -28,7 +28,6 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchValidator;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
@@ -49,6 +48,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchValidator.containsDataWarehouseSearchElements;
 
 @Singleton
 public class QueryEngine {
@@ -127,12 +128,12 @@ public class QueryEngine {
                 .filter(query -> !isQueryWithError(validationErrors, query))
                 .collect(Collectors.toSet());
 
-        final Executor properExecutor = DataWarehouseSearchValidator.containsDataWarehouseSearchElements(searchJob.getSearch()) ? dataLakeJobsQueryPool : indexerJobsQueryPool;
 
         validQueries.forEach(query -> searchJob.addQueryResultFuture(query.id(),
                 // generate and run each query, making sure we never let an exception escape
                 // if need be we default to an empty result with a failed state and the wrapped exception
-                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors, timezone), properExecutor)
+                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors, timezone),
+                                containsDataWarehouseSearchElements(query) ? dataLakeJobsQueryPool : indexerJobsQueryPool)
                         .handle((queryResult, throwable) -> {
                             if (throwable != null) {
                                 final Throwable cause = throwable.getCause();
