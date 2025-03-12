@@ -40,7 +40,7 @@ type Props = {
 
 const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate }: Props) => {
   const [tokenName, setTokenName] = useState('');
-  const [tokenTtl, setTokenTtl] = useState('');
+  const [tokenTtl, setTokenTtl] = useState('P7D');
 
   const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -62,14 +62,11 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
           value={tokenName}
           onChange={(event) => setTokenName((event.target as HTMLInputElement).value)}
         />
-      </FormGroup>
-      <FormGroup controlId="create-token-input">
-        <ControlLabel>Token TTL</ControlLabel>
         <ISODurationInput
           id="token_creation_ttl"
-          duration={tokenTtl || "P7D"}
+          duration={tokenTtl}
           update={(value) => setTokenTtl(value)}
-          label=""
+          label="Token TTL"
           help=""
           validator={ttlValidator}
           errorText="invalid (min: 1 minute)"
