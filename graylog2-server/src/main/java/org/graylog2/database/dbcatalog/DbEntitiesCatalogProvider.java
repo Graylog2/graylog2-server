@@ -19,21 +19,27 @@ package org.graylog2.database.dbcatalog;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog2.database.DbEntity;
 
 import java.util.Arrays;
 import java.util.Set;
 
-public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
-    private final Set<Class<?>> entityClasses;
+@Singleton
+public class DbEntitiesCatalogProvider implements Provider<DbEntitiesCatalog> {
+    private final DbEntitiesCatalog catalog;
 
     @Inject
-    public DbEntitiesScanner(@Named("dbEntities") Set<Class<?>> entityClasses) {
-        this.entityClasses = entityClasses;
+    public DbEntitiesCatalogProvider(@Named("dbEntities") Set<Class<?>> entityClasses) {
+        this.catalog = buildCatalog(entityClasses);
     }
 
     @Override
     public DbEntitiesCatalog get() {
+        return catalog;
+    }
+
+    private DbEntitiesCatalog buildCatalog(Set<Class<?>> entityClasses) {
         final var catalogEntries = entityClasses.stream()
                 .flatMap(clazz ->
                         Arrays.stream(clazz.getAnnotationsByType(DbEntity.class))

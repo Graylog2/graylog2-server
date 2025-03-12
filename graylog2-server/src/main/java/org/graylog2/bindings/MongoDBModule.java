@@ -21,7 +21,7 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.cluster.nodes.DataNodeEntity;
 import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.database.dbcatalog.DbEntitiesScanner;
+import org.graylog2.database.dbcatalog.DbEntitiesCatalogProvider;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -40,7 +40,7 @@ import org.graylog2.users.UserImpl;
 public class MongoDBModule extends PluginModule {
     @Override
     protected void configure() {
-        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class).asEagerSingleton();
+        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesCatalogProvider.class).asEagerSingleton();
 
         addDbEntities(
                 AccessTokenImpl.class,

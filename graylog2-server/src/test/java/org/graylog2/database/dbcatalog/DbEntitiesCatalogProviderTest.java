@@ -31,11 +31,11 @@ import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Disabled
-class DbEntitiesScannerTest {
+class DbEntitiesCatalogProviderTest {
     @Test
-    void testScansEntitiesWithDefaultTitleFieldProperly() {
-        DbEntitiesScanner scanner = new DbEntitiesScanner(Set.of(IndexSetConfig.class));
-        final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
+    void testHandlesEntitiesWithDefaultTitleFieldProperly() {
+        DbEntitiesCatalogProvider provider = new DbEntitiesCatalogProvider(Set.of(IndexSetConfig.class));
+        final DbEntitiesCatalog dbEntitiesCatalog = provider.get();
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName("index_sets").get();
 
@@ -43,9 +43,9 @@ class DbEntitiesScannerTest {
     }
 
     @Test
-    void testScansEntitiesWithDefaultReadPermissionFieldProperly() {
-        DbEntitiesScanner scanner = new DbEntitiesScanner(Set.of(ServerNodeEntity.class));
-        final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
+    void testHandlesEntitiesWithDefaultReadPermissionFieldProperly() {
+        DbEntitiesCatalogProvider provider = new DbEntitiesCatalogProvider(Set.of(ServerNodeEntity.class));
+        final DbEntitiesCatalog dbEntitiesCatalog = provider.get();
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName("nodes").get();
 
@@ -53,9 +53,9 @@ class DbEntitiesScannerTest {
     }
 
     @Test
-    void testScansEntitiesWithCustomTitleFieldProperly() {
-        DbEntitiesScanner scanner = new DbEntitiesScanner(Set.of(UserImpl.class));
-        final DbEntitiesCatalog dbEntitiesCatalog = scanner.get();
+    void testHandlesEntitiesWithCustomTitleFieldProperly() {
+        DbEntitiesCatalogProvider provider = new DbEntitiesCatalogProvider(Set.of(UserImpl.class));
+        final DbEntitiesCatalog dbEntitiesCatalog = provider.get();
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName(UserImpl.COLLECTION_NAME).get();
 
