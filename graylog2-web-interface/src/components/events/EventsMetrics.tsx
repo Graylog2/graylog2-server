@@ -26,9 +26,7 @@ import Spinner from 'components/common/Spinner';
 
 const Container = styled.div(
   ({ theme }) => css`
-    margin: 5px 0;
-    padding: 5px;
-    background-color: ${theme.colors.background.secondaryNav};
+    margin: ${theme.spacings.xs} 0;
   `,
 );
 const HeadlineContainer = styled.div`
