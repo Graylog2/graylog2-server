@@ -100,6 +100,7 @@ describe('IndexSetFieldTypesList', () => {
         displayedAttributes: ['field_name', 'origin', 'is_reserved', 'type'],
       },
       isInitialLoading: false,
+      refetch: () => {},
     });
 
     asMock(useFieldTypesForMappings).mockReturnValue({

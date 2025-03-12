@@ -22,42 +22,38 @@ import type { GraylogNode } from './useClusterNodes';
 import ClusterActions from './ClusterActions';
 
 const nodeMock: GraylogNode = {
-  cluster_id: "600120f7-a111-4ec3-88b0-aee4067fb21d",
-  type: "server",
-  codename: "Noir",
-  facility: "graylog-server",
-  hostname: "localhost",
+  cluster_id: '600120f7-a111-4ec3-88b0-aee4067fb21d',
+  type: 'server',
+  codename: 'Noir',
+  facility: 'graylog-server',
+  hostname: 'localhost',
   is_leader: true,
   is_processing: true,
-  last_seen: "2025-03-06T09:36:14.000Z",
-  lb_status: "alive",
-  lifecycle: "running",
-  node_id: "a853111d-85ce-42c0-bc6d-22f7f0fecbb4",
-  operating_system: "Mac OS X 15.3.1",
-  short_node_id: "a853553d",
-  started_at: "2025-03-04T14:17:26.310Z",
-  timezone: "Europe/Berlin",
-  transport_address: "http://192.168.64.1:9000/api/",
-  version: "6.2.0-SNAPSHOT",
-}
+  last_seen: '2025-03-06T09:36:14.000Z',
+  lb_status: 'alive',
+  lifecycle: 'running',
+  node_id: 'a853111d-85ce-42c0-bc6d-22f7f0fecbb4',
+  operating_system: 'Mac OS X 15.3.1',
+  short_node_id: 'a853553d',
+  started_at: '2025-03-04T14:17:26.310Z',
+  timezone: 'Europe/Berlin',
+  transport_address: 'http://192.168.64.1:9000/api/',
+  version: '6.2.0-SNAPSHOT',
+};
 
 describe('ClusterActions', () => {
   it('opens upon click on More button', async () => {
-    render(
-      <ClusterActions node={nodeMock} />,
-    );
+    render(<ClusterActions node={nodeMock} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
-    
+
     await screen.findByRole('menuitem', { name: /Metrics/i });
     await screen.findByRole('menuitem', { name: /API Browser/i });
   });
 
   it('shows pause message processing menu item when is_processing true', async () => {
-    render(
-      <ClusterActions node={{ ...nodeMock, is_processing: true }} />,
-    );
+    render(<ClusterActions node={{ ...nodeMock, is_processing: true }} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
@@ -66,9 +62,7 @@ describe('ClusterActions', () => {
   });
 
   it('shows resume message processing menu item when is_processing false', async () => {
-    render(
-      <ClusterActions node={{ ...nodeMock, is_processing: false }} />,
-    );
+    render(<ClusterActions node={{ ...nodeMock, is_processing: false }} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
@@ -77,9 +71,7 @@ describe('ClusterActions', () => {
   });
 
   it('shows set load balancer to DEAD menu item when lb_status is alive', async () => {
-    render(
-      <ClusterActions node={{ ...nodeMock, lb_status: 'alive' }} />,
-    );
+    render(<ClusterActions node={{ ...nodeMock, lb_status: 'alive' }} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
@@ -88,9 +80,7 @@ describe('ClusterActions', () => {
   });
 
   it('shows set load balancer to ALIVE menu item when lb_status is not alive', async () => {
-    render(
-      <ClusterActions node={{ ...nodeMock, lb_status: 'dead' }} />,
-    );
+    render(<ClusterActions node={{ ...nodeMock, lb_status: 'dead' }} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);

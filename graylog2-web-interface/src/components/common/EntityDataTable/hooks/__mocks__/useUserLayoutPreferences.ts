@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bindings;
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
-import com.google.inject.AbstractModule;
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.database.dbcatalog.DbEntitiesScanner;
+import type originalUseUserLayoutPreferences from '../useUserLayoutPreferences';
 
-public class MongoDBModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class).asEagerSingleton();
-    }
-}
+const useUserLayoutPreferences = jest.fn(
+  (): ReturnType<typeof originalUseUserLayoutPreferences> => ({
+    data: layoutPreferences,
+    isInitialLoading: false,
+    refetch: () => {},
+  }),
+);
+export default useUserLayoutPreferences;
