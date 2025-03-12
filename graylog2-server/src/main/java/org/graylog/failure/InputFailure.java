@@ -26,6 +26,8 @@ import org.joda.time.DateTime;
 
 import java.util.Optional;
 
+import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
+import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_NODE;
 import static org.graylog2.plugin.Message.FIELD_SOURCE;
 
 public class InputFailure implements Failure {
@@ -102,7 +104,12 @@ public class InputFailure implements Failure {
     @Nonnull
     @Override
     public FailureObjectBuilder failureObjectBuilder(ObjectMapper objectMapper, @NonNull Meter invalidTimestampMeter, boolean includeFailedMessage) {
-        FailureObjectBuilder builder = new FailureObjectBuilder(this);
+        FailureObjectBuilder builder = new FailureObjectBuilder(this)
+                .put(FIELD_GL2_SOURCE_INPUT, rawMessage.getInputIdOnCurrentNode().orElse(null));
+        rawMessage.getLastSourceNode().ifPresent(sourceNode -> builder
+                .put(FIELD_GL2_SOURCE_INPUT, sourceNode.inputId)
+                .put(FIELD_GL2_SOURCE_NODE, sourceNode.nodeId)
+        );
         Optional.ofNullable(rawMessage.getRemoteAddress()).ifPresent(address ->
                 builder.put(FIELD_SOURCE, address.toString()));
 
