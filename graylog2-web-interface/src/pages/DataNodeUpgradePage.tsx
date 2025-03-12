@@ -17,30 +17,13 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Row, Col, Button, Table, Label, Panel, SegmentedControl } from 'components/bootstrap';
+import { Row, Col, Button, Table, Label, SegmentedControl, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import useDataNodeUpgradeStatus, { getNodeToUpgrade, saveNodeToUpgrade, startShardReplication, stopShardReplication } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
-
-const StyledSegmentedControl = styled(SegmentedControl)(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.sm};
-  `,
-);
-
-const StyledPanel = styled(Panel)<{ bsStyle: string }>(
-  ({ bsStyle = 'default', theme }) => css`
-    &.panel {
-      background-color: ${theme.colors.global.contentBackground};
-
-      .panel-heading {
-        color: ${theme.colors.variant.darker[bsStyle]};
-      }
-    }
-  `,
-);
+import DocumentationLink from 'components/support/DocumentationLink';
 
 const StyledHorizontalDl = styled.dl(
   ({ theme }) => css`
@@ -70,39 +53,45 @@ const UpgradeMethodSegments: Array<{ value: DataNodeUpgradeMethodType; label: st
   { value: 'rolling-upgrade', label: 'Rolling Upgrade' },
 ];
 
+const getClusterHealthStyle = (status: string) => {
+  switch (status) {
+    case 'GREEN':
+      return 'success';
+    case 'YELLOW':
+      return 'warning';
+    case 'RED':
+      return 'danger';
+    default:
+      return 'info';
+  }
+}
+
+const upgradeNode = async (node: DataNodeInformation) => {
+  await stopShardReplication();
+  saveNodeToUpgrade(node?.hostname);
+}
+
+const confirmUpgradeButton = (
+  <Button onClick={startShardReplication} bsSize="sm" bsStyle="primary">
+    Confirm Upgrade Here
+  </Button>
+);
+
+const upgradeInstructionsDocumentationMessage = (
+  <p>
+    To upgrade your Data Nodes, please follow the instructions in the <DocumentationLink text="documentation" page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} />.
+  </p>
+);
+
 const DataNodeUpgradePage = () => {
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
   const [upgradeMethod, setUpgradeMethod] = useState<DataNodeUpgradeMethodType>('cluster-restart');
-
-  const confirmUpgradeButton = (
-    <Button onClick={startShardReplication} bsSize="sm" bsStyle="primary">
-      Confirm Upgrade Here
-    </Button>
-  );
-
-  const getClusterHealthStyle = (status: string) => {
-    switch (status) {
-      case 'GREEN':
-        return 'success';
-      case 'YELLOW':
-        return 'warning';
-      case 'RED':
-        return 'danger';
-      default:
-        return 'info';
-    }
-  }
-
-  const upgradeNode = async (node: DataNodeInformation) => {
-    await stopShardReplication();
-    saveNodeToUpgrade(node?.hostname);
-  }
 
   const nodeInProgress = getNodeToUpgrade();
 
   const numberOfNodes = (data?.outdated_nodes?.length || 0) + (data?.up_to_date_nodes?.length || 0);
 
-  const showRollingUpgrade = numberOfNodes > 2;
+  const showRollingUpgrade = (upgradeMethod === 'rolling-upgrade') && (numberOfNodes > 2);
 
   return (
     <DocumentTitle title="Data Node Upgrade">
@@ -121,68 +110,60 @@ const DataNodeUpgradePage = () => {
       {isInitialLoading ? <Spinner /> : (
         <Row className="content">
           <Col xs={12}>
-            <Row>
-              <Col xs={6}>
-                <h3>
-                  <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} bsSize="xs">
-                    {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
-                  </Label>
-                </h3>
-                <StyledHorizontalDl>
-                  <dt>Shard Replication:</dt>
-                  <dd>
-                    {data?.shard_replication_enabled ? (
-                      <Label bsStyle="success" bsSize="xs">Enabled</Label>
-                    ) : (
-                      <Label bsStyle="warning" bsSize="xs">Disabled</Label>
-                    )}
-                  </dd>
-                  <dt>Cluster Manager:</dt>
-                  <dd>{data?.cluster_state?.manager_node?.name}</dd>
-                  <dt>Number of Nodes:</dt>
-                  <dd>{numberOfNodes} ({data?.outdated_nodes?.length || 0} outdated, {data?.up_to_date_nodes?.length || 0} upgraded)</dd> 
-                  <dt>Number of Shards:</dt>
-                  <dd>{data?.cluster_state?.active_shards || 0} ({data?.cluster_state?.unassigned_shards || 0} unassigned)</dd>
-                </StyledHorizontalDl>
-              </Col>
-              <Col xs={6}>
-                <StyledPanel bsStyle="info">
-                  <Panel.Heading>
-                    <Panel.Title componentClass="h3">
-                      <Icon name="info" /> Methods for Data Node Upgrade
-                    </Panel.Title>
-                  </Panel.Heading>
-                  <Panel.Body>
-                    <StyledSegmentedControl data={UpgradeMethodSegments} value={upgradeMethod} onChange={(value: DataNodeUpgradeMethodType) => setUpgradeMethod(value)} />
-                    {(upgradeMethod === 'cluster-restart') && (
-                      <>
-                        <p>
-                          When using the cluster restart method, you will upgrade all Data Nodes at once. During this time, 
-                          messages will be buffered in the journal and processed as the Data Node cluster comes back online, 
-                          leading to no data loss provided your journal size is configured for the message volume which is expected during the Data Node downtime.               
-                        </p>
-                        <p>
-                          If you are running a Data Node cluster with less than three nodes, the cluster restart method is the only method available.
-                        </p>
-                        <p>
-                          If you are running a Data Node cluster with three or more nodes, you can choose to use the cluster restart method after consideration of your journal size and your message throughput.
-                        </p>
-                        <p>
-                          To upgrade your Data Nodes, please follow the instructions in the documentation.
-                        </p>
-                      </>
-                    )}
-                    {(upgradeMethod === 'rolling-upgrade') && (
-                      <p>
-                        Rolling upgrades can be performed on a running Data Node cluster with virtually no downtime. 
-                        Data Nodes are individually stopped and upgraded in place. Alternatively, Data Nodes can be stopped and replaced, one at a time, 
-                        by hosts running the new version. During this process you can continue to index and query data in your cluster.               
-                      </p>
-                    )}
-                  </Panel.Body>
-                </StyledPanel>
-              </Col>
-            </Row>
+            <SegmentedControl data={UpgradeMethodSegments} value={upgradeMethod} onChange={(value: DataNodeUpgradeMethodType) => setUpgradeMethod(value)} />  
+            <Alert bsStyle="info">
+              {(upgradeMethod === 'cluster-restart') && (
+                <>
+                  <p>
+                    When using the cluster restart method, you will upgrade all Data Nodes at once. During this time, 
+                    messages will be buffered in the journal and processed as the Data Node cluster comes back online, 
+                    leading to no data loss provided your journal size is configured for the message volume which is expected during the Data Node downtime.               
+                  </p>
+                  <p>
+                    If you are running a Data Node cluster with less than three nodes, the cluster restart method is the only method available.
+                  </p>
+                  <p>
+                    If you are running a Data Node cluster with three or more nodes, you can choose to use the cluster restart method after consideration of your journal size and your message throughput.
+                  </p>
+                  {upgradeInstructionsDocumentationMessage}
+                </>
+              )}
+              {(upgradeMethod === 'rolling-upgrade') && (
+                <>
+                  <p>
+                    Rolling upgrades can be performed on a running Data Node cluster with three or more nodes with virtually no downtime.             
+                  </p>
+                  <p>
+                    Data Nodes are individually stopped and upgraded in place. Alternatively, Data Nodes can be stopped and replaced, one at a time, 
+                    by hosts running the new version. During this process you can continue to index and query data in your cluster.               
+                  </p>
+                  {upgradeInstructionsDocumentationMessage}
+                </>
+              )}
+            </Alert>
+          </Col>
+          <Col xs={12}>
+            <h3>
+              <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} bsSize="xs">
+                {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
+              </Label>
+            </h3>
+            <StyledHorizontalDl>
+              <dt>Shard Replication:</dt>
+              <dd>
+                {data?.shard_replication_enabled ? (
+                  <Label bsStyle="success" bsSize="xs">Enabled</Label>
+                ) : (
+                  <Label bsStyle="warning" bsSize="xs">Disabled</Label>
+                )}
+              </dd>
+              <dt>Cluster Manager:</dt>
+              <dd>{data?.cluster_state?.manager_node?.name}</dd>
+              <dt>Number of Nodes:</dt>
+              <dd>{numberOfNodes} ({data?.outdated_nodes?.length || 0} outdated, {data?.up_to_date_nodes?.length || 0} upgraded)</dd> 
+              <dt>Number of Shards:</dt>
+              <dd>{data?.cluster_state?.active_shards || 0} ({data?.cluster_state?.unassigned_shards || 0} unassigned)</dd>
+            </StyledHorizontalDl>
             <br />
           </Col>
           {showRollingUpgrade && (
