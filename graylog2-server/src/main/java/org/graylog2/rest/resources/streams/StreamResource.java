@@ -284,6 +284,29 @@ public class StreamResource extends RestResource {
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
 
+    //TODO: remove this method when https://github.com/Graylog2/graylog-plugin-enterprise/issues/8610 is resolved!
+    @GET
+    @Path("/no_security")
+    @Timed
+    @ApiOperation(value = "Get a list of all streams, excluding security streams")
+    @Deprecated
+    @Produces(MediaType.APPLICATION_JSON)
+    public StreamListResponse getNoSecurity() {
+        final List<Stream> streams = streamService.loadAll()
+                .stream()
+                .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                .filter(stream -> !isSecurityStream(stream.getTitle()))
+                .toList();
+
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
+    }
+
+    private boolean isSecurityStream(String title) {
+        return title.equalsIgnoreCase("All investigation events")
+                || title.equalsIgnoreCase("All investigation messages")
+                || title.startsWith("Illuminate:");
+    }
+
     @GET
     @Path("/byIndex/{indexSetId}")
     @Timed
@@ -651,7 +674,7 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, List<PipelineCompactSource>> getConnectedPipelinesForStreams(@ApiParam(name = "streamIds", required = true) GetConnectedPipelinesRequest request) {
         final var streamIds = request.streamIds.stream()
-                .filter((streamId) -> {
+                .filter(streamId -> {
                     if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
                         throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
                     }
@@ -745,7 +768,7 @@ public class StreamResource extends RestResource {
 
     private Collection<OutputSummary> outputsToSummaries(Collection<Output> outputs) {
         return outputs.stream()
-                .map((output) -> OutputSummary.create(output.getId(), output.getTitle(), output.getType(),
+                .map(output -> OutputSummary.create(output.getId(), output.getTitle(), output.getType(),
                         output.getCreatorUserId(), new DateTime(output.getCreatedAt()), output.getConfiguration(), output.getContentPack()))
                 .collect(Collectors.toSet());
     }
