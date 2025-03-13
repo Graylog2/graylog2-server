@@ -1,0 +1,5 @@
+type="a"
+message="Add the Global API browser link to the Help menu"
+
+issues=["Graylog2/graylog-plugin-enterprise#9955"]
+pulls=["21974"]
