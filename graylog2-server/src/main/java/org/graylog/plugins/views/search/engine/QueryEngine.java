@@ -44,7 +44,7 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -90,14 +90,13 @@ public class QueryEngine {
     private Executor createThreadPool(final int poolSize,
                                       final int queueSize,
                                       final String nameFormat) {
-        if (queueSize > 0) {
-            return new ThreadPoolExecutor(poolSize, poolSize,
-                    0L, TimeUnit.MILLISECONDS,
-                    new ArrayBlockingQueue<>(queueSize),
-                    new ThreadFactoryBuilder().setNameFormat(nameFormat).build());
-        } else {
-            return Executors.newFixedThreadPool(poolSize, new ThreadFactoryBuilder().setNameFormat(nameFormat).build());
-        }
+        return new ThreadPoolExecutor(poolSize, poolSize,
+                0L, TimeUnit.MILLISECONDS,
+                queueSize > 0 ? new ArrayBlockingQueue<>(queueSize) : new LinkedBlockingQueue<>(),
+                new ThreadFactoryBuilder()
+                        .setNameFormat(nameFormat)
+                        .build()
+        );
     }
 
     public QueryMetadata parse(Search search, Query query) {
