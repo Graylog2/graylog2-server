@@ -50,8 +50,8 @@ const SelectedIndexSetAlert = ({ selectedIndexSetId = undefined, indexSets }: Pr
             You have selected the Default Index Set.
             <br />
             We recommend against this: as the potential recipient of messages of many different formats (any message
-            with no routing, via the Default Stream), the Default Index Set is susceptible to reaching the maximum field
-            limit of Opensearch if used extensively.
+            with no routing, via the Default Stream), the Default Index Set is susceptible to reaching the maximum
+            per-Index field limit of the search backend if used extensively.
           </Alert>
         </Col>
       </Row>

@@ -24,7 +24,7 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 type Props = {
   indexSets: Array<IndexSet>;
-  help?: string;
+  help?: React.ReactElement | string;
 };
 
 const IndexSetSelect = ({
