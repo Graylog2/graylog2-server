@@ -41,11 +41,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class DatanodeUpradeServiceAdapterOS2 implements DatanodeUpgradeServiceAdapter {
+public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceAdapter {
 
     public static final String REPLICATION_PRIMARIES = "primaries";
     public static final String REPLICATION_ALL = "all";
@@ -53,7 +52,7 @@ public class DatanodeUpradeServiceAdapterOS2 implements DatanodeUpgradeServiceAd
     private final ObjectMapper objectMapper;
 
     @Inject
-    public DatanodeUpradeServiceAdapterOS2(OpenSearchClient client, ObjectMapper objectMapper) {
+    public DatanodeUpgradeServiceAdapterOS2(OpenSearchClient client, ObjectMapper objectMapper) {
         this.client = client;
         this.objectMapper = objectMapper;
     }
@@ -94,12 +93,7 @@ public class DatanodeUpradeServiceAdapterOS2 implements DatanodeUpgradeServiceAd
 
     @Override
     public void enableShardReplication() {
-        final ClusterHealthStatus clusterHealthStatus = getClusterHealthResponse().getStatus();
-        if (clusterHealthStatus == ClusterHealthStatus.GREEN) {
-            configureShardReplication(REPLICATION_ALL);
-        } else {
-            throw new IllegalStateException("Can't enable shard replication, cluster is not in healthy state. Current state: " + clusterHealthStatus);
-        }
+        configureShardReplication(REPLICATION_ALL);
     }
 
     private String queryShardReplication() {
