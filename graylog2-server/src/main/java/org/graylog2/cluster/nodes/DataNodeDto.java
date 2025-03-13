@@ -27,11 +27,13 @@ import jakarta.annotation.Nullable;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.graylog2.plugin.Version;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,6 +46,8 @@ public abstract class DataNodeDto extends NodeDto {
 
     public static final String FIELD_CERT_VALID_UNTIL = "cert_valid_until";
     public static final String FIELD_DATANODE_VERSION = "datanode_version";
+    public static final String FIELD_CONFIGURATION_WARNINGS = "configuration_warnings";
+    public static final String FIELD_OPENSEARCH_ROLES = "opensearch_roles";
 
     @Nullable
     @JsonProperty("cluster_address")
@@ -60,22 +64,41 @@ public abstract class DataNodeDto extends NodeDto {
     @JsonProperty("action_queue")
     public abstract DataNodeLifecycleTrigger getActionQueue();
 
-    @jakarta.annotation.Nullable
+    @Nullable
     @JsonProperty(FIELD_CERT_VALID_UNTIL)
     public abstract Date getCertValidUntil();
 
-    @jakarta.annotation.Nullable
+    @Nullable
     @JsonProperty(FIELD_DATANODE_VERSION)
     public abstract String getDatanodeVersion();
 
+    @Nullable
+    @JsonProperty(FIELD_OPENSEARCH_ROLES)
+    public abstract List<String> getOpensearchRoles();
+
+    @Nullable
+    @JsonProperty(FIELD_CONFIGURATION_WARNINGS)
+    public abstract List<String> getConfigurationWarnings();
+
+    @JsonProperty("version_compatible")
+    public boolean isCompatibleWithVersion() {
+        return Optional.ofNullable(getDatanodeVersion())
+                .map(datanodeVersion -> isVersionEqualIgnoreBuildMetadata(datanodeVersion, Version.CURRENT_CLASSPATH))
+                .orElse(false);
+    }
+
+    protected static boolean isVersionEqualIgnoreBuildMetadata(String datanodeVersion, Version serverVersion) {
+        final com.github.zafarkhaja.semver.Version datanode = com.github.zafarkhaja.semver.Version.parse(datanodeVersion);
+        return serverVersion.getVersion().compareToIgnoreBuildMetadata(datanode) == 0;
+    }
 
     @Nullable
     @JsonUnwrapped
     public CertRenewalService.ProvisioningInformation getProvisioningInformation() {
         DataNodeProvisioningConfig.State state = switch (getDataNodeStatus()) {
             case AVAILABLE -> DataNodeProvisioningConfig.State.CONNECTED;
-            case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
-            case PREPARED -> DataNodeProvisioningConfig.State.STARTUP_PREPARED;
+            case STARTING -> DataNodeProvisioningConfig.State.STARTING;
+            case PREPARED -> DataNodeProvisioningConfig.State.PROVISIONED;
             default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
         };
 
@@ -112,8 +135,16 @@ public abstract class DataNodeDto extends NodeDto {
             params.put(FIELD_CERT_VALID_UNTIL, getCertValidUntil());
         }
 
-        if(Objects.nonNull(getDatanodeVersion())) {
+        if (Objects.nonNull(getDatanodeVersion())) {
             params.put(FIELD_DATANODE_VERSION, getDatanodeVersion());
+        }
+
+        if (Objects.nonNull(getOpensearchRoles())) {
+            params.put(FIELD_OPENSEARCH_ROLES, getOpensearchRoles());
+        }
+
+        if(Objects.nonNull(getConfigurationWarnings())) {
+            params.put(FIELD_CONFIGURATION_WARNINGS, getConfigurationWarnings());
         }
 
         return params;
@@ -148,6 +179,12 @@ public abstract class DataNodeDto extends NodeDto {
 
         @JsonProperty(FIELD_DATANODE_VERSION)
         public abstract Builder setDatanodeVersion(String datanodeVersion);
+
+        @JsonProperty(FIELD_OPENSEARCH_ROLES)
+        public abstract Builder setOpensearchRoles(List<String> opensearchRoles);
+
+        @JsonProperty(FIELD_CONFIGURATION_WARNINGS)
+        public abstract Builder setConfigurationWarnings(List<String> warnings);
 
         public abstract DataNodeDto build();
     }

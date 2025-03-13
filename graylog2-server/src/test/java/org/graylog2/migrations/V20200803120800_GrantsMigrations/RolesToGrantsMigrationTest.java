@@ -18,6 +18,7 @@ package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import jakarta.validation.Validator;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
@@ -30,6 +31,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.Permissions;
@@ -41,8 +43,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import jakarta.validation.Validator;
 
 import java.util.Set;
 
@@ -81,11 +81,11 @@ class RolesToGrantsMigrationTest {
 
         this.grnRegistry = grnRegistry;
 
-        roleService = new RoleServiceImpl(mongodb.mongoConnection(), mongoJackObjectMapperProvider, permissions, validator);
+        roleService = new RoleServiceImpl(
+                new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()), permissions, validator);
 
-        dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
+        this.dbGrantService = new DBGrantService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
         this.userService = userService;
-        DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
         migration = new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, "admin");
     }
 

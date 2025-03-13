@@ -32,7 +32,7 @@ export const DEFAULT_INITIAL_VALUES: RemoteReindexRequest = {
 };
 
 export const saveFormValues = (values: RemoteReindexRequest) => {
-  sessionStorage.setItem('migrateExistingDataForm', JSON.stringify({ ...values, password: '********' }));
+  sessionStorage.setItem('migrateExistingDataForm', JSON.stringify({ ...values, password: '' }));
 };
 
 export const getSavedFormValues = () => JSON.parse(sessionStorage.getItem('migrateExistingDataForm') || '{}');
@@ -41,9 +41,11 @@ export const removeSavedFormValues = () => {
   sessionStorage.removeItem('migrateExistingDataForm');
 };
 
-const useSaveRemoteReindexMigrationFormValues = (skipSavedValues: boolean = false) : {
-  initialValues: RemoteReindexRequest,
-  saveFormValues: (values: RemoteReindexRequest) => void,
+const useSaveRemoteReindexMigrationFormValues = (
+  skipSavedValues: boolean = false,
+): {
+  initialValues: RemoteReindexRequest;
+  saveFormValues: (values: RemoteReindexRequest) => void;
 } => {
   const [initialValues, setInitialValues] = useState<RemoteReindexRequest>(DEFAULT_INITIAL_VALUES);
 
@@ -54,10 +56,10 @@ const useSaveRemoteReindexMigrationFormValues = (skipSavedValues: boolean = fals
     }
   }, [skipSavedValues]);
 
-  return ({
+  return {
     initialValues,
     saveFormValues,
-  });
+  };
 };
 
 export default useSaveRemoteReindexMigrationFormValues;

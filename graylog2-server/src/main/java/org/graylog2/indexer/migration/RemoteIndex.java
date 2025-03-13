@@ -16,5 +16,5 @@
  */
 package org.graylog2.indexer.migration;
 
-public record RemoteIndex(String name, boolean managed) {
+public record RemoteIndex(String name, boolean managed, boolean closed) {
 }

@@ -19,19 +19,18 @@ import { useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import { defaultOnError } from 'util/conditional/onError';
 
 const useMinimumRefreshInterval = () => {
   const { data, isInitialLoading } = useQuery(
     ['system', 'configuration', 'minimum-refresh-interval'],
-    () => fetch('GET', qualifyUrl('/system/configuration/minimum_auto_refresh_interval')),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading system configuration "minimum_auto_refresh_interval" failed with status: ${errorThrown}`,
-          'Could not configuration option');
-      },
-      keepPreviousData: true,
-    },
+    () =>
+      defaultOnError(
+        fetch('GET', qualifyUrl('/system/configuration/minimum_auto_refresh_interval')),
+        'Loading system configuration "minimum_auto_refresh_interval" failed with status',
+        'Could not load configuration option',
+      ),
+    {},
   );
 
   return { data: data?.value, isInitialLoading };

@@ -22,15 +22,14 @@ import type { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAu
 import type HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 
 export type ActionsType = {
-  load: () => Promise<HTTPHeaderAuthConfig>,
-  update: (payload: HTTPHeaderAuthConfigJSON) => Promise<HTTPHeaderAuthConfig>,
+  load: () => Promise<HTTPHeaderAuthConfig>;
+  update: (payload: HTTPHeaderAuthConfigJSON) => Promise<HTTPHeaderAuthConfig>;
 };
 
 type HTTPHeaderAuthConfigActionsType = RefluxActions<ActionsType>;
 
-const HTTPHeaderAuthConfigActions: HTTPHeaderAuthConfigActionsType = singletonActions(
-  'HTTPHeaderAuthConfig',
-  () => Reflux.createActions({
+const HTTPHeaderAuthConfigActions: HTTPHeaderAuthConfigActionsType = singletonActions('HTTPHeaderAuthConfig', () =>
+  Reflux.createActions({
     load: { asyncResult: true },
     update: { asyncResult: true },
   }),

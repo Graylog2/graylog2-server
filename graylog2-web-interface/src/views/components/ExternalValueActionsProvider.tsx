@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -25,7 +24,7 @@ import ExternalValueActionsContext, { DEFAULT_EXTERNAL_ACTIONS } from './Externa
 
 const usePluginExternalActions = () => {
   const useExternalActions = usePluginEntities('useExternalActions');
-  const useExternalAction = useMemo<()=>(ExternalValueActionsContextValue)>(() => {
+  const useExternalAction = useMemo<() => ExternalValueActionsContextValue>(() => {
     if (useExternalActions && typeof useExternalActions[0] === 'function') return useExternalActions[0];
 
     return () => DEFAULT_EXTERNAL_ACTIONS;
@@ -36,18 +35,14 @@ const usePluginExternalActions = () => {
   return useMemo(() => ({ isLoading, isError, externalValueActions }), [externalValueActions, isError, isLoading]);
 };
 
-const ExternalValueActionsProvider = ({ children }) => {
-  const contextValue = usePluginExternalActions();
-
-  return (
-    <ExternalValueActionsContext.Provider value={contextValue}>
-      {children}
-    </ExternalValueActionsContext.Provider>
-  );
+type ExternalValueActionsProviderProps = {
+  children: React.ReactNode;
 };
 
-ExternalValueActionsProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+const ExternalValueActionsProvider = ({ children }: ExternalValueActionsProviderProps) => {
+  const contextValue = usePluginExternalActions();
+
+  return <ExternalValueActionsContext.Provider value={contextValue}>{children}</ExternalValueActionsContext.Provider>;
 };
 
 export default ExternalValueActionsProvider;

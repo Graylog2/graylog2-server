@@ -23,7 +23,6 @@ import org.graylog2.configuration.Documentation;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
 public class S3RepositoryConfiguration {
 

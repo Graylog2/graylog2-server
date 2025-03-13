@@ -28,7 +28,9 @@ import {
 import useMappedData from 'views/logic/valueactions/createEventDefinition/hooks/useMappedData';
 import {
   ltParam,
-  ltParamJSON, mappedDataResult, mockedContexts,
+  ltParamJSON,
+  mappedDataResult,
+  mockedContexts,
   mockedFilter,
   mockedSearchFilters,
   parameterBindings,
@@ -48,11 +50,7 @@ jest.mock('views/logic/valueactions/createEventDefinition/hooks/hookHelpers', ()
   __esModule: true,
 }));
 
-const wrapper = ({ children }) => (
-  <div>
-    {children}
-  </div>
-);
+const wrapper = ({ children }) => <div>{children}</div>;
 
 describe('useMappedData', () => {
   it('runs all he;per functions', async () => {
@@ -62,12 +60,16 @@ describe('useMappedData', () => {
     asMock(transformSearchFiltersToQuery).mockReturnValue('(http_method:GET)');
     asMock(replaceParametersInQueryString).mockReturnValue('http_method:GET');
 
-    const { result, waitFor } = renderHook(() => useMappedData({
-      contexts: mockedContexts,
-      field: 'action',
-      value: 'show',
-      queryId: 'query-id',
-    }), { wrapper });
+    const { result, waitFor } = renderHook(
+      () =>
+        useMappedData({
+          contexts: mockedContexts,
+          field: 'action',
+          value: 'show',
+          queryId: 'query-id',
+        }),
+      { wrapper },
+    );
     await waitFor(() => !!result.current);
 
     expect(getStreams).toHaveBeenCalledWith(mockedFilter);
@@ -82,7 +84,8 @@ describe('useMappedData', () => {
     expect(transformSearchFiltersToQuery).toHaveBeenCalledWith(mockedSearchFilters);
 
     expect(replaceParametersInQueryString).toHaveBeenCalledWith({
-      query: 'http_method:GET', restParameterValues: [valueParameterJSON],
+      query: 'http_method:GET',
+      restParameterValues: [valueParameterJSON],
     });
 
     expect(result.current).toEqual(mappedDataResult);

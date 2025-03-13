@@ -24,6 +24,7 @@ const AuthenticationOverviewPage = loadAsync(() => import('./AuthenticationOverv
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const AuthenticatorsPage = loadAsync(() => import('./AuthenticatorsPage'));
 const AuthenticatorsEditPage = loadAsync(() => import('./AuthenticatorsEditPage'));
+const ClusterConfigurationPage = loadAsync(() => import('./ClusterConfigurationPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
@@ -63,6 +64,7 @@ const IndexSetTemplateCreatePage = loadAsync(() => import('./IndexSetTemplateCre
 const IndexSetTemplateEditPage = loadAsync(() => import('./IndexSetTemplateEditPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
+const InputDiagnosisPage = loadAsync(() => import('./InputDiagnosisPage'));
 const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
@@ -121,6 +123,7 @@ export {
   AuthenticationOverviewPage,
   AuthenticatorsPage,
   AuthenticatorsEditPage,
+  ClusterConfigurationPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
@@ -160,6 +163,7 @@ export {
   IndexSetTemplateEditPage,
   IndicesPage,
   InputsPage,
+  InputDiagnosisPage,
   KeyboardShortcutsPage,
   LoadingPage,
   LoggersPage,

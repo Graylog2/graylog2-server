@@ -18,24 +18,20 @@ package org.graylog.events.search;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
-import jakarta.inject.Inject;
-
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,37 +55,13 @@ public class EventsSearchService {
         this.objectMapper = objectMapper;
     }
 
-    private String eventDefinitionFilter(String id) {
-        return String.format(Locale.ROOT, "%s:%s", EventDto.FIELD_EVENT_DEFINITION_ID, id);
+    private String buildFilter(EventsSearchParameters parameters) {
+        return new EventsFilterBuilder(parameters).build();
     }
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
-        final ImmutableSet.Builder<String> filterBuilder = ImmutableSet.<String>builder()
-                // Make sure we only filter for actual events and ignore anything else that might be in the event
-                // indices. (fixes an issue when users store non-event messages in event indices)
-                .add("_exists_:" + EventDto.FIELD_EVENT_DEFINITION_ID);
+        final var filter = buildFilter(parameters);
 
-        if (!parameters.filter().eventDefinitions().isEmpty()) {
-            final String eventDefinitionFilter = parameters.filter().eventDefinitions().stream()
-                    .map(this::eventDefinitionFilter)
-                    .collect(Collectors.joining(" OR "));
-
-            filterBuilder.addAll(Collections.singleton("(" + eventDefinitionFilter + ")"));
-        }
-
-        switch (parameters.filter().alerts()) {
-            case INCLUDE:
-                // Nothing to do
-                break;
-            case EXCLUDE:
-                filterBuilder.add("NOT alert:true");
-                break;
-            case ONLY:
-                filterBuilder.add("alert:true");
-                break;
-        }
-
-        final String filter = String.join(" AND ", filterBuilder.build());
         final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
         final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
@@ -121,6 +93,15 @@ public class EventsSearchService {
                 .build();
     }
 
+    public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
+        final var filter = buildFilter(parameters);
+
+        final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        final var result = moreSearch.histogram(parameters, filter, eventStreams, forbiddenSourceStreams(subject), timeZone);
+
+        return EventsHistogramResult.fromResult(result);
+    }
+
     // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is
     //       more efficient. Doing a separate ES query to get all source streams that would be in the result is
     //       most probably not more efficient.
@@ -139,23 +120,14 @@ public class EventsSearchService {
     }
 
     private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams) {
-        return streams.stream()
-                .map(streamId -> {
-                    try {
-                        return streamService.load(streamId);
-                    } catch (NotFoundException e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
+        return streamService.loadByIds(streams)
+                .stream()
                 .collect(Collectors.toMap(Persisted::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
     }
 
     private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions) {
-        return eventDefinitions.stream()
-                .map(eventDefinitionService::get)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        return eventDefinitionService.getByIds(eventDefinitions)
+                .stream()
                 .collect(Collectors.toMap(EventDefinitionDto::id,
                         d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description(), d.remediationSteps())));
     }

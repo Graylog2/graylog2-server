@@ -19,6 +19,8 @@ package org.graylog2.plugin;
 import com.codahale.metrics.Meter;
 import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -32,6 +34,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
@@ -64,9 +67,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.CharMatcher.anyOf;
+import static com.google.common.base.CharMatcher.inRange;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
@@ -155,6 +159,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public static final String FIELD_GL2_RECEIVE_TIMESTAMP = "gl2_receive_timestamp";
 
     /**
+     * Will be set to the original timestamp of the message, if the timestamp was normalized.
+     */
+    public static final String FIELD_GL2_ORIGINAL_TIMESTAMP = "gl2_original_timestamp";
+
+    /**
      * Reflects the time span from receiving the message till sending it to the output in milliseconds.
      * Will be set after all message processors have been run.
      */
@@ -216,10 +225,9 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public static final String FIELD_GL2_SOURCE_RADIO_INPUT = "gl2_source_radio_input";
 
     // Matches whole field names containing a-z, A-Z, 0-9, period char, -, or @.
-    private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-@]*$");
-    // Same as above, but matches only the invalid (non-indicated) characters.
-    // [^ ... ] around the pattern inverts the match.
-    private static final Pattern INVALID_KEY_CHARS = Pattern.compile("[^\\w\\.\\-@]");
+    private static final CharMatcher VALID_KEY_CHAR_MATCHER = inRange('a', 'z').or(inRange('A', 'Z')).or(inRange('0', '9')).or(anyOf(".@-_")).precomputed();
+    private static final CharMatcher INVALID_KEY_CHAR_MATCHER = VALID_KEY_CHAR_MATCHER.negate().precomputed();
+
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
@@ -488,6 +496,37 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         addField(FIELD_TIMESTAMP, dateTime);
     }
 
+    /**
+     * Normalize the timestamp of the message if it is (significantly) in the future:
+     * - use the receive time, if it is available and viable
+     * - otherwise clamp to current time
+     * Default behavior is do nothing.
+     *
+     * @param gracePeriod do nothing if the timestamp is within this grace period
+     */
+    public void normalizeTimestamp(Duration gracePeriod) {
+        if (gracePeriod == null) {
+            return;
+        }
+        final DateTime timeStamp = getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
+        final DateTime nowUTC = Tools.nowUTC();
+        final DateTime threshold = nowUTC.plus(gracePeriod.toMillis());
+        if (threshold.isBefore(timeStamp)) {
+            DateTime receiveTimeStamp = getReceiveTime();
+            if (receiveTimeStamp != null && threshold.isAfter(receiveTimeStamp)) {
+                updateTimeStamp(timeStamp, receiveTimeStamp);
+            } else {
+                updateTimeStamp(timeStamp, nowUTC);
+            }
+        }
+    }
+
+    @VisibleForTesting
+    public void updateTimeStamp(DateTime oldTimeStamp, DateTime newTimeStamp) {
+        addTimestampField(FIELD_TIMESTAMP, newTimeStamp);
+        addTimestampField(FIELD_GL2_ORIGINAL_TIMESTAMP, oldTimeStamp);
+    }
+
     private DateTime convertToDateTime(@Nonnull Object value) {
         try {
             return DateTimeConverter.convertToDateTime(value);
@@ -504,9 +543,6 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     private DateTime fallbackForNullTimestamp() {
         final String error = "<null> value for field timestamp in message <" + getId() + ">, forcing to current time";
         LOG.trace(error);
-        addProcessingError(new ProcessingError(ProcessingFailureCause.InvalidTimestampException,
-                "Replaced invalid timestamp value in message <" + getId() + "> with current time",
-                "<null> value provided"));
         return Tools.nowUTC();
     }
 
@@ -528,7 +564,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         final StringBuilder sb = new StringBuilder();
         sb.append("source: ").append(getField(FIELD_SOURCE)).append(" | ");
 
-        final String message = getField(FIELD_MESSAGE).toString().replaceAll("\\n", "").replaceAll("\\t", "");
+        final String message = ObjectUtils.defaultIfNull(getField(FIELD_MESSAGE), "").toString()
+                .replace("\\n", "").replace("\\t", "");
         sb.append("message: ");
 
         if (truncate && message.length() > 225) {
@@ -565,6 +602,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     public void addField(final String key, final Object value) {
         addField(key, value, false);
+    }
+
+    private void addTimestampField(final String key, final DateTime value) {
+        addField(key, buildElasticSearchTimeFormat(value.withZone(UTC)), false);
     }
 
     private void addRequiredField(final String key, final Object value) {
@@ -652,11 +693,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     public static boolean validKey(final String key) {
-        return VALID_KEY_CHARS.matcher(key).matches();
+        return VALID_KEY_CHAR_MATCHER.matchesAllOf(key);
     }
 
     public static String cleanKey(final String key) {
-        return INVALID_KEY_CHARS.matcher(key).replaceAll(String.valueOf(KEY_REPLACEMENT_CHAR));
+        return INVALID_KEY_CHAR_MATCHER.replaceFrom(key, KEY_REPLACEMENT_CHAR);
     }
 
     public void addFields(final Map<String, Object> fields) {
@@ -876,7 +917,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public void setReceiveTime(DateTime receiveTime) {
         if (receiveTime != null) {
             this.receiveTime = receiveTime;
-            addField(FIELD_GL2_RECEIVE_TIMESTAMP, buildElasticSearchTimeFormat(receiveTime.withZone(UTC)));
+            addTimestampField(FIELD_GL2_RECEIVE_TIMESTAMP, receiveTime);
         }
     }
 
@@ -895,7 +936,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public void setProcessingTime(DateTime processingTime) {
         if (processingTime != null) {
             this.processingTime = processingTime;
-            addField(FIELD_GL2_PROCESSING_TIMESTAMP, buildElasticSearchTimeFormat(processingTime.withZone(UTC)));
+            addTimestampField(FIELD_GL2_PROCESSING_TIMESTAMP, processingTime);
             if (getReceiveTime() != null) {
                 final long duration = processingTime.getMillis() - getReceiveTime().getMillis();
                 addField(FIELD_GL2_PROCESSING_DURATION_MS, Ints.saturatedCast(duration));
@@ -929,7 +970,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     public boolean hasRecordings() {
-        return recordings != null && recordings.size() > 0;
+        return recordings != null && recordings.isEmpty();
     }
 
     private void lazyInitRecordings() {
@@ -979,7 +1020,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return true;
     }
 
-    public static abstract class Recording {
+    public abstract static class Recording {
         static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }

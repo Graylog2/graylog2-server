@@ -15,44 +15,86 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useMemo } from 'react';
 import isString from 'lodash/isString';
 import trim from 'lodash/trim';
 import trunc from 'lodash/truncate';
 
-import Timestamp from 'components/common/Timestamp';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import InputField from 'views/components/fieldtypes/InputField';
-import NodeField from 'views/components/fieldtypes/NodeField';
-import StreamsField from 'views/components/fieldtypes/StreamsField';
-import PercentageField from 'views/components/fieldtypes/PercentageField';
+import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
+import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
+import useFeature from 'hooks/useFeature';
+import { MISSING_BUCKET_NAME } from 'views/Constants';
+import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import EmptyValue from './EmptyValue';
-import CustomPropTypes from './CustomPropTypes';
-import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
+import type { ValueRendererProps, ValueRenderer } from './messagelist/decoration/ValueRenderer';
 import DecoratorValue from './DecoratorValue';
 
-const _formatValue = (field, value, truncate, render, type) => {
-  const stringified = isString(value) ? value : JSON.stringify(value);
-  const Component = render;
+const usePluggableValueRenderer = () => {
+  const pluggableValueRenderer = usePluginEntities('fieldTypeValueRenderer');
 
-  return trim(stringified) === ''
-    ? <EmptyValue />
-    : <Component field={field} value={(truncate ? trunc(stringified) : stringified)} type={type} />;
-};
-
-type Props = {
-  field: string,
-  value?: any,
-  type: FieldType,
-  truncate?: boolean,
-  render?: React.ComponentType<ValueRendererProps>,
+  return useMemo(
+    () => Object.fromEntries((pluggableValueRenderer ?? []).map(({ type, render }) => [type, render])),
+    [pluggableValueRenderer],
+  );
 };
 
 const defaultComponent = ({ value }: ValueRendererProps) => value;
 
-const TypeSpecificValue = ({ field, value, render = defaultComponent, type = FieldType.Unknown, truncate = false }: Props) => {
-  const Component = render;
+const _formatValue = (field: string, value: any, truncate: boolean, render: ValueRenderer, type: FieldType) => {
+  const stringified = isString(value) ? value : JSON.stringify(value);
+  const Component: ValueRenderer = render;
+
+  return trim(stringified) === '' ? (
+    <EmptyValue />
+  ) : (
+    <Component field={field} value={truncate ? trunc(stringified) : stringified} type={type} />
+  );
+};
+
+type TypeSpecificValueProps = {
+  field: string;
+  value?: any;
+  type?: FieldType;
+  truncate?: boolean;
+  render?: React.ComponentType<ValueRendererProps>;
+  unit?: FieldUnit;
+};
+
+const ValueWithUnitRenderer = ({ value, unit }: { value: number; unit: FieldUnit }) => {
+  const prettified = getPrettifiedValue(value, { abbrev: unit.abbrev, unitType: unit.unitType });
+
+  return <span title={value.toString()}>{formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev)}</span>;
+};
+
+const FormattedValue = ({
+  field,
+  value = undefined,
+  truncate = false,
+  render = defaultComponent,
+  unit = undefined,
+  type = undefined,
+}: TypeSpecificValueProps) => {
+  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
+  const shouldRenderValueWithUnit =
+    unitFeatureEnabled && unit?.isDefined && value && value !== MISSING_BUCKET_NAME && unitFeatureEnabled;
+  if (shouldRenderValueWithUnit) return <ValueWithUnitRenderer value={value} unit={unit} />;
+
+  return _formatValue(field, value, truncate, render, type);
+};
+
+const TypeSpecificValue = ({
+  field,
+  value = undefined,
+  render = defaultComponent,
+  type = FieldType.Unknown,
+  truncate = false,
+  unit = undefined,
+}: TypeSpecificValueProps) => {
+  const pluggableValueRenderer = usePluggableValueRenderer();
 
   if (value === undefined) {
     return null;
@@ -62,28 +104,11 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
     return <DecoratorValue value={value} field={field} render={render} type={type} truncate={truncate} />;
   }
 
-  switch (type.type) {
-    case 'date': return <Timestamp dateTime={value} render={render} field={field} format="complete" />;
-    case 'boolean': return <Component value={String(value)} field={field} />;
-    case 'input': return <InputField value={String(value)} />;
-    case 'node': return <NodeField value={String(value)} />;
-    case 'streams': return <StreamsField value={value} />;
-    case 'percentage': return <PercentageField value={value} />;
-    default: return _formatValue(field, value, truncate, render, type);
+  if (pluggableValueRenderer[type.type]) {
+    return pluggableValueRenderer[type.type](value, field, render);
   }
-};
 
-TypeSpecificValue.propTypes = {
-  truncate: PropTypes.bool,
-  type: CustomPropTypes.FieldType,
-  value: PropTypes.any,
-};
-
-TypeSpecificValue.defaultProps = {
-  truncate: false,
-  render: defaultComponent,
-  type: undefined,
-  value: undefined,
+  return <FormattedValue field={field} value={value} truncate={truncate} unit={unit} render={render} type={type} />;
 };
 
 export default TypeSpecificValue;

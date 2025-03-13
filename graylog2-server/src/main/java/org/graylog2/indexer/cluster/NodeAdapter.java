@@ -27,7 +27,7 @@ public interface NodeAdapter {
 
     default Version parseVersion(String version) {
         try {
-            return Version.valueOf(version);
+            return Version.parse(version);
         } catch (Exception e) {
             throw new ElasticsearchException("Unable to parse Elasticsearch version: " + version, e);
         }

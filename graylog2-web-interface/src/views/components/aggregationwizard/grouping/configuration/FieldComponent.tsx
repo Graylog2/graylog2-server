@@ -27,6 +27,8 @@ import type { GroupByError } from 'views/components/aggregationwizard/grouping/G
 import { onGroupingFieldsChange } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
+import useFeature from 'hooks/useFeature';
+import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 
 const placeholder = (grouping: GroupByFormValues) => {
   if (!grouping.fields?.length) {
@@ -41,12 +43,14 @@ const placeholder = (grouping: GroupByFormValues) => {
 };
 
 type Props = {
-  groupingIndex: number,
+  groupingIndex: number;
 };
 
 const FieldComponent = ({ groupingIndex }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { setFieldValue, values, errors } = useFormikContext<WidgetConfigFormValues>();
+  const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
+  const showFieldUnit = unitFeatureEnabled && values?.visualization?.type === 'table';
   const grouping = values.groupBy.groupings[groupingIndex];
   const activeQueryId = useActiveQueryId();
   const createSelectPlaceholder = placeholder(grouping);
@@ -62,28 +66,35 @@ const FieldComponent = ({ groupingIndex }: Props) => {
     });
   };
 
-  const isFieldQualified = useCallback((field: FieldTypeMapping) => {
-    if (!grouping.fields?.length) {
-      return true;
-    }
+  const isFieldQualified = useCallback(
+    (field: FieldTypeMapping) => {
+      if (!grouping.fields?.length) {
+        return true;
+      }
 
-    const fieldTypeCategory = field.type.type === 'date' ? DateType : ValuesType;
+      const fieldTypeCategory = field.type.type === 'date' ? DateType : ValuesType;
 
-    return grouping.type === fieldTypeCategory;
-  }, [grouping.fields?.length, grouping.type]);
+      return grouping.type === fieldTypeCategory;
+    },
+    [grouping.fields?.length, grouping.type],
+  );
 
   return (
-    <Input id="group-by-field-select"
-           label="Fields"
-           labelClassName="col-sm-3"
-           error={(errors?.groupBy?.groupings?.[groupingIndex] as GroupByError)?.fields}
-           wrapperClassName="col-sm-9">
-      <FieldsConfiguration onChange={onChangeSelectedFields}
-                           selectedFields={grouping.fields}
-                           menuPortalTarget={document.body}
-                           createSelectPlaceholder={createSelectPlaceholder}
-                           isFieldQualified={isFieldQualified}
-                           testPrefix={`grouping-${groupingIndex}`} />
+    <Input
+      id="group-by-field-select"
+      label="Fields"
+      labelClassName="col-sm-3"
+      error={(errors?.groupBy?.groupings?.[groupingIndex] as GroupByError)?.fields}
+      wrapperClassName="col-sm-9">
+      <FieldsConfiguration
+        onChange={onChangeSelectedFields}
+        selectedFields={grouping.fields}
+        menuPortalTarget={document.body}
+        createSelectPlaceholder={createSelectPlaceholder}
+        isFieldQualified={isFieldQualified}
+        testPrefix={`grouping-${groupingIndex}`}
+        showUnit={showFieldUnit}
+      />
     </Input>
   );
 };

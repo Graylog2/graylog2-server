@@ -15,23 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { ListGroupItem } from 'components/bootstrap';
 
-const ControlledTableListItem = ({ className, children }: { className?: string, children: React.ReactNode }) => (
-  <ListGroupItem className={className}>
-    {children}
-  </ListGroupItem>
+const ControlledTableListItem = ({ className, children }: { className?: string; children: React.ReactNode }) => (
+  <ListGroupItem className={className}>{children}</ListGroupItem>
 );
-
-ControlledTableListItem.propTypes = {
-  children: PropTypes.node.isRequired,
-  className: PropTypes.string,
-};
-
-ControlledTableListItem.defaultProps = {
-  className: undefined,
-};
 
 export default ControlledTableListItem;

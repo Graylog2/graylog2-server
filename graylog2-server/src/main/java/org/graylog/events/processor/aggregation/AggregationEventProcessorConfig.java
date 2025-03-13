@@ -72,6 +72,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     private static final String FIELD_QUERY_PARAMETERS = "query_parameters";
     private static final String FIELD_FILTERS = "filters";
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_STREAM_CATEGORIES = "stream_categories";
     private static final String FIELD_GROUP_BY = "group_by";
     static final String FIELD_SERIES = "series";
     private static final String FIELD_CONDITIONS = "conditions";
@@ -85,6 +86,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     @JsonProperty(FIELD_QUERY)
     public abstract String query();
 
+    @Nullable
     @JsonProperty(FIELD_QUERY_PARAMETERS)
     public abstract ImmutableSet<Parameter> queryParameters();
 
@@ -93,6 +95,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @JsonProperty(FIELD_STREAMS)
     public abstract ImmutableSet<String> streams();
+
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    public abstract ImmutableSet<String> streamCategories();
 
     @JsonProperty(FIELD_GROUP_BY)
     public abstract List<String> groupBy();
@@ -183,7 +188,8 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .filters(Collections.emptyList())
                     .type(TYPE_NAME)
                     .useCronScheduling(false)
-                    .eventLimit(0);
+                    .eventLimit(0)
+                    .streamCategories(ImmutableSet.of());
         }
 
         @JsonProperty(FIELD_QUERY)
@@ -197,6 +203,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty(FIELD_STREAM_CATEGORIES)
+        public abstract Builder streamCategories(Set<String> streamCategories);
 
         @JsonProperty(FIELD_GROUP_BY)
         public abstract Builder groupBy(List<String> groupBy);
@@ -324,8 +333,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         return AggregationEventProcessorConfigEntity.builder()
                 .type(type())
                 .query(ValueReference.of(query()))
+                .queryParameters(queryParameters())
                 .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .streams(streamRefs)
+                .streamCategories(streamCategories())
                 .groupBy(groupBy())
                 .series(series().stream().map(SeriesSpecEntity::fromNativeEntity).toList())
                 .conditions(conditions().orElse(null))
@@ -347,6 +358,10 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .build();
             mutableGraph.putEdge(entityDescriptor, depStream);
         });
+        // attribute is tagged @Nullable, so do a null check first
+        if(queryParameters() != null) {
+            queryParameters().forEach(parameter -> parameter.resolveNativeEntity(entityDescriptor, mutableGraph));
+        }
         filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import PropTypes from 'prop-types';
 import isArray from 'lodash/isArray';
 
 import ApiRoutes from 'routing/ApiRoutes';
@@ -24,98 +23,77 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { RetentionStrategyConfig, RotationStrategyConfig } from 'components/indices/Types';
-import { RetentionStrategyConfigPropType, RotationStrategyConfigPropType } from 'components/indices/Types';
-import type { DataTieringConfig, DataTieringFormValues } from 'components/indices/data-tiering';
-
-export const IndexSetPropType = PropTypes.shape({
-  can_be_default: PropTypes.bool,
-  id: PropTypes.string,
-  title: PropTypes.string,
-  description: PropTypes.string.isRequired,
-  index_prefix: PropTypes.string.isRequired,
-  shards: PropTypes.number.isRequired,
-  replicas: PropTypes.number.isRequired,
-  rotation_strategy_class: PropTypes.string.isRequired,
-  rotation_strategy: RotationStrategyConfigPropType.isRequired,
-  retention_strategy_class: PropTypes.string.isRequired,
-  retention_strategy: RetentionStrategyConfigPropType.isRequired,
-  creation_date: PropTypes.string,
-  index_analyzer: PropTypes.string.isRequired,
-  index_optimization_max_num_segments: PropTypes.number.isRequired,
-  index_optimization_disabled: PropTypes.bool.isRequired,
-  field_type_refresh_interval: PropTypes.number.isRequired,
-  index_template_type: PropTypes.string,
-  writable: PropTypes.bool.isRequired,
-  default: PropTypes.bool.isRequired,
-});
+import type { DataTieringConfig, DataTieringFormValues, DataTieringStatus } from 'components/indices/data-tiering';
 
 export type IndexSetConfig = {
-  can_be_default?: boolean,
-  id?: string,
-  title: string,
-  description: string,
-  index_prefix: string,
-  shards: number,
-  replicas: number,
-  rotation_strategy_class: string,
-  rotation_strategy: RotationStrategyConfig,
-  retention_strategy_class: string,
-  retention_strategy: RetentionStrategyConfig,
-  creation_date?: string,
-  index_analyzer: string,
-  index_optimization_max_num_segments: number,
-  index_optimization_disabled: boolean,
-  field_type_refresh_interval: number,
-  field_type_profile?: string | null,
-  index_template_type?: string,
-  writable: boolean,
-  default?: boolean,
-  use_legacy_rotation?: boolean
-}
+  can_be_default?: boolean;
+  id?: string;
+  title: string;
+  description: string;
+  index_prefix: string;
+  shards: number;
+  replicas: number;
+  rotation_strategy_class: string;
+  rotation_strategy: RotationStrategyConfig;
+  retention_strategy_class: string;
+  retention_strategy: RetentionStrategyConfig;
+  creation_date?: string;
+  index_analyzer: string;
+  index_optimization_max_num_segments: number;
+  index_optimization_disabled: boolean;
+  field_type_refresh_interval: number;
+  field_type_profile?: string | null;
+  index_template_type?: string;
+  writable: boolean;
+  default?: boolean;
+  use_legacy_rotation?: boolean;
+};
 
-export type IndexSet = IndexSetConfig & { data_tiering?: DataTieringConfig };
+export type IndexSet = IndexSetConfig & {
+  data_tiering?: DataTieringConfig;
+  data_tiering_status?: DataTieringStatus;
+};
 
 export type IndexSetFormValues = IndexSetConfig & { data_tiering?: DataTieringFormValues };
 
 export type IndexSetStats = {
-  documents: number,
-  indices: number,
-  size: number,
-}
+  documents: number;
+  indices: number;
+  size: number;
+};
 
-type IndexSetsStats = {
-  [key: string]: IndexSetStats
-}
+export type IndexSetsStats = {
+  [key: string]: IndexSetStats;
+};
 
-type IndexSetsResponseType = {
-  total: number,
-  index_sets: Array<IndexSet>,
-  stats: IndexSetsStats,
+export type IndexSetsResponseType = {
+  total: number;
+  index_sets: Array<IndexSet>;
+  stats: IndexSetsStats;
 };
 
 export type IndexSetsStoreState = {
-  indexSetsCount: number,
-  indexSets: Array<IndexSet>,
-  indexSetStats: IndexSetsStats,
-  indexSet: IndexSet,
-  globalIndexSetStats: IndexSetStats
-}
-
-type IndexSetsActionsType = {
-  list: (stats: boolean) => Promise<unknown>,
-  listPaginated: (skip: number, limit: number, stats: boolean) => Promise<unknown>,
-  get: (indexSetId: string) => Promise<unknown>,
-  update: (indexSet: IndexSet) => Promise<unknown>,
-  create: (indexSet: IndexSet) => Promise<unknown>,
-  delete: (indexSet: IndexSet, deleteIndices: boolean) => Promise<unknown>,
-  searchPaginated: (searchTerm: string, skip: number, limit: number, stats: boolean) => Promise<unknown>,
-  setDefault: (indexSet: IndexSet) => Promise<unknown>,
-  stats: () => Promise<unknown>,
+  indexSetsCount: number;
+  indexSets: Array<IndexSet>;
+  indexSetStats: IndexSetsStats;
+  indexSet: IndexSet;
+  globalIndexSetStats: IndexSetStats;
 };
 
-export const IndexSetsActions = singletonActions(
-  'core.IndexSets',
-  () => Reflux.createActions<IndexSetsActionsType>({
+type IndexSetsActionsType = {
+  list: (stats: boolean) => Promise<unknown>;
+  listPaginated: (skip: number, limit: number, stats: boolean) => Promise<unknown>;
+  get: (indexSetId: string) => Promise<unknown>;
+  update: (indexSet: IndexSet) => Promise<unknown>;
+  create: (indexSet: IndexSet) => Promise<unknown>;
+  delete: (indexSet: IndexSet, deleteIndices: boolean) => Promise<unknown>;
+  searchPaginated: (searchTerm: string, skip: number, limit: number, stats: boolean) => Promise<unknown>;
+  setDefault: (indexSet: IndexSet) => Promise<unknown>;
+  stats: () => Promise<unknown>;
+};
+
+export const IndexSetsActions = singletonActions('core.IndexSets', () =>
+  Reflux.createActions<IndexSetsActionsType>({
     list: { asyncResult: true },
     listPaginated: { asyncResult: true },
     get: { asyncResult: true },
@@ -128,9 +106,8 @@ export const IndexSetsActions = singletonActions(
   }),
 );
 
-export const IndexSetsStore = singletonStore(
-  'core.IndexSets',
-  () => Reflux.createStore<IndexSetsStoreState>({
+export const IndexSetsStore = singletonStore('core.IndexSets', () =>
+  Reflux.createStore<IndexSetsStoreState>({
     listenables: [IndexSetsActions],
     indexSetsCount: undefined,
     indexSets: undefined,
@@ -160,22 +137,20 @@ export const IndexSetsStore = singletonStore(
       const url = qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
       const promise = fetch('GET', url);
 
-      promise
-        .then(
-          (response: IndexSetsResponseType) => {
-            this.indexSetsCount = response.total;
-            this.indexSets = response.index_sets;
-            this.indexSetStats = response.stats;
+      promise.then(
+        (response: IndexSetsResponseType) => {
+          this.indexSetsCount = response.total;
+          this.indexSets = response.index_sets;
+          this.indexSetStats = response.stats;
 
-            this.propagateChanges();
+          this.propagateChanges();
 
-            return response;
-          },
-          (error) => {
-            UserNotification.error(`Fetching index sets list failed: ${error.message}`,
-              'Could not retrieve index sets.');
-          },
-        );
+          return response;
+        },
+        (error) => {
+          UserNotification.error(`Fetching index sets list failed: ${error.message}`, 'Could not retrieve index sets.');
+        },
+      );
 
       IndexSetsActions.list.promise(promise);
     },
@@ -184,22 +159,23 @@ export const IndexSetsStore = singletonStore(
       const url = qualifyUrl(ApiRoutes.IndexSetsApiController.listPaginated(skip, limit, stats).url);
       const promise = fetch('GET', url);
 
-      promise
-        .then(
-          (response: IndexSetsResponseType) => {
-            this.indexSetsCount = response.total;
-            this.indexSets = response.index_sets;
-            this.indexSetStats = response.stats;
+      promise.then(
+        (response: IndexSetsResponseType) => {
+          this.indexSetsCount = response.total;
+          this.indexSets = response.index_sets;
+          this.indexSetStats = response.stats;
 
-            this.propagateChanges();
+          this.propagateChanges();
 
-            return response;
-          },
-          (error) => {
-            UserNotification.error(`Fetching index sets list failed: ${this._errorMessage(error)}`,
-              'Could not retrieve index sets.');
-          },
-        );
+          return response;
+        },
+        (error) => {
+          UserNotification.error(
+            `Fetching index sets list failed: ${this._errorMessage(error)}`,
+            'Could not retrieve index sets.',
+          );
+        },
+      );
 
       IndexSetsActions.listPaginated.promise(promise);
     },
@@ -208,22 +184,23 @@ export const IndexSetsStore = singletonStore(
       const url = qualifyUrl(ApiRoutes.IndexSetsApiController.searchPaginated(searchTerm, skip, limit, stats).url);
       const promise = fetch('GET', url);
 
-      promise
-        .then(
-          (response: IndexSetsResponseType) => {
-            this.indexSetsCount = response.total;
-            this.indexSets = response.index_sets;
-            this.indexSetStats = response.stats;
+      promise.then(
+        (response: IndexSetsResponseType) => {
+          this.indexSetsCount = response.total;
+          this.indexSets = response.index_sets;
+          this.indexSetStats = response.stats;
 
-            this.propagateChanges();
+          this.propagateChanges();
 
-            return response;
-          },
-          (error) => {
-            UserNotification.error(`Fetching index sets list failed: ${this._errorMessage(error)}`,
-              'Could not retrieve index sets.');
-          },
-        );
+          return response;
+        },
+        (error) => {
+          UserNotification.error(
+            `Fetching index sets list failed: ${this._errorMessage(error)}`,
+            'Could not retrieve index sets.',
+          );
+        },
+      );
 
       IndexSetsActions.searchPaginated.promise(promise);
     },
@@ -241,7 +218,10 @@ export const IndexSetsStore = singletonStore(
           return response;
         },
         (error) => {
-          UserNotification.error(`Fetching index set '${indexSetId}' failed with status: ${this._errorMessage(error)}`, 'Could not retrieve index set.');
+          UserNotification.error(
+            `Fetching index set '${indexSetId}' failed with status: ${this._errorMessage(error)}`,
+            'Could not retrieve index set.',
+          );
         },
       );
 
@@ -263,7 +243,10 @@ export const IndexSetsStore = singletonStore(
           return response;
         },
         (error) => {
-          UserNotification.error(`Updating index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`, 'Could not update index set.');
+          UserNotification.error(
+            `Updating index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`,
+            'Could not update index set.',
+          );
         },
       );
 
@@ -285,7 +268,10 @@ export const IndexSetsStore = singletonStore(
           return response;
         },
         (error) => {
-          UserNotification.error(`Creating index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`, 'Could not create index set.');
+          UserNotification.error(
+            `Creating index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`,
+            'Could not create index set.',
+          );
         },
       );
 
@@ -301,7 +287,10 @@ export const IndexSetsStore = singletonStore(
           UserNotification.success(`Successfully deleted index set '${indexSet.title}'`, 'Success');
         },
         (error) => {
-          UserNotification.error(`Deleting index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`, 'Could not delete index set.');
+          UserNotification.error(
+            `Deleting index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`,
+            'Could not delete index set.',
+          );
         },
       );
 
@@ -317,7 +306,10 @@ export const IndexSetsStore = singletonStore(
           UserNotification.success(`Successfully set index set '${indexSet.title}' as default`, 'Success');
         },
         (error) => {
-          UserNotification.error(`Setting index set '${indexSet.title}' as default failed with status: ${this._errorMessage(error)}`, 'Could not set default index set.');
+          UserNotification.error(
+            `Setting index set '${indexSet.title}' as default failed with status: ${this._errorMessage(error)}`,
+            'Could not set default index set.',
+          );
         },
       );
 
@@ -328,24 +320,25 @@ export const IndexSetsStore = singletonStore(
       const url = qualifyUrl(ApiRoutes.IndexSetsApiController.stats().url);
       const promise = fetch('GET', url);
 
-      promise
-        .then(
-          (response) => {
-            this.globalIndexSetStats = {
-              indices: response.indices,
-              documents: response.documents,
-              size: response.size,
-            };
+      promise.then(
+        (response) => {
+          this.globalIndexSetStats = {
+            indices: response.indices,
+            documents: response.documents,
+            size: response.size,
+          };
 
-            this.propagateChanges();
+          this.propagateChanges();
 
-            return response;
-          },
-          (error) => {
-            UserNotification.error(`Fetching global index stats failed: ${error.message}`,
-              'Could not retrieve global index stats.');
-          },
-        );
+          return response;
+        },
+        (error) => {
+          UserNotification.error(
+            `Fetching global index stats failed: ${error.message}`,
+            'Could not retrieve global index stats.',
+          );
+        },
+      );
 
       IndexSetsActions.stats.promise(promise);
     },

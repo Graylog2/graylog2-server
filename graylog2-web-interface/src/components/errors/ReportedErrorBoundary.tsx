@@ -21,18 +21,27 @@ import useLocation from 'routing/useLocation';
 import ErrorPage from 'components/errors/ErrorPage';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import type { ReportedError } from 'logic/errors/ReportedErrors';
-import { ReactErrorType, NotFoundErrorType, UnauthorizedErrorType, StreamPermissionErrorType } from 'logic/errors/ReportedErrors';
+import {
+  ReactErrorType,
+  NotFoundErrorType,
+  UnauthorizedErrorType,
+  StreamPermissionErrorType,
+} from 'logic/errors/ReportedErrors';
 import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
 import StreamPermissionErrorPage from 'pages/StreamPermissionErrorPage';
 
 const FallbackErrorPage = ({ reportedError }: { reportedError: ReportedError }) => (
-  <ErrorPage title="Something went wrong"
-             description={<p>An unknown error has occurred. Please have a look at the following message and the graylog server log for more information.</p>}>
-    <pre>
-      {JSON.stringify(reportedError)}
-    </pre>
+  <ErrorPage
+    title="Something went wrong"
+    description={
+      <p>
+        An unknown error has occurred. Please have a look at the following message and the graylog server log for more
+        information.
+      </p>
+    }>
+    <pre>{JSON.stringify(reportedError)}</pre>
   </ErrorPage>
 );
 
@@ -52,7 +61,7 @@ const ReportedErrorPage = ({ reportedError }: { reportedError: ReportedError }) 
 };
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const ReportedErrorBoundary = ({ children }: Props) => {
@@ -70,19 +79,20 @@ const ReportedErrorBoundary = ({ children }: Props) => {
 
   const location = useLocation();
 
-  useEffect(() => {
-    if (reportedError) {
-      setReportedError(null);
-    }
-  },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [location]);
+  useEffect(
+    () => {
+      if (reportedError) {
+        setReportedError(null);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location],
+  );
 
   if (reportedError) {
     return <ReportedErrorPage reportedError={reportedError} />;
   }
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 };
 

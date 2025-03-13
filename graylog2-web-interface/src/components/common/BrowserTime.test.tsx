@@ -21,8 +21,7 @@ import BrowserTime from './BrowserTime';
 
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
-jest.useFakeTimers()
-  .setSystemTime(mockedUnixTime);
+jest.useFakeTimers().setSystemTime(mockedUnixTime);
 
 jest.mock('util/DateTime', () => {
   const DateTime = jest.requireActual('util/DateTime');
@@ -33,17 +32,13 @@ jest.mock('util/DateTime', () => {
 
 describe('BrowserTime', () => {
   it('should display browser time', () => {
-    render(
-      <BrowserTime dateTime="2020-01-01T10:00:00.000Z" />,
-    );
+    render(<BrowserTime dateTime="2020-01-01T10:00:00.000Z" />);
 
     expect(screen.getByText('2020-01-01 04:00:00')).toBeInTheDocument();
   });
 
   it('should display browser time in a specific format', () => {
-    render(
-      <BrowserTime dateTime="2020-01-01T10:00:00.000Z" format="withTz" />,
-    );
+    render(<BrowserTime dateTime="2020-01-01T10:00:00.000Z" format="withTz" />);
 
     expect(screen.getByText('2020-01-01 04:00:00 -06:00')).toBeInTheDocument();
   });

@@ -17,11 +17,12 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog2.streams.StreamService;
 
-import jakarta.inject.Inject;
-
+import java.util.Collection;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -29,15 +30,17 @@ import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
 
 public class PermittedStreams {
     private final Supplier<Stream<String>> allStreamsProvider;
+    private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
 
-
-    public PermittedStreams(Supplier<Stream<String>> allStreamsProvider) {
+    public PermittedStreams(Supplier<Stream<String>> allStreamsProvider, Function<Collection<String>, Stream<String>> streamCategoryMapper) {
         this.allStreamsProvider = allStreamsProvider;
+        this.streamCategoryMapper = streamCategoryMapper;
     }
 
     @Inject
     public PermittedStreams(StreamService streamService) {
-        this(() -> streamService.loadAll().stream().map(org.graylog2.plugin.streams.Stream::getId));
+        this(() -> streamService.loadAll().stream().map(org.graylog2.plugin.streams.Stream::getId),
+                (categories) -> streamService.mapCategoriesToIds(categories).stream());
     }
 
     public ImmutableSet<String> loadAllMessageStreams(final StreamPermissions streamPermissions) {
@@ -53,6 +56,13 @@ public class PermittedStreams {
 
     public ImmutableSet<String> loadAll(final StreamPermissions streamPermissions) {
         return allStreamsProvider.get()
+                .filter(streamPermissions::canReadStream)
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    public ImmutableSet<String> loadWithCategories(final Collection<String> categories,
+                                                   final StreamPermissions streamPermissions) {
+        return streamCategoryMapper.apply(categories)
                 .filter(streamPermissions::canReadStream)
                 .collect(ImmutableSet.toImmutableSet());
     }

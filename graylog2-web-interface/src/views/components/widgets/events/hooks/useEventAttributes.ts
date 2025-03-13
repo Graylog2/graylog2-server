@@ -19,9 +19,9 @@ import usePluginEntities from 'hooks/usePluginEntities';
 const useEventAttributes = () => {
   const eventAttributes = usePluginEntities('views.components.widgets.events.attributes');
 
-  return eventAttributes.filter(({ useCondition }) => (
+  return eventAttributes.filter(({ useCondition }) =>
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    typeof useCondition === 'function' ? useCondition() : true),
+    typeof useCondition === 'function' ? useCondition() : true,
   );
 };
 

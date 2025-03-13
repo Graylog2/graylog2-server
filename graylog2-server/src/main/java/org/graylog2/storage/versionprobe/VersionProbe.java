@@ -24,6 +24,7 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Strings;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
@@ -190,7 +191,7 @@ public class VersionProbe {
 
     private Optional<SearchVersion> parseVersion(VersionResponse versionResponse, VersionProbeListener probeListener) {
         try {
-            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionResponse.number());
+            final com.github.zafarkhaja.semver.Version version = Version.parse(versionResponse.number());
             return Optional.of(SearchVersion.create(versionResponse.distribution(), version));
         } catch (Exception e) {
             probeListener.onError(String.format(Locale.ROOT, "Unable to parse version retrieved from indexer node: <%s>", versionResponse.number()), e);

@@ -28,7 +28,7 @@ import type { FocusContextState } from 'views/components/contexts/WidgetFocusCon
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import ElementDimensions from 'components/common/ElementDimensions';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectViewStates, selectIsDirty } from 'views/logic/slices/viewSelectors';
 import type Widget from 'views/logic/widgets/Widget';
 import findGaps from 'views/components/GridGaps';
@@ -36,8 +36,8 @@ import generateId from 'logic/generateId';
 import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
 import CreateNewWidgetModal from 'views/components/CreateNewWidgetModal';
 import isDeepEqual from 'stores/isDeepEqual';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetPositions, updateWidgetPosition } from 'views/logic/slices/widgetActions';
 import { setIsDirty } from 'views/logic/slices/viewSlice';
 
@@ -55,19 +55,23 @@ const COLUMNS = {
   xs: 12,
 };
 
-const DashboardWrap = styled(ElementDimensions)(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-  margin: 0;
-  width: 100%;
-  height: 100%;
-`);
+const DashboardWrap = styled(ElementDimensions)(
+  ({ theme }) => css`
+    color: ${theme.colors.global.textDefault};
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  `,
+);
 
-const StyledReactGridContainer = styled(ReactGridContainer)<{ $hasFocusedWidget: boolean }>(({ $hasFocusedWidget }) => css`
-  height: ${$hasFocusedWidget ? '100% !important' : '100%'};
-  max-height: ${$hasFocusedWidget ? '100%' : 'auto'};
-  overflow: ${$hasFocusedWidget ? 'hidden' : 'visible'};
-  transition: none;
-`);
+const StyledReactGridContainer = styled(ReactGridContainer)<{ $hasFocusedWidget: boolean }>(
+  ({ $hasFocusedWidget }) => css`
+    height: ${$hasFocusedWidget ? '100% !important' : '100%'};
+    max-height: ${$hasFocusedWidget ? '100%' : 'auto'};
+    overflow: ${$hasFocusedWidget ? 'hidden' : 'visible'};
+    transition: none;
+  `,
+);
 
 const _defaultDimensions = (type: string) => {
   const widgetDef = widgetDefinition(type);
@@ -76,37 +80,37 @@ const _defaultDimensions = (type: string) => {
 };
 
 type WidgetsProps = {
-  widgetId: string,
-  focusedWidget: FocusContextState | undefined,
-  onPositionsChange: (position: BackendWidgetPosition) => void,
-  positions: WidgetPositions,
+  widgetId: string;
+  focusedWidget: FocusContextState | undefined;
+  onPositionsChange: (position: BackendWidgetPosition) => void;
+  positions: WidgetPositions;
 };
 
-const WidgetGridItem = ({
-  onPositionsChange,
-  positions,
-  widgetId,
-  focusedWidget,
-}: WidgetsProps) => {
+const WidgetGridItem = ({ onPositionsChange, positions, widgetId, focusedWidget }: WidgetsProps) => {
   const editing = focusedWidget?.id === widgetId && focusedWidget?.editing;
   const widgetPosition = positions[widgetId];
 
   return (
-    <WidgetComponent editing={editing}
-                     onPositionsChange={onPositionsChange}
-                     position={widgetPosition}
-                     widgetId={widgetId} />
+    <WidgetComponent
+      editing={editing}
+      onPositionsChange={onPositionsChange}
+      position={widgetPosition}
+      widgetId={widgetId}
+    />
   );
 };
 
-const generatePositions = (widgets: Immutable.List<Widget>, positions: { [widgetId: string]: WidgetPosition }) => Object.fromEntries(widgets
-  .toArray()
-  .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)]));
+const generatePositions = (widgets: Immutable.List<Widget>, positions: { [widgetId: string]: WidgetPosition }) =>
+  Object.fromEntries(
+    widgets.toArray().map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)]),
+  );
 
-const selectWidgetPositions = createSelector(selectViewStates, (viewStates) => Object.fromEntries(viewStates.toArray().flatMap(({ widgetPositions }) => Object.entries(widgetPositions))));
+const selectWidgetPositions = createSelector(selectViewStates, (viewStates) =>
+  Object.fromEntries(viewStates.toArray().flatMap(({ widgetPositions }) => Object.entries(widgetPositions))),
+);
 
 const useWidgetsAndPositions = (): [ReturnType<typeof useWidgets>, WidgetPositions] => {
-  const initialPositions = useAppSelector(selectWidgetPositions);
+  const initialPositions = useViewsSelector(selectWidgetPositions);
   const widgets = useWidgets();
 
   const positions = useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
@@ -115,63 +119,71 @@ const useWidgetsAndPositions = (): [ReturnType<typeof useWidgets>, WidgetPositio
 };
 
 type GridProps = {
-  children: React.ReactNode,
-  locked: boolean,
-  onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
-  onSyncLayout?: (newPositions: Array<BackendWidgetPosition>) => void,
-  positions: WidgetPositions,
-  width: number,
+  children: React.ReactNode;
+  locked: boolean;
+  onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void;
+  onSyncLayout?: (newPositions: Array<BackendWidgetPosition>) => void;
+  positions: WidgetPositions;
+  width: number;
 };
 
-const Grid = ({ children, locked, onPositionsChange, onSyncLayout, positions, width }: GridProps) => {
+const Grid = ({ children, locked, onPositionsChange, onSyncLayout = undefined, positions, width }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return (
-    <StyledReactGridContainer $hasFocusedWidget={!!focusedWidget?.id}
-                              columns={COLUMNS}
-                              isResizable={!focusedWidget?.id}
-                              locked={locked}
-                              positions={positions}
-                              measureBeforeMount
-                              onPositionsChange={onPositionsChange}
-                              onSyncLayout={onSyncLayout}
-                              width={width}
-                              draggableHandle=".widget-drag-handle">
+    <StyledReactGridContainer
+      $hasFocusedWidget={!!focusedWidget?.id}
+      columns={COLUMNS}
+      isResizable={!focusedWidget?.id}
+      locked={locked}
+      positions={positions}
+      measureBeforeMount
+      onPositionsChange={onPositionsChange}
+      onSyncLayout={onSyncLayout}
+      width={width}
+      draggableHandle=".widget-drag-handle">
       {children}
     </StyledReactGridContainer>
   );
 };
 
-Grid.defaultProps = {
-  onSyncLayout: undefined,
-};
-
 const MAXIMUM_GRID_SIZE = 12;
 
-const convertPosition = ({ col, row, height, width }: BackendWidgetPosition) => new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);
+const convertPosition = ({ col, row, height, width }: BackendWidgetPosition) =>
+  new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);
 
-const onPositionChange = (dispatch: AppDispatch, newPosition: BackendWidgetPosition) => {
+const onPositionChange = (dispatch: ViewsDispatch, newPosition: BackendWidgetPosition) => {
   const { id } = newPosition;
   const widgetPosition = convertPosition(newPosition);
 
   return dispatch(updateWidgetPosition(id, widgetPosition));
 };
 
-const _onPositionsChange = (dispatch: AppDispatch, newPositions: Array<BackendWidgetPosition>, setLastUpdate: (newValue: string) => void) => {
-  const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
+const _onPositionsChange = (
+  dispatch: ViewsDispatch,
+  newPositions: Array<BackendWidgetPosition>,
+  setLastUpdate: (newValue: string) => void,
+) => {
+  const widgetPositions = Object.fromEntries(
+    newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]),
+  );
   setLastUpdate(generateId());
 
   return dispatch(updateWidgetPositions(widgetPositions));
 };
 
-const _onSyncLayout = (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) => (dispatch: AppDispatch, getState: GetState) => {
-  const isDirty = selectIsDirty(getState());
-  const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
+const _onSyncLayout =
+  (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) =>
+  (dispatch: ViewsDispatch, getState: GetState) => {
+    const isDirty = selectIsDirty(getState());
+    const widgetPositions = Object.fromEntries(
+      newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]),
+    );
 
-  if (!isDeepEqual(positions, widgetPositions)) {
-    dispatch(updateWidgetPositions(widgetPositions)).then(() => dispatch(setIsDirty(isDirty)));
-  }
-};
+    if (!isDeepEqual(positions, widgetPositions)) {
+      dispatch(updateWidgetPositions(widgetPositions)).then(() => dispatch(setIsDirty(isDirty)));
+    }
+  };
 
 const renderGaps = (widgets: Widget[], positions: WidgetPositions) => {
   const gaps = findGaps(widgets.map((widget) => positions[widget.id]));
@@ -181,18 +193,11 @@ const renderGaps = (widgets: Widget[], positions: WidgetPositions) => {
     const id = `gap-${generateId()}`;
 
     const { col, row, height, width } = gap;
-    const gapPosition = WidgetPosition.builder()
-      .col(col)
-      .row(row)
-      .height(height)
-      .width(width)
-      .build();
+    const gapPosition = WidgetPosition.builder().col(col).row(row).height(height).width(width).build();
 
     _positions[id] = gapPosition;
 
-    return (
-      <NewWidgetPlaceholder key={id} position={gapPosition} component={CreateNewWidgetModal} />
-    );
+    return <NewWidgetPlaceholder key={id} position={gapPosition} component={CreateNewWidgetModal} />;
   });
 
   return [gapsItems, _positions] as const;
@@ -203,35 +208,47 @@ const WidgetGrid = () => {
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [lastUpdate, setLastUpdate] = useState<string>(undefined);
   const preventDoubleUpdate = useRef<BackendWidgetPosition[]>();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   const [widgets, positions] = useWidgetsAndPositions();
 
-  const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => {
-    preventDoubleUpdate.current = newPositions;
+  const onPositionsChange = useCallback(
+    (newPositions: Array<BackendWidgetPosition>) => {
+      preventDoubleUpdate.current = newPositions;
 
-    return _onPositionsChange(dispatch, newPositions, setLastUpdate);
-  }, [dispatch]);
-  const _onPositionChange = useCallback((newPosition: BackendWidgetPosition) => onPositionChange(dispatch, newPosition), [dispatch]);
-  const onSyncLayout = useCallback((newPositions: Array<BackendWidgetPosition>) => {
-    if (!isDeepEqual(preventDoubleUpdate.current, newPositions)) {
-      dispatch(_onSyncLayout(positions, newPositions));
-    }
-  }, [dispatch, positions]);
+      return _onPositionsChange(dispatch, newPositions, setLastUpdate);
+    },
+    [dispatch],
+  );
+  const _onPositionChange = useCallback(
+    (newPosition: BackendWidgetPosition) => onPositionChange(dispatch, newPosition),
+    [dispatch],
+  );
+  const onSyncLayout = useCallback(
+    (newPositions: Array<BackendWidgetPosition>) => {
+      if (!isDeepEqual(preventDoubleUpdate.current, newPositions)) {
+        dispatch(_onSyncLayout(positions, newPositions));
+      }
+    },
+    [dispatch, positions],
+  );
 
   const [children, newPositions] = useMemo(() => {
     const widgetItems = widgets
       .toArray()
       .filter((widget) => !!positions[widget.id])
       .map(({ id: widgetId }) => (
-        <WidgetContainer key={widgetId}
-                         className="widgetFrame"
-                         data-widget-id={widgetId}
-                         isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
-          <WidgetGridItem positions={positions}
-                          widgetId={widgetId}
-                          focusedWidget={focusedWidget}
-                          onPositionsChange={_onPositionChange} />
+        <WidgetContainer
+          key={widgetId}
+          className="widgetFrame"
+          data-widget-id={widgetId}
+          isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+          <WidgetGridItem
+            positions={positions}
+            widgetId={widgetId}
+            focusedWidget={focusedWidget}
+            onPositionsChange={_onPositionChange}
+          />
         </WidgetContainer>
       ));
 
@@ -251,11 +268,12 @@ const WidgetGrid = () => {
   return (
     <DashboardWrap>
       {({ width }) => (
-        <Grid locked={!isInteractive}
-              positions={newPositions}
-              onPositionsChange={onPositionsChange}
-              onSyncLayout={onSyncLayout}
-              width={width}>
+        <Grid
+          locked={!isInteractive}
+          positions={newPositions}
+          onPositionsChange={onPositionsChange}
+          onSyncLayout={onSyncLayout}
+          width={width}>
           {children}
         </Grid>
       )}

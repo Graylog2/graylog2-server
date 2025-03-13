@@ -1,24 +1,25 @@
 :local(.overlay) {
-    position: absolute;
-    z-index: 999; /* So it displays below bootstrap dropdowns */
+  position: absolute;
+  z-index: 999; /* So it displays below bootstrap dropdowns */
 }
 
 :local(.mapLocked) .leaflet-control-container {
-    display: none;
+  display: none;
 }
 
-.leaflet-top, .leaflet-bottom {
-    z-index: 999; /* So it displays below bootstrap dropdowns */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 999; /* So it displays below bootstrap dropdowns */
 }
 
 @media print {
-    :local(.map) {
-        margin: 0 auto;
-        page-break-inside: avoid;
-    }
+  :local(.map) {
+    margin: 0 auto;
+    page-break-inside: avoid;
+  }
 
-    /* Hide zoom controls */
-    .leaflet-control-container {
-        display: none;
-    }
+  /* Hide zoom controls */
+  .leaflet-control-container {
+    display: none;
+  }
 }

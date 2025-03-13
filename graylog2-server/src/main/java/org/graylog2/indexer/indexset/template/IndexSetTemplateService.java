@@ -57,8 +57,8 @@ public class IndexSetTemplateService {
             EntityAttribute.builder().id(ID_FIELD_NAME).type(SearchQueryField.Type.OBJECT_ID).title("Template Id").hidden(true).sortable(true).build(),
             EntityAttribute.builder().id(TITLE_FIELD_NAME).title("Template Name").sortable(true).searchable(true).build(),
             EntityAttribute.builder().id(DESCRIPTION_FIELD_NAME).title("Template Description").sortable(false).build(),
-            EntityAttribute.builder().id(BUILT_IN_FIELD_NAME).type(SearchQueryField.Type.BOOLEAN).title("Is Built-in").sortable(false).searchable(true).build(),
-            EntityAttribute.builder().id(INDEX_SET_CONFIG_FIELD_NAME).title("Custom Config").sortable(false).build()
+            EntityAttribute.builder().id(BUILT_IN_FIELD_NAME).type(SearchQueryField.Type.BOOLEAN).title("Is Built-in").hidden(true).sortable(false).searchable(true).build(),
+            EntityAttribute.builder().id(INDEX_SET_CONFIG_FIELD_NAME).title("Custom Config").hidden(true).sortable(false).build()
     );
 
     private static final EntityDefaults DEFAULTS = EntityDefaults.builder()
@@ -112,7 +112,7 @@ public class IndexSetTemplateService {
                                                            final String sortField,
                                                            final String order) {
 
-        final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
+        final Bson dbQuery = Filters.and(dbQueryCreator.createDbQuery(filters, query), Filters.ne(BUILT_IN_FIELD_NAME, true));
         final Bson dbSort = "desc".equalsIgnoreCase(order) ? Sorts.descending(sortField) : Sorts.ascending(sortField);
 
         final long total = collection.countDocuments(dbQuery);

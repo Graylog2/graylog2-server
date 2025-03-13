@@ -16,23 +16,20 @@
  */
 import { useMemo } from 'react';
 
-import { useStore } from 'stores/connect';
-import type { Stream } from 'views/stores/StreamsStore';
-import { StreamsStore } from 'views/stores/StreamsStore';
 import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/useCurrentStream';
-
-const streamsMapper = ({ streams }) => streams.map((stream: Stream) => ({ indexSet: stream.index_set_id, id: stream.id }));
+import { isTemplateTypeAllowsFieldTypeChang } from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
+import useAllIndexSetIds from 'views/logic/fieldactions/ChangeFieldType/hooks/useAllIndexSetIds';
 
 const useInitialSelection = () => {
   const currentStreams = useCurrentStream();
-  const availableStreams: Array<{ indexSet: string, id: string }> = useStore(StreamsStore, streamsMapper);
+  const { data, isLoading } = useAllIndexSetIds(currentStreams);
 
-  return useMemo(() => {
-    const currentStreamSet = new Set(currentStreams);
-    const filterFn = currentStreamSet.size > 0 ? ({ id }) => currentStreamSet.has(id) : () => true;
+  const list = useMemo(
+    () => data.filter(({ type }) => isTemplateTypeAllowsFieldTypeChang(type)).map(({ id }) => id),
+    [data],
+  );
 
-    return availableStreams.filter(filterFn).map(({ indexSet }) => indexSet);
-  }, [availableStreams, currentStreams]);
+  return { list, isLoading };
 };
 
 export default useInitialSelection;

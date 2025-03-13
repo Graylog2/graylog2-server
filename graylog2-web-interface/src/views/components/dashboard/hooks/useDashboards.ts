@@ -16,13 +16,13 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type { SearchParams, PaginatedListJSON, Attribute } from 'stores/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -36,21 +36,24 @@ export const keyFn = (searchParams: SearchParams) => [...KEY_PREFIX, searchParam
 const dashboardsUrl = qualifyUrl('/dashboards');
 
 type PaginatedDashboardsResponse = PaginatedListJSON & {
-  elements: Array<ViewJson>,
-  attributes: Array<Attribute>,
+  elements: Array<ViewJson>;
+  attributes: Array<Attribute>;
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled?: boolean;
+};
 
-export const fetchDashboards = (searchParams: SearchParams) => {
-  const url = PaginationURL(
-    dashboardsUrl,
-    searchParams.page,
-    searchParams.pageSize,
-    searchParams.query,
-    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+type SearchParamsForDashboards = SearchParams & {
+  scope: 'read' | 'update';
+};
+
+export const fetchDashboards = (searchParams: SearchParamsForDashboards) => {
+  const url = PaginationURL(dashboardsUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
+    sort: searchParams.sort.attributeId,
+    order: searchParams.sort.direction,
+    scope: searchParams.scope,
+  });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
     ({ elements, total, count, page, per_page: perPage, attributes }) => ({
@@ -61,33 +64,37 @@ export const fetchDashboards = (searchParams: SearchParams) => {
   );
 };
 
-const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
+const useDashboards = (
+  searchParams: SearchParamsForDashboards,
+  { enabled }: Options = { enabled: true },
+): {
   data: {
-    list: Readonly<Array<View>>,
-    pagination: { total: number },
-    attributes: Array<Attribute>
-  },
-  refetch: () => void,
-  isInitialLoading: boolean,
+    list: Readonly<Array<View>>;
+    pagination: { total: number };
+    attributes: Array<Attribute>;
+  };
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     keyFn(searchParams),
-    () => fetchDashboards(searchParams),
+    () =>
+      defaultOnError(
+        fetchDashboards(searchParams),
+        'Loading dashboards failed with status',
+        'Could not load dashboards',
+      ),
     {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,
-          'Could not load dashboards');
-      },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useDashboards;

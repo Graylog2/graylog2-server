@@ -15,22 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import IfFeatureEnabled from './IfFeatureEnabled';
 
-const withFeature = <Props extends {}>(
-  featureName: string,
-  Component: React.ComponentType<Props>,
-): React.ComponentType<Props> => (props) => (
-  <IfFeatureEnabled name={featureName}>
-    <Component {...props} />
-  </IfFeatureEnabled>
+const withFeature =
+  <Props extends {}>(featureName: string, Component: React.ComponentType<Props>): React.ComponentType<Props> =>
+  (props) => (
+    <IfFeatureEnabled name={featureName}>
+      <Component {...props} />
+    </IfFeatureEnabled>
   );
-
-withFeature.propTypes = {
-  featureName: PropTypes.string,
-  Component: PropTypes.node,
-};
 
 export default withFeature;

@@ -16,7 +16,6 @@
  */
 package org.graylog.integrations.notifications.types.microsoftteams;
 
-import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -30,6 +29,7 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.integrations.notifications.types.util.RequestClient;
+import org.graylog2.bindings.providers.JsonSafeEngineProvider;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
@@ -67,6 +67,106 @@ public class TeamsEventNotificationV2Test {
 
     private final NodeId nodeId = new SimpleNodeId("12345");
     private final MessageFactory messageFactory = new TestMessageFactory();
+    private final String defaultTemplate = """
+            {  "type": "message",
+              "attachments": [
+                {
+                  "contentType": "application/vnd.microsoft.card.adaptive",
+                  "content": {
+                    "type": "AdaptiveCard",
+                    "version": "1.6",
+                    "msTeams": { "width": "full" },
+                    "body": [
+                      {
+                        "type": "TextBlock",
+                        "size": "Large",
+                        "weight": "Bolder",
+                        "text": "${event_definition_title} triggered",
+                        "style": "heading",
+                        "fontType": "Default"
+                      },
+                      {
+                        "type": "TextBlock",
+                        "text": "${event_definition_description}",
+                        "wrap": true
+                      },
+                      {
+                        "type": "TextBlock",
+                        "text": "Event Details",
+                        "wrap": true
+                      },
+                      {
+                        "type": "FactSet",
+                        "facts": [
+                          {
+                            "title": "Type",
+                            "value": "${event_definition_type}"
+                          },
+                          {
+                            "title": "Timestamp",
+                            "value": "${event.timestamp_processing}"
+                          },
+                          {
+                            "title": "Message",
+                            "value": "${event.message}"
+                          },
+                          {
+                            "title": "Source",
+                            "value": "${event.source}"
+                          },
+                          {
+                            "title": "Key",
+                            "value": "${event.key}"
+                          },
+                          {
+                            "title": "Priority",
+                            "value": "${event.priority}"
+                          },
+                          {
+                            "title": "Alert",
+                            "value": "${event.alert}"
+                          },
+                          {
+                            "title": "Timerange Start",
+                            "value": "${event.timerange_start}"
+                          },
+                          {
+                            "title": "Timerange End",
+                            "value": "${event.timerange_end}"
+                          }
+                        ]
+                      }${if event.fields},
+                      {
+                        "type": "TextBlock",
+                        "text": "Event Fields",
+                        "weight": "bolder",
+                        "size": "medium"
+                      },
+                      {
+                        "type": "FactSet",
+                        "facts": [${foreach event.fields field}
+                          { "title": "${field.key}", "value": "${field.value}" }${if last_field}${else},${end}${end}
+                        ]
+                      }${end}${if backlog},
+                      {
+                        "type": "TextBlock",
+                        "text": "Backlog",
+                        "weight": "bolder",
+                        "size": "medium"
+                      },
+                      {
+                        "type": "FactSet",
+                        "facts": [${foreach backlog message}
+                          { "title": "Message", "value": "${message.message}" }${if last_message}${else},${end}${end}
+                        ]
+                      }${end}
+                    ],
+                    "$schema": "[http://adaptivecards.io/schemas/adaptive-card.json](https://link.edgepilot.com/s/8e5962e4/2Jj9cedkLka5KIsBRuMOIg?u=http://adaptivecards.io/schemas/adaptive-card.json)",
+                    "rtl": false
+                  }
+                }
+              ]
+            }""";
 
     @Mock
     NotificationService mockNotificationService;
@@ -89,7 +189,7 @@ public class TeamsEventNotificationV2Test {
 
         teamsEventNotification = new TeamsEventNotificationV2(notificationCallbackService,
                 new ObjectMapperProvider(),
-                Engine.createEngine(),
+                new JsonSafeEngineProvider().get(),
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
@@ -97,15 +197,22 @@ public class TeamsEventNotificationV2Test {
     }
 
     @Test
-    public void testEscapedQuotes() {
+    public void testEscapedQuotes() throws PermanentEventNotificationException {
         if (eventNotificationContext.eventDefinition().isPresent()) {
             EventDefinitionDto definition = eventNotificationContext.eventDefinition().get();
             definition = definition.toBuilder().description("A Description with \"Double Quotes\"").build();
             eventNotificationContext = eventNotificationContext.toBuilder().eventDefinition(definition).build();
         }
-        List<MessageSummary> messageSummaries = generateMessageSummaries(50);
-        Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, notificationConfig.type(), messageSummaries, DateTimeZone.UTC);
-        assertThat(customMessageModel.get("event_definition_description")).isEqualTo("A Description with \\\"Double Quotes\\\"");
+        when(notificationCallbackService.getBacklogForEvent(any())).thenReturn(generateMessageSummariesWithDoubleQuotes(5));
+        TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
+                .adaptiveCard(defaultTemplate)
+                .backlogSize(5)
+                .timeZone(DateTimeZone.UTC)
+                .webhookUrl("http://localhost:12345")
+                .build();
+        String body = teamsEventNotification.generateBody(eventNotificationContext, config);
+        assertThat(body).contains("A Description with \\\"Double Quotes\\\"");
+        assertThat(body).contains("Test message1 with \\\"Double Quotes\\\"");
     }
 
     @Test
@@ -241,6 +348,15 @@ public class TeamsEventNotificationV2Test {
         List<MessageSummary> messageSummaries = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             MessageSummary summary = new MessageSummary("graylog_" + i, messageFactory.createMessage("Test message_" + i + " : with a colon and another colon : just for good measure", "source" + i, new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC)));
+            messageSummaries.add(summary);
+        }
+        return ImmutableList.copyOf(messageSummaries);
+    }
+
+    private ImmutableList<MessageSummary> generateMessageSummariesWithDoubleQuotes(int size) {
+        List<MessageSummary> messageSummaries = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            MessageSummary summary = new MessageSummary("graylog_" + i, messageFactory.createMessage("Test message" + i + " with \"Double Quotes\"", "source" + i, new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC)));
             messageSummaries.add(summary);
         }
         return ImmutableList.copyOf(messageSummaries);

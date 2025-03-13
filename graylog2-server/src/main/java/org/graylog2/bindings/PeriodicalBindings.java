@@ -23,10 +23,12 @@ import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioningPeriodical
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
+import org.graylog2.inputs.diagnosis.InputDiagnosisMetricsPeriodical;
 import org.graylog2.periodical.ClusterHealthCheckThread;
 import org.graylog2.periodical.ContentPackLoaderPeriodical;
 import org.graylog2.periodical.DataNodeHousekeepingPeriodical;
 import org.graylog2.periodical.ESVersionCheckPeriodical;
+import org.graylog2.periodical.ExpiredTokenCleaner;
 import org.graylog2.periodical.IndexBlockCheck;
 import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.graylog2.periodical.IndexRetentionThread;
@@ -35,7 +37,7 @@ import org.graylog2.periodical.IndexerClusterCheckerThread;
 import org.graylog2.periodical.LeaderPresenceCheckPeriodical;
 import org.graylog2.periodical.NodePingThread;
 import org.graylog2.periodical.ThrottleStateUpdaterThread;
-import org.graylog2.periodical.TrafficCounterCalculator;
+import org.graylog2.periodical.TrafficCounterPeriodical;
 import org.graylog2.periodical.UserSessionTerminationPeriodical;
 import org.graylog2.periodical.VersionCheckThread;
 import org.graylog2.plugin.periodical.Periodical;
@@ -58,7 +60,7 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
         periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
         periodicalBinder.addBinding().to(IndexRangesCleanupPeriodical.class);
-        periodicalBinder.addBinding().to(TrafficCounterCalculator.class);
+        periodicalBinder.addBinding().to(TrafficCounterPeriodical.class);
         periodicalBinder.addBinding().to(IndexFieldTypePollerPeriodical.class).asEagerSingleton();
         periodicalBinder.addBinding().to(ScheduleTriggerCleanUp.class);
         periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
@@ -66,5 +68,7 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(TelemetryClusterInfoPeriodical.class);
         periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
         periodicalBinder.addBinding().to(DataNodeHousekeepingPeriodical.class);
+        periodicalBinder.addBinding().to(InputDiagnosisMetricsPeriodical.class);
+        periodicalBinder.addBinding().to(ExpiredTokenCleaner.class);
     }
 }

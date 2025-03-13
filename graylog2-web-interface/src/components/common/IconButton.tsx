@@ -15,89 +15,83 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
-import type { IconName, RotateProp, IconType } from 'components/common/Icon';
+import type { IconName, RotateProp, IconType, SizeProp } from 'components/common/Icon';
 
-const Wrapper = styled.button<{ disabled: boolean }>(({ theme, disabled }) => css`
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  height: 25px;
-  width: 25px;
-  border: 0;
-  background-color: transparent;
-  cursor: pointer;
-  color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
-  font-size: ${theme.fonts.size.large};
+const Wrapper = styled.button<{ disabled: boolean }>(
+  ({ theme, disabled }) => css`
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 25px;
+    width: 25px;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
+    color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
+    font-size: ${theme.fonts.size.large};
 
-  &:hover {
-    background-color: ${theme.colors.gray[80]};
-  }
+    &:hover {
+      background-color: ${theme.colors.gray[80]};
+    }
 
-  &:active {
-    background-color: ${theme.colors.gray[70]};
-  }
-`);
+    &:active {
+      background-color: ${theme.colors.gray[70]};
+    }
+  `,
+);
 
 type Props = {
-  focusable?: boolean,
-  title: string,
-  onClick?: () => void,
-  className?: string,
-  name: IconName,
-  iconType?: IconType,
-  disabled?: boolean,
-  rotation?: RotateProp,
-  'data-testid'?: string
+  focusable?: boolean;
+  title: string;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  className?: string;
+  name: IconName;
+  iconType?: IconType;
+  disabled?: boolean;
+  rotation?: RotateProp;
+  'data-testid'?: string;
+  size?: SizeProp;
 };
 
-const handleClick = (onClick: () => void | undefined) => {
+const handleClick = (
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void | undefined,
+  e: React.MouseEvent<HTMLButtonElement>,
+) => {
   if (typeof onClick === 'function') {
-    onClick();
+    onClick(e);
   }
 };
 
-const IconButton = React.forwardRef<HTMLButtonElement, Props>(({
-  title,
-  onClick,
-  focusable,
-  className,
-  disabled,
-  iconType,
-  'data-testid': dataTestId,
-  ...rest
-}: Props, ref) => (
-  <Wrapper ref={ref}
-           tabIndex={focusable ? 0 : -1}
-           data-testid={dataTestId}
-           title={title}
-           aria-label={title}
-           onClick={() => handleClick(onClick)}
-           className={className}
-           type="button"
-           disabled={disabled}>
-    <Icon type={iconType} {...rest} />
-  </Wrapper>
-));
-
-IconButton.propTypes = {
-  className: PropTypes.string,
-  onClick: PropTypes.func,
-  name: PropTypes.any,
-};
-
-IconButton.defaultProps = {
-  className: undefined,
-  focusable: true,
-  onClick: undefined,
-  name: undefined,
-  disabled: false,
-  rotation: undefined,
-  iconType: undefined,
-  'data-testid': undefined,
-};
+const IconButton = React.forwardRef<HTMLButtonElement, Props>(
+  (
+    {
+      title,
+      onClick,
+      focusable = true,
+      className,
+      disabled = false,
+      iconType,
+      'data-testid': dataTestId,
+      ...rest
+    }: Props,
+    ref,
+  ) => (
+    <Wrapper
+      ref={ref}
+      tabIndex={focusable ? 0 : -1}
+      data-testid={dataTestId}
+      title={title}
+      aria-label={title}
+      onClick={(e) => handleClick(onClick, e)}
+      className={className}
+      type="button"
+      disabled={disabled}>
+      <Icon type={iconType} {...rest} />
+    </Wrapper>
+  ),
+);
 
 export default IconButton;

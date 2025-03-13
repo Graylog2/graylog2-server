@@ -30,14 +30,13 @@ jest.mock('hooks/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 type SUTProps = {
-  // eslint-disable-next-line react/require-default-props
-  error?: QueryValidationState,
-  // eslint-disable-next-line react/require-default-props
-  warning?: QueryValidationState,
-}
+  error?: QueryValidationState;
+
+  warning?: QueryValidationState;
+};
 
 describe('QueryValidation', () => {
-  const validationErrorIconTitle = 'Toggle validation error explanation';
+  const validationErrorIconTitle = /Toggle validation/;
 
   const openExplanation = async () => {
     const validationExplanationTrigger = await screen.findByTitle(validationErrorIconTitle);
@@ -45,9 +44,14 @@ describe('QueryValidation', () => {
   };
 
   const SUT = ({ error, warning }: SUTProps) => (
-    <Formik onSubmit={() => {}} initialValues={{}} initialErrors={error ? { queryString: error } : {}} enableReinitialize>
+    <Formik
+      onSubmit={() => {}}
+      initialValues={{}}
+      initialErrors={error ? { queryString: error } : {}}
+      enableReinitialize>
       <Form>
-        <FormWarningsContext.Provider value={{ warnings: warning ? { queryString: warning } : {}, setFieldWarning: () => {} }}>
+        <FormWarningsContext.Provider
+          value={{ warnings: warning ? { queryString: warning } : {}, setFieldWarning: () => {} }}>
           <QueryValidation />
         </FormWarningsContext.Provider>
       </Form>
@@ -86,14 +90,16 @@ describe('QueryValidation', () => {
     await openExplanation();
 
     await screen.findByText('Parse Exception');
-    await screen.findByTitle('Parse Exception documentation');
+    await screen.findByTitle('Query error documentation');
   });
 
   it('renders pluggable validation explanation', async () => {
     const ExampleComponent = ({ validationState }: { validationState: QueryValidationState }) => (
       <>Plugable validation explanation for {validationState.explanations.map(({ errorTitle }) => errorTitle).join()}</>
     );
-    asMock(usePluginEntities).mockImplementation((entityKey) => (entityKey === 'views.elements.validationErrorExplanation' ? [ExampleComponent] : []));
+    asMock(usePluginEntities).mockImplementation((entityKey) =>
+      entityKey === 'views.elements.validationErrorExplanation' ? [ExampleComponent] : [],
+    );
     render(<SUT error={validationError} />);
 
     await openExplanation();
@@ -130,27 +136,30 @@ describe('QueryValidation', () => {
   it('should deduplicate "unknown field" errors referring to same field name', async () => {
     const validationErrorForUnknownField: QueryValidationState = {
       status: 'WARNING',
-      explanations: [{
-        id: 'foo',
-        errorType: 'UNKNOWN_FIELD',
-        beginLine: 1,
-        beginColumn: 2,
-        endLine: 1,
-        endColumn: 16,
-        errorTitle: 'Unknown field',
-        errorMessage: 'Query contains unknown field: TargetFilename',
-        relatedProperty: 'TargetFilename',
-      }, {
-        id: 'bar',
-        errorType: 'UNKNOWN_FIELD',
-        beginLine: 1,
-        beginColumn: 193,
-        endLine: 1,
-        endColumn: 207,
-        errorTitle: 'Unknown field',
-        errorMessage: 'Query contains unknown field: TargetFilename',
-        relatedProperty: 'TargetFilename',
-      }],
+      explanations: [
+        {
+          id: 'foo',
+          errorType: 'UNKNOWN_FIELD',
+          beginLine: 1,
+          beginColumn: 2,
+          endLine: 1,
+          endColumn: 16,
+          errorTitle: 'Unknown field',
+          errorMessage: 'Query contains unknown field: TargetFilename',
+          relatedProperty: 'TargetFilename',
+        },
+        {
+          id: 'bar',
+          errorType: 'UNKNOWN_FIELD',
+          beginLine: 1,
+          beginColumn: 193,
+          endLine: 1,
+          endColumn: 207,
+          errorTitle: 'Unknown field',
+          errorMessage: 'Query contains unknown field: TargetFilename',
+          relatedProperty: 'TargetFilename',
+        },
+      ],
       context: {
         searched_index_ranges: [],
       },

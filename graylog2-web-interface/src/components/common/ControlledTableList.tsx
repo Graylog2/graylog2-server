@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { ListGroup } from 'components/bootstrap';
 
 import ControlledTableListHeader from './ControlledTableListHeader';
 import ControlledTableListItem from './ControlledTableListItem';
 
-const ControlledTableList = ({ children }: { children: Array<React.ReactNode>}) => {
+const ControlledTableList = ({ children }: { children: Array<React.ReactNode> }) => {
   let effectiveChildren;
 
   if (children.length === 0) {
@@ -33,18 +32,12 @@ const ControlledTableList = ({ children }: { children: Array<React.ReactNode>}) 
 
   return (
     <div>
-      <ListGroup>
-        {effectiveChildren}
-      </ListGroup>
+      <ListGroup>{effectiveChildren}</ListGroup>
     </div>
   );
 };
 
 ControlledTableList.Header = ControlledTableListHeader;
 ControlledTableList.Item = ControlledTableListItem;
-
-ControlledTableList.propTypes = {
-  children: PropTypes.node.isRequired,
-};
 
 export default ControlledTableList;

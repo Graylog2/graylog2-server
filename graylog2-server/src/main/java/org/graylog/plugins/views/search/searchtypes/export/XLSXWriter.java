@@ -59,20 +59,22 @@ public class XLSXWriter {
                     cell.setCellValue(d);
                 } else if(rawData instanceof Boolean b) {
                     cell.setCellValue(b);
-                } if(rawData instanceof Date d) {
+                } else if (rawData instanceof Date d) {
                     cell.setCellValue(d);
-                } if(rawData instanceof LocalDateTime ldt) {
+                } else if (rawData instanceof LocalDateTime ldt) {
                     cell.setCellValue(ldt);
-                } if(rawData instanceof Calendar cal) {
+                } else if (rawData instanceof Calendar cal) {
                     cell.setCellValue(cal);
-                } if(rawData instanceof String s) {
+                } else if (rawData instanceof String s) {
                     cell.setCellValue(s);
-                } if(rawData instanceof RichTextString rts) {
+                } else if (rawData instanceof RichTextString rts) {
                     cell.setCellValue(rts);
-                } if(rawData instanceof LocalDate ld) {
+                } else if (rawData instanceof LocalDate ld) {
                     cell.setCellValue(ld);
-                } else {
+                } else if (rawData != null) {
                     cell.setCellValue(rawData.toString());
+                } else {
+                    cell.setBlank();
                 }
             }
         }

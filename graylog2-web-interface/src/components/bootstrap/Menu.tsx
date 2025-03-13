@@ -20,23 +20,23 @@ import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
 type Props = PropsWithChildren<{
-  closeOnItemClick?: boolean,
-  keepMounted?: boolean,
-  offset?: MenuProps['offset'],
-  onChange?: (isOpen: boolean) => void,
-  onClose?: () => void,
-  opened?: boolean,
-  portalProps?: { target: HTMLElement },
-  position?: MenuProps['position'],
-  shadow?: MenuProps['shadow'],
-  width?: number,
-  withinPortal?: boolean,
-  zIndex?: number,
-}>
+  closeOnItemClick?: boolean;
+  keepMounted?: boolean;
+  offset?: MenuProps['offset'];
+  onChange?: (isOpen: boolean) => void;
+  onClose?: () => void;
+  opened?: boolean;
+  portalProps?: { target: HTMLElement };
+  position?: MenuProps['position'];
+  shadow?: MenuProps['shadow'];
+  width?: number;
+  withinPortal?: boolean;
+  zIndex?: number;
+}>;
 
 const Menu = ({
   children,
-  closeOnItemClick,
+  closeOnItemClick = true,
   keepMounted,
   offset,
   onChange,
@@ -46,71 +46,67 @@ const Menu = ({
   position,
   shadow,
   width,
-  withinPortal,
+  withinPortal = false,
   zIndex,
 }: Props) => (
-  <MantineMenu closeOnItemClick={closeOnItemClick}
-               onClose={onClose}
-               shadow={shadow}
-               opened={opened}
-               onChange={onChange}
-               portalProps={portalProps}
-               width={width}
-               position={position}
-               withinPortal={withinPortal}
-               keepMounted={keepMounted}
-               offset={offset}
-               zIndex={zIndex}>
+  <MantineMenu
+    closeOnItemClick={closeOnItemClick}
+    onClose={onClose}
+    shadow={shadow}
+    opened={opened}
+    onChange={onChange}
+    portalProps={portalProps}
+    width={width}
+    position={position}
+    withinPortal={withinPortal}
+    keepMounted={keepMounted}
+    offset={offset}
+    zIndex={zIndex}>
     {children}
   </MantineMenu>
 );
 
-const StyledMenuItem = styled(MantineMenu.Item)(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-  font-size: ${theme.fonts.size.body};
-  white-space: nowrap;
-  
-  &[data-hovered], &:focus {
-    text-decoration: none;
-    color: inherit;
-    background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)}
-  }
-`);
+const StyledMenuItem = styled(MantineMenu.Item)(
+  ({ theme }) => css`
+    color: ${theme.colors.global.textDefault};
+    font-size: ${theme.fonts.size.body};
+    white-space: nowrap;
 
-const StyledMenuDivider = styled(MantineMenu.Divider)(({ theme }) => css`
-  border-color: ${theme.colors.variant.lighter.default};
-`);
+    &[data-hovered],
+    &:focus {
+      text-decoration: none;
+      color: inherit;
+      background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
+    }
+  `,
+);
 
-const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
-  font-size: ${theme.fonts.size.navigation};
-`);
+const StyledMenuDivider = styled(MantineMenu.Divider)(
+  ({ theme }) => css`
+    border-color: ${theme.colors.variant.lighter.default};
+  `,
+);
+
+const StyledMenuLabel = styled(MantineMenu.Label)(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.small};
+    color: ${theme.colors.global.textSecondary};
+  `,
+);
 
 Menu.Target = MantineMenu.Target;
 
-Menu.Dropdown = styled(MantineMenu.Dropdown)(({ theme }) => css`
-  && {
-    background-color: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.variant.lighter.default};
-  }
-`);
+Menu.Dropdown = styled(MantineMenu.Dropdown)(
+  ({ theme }) => css`
+    && {
+      background-color: ${theme.colors.global.contentBackground};
+      border: 1px solid ${theme.colors.variant.lighter.default};
+    }
+  `,
+);
 
 Menu.Item = StyledMenuItem;
 Menu.Divider = StyledMenuDivider;
 Menu.Label = StyledMenuLabel;
-
-Menu.defaultProps = {
-  closeOnItemClick: true,
-  keepMounted: undefined,
-  offset: undefined,
-  onChange: undefined,
-  onClose: undefined,
-  opened: undefined,
-  portalProps: undefined,
-  position: undefined,
-  shadow: undefined,
-  width: undefined,
-  withinPortal: false,
-  zIndex: undefined,
-};
 
 export default Menu;

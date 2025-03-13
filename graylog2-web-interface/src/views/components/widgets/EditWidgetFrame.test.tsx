@@ -23,8 +23,8 @@ import Widget from 'views/logic/widgets/Widget';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { updateWidget } from 'views/logic/slices/widgetActions';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import EditWidgetFrame from './EditWidgetFrame';
 
@@ -34,12 +34,15 @@ jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('hooks/useHotkey', () => jest.fn());
 
 jest.mock('views/stores/StreamsStore', () => ({
-  StreamsStore: MockStore(['getInitialState', () => ({
-    streams: [
-      { title: 'PFLog', id: '5c2e27d6ba33a9681ad62775' },
-      { title: 'DNS Logs', id: '5d2d9649e117dc4df84cf83c' },
-    ],
-  })]),
+  StreamsStore: MockStore([
+    'getInitialState',
+    () => ({
+      streams: [
+        { title: 'PFLog', id: '5c2e27d6ba33a9681ad62775' },
+        { title: 'DNS Logs', id: '5d2d9649e117dc4df84cf83c' },
+      ],
+    }),
+  ]),
 }));
 
 jest.mock('moment', () => {
@@ -48,9 +51,9 @@ jest.mock('moment', () => {
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
-jest.mock('views/logic/slices/searchExecutionSlice', () => ({
-  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
-  execute: jest.fn(() => async () => {}),
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  executeActiveQuery: jest.fn(() => async () => {}),
 }));
 
 jest.mock('views/logic/slices/widgetActions', () => ({
@@ -67,16 +70,16 @@ describe('EditWidgetFrame', () => {
       .timerange({ type: 'relative', from: 300 })
       .config({})
       .build();
-    const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) => render((
-      <TestStoreProvider>
-        <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} {...props}>
-            Hello World!
-            These are some buttons!
-          </EditWidgetFrame>
-        </WidgetContext.Provider>
-      </TestStoreProvider>
-    ));
+    const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) =>
+      render(
+        <TestStoreProvider>
+          <WidgetContext.Provider value={widget}>
+            <EditWidgetFrame onCancel={() => {}} onSubmit={() => Promise.resolve()} {...props}>
+              Hello World! These are some buttons!
+            </EditWidgetFrame>
+          </WidgetContext.Provider>
+        </TestStoreProvider>,
+      );
 
     useViewsPlugin();
 
@@ -87,10 +90,10 @@ describe('EditWidgetFrame', () => {
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(executeActiveQuery).toHaveBeenCalledTimes(1));
     });
 
-    it('changes the widget\'s streams when using stream filter', async () => {
+    it("changes the widget's streams when using stream filter", async () => {
       renderSUT();
       const streamFilter = await screen.findByTestId('streams-filter');
       const reactSelect = streamFilter.querySelector('div');
@@ -108,13 +111,18 @@ describe('EditWidgetFrame', () => {
 
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(updateWidget).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
-        streams: ['5c2e27d6ba33a9681ad62775'],
-      })));
+      await waitFor(() =>
+        expect(updateWidget).toHaveBeenCalledWith(
+          'deadbeef',
+          expect.objectContaining({
+            streams: ['5c2e27d6ba33a9681ad62775'],
+          }),
+        ),
+      );
     });
 
     it('calls onSubmit', async () => {
-      const onSubmit = jest.fn();
+      const onSubmit = jest.fn(() => Promise.resolve());
       renderSUT({ onSubmit });
 
       fireEvent.click(await screen.findByRole('button', { name: /update widget/i }));

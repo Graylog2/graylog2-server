@@ -143,7 +143,7 @@ public class JsonParsingErrorsIT {
                     "foo": 23
                 }
                 """)
-                .body("message", equalTo("Unable to map property foo.\nKnown properties include: parameters, id, queries"))
+                .body("message", equalTo("Unable to map property foo.\nKnown properties include: parameters, id, queries, skip_no_streams_check"))
                 .body("line", equalTo(2))
                 .body("column", equalTo(14))
                 .body("path", equalTo("foo"))

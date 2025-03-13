@@ -17,11 +17,12 @@
 
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
+import { SystemFieldTypes } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
-import { SystemFieldTypes } from '@graylog/server-api';
 
 const mockFieldType = {
   string: 'String',
@@ -73,6 +74,7 @@ describe('useFieldType custom hook', () => {
 
     expect(UserNotification.error).toHaveBeenCalledWith(
       'Loading field type options failed with status: Error: Error',
-      'Could not load field type options');
+      'Could not load field type options',
+    );
   });
 });

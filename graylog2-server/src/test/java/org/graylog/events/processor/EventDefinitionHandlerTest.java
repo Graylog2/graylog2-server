@@ -109,7 +109,7 @@ public class EventDefinitionHandlerTest {
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         this.eventDefinitionService = spy(new DBEventDefinitionService(mongoCollections, stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
-        this.jobDefinitionService = spy(new DBJobDefinitionService(mongodb.mongoConnection(), mapperProvider));
+        this.jobDefinitionService = spy(new DBJobDefinitionService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider));
         this.jobTriggerService = spy(new DBJobTriggerService(mongoCollections, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 
         this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock);
@@ -443,7 +443,9 @@ public class EventDefinitionHandlerTest {
     public void schedule() {
         assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isPresent();
         assertThat(jobDefinitionService.streamAll().count()).isEqualTo(0);
-        assertThat(jobTriggerService.all()).isEmpty();
+        try (var stream = jobTriggerService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
 
         handler.schedule("54e3deadbeefdeadbeef0000");
 

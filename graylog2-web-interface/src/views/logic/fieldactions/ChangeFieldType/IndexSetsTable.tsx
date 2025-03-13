@@ -17,12 +17,7 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import styled from 'styled-components';
 
-import {
-  PaginatedList,
-  Spinner,
-  NoEntitiesExist,
-  EntityDataTable,
-} from 'components/common';
+import { PaginatedList, Spinner, NoEntitiesExist, EntityDataTable } from 'components/common';
 import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/logic/fieldactions/ChangeFieldType/Constants';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { SearchParams, Sort } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
@@ -32,20 +27,31 @@ import type { FieldTypeUsage, FieldTypes } from 'views/logic/fieldactions/Change
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/useCurrentStream';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 const Container = styled.div`
   margin-top: 20px;
 `;
 
 type Props = {
-  field: string,
-  setIndexSetSelection: React.Dispatch<Array<string>>,
-  fieldTypes: FieldTypes,
-  initialSelection: Array<string>
-}
+  field: string;
+  setIndexSetSelection: React.Dispatch<Array<string>>;
+  fieldTypes: FieldTypes;
+  initialSelection: Array<string>;
+};
+
+const mapper = (indexSets: Array<IndexSet>): Record<string, IndexSet> => {
+  if (!indexSets) return null;
+
+  return Object.fromEntries(indexSets.map((indexSet) => [indexSet.id, indexSet]));
+};
 
 const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelection }: Props) => {
   const [activePage, setActivePage] = useState(1);
+  const { data, isSuccess } = useIndexSetsList();
+  const mappedIndexSets = useMemo(() => mapper(data?.indexSets), [data?.indexSets]);
 
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
@@ -54,13 +60,21 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
     defaultSort: DEFAULT_LAYOUT.sort,
   });
 
-  const searchParams: SearchParams = useMemo(() => ({
-    page: activePage,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort as Sort,
-  }), [activePage, layoutConfig.pageSize, layoutConfig.sort]);
+  const searchParams: SearchParams = useMemo(
+    () => ({
+      page: activePage,
+      pageSize: layoutConfig.pageSize,
+      sort: layoutConfig.sort as Sort,
+    }),
+    [activePage, layoutConfig.pageSize, layoutConfig.sort],
+  );
   const currentStreams = useCurrentStream();
-  const { data: { list, attributes, pagination }, isLoading } = useFieldTypeUsages({ field, streams: currentStreams }, searchParams, { enabled: !isLoadingLayoutPreferences && !!currentStreams });
+  const {
+    data: { list, attributes, pagination },
+    isLoading,
+  } = useFieldTypeUsages({ field, streams: currentStreams }, searchParams, {
+    enabled: !isLoadingLayoutPreferences && !!currentStreams,
+  });
 
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
@@ -73,63 +87,85 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
       if (newPageSize) {
         updateTableLayout({ perPage: newPageSize });
       }
-    }, [updateTableLayout],
+    },
+    [updateTableLayout],
   );
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    setActivePage(1);
-    updateTableLayout({ perPage: newPageSize });
-  }, [updateTableLayout]);
+  const onPageSizeChange = useCallback(
+    (newPageSize: number) => {
+      setActivePage(1);
+      updateTableLayout({ perPage: newPageSize });
+    },
+    [updateTableLayout],
+  );
 
-  const onSortChange = useCallback((newSort: Sort) => {
-    setActivePage(1);
-    updateTableLayout({ sort: newSort });
-  }, [updateTableLayout]);
+  const onSortChange = useCallback(
+    (newSort: Sort) => {
+      setActivePage(1);
+      updateTableLayout({ sort: newSort });
+    },
+    [updateTableLayout],
+  );
 
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
+  const onColumnsChange = useCallback(
+    (displayedAttributes: Array<string>) => {
+      updateTableLayout({ displayedAttributes });
+    },
+    [updateTableLayout],
+  );
 
   const columnRenderers = useColumnRenderers(fieldTypes);
 
-  const onChangeSelection = useCallback((newSelection: Array<string>) => {
-    setIndexSetSelection(newSelection);
-  }, [setIndexSetSelection]);
+  const onChangeSelection = useCallback(
+    (newSelection: Array<string>) => {
+      setIndexSetSelection(newSelection);
+    },
+    [setIndexSetSelection],
+  );
 
-  if (isLoadingLayoutPreferences || isLoading) {
+  const isEntitySelectable = useCallback(
+    (entity) => {
+      const indexSetId = entity.id;
+
+      return isIndexFieldTypeChangeAllowed(mappedIndexSets[indexSetId]);
+    },
+    [mappedIndexSets],
+  );
+
+  if (isLoadingLayoutPreferences || isLoading || !isSuccess) {
     return <Spinner />;
   }
 
   return (
     <Container>
-      <PaginatedList onChange={onPageChange}
-                     totalItems={pagination?.total}
-                     pageSize={layoutConfig.pageSize}
-                     activePage={activePage}
-                     showPageSizeSelect={false}
-                     useQueryParameter={false}>
-        {!list?.length && (
-          <NoEntitiesExist>
-            No index sets have been found.
-          </NoEntitiesExist>
-        )}
+      <PaginatedList
+        onChange={onPageChange}
+        totalItems={pagination?.total}
+        pageSize={layoutConfig.pageSize}
+        activePage={activePage}
+        showPageSizeSelect={false}
+        useQueryParameter={false}>
+        {!list?.length && <NoEntitiesExist>No index sets have been found.</NoEntitiesExist>}
         {list.length && (
-          <EntityDataTable<FieldTypeUsage> activeSort={layoutConfig.sort}
-                                           bulkSelection={{
-                                             onChangeSelection,
-                                             initialSelection,
-                                             actions: <BulkActionsDropdown />,
-                                           }}
-                                           columnDefinitions={attributes}
-                                           columnRenderers={columnRenderers}
-                                           columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                           entities={list}
-                                           onColumnsChange={onColumnsChange}
-                                           onPageSizeChange={onPageSizeChange}
-                                           entityAttributesAreCamelCase
-                                           onSortChange={onSortChange}
-                                           pageSize={layoutConfig.pageSize}
-                                           visibleColumns={layoutConfig.displayedAttributes} />
+          <EntityDataTable<FieldTypeUsage>
+            activeSort={layoutConfig.sort}
+            bulkSelection={{
+              onChangeSelection,
+              initialSelection,
+              actions: <BulkActionsDropdown />,
+              isEntitySelectable,
+            }}
+            columnDefinitions={attributes}
+            columnRenderers={columnRenderers}
+            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+            entities={list}
+            onColumnsChange={onColumnsChange}
+            onPageSizeChange={onPageSizeChange}
+            entityAttributesAreCamelCase
+            onSortChange={onSortChange}
+            pageSize={layoutConfig.pageSize}
+            visibleColumns={layoutConfig.displayedAttributes}
+          />
         )}
       </PaginatedList>
     </Container>

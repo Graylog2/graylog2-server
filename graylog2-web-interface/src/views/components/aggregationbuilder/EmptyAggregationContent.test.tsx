@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render } from 'wrappedTestingLibrary';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 
@@ -25,11 +25,11 @@ describe('EmptyAggregationContext', () => {
   it('calls render completion callback after first render', () => {
     const onRenderComplete = jest.fn();
 
-    mount((
+    render(
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <EmptyAggregationContent toggleEdit={() => {}} editing={false} />
-      </RenderCompletionCallback.Provider>
-    ));
+      </RenderCompletionCallback.Provider>,
+    );
 
     expect(onRenderComplete).toHaveBeenCalled();
   });

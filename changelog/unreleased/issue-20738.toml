@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix encoding of CName in generated CA certificates"
+
+issues = ["20738"]
+pulls = ["20745"]

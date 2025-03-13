@@ -36,12 +36,7 @@ jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));
 jest.mock('routing/useHistory');
 
 const search = Search.create();
-const view = View.create()
-  .toBuilder()
-  .id('deadbeef')
-  .type(View.Type.Dashboard)
-  .search(search)
-  .build();
+const view = View.create().toBuilder().id('deadbeef').type(View.Type.Dashboard).search(search).build();
 
 const createViewWithQueries = () => {
   const queries = [
@@ -51,17 +46,14 @@ const createViewWithQueries = () => {
   ];
   const states: ViewStateMap = Immutable.Map({
     'query-id-1': ViewState.create(),
-    'query-id-2': ViewState.builder().titles(Immutable.fromJS({ tab: { title: 'My awesome Query tab' } })).build(),
+    'query-id-2': ViewState.builder()
+      .titles(Immutable.fromJS({ tab: { title: 'My awesome Query tab' } }))
+      .build(),
     'other-query-id': ViewState.create(),
   });
-  const searchWithQueries = search.toBuilder()
-    .queries(queries)
-    .build();
+  const searchWithQueries = search.toBuilder().queries(queries).build();
 
-  return view.toBuilder()
-    .state(states)
-    .search(searchWithQueries)
-    .build();
+  return view.toBuilder().state(states).search(searchWithQueries).build();
 };
 
 describe('BigDisplayModeConfiguration', () => {

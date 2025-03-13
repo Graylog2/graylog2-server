@@ -17,38 +17,42 @@
 import * as React from 'react';
 import { SegmentedControl as MantineSegmentedControl } from '@mantine/core';
 import { useTheme } from 'styled-components';
-import type { SegmentedControlItem } from '@mantine/core';
+import type { MantineRadius, SegmentedControlItem } from '@mantine/core';
 
 type Props<OptionValue> = {
-  data: Array<SegmentedControlItem & { value: OptionValue }>,
-  defaultValue?: string,
-  disabled?: boolean,
-  onChange?: (value: OptionValue) => void,
-  value?: OptionValue,
-  className?: string
-}
+  data: Array<SegmentedControlItem & { value: OptionValue }>;
+  defaultValue?: string;
+  disabled?: boolean;
+  onChange?: (value: OptionValue) => void;
+  value?: OptionValue;
+  className?: string;
+  radius?: MantineRadius;
+};
 
-const SegmentedControl = <OptionValue extends string>({ className, data, defaultValue, disabled, onChange, value }: Props<OptionValue>) => {
+const SegmentedControl = <OptionValue extends string>({
+  className,
+  data,
+  defaultValue,
+  disabled = false,
+  onChange,
+  value,
+  radius = 'xs',
+}: Props<OptionValue>) => {
   const theme = useTheme();
 
   return (
-    <MantineSegmentedControl color={theme.colors.variant.info}
-                             className={className}
-                             data={data}
-                             defaultValue={defaultValue}
-                             disabled={disabled}
-                             value={value}
-                             onChange={onChange}
-                             styles={{ label: { marginBottom: 0 } }} />
+    <MantineSegmentedControl
+      color={theme.colors.variant.info}
+      className={className}
+      data={data}
+      defaultValue={defaultValue}
+      radius={radius}
+      disabled={disabled}
+      value={value}
+      onChange={onChange}
+      styles={{ label: { marginBottom: 0 } }}
+    />
   );
-};
-
-SegmentedControl.defaultProps = {
-  className: undefined,
-  defaultValue: undefined,
-  disabled: false,
-  onChange: undefined,
-  value: undefined,
 };
 
 export default SegmentedControl;

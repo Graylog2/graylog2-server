@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import type { GradientColor, StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
@@ -31,9 +30,11 @@ const ColorPreviewBase = styled.div`
   border: 1px solid rgb(0 126 255 / 24%);
 `;
 
-const StaticColorPreview = styled(ColorPreviewBase)(({ color }) => css`
-  background-color: ${color};
-`);
+const StaticColorPreview = styled(ColorPreviewBase)(
+  ({ color }) => css`
+    background-color: ${color};
+  `,
+);
 
 const colorsForGradient = (gradient: string, count = 5): Array<string> => scaleForGradient(gradient).colors(count);
 
@@ -41,19 +42,29 @@ export const GradientColorPreview = styled(ColorPreviewBase)<{ $gradient: string
   const colors = colorsForGradient($gradient);
 
   return css`
-      border: none;
-      background: linear-gradient(0deg, ${colors.map((color, idx) => `${color} ${idx * (100 / colors.length)}%`).join(', ')});
-`;
+    border: none;
+    background: linear-gradient(
+      0deg,
+      ${colors.map((color, idx) => `${color} ${idx * (100 / colors.length)}%`).join(', ')}
+    );
+  `;
 });
 
 type ColorPreviewProps = {
-  color: HighlightingColor,
-  onClick?: () => void,
+  color: HighlightingColor;
+  onClick?: () => void;
 };
 
 const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ color, onClick = () => {} }, ref) => {
   if (color.type === 'static') {
-    return <StaticColorPreview ref={ref} data-testid="static-color-preview" onClick={onClick} color={(color as StaticColor).color} />;
+    return (
+      <StaticColorPreview
+        ref={ref}
+        data-testid="static-color-preview"
+        onClick={onClick}
+        color={(color as StaticColor).color}
+      />
+    );
   }
 
   if (color.type === 'gradient') {
@@ -62,14 +73,5 @@ const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ colo
 
   throw new Error(`Invalid highlighting color type: ${color}`);
 });
-
-ColorPreview.propTypes = {
-  color: PropTypes.any.isRequired,
-  onClick: PropTypes.func,
-};
-
-ColorPreview.defaultProps = {
-  onClick: () => {},
-};
 
 export default ColorPreview;

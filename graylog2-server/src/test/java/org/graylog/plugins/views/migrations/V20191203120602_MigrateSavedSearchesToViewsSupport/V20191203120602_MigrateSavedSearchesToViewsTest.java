@@ -258,6 +258,7 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
         final List<View> newViews = newViewsCaptor.getAllValues();
         assertThat(newViews).hasSize(count);
 
+        String newViewsStr = toJSON(newViews);
         JSONAssert.assertEquals(viewsCollection, toJSON(newViews), true);
     }
 
@@ -270,6 +271,7 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
 
         assertThat(newSearches).hasSize(count);
 
+        String newSearchesStr = toJSON(newSearches);
         JSONAssert.assertEquals(toJSON(newSearches), searchCollection, true);
     }
 

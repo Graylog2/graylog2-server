@@ -24,8 +24,8 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import AppConfig from 'util/AppConfig';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import { effectiveTimerange, simpleChartData } from './AreaVisualization.fixtures';
 
@@ -40,16 +40,21 @@ jest.mock('util/AppConfig', () => ({
   isCloud: jest.fn(() => false),
 }));
 
+// eslint-disable-next-line react/require-default-props
 const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisualization>) => (
   <TestStoreProvider>
-    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }) }}>
+    <TestFieldTypesContextProvider>
       <OriginalAreaVisualization {...props} />
-    </FieldTypesContext.Provider>
+    </TestFieldTypesContextProvider>
   </TestStoreProvider>
 );
 
 describe('AreaVisualization', () => {
   useViewsPlugin();
+
+  beforeEach(() => {
+    AppConfig.isFeatureEnabled = jest.fn(() => false);
+  });
 
   it('generates correct props for plot component', () => {
     const config = AggregationWidgetConfig.builder()
@@ -59,22 +64,29 @@ describe('AreaVisualization', () => {
       .series([Series.forFunction('avg(nf_bytes)'), Series.forFunction('sum(nf_pkts)')])
       .build();
 
-    const wrapper = mount(<AreaVisualization config={config}
-                                             data={simpleChartData}
-                                             effectiveTimerange={effectiveTimerange}
-                                             setLoadingState={() => {}}
-                                             fields={Immutable.List()}
-                                             height={1024}
-                                             onChange={() => {}}
-                                             toggleEdit={() => {}}
-                                             width={800} />);
+    const wrapper = mount(
+      <AreaVisualization
+        config={config}
+        data={simpleChartData}
+        effectiveTimerange={effectiveTimerange}
+        setLoadingState={() => {}}
+        fields={Immutable.List()}
+        height={1024}
+        onChange={() => {}}
+        toggleEdit={() => {}}
+        width={800}
+      />,
+    );
 
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2019-11-28T16:21:00.486+01:00', '2019-11-28T16:25:57.000+01:00'], type: 'date' },
-      legend: { y: -0.14 },
-    }));
+    expect(genericPlot).toHaveProp(
+      'layout',
+      expect.objectContaining({
+        xaxis: { range: ['2019-11-28T16:21:00.486+01:00', '2019-11-28T16:25:57.000+01:00'], type: 'date' },
+        legend: { y: -0.14 },
+      }),
+    );
 
     expect(genericPlot).toHaveProp('chartData', [
       {

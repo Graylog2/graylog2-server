@@ -57,12 +57,16 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                                     final CustomFieldMappings customFieldMappings) {
         var settings = new Template.Settings(Map.of(
                 "index", Map.of(
-                        "analysis", Map.of("analyzer", analyzerKeyword())
+                        "analysis", analysisSettings()
                 )
         ));
         var mappings = mapping(analyzer, customFieldMappings);
 
         return createTemplate(indexPattern, order, settings, mappings);
+    }
+
+    public Map<String, Object> analysisSettings() {
+        return Map.of("analyzer", analyzerKeyword());
     }
 
     Template createTemplate(String indexPattern, Long order, Template.Settings settings, Template.Mappings mappings) {
@@ -110,6 +114,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .put(Message.FIELD_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong())
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
+                .put(Message.FIELD_GL2_ORIGINAL_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_DURATION_MS, typeInteger())
                 .put(FIELD_GL2_MESSAGE_ID, notAnalyzedString())

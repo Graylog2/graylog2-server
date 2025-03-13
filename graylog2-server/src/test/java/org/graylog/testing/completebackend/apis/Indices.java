@@ -16,6 +16,10 @@
  */
 package org.graylog.testing.completebackend.apis;
 
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
@@ -25,6 +29,9 @@ import org.joda.time.Period;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
@@ -87,7 +94,8 @@ public class Indices implements GraylogRestApi {
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
 
         return createIndexSet(indexSetSummary);
@@ -105,6 +113,15 @@ public class Indices implements GraylogRestApi {
                 .ifValidationFails()
                 .statusCode(200);
         return new GraylogApiResponse(response);
+    }
+
+    public List<String> waitForIndexNames(String indexSetId) throws ExecutionException, RetryException {
+        return RetryerBuilder.<List<String>>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(30))
+                .retryIfResult(List::isEmpty)
+                .build()
+                .call(() -> listOpenIndices(indexSetId).properJSONPath().read("indices.*.index_name"));
     }
 
     public void rotateIndexSet(String indexSetId) {

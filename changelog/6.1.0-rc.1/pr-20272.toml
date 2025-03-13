@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fix tooltips not being visible in modals."
+
+issues = [""]
+pulls = ["20272"]

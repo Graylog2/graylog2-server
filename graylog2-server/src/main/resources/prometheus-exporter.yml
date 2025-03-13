@@ -961,19 +961,19 @@ metric_mappings:
     match_pattern: "org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter.httpURLErrors"
 
   - metric_name: "blocking_elasticsearch_output_batch_size"
-    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.batchSize"
+    match_pattern: "org.graylog2.outputs.BatchedMessageFilterOutput.batchSize"
 
   - metric_name: "blocking_elasticsearch_output_buffer_flushes"
-    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.bufferFlushes"
+    match_pattern: "org.graylog2.outputs.BatchedMessageFilterOutput.bufferFlushes"
 
   - metric_name: "blocking_elasticsearch_output_buffer_flushes_requested"
-    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.bufferFlushesRequested"
+    match_pattern: "org.graylog2.outputs.BatchedMessageFilterOutput.bufferFlushesRequested"
 
   - metric_name: "blocking_elasticsearch_output_buffer_flush_failures"
-    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.bufferFlushFailures"
+    match_pattern: "org.graylog2.outputs.BatchedMessageFilterOutput.bufferFlushFailures"
 
   - metric_name: "blocking_elasticsearch_output_process_time"
-    match_pattern: "org.graylog2.outputs.BlockingBatchedESOutput.processTime"
+    match_pattern: "org.graylog2.outputs.BatchedMessageFilterOutput.processTime"
 
   - metric_name: "elasticsearch_output_failures"
     match_pattern: "org.graylog2.outputs.ElasticSearchOutput.failures"
@@ -1300,3 +1300,68 @@ metric_mappings:
 
   - metric_name: "data_warehouse_iceberg_file_io_local_read"
     match_pattern: "org.graylog.iceberg.file.io.local.read"
+
+  - metric_name: "data_warehouse_journal_writer_written_messages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.DataWarehouseJournalWriter.written-messages"
+
+  - metric_name: "data_warehouse_journal_writer_written_bytes"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.DataWarehouseJournalWriter.written-bytes"
+
+  - metric_name: "data_warehouse_journal_writer_written_failed_write_attempts"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.DataWarehouseJournalWriter.failed-write-attempts"
+
+  - metric_name: "data_warehouse_journal_last_flush_time"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.lastFlushTime"
+
+  - metric_name: "data_warehouse_journal_log_end_offset"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.logEndOffset"
+
+  - metric_name: "data_warehouse_journal_number_of_segments"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.numberOfSegments"
+
+  - metric_name: "data_warehouse_journal_read_messages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.readMessages"
+
+  - metric_name: "data_warehouse_journal_read_time"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.readTime"
+
+  - metric_name: "data_warehouse_journal_recovery_point"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.recoveryPoint"
+
+  - metric_name: "data_warehouse_journal_size"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.size"
+
+  - metric_name: "data_warehouse_journal_uncommitted_messages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.uncommittedMessages"
+
+  - metric_name: "data_warehouse_journal_unflushed_messages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.unflushedMessages"
+
+  - metric_name: "data_warehouse_journal_write_discarded_messages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.writeDiscardedMessages"
+
+  - metric_name: "data_warehouse_journal_write_time"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.writeTime"
+
+  - metric_name: "data_warehouse_journal_written_messages"
+    match_pattern: "org.graylog.plugins.datawarehouse.output.journal.writtenMessages"
+
+  - metric_name: "shared_thread_pools_daemon_scheduler_executor"
+    match_pattern: "org.graylog2.shared-thread-pools.scheduled-daemon-executor.*"
+    wildcard_extract_labels:
+      - "type"
+
+  - metric_name: "shared_thread_pools_daemon_scheduler_executor_scheduled"
+    match_pattern: "org.graylog2.shared-thread-pools.scheduled-daemon-executor.scheduled.*"
+    wildcard_extract_labels:
+      - "type"
+
+  - metric_name: "shared_thread_pools_scheduler_executor_scheduled"
+    match_pattern: "org.graylog2.shared-thread-pools.scheduled-executor.*"
+    wildcard_extract_labels:
+      - "type"
+
+  - metric_name: "shared_thread_pools_scheduler_executor_scheduled"
+    match_pattern: "org.graylog2.shared-thread-pools.scheduled-executor.scheduled.*"
+    wildcard_extract_labels:
+      - "type"

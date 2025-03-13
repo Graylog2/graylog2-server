@@ -128,6 +128,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Length;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.MultiGrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Replace;
@@ -202,6 +203,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(RegexMatch.NAME, RegexMatch.class);
         addMessageProcessorFunction(RegexReplace.NAME, RegexReplace.class);
         addMessageProcessorFunction(GrokMatch.NAME, GrokMatch.class);
+        addMessageProcessorFunction(MultiGrokMatch.NAME, MultiGrokMatch.class);
         addMessageProcessorFunction(GrokExists.NAME, GrokExists.class);
 
         // string functions

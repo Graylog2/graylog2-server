@@ -21,8 +21,8 @@ import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.Assertions;
 import org.graylog.events.EventsConfigurationTestProvider;
 import org.graylog.events.processor.EventDefinition;
-import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
@@ -41,6 +41,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -68,11 +69,11 @@ public class PivotAggregationSearchTest {
     @Mock
     private EventDefinition eventDefinition;
     @Mock
-    private MoreSearch moreSearch;
-    @Mock
     private NotificationService notificationService;
+    @Mock
+    private StreamService streamService;
 
-    private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of);
+    private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of, (categories) -> Stream.of());
 
     @Test
     public void testExtractValuesWithGroupBy() throws Exception {
@@ -95,20 +96,7 @@ public class PivotAggregationSearchTest {
                 .batchSize(500)
                 .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
-                config,
-                parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
-                Collections.emptyList(),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                permittedStreams,
-                notificationService,
-                new QueryStringDecorators(Optional.empty())
-        );
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(config, parameters);
 
         final String toString = timerange.getTo().toString();
         final PivotResult pivotResult = PivotResult.builder()
@@ -196,20 +184,7 @@ public class PivotAggregationSearchTest {
                 .batchSize(500)
                 .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
-                config,
-                parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
-                Collections.emptyList(),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                permittedStreams,
-                notificationService,
-                new QueryStringDecorators(Optional.empty())
-        );
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(config, parameters);
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -270,24 +245,15 @@ public class PivotAggregationSearchTest {
                 .batchSize(500)
                 .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(
                 config,
                 parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
                 List.of(Pivot.builder()
                         .id("risk-asset-1")
                         .rowGroups(Values.builder().limit(10).field("Field").build())
                         .rollup(false)
                         .series(Count.builder().build())
-                        .build()),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                permittedStreams,
-                notificationService,
-                new QueryStringDecorators(Optional.empty())
+                        .build())
         );
 
         final PivotResult pivotResult = PivotResult.builder()
@@ -341,20 +307,7 @@ public class PivotAggregationSearchTest {
                 .batchSize(500)
                 .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
-                config,
-                parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
-                Collections.emptyList(),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                permittedStreams,
-                notificationService,
-                new QueryStringDecorators(Optional.empty())
-        );
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(config, parameters);
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -479,18 +432,11 @@ public class PivotAggregationSearchTest {
                 .batchSize(500)
                 .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(
                 config,
                 parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
                 Collections.emptyList(),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                new PermittedStreams(() -> Stream.of("00001")),
-                notificationService,
+                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
                 new QueryStringDecorators(Optional.of((queryString, parameterProvider, query) -> {
                     if (queryString.equals("source:$secret$") && parameterProvider.getParameter("secret").isPresent()) {
                         return PositionTrackingQuery.of("source:example.org");
@@ -525,24 +471,16 @@ public class PivotAggregationSearchTest {
                 .batchSize(500)
                 .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+        final PivotAggregationSearch pivotAggregationSearch = createPivotAggregationSearch(
                 config,
                 parameters,
-                new AggregationSearch.User("test", DateTimeZone.UTC),
-                eventDefinition,
                 List.of(Pivot.builder()
                         .id("risk-asset-1")
                         .rowGroups(Values.builder().limit(10).field("Field").build())
                         .rollup(false)
                         .series(Count.builder().build())
                         .build()),
-                searchJobService,
-                queryEngine,
-                EventsConfigurationTestProvider.create(),
-                moreSearch,
-                new PermittedStreams(() -> Stream.of("00001")),
-                notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of())
         );
         final Query query = pivotAggregationSearch.getAggregationQuery(parameters, WINDOW_LENGTH, WINDOW_LENGTH);
         Assertions.assertThatCollection(query.searchTypes()).contains(
@@ -553,5 +491,61 @@ public class PivotAggregationSearchTest {
                         .series(Count.builder().build())
                         .build());
 
+    }
+
+    private PivotAggregationSearch createPivotAggregationSearch(
+            AggregationEventProcessorConfig config,
+            AggregationEventProcessorParameters parameters
+    ) {
+        return createPivotAggregationSearch(config, parameters, Collections.emptyList(), permittedStreams);
+    }
+
+    private PivotAggregationSearch createPivotAggregationSearch(
+            AggregationEventProcessorConfig config,
+            AggregationEventProcessorParameters parameters,
+            PermittedStreams permittedStreams
+    ) {
+        return createPivotAggregationSearch(config, parameters, Collections.emptyList(), permittedStreams);
+    }
+
+    private PivotAggregationSearch createPivotAggregationSearch(
+            AggregationEventProcessorConfig config,
+            AggregationEventProcessorParameters parameters,
+            List<SearchType> additionalSearchTypes
+    ) {
+        return createPivotAggregationSearch(config, parameters, additionalSearchTypes, permittedStreams);
+    }
+
+    private PivotAggregationSearch createPivotAggregationSearch(
+            AggregationEventProcessorConfig config,
+            AggregationEventProcessorParameters parameters,
+            List<SearchType> additionalSearchTypes,
+            PermittedStreams permittedStreams
+    ) {
+        return createPivotAggregationSearch(config, parameters, additionalSearchTypes, permittedStreams, new QueryStringDecorators(Optional.empty()));
+    }
+
+    private PivotAggregationSearch createPivotAggregationSearch(
+            AggregationEventProcessorConfig config,
+            AggregationEventProcessorParameters parameters,
+            List<SearchType> additionalSearchTypes,
+            PermittedStreams permittedStreams,
+            QueryStringDecorators queryStringDecorators
+    ) {
+        return new PivotAggregationSearch(
+                config,
+                parameters,
+                new AggregationSearch.User("test", DateTimeZone.UTC),
+                eventDefinition,
+                additionalSearchTypes,
+                searchJobService,
+                queryEngine,
+                EventsConfigurationTestProvider.create(),
+                permittedStreams,
+                notificationService,
+                queryStringDecorators,
+                streamService,
+                false
+        );
     }
 }

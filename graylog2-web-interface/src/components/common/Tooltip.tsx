@@ -31,7 +31,7 @@ const Tooltip = (props: Props) => {
     },
   });
 
-  return <MantineTooltip styles={styles} {...props} />;
+  return <MantineTooltip zIndex="var(--mantine-z-index-max)" styles={styles} {...props} />;
 };
 
 export default Tooltip;

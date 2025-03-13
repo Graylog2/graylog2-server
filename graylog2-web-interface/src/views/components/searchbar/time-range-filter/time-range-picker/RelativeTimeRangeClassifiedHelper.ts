@@ -21,7 +21,8 @@ import type {
   RelativeTimeRange,
   AbsoluteTimeRange,
   KeywordTimeRange,
-  NoTimeRangeOverride, TimeRange,
+  NoTimeRangeOverride,
+  TimeRange,
 } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 
@@ -60,7 +61,9 @@ export const classifyRange = (range: number | undefined | null, allTimeValue: nu
     }
 
     return null;
-  }).filter(Boolean).pop();
+  })
+    .filter(Boolean)
+    .pop();
 };
 
 export const classifyFromRange = (range: number) => classifyRange(range, RELATIVE_ALL_TIME);
@@ -82,15 +85,16 @@ export const classifyRelativeTimeRange = (timeRange: RelativeTimeRange): Relativ
   };
 };
 
-export const isTypeRelativeClassified = (timeRange: TimeRange | NoTimeRangeOverride | undefined): timeRange is RelativeTimeRangeClassified => (
-  timeRange
-  && 'type' in timeRange
-  && timeRange.type === 'relative'
-  && 'from' in timeRange
-  && typeof timeRange?.from === 'object'
-  && 'to' in timeRange
-  && typeof timeRange.to === 'object'
-);
+export const isTypeRelativeClassified = (
+  timeRange: TimeRange | NoTimeRangeOverride | undefined,
+): timeRange is RelativeTimeRangeClassified =>
+  timeRange &&
+  'type' in timeRange &&
+  timeRange.type === 'relative' &&
+  'from' in timeRange &&
+  typeof timeRange?.from === 'object' &&
+  'to' in timeRange &&
+  typeof timeRange.to === 'object';
 
 export const normalizeClassifiedRange = ({ value, unit, isAllTime }: RangeClassified) => {
   if (isAllTime) {
@@ -100,7 +104,9 @@ export const normalizeClassifiedRange = ({ value, unit, isAllTime }: RangeClassi
   return moment.duration(value || 1, unit).asSeconds();
 };
 
-export const normalizeIfClassifiedRelativeTimeRange = (timeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride): TimeRange | NoTimeRangeOverride => {
+export const normalizeIfClassifiedRelativeTimeRange = (
+  timeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride,
+): TimeRange | NoTimeRangeOverride => {
   if (isTypeRelativeClassified(timeRange)) {
     const fromRange = timeRange.from.value !== null ? normalizeClassifiedRange(timeRange.from) : null;
     const toRange = timeRange.to.value !== null ? normalizeClassifiedRange(timeRange.to) : null;

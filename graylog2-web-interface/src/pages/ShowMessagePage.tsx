@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useEffect, useMemo, useState, useContext } from 'react';
 import * as Immutable from 'immutable';
+import styled from 'styled-components';
 
 import useMessage from 'views/hooks/useMessage';
 import DocumentTitle from 'components/common/DocumentTitle';
@@ -30,18 +30,20 @@ import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextPro
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { NodesActions } from 'stores/nodes/NodesStore';
 import { isLocalNode } from 'views/hooks/useIsLocalNode';
-import PluggableStoreProvider from 'components/PluggableStoreProvider';
+import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import View from 'views/logic/views/View';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import SingleMessageFieldTypesProvider from 'views/components/fieldtypes/SingleMessageFieldTypesProvider';
 import StreamsContext from 'contexts/StreamsContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import type { Message } from 'views/components/messagelist/Types';
+import ErrorPage from 'components/errors/ErrorPage';
 
 type Props = {
   params: {
-    index: string | undefined | null,
-    messageId: string | undefined | null,
-  },
+    index: string | undefined | null;
+    messageId: string | undefined | null;
+  };
 };
 
 const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | undefined) => {
@@ -67,25 +69,26 @@ const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | un
 };
 
 type MessageFields = {
-  streams: Array<string>,
-  timestamp: string,
+  streams: Array<string>;
+  timestamp: string;
 };
 
-const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
-  if (!index || !messageId) {
-    throw new Error('index and messageId need to be specified!');
-  }
-
+type ShowMessagePageProps = {
+  message: Message;
+  messageId: string;
+  index: string;
+};
+const ShowMessagePage = ({ message, messageId, index }: ShowMessagePageProps) => {
   const streams = useContext(StreamsContext);
   const streamsMap = Immutable.Map(Object.fromEntries(streams.map((stream) => [stream.id, stream])));
   const streamsList = Immutable.List(streams);
-  const { data: message } = useMessage(index, messageId);
   const inputs = useInputs(message?.source_input_id, message?.fields.gl2_source_node);
 
-  useEffect(() => { NodesActions.list(); }, []);
+  useEffect(() => {
+    NodesActions.list();
+  }, []);
 
-  const isLoaded = useMemo(() => (message !== undefined
-    && inputs !== undefined), [message, inputs]);
+  const isLoaded = useMemo(() => message !== undefined && inputs !== undefined, [message, inputs]);
 
   const view = useMemo(() => View.create(), []);
   const executionState = useMemo(() => SearchExecutionState.empty(), []);
@@ -95,7 +98,7 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
     const fieldTypesStreams = messageStreams.filter((streamId) => streamsMap.has(streamId));
 
     return (
-      <PluggableStoreProvider view={view} initialQuery="none" isNew={false} executionState={executionState}>
+      <ViewsStoreProvider view={view} initialQuery="none" isNew={false} executionState={executionState}>
         <DocumentTitle title={`Message ${messageId} on ${index}`}>
           <Row className="content" id="sticky-augmentations-container">
             <Col md={12}>
@@ -104,12 +107,14 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
                   <FieldTypesContext.Consumer>
                     {({ all }) => (
                       <InteractiveContext.Provider value={false}>
-                        <MessageDetail fields={all}
-                                       streams={streamsMap}
-                                       allStreams={streamsList}
-                                       disableSurroundingSearch
-                                       inputs={inputs}
-                                       message={message} />
+                        <MessageDetail
+                          fields={all}
+                          streams={streamsMap}
+                          allStreams={streamsList}
+                          disableSurroundingSearch
+                          inputs={inputs}
+                          message={message}
+                        />
                       </InteractiveContext.Provider>
                     )}
                   </FieldTypesContext.Consumer>
@@ -118,18 +123,32 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
             </Col>
           </Row>
         </DocumentTitle>
-      </PluggableStoreProvider>
+      </ViewsStoreProvider>
     );
   }
 
   return <Spinner data-testid="spinner" />;
 };
 
-ShowMessagePage.propTypes = {
-  params: PropTypes.exact({
-    index: PropTypes.string.isRequired,
-    messageId: PropTypes.string.isRequired,
-  }).isRequired,
+const ErrorPre = styled.pre`
+  margin: 0 3rem;
+`;
+const ShowMessagePageLoader = ({ params: { index, messageId } }: Props) => {
+  if (!index || !messageId) {
+    throw new Error('index and messageId need to be specified!');
+  }
+  const { data: message, isError, error } = useMessage(index, messageId);
+
+  return isError ? (
+    <ErrorPage
+      title="Index/Message not found"
+      description="The index or message specified was not found. The most probable reason for this is that the index containing the
+      message referenced has been deleted. The full error message is:">
+      <ErrorPre>{error.details}</ErrorPre>
+    </ErrorPage>
+  ) : (
+    <ShowMessagePage message={message} messageId={messageId} index={index} />
+  );
 };
 
-export default withParams(ShowMessagePage);
+export default withParams(ShowMessagePageLoader);

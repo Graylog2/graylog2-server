@@ -16,10 +16,7 @@
  */
 import { useState, useLayoutEffect } from 'react';
 
-import {
-  DEFAULT_COL_MIN_WIDTH,
-  DEFAULT_COL_WIDTH,
-} from 'components/common/EntityDataTable/Constants';
+import { DEFAULT_COL_MIN_WIDTH, DEFAULT_COL_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import type { EntityBase, ColumnRenderersByAttribute } from '../types';
 
@@ -30,13 +27,16 @@ const assignableTableWidth = ({
   columnsIds,
   columnRenderersByAttribute,
 }: {
-  actionsColWidth: number,
-  bulkSelectColWidth: number,
-  columnRenderersByAttribute: { [columnId: string]: { staticWidth?: number } }
-  columnsIds: Array<string>,
-  tableWidth: number,
+  actionsColWidth: number;
+  bulkSelectColWidth: number;
+  columnRenderersByAttribute: { [columnId: string]: { staticWidth?: number } };
+  columnsIds: Array<string>;
+  tableWidth: number;
 }) => {
-  const staticColsWidth = columnsIds.reduce((total, id) => total + (columnRenderersByAttribute[id]?.staticWidth ?? 0), 0);
+  const staticColsWidth = columnsIds.reduce(
+    (total, id) => total + (columnRenderersByAttribute[id]?.staticWidth ?? 0),
+    0,
+  );
 
   return tableWidth - bulkSelectColWidth - actionsColWidth - staticColsWidth;
 };
@@ -46,9 +46,9 @@ const columnsWidth = ({
   columnsIds,
   columnRenderersByAttribute,
 }: {
-  assignableWidth: number,
-  columnRenderersByAttribute: { [columnId: string]: { staticWidth?: number, width?: number, minWidth?: number } }
-  columnsIds: Array<string>,
+  assignableWidth: number;
+  columnRenderersByAttribute: { [columnId: string]: { staticWidth?: number; width?: number; minWidth?: number } };
+  columnsIds: Array<string>;
 }) => {
   const totalFlexColumns = columnsIds.reduce((total, id) => {
     const { staticWidth, width = DEFAULT_COL_WIDTH } = columnRenderersByAttribute[id] ?? {};
@@ -62,12 +62,18 @@ const columnsWidth = ({
 
   const flexColWidth = assignableWidth / totalFlexColumns;
 
-  return Object.fromEntries(columnsIds.map((id) => {
-    const { staticWidth, width = DEFAULT_COL_WIDTH, minWidth = DEFAULT_COL_MIN_WIDTH } = columnRenderersByAttribute[id] ?? {};
-    const targetWidth = staticWidth ?? (flexColWidth * width);
+  return Object.fromEntries(
+    columnsIds.map((id) => {
+      const {
+        staticWidth,
+        width = DEFAULT_COL_WIDTH,
+        minWidth = DEFAULT_COL_MIN_WIDTH,
+      } = columnRenderersByAttribute[id] ?? {};
+      const targetWidth = staticWidth ?? flexColWidth * width;
 
-    return [id, (!staticWidth && targetWidth < minWidth) ? minWidth : targetWidth];
-  }));
+      return [id, !staticWidth && targetWidth < minWidth ? minWidth : targetWidth];
+    }),
+  );
 };
 
 const useColumnsWidths = <Entity extends EntityBase>({
@@ -77,13 +83,12 @@ const useColumnsWidths = <Entity extends EntityBase>({
   columnsIds,
   tableWidth,
 }: {
-  actionsColWidth: number,
-  bulkSelectColWidth: number,
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
-  columnsIds: Array<string>,
-  tableWidth: number,
-},
-) => {
+  actionsColWidth: number;
+  bulkSelectColWidth: number;
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
+  columnsIds: Array<string>;
+  tableWidth: number;
+}) => {
   const [columnsWidths, setColumnWidths] = useState({});
 
   useLayoutEffect(() => {
@@ -100,11 +105,13 @@ const useColumnsWidths = <Entity extends EntityBase>({
       tableWidth,
     });
 
-    setColumnWidths(columnsWidth({
-      assignableWidth,
-      columnsIds,
-      columnRenderersByAttribute,
-    }));
+    setColumnWidths(
+      columnsWidth({
+        assignableWidth,
+        columnsIds,
+        columnRenderersByAttribute,
+      }),
+    );
   }, [actionsColWidth, bulkSelectColWidth, columnRenderersByAttribute, columnsIds, tableWidth]);
 
   return columnsWidths;

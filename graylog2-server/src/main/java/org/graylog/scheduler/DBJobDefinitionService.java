@@ -18,37 +18,36 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import one.util.streamex.StreamEx;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
-import org.graylog2.database.PaginatedList;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
+import one.util.streamex.StreamEx;
+import org.bson.conversions.Bson;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto> {
+public class DBJobDefinitionService {
     public static final String COLLECTION_NAME = "scheduler_job_definitions";
 
     private final ObjectMapper objectMapper;
+    private final MongoCollection<JobDefinitionDto> collection;
+    private final MongoUtils<JobDefinitionDto> mongoUtils;
 
     @Inject
-    public DBJobDefinitionService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, JobDefinitionDto.class, COLLECTION_NAME);
-        this.objectMapper = mapper.get();
-    }
-
-    public PaginatedList<JobDefinitionDto> getAllPaginated(String sortByField, int page, int perPage) {
-        return findPaginatedWithQueryAndSort(DBQuery.empty(), DBSort.asc(sortByField), page, perPage);
+    public DBJobDefinitionService(MongoCollections mongoCollections, MongoJackObjectMapperProvider mapper) {
+        collection = mongoCollections.collection(COLLECTION_NAME, JobDefinitionDto.class);
+        mongoUtils = mongoCollections.utils(collection);
+        objectMapper = mapper.get();
     }
 
     /**
@@ -59,12 +58,27 @@ public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto>
      * @return the job definition with the given config field, or an empty optional
      */
     public Optional<JobDefinitionDto> getByConfigField(String configField, Object value) {
-        final String field = String.format(Locale.US, "%s.%s", JobDefinitionDto.FIELD_CONFIG, configField);
-        return Optional.ofNullable(db.findOne(DBQuery.is(field, value)));
+        return Optional.ofNullable(collection.find(buildConfigFieldQuery(configField, value)).first());
     }
 
-    public List<JobDefinitionDto> getByQuery(DBQuery.Query query) {
-        return StreamEx.of(db.find(query)).collect(Collectors.toList());
+    /**
+     * Returns a stream of job definitions that have the given config field value.
+     *
+     * @param configField the config field
+     * @param value       the value of the config field
+     * @return a stream of job definitions with the given config field.
+     */
+    public Stream<JobDefinitionDto> streamByConfigField(String configField, Object value) {
+        return MongoUtils.stream(collection.find(buildConfigFieldQuery(configField, value)));
+    }
+
+    private static Bson buildConfigFieldQuery(String configField, Object value) {
+        final String field = String.format(Locale.US, "%s.%s", JobDefinitionDto.FIELD_CONFIG, configField);
+        return Filters.eq(field, value);
+    }
+
+    public List<JobDefinitionDto> getByQuery(Bson query) {
+        return collection.find(query).into(new ArrayList<>());
     }
 
     /**
@@ -77,12 +91,32 @@ public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto>
     public Map<String, List<JobDefinitionDto>> getAllByConfigField(String configField, Collection<? extends Object> values) {
         final String field = String.format(Locale.US, "%s.%s", JobDefinitionDto.FIELD_CONFIG, configField);
 
-        return StreamEx.of(db.find(DBQuery.in(field, values))).groupingBy(configFieldGroup(configField));
+        return StreamEx.of(collection.find(Filters.in(field, values)).iterator()).groupingBy(configFieldGroup(configField));
     }
 
     private Function<JobDefinitionDto, String> configFieldGroup(final String key) {
         // Since JobDefinitionDto#config() is a pluggable interface type and we don't have methods we can access,
         // convert the value to a JsonNode and access the group key with that.
         return jobDefinition -> objectMapper.convertValue(jobDefinition.config(), JsonNode.class).path(key).asText();
+    }
+
+    public JobDefinitionDto save(JobDefinitionDto jobDefinitionDto) {
+        return mongoUtils.save(jobDefinitionDto);
+    }
+
+    public void delete(String id) {
+        mongoUtils.deleteById(id);
+    }
+
+    public Optional<JobDefinitionDto> get(String id) {
+        return mongoUtils.getById(id);
+    }
+
+    public Stream<JobDefinitionDto> streamAll() {
+        return mongoUtils.stream(collection.find());
+    }
+
+    public JobDefinitionDto findOrCreate(JobDefinitionDto dto) {
+        return mongoUtils.getOrCreate(dto);
     }
 }

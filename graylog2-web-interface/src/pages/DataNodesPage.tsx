@@ -24,24 +24,21 @@ import { IndexerClusterHealth } from 'components/indexers';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
 
-import Alert from '../components/bootstrap/Alert';
-
 const DataNodesPage = () => (
   <DocumentTitle title="Data Nodes">
     <DataNodesPageNavigation />
-    <PageHeader title="Data Nodes"
-                documentationLink={{
-                  title: 'Data Nodes documentation',
-                  path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-                }}>
+    <PageHeader
+      title="Data Nodes"
+      documentationLink={{
+        title: 'Data Nodes documentation',
+        path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
+      }}>
       <span>
-        Graylog data nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
+        Graylog data nodes offer a better integration with Graylog and simplify future updates. They allow you to index
+        and search through all the messages in your Graylog message database.
       </span>
     </PageHeader>
     <HideOnCloud>
-      <Alert bsStyle="warning">
-        Data Node is currently in beta. Feel free to check it out and tell us about your experience!
-      </Alert>
       <IndexerClusterHealth minimal />
     </HideOnCloud>
     <Row className="content">

@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.Min;
@@ -44,6 +45,7 @@ import java.util.Optional;
 public abstract class IndexSetSummary implements SimpleIndexSetConfig {
     public static final String FIELD_DEFAULT = "default";
     public static final String FIELD_CAN_BE_DEFAULT = "can_be_default";
+    public static final String FIELD_DATA_TIERING_STATUS = "data_tiering_status";
 
     @JsonCreator
     public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
@@ -67,17 +69,23 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
                                          @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE) @Nullable String templateType,
                                          @JsonProperty(FIELD_PROFILE_ID) @Nullable String fieldTypeProfile,
                                          @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
-                                         @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) {
+                                         @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation,
+                                         @JsonProperty(FIELD_DATA_TIERING_STATUS) @Nullable DataTieringStatus dataTieringStatus) {
         if (Objects.isNull(creationDate)) {
             creationDate = ZonedDateTime.now();
         }
         return new AutoValue_IndexSetSummary(shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass,
                 retentionStrategy, dataTiering, id, title, description, isDefault, canBeDefault, isWritable, indexPrefix,
                 creationDate, indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
-                Optional.ofNullable(templateType), fieldTypeProfile, Objects.isNull(useLegacyRotation) || useLegacyRotation);
+                Optional.ofNullable(templateType), fieldTypeProfile, Objects.isNull(useLegacyRotation) || useLegacyRotation,
+                dataTieringStatus);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
+        return fromIndexSetConfig(indexSet, isDefault, null);
+    }
+
+    public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault, DataTieringStatus dataTieringStatus) {
         return create(
                 indexSet.id(),
                 indexSet.title(),
@@ -100,8 +108,9 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
                 indexSet.indexTemplateType().orElse(null),
                 indexSet.fieldTypeProfile(),
                 indexSet.dataTieringConfig(),
-                indexSet.dataTieringConfig() == null);
-
+                indexSet.dataTieringConfig() == null,
+                dataTieringStatus
+        );
     }
 
     @JsonProperty("id")
@@ -158,6 +167,11 @@ public abstract class IndexSetSummary implements SimpleIndexSetConfig {
     @Nullable
     @JsonProperty(FIELD_USE_LEGACY_ROTATION)
     public abstract Boolean useLegacyRotation();
+
+    @Nullable
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(FIELD_DATA_TIERING_STATUS)
+    public abstract DataTieringStatus dataTieringStatus();
 
     public IndexSetConfig toIndexSetConfig(boolean isRegular) {
         final IndexSetConfig.Builder builder = IndexSetConfig.builder()

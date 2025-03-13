@@ -19,11 +19,8 @@ import { renderHook } from '@testing-library/react-hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import { layoutPreferences, layoutPreferencesJSON } from 'fixtures/entityListLayoutPreferences';
-import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-
-import useUserLayoutPreferences from './useUserLayoutPreferences';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,21 +30,13 @@ const queryClient = new QueryClient({
   },
 });
 
-const wrapper = ({ children }) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-  </QueryClientProvider>
-);
+const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
 jest.mock('./useUserLayoutPreferences');
 
 describe('useUserSearchFilterQuery hook', () => {
-  beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -57,19 +46,26 @@ describe('useUserSearchFilterQuery hook', () => {
 
     result.current.mutate(layoutPreferences);
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), layoutPreferencesJSON));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(
+        'POST',
+        expect.stringContaining('/entitylists/preferences/streams'),
+        layoutPreferencesJSON,
+      ),
+    );
   });
 
   it('should allow partial update of user layout preferences', async () => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
     const { result, waitFor } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
 
     result.current.mutate({ perPage: 100 });
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), {
-      displayed_attributes: layoutPreferencesJSON.displayed_attributes,
-      sort: layoutPreferencesJSON.sort,
-      per_page: 100,
-    }));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), {
+        displayed_attributes: layoutPreferencesJSON.displayed_attributes,
+        sort: layoutPreferencesJSON.sort,
+        per_page: 100,
+      }),
+    );
   });
 });

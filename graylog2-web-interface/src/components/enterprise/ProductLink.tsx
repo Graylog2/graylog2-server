@@ -15,18 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { ExternalLinkButton } from 'components/common';
 import { ButtonToolbar } from 'components/bootstrap';
 
 type Props = {
-  href: string,
-  clusterId?: string,
-  children: React.ReactNode,
-}
+  href?: string;
+  clusterId?: string;
+  children?: React.ReactNode;
+};
 
-const ProductLink = ({ href, clusterId, children } : Props) => {
+const ProductLink = ({ href = '', clusterId, children }: Props) => {
   let hrefWithParam = href;
 
   if (clusterId) {
@@ -35,26 +34,11 @@ const ProductLink = ({ href, clusterId, children } : Props) => {
 
   return (
     <ButtonToolbar>
-      <ExternalLinkButton target="_blank"
-                          rel="noopener noreferrer"
-                          href={hrefWithParam}
-                          bsStyle="primary">
+      <ExternalLinkButton target="_blank" rel="noopener noreferrer" href={hrefWithParam} bsStyle="primary">
         {children}
       </ExternalLinkButton>
     </ButtonToolbar>
   );
-};
-
-ProductLink.propTypes = {
-  href: PropTypes.string,
-  clusterId: PropTypes.string,
-  children: PropTypes.node,
-};
-
-ProductLink.defaultProps = {
-  href: '',
-  clusterId: undefined,
-  children: undefined,
 };
 
 export default ProductLink;

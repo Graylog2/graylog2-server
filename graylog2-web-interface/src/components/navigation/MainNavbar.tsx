@@ -16,136 +16,52 @@
  */
 
 import * as React from 'react';
-import type { PluginNavigation } from 'graylog-web-plugin';
 import { useMemo } from 'react';
+import type { PluginNavigation } from 'graylog-web-plugin';
 
-import { Nav, NavDropdown } from 'components/bootstrap';
+import { Nav } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
-import Routes, { ENTERPRISE_ROUTE_DESCRIPTION, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
 import filterByPerspective from 'components/perspectives/util/filterByPerspective';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import usePluginEntities from 'hooks/usePluginEntities';
-import AppConfig from 'util/AppConfig';
-import isActiveRoute from 'components/navigation/util/isActiveRoute';
-import { navigation as securityNavigation } from 'components/security/bindings';
+import NavigationItem from 'components/navigation/NavigationItem';
+import { DEFAULT_SECURITY_NAV_ITEM } from 'components/security/bindings';
+import DEFAULT_ENTERPRISE_NAV_ITEM from 'components/navigation/DefaultEnterpriseNavItem';
 
-import NavigationLink from './NavigationLink';
-
-const LAST_POSITION = 'last';
-const requiredFeatureFlagIsEnabled = (requiredFeatureFlag: undefined | string) => (requiredFeatureFlag ? AppConfig.isFeatureEnabled(requiredFeatureFlag) : true);
-
-type PluginRouteProps = {
-  navigationItem: {
-    path: string;
-    description: string;
-    requiredFeatureFlag?: string;
-    BadgeComponent?: React.ComponentType<{ text: string }>
-    permissions?: string | Array<string>
-  },
-  topLevel?: boolean
-}
-
-const PluginRoute = ({
-  navigationItem: {
-    description,
-    path,
-    permissions,
-    requiredFeatureFlag,
-    BadgeComponent,
-  },
-  topLevel,
-}: PluginRouteProps) => {
-  const currentUser = useCurrentUser();
-  if (permissions && !isPermitted(currentUser.permissions, permissions)) return null;
-
-  if (!requiredFeatureFlagIsEnabled(requiredFeatureFlag)) {
-    return null;
-  }
-
-  return (
-    <NavigationLink key={description}
-                    description={BadgeComponent ? <BadgeComponent text={description} /> : description}
-                    path={path}
-                    topLevel={topLevel} />
-  );
-};
-
-PluginRoute.defaultProps = {
-  topLevel: false,
-};
-
-type PluginNavDropdownProps = {
-  navigationItem: PluginNavigation,
-  pathname: string
-}
-
-const PluginNavDropdown = ({
-  navigationItem: {
-    children,
-    description,
-    BadgeComponent,
-    requiredFeatureFlag,
-  },
-  pathname,
-}: PluginNavDropdownProps) => {
-  const currentUser = useCurrentUser();
-
-  if (!requiredFeatureFlagIsEnabled(requiredFeatureFlag)) {
-    return null;
-  }
-
-  const activeChild = children.filter(({ path, end }) => (path && isActiveRoute(pathname, path, end)));
-  const title = activeChild.length > 0 ? `${description} / ${activeChild[0].description}` : description;
-  const isEmpty = !children.some((child) => (
-    isPermitted(currentUser.permissions, child.permissions) && requiredFeatureFlagIsEnabled(child.requiredFeatureFlag)),
-  );
-
-  if (isEmpty) {
-    return null;
-  }
-
-  const renderBadge = children.some((child) => isPermitted(currentUser.permissions, child.permissions) && child?.BadgeComponent);
-
-  return (
-    <NavDropdown key={title}
-                 title={title}
-                 badge={renderBadge ? BadgeComponent : null}
-                 inactiveTitle={description}>
-      {children.map((childNavigationItem) => <PluginRoute navigationItem={childNavigationItem} key={childNavigationItem.description} />)}
-    </NavDropdown>
-  );
-};
-
-const _existingDropdownItemIndex = (existingNavigationItems: Array<PluginNavigation>, newNavigationItem: PluginNavigation) => {
+const _existingDropdownItemIndex = (
+  existingNavigationItems: Array<PluginNavigation>,
+  newNavigationItem: PluginNavigation,
+) => {
   if (!newNavigationItem.children) {
     return -1;
   }
 
-  return existingNavigationItems.findIndex(({ description, children }) => newNavigationItem.description === description && children);
+  return existingNavigationItems.findIndex(
+    ({ description, perspective, children }) =>
+      newNavigationItem.description === description && newNavigationItem.perspective === perspective && children,
+  );
 };
 
-const mergeDuplicateDropdowns = (navigationItems: Array<PluginNavigation>): Array<PluginNavigation> => navigationItems.reduce((result, current) => {
-  const existingDropdownItemIndex = _existingDropdownItemIndex(result, current);
+const mergeDuplicateDropdowns = (navigationItems: Array<PluginNavigation>): Array<PluginNavigation> =>
+  navigationItems.reduce((result, current) => {
+    const existingDropdownItemIndex = _existingDropdownItemIndex(result, current);
 
-  if (existingDropdownItemIndex >= 0) {
-    const existingDropdownItem = result[existingDropdownItemIndex];
-    const newDropdownItem = {
-      ...current,
-      ...existingDropdownItem,
-      children: [
-        ...existingDropdownItem.children,
-        ...current.children,
-      ],
-    };
-    const newResult = [...result];
-    newResult[existingDropdownItemIndex] = newDropdownItem;
+    if (existingDropdownItemIndex >= 0) {
+      const existingDropdownItem = result[existingDropdownItemIndex];
+      const newDropdownItem = {
+        ...current,
+        ...existingDropdownItem,
+        children: [...existingDropdownItem.children, ...current.children],
+      };
+      const newResult = [...result];
+      newResult[existingDropdownItemIndex] = newDropdownItem;
 
-    return newResult;
-  }
+      return newResult;
+    }
 
-  return [...result, current];
-}, []);
+    return [...result, current];
+  }, []);
 
 const pluginMenuItemExists = (navigationItems: Array<PluginNavigation>, description: string) => {
   if (!navigationItems?.length) {
@@ -162,17 +78,28 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
   return menuItem && Object.keys(menuItem).includes('useIsValidLicense') ? menuItem.useIsValidLicense() : true;
 };
 
-const sortItemsByPosition = <T extends { position: typeof LAST_POSITION | undefined }>(navigationItems: Array<T>) => navigationItems.sort((route1, route2) => {
-  if (route1.position === LAST_POSITION) {
-    return 1;
-  }
+const sortInAfterItems = (targetList: Array<PluginNavigation>, afterItems: Array<PluginNavigation>) => {
+  const result = [...targetList];
 
-  if (route2.position === LAST_POSITION) {
-    return -1;
-  }
+  afterItems.forEach((afterItem) => {
+    const index = result.findIndex((targetItem) => targetItem.description === afterItem.position?.after);
+    if (index !== -1) {
+      result.splice(index + 1, 0, afterItem);
+    } else {
+      result.push(afterItem);
+    }
+  });
 
-  return 0;
-});
+  return result;
+};
+
+const sortItemsByPosition = (navigationItems: Array<PluginNavigation>) => {
+  const withoutPositionItems = navigationItems.filter((item) => !item.position);
+  const afterItems = navigationItems.filter((item) => !!item.position?.after);
+  const lastItems = navigationItems.filter((item) => !!item.position?.last);
+
+  return [...sortInAfterItems(withoutPositionItems, afterItems), ...lastItems];
+};
 
 const useNavigationItems = () => {
   const { permissions } = useCurrentUser();
@@ -181,27 +108,27 @@ const useNavigationItems = () => {
 
   return useMemo(() => {
     const navigationItems = mergeDuplicateDropdowns(allNavigationItems);
-    const enterpriseMenuIsMissing = !pluginMenuItemExists(navigationItems, ENTERPRISE_ROUTE_DESCRIPTION);
-    const securityMenuIsMissing = !pluginMenuItemExists(navigationItems, SECURITY_ROUTE_DESCRIPTION);
-    const securityLicenseInvalid = !pluginLicenseValid(navigationItems, SECURITY_ROUTE_DESCRIPTION);
+    const enterpriseMenuIsMissing = !pluginMenuItemExists(navigationItems, DEFAULT_ENTERPRISE_NAV_ITEM.description);
+    const securityMenuIsMissing = !pluginMenuItemExists(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
+    const securityLicenseInvalid = !pluginLicenseValid(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
     const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
 
     if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
       // no enterprise plugin menu, so we will add one
-      navigationItems.push({
-        path: Routes.SYSTEM.ENTERPRISE,
-        description: ENTERPRISE_ROUTE_DESCRIPTION,
-      });
+      navigationItems.push(DEFAULT_ENTERPRISE_NAV_ITEM);
     }
 
     if ((securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) || securityLicenseInvalid) {
       // no security plugin menu, so we will add one
       if (!securityMenuIsMissing) {
         // remove the existing security menu item
-        navigationItems.splice(navigationItems.findIndex((item) => item.description === SECURITY_ROUTE_DESCRIPTION), 1);
+        navigationItems.splice(
+          navigationItems.findIndex((item) => item.description === DEFAULT_SECURITY_NAV_ITEM.description),
+          1,
+        );
       }
 
-      navigationItems.push(securityNavigation);
+      navigationItems.push(DEFAULT_SECURITY_NAV_ITEM);
     }
 
     const itemsForActivePerspective = filterByPerspective(navigationItems, activePerspective?.id);
@@ -215,21 +142,9 @@ const MainNavbar = ({ pathname }: { pathname: string }) => {
 
   return (
     <Nav className="navbar-main">
-      {navigationItems.map((navigationItem) => {
-        if (navigationItem.children) {
-          return (
-            <PluginNavDropdown navigationItem={navigationItem}
-                               pathname={pathname}
-                               key={navigationItem.description} />
-          );
-        }
-
-        return (
-          <PluginRoute navigationItem={navigationItem}
-                       key={navigationItem.description}
-                       topLevel />
-        );
-      })}
+      {navigationItems.map((navigationItem) => (
+        <NavigationItem navigationItem={navigationItem} pathname={pathname} key={navigationItem.description} />
+      ))}
     </Nav>
   );
 };

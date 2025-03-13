@@ -25,6 +25,7 @@ import org.graylog2.configuration.PathConfiguration;
 import java.nio.file.Path;
 import java.util.Optional;
 
+@SuppressWarnings({"unused", "FieldMayBeFinal"})
 @Singleton
 public class GeoIpProcessorConfig extends PathConfiguration {
     private static final String PREFIX = "geo_ip_processor";
@@ -40,5 +41,5 @@ public class GeoIpProcessorConfig extends PathConfiguration {
     }
 
     @Parameter(value = DISABLE_IPINFO_DB_TYPE_CHECK)
-    private final boolean disableIpInfoDBTypeCheck = false;
+    private boolean disableIpInfoDBTypeCheck = false;
 }

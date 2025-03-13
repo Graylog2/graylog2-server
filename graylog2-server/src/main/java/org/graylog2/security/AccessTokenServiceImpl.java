@@ -24,30 +24,50 @@ import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
+import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.MongoCollection;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.users.UserConfiguration;
+import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static com.mongodb.client.model.Aggregates.lookup;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Aggregates.project;
+import static com.mongodb.client.model.Aggregates.sort;
+import static com.mongodb.client.model.Aggregates.unwind;
+import static com.mongodb.client.model.Projections.fields;
+import static com.mongodb.client.model.Projections.include;
 
 /**
  * Provides access to access tokens in the database.
@@ -60,22 +80,27 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
     private static final SecureRandom RANDOM = new SecureRandom();
+    private final PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
     private final AccessTokenCipher cipher;
+    private final ClusterConfigService configService;
     private LoadingCache<String, DateTime> lastAccessCache;
 
     @Inject
-    public AccessTokenServiceImpl(MongoConnection mongoConnection, AccessTokenCipher accessTokenCipher) {
+    public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService, AccessTokenCipher accessTokenCipher, ClusterConfigService configService) {
         super(mongoConnection);
+        this.paginatedAccessTokenEntityService = paginatedAccessTokenEntityService;
         this.cipher = accessTokenCipher;
+        this.configService = configService;
         setLastAccessCache(30, TimeUnit.SECONDS);
 
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN_TYPE, 1));
         // make sure we cannot overwrite an existing access token
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), new BasicDBObject("unique", true));
+        // Add an index on the expires_at field to speed up the search for expired tokens:
+        collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.EXPIRES_AT, 1));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public AccessToken load(String token) {
         DBObject query = new BasicDBObject();
         query.put(AccessTokenImpl.TOKEN, cipher.encrypt(token));
@@ -107,7 +132,6 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<AccessToken> loadAll(String username) {
         DBObject query = new BasicDBObject();
         query.put(AccessTokenImpl.USERNAME, username);
@@ -119,6 +143,12 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public AccessToken create(String username, String name) {
+        final Duration defaultTTL = configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens();
+        return create(username, name, defaultTTL);
+    }
+
+    @Override
+    public AccessToken create(String username, String name, Duration ttl) {
         Map<String, Object> fields = Maps.newHashMap();
         AccessTokenImpl accessToken;
         String id = null;
@@ -128,14 +158,21 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         do {
             // 256 bits of randomness should be plenty hard to guess, no?
             final String token = new BigInteger(256, RANDOM).toString(32);
+            final DateTime nowUTC = Tools.nowUTC();
             fields.put(AccessTokenImpl.TOKEN, token);
             fields.put(AccessTokenImpl.USERNAME, username);
             fields.put(AccessTokenImpl.NAME, name);
+            fields.put(AccessTokenImpl.CREATED_AT, nowUTC);
+            fields.put(AccessTokenImpl.EXPIRES_AT, nowUTC.plus(ttl.toMillis()));
             fields.put(AccessTokenImpl.LAST_ACCESS, Tools.dateTimeFromDouble(0)); // aka never.
             accessToken = new AccessTokenImpl(fields);
             try {
                 id = saveWithoutValidation(encrypt(accessToken));
-            } catch (DuplicateKeyException ignore) {
+            } catch (MongoException e) {
+                // ignore duplicate key errors
+                if (!MongoUtils.isDuplicateKeyError(e)) {
+                    throw e;
+                }
             }
         } while (iterations++ < 10 && id == null);
         if (id == null) {
@@ -177,7 +214,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             // The token type field is only used internally for now so we don't want to expose it
             fields.remove(AccessTokenImpl.TOKEN_TYPE);
         }
-        final ObjectId id = (ObjectId) dbObject.get("_id");
+        final ObjectId id = (ObjectId) dbObject.get(AccessTokenImpl.ID_FIELD);
         return new AccessTokenImpl(id, fields);
     }
 
@@ -214,5 +251,55 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
                         return now;
                     }
                 });
+    }
+
+    @Override
+    public PaginatedList<AccessTokenEntity> findPaginated(SearchQuery searchQuery, int page, int perPage, String sortField, SortOrder order) {
+        return this.paginatedAccessTokenEntityService.findPaginated(searchQuery, page, perPage, sortField, order);
+    }
+
+    @Override
+    public List<ExpiredToken> findExpiredTokens(DateTime expiredBefore) {
+        final String join = "userDetails";
+        final String joinId = join + "._id";
+
+        final List<Bson> pipeline = List.of(
+                //Search fot tokens whose EXPIRES_AT is less than or equal to now:
+                match(new Document(AccessTokenImpl.EXPIRES_AT, new Document("$lte", expiredBefore.toDate()))),
+                // Sort by expiration date:
+                sort(new Document(AccessTokenImpl.EXPIRES_AT, 1)),
+                // Join in the user-collection on the username as "userDetails":
+                lookup(UserImpl.COLLECTION_NAME, AccessTokenImpl.USERNAME, UserImpl.USERNAME, join),
+                // Have a dedicated Doc for each user-id - we're working with a 1:1 relationship here, so it's safe:
+                unwind("$" + join),
+                // Load only token-id, expiration date and user-id:
+                project(fields(
+                        include(AccessTokenImpl.ID_FIELD),
+                        include(AccessTokenImpl.NAME),
+                        include(AccessTokenImpl.EXPIRES_AT),
+                        include(joinId)
+                ))
+        );
+
+        final MongoCollection<Document> tokenColl = mongoCollection(AccessTokenImpl.class);
+        final AggregateIterable<Document> aggregateIt = tokenColl.aggregate(pipeline);
+        try (var stream = StreamSupport.stream(aggregateIt.spliterator(), false)) {
+            return stream.map(d -> {
+                        final Document userDetails = d.get(join, Document.class);
+                        return new ExpiredToken(
+                                d.getObjectId(AccessTokenImpl.ID_FIELD).toString(),
+                                d.getString(AccessTokenImpl.NAME),
+                                new DateTime(d.getDate(AccessTokenImpl.EXPIRES_AT)).withZone(DateTimeZone.UTC),
+                                userDetails.getObjectId("_id").toString()
+                        );
+                    }
+            ).toList();
+        }
+    }
+
+    @Override
+    public int deleteById(final String id) {
+        final DBObject query = new BasicDBObject(AccessTokenImpl.ID_FIELD, new ObjectId(id));
+        return destroy(query, AccessTokenImpl.COLLECTION_NAME);
     }
 }

@@ -17,7 +17,6 @@
 import * as React from 'react';
 import type { DropResult } from 'react-beautiful-dnd';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import PropTypes from 'prop-types';
 import { useCallback } from 'react';
 
 import type { ListItemType, CustomContentRender, CustomListItemRender } from './types';
@@ -32,14 +31,14 @@ const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startInde
 };
 
 export type Props<ItemType extends ListItemType> = {
-  alignItemContent?: 'flex-start' | 'center',
-  customContentRender?: CustomContentRender<ItemType>,
-  customListItemRender?: CustomListItemRender<ItemType>,
-  disableDragging?: boolean,
-  displayOverlayInPortal?: boolean,
-  items: Array<ItemType>,
-  onMoveItem: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void,
-}
+  alignItemContent?: 'flex-start' | 'center';
+  customContentRender?: CustomContentRender<ItemType>;
+  customListItemRender?: CustomListItemRender<ItemType>;
+  disableDragging?: boolean;
+  displayOverlayInPortal?: boolean;
+  items?: Array<ItemType>;
+  onMoveItem: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void;
+};
 
 /**
  * Component that renders a list of elements and let users manually
@@ -52,82 +51,45 @@ const SortableList = <ItemType extends ListItemType>({
   alignItemContent,
   customContentRender,
   customListItemRender,
-  disableDragging,
-  displayOverlayInPortal,
-  items,
+  disableDragging = false,
+  displayOverlayInPortal = false,
+  items = [],
   onMoveItem,
 }: Props<ItemType>) => {
-  const onDragEnd = useCallback((result: DropResult) => {
-    if (!result.destination) {
-      return;
-    }
+  const onDragEnd = useCallback(
+    (result: DropResult) => {
+      if (!result.destination) {
+        return;
+      }
 
-    if (result.source.index !== result.destination.index) {
-      const newList: Array<ItemType> = reorder(
-        items,
-        result.source.index,
-        result.destination.index,
-      );
+      if (result.source.index !== result.destination.index) {
+        const newList: Array<ItemType> = reorder(items, result.source.index, result.destination.index);
 
-      onMoveItem(newList, result.source.index, result.destination.index);
-    }
-  }, [items, onMoveItem]);
+        onMoveItem(newList, result.source.index, result.destination.index);
+      }
+    },
+    [items, onMoveItem],
+  );
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="droppable">
         {({ droppableProps, innerRef, placeholder }) => (
-          <div {...droppableProps}
-               ref={innerRef}>
-            <List alignItemContent={alignItemContent}
-                  items={items}
-                  disableDragging={disableDragging}
-                  displayOverlayInPortal={displayOverlayInPortal}
-                  customContentRender={customContentRender}
-                  customListItemRender={customListItemRender} />
+          <div {...droppableProps} ref={innerRef}>
+            <List
+              alignItemContent={alignItemContent}
+              items={items}
+              disableDragging={disableDragging}
+              displayOverlayInPortal={displayOverlayInPortal}
+              customContentRender={customContentRender}
+              customListItemRender={customListItemRender}
+            />
             {placeholder}
           </div>
         )}
       </Droppable>
     </DragDropContext>
   );
-};
-
-SortableList.propTypes = {
-  /** Specifies if dragging and dropping is disabled or not. */
-  disableDragging: PropTypes.bool,
-  /**
-   * Array of objects that will be displayed in the list. Each item is
-   * expected to have an `id` and a `title` key. `id` must be unique
-   * and will be used for sorting the item. `title` is used to display the
-   * element name in the list.
-   */
-  items: PropTypes.arrayOf(PropTypes.object),
-  /**
-   * Function that will be called when an item of the list was moved.
-   * The function will receive the newly sorted list as an argument
-   * and the source and destination index of the moved item.
-   */
-  onMoveItem: PropTypes.func.isRequired,
-  /**
-   * Custom list item content renderer. Allows rendering custom content next to the drag handle.
-   * The default content is the item title. This method is not being called when `customListItemRender` is defined.
-   */
-  customContentRender: PropTypes.func,
-  /**
-   * Custom renderer for the complete list item. Can be used if `ListGroupItem` component is not suitable
-   * or the drag handle needs to be displayed differently. When defined, `customContentRender` will not be called.
-   */
-  customListItemRender: PropTypes.func,
-};
-
-SortableList.defaultProps = {
-  alignItemContent: undefined,
-  items: [],
-  disableDragging: false,
-  displayOverlayInPortal: false,
-  customContentRender: undefined,
-  customListItemRender: undefined,
 };
 
 export default SortableList;

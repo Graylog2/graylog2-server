@@ -13,6 +13,21 @@
       "modified_at": {
         "$date": "2018-04-24T12:37:31.592Z"
       }
+    },
+    {
+      "_id": {
+        "$oid": "5a85c4854b900afd5d662be4"
+      },
+      "_scope": "GRAYLOG_IMMUTABLE_SCOPE",
+      "title": "All Messages Routing",
+      "description": "GL generated pipeline",
+      "source": "pipeline \"All Messages Routing\"\nstage 0 match either\nrule \"debug\"\nrule \"no-op\"\nend",
+      "created_at": {
+        "$date": "2018-02-15T17:33:57.125Z"
+      },
+      "modified_at": {
+        "$date": "2018-04-24T12:37:31.592Z"
+      }
     }
   ],
   "pipeline_processor_pipelines_streams": [

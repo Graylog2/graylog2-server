@@ -29,9 +29,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public record ConnectionCheckResponse(List<String> indices, List<String> certificates,
+public record ConnectionCheckResponse(List<ConnectionCheckIndex> indices, List<String> certificates,
                                       String error) {
-    public static ConnectionCheckResponse success(List<String> indices, List<X509Certificate> certificates) {
+    public static ConnectionCheckResponse success(List<ConnectionCheckIndex> indices, List<X509Certificate> certificates) {
         return new ConnectionCheckResponse(indices, encodeCerts(certificates), null);
     }
 

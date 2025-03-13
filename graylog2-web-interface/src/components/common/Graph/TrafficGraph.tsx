@@ -16,29 +16,30 @@
  */
 import React from 'react';
 import styled, { css, useTheme } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
 import type { PlotLayout } from 'views/components/visualizations/GenericPlot';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
+import AppConfig from 'util/AppConfig';
 
 type Props = {
-  traffic: { [key: string]: number },
-  width: number,
+  traffic: { [key: string]: number };
+  width: number;
   trafficLimit?: number;
 };
 
 const GraphWrapper = styled.div<{
-  $width: number,
-}>(({
-  $width,
-}) => css`
-  height: 200px;
-  width: ${$width}px
-`);
+  $width: number;
+}>(
+  ({ $width }) => css`
+    height: 200px;
+    width: ${$width}px;
+  `,
+);
 
-const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
+const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
   const theme = useTheme();
+  const isCloud = AppConfig.isCloud();
 
   const getMaxDailyValue = (arr) => arr.reduce((a, b) => Math.max(a, b));
 
@@ -84,11 +85,13 @@ const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
     ],
   };
 
-  const chartData = [{
-    type: 'bar',
-    x: Object.keys(traffic),
-    y: Object.values(traffic),
-  }];
+  const chartData = [
+    {
+      type: 'bar',
+      x: Object.keys(traffic),
+      y: Object.values(traffic),
+    },
+  ];
 
   const layout: Partial<PlotLayout> = {
     showlegend: false,
@@ -106,6 +109,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
       namelength: -1,
     },
     yaxis: {
+      range: isCloud ? [0, range] : null,
       title: {
         text: 'Bytes',
       },
@@ -117,7 +121,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
       {
         buttons: [
           {
-            args: ['yaxis.range', [0, range]],
+            args: ['yaxis.range', [0, isCloud ? trafficLimit : range]],
             args2: [{ 'yaxis.autorange': 'True' }, { 'yaxis.range': null }],
             label: 'Zoom/Reset',
             method: 'relayout',
@@ -131,7 +135,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
         },
         active: 1,
         type: 'buttons',
-        visible: trafficLimit && (range < trafficLimit),
+        visible: trafficLimit && range < trafficLimit,
         xanchor: 'right',
         yanchor: 'top',
         x: 1,
@@ -146,20 +150,9 @@ const TrafficGraph = ({ width, traffic, trafficLimit }: Props) => {
 
   return (
     <GraphWrapper $width={width}>
-      <GenericPlot chartData={chartData}
-                   layout={trafficLayout} />
+      <GenericPlot chartData={chartData} layout={trafficLayout} />
     </GraphWrapper>
   );
-};
-
-TrafficGraph.propTypes = {
-  traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
-  width: PropTypes.number.isRequired,
-  trafficLimit: PropTypes.number,
-};
-
-TrafficGraph.defaultProps = {
-  trafficLimit: undefined,
 };
 
 export default TrafficGraph;

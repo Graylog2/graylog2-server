@@ -1,0 +1,5 @@
+type = "a"
+message = "Automatically trim newline characters for Fortigate messages received through Syslog inputs."
+
+issues = ["graylog-plugin-enterprise#8980"]
+pulls = ["20788"]

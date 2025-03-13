@@ -24,25 +24,26 @@ import type { TimeRangeTypes } from 'views/logic/queries/Query';
 export const SECURITY_PATH = '/security';
 
 type RoutesRelativeTimeRange = {
-  relative: number
+  relative: number;
 };
 type RoutesAbsoluteTimeRange = {
-  from: string,
-  to: string,
+  from: string;
+  to: string;
 };
 type RoutesKeywordTimeRange = {
-  keyword: string
+  keyword: string;
 };
 type RoutesTimeRange = RoutesRelativeTimeRange | RoutesAbsoluteTimeRange | RoutesKeywordTimeRange;
 type SearchQueryParams = {
-  q: string,
-  relative?: number,
-  rangetype?: string,
-  from?: string,
-  to?: string,
-  keyword?: string,
-  streams?: string,
-}
+  q: string;
+  relative?: number;
+  rangetype?: string;
+  from?: string;
+  to?: string;
+  keyword?: string;
+  streams?: string;
+  stream_categories?: string;
+};
 
 const Routes = {
   STARTPAGE: '/',
@@ -52,6 +53,7 @@ const Routes = {
   ALERTS: {
     LIST: '/alerts',
     replay_search: (alertId: string) => `/alerts/${alertId}/replay-search`,
+    BULK_REPLAY_SEARCH: '/alerts/replay-search',
     DEFINITIONS: {
       LIST: '/alerts/definitions',
       CREATE: '/alerts/definitions/new',
@@ -79,13 +81,21 @@ const Routes = {
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
+    CLUSTER: {
+      NODES: '/system/cluster',
+      DATANODE_DASHBOARD: '/system/cluster/datanode-dashboard',
+      DATANODE_CONFIGURATION: '/system/cluster/datanode-configuration',
+      DATANODE_MIGRATION: '/system/cluster/datanode-migration',
+    },
     CONFIGURATIONS: '/system/configurations',
-    configurationsSection: (section: string, pluginSection?: string) => `/system/configurations/${section}${pluginSection ? `/${pluginSection}` : ''}`,
+    configurationsSection: (section: string, pluginSection?: string) =>
+      `/system/configurations/${section}${pluginSection ? `/${pluginSection}` : ''}`,
     CONTENTPACKS: {
       LIST: '/system/contentpacks',
       EXPORT: '/system/contentpacks/export',
       CREATE: '/system/contentpacks/create',
-      edit: (contentPackId: string, contentPackRev: string) => `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`,
+      edit: (contentPackId: string, contentPackRev: string) =>
+        `/system/contentpacks/${contentPackId}/${contentPackRev}/edit`,
       show: (contentPackId: string) => `/system/contentpacks/${contentPackId}`,
     },
     GROKPATTERNS: '/system/grokpatterns',
@@ -117,6 +127,7 @@ const Routes = {
       CREATE: '/system/index_sets/create',
     },
     INPUTS: '/system/inputs',
+    INPUT_DIAGNOSIS: (input: string) => `/system/input/diagnosis/${input}`,
     LOGGING: '/system/logging',
     METRICS: (nodeId: string) => `/system/metrics/node/${nodeId}`,
     NODES: {
@@ -163,6 +174,9 @@ const Routes = {
       },
       OVERVIEW: '/system/users',
       show: (userId: string) => `/system/users/${userId}`,
+    },
+    USERS_TOKEN_MANAGEMENT: {
+      overview: '/system/tokenmanagement/overview',
     },
     AUTHZROLES: {
       OVERVIEW: '/system/roles',
@@ -213,7 +227,13 @@ const Routes = {
   },
   EXTENDEDSEARCH: extendedSearchPath,
   KEYBOARD_SHORTCUTS: '/keyboard-shortcuts',
-  search_with_query: (query: string, rangeType: TimeRangeTypes, timeRange: RoutesTimeRange, streams?: string[]) => {
+  search_with_query: (
+    query: string,
+    rangeType: TimeRangeTypes,
+    timeRange: RoutesTimeRange,
+    streams?: string[],
+    streamCategories?: string[],
+  ) => {
     const route = new URI(Routes.SEARCH);
     const queryParams: SearchQueryParams = {
       q: query,
@@ -242,11 +262,20 @@ const Routes = {
       queryParams.streams = streams.join(',');
     }
 
+    if (streamCategories) {
+      queryParams.stream_categories = streamCategories.join(',');
+    }
+
     route.query(queryParams);
 
     return route.resource();
   },
-  _common_search_url: (resource: string, query: string | undefined, timeRange: RoutesTimeRange | undefined, resolution: number | undefined) => {
+  _common_search_url: (
+    resource: string,
+    query: string | undefined,
+    timeRange: RoutesTimeRange | undefined,
+    resolution: number | undefined,
+  ) => {
     const route = new URI(resource);
     const queryParams = {
       q: query,
@@ -263,13 +292,16 @@ const Routes = {
 
     return route.resource();
   },
-  search: (query: string, timeRange: RoutesTimeRange, resolution?: number) => Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution),
+  search: (query: string, timeRange: RoutesTimeRange, resolution?: number) =>
+    Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution),
   message_show: (index: string, messageId: string) => `/messages/${index}/${messageId}`,
   stream_view: (streamId: string) => `/streams/${streamId}/view`,
   stream_edit: (streamId: string) => `/streams/${streamId}/edit`,
-  stream_edit_example: (streamId: string, index: string, messageId: string) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
+  stream_edit_example: (streamId: string, index: string, messageId: string) =>
+    `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
   stream_outputs: (streamId: string) => `/streams/${streamId}/outputs`,
-  stream_search: (streamId: string, query?: string, timeRange?: RoutesTimeRange, resolution?: number) => Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution),
+  stream_search: (streamId: string, query?: string, timeRange?: RoutesTimeRange, resolution?: number) =>
+    Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution),
   stream_alerts: (streamId: string) => `/alerts/?stream_id=${streamId}`,
 
   legacy_stream_search: (streamId: string) => `/streams/${streamId}/messages`,
@@ -285,7 +317,14 @@ const Routes = {
   local_input_extractors: (nodeId: string, inputId: string) => `/system/inputs/${nodeId}/${inputId}/extractors`,
   export_extractors: (nodeId: string, inputId: string) => `${Routes.local_input_extractors(nodeId, inputId)}/export`,
   import_extractors: (nodeId: string, inputId: string) => `${Routes.local_input_extractors(nodeId, inputId)}/import`,
-  new_extractor: (nodeId: string, inputId: string, extractorType?: string, fieldName?: string, index?: string, messageId?: string) => {
+  new_extractor: (
+    nodeId: string,
+    inputId: string,
+    extractorType?: string,
+    fieldName?: string,
+    index?: string,
+    messageId?: string,
+  ) => {
     const route = new URI(`/system/inputs/${nodeId}/${inputId}/extractors/new`);
     const queryParams = {
       extractor_type: extractorType,
@@ -298,9 +337,11 @@ const Routes = {
 
     return route.resource();
   },
-  edit_extractor: (nodeId: string, inputId: string, extractorId: string) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
+  edit_extractor: (nodeId: string, inputId: string, extractorId: string) =>
+    `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
 
-  edit_input_extractor: (nodeId: string, inputId: string, extractorId: string) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
+  edit_input_extractor: (nodeId: string, inputId: string, extractorId: string) =>
+    `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
   filtered_metrics: (nodeId: string, filter: string) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
   global_api_browser: () => Routes.GLOBAL_API_BROWSER_URL,
 } as const;
@@ -308,21 +349,19 @@ const Routes = {
 const prefixUrlWithoutHostname = (url: string, prefix: string) => {
   const uri = new URI(url);
 
-  return uri.directory(`${prefix}/${uri.directory()}`)
-    .normalizePath()
-    .resource();
+  return uri.directory(`${prefix}/${uri.directory()}`).normalizePath().resource();
 };
 
 type RouteFunction<P extends Array<any>> = (...args: P) => string;
 type RouteMapEntry = string | RouteFunction<any> | RouteMap;
 type RouteMap = { [routeName: string]: RouteMapEntry };
 
-const isLiteralRoute = (entry: RouteMapEntry): entry is string => (typeof entry === 'string');
-const isRouteFunction = (entry: RouteMapEntry): entry is RouteFunction<any> => (typeof entry === 'function');
+const isLiteralRoute = (entry: RouteMapEntry): entry is string => typeof entry === 'string';
+const isRouteFunction = (entry: RouteMapEntry): entry is RouteFunction<any> => typeof entry === 'function';
 
 declare const __brand: unique symbol;
-type Brand<B> = { [__brand]: B }
-export type Branded<T, B> = T & Brand<B>
+type Brand<B> = { [__brand]: B };
+export type Branded<T, B> = T & Brand<B>;
 
 export type QualifiedUrl<T extends string> = Branded<T, 'Qualified URL'>;
 type QualifiedFunction<F extends (...args: Parameters<F>) => string> = (...args: Parameters<F>) => QualifiedUrl<string>;
@@ -337,34 +376,42 @@ type QualifiedRoutes<T> = {
         : never;
 };
 
-export const qualifyUrls = <R extends RouteMap>(routes: R, appPrefix: string = AppConfig.gl2AppPathPrefix()): QualifiedRoutes<R> => {
+export const qualifyUrls = <R extends RouteMap>(
+  routes: R,
+  appPrefix: string = AppConfig.gl2AppPathPrefix(),
+): QualifiedRoutes<R> => {
   if (!appPrefix || appPrefix === '' || appPrefix === '/') {
     return routes as QualifiedRoutes<R>;
   }
 
-  return Object.fromEntries(Object.entries(routes).map(([routeName, routeValue]) => {
-    if (isLiteralRoute(routeValue)) {
-      return [routeName, prefixUrlWithoutHostname(routeValue, appPrefix)];
-    }
+  return Object.fromEntries(
+    Object.entries(routes).map(([routeName, routeValue]) => {
+      if (isLiteralRoute(routeValue)) {
+        return [routeName, prefixUrlWithoutHostname(routeValue, appPrefix)];
+      }
 
-    if (isRouteFunction(routeValue)) {
-      return [routeName, (...params: Parameters<typeof routeValue>) => {
-        const result = routeValue(...params);
+      if (isRouteFunction(routeValue)) {
+        return [
+          routeName,
+          (...params: Parameters<typeof routeValue>) => {
+            const result = routeValue(...params);
 
-        return prefixUrlWithoutHostname(result, appPrefix);
-      }];
-    }
+            return prefixUrlWithoutHostname(result, appPrefix);
+          },
+        ];
+      }
 
-    return [routeName, qualifyUrls(routeValue, appPrefix)];
-  }));
+      return [routeName, qualifyUrls(routeValue, appPrefix)];
+    }),
+  );
 };
 
 export const prefixUrl = <T extends string>(route: T): QualifiedUrl<T> => {
   const appPrefix = AppConfig.gl2AppPathPrefix();
 
-  return ((!appPrefix || appPrefix === '' || appPrefix === '/')
-    ? route
-    : prefixUrlWithoutHostname(route, appPrefix)) as QualifiedUrl<T>;
+  return (
+    !appPrefix || appPrefix === '' || appPrefix === '/' ? route : prefixUrlWithoutHostname(route, appPrefix)
+  ) as QualifiedUrl<T>;
 };
 
 const qualifiedRoutes = qualifyUrls(Routes);
@@ -393,7 +440,10 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
   PluginStore.exports('routes').forEach((route) => {
     const uri = new URI(route.path);
     const segments = uri.segment();
-    const key = segments.map((segment) => segment.replace(':', '')).join('_').toUpperCase();
+    const key = segments
+      .map((segment) => segment.replace(':', ''))
+      .join('_')
+      .toUpperCase();
     const paramNames = segments.filter((segment) => segment.startsWith(':'));
 
     if (paramNames.length > 0) {
@@ -423,13 +473,6 @@ const pluginRoute = (routeKey: string, throwError: boolean = true) => {
 };
 
 const getPluginRoute = (routeKey: string) => pluginRoute(routeKey, false);
-
-/**
- * Exported constants for using strings to check if a plugin is registered by its description.
- *
- */
-export const ENTERPRISE_ROUTE_DESCRIPTION = 'Enterprise';
-export const SECURITY_ROUTE_DESCRIPTION = 'Security';
 
 const defaultExport = Object.assign(qualifiedRoutes, { pluginRoute, getPluginRoute, unqualified });
 

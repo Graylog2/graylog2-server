@@ -50,6 +50,7 @@ import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -80,9 +81,16 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public abstract class PluginModule extends Graylog2Module {
     public Set<? extends PluginConfigBean> getConfigBeans() {
         return Collections.emptySet();
+    }
+
+    @Override
+    protected Set<Object> getConfigurationBeans() {
+        return Collections.singleton(getConfigBeans());
     }
 
     protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
@@ -461,5 +469,17 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addStreamDeletionGuard(Class<? extends StreamDeletionGuard> streamDeletionGuard) {
         streamDeletionGuardBinder().addBinding().to(streamDeletionGuard);
+    }
+
+    protected void addDbEntities(Class<?>... entitiesClasses) {
+        for (final Class<?> entitiesClass : entitiesClasses) {
+            if (!entitiesClass.isAnnotationPresent(DbEntity.class)) {
+                throw new IllegalArgumentException(f(
+                        "Trying to bind entities class %s but found no @DbEntity annotation",
+                        entitiesClass.getCanonicalName()));
+            }
+
+            dbEntitiesBinder().addBinding().toInstance(entitiesClass);
+        }
     }
 }

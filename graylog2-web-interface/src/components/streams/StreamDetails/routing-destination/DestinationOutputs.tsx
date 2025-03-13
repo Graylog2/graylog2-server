@@ -22,12 +22,13 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 import type { AvailableOutputSummary } from 'components/streams/useAvailableOutputTypes';
 import useAvailableOutputTypes from 'components/streams/useAvailableOutputTypes';
-
-import OutputsList from './OutputsList';
-import AddOutputButton from './AddOutputButton';
+import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
+import AddOutputButton from 'components/streams/StreamDetails/routing-destination/AddOutputButton';
+import OutputsList from 'components/streams/StreamDetails/routing-destination/OutputsList';
+import DestinationSwitch from 'components/streams/StreamDetails/routing-destination/DestinationSwitch';
 
 type Props = {
-  stream: Stream
+  stream: Stream;
 };
 
 const DestinationOutputs = ({ stream }: Props) => {
@@ -49,23 +50,47 @@ const DestinationOutputs = ({ stream }: Props) => {
     return <Spinner />;
   }
 
+  const hasAssignedOutput = data.outputs.length > 0;
+  const title = hasAssignedOutput ? 'Enabled' : 'Disabled';
+
   const streamOutputIds = data.outputs.map((output) => output.id);
   const assignableOutputs = outputs.outputs
     .filter((output) => streamOutputIds.indexOf(output.id) === -1)
     .sort((output1, output2) => output1.title.localeCompare(output2.title));
 
   return (
-    <Section title="Outputs"
-             actions={(
-               <AddOutputButton stream={stream}
-                                availableOutputTypes={availableOutputTypes.types}
-                                assignableOutputs={assignableOutputs}
-                                getTypeDefinition={getTypeDefinition} />
-            )}>
-      <OutputsList streamId={stream.id}
-                   outputs={data.outputs}
-                   isLoadingOutputTypes={isLoadingOutputTypes}
-                   getTypeDefinition={getTypeDefinition} />
+    <Section
+      title="Outputs"
+      collapsible
+      defaultClosed
+      disableCollapseButton={!hasAssignedOutput}
+      headerLeftSection={
+        <>
+          <DestinationSwitch
+            aria-label="Toggle Output"
+            name="toggle-indexset"
+            checked={hasAssignedOutput}
+            disabled
+            onChange={(e) => e.preventDefault()}
+            label={title}
+          />
+          <SectionCountLabel>OUTPUTS {data.outputs.length}</SectionCountLabel>
+        </>
+      }
+      actions={
+        <AddOutputButton
+          stream={stream}
+          availableOutputTypes={availableOutputTypes.types}
+          assignableOutputs={assignableOutputs}
+          getTypeDefinition={getTypeDefinition}
+        />
+      }>
+      <OutputsList
+        streamId={stream.id}
+        outputs={data.outputs}
+        isLoadingOutputTypes={isLoadingOutputTypes}
+        getTypeDefinition={getTypeDefinition}
+      />
     </Section>
   );
 };

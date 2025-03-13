@@ -29,6 +29,7 @@ import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.SearchEngineSearchType;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -52,7 +53,7 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID
 @AutoValue
 @JsonTypeName(EventList.NAME)
 @JsonDeserialize(builder = EventList.Builder.class)
-public abstract class EventList implements SearchType, HasAttributeFilter {
+public abstract class EventList implements SearchEngineSearchType, HasAttributeFilter {
     public static final int DEFAULT_PAGE_SIZE = 10;
     public static final String NAME = "events";
     public static final Set<String> KNOWN_ATTRIBUTES = Set.of("priority", "event_definition_id", "alert");
@@ -109,6 +110,7 @@ public abstract class EventList implements SearchType, HasAttributeFilter {
                 .type(NAME)
                 .filters(Collections.emptyList())
                 .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet())
                 .attributes(Collections.emptyList());
     }
 
@@ -144,6 +146,7 @@ public abstract class EventList implements SearchType, HasAttributeFilter {
         public static Builder createDefault() {
             return builder()
                     .filters(Collections.emptyList())
+                    .streamCategories(Collections.emptySet())
                     .streams(Collections.emptySet());
         }
 
@@ -172,6 +175,9 @@ public abstract class EventList implements SearchType, HasAttributeFilter {
 
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty
+        public abstract Builder streamCategories(@Nullable Set<String> streamCategories);
 
         @JsonProperty
         public abstract Builder page(@Nullable Integer page);
@@ -266,6 +272,7 @@ public abstract class EventList implements SearchType, HasAttributeFilter {
     public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         return EventListEntity.builder()
                 .streams(mappedStreams(entityDescriptorIds))
+                .streamCategories(streamCategories())
                 .filter(filter())
                 .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .id(id())

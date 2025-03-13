@@ -14,23 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Icon } from 'components/common';
 
 type Props = {
-  builtIn: boolean,
+  builtIn: boolean;
 };
 
 const BuiltInCell = ({ builtIn }: Props) => {
   if (!builtIn) return null;
 
-  return (<Icon name="check_circle" />);
+  return <Icon name="check_circle" />;
 };
 
 export default BuiltInCell;
-
-BuiltInCell.propTypes = {
-  builtIn: PropTypes.bool.isRequired,
-};

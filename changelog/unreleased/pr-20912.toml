@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Directory compatibility check for datanode inplace migration rejects empty dir"
+
+issues = []
+pulls = ["20912"]

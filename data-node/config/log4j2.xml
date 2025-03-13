@@ -17,6 +17,8 @@
         <Logger name="org.graylog2" level="info"/>
         <Logger name="org.graylog.datanode" level="info"/>
         <Logger name="com.github.joschi.jadconfig" level="warn"/>
+        <!-- Hide warnings for enterprise cluster events -->
+        <Logger name="org.graylog2.events.ClusterEventPeriodical" level="error"/>
         <!-- Disable messages from the version check -->
         <Logger name="org.graylog2.periodical.VersionCheckThread" level="off"/>
         <!-- Silence useless session validation messages -->

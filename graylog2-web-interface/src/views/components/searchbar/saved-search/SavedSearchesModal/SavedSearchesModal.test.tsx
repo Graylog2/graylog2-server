@@ -23,11 +23,10 @@ import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import useSavedSearches from 'views/hooks/useSavedSearches';
-import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
-import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { adminUser } from 'fixtures/users';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import SavedSearchesModal from './SavedSearchesModal';
 
@@ -37,17 +36,11 @@ const createPaginatedSearches = (count = 1) => {
   if (count > 0) {
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < count; i++) {
-      views.push(
-        View.builder()
-          .id(`search-id-${i}`)
-          .title(`search-title-${i}`)
-          .description('desc')
-          .build(),
-      );
+      views.push(View.builder().id(`search-id-${i}`).title(`search-title-${i}`).description('desc').build());
     }
   }
 
-  return ({
+  return {
     pagination: {
       total: count,
       page: count > 0 ? count : 0,
@@ -67,7 +60,7 @@ const createPaginatedSearches = (count = 1) => {
       },
     ],
     list: views,
-  });
+  };
 };
 
 jest.mock('views/hooks/useSavedSearches');
@@ -80,6 +73,7 @@ jest.mock('routing/Routes', () => ({
 }));
 
 describe('SavedSearchesModal', () => {
+  useWindowConfirmMock();
   const defaultPaginatedSearches = createPaginatedSearches();
 
   beforeEach(() => {
@@ -89,7 +83,6 @@ describe('SavedSearchesModal', () => {
       isInitialLoading: false,
     });
 
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
     asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutate: () => {} });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });
@@ -104,9 +97,13 @@ describe('SavedSearchesModal', () => {
         isInitialLoading: false,
       });
 
-      render(<SavedSearchesModal toggleModal={() => {}}
-                                 deleteSavedSearch={() => Promise.resolve(paginatedSavedSearches.list[0])}
-                                 activeSavedSearchId="search-id-0" />);
+      render(
+        <SavedSearchesModal
+          toggleModal={() => {}}
+          deleteSavedSearch={() => Promise.resolve()}
+          activeSavedSearchId="search-id-0"
+        />,
+      );
 
       await screen.findByText('No saved searches have been created yet.');
     });
@@ -120,9 +117,13 @@ describe('SavedSearchesModal', () => {
         isInitialLoading: false,
       });
 
-      render(<SavedSearchesModal toggleModal={() => {}}
-                                 deleteSavedSearch={() => Promise.resolve(paginatedSavedSearches.list[0])}
-                                 activeSavedSearchId="search-id-0" />);
+      render(
+        <SavedSearchesModal
+          toggleModal={() => {}}
+          deleteSavedSearch={() => Promise.resolve()}
+          activeSavedSearchId="search-id-0"
+        />,
+      );
 
       await screen.findByText('search-title-0');
       await screen.findByText('search-title-1');
@@ -130,9 +131,13 @@ describe('SavedSearchesModal', () => {
 
     it('should handle toggle modal', async () => {
       const onToggleModal = jest.fn();
-      const { getByText } = render(<SavedSearchesModal toggleModal={onToggleModal}
-                                                       deleteSavedSearch={() => Promise.resolve(defaultPaginatedSearches.list[0])}
-                                                       activeSavedSearchId="search-id-0" />);
+      const { getByText } = render(
+        <SavedSearchesModal
+          toggleModal={onToggleModal}
+          deleteSavedSearch={() => Promise.resolve()}
+          activeSavedSearchId="search-id-0"
+        />,
+      );
 
       await screen.findByText('search-title-0');
 
@@ -144,12 +149,11 @@ describe('SavedSearchesModal', () => {
     });
 
     it('should call `onDelete` if saved search is deleted', async () => {
-      window.confirm = jest.fn(() => true);
-      const onDelete = jest.fn(() => Promise.resolve(defaultPaginatedSearches.list[0]));
+      const onDelete = jest.fn(() => Promise.resolve());
 
-      render(<SavedSearchesModal toggleModal={() => {}}
-                                 deleteSavedSearch={onDelete}
-                                 activeSavedSearchId="search-id-0" />);
+      render(
+        <SavedSearchesModal toggleModal={() => {}} deleteSavedSearch={onDelete} activeSavedSearchId="search-id-0" />,
+      );
 
       await screen.findByText('search-title-0');
       const deleteBtn = screen.getByTitle('Delete search search-title-0');
@@ -166,9 +170,11 @@ describe('SavedSearchesModal', () => {
 
       render(
         <ViewLoaderContext.Provider value={onLoad}>
-          <SavedSearchesModal toggleModal={() => {}}
-                              deleteSavedSearch={() => Promise.resolve(defaultPaginatedSearches.list[0])}
-                              activeSavedSearchId="search-id-0" />
+          <SavedSearchesModal
+            toggleModal={() => {}}
+            deleteSavedSearch={() => Promise.resolve()}
+            activeSavedSearchId="search-id-0"
+          />
         </ViewLoaderContext.Provider>,
       );
 
@@ -180,12 +186,15 @@ describe('SavedSearchesModal', () => {
     });
 
     it('should not display delete action for saved search when user is missing required permissions', async () => {
-      const currentUser = adminUser.toBuilder().permissions(Immutable.List([`view:read:${defaultPaginatedSearches.list[0].id}`])).build();
+      const currentUser = adminUser
+        .toBuilder()
+        .permissions(Immutable.List([`view:read:${defaultPaginatedSearches.list[0].id}`]))
+        .build();
       asMock(useCurrentUser).mockReturnValue(currentUser);
 
-      render(<SavedSearchesModal toggleModal={() => {}}
-                                 deleteSavedSearch={jest.fn()}
-                                 activeSavedSearchId="search-id-0" />);
+      render(
+        <SavedSearchesModal toggleModal={() => {}} deleteSavedSearch={jest.fn()} activeSavedSearchId="search-id-0" />,
+      );
 
       await screen.findByText('search-title-0');
 
@@ -199,9 +208,13 @@ describe('SavedSearchesModal', () => {
         mutate: updateTableLayout,
       });
 
-      render(<SavedSearchesModal toggleModal={() => {}}
-                                 deleteSavedSearch={() => Promise.resolve(defaultPaginatedSearches.list[0])}
-                                 activeSavedSearchId="search-id-0" />);
+      render(
+        <SavedSearchesModal
+          toggleModal={() => {}}
+          deleteSavedSearch={() => Promise.resolve()}
+          activeSavedSearchId="search-id-0"
+        />,
+      );
 
       const pageSizeDropdown = await screen.findByRole('button', {
         name: /configure page size/i,

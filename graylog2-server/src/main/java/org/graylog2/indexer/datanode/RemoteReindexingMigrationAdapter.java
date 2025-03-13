@@ -26,6 +26,8 @@ import java.net.URI;
 import java.util.Optional;
 
 public interface RemoteReindexingMigrationAdapter {
+
+    String EXISTING_INDEX_SET_WRITE_INDICES = "indexSetWriteIndices";
     boolean isMigrationRunning(IndexSet indexSet);
 
     enum Status {

@@ -18,6 +18,8 @@ package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.Meter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import jakarta.annotation.Nonnull;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
@@ -29,8 +31,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 
 /**
  * Wraps a {@link Message} by making it immutable and caching the result of {@link #serialize(SerializationContext)}
@@ -47,9 +50,44 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
 
     private volatile SoftReference<CacheEntry> lastSerializationResult;
 
-    private record CacheEntry(byte[] serializedBytes,
-                              ObjectMapper objectMapper,
-                              Meter invalidTimeStampMeter) {}
+    private static class CacheEntry {
+        private final byte[] serializedBytes;
+        private final ObjectMapper objectMapper;
+        private final Meter invalidTimeStampMeter;
+
+        CacheEntry(byte[] serializedBytes, ObjectMapper objectMapper, Meter invalidTimeStampMeter) {
+            this.serializedBytes = serializedBytes;
+            this.objectMapper = objectMapper;
+            this.invalidTimeStampMeter = invalidTimeStampMeter;
+        }
+
+        public byte[] serializedBytes() {
+            return serializedBytes;
+        }
+
+        public ObjectMapper objectMapper() {
+            return objectMapper;
+        }
+
+        public Meter invalidTimeStampMeter() {
+            return invalidTimeStampMeter;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final CacheEntry that = (CacheEntry) o;
+            return Objects.equals(objectMapper, that.objectMapper)
+                    && Objects.equals(invalidTimeStampMeter, that.invalidTimeStampMeter)
+                    && Objects.deepEquals(serializedBytes, that.serializedBytes);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(objectMapper, invalidTimeStampMeter, Arrays.hashCode(serializedBytes));
+        }
+    }
 
     public SerializationMemoizingMessage(Message delegate) {
         this.delegate = delegate;
@@ -150,13 +188,13 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     }
 
     @Override
-    public Set<IndexSet> getIndexSets() {
-        return delegate.getIndexSets();
+    public ImmutableSet<IndexSet> getIndexSets() {
+        return ImmutableSet.copyOf(delegate.getIndexSets());
     }
 
     @Override
-    public Map<String, Object> getFields() {
-        return delegate.getFields();
+    public ImmutableMap<String, Object> getFields() {
+        return ImmutableMap.copyOf(delegate.getFields());
     }
 
     @Override
@@ -175,8 +213,8 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     }
 
     @Override
-    public Set<String> getStreamIds() {
-        return delegate.getStreamIds();
+    public ImmutableSet<String> getStreamIds() {
+        return ImmutableSet.copyOf(delegate.getStreamIds());
     }
 
     @Override

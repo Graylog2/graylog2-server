@@ -42,6 +42,7 @@ import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
+import org.graylog2.streams.StreamService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,6 +79,9 @@ public class SearchExecutorTest {
     @Mock
     private NodeId nodeId;
 
+    @Mock
+    private StreamService streamService;
+
     @Captor
     private ArgumentCaptor<SearchJob> searchJobCaptor;
 
@@ -97,7 +101,7 @@ public class SearchExecutorTest {
                                         Optional.of((queryString, job, query) -> PositionTrackingQuery.of("decorated"))
                                 )
                         )
-                )));
+                ), streamService));
         when(queryEngine.execute(any(), any(), any())).thenAnswer(invocation -> {
             final SearchJob searchJob = invocation.getArgument(0);
             searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));

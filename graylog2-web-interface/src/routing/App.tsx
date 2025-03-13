@@ -18,8 +18,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import { Outlet } from 'react-router-dom';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
-import { QueryParamProvider } from 'use-query-params';
 
 import { ScratchpadProvider } from 'contexts/ScratchpadProvider';
 import { Icon, Spinner } from 'components/common';
@@ -28,12 +26,13 @@ import CurrentUserContext from 'contexts/CurrentUserContext';
 import Navigation from 'components/navigation/Navigation';
 import ReportedErrorBoundary from 'components/errors/ReportedErrorBoundary';
 import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
-import 'stylesheets/typeahead.less';
 import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
 import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import PageContextProviders from 'components/page/contexts/PageContextProviders';
+import { singleton } from 'logic/singleton';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const AppLayout = styled.div`
   display: flex;
@@ -47,26 +46,28 @@ const PageContent = styled.div`
   flex: 1;
 `;
 
-const ScrollToHint = styled.div(({ theme }) => css`
-  position: fixed;
-  left: 50%;
-  margin-left: -125px;
-  top: 50px;
-  /* stylelint-disable function-no-unknown */
-  color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
-  font-size: 80px;
-  padding: 25px;
-  z-index: 2000;
-  width: 200px;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 10px;
-  display: none;
-  background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
-`);
+const ScrollToHint = styled.div(
+  ({ theme }) => css`
+    position: fixed;
+    left: 50%;
+    margin-left: -125px;
+    top: 50px;
+    /* stylelint-disable function-no-unknown */
+    color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
+    font-size: 80px;
+    padding: 25px;
+    z-index: 2000;
+    width: 200px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 10px;
+    display: none;
+    background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
+  `,
+);
 
 const App = () => (
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
+  <DefaultQueryParamProvider>
     <CurrentUserContext.Consumer>
       {(currentUser) => {
         if (!currentUser) {
@@ -103,7 +104,7 @@ const App = () => (
         );
       }}
     </CurrentUserContext.Consumer>
-  </QueryParamProvider>
+  </DefaultQueryParamProvider>
 );
 
-export default App;
+export default singleton('components.App', () => App);

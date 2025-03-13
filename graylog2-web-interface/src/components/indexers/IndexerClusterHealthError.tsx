@@ -25,14 +25,17 @@ const ESClusterError = styled(Alert)`
   margin-bottom: 5px;
 `;
 
-const IndexerClusterHealthError = ({ error, name }: { error: FetchError, name?: { name: string, distribution: string } }) => (
+const IndexerClusterHealthError = ({
+  error,
+  name,
+}: {
+  error: FetchError;
+  name?: { name: string; distribution: string };
+}) => (
   <ESClusterError bsStyle="danger">
-    Could not retrieve {name?.distribution || 'Elasticsearch'} cluster health. Fetching {name?.distribution || 'Elasticsearch'} cluster health failed: {error.message}
+    Could not retrieve {name?.distribution || 'Elasticsearch'} cluster health. Fetching{' '}
+    {name?.distribution || 'Elasticsearch'} cluster health failed: {error.message}
   </ESClusterError>
 );
-
-IndexerClusterHealthError.defaultProps = {
-  name: undefined,
-};
 
 export default IndexerClusterHealthError;

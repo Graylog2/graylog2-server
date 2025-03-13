@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixes issue where some event types did not display all actions that should have been available."
+
+issues = ["graylog-plugin-enterprise#8638"]
+pulls = ["20847"]

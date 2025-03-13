@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -46,13 +45,20 @@ const PipelineDl = styled.dl`
 `;
 
 type Props = {
-  pipeline?: PipelineType,
-  create?: boolean,
-  onChange: (event) => void,
-  onCancel?: () => void,
+  pipeline?: PipelineType;
+  create?: boolean;
+  onChange: (event) => void;
+  onCancel?: () => void;
+  disableEdit?: boolean;
 };
 
-const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
+const PipelineDetails = ({
+  pipeline = undefined,
+  create = false,
+  onChange,
+  onCancel = () => {},
+  disableEdit = false,
+}: Props) => {
   if (create) {
     return <PipelineForm create save={onChange} onCancel={onCancel} modal={false} />;
   }
@@ -62,7 +68,7 @@ const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
       <Row>
         <Col md={12}>
           <div className="pull-right">
-            <PipelineForm pipeline={pipeline} save={onChange} />
+            <PipelineForm pipeline={pipeline} save={onChange} disableEdit={disableEdit} />
           </div>
           <h2>Details</h2>
           <PipelineDl className="dl-horizontal">
@@ -71,9 +77,13 @@ const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
             <dt>Description</dt>
             <dd>{pipeline.description}</dd>
             <dt>Created</dt>
-            <dd><RelativeTime dateTime={pipeline.created_at} /></dd>
+            <dd>
+              <RelativeTime dateTime={pipeline.created_at} />
+            </dd>
             <dt>Last modified</dt>
-            <dd><RelativeTime dateTime={pipeline.modified_at} /></dd>
+            <dd>
+              <RelativeTime dateTime={pipeline.modified_at} />
+            </dd>
             <dt>Current throughput</dt>
             <dd>
               <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
@@ -86,19 +96,6 @@ const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
       <hr />
     </div>
   );
-};
-
-PipelineDetails.propTypes = {
-  pipeline: PropTypes.object,
-  create: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
-  onCancel: PropTypes.func,
-};
-
-PipelineDetails.defaultProps = {
-  pipeline: undefined,
-  create: false,
-  onCancel: () => {},
 };
 
 export default PipelineDetails;

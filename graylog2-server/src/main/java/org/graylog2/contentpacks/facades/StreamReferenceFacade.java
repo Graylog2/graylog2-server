@@ -144,7 +144,7 @@ public class StreamReferenceFacade extends StreamFacade {
 
     private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
         final StreamReferenceEntity streamEntity = objectMapper.convertValue(entity.data(), StreamReferenceEntity.class);
-        final List<Stream> streams = streamService.loadAllByTitle(streamEntity.title().asString());
+        final List<Stream> streams = streamService.loadAllByTitle(streamEntity.title().asString(parameters));
         if (streams.size() == 1) {
             final Stream stream = streams.get(0);
             return Optional.of(NativeEntity.create(entity.id(), stream.getId(), ModelTypes.STREAM_V1, stream.getTitle(), stream));

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
+import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
 import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
@@ -29,6 +30,8 @@ import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/Chang
 import type { Attributes } from 'stores/PaginationTypes';
 import suppressConsole from 'helpers/suppressConsole';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
+import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 const onCloseMock = jest.fn();
 const renderChangeFieldTypeModal = ({
@@ -38,18 +41,21 @@ const renderChangeFieldTypeModal = ({
   showSelectionTable = undefined,
   initialFieldType = undefined,
   initialSelectedIndexSets = ['id-1', 'id-2'],
-}) => render(
-  <TestStoreProvider>
-    <ChangeFieldTypeModal onClose={onClose}
-                          initialData={{
-                            fieldName: field,
-                            type: initialFieldType,
-                          }}
-                          show={show}
-                          initialSelectedIndexSets={initialSelectedIndexSets}
-                          showSelectionTable={showSelectionTable} />
-  </TestStoreProvider>,
-);
+}) =>
+  render(
+    <TestStoreProvider>
+      <ChangeFieldTypeModal
+        onClose={onClose}
+        initialData={{
+          fieldName: field,
+          type: initialFieldType,
+        }}
+        show={show}
+        initialSelectedIndexSets={initialSelectedIndexSets}
+        showSelectionTable={showSelectionTable}
+      />
+    </TestStoreProvider>,
+  );
 const attributes: Attributes = [
   {
     id: 'index_set_id',
@@ -92,7 +98,7 @@ const fieldTypeUsages = [
     types: ['int'],
   },
 ];
-const paginatedFieldUsage = ({
+const paginatedFieldUsage = {
   data: {
     list: fieldTypeUsages,
     pagination: {
@@ -103,11 +109,10 @@ const paginatedFieldUsage = ({
     },
     attributes,
   },
-  refetch: () => {
-  },
+  refetch: () => {},
   isInitialLoading: false,
   isLoading: false,
-});
+};
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
@@ -115,6 +120,23 @@ jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappin
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
+
+jest.mock('components/indices/hooks/useIndexSetsList');
+
+jest.mock('stores/indices/IndexSetsStore', () => ({
+  IndexSetsActions: {
+    list: jest.fn(),
+  },
+  IndexSetsStore: MockStore([
+    'getInitialState',
+    () => ({
+      indexSets: [
+        { id: 'id-1', title: 'Index Title 1' },
+        { id: 'id-2', title: 'Index Title 2' },
+      ],
+    }),
+  ]),
+}));
 
 describe('ChangeFieldTypeModal', () => {
   const putFieldTypeMutationMock = jest.fn(() => Promise.resolve());
@@ -133,17 +155,30 @@ describe('ChangeFieldTypeModal', () => {
       },
     });
 
+    asMock(useIndexSetsList).mockReturnValue({
+      data: {
+        indexSets: [
+          { id: 'id-1', title: 'Index Title 1' },
+          { id: 'id-2', title: 'Index Title 2' },
+        ] as Array<IndexSet>,
+        indexSetsCount: 2,
+        indexSetStats: null,
+      },
+      isSuccess: true,
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+
     asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFieldTypeMutation: putFieldTypeMutationMock });
     asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
 
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['index_set_title',
-          'stream_titles',
-          'types'],
+        displayedAttributes: ['index_set_title', 'stream_titles', 'types'],
       },
       isInitialLoading: false,
+      refetch: () => {},
     });
   });
 
@@ -188,12 +223,14 @@ describe('ChangeFieldTypeModal', () => {
     fireEvent.click(rowCheckboxes[1]);
     fireEvent.click(submit);
 
-    await waitFor(() => expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
-      indexSetSelection: ['id-1'],
-      newFieldType: 'int',
-      rotated: true,
-      field: 'field',
-    }));
+    await waitFor(() =>
+      expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
+        indexSetSelection: ['id-1'],
+        newFieldType: 'int',
+        rotated: true,
+        field: 'field',
+      }),
+    );
   });
 
   it('run putFieldTypeMutationMock with selected type and indexes when showSelectionTable false', async () => {
@@ -207,15 +244,17 @@ describe('ChangeFieldTypeModal', () => {
 
     fireEvent.click(submit);
 
-    await waitFor(() => expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
-      indexSetSelection: ['id-2'],
-      newFieldType: 'int',
-      rotated: true,
-      field: 'field',
-    }));
+    await waitFor(() =>
+      expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
+        indexSetSelection: ['id-2'],
+        newFieldType: 'int',
+        rotated: true,
+        field: 'field',
+      }),
+    );
   });
 
-  it('Doesn\'t shows index sets data when showSelectionTable false', async () => {
+  it("Doesn't shows index sets data when showSelectionTable false", async () => {
     renderChangeFieldTypeModal({ showSelectionTable: false });
 
     expect(screen.queryByText('Stream Title 1')).not.toBeInTheDocument();

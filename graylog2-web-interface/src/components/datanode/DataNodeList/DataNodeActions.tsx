@@ -15,13 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import styled from 'styled-components';
 
 import { ConfirmDialog } from 'components/common';
 import { Button, MenuItem } from 'components/bootstrap';
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 import { MoreActions } from 'components/common/EntityDataTable';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import sleep from 'logic/sleep';
 
 import DataNodeLogsDialog from './DataNodeLogsDialog';
 
@@ -38,8 +40,9 @@ const ActionButton = styled(Button)`
 `;
 
 type Props = {
-  dataNode: DataNode,
-  displayAs?: 'dropdown'|'buttons',
+  dataNode: DataNode;
+  displayAs?: 'dropdown' | 'buttons';
+  refetch?: () => void;
 };
 
 const DIALOG_TYPES = {
@@ -64,10 +67,31 @@ const DIALOG_TEXT = {
   },
 };
 
-const DataNodeActions = ({ dataNode, displayAs }: Props) => {
+const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown' }: Props) => {
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
+  const context = useTableFetchContext(!!refetch);
+  const _refetch = refetch || context?.refetch || (() => {});
+  const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
+
+  const sleepAndClearTimer = async () => {
+    if (statusTimeout.current) {
+      clearTimeout(statusTimeout.current);
+    }
+
+    statusTimeout.current = await sleep(1000);
+  };
+
+  const refetchDatanodes = async () => {
+    await sleepAndClearTimer();
+    await _refetch();
+  };
+
+  const handleStartDatanode = async () => {
+    await startDataNode(dataNode.node_id);
+    await refetchDatanodes();
+  };
 
   const updateState = ({ show, type }) => {
     setShowConfirmDialog(show);
@@ -93,8 +117,9 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
     }
   };
 
-  const handleClearState = () => {
+  const handleClearState = async () => {
     updateState({ show: false, type: null });
+    await refetchDatanodes();
   };
 
   const handleConfirm = () => {
@@ -131,41 +156,60 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
       {displayAs === 'dropdown' && (
         <MoreActions>
           <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
-          {!isDatanodeRunning && <MenuItem onSelect={() => startDataNode(dataNode.node_id)}>Start</MenuItem>}
+          {!isDatanodeRunning && <MenuItem onSelect={handleStartDatanode}>Start</MenuItem>}
           {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
           {isDatanodeRemoved && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>}
-          {(!isDatanodeRemoved || isRemovingDatanode) && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>}
+          {(!isDatanodeRemoved || isRemovingDatanode) && (
+            <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
+          )}
           <MenuItem onSelect={() => setShowLogsDialog(true)}>Show logs</MenuItem>
         </MoreActions>
       )}
       {displayAs === 'buttons' && (
         <>
-          {!isDatanodeRunning && <ActionButton onClick={() => startDataNode(dataNode.node_id)} bsSize="small">Start</ActionButton>}
-          {isDatanodeRunning && <ActionButton onClick={() => handleAction(DIALOG_TYPES.STOP)} bsSize="small">Stop</ActionButton>}
-          {isDatanodeRemoved && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REJOIN)} bsSize="small">Rejoin</ActionButton>}
-          {(!isDatanodeRemoved || isRemovingDatanode) && <ActionButton onClick={() => handleAction(DIALOG_TYPES.REMOVE)} bsSize="small">Remove</ActionButton>}
-          <ActionButton onClick={() => setShowLogsDialog(true)} bsSize="small">Show logs</ActionButton>
+          {!isDatanodeRunning && (
+            <ActionButton onClick={handleStartDatanode} bsSize="small">
+              Start
+            </ActionButton>
+          )}
+          {isDatanodeRunning && (
+            <ActionButton onClick={() => handleAction(DIALOG_TYPES.STOP)} bsSize="small">
+              Stop
+            </ActionButton>
+          )}
+          {isDatanodeRemoved && (
+            <ActionButton onClick={() => handleAction(DIALOG_TYPES.REJOIN)} bsSize="small">
+              Rejoin
+            </ActionButton>
+          )}
+          {(!isDatanodeRemoved || isRemovingDatanode) && (
+            <ActionButton onClick={() => handleAction(DIALOG_TYPES.REMOVE)} bsSize="small">
+              Remove
+            </ActionButton>
+          )}
+          <ActionButton onClick={() => setShowLogsDialog(true)} bsSize="small">
+            Show logs
+          </ActionButton>
         </>
       )}
       {showConfirmDialog && (
-        <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
-                       show
-                       onConfirm={handleConfirm}
-                       onCancel={handleClearState}>
+        <ConfirmDialog
+          title={DIALOG_TEXT[dialogType].dialogTitle}
+          show
+          onConfirm={handleConfirm}
+          onCancel={handleClearState}>
           {DIALOG_TEXT[dialogType].dialogBody(dataNode.hostname)}
         </ConfirmDialog>
       )}
       {showLogsDialog && (
-        <DataNodeLogsDialog show={showLogsDialog}
-                            hostname={dataNode?.hostname}
-                            onHide={() => setShowLogsDialog(false)} />
+        <DataNodeLogsDialog
+          show={showLogsDialog}
+          hostname={dataNode?.hostname}
+          onHide={() => setShowLogsDialog(false)}
+        />
       )}
     </>
   );
-};
-
-DataNodeActions.defaultProps = {
-  displayAs: 'dropdown',
 };
 
 export default DataNodeActions;

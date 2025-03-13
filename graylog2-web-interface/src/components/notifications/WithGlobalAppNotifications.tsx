@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import PublicNotifications from 'components/common/PublicNotifications';
 
 import GlobalAppNotifications from './GlobalAppNotifications';
 
 type Props = {
-  children: React.ReactNode
-}
+  children: React.ReactNode;
+};
 
 const WithGlobalNotifications = ({ children }: Props) => (
   <>
@@ -32,12 +31,5 @@ const WithGlobalNotifications = ({ children }: Props) => (
     {children}
   </>
 );
-
-WithGlobalNotifications.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
-};
 
 export default WithGlobalNotifications;

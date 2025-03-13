@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import Section from './Section';
 
@@ -37,5 +38,52 @@ describe('Section', () => {
     await screen.findByRole('heading', { name: /the title/i });
     await screen.findByText(/the children/i);
     await screen.findByText(/the actions/i);
+  });
+
+  it('should render headerLeftSection', async () => {
+    render(
+      <Section title="The Title" headerLeftSection="The left section">
+        The children
+      </Section>,
+    );
+
+    await screen.findByText(/the left section/i);
+  });
+
+  it('should render collapse button', async () => {
+    render(
+      <Section title="The Title" collapsible>
+        The children
+      </Section>,
+    );
+
+    await screen.findByRole('heading', { name: /the title/i });
+    await screen.findByText(/the children/i);
+
+    userEvent.click(screen.getByTestId('collapseButton'));
+
+    const children = await screen.findByText(/the children/i);
+
+    expect(children).not.toBeVisible();
+  });
+
+  it('should execute onCollapse', async () => {
+    const onCollapse = jest.fn();
+
+    render(
+      <Section title="The Title" collapsible onCollapse={onCollapse}>
+        The children
+      </Section>,
+    );
+
+    await screen.findByRole('heading', { name: /the title/i });
+    await screen.findByText(/the children/i);
+
+    userEvent.click(screen.getByTestId('collapseButton'));
+
+    const children = await screen.findByText(/the children/i);
+
+    expect(children).not.toBeVisible();
+    expect(onCollapse).toHaveBeenCalledWith(true);
   });
 });

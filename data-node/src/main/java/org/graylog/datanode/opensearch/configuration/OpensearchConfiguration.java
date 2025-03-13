@@ -16,110 +16,160 @@
  */
 package org.graylog.datanode.opensearch.configuration;
 
-import org.apache.commons.exec.OS;
+import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nonnull;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
-import org.graylog.datanode.configuration.S3RepositoryConfiguration;
-import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
+import org.graylog.datanode.configuration.OpensearchConfigurationDir;
 import org.graylog.datanode.process.Environment;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
+import org.graylog.datanode.process.configuration.files.YamlConfigFile;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
+import java.nio.file.Path;
+import java.security.KeyStore;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public record OpensearchConfiguration(
-        OpensearchDistribution opensearchDistribution,
-        DatanodeDirectories datanodeDirectories,
-        String bindAddress,
-        String hostname,
-        int httpPort,
-        int transportPort,
-        String clusterName,
-        String nodeName,
-        List<String> nodeRoles,
-        List<String> discoverySeedHosts,
-        OpensearchSecurityConfiguration opensearchSecurityConfiguration,
-        S3RepositoryConfiguration s3RepositoryConfiguration,
+public class OpensearchConfiguration {
 
-        String nodeSearchCacheSize,
-        Map<String, Object> additionalConfiguration
-) {
-    public Map<String, Object> asMap() {
+    private final OpensearchDistribution opensearchDistribution;
+    private final String hostname;
+    private final int httpPort;
+    private final List<DatanodeConfigurationPart> configurationParts;
+    private final OpensearchConfigurationDir opensearchConfigurationDir;
+    private final DatanodeDirectories datanodeDirectories;
 
-        Map<String, Object> config = new LinkedHashMap<>();
-
-        config.put("action.auto_create_index", "false");
-
-        // currently, startup fails on macOS without disabling this filter.
-        // for a description of the filter (although it's for ES), see https://www.elastic.co/guide/en/elasticsearch/reference/7.17/_system_call_filter_check.html
-        if (OS.isFamilyMac()) {
-            config.put("bootstrap.system_call_filter", "false");
-        }
-
-        if (bindAddress != null && !bindAddress.isBlank()) {
-            config.put("network.host", bindAddress);
-        }
-        config.put("http.port", String.valueOf(httpPort));
-        config.put("transport.port", String.valueOf(transportPort));
-        if (clusterName != null && !clusterName.isBlank()) {
-            config.put("cluster.name", clusterName);
-        }
-
-        config.put("node.name", nodeName);
-
-        if (nodeRoles != null && !nodeRoles.isEmpty()) {
-            config.put("node.roles", toValuesList(nodeRoles));
-        }
-        if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
-            config.put("discovery.seed_hosts", toValuesList(discoverySeedHosts));
-        }
-
-        config.put("discovery.seed_providers", "file");
-
-        config.put("node.search.cache.size", nodeSearchCacheSize);
-        if (s3RepositoryConfiguration.isRepositoryEnabled()) {
-            config.putAll(s3RepositoryConfiguration.toOpensearchProperties());
-        }
-
-        config.putAll(additionalConfiguration);
-        return config;
+    public OpensearchConfiguration(OpensearchDistribution opensearchDistribution, DatanodeDirectories datanodeDirectories, String hostname, int httpPort, List<DatanodeConfigurationPart> configurationParts) {
+        this.opensearchDistribution = opensearchDistribution;
+        this.hostname = hostname;
+        this.httpPort = httpPort;
+        this.configurationParts = configurationParts;
+        this.datanodeDirectories = datanodeDirectories;
+        this.opensearchConfigurationDir = datanodeDirectories.createUniqueOpensearchProcessConfigurationDir();
     }
 
-    private String toValuesList(List<String> values) {
-        return String.join(",", values);
+    @Nonnull
+    private String buildRolesList() {
+        return configurationParts.stream()
+                .flatMap(cfg -> cfg.nodeRoles().stream())
+                .collect(Collectors.joining(","));
     }
 
     public Environment getEnv() {
         final Environment env = new Environment(System.getenv());
 
         List<String> javaOpts = new LinkedList<>();
-        javaOpts.add("-Xms%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
-        javaOpts.add("-Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap()));
 
-        opensearchSecurityConfiguration.getTruststore().ifPresent(truststore -> {
-            javaOpts.add("-Djavax.net.ssl.trustStore=" + truststore.location().toAbsolutePath());
-            javaOpts.add("-Djavax.net.ssl.trustStorePassword=" + truststore.passwordAsString());
-            javaOpts.add("-Djavax.net.ssl.trustStoreType=pkcs12");
-        });
+        configurationParts.stream().map(DatanodeConfigurationPart::javaOpts)
+                .forEach(javaOpts::addAll);
 
         env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
-        env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
+        env.put("OPENSEARCH_PATH_CONF", opensearchConfigurationDir.configurationRoot().toString());
         return env;
     }
 
     public HttpHost getRestBaseUrl() {
-        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false").toString());
-        return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
+        return new HttpHost(hostname, httpPort, isHttpsEnabled() ? "https" : "http");
     }
 
-    public HttpHost getClusterBaseUrl() {
-        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false").toString());
-        return new HttpHost(hostname(), transportPort(), sslEnabled ? "https" : "http");
+    public boolean isHttpsEnabled() {
+        return httpCertificate().isPresent();
     }
 
+    /**
+     * Are there any {@link  org.graylog.datanode.configuration.variants.OpensearchCertificatesProvider} configured?
+     */
     public boolean securityConfigured() {
-        return opensearchSecurityConfiguration() != null;
+        return configurationParts.stream().anyMatch(DatanodeConfigurationPart::securityConfigured);
+    }
+
+
+    public Map<String, String> getKeystoreItems() {
+        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        configurationParts.stream()
+                .map(DatanodeConfigurationPart::keystoreItems)
+                .forEach(builder::putAll);
+
+        return builder.build();
+    }
+
+    public KeyStore trustStore() {
+        return configurationParts.stream()
+                .map(DatanodeConfigurationPart::trustStore)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("This should not happen, truststore should always be present"));
+    }
+
+    public Optional<KeystoreInformation> httpCertificate() {
+        return configurationParts.stream()
+                .map(DatanodeConfigurationPart::httpCertificate)
+                .filter(Objects::nonNull)
+                .findFirst();
+    }
+
+    public Optional<KeystoreInformation> transportCertificate() {
+        return configurationParts.stream()
+                .map(DatanodeConfigurationPart::transportCertificate)
+                .filter(Objects::nonNull)
+                .findFirst();
+    }
+
+    public List<String> opensearchRoles() {
+        return configurationParts.stream()
+                .flatMap(cfg -> cfg.nodeRoles().stream())
+                .collect(Collectors.toList());
+    }
+
+    public List<DatanodeConfigFile> configFiles() {
+
+        final List<DatanodeConfigFile> configFiles = new LinkedList<>();
+
+        configurationParts.stream()
+                .flatMap(cp -> cp.configFiles().stream())
+                .forEach(configFiles::add);
+
+        configFiles.add(new YamlConfigFile(Path.of("opensearch.yml"), opensearchYmlConfig()));
+
+        return configFiles;
+    }
+
+    private Map<String, Object> opensearchYmlConfig() {
+        Map<String, Object> config = new LinkedHashMap<>();
+
+        // this needs special treatment as it's as an aggregation of other configuration parts
+        config.put("node.roles", buildRolesList());
+
+        configurationParts.stream()
+                .map(DatanodeConfigurationPart::properties)
+                .forEach(config::putAll);
+
+        return config;
+    }
+
+    public OpensearchDistribution getOpensearchDistribution() {
+        return opensearchDistribution;
+    }
+
+    public OpensearchConfigurationDir getOpensearchConfigurationDir() {
+        return opensearchConfigurationDir;
+    }
+
+    public DatanodeDirectories getDatanodeDirectories() {
+        return datanodeDirectories;
+    }
+
+    public List<String> warnings() {
+        return configurationParts.stream()
+                .flatMap(part -> part.warnings().stream())
+                .collect(Collectors.toList());
     }
 }

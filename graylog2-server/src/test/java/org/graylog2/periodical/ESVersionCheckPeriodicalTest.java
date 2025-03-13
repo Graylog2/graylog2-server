@@ -16,10 +16,10 @@
  */
 package org.graylog2.periodical;
 
+import com.github.zafarkhaja.semver.Version;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
-import org.graylog2.plugin.Version;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.VersionProbe;
@@ -67,7 +67,7 @@ class ESVersionCheckPeriodicalTest {
 
     @Test
     void createsNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
-        returnProbedVersion(com.github.zafarkhaja.semver.Version.forIntegers(9, 2, 3));
+        returnProbedVersion(Version.of(9, 2, 3));
 
         createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
 
@@ -76,7 +76,7 @@ class ESVersionCheckPeriodicalTest {
 
     @Test
     void createsNotificationIfCurrentVersionIncompatiblyOlderThanInitialOne() {
-        returnProbedVersion(com.github.zafarkhaja.semver.Version.forIntegers(6, 8, 1));
+        returnProbedVersion(Version.of(6, 8, 1));
 
         createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
 
@@ -85,7 +85,7 @@ class ESVersionCheckPeriodicalTest {
 
     @Test
     void fixesNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
-        returnProbedVersion(com.github.zafarkhaja.semver.Version.forIntegers(8, 2, 3));
+        returnProbedVersion(Version.of(8, 2, 3));
 
         createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
 

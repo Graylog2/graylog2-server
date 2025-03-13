@@ -126,6 +126,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.REMOVED);
 
         config.configure(OpensearchState.REMOVED)
+                .onEntry(process::stop)
                 .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION, process::reset)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 
@@ -145,7 +146,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         try {
             super.fire(trigger);
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            LOG.error("Failed to fire event " + trigger, e);
             super.fire(errorEvent);
         }
     }

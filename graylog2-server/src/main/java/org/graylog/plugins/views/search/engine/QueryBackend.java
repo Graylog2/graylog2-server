@@ -41,6 +41,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static org.graylog.plugins.views.search.ExplainResults.IndexRangeResult.fromIndexRange;
+
 /**
  * A search backend that is capable of generating and executing search jobs
  *
@@ -137,9 +139,17 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
         final ImmutableMap.Builder<String, ExplainResults.ExplainResult> builder = ImmutableMap.builder();
 
         query.searchTypes().forEach(s -> {
-            final Set<ExplainResults.IndexRangeResult> indicesForQuery = indexRangesForStreamsInTimeRange(
-                    query.effectiveStreams(s), query.effectiveTimeRange(s))
-                    .stream().map(ExplainResults.IndexRangeResult::fromIndexRange).collect(Collectors.toSet());
+            final Set<String> streamIds = query.effectiveStreams(s);
+            final Set<String> streamTitles = streamIds.stream()
+                    .map(this::streamTitle)
+                    .flatMap(Optional::stream)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+
+            final Set<ExplainResults.IndexRangeResult> indicesForQuery =
+                    indexRangesForStreamsInTimeRange(streamIds, query.effectiveTimeRange(s)).stream()
+                            .map(indexRange -> fromIndexRange(indexRange, streamTitles))
+                            .collect(Collectors.toSet());
             queryContext.getSearchTypeQueryString(s.id())
                     .ifPresent(queryString -> builder.put(s.id(), new ExplainResults.ExplainResult(queryString, indicesForQuery)));
         });
@@ -148,6 +158,8 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
     }
 
     Set<IndexRange> indexRangesForStreamsInTimeRange(final Set<String> streamIds, final TimeRange timeRange);
+
+    Optional<String> streamTitle(String streamId);
 
     default boolean isSearchTypeWithError(T queryContext, String searchTypeId) {
         return queryContext.errors().stream()

@@ -16,11 +16,14 @@
  */
 package org.graylog2.periodical;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
@@ -36,9 +39,6 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 import java.util.Map;
 
 public class IndexRotationThread extends Periodical {
@@ -51,6 +51,7 @@ public class IndexRotationThread extends Periodical {
     private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
     private final DataTieringOrchestrator dataTieringOrchestrator;
     private final NotificationService notificationService;
+    private final DatanodeMigrationLockService migrationLockService;
 
     @Inject
     public IndexRotationThread(NotificationService notificationService,
@@ -60,7 +61,7 @@ public class IndexRotationThread extends Periodical {
                                ActivityWriter activityWriter,
                                NodeId nodeId,
                                Map<String, Provider<RotationStrategy>> rotationStrategyMap,
-                               DataTieringOrchestrator dataTieringOrchestrator) {
+                               DataTieringOrchestrator dataTieringOrchestrator, DatanodeMigrationLockService migrationLockService) {
         this.notificationService = notificationService;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -69,6 +70,7 @@ public class IndexRotationThread extends Periodical {
         this.nodeId = nodeId;
         this.rotationStrategyMap = rotationStrategyMap;
         this.dataTieringOrchestrator = dataTieringOrchestrator;
+        this.migrationLockService = migrationLockService;
     }
 
     @Override
@@ -91,8 +93,10 @@ public class IndexRotationThread extends Periodical {
             indexSetRegistry.forEach((indexSet) -> {
                 try {
                     if (indexSet.getConfig().isWritable()) {
-                        checkAndRepair(indexSet);
-                        checkForRotation(indexSet);
+                        migrationLockService.tryRun(indexSet, IndexRotationThread.class, () -> {
+                            checkAndRepair(indexSet);
+                            checkForRotation(indexSet);
+                        });
                     } else {
                         LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
                     }

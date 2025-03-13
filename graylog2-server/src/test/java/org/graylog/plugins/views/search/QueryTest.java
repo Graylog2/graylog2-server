@@ -34,6 +34,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.filter.AndFilter;
+import org.graylog.plugins.views.search.filter.OrFilter;
+import org.graylog.plugins.views.search.filter.QueryStringFilter;
+import org.graylog.plugins.views.search.filter.StreamCategoryFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
@@ -62,9 +66,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class QueryTest {
 
@@ -343,5 +350,105 @@ public class QueryTest {
 
         assertThat(query.query().queryString())
                 .isEqualTo("query");
+    }
+
+    @Test
+    void replaceStreamCategoryFiltersWithStreamFilters() {
+        StreamCategoryFilter colorCategory = mock(StreamCategoryFilter.class);
+        StreamCategoryFilter numberCategory = mock(StreamCategoryFilter.class);
+        when(colorCategory.toStreamFilter(any(), any())).thenReturn(StreamFilter.anyIdOf("red", "blue", "yellow"));
+        when(numberCategory.toStreamFilter(any(), any())).thenReturn(StreamFilter.anyIdOf("one", "two", "three"));
+        var queryWithCategories = Query.builder()
+                .id("query1")
+                .query(ElasticsearchQueryString.of("*"))
+                .filter(AndFilter.and(colorCategory, numberCategory))
+                .build();
+
+        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(Function.class), streamId -> true);
+        Filter filter = queryWithCategories.filter();
+        assertThat(filter).isInstanceOf(AndFilter.class);
+        assertThat(filter.filters()).isNotNull();
+        // The two StreamCategoryFilters should have been replaced with two OrFilters of three StreamFilters
+        assertThat(filter.filters()).hasSize(2);
+        assertThat(filter.filters().stream()).allSatisfy(f -> {
+            assertThat(f).isInstanceOf(OrFilter.class);
+            assertThat(f.filters()).isNotEmpty();
+            assertThat(f.filters()).hasSize(3);
+            assertThat(f.filters().stream()).allSatisfy(f2 -> {
+                assertThat(f2).isInstanceOf(StreamFilter.class);
+                assertThat(f2.filters()).isNull();
+            });
+        });
+    }
+
+    @Test
+    void replaceStreamCategoryFiltersLeavesOtherFiltersAlone() {
+        StreamCategoryFilter colorCategory = mock(StreamCategoryFilter.class);
+        StreamCategoryFilter numberCategory = mock(StreamCategoryFilter.class);
+        when(colorCategory.toStreamFilter(any(), any())).thenReturn(StreamFilter.anyIdOf("red", "blue", "yellow"));
+        when(numberCategory.toStreamFilter(any(), any())).thenReturn(StreamFilter.anyIdOf("one", "two", "three"));
+        var queryWithCategories = Query.builder()
+                .id("query1")
+                .query(ElasticsearchQueryString.of("*"))
+                .filter(AndFilter.builder()
+                        .filters(ImmutableSet.<Filter>builder()
+                                .add(OrFilter.or(colorCategory, numberCategory))
+                                .add(QueryStringFilter.builder().query("source:localhost").build())
+                                .build())
+                        .build())
+                .build();
+
+        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(Function.class), streamId -> true);
+        Filter filter = queryWithCategories.filter();
+        assertThat(filter).isInstanceOf(AndFilter.class);
+        assertThat(filter.filters()).isNotNull();
+        assertThat(filter.filters()).hasSize(2);
+        // The QueryStringFilter should have been left alone in the replacement
+        assertThat(filter.filters().stream()).satisfiesOnlyOnce(f -> {
+            assertThat(f).isInstanceOf(QueryStringFilter.class);
+            assertThat(f.filters()).isNull();
+            assertThat(((QueryStringFilter) f).query()).isEqualTo("source:localhost");
+        });
+    }
+
+    @Test
+    void replacementLeavesNoFilters() {
+        StreamCategoryFilter colorCategory = mock(StreamCategoryFilter.class);
+        StreamCategoryFilter numberCategory = mock(StreamCategoryFilter.class);
+        when(colorCategory.toStreamFilter(any(), any())).thenReturn(null);
+        when(numberCategory.toStreamFilter(any(), any())).thenReturn(null);
+        var queryWithCategories = Query.builder()
+                .id("query1")
+                .query(ElasticsearchQueryString.of("*"))
+                .filter(AndFilter.and(colorCategory, numberCategory))
+                .build();
+
+        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(Function.class), (streamId) -> false);
+        Filter filter = queryWithCategories.filter();
+        assertThat(filter).isNull();
+    }
+
+    @Test
+    void emptyReplacementFiltersAreRemoved() {
+        StreamCategoryFilter colorCategory = mock(StreamCategoryFilter.class);
+        StreamCategoryFilter numberCategory = mock(StreamCategoryFilter.class);
+        when(colorCategory.toStreamFilter(any(), any())).thenReturn(null);
+        when(numberCategory.toStreamFilter(any(), any())).thenReturn(null);
+        var queryWithCategories = Query.builder()
+                .id("query1")
+                .query(ElasticsearchQueryString.of("*"))
+                .filter(AndFilter.builder()
+                        .filters(ImmutableSet.<Filter>builder()
+                                .add(OrFilter.or(colorCategory, numberCategory))
+                                .add(QueryStringFilter.builder().query("source:localhost").build())
+                                .build())
+                        .build())
+                .build();
+
+        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(Function.class), (streamId) -> false);
+        Filter filter = queryWithCategories.filter();
+        assertThat(filter).isInstanceOf(AndFilter.class);
+        assertThat(filter.filters()).isNotNull();
+        assertThat(filter.filters()).hasSize(1);
     }
 }

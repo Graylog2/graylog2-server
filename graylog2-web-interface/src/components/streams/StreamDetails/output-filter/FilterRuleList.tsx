@@ -15,69 +15,133 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import type { ColumnRenderers } from 'components/common/EntityDataTable/types';
-import type { SearchParams } from 'stores/PaginationTypes';
+import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { IfPermitted, PaginatedEntityTable, QueryHelper } from 'components/common';
-import { ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER, DEFAULT_LAYOUT } from 'components/streams/StreamDetails/output-filter/Constants';
-import useTableElements from 'components/streams/StreamDetails/output-filter/hooks/useTableComponents';
+import { IfPermitted, DataTable, PaginatedList, NoSearchResult, Text } from 'components/common';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 import FilterRuleEditButton from 'components/streams/StreamDetails/output-filter/FilterRuleEditButton';
-import { keyFn, fetchStreamOutputFilters } from 'components/streams/hooks/useStreamOutputFilters';
 import { Alert } from 'components/bootstrap';
+import type { PaginatedList as PaginatedListType } from 'stores/PaginationTypes';
 
 import FilterStatusCell from './FilterStatusCell';
+import FilterActions from './FilterActions';
 
-export const StyledSectionComponent = styled(SectionComponent)`
-  &.content {
-    background-color: transparent;
-  }
-`;
+const TABLE_HEADERS = ['Title', 'Status', ''];
 
+export const StyledSectionComponent = styled(SectionComponent)(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.xs};
+
+    &.content {
+      background-color: ${theme.colors.table.row.backgroundHover};
+      padding: ${theme.spacings.sm} ${theme.spacings.xxs};
+    }
+
+    &.row {
+      margin: 0 ${theme.spacings.xxs} ${theme.spacings.sm};
+    }
+
+    h2 {
+      font-size: ${theme.fonts.size.h3};
+    }
+
+    .table > tbody > tr > td {
+      vertical-align: middle;
+    }
+
+    .table > tbody > tr {
+      background-color: transparent;
+    }
+
+    .table > thead > tr > th {
+      border-bottom-color: ${theme.utils.colorLevel(theme.colors.variant.default, -5)};
+      border-bottom-width: 1px;
+    }
+
+    .table.striped > tbody > tr:nth-of-type(even) {
+      background-color: ${theme.colors.table.row.backgroundStriped};
+    }
+  `,
+);
+const StyledText = styled(Text)(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[50]};
+  `,
+);
 type Props = {
-  streamId: string,
-  destinationType: string,
+  streamId: string;
+  destinationType: string;
+  paginatedFilters: PaginatedListType<StreamOutputFilterRule>;
+  onPaginationChange: (newPage: number, newPerPage: number) => void;
+  requiredPermissions: Array<string>;
 };
+const _headerCellFormatter = (header: string) => <th>{header}</th>;
+const buildFilterItem =
+  (destinationType: string, requiredPermissions: Array<string>) => (filter: StreamOutputFilterRule) => (
+    <tr key={filter.id}>
+      <td>
+        {filter.title}
+        <StyledText>{filter.description}</StyledText>
+      </td>
+      <td>
+        <FilterStatusCell filterOutputRule={filter} />
+      </td>
+      <td>
+        <IfPermitted permissions={requiredPermissions}>
+          <FilterActions filterRule={filter} destinationType={destinationType} />
+        </IfPermitted>
+      </td>
+    </tr>
+  );
 
-const FilterRulesList = ({ streamId, destinationType }: Props) => {
-  const { entityActions } = useTableElements(destinationType);
-  const _keyFn = useCallback((searchParams: SearchParams) => keyFn(streamId, destinationType, searchParams), [streamId, destinationType]);
-  const _fetchStreamOutputFilters = useCallback((searchParams: SearchParams) => fetchStreamOutputFilters(streamId, { ...searchParams, query: `destination_type:${destinationType}` }), [streamId, destinationType]);
-
-  const customColumnRenderers = (): ColumnRenderers<StreamOutputFilterRule> => ({
-    attributes: {
-      status: {
-        renderCell: (_title: string, filterOutputRule) => <FilterStatusCell filterOutputRule={filterOutputRule} />,
-      },
-    },
-  });
+const FilterRulesList = ({
+  streamId,
+  destinationType,
+  paginatedFilters,
+  onPaginationChange,
+  requiredPermissions,
+}: Props) => {
+  const {
+    list: filters,
+    pagination: { total },
+  } = paginatedFilters;
 
   return (
-    <StyledSectionComponent title="Filter Rule"
-                            headerActions={(
-                              <IfPermitted permissions="">
-                                <FilterRuleEditButton filterRule={{ stream_id: streamId }}
-                                                      destinationType={destinationType}
-                                                      streamId={streamId} />
-                              </IfPermitted>
-             )}>
-      <Alert bsStyle="info">
-        Messages which meet the criteria of the following filter rule(s) will not be routed to the  {destinationType === 'indexer' ? 'Index Set' : 'Data Warehouse'}.
+    <StyledSectionComponent
+      title="Filter Rules"
+      headerActions={
+        <IfPermitted permissions={requiredPermissions}>
+          <FilterRuleEditButton
+            filterRule={{ stream_id: streamId }}
+            destinationType={destinationType}
+            streamId={streamId}
+          />
+        </IfPermitted>
+      }>
+      <Alert bsStyle="default">
+        Messages which meet the criteria of the following filter rule(s) will not be routed to the{' '}
+        {destinationType === 'indexer' ? 'Index Set' : 'Data Lake'}.
       </Alert>
-      <PaginatedEntityTable<StreamOutputFilterRule> humanName="filter"
-                                                    columnsOrder={COLUMNS_ORDER}
-                                                    additionalAttributes={ADDITIONAL_ATTRIBUTES}
-                                                    queryHelpComponent={<QueryHelper entityName="streamOutputFilters" />}
-                                                    entityActions={entityActions}
-                                                    tableLayout={DEFAULT_LAYOUT}
-                                                    fetchEntities={_fetchStreamOutputFilters}
-                                                    columnRenderers={customColumnRenderers()}
-                                                    keyFn={_keyFn}
-                                                    entityAttributesAreCamelCase={false} />
-
+      <PaginatedList
+        totalItems={total}
+        pageSize={DEFAULT_PAGE_SIZES[0]}
+        onChange={onPaginationChange}
+        useQueryParameter={false}
+        showPageSizeSelect={false}>
+        <DataTable
+          id="filter-list"
+          className="striped"
+          rowClassName="no-bm"
+          headers={TABLE_HEADERS}
+          headerCellFormatter={_headerCellFormatter}
+          sortByKey="title"
+          noDataText={<NoSearchResult>No filter have been found.</NoSearchResult>}
+          rows={filters.toJS()}
+          dataRowFormatter={buildFilterItem(destinationType, requiredPermissions)}
+        />
+      </PaginatedList>
     </StyledSectionComponent>
   );
 };
