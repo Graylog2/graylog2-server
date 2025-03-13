@@ -24,7 +24,6 @@ import { isPermitted } from 'util/PermissionsMixin';
 import DocsHelper from 'util/DocsHelper';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { PageHeader, DocumentTitle, Spinner } from 'components/common';
-import { Headline } from 'components/common/Section/SectionComponent';
 import TokenList from 'components/users/TokenList';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
@@ -117,7 +116,6 @@ const UserEditPage = ({ params }: Props) => {
 
       <Row className="content">
         <Col lg={8}>
-          <Headline>Create And Edit Tokens</Headline>
           {loadedUser ? (
             <TokenList
               tokens={tokens}
