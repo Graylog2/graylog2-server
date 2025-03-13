@@ -123,6 +123,7 @@ import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
+import TokenManagementPage from 'pages/TokenManagementPage';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -359,6 +360,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.USERS.show(':userId'), element: <UserDetailsPage /> },
             { path: RoutePaths.SYSTEM.USERS.edit(':userId'), element: <UserEditPage /> },
             { path: RoutePaths.SYSTEM.USERS.TOKENS.edit(':userId'), element: <UserTokensEditPage /> },
+            { path: RoutePaths.SYSTEM.USERS_TOKEN_MANAGEMENT.overview, element: <TokenManagementPage /> },
 
             { path: RoutePaths.SYSTEM.AUTHZROLES.OVERVIEW, element: <RolesOverviewPage /> },
             { path: RoutePaths.SYSTEM.AUTHZROLES.show(':roleId'), element: <RoleDetailsPage /> },

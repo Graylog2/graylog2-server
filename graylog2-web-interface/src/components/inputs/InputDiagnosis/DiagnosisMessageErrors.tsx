@@ -72,7 +72,9 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
       <StyledListGroup>
         <StyledListGroupItem>
           Message Error at Input <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT} />:{' '}
-          {messageErrors.failures_inputs_codecs}
+          <LinkCompoment failureType="input" inputId={inputId}>
+            {messageErrors.failures_inputs_codecs}
+          </LinkCompoment>
         </StyledListGroupItem>
         <StyledListGroupItem>
           Message failed to process <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS} />:{' '}

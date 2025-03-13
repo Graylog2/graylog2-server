@@ -374,7 +374,7 @@ const StartInputStep = () => {
           onClick={goToInputDiagnosis}
           bsStyle="primary"
           data-testid="input-diagnosis-button">
-          Input Diagnosis
+          Launch Input Diagnosis
         </Button>
       );
     }
