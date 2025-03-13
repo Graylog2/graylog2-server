@@ -16,8 +16,8 @@
  */
 package org.graylog2.plugin;
 
+import org.graylog.inputs.MessageInputFailure;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
@@ -51,15 +51,7 @@ public class InputFailureRecorder {
      * @param e the exception leading to the error
      */
     public void setFailing(Class<?> loggingClass, String error, @Nullable Throwable e) {
-        if (inputState.getState().equals(IOState.Type.FAILING)) {
-            return;
-        }
-        if (e != null) {
-            inputState.setState(IOState.Type.FAILING, error + ": (" + e.getMessage() + ")");
-        } else {
-            inputState.setState(IOState.Type.FAILING, error);
-        }
-        LoggerFactory.getLogger(loggingClass).warn(error, e);
+        inputState.triggerFail(MessageInputFailure.asWarning(loggingClass, error, e));
     }
 
     /**
@@ -67,8 +59,6 @@ public class InputFailureRecorder {
      * Call this once the error has resolved itself.
      */
     public void setRunning() {
-        if (inputState.getState() == IOState.Type.FAILING) {
-            inputState.setState(IOState.Type.RUNNING);
-        }
+        inputState.triggerRunning();
     }
 }

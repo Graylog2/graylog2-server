@@ -54,48 +54,26 @@ public class InputEventListener {
     public void inputCreated(String inputId) {
         LOG.debug("Input created: {}", inputId);
 
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-        if (inputState != null) {
-            inputRegistry.remove(inputState);
-        }
-
+        inputRegistry.remove(inputId);
         inputLauncher.launch(inputId);
     }
 
     public void inputUpdated(String inputId) {
         LOG.debug("Input updated: {}", inputId);
-
-        final boolean startInput;
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-        if (inputState != null) {
-            startInput = inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.SETUP;
-            inputRegistry.remove(inputState);
-        } else {
-            startInput = false;
-        }
-
-        if (startInput) {
-            inputLauncher.launch(inputId);
-        }
+        inputRegistry.remove(inputId);
+        inputLauncher.launch(inputId);
     }
 
     public void inputDeleted(String inputId) {
         LOG.debug("Input deleted: {}", inputId);
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-        if (inputState != null) {
-            inputRegistry.remove(inputState);
-        }
+        inputRegistry.remove(inputId);
     }
 
     public void inputSetup(String inputId) {
         LOG.debug("Input setup: {}", inputId);
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
-        if (inputState != null) {
-            inputRegistry.setup(inputState);
-        } else {
-            LOG.debug("Input created for setup: {}", inputId);
-            inputLauncher.launch(inputId);
-        }
+        inputRegistry.setup(inputId);
+        LOG.debug("Input created for setup: {}", inputId);
+        inputLauncher.launch(inputId);
     }
 
     public void leaderChanged() {
