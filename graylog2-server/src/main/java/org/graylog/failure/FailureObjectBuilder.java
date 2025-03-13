@@ -51,7 +51,9 @@ public class FailureObjectBuilder {
     }
 
     public FailureObjectBuilder put(String key, Object value) {
-        esObject.put(key, value);
+        if (value != null) {
+            esObject.put(key, value);
+        }
         return this;
     }
 
