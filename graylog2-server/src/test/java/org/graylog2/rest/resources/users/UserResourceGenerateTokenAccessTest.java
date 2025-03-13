@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.users;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
@@ -54,7 +55,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
@@ -179,8 +180,11 @@ public class UserResourceGenerateTokenAccessTest {
     public void testAccess() {
         final User user = mkUser();
         prepareMocks();
-        final boolean allowed = usersResource.isTokenCreationAllowed(user, user);
-        assertEquals(expectedResult, allowed);
+        if (expectedResult) {
+            usersResource.validatePermissionForTokenCreation(user, user);
+        } else {
+            assertThrows(ForbiddenException.class, () -> usersResource.validatePermissionForTokenCreation(user, user));
+        }
     }
 
     private void prepareMocks() {

@@ -728,10 +728,11 @@ public class UsersResource extends RestResource {
         final User futureOwner = loadUserById(userId);
         final User currentUser = getCurrentUser();
 
-        if (currentUser == null || !isTokenCreationAllowed(currentUser, futureOwner)) {
-            final String username = currentUser == null ? "UNKNOWN" : currentUser.getName();
-            throw new ForbiddenException("Not allowed to create tokens for user " + username);
+        if (currentUser == null) {
+            throw new ForbiddenException("Not allowed to create tokens for unknown user.");
         }
+        validatePermissionForTokenCreation(currentUser, futureOwner);
+
         if (body == null) {
             body = new GenerateTokenTTL(Optional.empty());
         }
@@ -768,20 +769,24 @@ public class UsersResource extends RestResource {
     }
 
     @VisibleForTesting
-    boolean isTokenCreationAllowed(User callingUser, User futureOwner) {
-        final boolean allowed = isPermitted(USERS_TOKENCREATE, callingUser.getName());
-        final boolean isAdmin = isAdmin(callingUser);
-        if (isAdmin) {
-            return allowed;
+    void validatePermissionForTokenCreation(User callingUser, User futureOwner) {
+        if (!isPermitted(USERS_TOKENCREATE, callingUser.getName())) {
+            throw new ForbiddenException(callingUser.getName() + " is not allowed to create token.");
+        }
+        if (isAdmin(callingUser)) {
+            // Not throwing an exception here, admin is allowed to create a token.
+            return;
         }
         if (!Objects.equals(callingUser.getId(), futureOwner.getId())) {
             // Only admins are allowed to create tokens for other users, but we already checked for admin above.
-            return false;
+            throw new ForbiddenException("Only admins are allowed to create a token for another user.");
         }
-        final boolean externalAllowed = isExternalUserAllowed(callingUser);
-        final boolean adminAllowed = isAllowedAsNoAdmin(callingUser);
-
-        return allowed && externalAllowed && adminAllowed;
+        if (!isExternalUserAllowed(callingUser)) {
+            throw new ForbiddenException("External users are not allowed to create tokens.");
+        }
+        if (!isAllowedAsNoAdmin(callingUser)) {
+            throw new ForbiddenException("Only admins are allowed to create tokens.");
+        }
     }
 
     private boolean isAdmin(User user) {
