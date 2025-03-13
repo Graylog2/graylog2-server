@@ -18,7 +18,6 @@ import * as React from 'react';
 
 import { NavDropdown } from 'components/bootstrap';
 import { Icon } from 'components/common';
-import AppConfig from 'util/AppConfig';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import useHotkeysContext from 'hooks/useHotkeysContext';
@@ -39,9 +38,7 @@ const HelpMenu = () => {
 
       <Menu.Item onClick={() => setShowHotkeysModal(true)}>Keyboard Shortcuts</Menu.Item>
 
-      {AppConfig.isCloud() && (
-        <HelpMenuLinkItem href={Routes.global_api_browser()}>Cluster Global API browser</HelpMenuLinkItem>
-      )}
+      <HelpMenuLinkItem href={Routes.global_api_browser()}>Cluster Global API browser</HelpMenuLinkItem>
     </NavDropdown>
   );
 };
