@@ -29,7 +29,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { Col, Row, Button } from 'components/bootstrap';
-import { ExternalLinkButton, Select } from 'components/common';
+import { Select } from 'components/common';
 import { InputForm } from 'components/inputs';
 import type { ConfiguredInput } from 'components/messageloaders/Types';
 
@@ -122,13 +122,6 @@ const CreateInputControl = () => {
     });
   };
 
-  const handleMarketplaceClick = () => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.FIND_MORE_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_action_value: 'inputs-find-more',
-    });
-  };
-
   const CustomInputsConfiguration = customInputConfiguration ? customInputConfiguration.component : null;
 
   return (
@@ -148,9 +141,6 @@ const CreateInputControl = () => {
           <Button bsStyle="success" type="submit" disabled={!selectedInput}>
             Launch new input
           </Button>
-          <ExternalLinkButton href="https://marketplace.graylog.org/" bsStyle="info" onClick={handleMarketplaceClick}>
-            Find more inputs
-          </ExternalLinkButton>
         </StyledForm>
         {selectedInputDefinition &&
           (customInputConfiguration ? (

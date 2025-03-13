@@ -67,8 +67,8 @@ const _deleteToken = (tokenId, tokenName, userId, loadTokens, setDeletingTokenId
   });
 };
 
-const _createToken = (tokenName, userId, loadTokens, setCreatingToken) => {
-  const promise = UsersDomain.createToken(userId, tokenName);
+const _createToken = (tokenName, userId, loadTokens, setCreatingToken, tokenTtl) => {
+  const promise = UsersDomain.createToken(userId, tokenName, tokenTtl);
 
   setCreatingToken(true);
 
@@ -92,7 +92,7 @@ const UserEditPage = ({ params }: Props) => {
   const loadTokens = useCallback(() => _loadTokens(loadedUser, currentUser, setTokens), [currentUser, loadedUser]);
   const _handleTokenDelete = (tokenId, tokenName) =>
     _deleteToken(tokenId, tokenName, userId, loadTokens, setDeletingTokenId);
-  const _handleTokenCreate = (tokenName) => _createToken(tokenName, userId, loadTokens, setCreatingToken);
+  const _handleTokenCreate = ({tokenName, tokenTtl}: {tokenName:string, tokenTtl: string}) => _createToken(tokenName, userId, loadTokens, setCreatingToken, tokenTtl);
 
   useEffect(() => {
     loadTokens();
