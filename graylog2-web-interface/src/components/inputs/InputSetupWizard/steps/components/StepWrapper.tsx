@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
+import { Tooltip } from 'components/common';
 
 export const DescriptionCol = styled(Col)(
   ({ theme }) => css`
@@ -45,6 +46,15 @@ const StepCol = styled(Col)(
     padding-left: ${theme.spacings.lg};
     padding-right: ${theme.spacings.lg};
     padding-top: ${theme.spacings.sm};
+  `,
+);
+
+export const RecommendedTooltip = styled(Tooltip)(
+  ({ theme }) => css`
+    &.mantine-Tooltip-tooltip {
+      background-color: ${theme.colors.global.background}!important;
+      font-size: ${theme.fonts.size.small}!important;
+    }
   `,
 );
 
