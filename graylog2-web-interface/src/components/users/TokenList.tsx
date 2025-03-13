@@ -17,7 +17,14 @@
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { ClipboardButton, ControlledTableList, Icon, RelativeTime, SearchForm, Spinner } from 'components/common';
+import {
+  ClipboardButton,
+  ControlledTableList,
+  Icon,
+  RelativeTime,
+  SearchForm,
+  Spinner,
+} from 'components/common';
 import { Button, Col, Panel, Row } from 'components/bootstrap';
 import type { Token, TokenSummary } from 'stores/users/UsersStore';
 import { sortByDate } from 'util/SortUtils';
@@ -53,12 +60,12 @@ const StyledLastAccess = styled.div`
 type Props = {
   creatingToken?: boolean;
   deletingToken?: string;
-  onCreate: (tokenName: string) => Promise<Token>;
+  onCreate: ({tokenName, tokenTtl}: {tokenName:string, tokenTtl: string}) => Promise<Token>;
   onDelete: (tokenId: string, tokenName: string) => void;
   tokens?: TokenSummary[];
 };
 
-const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, tokens = [] }: Props) => {
+const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDelete, tokens = [] }: Props) => {
   const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
 
@@ -70,8 +77,8 @@ const TokenList = ({ creatingToken = false, deletingToken, onCreate, onDelete, t
       .sort((token1, token2) => sortByDate(token1.last_access, token2.last_access, 'desc'));
   }, [query, tokens]);
 
-  const handleTokenCreation = (tokenName: string) => {
-    const promise = onCreate(tokenName);
+  const handleTokenCreation = ({tokenName, tokenTtl}) => {
+    const promise = onCreate({tokenName, tokenTtl});
 
     promise.then((token) => {
       setCreatedToken(token);
