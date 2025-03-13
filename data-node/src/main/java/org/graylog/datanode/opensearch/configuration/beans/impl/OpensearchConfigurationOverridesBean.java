@@ -31,11 +31,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -48,13 +48,13 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
     private final Supplier<Map<String, String>> systemEnvSupplier;
     private final DatanodeDirectories datanodeDirectories;
     private final Path overridesFile;
-    private static final String[] ALLOWED_OVERRIDES = new String[]{
+    private static final Set<Pattern> ALLOWED_OVERRIDES = Set.of(
             "^cluster\\.routing\\.allocation\\.disk\\.watermark\\..*$",
             "^cluster\\.routing\\.allocation\\.awareness\\..*$",
             "^node\\.attr\\.zone$",
             "^plugins\\.security\\.ssl\\.transport\\.enforce_hostname_verification$",
-            "^index\\.codec$",
-    };
+            "^index\\.codec$"
+    ).stream().map(Pattern::compile).collect(Collectors.toSet());
 
     @Inject
     public OpensearchConfigurationOverridesBean(DatanodeConfiguration datanodeConfiguration, Configuration configuration) {
@@ -105,7 +105,7 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
     }
 
     private boolean shouldPrintWarning(Map.Entry<String, String> property) {
-        return Arrays.stream(ALLOWED_OVERRIDES).noneMatch(regex -> Pattern.compile(regex).matcher(property.getKey()).matches());
+        return ALLOWED_OVERRIDES.stream().noneMatch(pattern -> pattern.matcher(property.getKey()).matches());
     }
 
     private Map<String, String> readPropertiesFile(Path file) {
