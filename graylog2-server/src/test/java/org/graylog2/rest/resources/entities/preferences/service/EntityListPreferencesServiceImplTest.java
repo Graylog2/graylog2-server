@@ -71,7 +71,7 @@ public class EntityListPreferencesServiceImplTest {
     public void performsSaveAndGetOperationsCorrectly() {
         final StoredEntityListPreferences existingPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(new EntityListPreferences(List.of("title", "description"), 42, new SingleFieldSortPreferences("title", ASC)))
+                .preferences(EntityListPreferences.create(List.of("title", "description"), 42, new SingleFieldSortPreferences("title", ASC)))
                 .build();
 
         //save
@@ -89,7 +89,7 @@ public class EntityListPreferencesServiceImplTest {
         //update with save
         StoredEntityListPreferences updatedPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(new EntityListPreferences(List.of("title", "description", "owner"), 13, new SingleFieldSortPreferences("title", DESC)))
+                .preferences(EntityListPreferences.create(List.of("title", "description", "owner"), 13, new SingleFieldSortPreferences("title", DESC)))
                 .build();
         saved = toTest.save(updatedPreference);
         assertTrue(saved);
@@ -101,7 +101,7 @@ public class EntityListPreferencesServiceImplTest {
         //update with some values cleaned
         updatedPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(new EntityListPreferences(List.of("title", "description", "owner"), null, null))
+                .preferences(EntityListPreferences.create(List.of("title", "description", "owner"), null, null))
                 .build();
         saved = toTest.save(updatedPreference);
         assertTrue(saved);

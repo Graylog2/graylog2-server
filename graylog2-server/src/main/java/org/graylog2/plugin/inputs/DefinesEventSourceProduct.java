@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin.inputs.failure;
+package org.graylog2.plugin.inputs;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import org.graylog2.plugin.journal.RawMessage;
-
-public record InputProcessingFailure(@Nonnull String errorMessage,
-                                     @Nullable Throwable exception,
-                                     @Nonnull RawMessage rawMessage,
-                                     @Nullable String inputMessage) {
+public interface DefinesEventSourceProduct {
+    /**
+     * Every codec except the general Syslog/GELF codecs set this attribute and we start to depend on
+     * it in code, so we make this a mandatory getter
+     * @return
+     */
+    String getEventSourceProduct();
 }

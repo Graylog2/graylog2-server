@@ -69,7 +69,7 @@ class EntityListPreferencesCleanerOnUserDeletionTest {
                 .build();
         service.save(StoredEntityListPreferences.builder()
                 .preferencesId(preferenceId1)
-                .preferences(new EntityListPreferences(List.of(), 42, null))
+                .preferences(EntityListPreferences.create(List.of(), 42, null))
                 .build());
 
         final StoredEntityListPreferencesId preferenceId2 = StoredEntityListPreferencesId.builder()
@@ -78,7 +78,7 @@ class EntityListPreferencesCleanerOnUserDeletionTest {
                 .build();
         service.save(StoredEntityListPreferences.builder()
                 .preferencesId(preferenceId2)
-                .preferences(new EntityListPreferences(List.of(), 42, null))
+                .preferences(EntityListPreferences.create(List.of(), 42, null))
                 .build());
 
         //verify they are present

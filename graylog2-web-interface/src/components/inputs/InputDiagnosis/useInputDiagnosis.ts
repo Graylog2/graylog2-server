@@ -36,10 +36,12 @@ export type InputDiagnosisMetrics = {
   read_bytes_total: number;
   write_bytes_1sec: number;
   write_bytes_total: number;
-  failures_indexing: any;
-  failures_processing: any;
-  failures_inputs_codecs: any;
-  dropped_message_occurrence: any;
+  message_errors: {
+    failures_indexing: number;
+    failures_processing: number;
+    failures_inputs_codecs: number;
+    dropped_message_occurrence: number;
+  };
   stream_message_count: StreamMessageCount[];
 };
 
@@ -196,10 +198,12 @@ const useInputDiagnosis = (
       read_bytes_total: aggregatedMetrics[metricWithPrefix(input, 'read_bytes_total')],
       write_bytes_1sec: aggregatedMetrics[metricWithPrefix(input, 'write_bytes_1sec')],
       write_bytes_total: aggregatedMetrics[metricWithPrefix(input, 'write_bytes_total')],
-      dropped_message_occurrence: aggregatedMetrics[dropped_message_occurrence],
-      failures_indexing: aggregatedMetrics[failures_indexing] || 0,
-      failures_processing: aggregatedMetrics[failures_processing] || 0,
-      failures_inputs_codecs: aggregatedMetrics[failures_inputs_codecs] || 0,
+      message_errors: {
+        failures_indexing: aggregatedMetrics[failures_indexing] || 0,
+        failures_processing: aggregatedMetrics[failures_processing] || 0,
+        failures_inputs_codecs: aggregatedMetrics[failures_inputs_codecs] || 0,
+        dropped_message_occurrence: aggregatedMetrics[dropped_message_occurrence],
+      },
       stream_message_count: messageCountByStream?.stream_message_count || [],
     },
   };

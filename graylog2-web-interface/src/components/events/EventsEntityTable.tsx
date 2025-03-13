@@ -27,11 +27,19 @@ import useQuery from 'routing/useQuery';
 import useColumnRenderers from 'components/events/events/ColumnRenderers';
 import EventsRefreshControls from 'components/events/events/EventsRefreshControls';
 import QueryHelper from 'components/common/QueryHelper';
+import EventsHistogram from 'components/events/EventsHistogram';
+import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
+import EventsMetrics from 'components/events/EventsMetrics';
 
 const additionalSearchFields = {
   key: 'The key of the event',
 };
 
+const Metrics = ({ searchParams, setFilters }: MiddleSectionProps) => (
+  <EventsMetrics>
+    <EventsHistogram searchParams={searchParams} setFilters={setFilters} />
+  </EventsMetrics>
+);
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
 
@@ -60,6 +68,7 @@ const EventsEntityTable = () => {
       columnRenderers={columnRenderers}
       bulkSelection={bulkSelection}
       topRightCol={<EventsRefreshControls />}
+      middleSection={Metrics}
     />
   );
 };

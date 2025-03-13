@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class NodePingPeriodical extends Periodical {
@@ -45,8 +46,8 @@ public class NodePingPeriodical extends Periodical {
     private final Supplier<String> datanodeRestApiUri;
     private final Configuration configuration;
     private final Supplier<OpensearchState> processState;
-
     private final Supplier<Date> certValidUntil;
+    private final Supplier<List<String>> opensearchRoles;
 
     private final Version version = Version.CURRENT_CLASSPATH;
 
@@ -61,7 +62,8 @@ public class NodePingPeriodical extends Periodical {
                 managedOpenSearch::getOpensearchClusterUrl,
                 managedOpenSearch::getDatanodeRestApiUrl,
                 () -> managedOpenSearch.processInfo().state(),
-                datanodeKeystore::getCertificateExpiration
+                datanodeKeystore::getCertificateExpiration,
+                managedOpenSearch::getOpensearchRoles
         );
     }
 
@@ -73,7 +75,8 @@ public class NodePingPeriodical extends Periodical {
             Supplier<String> opensearchClusterUri,
             Supplier<String> datanodeRestApiUri,
             Supplier<OpensearchState> processState,
-            Supplier<Date> certValidUntil
+            Supplier<Date> certValidUntil,
+            Supplier<List<String>> opensearchRoles
     ) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -83,6 +86,7 @@ public class NodePingPeriodical extends Periodical {
         this.configuration = configuration;
         this.processState = processState;
         this.certValidUntil = certValidUntil;
+        this.opensearchRoles = opensearchRoles;
     }
 
     @Override
@@ -137,6 +141,7 @@ public class NodePingPeriodical extends Periodical {
                 .setRestApiAddress(datanodeRestApiUri.get())
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
+                .setOpensearchRoles(opensearchRoles.get())
                 .build();
 
         nodeService.ping(dto);
@@ -152,6 +157,7 @@ public class NodePingPeriodical extends Periodical {
                 .setDataNodeStatus(DataNodeStatus.STARTING)
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
+                .setOpensearchRoles(opensearchRoles.get())
                 .build());
 
         if (!registrationSucceeded) {

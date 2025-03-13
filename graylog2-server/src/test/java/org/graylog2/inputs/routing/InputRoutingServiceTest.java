@@ -108,7 +108,7 @@ class InputRoutingServiceTest {
     @Test
     void handleInputDeleted() throws IOException {
         final RuleDao ruleDao = loadFixture("org/graylog2/inputs/routing/InputRoutingRule1.json", RuleDao.class);
-        when(ruleService.loadAll()).thenReturn(List.of(ruleDao));
+        when(ruleService.loadAllByTitle(anyString())).thenReturn(List.of(ruleDao));
 
         inputRoutingService.handleInputDeleted(new InputDeletedEvent(INPUT_ID, INPUT_NAME));
         verify(ruleService).delete(ruleDao);
@@ -117,7 +117,7 @@ class InputRoutingServiceTest {
     @Test
     void deleteFromDefaultPipeline() throws IOException, NotFoundException {
         final RuleDao ruleDao = loadFixture("org/graylog2/inputs/routing/InputRoutingRule1.json", RuleDao.class);
-        when(ruleService.loadAll()).thenReturn(List.of(ruleDao));
+        when(ruleService.loadAllByTitle(anyString())).thenReturn(List.of(ruleDao));
 
         when(pipelineService.loadByName(anyString())).thenReturn(PipelineDao.builder().id("pipelineId1").title("pipelineDao").source("dummySource").build());
 
@@ -145,7 +145,7 @@ class InputRoutingServiceTest {
     @Test
     void handleInputRenamed() throws IOException, NotFoundException {
         final RuleDao ruleDao = loadFixture("org/graylog2/inputs/routing/InputRoutingRule1.json", RuleDao.class);
-        when(ruleService.loadAll()).thenReturn(List.of(ruleDao));
+        when(ruleService.loadAllByTitle(anyString())).thenReturn(List.of(ruleDao));
 
         String pipelineSource = "pipeline \"All Messages Routing\"\nstage 0 match EITHER\nrule \"gl_route_inputName_to_streamName\"\nend";
         when(pipelineService.loadByName(anyString())).thenReturn(PipelineDao.builder().id("pipelineId1").title("pipelineDao").source(pipelineSource).build());

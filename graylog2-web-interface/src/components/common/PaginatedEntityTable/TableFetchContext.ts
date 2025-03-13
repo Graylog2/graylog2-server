@@ -23,6 +23,7 @@ export type ContextValue = {
   searchParams: SearchParams;
   refetch: () => void;
   attributes: Array<Attribute>;
+  entityTableId: string;
 };
 
 const TableFetchContext = React.createContext<ContextValue | undefined>(undefined);

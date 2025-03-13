@@ -81,6 +81,12 @@ const Routes = {
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
+    CLUSTER: {
+      NODES: '/system/cluster',
+      DATANODE_DASHBOARD: '/system/cluster/datanode-dashboard',
+      DATANODE_CONFIGURATION: '/system/cluster/datanode-configuration',
+      DATANODE_MIGRATION: '/system/cluster/datanode-migration',
+    },
     CONFIGURATIONS: '/system/configurations',
     configurationsSection: (section: string, pluginSection?: string) =>
       `/system/configurations/${section}${pluginSection ? `/${pluginSection}` : ''}`,
@@ -168,6 +174,9 @@ const Routes = {
       },
       OVERVIEW: '/system/users',
       show: (userId: string) => `/system/users/${userId}`,
+    },
+    USERS_TOKEN_MANAGEMENT: {
+      overview: '/system/tokenmanagement/overview',
     },
     AUTHZROLES: {
       OVERVIEW: '/system/roles',

@@ -57,11 +57,11 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.ConfigurationModule;
+import org.graylog2.bindings.DbEntitiesModule;
 import org.graylog2.bindings.ElasticsearchModule;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
 import org.graylog2.bindings.MessageOutputBindings;
-import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
@@ -169,7 +169,7 @@ public class Server extends ServerBootstrap {
         modules.add(
                 new VersionAwareStorageModule(configuration),
                 new ConfigurationModule(configuration),
-                new MongoDBModule(),
+                new DbEntitiesModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
                 new ElasticsearchModule(),
                 new PersistenceServicesBindings(),

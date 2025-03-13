@@ -20,7 +20,7 @@ import selectEvent from 'react-select-event';
 
 import { asMock } from 'helpers/mocking';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
-import useStreams from 'components/streams/hooks/useStreams';
+import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilteredStreams';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import useStreamsByIndexSet from 'components/inputs/InputSetupWizard/hooks/useStreamsByIndexSet';
 
@@ -48,17 +48,16 @@ const renderWizard = () =>
     </InputSetupWizardProvider>,
   );
 
-jest.mock('components/streams/hooks/useStreams');
+jest.mock('components/inputs/InputSetupWizard/hooks/useFilteredStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
 jest.mock('components/indices/hooks/useIndexSetsList');
 jest.mock('components/inputs/InputSetupWizard/hooks/useStreamsByIndexSet');
 
 const useStreamsResult = (list = []) => ({
-  data: { list: list, pagination: { total: 1 }, attributes: [] },
-  isInitialLoading: false,
+  data: { streams: list, total: 1 },
+  isLoading: false,
   isFetching: false,
   error: undefined,
-  refetch: () => {},
 });
 
 const useStreamByIndexSetResult = (data = { total: 0, streams: [] }) => ({
@@ -176,7 +175,7 @@ const getStreamCreateFormFields = async () => {
 };
 
 beforeEach(() => {
-  asMock(useStreams).mockReturnValue(useStreamsResult());
+  asMock(useFilteredStreams).mockReturnValue(useStreamsResult());
   asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
   asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
 });
@@ -210,7 +209,7 @@ describe('InputSetupWizard Setup Routing', () => {
       });
 
       it('should only show editable existing streams', async () => {
-        asMock(useStreams).mockReturnValue(
+        asMock(useFilteredStreams).mockReturnValue(
           useStreamsResult([
             { id: 'alohoid', title: 'Aloho', is_editable: true },
             { id: 'moraid', title: 'Mora', is_editable: false },
@@ -237,7 +236,7 @@ describe('InputSetupWizard Setup Routing', () => {
       });
 
       it('should not show existing default stream in select', async () => {
-        asMock(useStreams).mockReturnValue(
+        asMock(useFilteredStreams).mockReturnValue(
           useStreamsResult([
             { id: 'alohoid', title: 'Aloho', is_editable: true, is_default: true },
             { id: 'moraid', title: 'Mora', is_editable: true },
@@ -265,7 +264,7 @@ describe('InputSetupWizard Setup Routing', () => {
       });
 
       it('should allow the user to select a stream', async () => {
-        asMock(useStreams).mockReturnValue(
+        asMock(useFilteredStreams).mockReturnValue(
           useStreamsResult([
             { id: 'alohoid', title: 'Aloho', is_editable: true },
             { id: 'moraid', title: 'Mora', is_editable: true },
@@ -288,7 +287,7 @@ describe('InputSetupWizard Setup Routing', () => {
       });
 
       it('should show a warning if the selected stream has connected pipelines', async () => {
-        asMock(useStreams).mockReturnValue(
+        asMock(useFilteredStreams).mockReturnValue(
           useStreamsResult([
             { id: 'alohoid', title: 'Aloho', is_editable: true },
             { id: 'moraid', title: 'Mora', is_editable: true },

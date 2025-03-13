@@ -1,0 +1,5 @@
+type = "c"
+message = "More concise information on when/how to change permissions for the OpenSearch data directory in the Data Node migration wizard. ."
+
+issues = ["Graylog2/graylog-plugin-enterprise#9231"]
+pulls = ["21959"]
