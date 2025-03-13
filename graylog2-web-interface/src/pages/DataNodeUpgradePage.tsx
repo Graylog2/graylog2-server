@@ -102,15 +102,12 @@ const DataNodeUpgradePage = () => {
   const manualUpgradeAlert = (nodeInProgress: string) => (
     <Alert bsStyle="warning">
       <p>
-        Once you have completed the manual upgrade of {nodeInProgress ? <b>{nodeInProgress}</b> : 'your Data Node'} on the system, wait until it reconnects and
-        apears in the <b>Upgraded Nodes</b> panel, then click on&nbsp;
-        <Button
-          onClick={confirmNodeUpgrade}
-          bsStyle="primary"
-          bsSize="xs">
+        Once you have completed the manual upgrade of {nodeInProgress ? <b>{nodeInProgress}</b> : 'your Data Node'} on
+        the system, wait until it reconnects and apears in the <b>Upgraded Nodes</b> panel, then click on&nbsp;
+        <Button onClick={confirmNodeUpgrade} bsStyle="primary" bsSize="xs">
           Confirm Upgrade
-        </Button>&nbsp;
-        and continue with next node.
+        </Button>
+        &nbsp; and continue with next node.
       </p>
       {upgradeInstructionsDocumentationMessage}
     </Alert>
@@ -180,9 +177,7 @@ const DataNodeUpgradePage = () => {
               )}
             </Alert>
             {!data?.outdated_nodes?.length && data?.up_to_date_nodes?.length > 0 && (
-              <Alert bsStyle="success">
-                All your Data Nodes are Up-to-date.
-              </Alert>
+              <Alert bsStyle="success">All your Data Nodes are Up-to-date.</Alert>
             )}
             {!data?.shard_replication_enabled && manualUpgradeAlert(nodeInProgress)}
           </Col>
@@ -204,7 +199,8 @@ const DataNodeUpgradePage = () => {
                     <Label bsStyle="warning" bsSize="xs">
                       Disabled
                     </Label>
-                  )}&nbsp;
+                  )}
+                  &nbsp;
                   <Switch
                     checked={!!data?.shard_replication_enabled}
                     onChange={data?.shard_replication_enabled ? stopShardReplication : startShardReplication}
@@ -328,7 +324,7 @@ const DataNodeUpgradePage = () => {
               <Modal.Header closeButton>
                 <Modal.Title>Data Node Manual Upgrade</Modal.Title>
               </Modal.Header>
-        
+
               <Modal.Body>{manualUpgradeAlert(nodeInProgress)}</Modal.Body>
             </Modal>
           )}
