@@ -443,7 +443,7 @@ const ApiRoutes = {
     setStatus: (userId: string, accountStatus) => ({ url: `/users/${userId}/status/${accountStatus}` }),
   },
   TokenManagementController: {
-    paginated: () =>({url: '/token_usage/paginated'}),
+    paginated: () => ({ url: '/token_usage/paginated' }),
   },
   DashboardsController: {
     show: (id) => ({ url: `/dashboards/${id}` }),

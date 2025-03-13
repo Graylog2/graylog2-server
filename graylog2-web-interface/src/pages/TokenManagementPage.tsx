@@ -24,9 +24,7 @@ import TokenManagement from 'components/users/UsersTokenManagement/TokenManageme
 const TokenManagementPage = () => (
   <DocumentTitle title="Token Management">
     <UsersPageNavigation />
-    <PageHeader
-      title="Token Management"
-    >
+    <PageHeader title="Token Management">
       <span>Overview of Graylog&apos;s access tokens.</span>
     </PageHeader>
 

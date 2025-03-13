@@ -53,7 +53,8 @@ const docsHelper = {
     SEARCH_QUERY_ERRORS: 'making_sense_of_your_log_data/writing_search_queries.html#ErrorTypes',
     SEARCH_QUERY_LANGUAGE: 'making_sense_of_your_log_data/writing_search_queries.html',
     STREAMS: 'making_sense_of_your_log_data/streams.html',
-    STREAM_PROCESSING_RUNTIME_LIMITS: 'making_sense_of_your_log_data/stream_processing.htm#StreamProcessingRuntimeLimits',
+    STREAM_PROCESSING_RUNTIME_LIMITS:
+      'making_sense_of_your_log_data/stream_processing.htm#StreamProcessingRuntimeLimits',
     TIME_FRAME_SELECTOR: 'making_sense_of_your_log_data/time_frame_selector.html',
     UPGRADE_GUIDE: 'upgrading_graylog/upgrading_graylog.html',
     USERS_ROLES: 'setting_up_graylog/users_teams.htm',

@@ -15,16 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type {Sort} from 'stores/PaginationTypes';
+import type { Sort } from 'stores/PaginationTypes';
 
 export const ENTITY_TABLE_ID = 'token_usage';
 export const DEFAULT_LAYOUT = {
   entityTableId: 'token_usage',
   defaultPageSize: 20,
   defaultSort: { attributeId: 'NAME', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ["id", "username", "user_id", "NAME", "created_at", "last_access", "external_user", "title"],
+  defaultDisplayedAttributes: [
+    'id',
+    'username',
+    'user_id',
+    'NAME',
+    'created_at',
+    'last_access',
+    'external_user',
+    'title',
+  ],
 };
-export const COLUMNS_ORDER = ["id", "username", "user_id", "NAME", "created_at", "last_access", "external_user", "title"];
-
-export const ADDITIONAL_ATTRIBUTES = [
+export const COLUMNS_ORDER = [
+  'id',
+  'username',
+  'user_id',
+  'NAME',
+  'created_at',
+  'last_access',
+  'external_user',
+  'title',
 ];
+
+export const ADDITIONAL_ATTRIBUTES = [];
