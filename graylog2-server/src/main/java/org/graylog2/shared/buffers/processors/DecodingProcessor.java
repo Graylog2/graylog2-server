@@ -26,7 +26,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
 import org.graylog.failure.FailureSubmissionService;
-import org.graylog2.inputs.diagnosis.InputDiagnosisMetrics;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -127,7 +126,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         // TODO fix the above
 
         //.inputId checked during raw message decode!
-        final String inputIdOnCurrentNode = InputDiagnosisMetrics.getInputIOnCurrentNode(raw);
+        final String inputIdOnCurrentNode = raw.getInputIdOnCurrentNode().orElse(null);
 
         final Codec.Factory<? extends Codec> factory = codecFactory.get(raw.getCodecName());
         if (factory == null) {
