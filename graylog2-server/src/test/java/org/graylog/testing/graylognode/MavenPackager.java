@@ -43,6 +43,8 @@ public class MavenPackager {
     public static synchronized void packageJarIfNecessary(final MavenProjectDirProvider mavenProjectDirProvider) {
         if (isRunFromMaven()) {
             LOG.info("Running from Maven. Assuming jars are current.");
+        } else if (isRunFromExecutableJar()) {
+            LOG.info("Running from executable JAR. Assuming jars are current.");
         } else if (jarHasBeenPackagedInThisRun) {
             LOG.info("Assuming jars are current.");
         } else {
@@ -54,6 +56,10 @@ public class MavenPackager {
     public static boolean isRunFromMaven() {
         // surefire-related properties should only be present when the tests are started from surefire, i.e. maven
         return System.getProperty("surefire.test.class.path") != null;
+    }
+
+    public static boolean isRunFromExecutableJar() {
+        return System.getProperty("graylog.executable-test-jar") != null;
     }
 
     public static void packageJar(final MavenProjectDirProvider mavenProjectDirProvider) {

@@ -1,0 +1,38 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.2.0 http://maven.apache.org/xsd/assembly-2.2.0.xsd">
+    <id>test-jar</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>/</outputDirectory>
+            <useProjectArtifact>true</useProjectArtifact>
+            <unpack>true</unpack>
+            <scope>test</scope>
+            <unpackOptions>
+                <excludes>
+                    <!-- Avoids logging issues due to multiple Log4j2Plugins.dat present in dependencies. -->
+                    <exclude>**/Log4j2Plugins.dat</exclude>
+                    <!-- Exclude integration tests from dependencies. -->
+                    <exclude>**/*IT.class</exclude>
+                </excludes>
+            </unpackOptions>
+        </dependencySet>
+    </dependencySets>
+
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}/test-classes</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>**/*.class</include>
+            </includes>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
+    </fileSets>
+</assembly>
