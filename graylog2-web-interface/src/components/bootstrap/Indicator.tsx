@@ -15,16 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Indicator as MantineIndicator } from '@mantine/core';
 
-import type { SearchParams, Attribute } from 'stores/PaginationTypes';
-import { singleton } from 'logic/singleton';
+type Props = Pick<
+  React.ComponentProps<typeof MantineIndicator>,
+  | 'position'
+  | 'offset'
+  | 'label'
+  | 'children'
+  | 'className'
+  | 'size'
+  | 'title'
+  | 'radius'
+  | 'color'
+  | 'zIndex'
+  | 'withBorder'
+  | 'disabled'
+  | 'processing'
+  | 'autoContrast'
+>;
+const Indicator = ({ ...props }: Props) => <MantineIndicator {...props} />;
 
-export type ContextValue = {
-  searchParams: SearchParams;
-  refetch: () => void;
-  attributes: Array<Attribute>;
-  entityTableId: string;
-};
-
-const TableFetchContext = React.createContext<ContextValue | undefined>(undefined);
-export default singleton('contexts.TableFetchContext', () => TableFetchContext);
+export default Indicator;
