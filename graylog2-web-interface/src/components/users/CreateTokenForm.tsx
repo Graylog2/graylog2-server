@@ -62,6 +62,7 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
           value={tokenName}
           onChange={(event) => setTokenName((event.target as HTMLInputElement).value)}
         />
+        {' '}
         <ISODurationInput
           id="token_creation_ttl"
           duration={tokenTtl}
