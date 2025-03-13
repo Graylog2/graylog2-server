@@ -250,7 +250,7 @@ const SetupRoutingStep = () => {
         <>
           <Row>
             <DescriptionCol md={12}>
-              <StyledLabel>Choose an existing Stream</StyledLabel>
+              <StyledLabel htmlFor="streams">Choose an existing Stream</StyledLabel>
               <StyledList>
                 <li>Route messages from this input to an existing stream is selected.</li>
                 <li>
