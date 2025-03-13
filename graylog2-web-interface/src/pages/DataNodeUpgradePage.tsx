@@ -20,7 +20,12 @@ import styled, { css } from 'styled-components';
 import { Row, Col, Button, Table, Label, SegmentedControl, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Icon, ConfirmDialog } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import useDataNodeUpgradeStatus, { getNodeToUpgrade, saveNodeToUpgrade, startShardReplication, stopShardReplication } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
+import useDataNodeUpgradeStatus, {
+  getNodeToUpgrade,
+  saveNodeToUpgrade,
+  startShardReplication,
+  stopShardReplication,
+} from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -46,7 +51,7 @@ const StyledHorizontalDl = styled.dl(
   `,
 );
 
-type DataNodeUpgradeMethodType = 'cluster-restart'|'rolling-upgrade';
+type DataNodeUpgradeMethodType = 'cluster-restart' | 'rolling-upgrade';
 
 const UpgradeMethodSegments: Array<{ value: DataNodeUpgradeMethodType; label: string }> = [
   { value: 'cluster-restart', label: 'Cluster Restart' },
@@ -64,11 +69,12 @@ const getClusterHealthStyle = (status: string) => {
     default:
       return 'info';
   }
-}
+};
 
 const upgradeInstructionsDocumentationMessage = (
   <p>
-    To upgrade your Data Nodes, please follow the instructions in the <DocumentationLink text="documentation" page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} />.
+    To upgrade your Data Nodes, please follow the instructions in the{' '}
+    <DocumentationLink text="documentation" page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} />.
   </p>
 );
 
@@ -81,18 +87,18 @@ const DataNodeUpgradePage = () => {
     saveNodeToUpgrade(node?.hostname);
     setOpenUpgradeConfirmDialog(true);
     stopShardReplication();
-  }
+  };
 
   const confirmNodeUpgrade = async () => {
     startShardReplication();
     setOpenUpgradeConfirmDialog(false);
-  }
+  };
 
   const nodeInProgress = getNodeToUpgrade();
 
   const numberOfNodes = (data?.outdated_nodes?.length || 0) + (data?.up_to_date_nodes?.length || 0);
 
-  const showRollingUpgrade = (upgradeMethod === 'rolling-upgrade') && (numberOfNodes > 2);
+  const showRollingUpgrade = upgradeMethod === 'rolling-upgrade' && numberOfNodes > 2;
 
   return (
     <DocumentTitle title="Data Node Upgrade">
@@ -104,39 +110,50 @@ const DataNodeUpgradePage = () => {
           path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
         }}>
         <span>
-          Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index
-          and search through all the messages in your Graylog message database.
+          Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to
+          index and search through all the messages in your Graylog message database.
         </span>
       </PageHeader>
-      {isInitialLoading ? <Spinner /> : (
+      {isInitialLoading ? (
+        <Spinner />
+      ) : (
         <Row className="content">
           <Col xs={12}>
-            <SegmentedControl data={UpgradeMethodSegments} value={upgradeMethod} onChange={(value: DataNodeUpgradeMethodType) => setUpgradeMethod(value)} />  
+            <SegmentedControl
+              data={UpgradeMethodSegments}
+              value={upgradeMethod}
+              onChange={(value: DataNodeUpgradeMethodType) => setUpgradeMethod(value)}
+            />
             <Alert bsStyle="info">
-              {(upgradeMethod === 'cluster-restart') && (
+              {upgradeMethod === 'cluster-restart' && (
                 <>
                   <p>
-                    When using the cluster restart method, you will upgrade all Data Nodes at once. During this time, 
-                    messages will be buffered in the journal and processed as the Data Node cluster comes back online, 
-                    leading to no data loss provided your journal size is configured for the message volume which is expected during the Data Node downtime.               
+                    When using the cluster restart method, you will upgrade all Data Nodes at once. During this time,
+                    messages will be buffered in the journal and processed as the Data Node cluster comes back online,
+                    leading to no data loss provided your journal size is configured for the message volume which is
+                    expected during the Data Node downtime.
                   </p>
                   <p>
-                    If you are running a Data Node cluster with less than three nodes, the cluster restart method is the only method available.
+                    If you are running a Data Node cluster with less than three nodes, the cluster restart method is the
+                    only method available.
                   </p>
                   <p>
-                    If you are running a Data Node cluster with three or more nodes, you can choose to use the cluster restart method after consideration of your journal size and your message throughput.
+                    If you are running a Data Node cluster with three or more nodes, you can choose to use the cluster
+                    restart method after consideration of your journal size and your message throughput.
                   </p>
                   {upgradeInstructionsDocumentationMessage}
                 </>
               )}
-              {(upgradeMethod === 'rolling-upgrade') && (
+              {upgradeMethod === 'rolling-upgrade' && (
                 <>
                   <p>
-                    Rolling upgrades can be performed on a running Data Node cluster only with <b>three or more nodes</b>, with virtually no downtime.             
+                    Rolling upgrades can be performed on a running Data Node cluster only with{' '}
+                    <b>three or more nodes</b>, with virtually no downtime.
                   </p>
                   <p>
-                    Data Nodes are individually stopped and upgraded in place. Alternatively, Data Nodes can be stopped and replaced, one at a time, 
-                    by hosts running the new version. During this process you can continue to index and query data in your cluster.               
+                    Data Nodes are individually stopped and upgraded in place. Alternatively, Data Nodes can be stopped
+                    and replaced, one at a time, by hosts running the new version. During this process you can continue
+                    to index and query data in your cluster.
                   </p>
                   {upgradeInstructionsDocumentationMessage}
                 </>
@@ -153,17 +170,26 @@ const DataNodeUpgradePage = () => {
               <dt>Shard Replication:</dt>
               <dd>
                 {data?.shard_replication_enabled ? (
-                  <Label bsStyle="success" bsSize="xs">Enabled</Label>
+                  <Label bsStyle="success" bsSize="xs">
+                    Enabled
+                  </Label>
                 ) : (
-                  <Label bsStyle="warning" bsSize="xs">Disabled</Label>
+                  <Label bsStyle="warning" bsSize="xs">
+                    Disabled
+                  </Label>
                 )}
               </dd>
               <dt>Cluster Manager:</dt>
               <dd>{data?.cluster_state?.manager_node?.name}</dd>
               <dt>Number of Nodes:</dt>
-              <dd>{numberOfNodes} ({data?.outdated_nodes?.length || 0} outdated, {data?.up_to_date_nodes?.length || 0} upgraded)</dd> 
+              <dd>
+                {numberOfNodes} ({data?.outdated_nodes?.length || 0} outdated, {data?.up_to_date_nodes?.length || 0}{' '}
+                upgraded)
+              </dd>
               <dt>Number of Shards:</dt>
-              <dd>{data?.cluster_state?.active_shards || 0} ({data?.cluster_state?.unassigned_shards || 0} unassigned)</dd>
+              <dd>
+                {data?.cluster_state?.active_shards || 0} ({data?.cluster_state?.unassigned_shards || 0} unassigned)
+              </dd>
             </StyledHorizontalDl>
             <br />
           </Col>
@@ -180,18 +206,31 @@ const DataNodeUpgradePage = () => {
                           <td>
                             <div>
                               {outdated_node?.hostname}&nbsp;
-                              <Label bsStyle={outdated_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'} bsSize="xs">
+                              <Label
+                                bsStyle={outdated_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'}
+                                bsSize="xs">
                                 {outdated_node?.data_node_status}
-                              </Label>&nbsp;
-                              {outdated_node?.manager_node && (<Label bsStyle="info" bsSize="xs">manager</Label>)}
+                              </Label>
+                              &nbsp;
+                              {outdated_node?.manager_node && (
+                                <Label bsStyle="info" bsSize="xs">
+                                  manager
+                                </Label>
+                              )}
                             </div>
                             <div>
                               <i>{outdated_node?.ip}</i>
                             </div>
                           </td>
-                          <td><i>{outdated_node?.datanode_version}</i></td>
+                          <td>
+                            <i>{outdated_node?.datanode_version}</i>
+                          </td>
                           <td align="right">
-                            <Button onClick={() => startNodeUpgrade(outdated_node)} disabled={!outdated_node?.upgrade_possible} bsSize="sm" bsStyle="primary">
+                            <Button
+                              onClick={() => startNodeUpgrade(outdated_node)}
+                              disabled={!outdated_node?.upgrade_possible}
+                              bsSize="sm"
+                              bsStyle="primary">
                               Start Upgrade Process
                             </Button>
                           </td>
@@ -215,18 +254,29 @@ const DataNodeUpgradePage = () => {
                           <td>
                             <div>
                               {upgraded_node?.hostname}&nbsp;
-                              <Label bsStyle={upgraded_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'} bsSize="xs">
+                              <Label
+                                bsStyle={upgraded_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'}
+                                bsSize="xs">
                                 {upgraded_node?.data_node_status}
-                              </Label>&nbsp;
-                              {upgraded_node?.manager_node && (<Label bsStyle="info" bsSize="xs">manager</Label>)}
+                              </Label>
+                              &nbsp;
+                              {upgraded_node?.manager_node && (
+                                <Label bsStyle="info" bsSize="xs">
+                                  manager
+                                </Label>
+                              )}
                             </div>
                             <div>
                               <i>{upgraded_node?.ip}</i>
                             </div>
                           </td>
-                          <td><i>{upgraded_node?.datanode_version}</i></td>
+                          <td>
+                            <i>{upgraded_node?.datanode_version}</i>
+                          </td>
                           <td align="right">
-                            <Label bsStyle="success" bsSize="xs">Upgraded <Icon name="check" /></Label>
+                            <Label bsStyle="success" bsSize="xs">
+                              Upgraded <Icon name="check" />
+                            </Label>
                           </td>
                         </tr>
                       ))}
@@ -247,11 +297,10 @@ const DataNodeUpgradePage = () => {
               onConfirm={confirmNodeUpgrade}
               onCancel={() => setOpenUpgradeConfirmDialog(false)}
               title="Start Data Node Upgrade Process"
-              btnConfirmText="Confirm Upgrade"
-            >
+              btnConfirmText="Confirm Upgrade">
               <>
-                Once you have completed upgrading <b>{nodeInProgress}</b> on the system, wait until it reconnects and apears in the <b>Upgraded Nodes</b> panel,
-                then click on Confirm Upgrade and continue with next node.
+                Once you have completed upgrading <b>{nodeInProgress}</b> on the system, wait until it reconnects and
+                apears in the <b>Upgraded Nodes</b> panel, then click on Confirm Upgrade and continue with next node.
               </>
             </ConfirmDialog>
           )}

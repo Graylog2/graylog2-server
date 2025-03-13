@@ -293,10 +293,20 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.PIPELINES.PIPELINE(':pipelineId'), element: <PipelineDetailsPage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODES, element: <ClusterConfigurationPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_DASHBOARD, element: <DataNodesClusterManagementPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION, element: <DataNodesClusterConfigurationPage /> },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_DASHBOARD,
+              element: <DataNodesClusterManagementPage />,
+            },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
+              element: <DataNodesClusterConfigurationPage />,
+            },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
-            !isCloud && enableDataNodeMigration && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION, element: <DataNodesMigrationPage /> },
+            !isCloud &&
+              enableDataNodeMigration && {
+                path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
+                element: <DataNodesMigrationPage />,
+              },
 
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODE_SHOW(':nodeId'), element: <ShowNodePage /> },
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(':dataNodeId'), element: <DataNodePage /> },

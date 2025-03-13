@@ -88,7 +88,10 @@ export const stopShardReplication = async (): Promise<FlushResponse> => {
 
     return response;
   } catch (errorThrown) {
-    UserNotification.error(`Stopping shard replication failed with status: ${errorThrown}`, 'Could not stop shard replication.');
+    UserNotification.error(
+      `Stopping shard replication failed with status: ${errorThrown}`,
+      'Could not stop shard replication.',
+    );
 
     return { total: 0, failed: 0, successful: 0 };
   }
@@ -104,8 +107,11 @@ export const startShardReplication = async (): Promise<FlushResponse> => {
 
     return response;
   } catch (errorThrown) {
-    UserNotification.error(`Starting shard replication failed with status: ${errorThrown}`, 'Could not start shard replication.');
-  
+    UserNotification.error(
+      `Starting shard replication failed with status: ${errorThrown}`,
+      'Could not start shard replication.',
+    );
+
     return { total: 0, failed: 0, successful: 0 };
   }
 };
@@ -120,7 +126,12 @@ const useDataNodeUpgradeStatus = (): {
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery(
     ['datanode-upgrade-status'],
-    () => defaultOnError(fetchDataNodeUpgradeStatus(), 'Loading Data Node upgrade status failed', 'Could not load Data Node upgrade status'),
+    () =>
+      defaultOnError(
+        fetchDataNodeUpgradeStatus(),
+        'Loading Data Node upgrade status failed',
+        'Could not load Data Node upgrade status',
+      ),
     {
       notifyOnChangeProps: ['data', 'error'],
       refetchInterval: 5000,
