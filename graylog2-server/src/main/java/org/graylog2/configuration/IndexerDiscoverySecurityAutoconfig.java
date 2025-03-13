@@ -56,6 +56,7 @@ public class IndexerDiscoverySecurityAutoconfig implements IndexerDiscoveryListe
             LOG.info("Creating new self-signed Graylog CA");
             caKeystore.createSelfSigned("Graylog CA");
         }
+        LOG.info("Self-signed graylog CA configuration has been successfully initialized");
     }
 
     private Optional<RenewalPolicy> getRenewalPolicy() {
@@ -65,6 +66,13 @@ public class IndexerDiscoverySecurityAutoconfig implements IndexerDiscoveryListe
     @Override
     public void beforeIndexerDiscovery() {
         if (configuration.selfsignedStartupEnabled()) {
+            // We assume that this will run on a new cluster that doesn't contain any preflight config result value
+            // so the upsert during setConfigResult will create a new value. This information is then used to decide
+            // if this node should configure the rest of the selfsigned setup. Only if this is the first node, creating
+            // the value, we will continue with the setup.
+            // Ideally we'd use LeaderElectionService#isLeader for this decision. But this code runs earlier than
+            // the service is started and initialized, so we need a workaround. It doesn't matter if this code
+            // runs on a leader or follower node, as long as it runs only once.
             final PreflightConfigService.ConfigResultState writeResult = preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
             if (writeResult == PreflightConfigService.ConfigResultState.CREATED) {
                 LOG.info("Self-signed security startup enabled, configuring renewal policy and CA");
