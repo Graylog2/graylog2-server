@@ -33,6 +33,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settin
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 
 import java.io.IOException;
@@ -59,7 +60,7 @@ public class DatanodeUpradeServiceAdapterOS2 implements DatanodeUpgradeServiceAd
 
     @Override
     public ClusterState getClusterState() {
-        final ClusterHealthResponse response = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.cluster().health(new ClusterHealthRequest(), requestOptions));
+        final ClusterHealthResponse response = getClusterHealthResponse();
         final String shardReplication = queryShardReplication();
         final ManagerNode managerNode = managerNode();
         return new ClusterState(
@@ -77,14 +78,28 @@ public class DatanodeUpradeServiceAdapterOS2 implements DatanodeUpgradeServiceAd
                 nodesResponse());
     }
 
+    private ClusterHealthResponse getClusterHealthResponse() {
+        return client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.cluster().health(new ClusterHealthRequest(), requestOptions));
+    }
+
     @Override
     public void disableShardReplication() {
-        configureShardReplication(REPLICATION_PRIMARIES);
+        final ClusterHealthStatus clusterHealthStatus = getClusterHealthResponse().getStatus();
+        if (clusterHealthStatus == ClusterHealthStatus.GREEN) {
+            configureShardReplication(REPLICATION_PRIMARIES);
+        } else {
+            throw new IllegalStateException("Can't disable shard replication, cluster is not in healthy state. Current state: " + clusterHealthStatus);
+        }
     }
 
     @Override
     public void enableShardReplication() {
-        configureShardReplication(REPLICATION_ALL);
+        final ClusterHealthStatus clusterHealthStatus = getClusterHealthResponse().getStatus();
+        if (clusterHealthStatus == ClusterHealthStatus.GREEN) {
+            configureShardReplication(REPLICATION_ALL);
+        } else {
+            throw new IllegalStateException("Can't enable shard replication, cluster is not in healthy state. Current state: " + clusterHealthStatus);
+        }
     }
 
     private String queryShardReplication() {
