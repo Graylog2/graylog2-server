@@ -258,13 +258,13 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     private int searchQueryEngineIndexerJobsPoolSize = 4;
 
     @Parameter("search_query_engine_indexer_jobs_queue_size")
-    private int searchQueryEngineIndexerJobsQueueSize = -1;
+    private int searchQueryEngineIndexerJobsQueueSize = 0;
 
     @Parameter(value = "search_query_engine_data_lake_jobs_pool_size", validators = PositiveIntegerValidator.class)
     private int searchQueryEngineDataLakeJobsPoolSize = 4;
 
     @Parameter("search_query_engine_data_lake_jobs_queue_size")
-    private int searchQueryEngineDataLakeJobsQueueSize = -1;
+    private int searchQueryEngineDataLakeJobsQueueSize = 0;
 
     @Documentation("""
             Enabling this parameter will activate automatic security configuration. Graylog server will

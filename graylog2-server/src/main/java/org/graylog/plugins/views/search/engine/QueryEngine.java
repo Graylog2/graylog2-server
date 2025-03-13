@@ -54,8 +54,6 @@ import static org.graylog.plugins.views.search.engine.validation.DataWarehouseSe
 @Singleton
 public class QueryEngine {
     private static final Logger LOG = LoggerFactory.getLogger(QueryEngine.class);
-
-    private final Configuration configuration;
     private final Set<QueryMetadataDecorator> queryMetadataDecorators;
     private final QueryParser queryParser;
 
@@ -71,7 +69,6 @@ public class QueryEngine {
                        Map<String, QueryBackend<? extends GeneratedQueryContext>> unversionedBackends,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
                        QueryParser queryParser) {
-        this.configuration = configuration;
         this.elasticsearchBackendProvider = elasticsearchBackendProvider;
         this.unversionedBackends = unversionedBackends;
         this.queryMetadataDecorators = queryMetadataDecorators;
