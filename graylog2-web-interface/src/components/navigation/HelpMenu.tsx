@@ -23,7 +23,7 @@ import Routes from 'routing/Routes';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import Menu from 'components/bootstrap/Menu';
 
-const HelpMenuLinkItem = ({ href, children }: React.PropsWithChildren<{ href: string }>) => (
+const HelpMenuLinkItem = ({ href, children = undefined }: React.PropsWithChildren<{ href: string }>) => (
   <Menu.Item component="a" href={href} target="_blank" leftSection={<Icon name="open_in_new" />}>
     {children}
   </Menu.Item>
