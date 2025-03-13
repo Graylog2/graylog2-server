@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -121,8 +122,7 @@ public class MongoDbPipelineService implements PipelineService {
         try {
             return ruleService.loadBySourcePattern(sourcePattern).stream()
                     .flatMap(rule ->
-                            collection.find(Filters.regex(FIELD_SOURCE, rule.title())).into(new ArrayList<>()).stream()
-                    )
+                            collection.find(Filters.regex(FIELD_SOURCE, Pattern.quote(rule.title()))).into(new ArrayList<>()).stream())
                     .filter(pipelineDao -> !pipelineStreamConnectionsService.loadByPipelineId(pipelineDao.id()).isEmpty())
                     .collect(Collectors.toSet());
         } catch (MongoException e) {

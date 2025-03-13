@@ -38,6 +38,7 @@ import org.graylog2.events.ClusterEventBus;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.regex.Pattern;
 
 import static com.mongodb.client.model.Filters.regex;
 import static org.graylog.plugins.pipelineprocessor.db.RuleDao.FIELD_SOURCE;
@@ -108,7 +109,8 @@ public class MongoDbRuleService implements RuleService {
     @Override
     public Collection<RuleDao> loadBySourcePattern(String sourcePattern) {
         try {
-            return collection.find(regex(FIELD_SOURCE, sourcePattern)).into(new LinkedHashSet<>());
+            final LinkedHashSet<RuleDao> result = collection.find(regex(FIELD_SOURCE, Pattern.quote(sourcePattern))).into(new LinkedHashSet<>());
+            return result;
         } catch (MongoException e) {
             log.error("Unable to load processing rules", e);
             return Collections.emptySet();
