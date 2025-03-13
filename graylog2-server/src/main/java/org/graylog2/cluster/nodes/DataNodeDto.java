@@ -46,6 +46,7 @@ public abstract class DataNodeDto extends NodeDto {
 
     public static final String FIELD_CERT_VALID_UNTIL = "cert_valid_until";
     public static final String FIELD_DATANODE_VERSION = "datanode_version";
+    public static final String FIELD_CONFIGURATION_WARNINGS = "configuration_warnings";
     public static final String FIELD_OPENSEARCH_ROLES = "opensearch_roles";
 
     @Nullable
@@ -74,6 +75,10 @@ public abstract class DataNodeDto extends NodeDto {
     @Nullable
     @JsonProperty(FIELD_OPENSEARCH_ROLES)
     public abstract List<String> getOpensearchRoles();
+
+    @Nullable
+    @JsonProperty(FIELD_CONFIGURATION_WARNINGS)
+    public abstract List<String> getConfigurationWarnings();
 
     @JsonProperty("version_compatible")
     public boolean isCompatibleWithVersion() {
@@ -138,6 +143,10 @@ public abstract class DataNodeDto extends NodeDto {
             params.put(FIELD_OPENSEARCH_ROLES, getOpensearchRoles());
         }
 
+        if(Objects.nonNull(getConfigurationWarnings())) {
+            params.put(FIELD_CONFIGURATION_WARNINGS, getConfigurationWarnings());
+        }
+
         return params;
     }
 
@@ -173,6 +182,9 @@ public abstract class DataNodeDto extends NodeDto {
 
         @JsonProperty(FIELD_OPENSEARCH_ROLES)
         public abstract Builder setOpensearchRoles(List<String> opensearchRoles);
+
+        @JsonProperty(FIELD_CONFIGURATION_WARNINGS)
+        public abstract Builder setConfigurationWarnings(List<String> warnings);
 
         public abstract DataNodeDto build();
     }
