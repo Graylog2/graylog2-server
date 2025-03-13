@@ -26,7 +26,7 @@ import useInputSetupWizardStepsHelper from 'components/inputs/InputSetupWizard/h
 import { defaultCompare } from 'logic/DefaultCompare';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStreamForm from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
-import useStreams from 'components/streams/hooks/useStreams';
+import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilteredStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import type { OpenStepsData } from 'components/inputs/InputSetupWizard/types';
 
@@ -87,13 +87,8 @@ const SetupRoutingStep = () => {
   const removeFromDefaultStreamChecked = typeof removeFromDefault === 'undefined' ? true : removeFromDefault;
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
-  const { data: streamsData, isInitialLoading: isLoadingStreams } = useStreams({
-    query: '',
-    page: 1,
-    pageSize: 0,
-    sort: { direction: 'asc', attributeId: 'title' },
-  });
-  const streams = streamsData?.list;
+  const { data: streamsData, isLoading: isLoadingStreams } = useFilteredStreams();
+  const streams = streamsData?.streams;
   const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
 
   const defaultStepData = { streamType: 'DEFAULT' };
