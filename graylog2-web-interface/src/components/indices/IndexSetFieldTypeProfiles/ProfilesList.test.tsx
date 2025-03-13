@@ -63,6 +63,7 @@ describe('IndexSetFieldTypesList', () => {
         displayedAttributes: ['name', 'description', 'type', 'custom_field_mappings'],
       },
       isInitialLoading: false,
+      refetch: () => {},
     });
 
     asMock(useFieldTypesForMappings).mockReturnValue({

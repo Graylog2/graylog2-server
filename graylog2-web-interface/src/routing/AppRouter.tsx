@@ -123,6 +123,7 @@ import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
+import TokenManagementPage from 'pages/TokenManagementPage';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -293,9 +294,19 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.PIPELINES.PIPELINE(':pipelineId'), element: <PipelineDetailsPage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODES, element: <ClusterConfigurationPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_DASHBOARD, element: <DataNodesClusterManagementPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION, element: <DataNodesClusterConfigurationPage /> },
-            !isCloud && enableDataNodeMigration && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION, element: <DataNodesMigrationPage /> },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_DASHBOARD,
+              element: <DataNodesClusterManagementPage />,
+            },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
+              element: <DataNodesClusterConfigurationPage />,
+            },
+            !isCloud &&
+              enableDataNodeMigration && {
+                path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
+                element: <DataNodesMigrationPage />,
+              },
 
             !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
@@ -349,6 +360,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.USERS.show(':userId'), element: <UserDetailsPage /> },
             { path: RoutePaths.SYSTEM.USERS.edit(':userId'), element: <UserEditPage /> },
             { path: RoutePaths.SYSTEM.USERS.TOKENS.edit(':userId'), element: <UserTokensEditPage /> },
+            { path: RoutePaths.SYSTEM.USERS_TOKEN_MANAGEMENT.overview, element: <TokenManagementPage /> },
 
             { path: RoutePaths.SYSTEM.AUTHZROLES.OVERVIEW, element: <RolesOverviewPage /> },
             { path: RoutePaths.SYSTEM.AUTHZROLES.show(':roleId'), element: <RoleDetailsPage /> },

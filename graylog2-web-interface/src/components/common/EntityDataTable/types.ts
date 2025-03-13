@@ -51,19 +51,21 @@ export type ColumnRenderers<Entity extends EntityBase, Meta = unknown> = {
   types?: { [type: string]: ColumnRenderer<Entity, Meta> };
 };
 
-export type TableLayoutPreferences = {
+export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
   displayedAttributes?: Array<string>;
   sort?: Sort;
   perPage?: number;
+  customPreferences?: T;
 };
 
-export type TableLayoutPreferencesJSON = {
+export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
   displayed_attributes?: Array<string>;
   sort?: {
     field: string;
     order: 'asc' | 'desc';
   };
   per_page?: number;
+  custom_preferences?: T;
 };
 
 export type ExpandedSectionRenderer<Entity> = {
