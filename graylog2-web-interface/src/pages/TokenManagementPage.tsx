@@ -16,22 +16,20 @@
  */
 import * as React from 'react';
 
-import Routes from 'routing/Routes';
-import PageNavigation from 'components/common/PageNavigation';
-import { Row } from 'components/bootstrap';
+// import DocsHelper from 'util/DocsHelper';
+import { PageHeader, DocumentTitle } from 'components/common';
+import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
+import TokenManagement from 'components/users/UsersTokenManagement/TokenManagement';
 
-const UsersPageNavigation = () => {
-  const NAV_ITEMS = [
-    { title: 'Users Overview', path: Routes.SYSTEM.USERS.OVERVIEW, permissions: 'users:list' },
-    { title: 'Teams Overview', path: Routes.getPluginRoute('SYSTEM_TEAMS'), permissions: 'teams:list' },
-    { title: 'Token Management', path: Routes.SYSTEM.USERS_TOKEN_MANAGEMENT.overview, permissions: 'users:tokenlist' },
-  ];
+const TokenManagementPage = () => (
+  <DocumentTitle title="Token Management">
+    <UsersPageNavigation />
+    <PageHeader title="Token Management">
+      <span>Overview of Graylog&apos;s access tokens.</span>
+    </PageHeader>
 
-  return (
-    <Row>
-      <PageNavigation items={NAV_ITEMS} />
-    </Row>
-  );
-};
+    <TokenManagement />
+  </DocumentTitle>
+);
 
-export default UsersPageNavigation;
+export default TokenManagementPage;

@@ -167,6 +167,9 @@ const Routes = {
       OVERVIEW: '/system/users',
       show: (userId: string) => `/system/users/${userId}`,
     },
+    USERS_TOKEN_MANAGEMENT: {
+      overview: '/system/tokenmanagement/overview',
+    },
     AUTHZROLES: {
       OVERVIEW: '/system/roles',
       show: (roleId: string) => `/system/roles/${roleId}`,

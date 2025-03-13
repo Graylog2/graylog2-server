@@ -276,6 +276,7 @@ const ApiRoutes = {
   StreamsApiController: {
     index: () => ({ url: '/streams' }),
     paginated: () => ({ url: '/streams/paginated' }),
+    withoutSecurityDefaults: () => ({ url: '/streams/no_security' }),
     get: (streamId: string) => ({ url: `/streams/${streamId}` }),
     bulk_delete: () => ({ url: '/streams/bulk_delete' }),
     bulk_resume: () => ({ url: '/streams/bulk_resume' }),
@@ -441,6 +442,9 @@ const ApiRoutes = {
     delete_token: (userId: string, tokenName: string) => ({ url: `/users/${userId}/tokens/${tokenName}` }),
     list_tokens: (userId: string) => ({ url: `/users/${userId}/tokens` }),
     setStatus: (userId: string, accountStatus) => ({ url: `/users/${userId}/status/${accountStatus}` }),
+  },
+  TokenManagementController: {
+    paginated: () => ({ url: '/token_usage/paginated' }),
   },
   DashboardsController: {
     show: (id) => ({ url: `/dashboards/${id}` }),
