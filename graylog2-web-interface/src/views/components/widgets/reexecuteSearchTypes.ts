@@ -56,17 +56,17 @@ const reexecuteSearchTypes =
     };
 
     return dispatch(
-      executeWithExecutionState(
-        view.search,
+      executeWithExecutionState({
+        search: view.search,
         activeQuery,
-        [],
+        searchTypesToSearch: [],
         executionState,
-        {
+        searchExecutors: {
           ...searchExecutors,
           resultMapper: handleSearchResult,
         },
-        view.widgetMapping,
-      ),
+        widgetMapping: view.widgetMapping,
+      }),
     );
   };
 

@@ -22,7 +22,7 @@ import { PipelinesPipelines, Streams, PipelinesConnections } from '@graylog/serv
 
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
-import useStreams from 'components/streams/hooks/useStreams';
+import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilteredStreams';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import { streams } from 'fixtures/streams';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
@@ -49,7 +49,7 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-jest.mock('components/streams/hooks/useStreams', () => jest.fn());
+jest.mock('components/inputs/InputSetupWizard/hooks/useFilteredStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
 jest.mock('components/indices/hooks/useIndexSetsList');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
@@ -86,15 +86,10 @@ const renderWizard = () =>
   );
 
 const useStreamsResult = {
-  data: {
-    list: streams,
-    pagination: { total: 1 },
-    attributes: [],
-  },
-  isInitialLoading: false,
+  data: { streams, total: 1 },
+  isLoading: false,
   isFetching: false,
   error: undefined,
-  refetch: () => {},
 };
 
 const pipelinesConnectedMock = (response = []) => ({
@@ -171,7 +166,7 @@ const useIndexSetsListResult = {
 const newStreamConfig = {
   description: 'Wingardium new stream',
   index_set_id: 'default_id',
-  remove_matches_from_default_stream: undefined,
+  remove_matches_from_default_stream: true,
   title: 'Wingardium',
 };
 
@@ -224,7 +219,7 @@ const createStream = async (newPipeline = false, removeFromDefault = true) => {
   });
 
   const submitButton = await screen.findByRole('button', {
-    name: 'Create',
+    name: 'Next',
     hidden: true,
   });
 
@@ -235,7 +230,7 @@ const createStream = async (newPipeline = false, removeFromDefault = true) => {
     fireEvent.click(removeFromDefaultCheckbox);
   }
 
-  if (newPipeline) {
+  if (!newPipeline) {
     fireEvent.click(newPipelineCheckbox);
   }
 
@@ -245,7 +240,7 @@ const createStream = async (newPipeline = false, removeFromDefault = true) => {
 
 describe('InputSetupWizard Start Input', () => {
   beforeEach(() => {
-    asMock(useStreams).mockReturnValue(useStreamsResult);
+    asMock(useFilteredStreams).mockReturnValue(useStreamsResult);
     asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
     asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
   });
