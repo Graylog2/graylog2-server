@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.periodicals;
 
+import io.jsonwebtoken.lang.Collections;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
@@ -62,7 +63,8 @@ class NodePingPeriodicalTest {
                 () -> datanodeRestApi,
                 () -> OpensearchState.AVAILABLE,
                 Date::new,
-                () -> List.of("search", "ingest")
+                () -> List.of("search", "ingest"),
+                Collections::emptyList
         );
 
         task.doRun();
