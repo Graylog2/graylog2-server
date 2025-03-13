@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Row, Col, Button, Table, Label, SegmentedControl, Alert, Modal } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner, Icon, Switch } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import useDataNodeUpgradeStatus, {
   getNodeToUpgrade,
@@ -50,6 +50,11 @@ const StyledHorizontalDl = styled.dl(
     }
   `,
 );
+
+const ShardReplicationContainer = styled.div`
+  display: flex;
+  height: 20px;
+`;
 
 type DataNodeUpgradeMethodType = 'cluster-restart' | 'rolling-upgrade';
 
@@ -103,7 +108,7 @@ const DataNodeUpgradePage = () => {
           onClick={confirmNodeUpgrade}
           bsStyle="primary"
           bsSize="xs">
-          Confirm Upgrade Here
+          Confirm Upgrade
         </Button>&nbsp;
         and continue with next node.
       </p>
@@ -158,7 +163,6 @@ const DataNodeUpgradePage = () => {
                     If you are running a Data Node cluster with three or more nodes, you can choose to use the cluster
                     restart method after consideration of your journal size and your message throughput.
                   </p>
-                  {upgradeInstructionsDocumentationMessage}
                 </>
               )}
               {upgradeMethod === 'rolling-upgrade' && (
@@ -172,10 +176,15 @@ const DataNodeUpgradePage = () => {
                     and replaced, one at a time, by hosts running the new version. During this process you can continue
                     to index and query data in your cluster.
                   </p>
-                  {upgradeInstructionsDocumentationMessage}
                 </>
               )}
             </Alert>
+            {!data?.outdated_nodes?.length && data?.up_to_date_nodes?.length > 0 && (
+              <Alert bsStyle="success">
+                All your Data Nodes are Up-to-date.
+              </Alert>
+            )}
+            {!data?.shard_replication_enabled && manualUpgradeAlert(nodeInProgress)}
           </Col>
           <Col xs={12}>
             <h3>
@@ -186,20 +195,21 @@ const DataNodeUpgradePage = () => {
             <StyledHorizontalDl>
               <dt>Shard Replication:</dt>
               <dd>
-                {data?.shard_replication_enabled ? (
-                  <Label bsStyle="success" bsSize="xs">
-                    Enabled
-                  </Label>
-                ) : (
-                  <Label bsStyle="warning" bsSize="xs">
-                    Disabled
-                  </Label>
-                )}&nbsp;
-                <Button
-                  onClick={data?.shard_replication_enabled ? stopShardReplication : startShardReplication}
-                  bsSize="xs">
-                  Force {data?.shard_replication_enabled ? 'Disable' : 'Enable'}
-                </Button>
+                <ShardReplicationContainer>
+                  {data?.shard_replication_enabled ? (
+                    <Label bsStyle="success" bsSize="xs">
+                      Enabled
+                    </Label>
+                  ) : (
+                    <Label bsStyle="warning" bsSize="xs">
+                      Disabled
+                    </Label>
+                  )}&nbsp;
+                  <Switch
+                    checked={!!data?.shard_replication_enabled}
+                    onChange={data?.shard_replication_enabled ? stopShardReplication : startShardReplication}
+                  />
+                </ShardReplicationContainer>
               </dd>
               <dt>Cluster Manager:</dt>
               <dd>{data?.cluster_state?.manager_node?.name}</dd>
@@ -309,11 +319,6 @@ const DataNodeUpgradePage = () => {
                       )}
                     </tbody>
                   </Table>
-                </Col>
-              </Row>
-              <Row>
-                <Col xs={12}>
-                  {!data?.shard_replication_enabled && manualUpgradeAlert(nodeInProgress)}
                 </Col>
               </Row>
             </Col>
