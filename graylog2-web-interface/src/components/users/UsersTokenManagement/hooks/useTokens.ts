@@ -14,22 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type {SearchParams, Attributes} from 'stores/PaginationTypes';
+import type { SearchParams, Attributes } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
-import {qualifyUrl} from 'util/URLUtils';
+import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 export type Token = {
-  id: string,
-  _id: string,
-  username: string,
-  user_id: string,
-  NAME: string,
-  created_at: string,
-  last_access: string,
-  external_user: boolean,
-  title: string
+  id: string;
+  _id: string;
+  username: string;
+  user_id: string;
+  NAME: string;
+  created_at: string;
+  last_access: string;
+  external_user: boolean;
+  title: string;
 };
 
 type PaginatedResponse = {
@@ -37,9 +37,9 @@ type PaginatedResponse = {
   count: number;
   total: number;
   page: number;
-  query: string,
-  attributes: Attributes,
-  elements: Array<Token>,
+  query: string;
+  attributes: Attributes;
+  elements: Array<Token>;
 };
 
 export const fetchTokens = (searchParams: SearchParams) => {
@@ -55,18 +55,10 @@ export const fetchTokens = (searchParams: SearchParams) => {
   );
 
   return fetch('GET', qualifyUrl(url)).then((response: PaginatedResponse) => {
-    const {
-      elements,
-      query,
-      attributes,
-      count,
-      total,
-      page,
-      per_page: perPage,
-    } = response;
+    const { elements, query, attributes, count, total, page, per_page: perPage } = response;
 
     return {
-      list: elements.map(el => ({...el, id: el._id})),
+      list: elements.map((el) => ({ ...el, id: el._id })),
       attributes,
       pagination: {
         count,
@@ -77,6 +69,6 @@ export const fetchTokens = (searchParams: SearchParams) => {
       },
     };
   });
-}
+};
 
 export const keyFn = (searchParams: SearchParams) => ['token-management', 'overview', searchParams];

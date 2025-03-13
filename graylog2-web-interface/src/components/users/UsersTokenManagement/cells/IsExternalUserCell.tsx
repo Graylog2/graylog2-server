@@ -19,8 +19,8 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Tooltip } from 'components/common';
-import type {Token} from 'components/users/UsersTokenManagement/hooks/useTokens';
-import {Label} from 'components/bootstrap';
+import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
+import { Label } from 'components/bootstrap';
 
 type Props = {
   token: Token;
@@ -39,9 +39,7 @@ const IsExternalUserCell = ({ token }: Props) => {
   return (
     <Tooltip withArrow position="right" label={`User is ${isExternal ? 'external' : 'internal'}`}>
       <Wrapper $enabled={isExternal}>
-        <Label bsStyle="primary">
-          {isExternal ? 'External' : 'Internal'}
-        </Label>
+        <Label bsStyle="primary">{isExternal ? 'External' : 'Internal'}</Label>
       </Wrapper>
     </Tooltip>
   );

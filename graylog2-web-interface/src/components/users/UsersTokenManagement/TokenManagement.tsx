@@ -14,35 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, {useMemo, useCallback} from 'react';
+import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 
-import {
-  DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER,
-} from 'components/users/UsersTokenManagement/constants';
-import { Row, Col } from 'components/bootstrap'
+import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER } from 'components/users/UsersTokenManagement/constants';
+import { Row, Col } from 'components/bootstrap';
 import { fetchTokens, keyFn } from 'components/users/UsersTokenManagement/hooks/useTokens';
 import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
-import {PaginatedEntityTable} from 'components/common';
+import { PaginatedEntityTable } from 'components/common';
 import TokenActions from 'components/users/UsersTokenManagement/TokenManagementActions';
 
 import CustomColumnRenderers from './ColumnRenderers';
 
-
 const TokenManagement = () => {
   const Container = styled.div`
-  .data-table {
-    overflow-x: visible;
-  }
-`;
+    .data-table {
+      overflow-x: visible;
+    }
+  `;
 
   const Header = styled.div`
-  display: flex;
-  align-items: center;
-`;
+    display: flex;
+    align-items: center;
+  `;
 
   const tokenAction = useCallback(
-    ({ user_id, id:tokenId, NAME:tokenName}: Token) => (
+    ({ user_id, id: tokenId, NAME: tokenName }: Token) => (
       <TokenActions userId={user_id} tokenId={tokenId} tokenName={tokenName} />
     ),
     [],
@@ -56,16 +53,18 @@ const TokenManagement = () => {
           <Header>
             <h2>Tokens</h2>
           </Header>
-          <PaginatedEntityTable<Token> humanName="tokens"
-                                      columnsOrder={COLUMNS_ORDER}
-                                      additionalAttributes={ADDITIONAL_ATTRIBUTES}
-                                      actionsCellWidth={320}
-                                      entityActions={tokenAction}
-                                      tableLayout={DEFAULT_LAYOUT}
-                                      fetchEntities={fetchTokens}
-                                      keyFn={keyFn}
-                                      entityAttributesAreCamelCase={false}
-                                      columnRenderers={columnRenderers} />
+          <PaginatedEntityTable<Token>
+            humanName="tokens"
+            columnsOrder={COLUMNS_ORDER}
+            additionalAttributes={ADDITIONAL_ATTRIBUTES}
+            actionsCellWidth={320}
+            entityActions={tokenAction}
+            tableLayout={DEFAULT_LAYOUT}
+            fetchEntities={fetchTokens}
+            keyFn={keyFn}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={columnRenderers}
+          />
         </Col>
       </Row>
     </Container>
