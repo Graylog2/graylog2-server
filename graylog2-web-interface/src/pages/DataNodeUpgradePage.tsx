@@ -17,8 +17,8 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Row, Col, Button, Table, Label, SegmentedControl, Alert } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner, Icon, ConfirmDialog } from 'components/common';
+import { Row, Col, Button, Table, Label, SegmentedControl, Alert, Modal } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import useDataNodeUpgradeStatus, {
   getNodeToUpgrade,
@@ -73,7 +73,7 @@ const getClusterHealthStyle = (status: string) => {
 
 const upgradeInstructionsDocumentationMessage = (
   <p>
-    To upgrade your Data Nodes, please follow the instructions in the{' '}
+    To upgrade your Data Nodes manually, please follow the instructions in the&nbsp;
     <DocumentationLink text="documentation" page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} />.
   </p>
 );
@@ -93,6 +93,23 @@ const DataNodeUpgradePage = () => {
     startShardReplication();
     setOpenUpgradeConfirmDialog(false);
   };
+
+  const manualUpgradeAlert = (nodeInProgress: string) => (
+    <Alert bsStyle="warning">
+      <p>
+        Once you have completed the manual upgrade of {nodeInProgress ? <b>{nodeInProgress}</b> : 'your Data Node'} on the system, wait until it reconnects and
+        apears in the <b>Upgraded Nodes</b> panel, then click on&nbsp;
+        <Button
+          onClick={confirmNodeUpgrade}
+          bsStyle="primary"
+          bsSize="xs">
+          Confirm Upgrade Here
+        </Button>&nbsp;
+        and continue with next node.
+      </p>
+      {upgradeInstructionsDocumentationMessage}
+    </Alert>
+  );
 
   const nodeInProgress = getNodeToUpgrade();
 
@@ -177,7 +194,12 @@ const DataNodeUpgradePage = () => {
                   <Label bsStyle="warning" bsSize="xs">
                     Disabled
                   </Label>
-                )}
+                )}&nbsp;
+                <Button
+                  onClick={data?.shard_replication_enabled ? stopShardReplication : startShardReplication}
+                  bsSize="xs">
+                  Force {data?.shard_replication_enabled ? 'Disable' : 'Enable'}
+                </Button>
               </dd>
               <dt>Cluster Manager:</dt>
               <dd>{data?.cluster_state?.manager_node?.name}</dd>
@@ -289,20 +311,21 @@ const DataNodeUpgradePage = () => {
                   </Table>
                 </Col>
               </Row>
+              <Row>
+                <Col xs={12}>
+                  {!data?.shard_replication_enabled && manualUpgradeAlert(nodeInProgress)}
+                </Col>
+              </Row>
             </Col>
           )}
           {openUpgradeConfirmDialog && nodeInProgress && (
-            <ConfirmDialog
-              show
-              onConfirm={confirmNodeUpgrade}
-              onCancel={() => setOpenUpgradeConfirmDialog(false)}
-              title="Start Data Node Upgrade Process"
-              btnConfirmText="Confirm Upgrade">
-              <>
-                Once you have completed upgrading <b>{nodeInProgress}</b> on the system, wait until it reconnects and
-                apears in the <b>Upgraded Nodes</b> panel, then click on Confirm Upgrade and continue with next node.
-              </>
-            </ConfirmDialog>
+            <Modal show backdrop={false} onHide={() => setOpenUpgradeConfirmDialog(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Data Node Manual Upgrade</Modal.Title>
+              </Modal.Header>
+        
+              <Modal.Body>{manualUpgradeAlert(nodeInProgress)}</Modal.Body>
+            </Modal>
           )}
         </Row>
       )}
