@@ -17,5 +17,5 @@
 package org.graylog2.indexer;
 
 public interface ConstantsES7 {
-    String ES_DATE_FORMAT = "uuuu-MM-dd HH:mm:ss.SSS";
+    String ES_DATE_FORMAT = "uuuu-MM-dd HH:mm:ss.SSS||uuuu-MM-dd HH:mm:ss||uuuu-MM-dd";
 }
