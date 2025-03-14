@@ -35,6 +35,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -45,6 +47,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceAdapter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeUpgradeServiceAdapterOS2.class);
 
     public static final String REPLICATION_PRIMARIES = "primaries";
     public static final String REPLICATION_ALL = "all";
@@ -83,6 +87,7 @@ public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceA
 
     @Override
     public void disableShardReplication() {
+        LOG.info("Disabling shard replication for opensearch cluster");
         final ClusterHealthStatus clusterHealthStatus = getClusterHealthResponse().getStatus();
         if (clusterHealthStatus == ClusterHealthStatus.GREEN) {
             configureShardReplication(REPLICATION_PRIMARIES);
@@ -93,6 +98,7 @@ public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceA
 
     @Override
     public void enableShardReplication() {
+        LOG.info("Enabling shard replication for opensearch cluster");
         configureShardReplication(REPLICATION_ALL);
     }
 
@@ -116,6 +122,7 @@ public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceA
 
     @Override
     public FlushResponse flush() {
+        LOG.info("Flushing opensearch nodes, storing all in-memory operations to segments on disk");
         final Response response = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.getLowLevelClient().performRequest(new Request("POST", "_flush")));
         try {
             final JsonNode flushResponse = objectMapper.readValue(response.getEntity().getContent(), JsonNode.class);
@@ -152,7 +159,7 @@ public class DatanodeUpgradeServiceAdapterOS2 implements DatanodeUpgradeServiceA
         }
     }
 
-    private List<org.graylog.plugins.datanode.dto.Node> parseNodes(JsonNode nodes) {
+    private List<Node> parseNodes(JsonNode nodes) {
         return StreamSupport.stream(nodes.spliterator(), false)
                 .map(node -> new Node(
                         node.path("host").asText(),

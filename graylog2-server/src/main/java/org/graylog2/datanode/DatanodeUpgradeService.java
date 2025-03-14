@@ -27,21 +27,16 @@ import org.graylog.plugins.datanode.dto.ShardReplication;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.Version;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Singleton
 public class DatanodeUpgradeService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeUpgradeService.class);
 
     private final DatanodeUpgradeServiceAdapter upgradeService;
     private final NodeService<DataNodeDto> nodeService;
@@ -121,16 +116,12 @@ public class DatanodeUpgradeService {
     }
 
     public FlushResponse stopReplication() {
-        LOG.info("Stopping shard replication");
         upgradeService.disableShardReplication();
-        LOG.info("Flushing, storing all in-memory operations to segments on disk");
         return upgradeService.flush();
     }
 
     public FlushResponse startReplication() {
-        LOG.info("Starting shard replication");
         upgradeService.enableShardReplication();
-        LOG.info("Flushing, storing all in-memory operations to segments on disk");
         return upgradeService.flush();
     }
 }
