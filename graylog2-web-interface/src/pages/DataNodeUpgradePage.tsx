@@ -29,6 +29,7 @@ import useDataNodeUpgradeStatus, {
 import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import DocumentationLink from 'components/support/DocumentationLink';
+import DataNodeUpgradeHelp from 'components/datanode/DataNodeUpgrade/DataNodeUpgradeHelp';
 
 const StyledHorizontalDl = styled.dl(
   ({ theme }) => css`
@@ -186,6 +187,7 @@ const DataNodeUpgradePage = () => {
               <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} bsSize="xs">
                 {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
               </Label>
+              <DataNodeUpgradeHelp />
             </h3>
             <StyledHorizontalDl>
               <dt>Shard Replication:</dt>
