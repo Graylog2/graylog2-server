@@ -52,11 +52,17 @@ describe('<TokenList />', () => {
   });
 
   it('should add new token and display it', async () => {
-    const createFn = jest.fn(({tokenName, tokenTtl}: {tokenName: string, tokenTtl: string}) => {
+    const createFn = jest.fn(({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => {
       expect(tokenName).toEqual('hans');
       expect(tokenTtl).toEqual('PT72H');
 
-      return Promise.resolve({ name: 'hans', token: 'beef2003', id: 'abc3', last_access: '1970-01-01T00:00:00.000Z', tokenTtl: 'PT72H' });
+      return Promise.resolve({
+        name: 'hans',
+        token: 'beef2003',
+        id: 'abc3',
+        last_access: '1970-01-01T00:00:00.000Z',
+        tokenTtl: 'PT72H',
+      });
     });
 
     render(<TokenList tokens={tokens} onCreate={createFn} onDelete={() => {}} />);
@@ -64,15 +70,15 @@ describe('<TokenList />', () => {
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
     userEvent.type(nameInput, 'hans');
 
-    const ttlInput = await screen.findByLabelText("Token TTL");
-    fireEvent.change(ttlInput, {target: {value: 'PT72H'}});
+    const ttlInput = await screen.findByLabelText('Token TTL');
+    fireEvent.change(ttlInput, { target: { value: 'PT72H' } });
 
     const createToken = await screen.findByRole('button', { name: 'Create Token' });
     createToken.click();
 
     await screen.findByText('beef2003');
 
-    expect(createFn).toHaveBeenCalledWith({"tokenName": "hans", "tokenTtl": "PT72H"});
+    expect(createFn).toHaveBeenCalledWith({ 'tokenName': 'hans', 'tokenTtl': 'PT72H' });
   });
 
   it('should delete a token', async () => {

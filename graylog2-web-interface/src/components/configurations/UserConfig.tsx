@@ -164,21 +164,21 @@ const UserConfig = () => {
                           </fieldset>
                         </Col>
                         <Col sm={12}>
-                          <FormikInput type="checkbox"
-                                       name="restrict_access_token_to_admins"
-                                       id="restrict_access_token_to_admins"
-                                       label={(
-                                         <LabelSpan>Restrict access tokens to admins</LabelSpan>
-                                       )} />
+                          <FormikInput
+                            type="checkbox"
+                            name="restrict_access_token_to_admins"
+                            id="restrict_access_token_to_admins"
+                            label={<LabelSpan>Restrict access tokens to admins</LabelSpan>}
+                          />
                           <InputDescription help="If enabled, it will restrict the usage of access tokens to admins." />
                         </Col>
                         <Col sm={12}>
-                          <FormikInput type="checkbox"
-                                       name="allow_access_token_for_external_user"
-                                       id="allow_access_token_for_external_user"
-                                       label={(
-                                         <LabelSpan>Allow access token for external users</LabelSpan>
-                                       )} />
+                          <FormikInput
+                            type="checkbox"
+                            name="allow_access_token_for_external_user"
+                            id="allow_access_token_for_external_user"
+                            label={<LabelSpan>Allow access token for external users</LabelSpan>}
+                          />
                           <InputDescription help="If enabled, it will allow external users to use access tokens." />
                         </Col>
                         <Col sm={12}>
