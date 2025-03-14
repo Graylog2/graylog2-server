@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process.configuration.beans;
+package org.graylog2.bootstrap.preflight;
 
+import org.graylog2.security.encryption.EncryptedValue;
 
-public interface DatanodeConfigurationBean<T extends ConfigurationBuildParams> {
-    DatanodeConfigurationPart buildConfigurationPart(T configurationParams);
+public record PreflightEncryptedSecret(EncryptedValue encryptedSecret) {
 }
