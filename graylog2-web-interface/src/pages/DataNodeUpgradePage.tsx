@@ -105,8 +105,8 @@ const DataNodeUpgradePage = () => {
       <p>
         Once you have completed the manual upgrade of {nodeInProgress ? <b>{nodeInProgress}</b> : 'your Data Node'} on
         the system, wait until it reconnects and apears in the <b>Upgraded Nodes</b> panel, then click on&nbsp;
-        <Button onClick={confirmNodeUpgrade} bsStyle="primary" bsSize="xs">
-          Confirm Upgrade
+        <Button onClick={confirmNodeUpgrade} bsStyle="link" bsSize="large">
+          <b>Confirm Upgrade</b>
         </Button>
         &nbsp; and continue with next node.
       </p>
