@@ -149,7 +149,7 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
     return (
       <>
         <StyledListGroupItem>
-          {capitalize(state)}: {inputNodeStates.states[state].length}/{inputNodeStates.total} nodes
+          <strong>{capitalize(state)}</strong>: {inputNodeStates.states[state].length}/{inputNodeStates.total} nodes
         </StyledListGroupItem>
         {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
           <NodeListItem key={node_id} detailedMessage={detailed_message} nodeId={node_id} />
@@ -160,7 +160,7 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
 
   return (
     <StyledListGroupItem>
-      {state}: {inputNodeStates.states[state].length}/{inputNodeStates.total}
+      <strong>{state}</strong>: {inputNodeStates.states[state].length}/{inputNodeStates.total}
     </StyledListGroupItem>
   );
 };
@@ -194,19 +194,19 @@ const InputDiagnosisPage = () => {
             <Section title="Information" headerLeftSection={<StatusColorIndicator />}>
               <StyledP>The address on which the Input is being run.</StyledP>
               <StyledListGroup>
-                <StyledListGroupItem>Input Title: {input.title}</StyledListGroupItem>
-                <StyledListGroupItem>Input Type: {input.name}</StyledListGroupItem>
+                <StyledListGroupItem><strong>Input Title</strong>: {input.title}</StyledListGroupItem>
+                <StyledListGroupItem><strong>Input Type</strong>: {input.name}</StyledListGroupItem>
                 <StyledListGroupItem>
-                  This Input is running on : {input.global ? 'all graylog nodes' : <LinkToNode nodeId={input.node} />}
+                  <strong>This Input is running on</strong> : {input.global ? 'all graylog nodes' : <LinkToNode nodeId={input.node} />}
                 </StyledListGroupItem>
                 {input.attributes?.bind_address && input.attributes?.port && (
                   <>
                     <StyledListGroupItem>
-                      This Input is listening on <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_LISTENING_ON} />: Bind
+                      <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_LISTENING_ON}><strong>This Input is listening on</strong></DiagnosisHelp>: Bind
                       address {input.attributes?.bind_address}, Port {input.attributes?.port}.
                     </StyledListGroupItem>
                     <StyledListGroupItem>
-                      This Input is listening for <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_LISTENING_FOR} />:{' '}
+                     <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_LISTENING_FOR}> <strong>This Input is listening for</strong></DiagnosisHelp>:{' '}
                       {'tcp_keepalive' in (input.attributes || {}) ? 'TCP Traffic.' : 'UDP Traffic.'}
                     </StyledListGroupItem>
                   </>
@@ -249,23 +249,23 @@ const InputDiagnosisPage = () => {
               {inputMetrics && (
                 <StyledListGroup>
                   <StyledListGroupItem>
-                    Total Messages received by Input: {inputMetrics.incomingMessagesTotal} events
+                    <strong>Total Messages received by Input</strong>: {inputMetrics.incomingMessagesTotal} events
                   </StyledListGroupItem>
                   <StyledListGroupItem>
-                    Empty Messages discarded <DiagnosisHelp helpText={DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED} />:{' '}
+                   <DiagnosisHelp helpText={DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED}><strong>Empty Messages discarded</strong></DiagnosisHelp>:{' '}
                     {inputMetrics.emptyMessages}
                   </StyledListGroupItem>
                   {Number.isInteger(inputMetrics.open_connections) &&
                     Number.isInteger(inputMetrics.total_connections) && (
                       <StyledListGroupItem>
-                        Active Connections: {inputMetrics.open_connections}&nbsp; ({inputMetrics.total_connections}{' '}
+                       <strong>Active Connections</strong>: {inputMetrics.open_connections}&nbsp; ({inputMetrics.total_connections}{' '}
                         total)
                       </StyledListGroupItem>
                     )}
                   {Number.isInteger(inputMetrics.read_bytes_1sec) &&
                     Number.isInteger(inputMetrics.read_bytes_total) && (
                       <StyledListGroupItem>
-                        Network I/O <DiagnosisHelp helpText={DIAGNOSIS_HELP.NETWORK_IO} />:
+                       <DiagnosisHelp helpText={DIAGNOSIS_HELP.NETWORK_IO}><strong>Network I/O</strong></DiagnosisHelp>:
                         <NetworkStats
                           readBytes1Sec={inputMetrics.read_bytes_1sec}
                           readBytesTotal={inputMetrics.read_bytes_total}
@@ -299,7 +299,7 @@ const InputDiagnosisPage = () => {
                     <StyledListGroupItem key={stream.stream_id}>
                       <Link
                         to={`/search?q=gl2_source_input%3A+${input.id}&rangetype=relative&streams=${stream.stream_id}&from=900`}>
-                        {stream.stream_name}:
+                       <strong>{stream.stream_name}</strong>:
                       </Link>
                       <StyledSpan>{stream.count}</StyledSpan>
                     </StyledListGroupItem>

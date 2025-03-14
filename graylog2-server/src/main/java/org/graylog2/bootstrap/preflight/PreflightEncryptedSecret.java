@@ -16,15 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-public interface PreflightConfigService {
-    ConfigResultState setConfigResult(PreflightConfigResult result);
+import org.graylog2.security.encryption.EncryptedValue;
 
-    PreflightConfigResult getPreflightConfigResult();
-
-    String getPreflightPassword();
-
-    enum ConfigResultState {
-        CREATED,
-        UPDATED
-    }
+public record PreflightEncryptedSecret(EncryptedValue encryptedSecret) {
 }
