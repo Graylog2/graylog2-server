@@ -56,7 +56,8 @@ public class PreflightStatusResource {
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
     public PreflightConfig finishConfig() {
-        return preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+        preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+        return new PreflightConfig(PreflightConfigResult.FINISHED);
     }
 
     @POST
@@ -64,6 +65,7 @@ public class PreflightStatusResource {
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
     public PreflightConfig skipConfig() {
-        return preflightConfigService.setConfigResult(PreflightConfigResult.SKIPPED);
+        preflightConfigService.setConfigResult(PreflightConfigResult.SKIPPED);
+        return new PreflightConfig(PreflightConfigResult.SKIPPED);
     }
 }

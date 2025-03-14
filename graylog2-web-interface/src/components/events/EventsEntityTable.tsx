@@ -27,7 +27,7 @@ import useQuery from 'routing/useQuery';
 import useColumnRenderers from 'components/events/events/ColumnRenderers';
 import EventsRefreshControls from 'components/events/events/EventsRefreshControls';
 import QueryHelper from 'components/common/QueryHelper';
-import EventsHistogram from 'components/events/EventsHistogram';
+import EventsWidgets from 'components/events/EventsWidgets';
 
 const additionalSearchFields = {
   key: 'The key of the event',
@@ -61,7 +61,7 @@ const EventsEntityTable = () => {
       columnRenderers={columnRenderers}
       bulkSelection={bulkSelection}
       topRightCol={<EventsRefreshControls />}
-      middleSection={EventsHistogram}
+      middleSection={EventsWidgets}
     />
   );
 };
