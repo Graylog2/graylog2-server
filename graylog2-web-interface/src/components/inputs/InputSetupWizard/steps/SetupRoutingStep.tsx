@@ -30,7 +30,15 @@ import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilt
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import type { OpenStepsData } from 'components/inputs/InputSetupWizard/types';
 
-import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading, RecommendedTooltip } from './components/StepWrapper';
+import {
+  StepWrapper,
+  DescriptionCol,
+  ButtonCol,
+  StyledHeading,
+  StyledList,
+  RecommendedTooltip,
+} from './components/StepWrapper';
+import InputInUseAlert from './components/InputInUseAlert';
 
 const ExistingStreamCol = styled(Col)(
   ({ theme }) => css`
@@ -47,11 +55,6 @@ const CreateStreamCol = styled(Col)(
   `,
 );
 
-const StyledList = styled.ul`
-  list-style-type: disc;
-  padding-left: 20px;
-`;
-
 const StyledLabel = styled.label(
   ({ theme }) => css`
     font-weight: normal;
@@ -67,7 +70,7 @@ const SetupRoutingStep = () => {
   const [showSelectStream, setShowSelectStream] = useState<boolean>(false);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
   const currentStepName = useMemo(() => INPUT_WIZARD_STEPS.SETUP_ROUTING, []);
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep } = useInputSetupWizard();
+  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
   const { stepsData, setStepsData } = useInputSetupWizardSteps<OpenStepsData>();
   const { checkHasPreviousStep, checkHasNextStep, updateStepData, getStepData } =
     useInputSetupWizardStepsHelper<OpenStepsData>();
@@ -198,6 +201,7 @@ const SetupRoutingStep = () => {
 
   return (
     <StepWrapper>
+      <InputInUseAlert inputId={wizardData?.input?.id} />
       {!showNewStreamSection && !showSelectStreamSection && (
         <>
           <Row>

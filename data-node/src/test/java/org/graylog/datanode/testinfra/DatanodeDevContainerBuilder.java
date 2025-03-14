@@ -26,6 +26,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.images.builder.Transferable;
 import org.testcontainers.images.builder.dockerfile.DockerfileBuilder;
 
 import java.io.IOException;
@@ -168,7 +169,12 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
                 // disable disk threshold in tests, it causes problems in github builds where we don't have
                 // enough free space
-                .withEnv("opensearch.cluster.routing.allocation.disk.threshold_enabled", "false")
+                .withCopyToContainer(Transferable.of(
+                        """
+                                cluster.routing.allocation.disk.threshold_enabled=false
+                                """
+                ), IMAGE_WORKING_DIR + "/config/opensearch.overrides")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIGURATION_OVERRIDES_FILE", IMAGE_WORKING_DIR + "/config/opensearch.overrides")
 
                 .withNetworkAliases(nodeName)
                 .waitingFor(new LogMessageWaitStrategy()

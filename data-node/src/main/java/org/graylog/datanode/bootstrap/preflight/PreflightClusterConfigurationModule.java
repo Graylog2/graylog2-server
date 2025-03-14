@@ -16,10 +16,13 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
+import org.graylog.datanode.bindings.PreflightObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.graylog2.shared.plugins.GraylogClassLoader;
 
 public class PreflightClusterConfigurationModule extends AbstractModule {
     private final ChainingClassLoader chainingClassLoader;
@@ -32,5 +35,12 @@ public class PreflightClusterConfigurationModule extends AbstractModule {
     protected void configure() {
         bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
+
+        bindLimitedObjectMapper();
+    }
+
+    private void bindLimitedObjectMapper() {
+        bind(ClassLoader.class).annotatedWith(GraylogClassLoader.class).toInstance(chainingClassLoader);
+        bind(ObjectMapper.class).toProvider(PreflightObjectMapperProvider.class).asEagerSingleton();
     }
 }
