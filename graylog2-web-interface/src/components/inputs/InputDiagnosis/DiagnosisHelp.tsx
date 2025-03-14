@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { PropsWithChildren} from 'react';
+import type { PropsWithChildren } from 'react';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -26,10 +26,12 @@ type Props = PropsWithChildren<{
   helpText: string;
 }>;
 
-const StyledButton = styled(Button)(({ theme }) => css`
-  padding: 1px 0;
-  font-size: ${theme.fonts.size.body};
-`);
+const StyledButton = styled(Button)(
+  ({ theme }) => css`
+    padding: 1px 0;
+    font-size: ${theme.fonts.size.body};
+  `,
+);
 
 const DiagnosisHelp = ({ helpText, children = null }: Props) => {
   const [showHelp, setShowHelp] = useState(false);
@@ -46,9 +48,7 @@ const DiagnosisHelp = ({ helpText, children = null }: Props) => {
       withinPortal>
       <Popover.Target>
         <StyledButton bsStyle="transparent" bsSize={children ? 'xs' : 'medium'} onClick={toggleHelp}>
-          {children || (
-            <Icon name="question_mark" />
-          )}
+          {children || <Icon name="question_mark" />}
         </StyledButton>
       </Popover.Target>
       <Popover.Dropdown>{helpText}</Popover.Dropdown>
