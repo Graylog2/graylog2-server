@@ -182,7 +182,7 @@ export const UsersStore = singletonStore('core.Users', () =>
       const url = qualifyUrl(
         ApiRoutes.UsersApiController.create_token(encodeURIComponent(userId), encodeURIComponent(tokenName)).url,
       );
-      const promise = fetch('POST', url, {token_ttl: tokenTtl});
+      const promise = fetch('POST', url, { token_ttl: tokenTtl });
       UsersActions.createToken.promise(promise);
 
       return promise;
