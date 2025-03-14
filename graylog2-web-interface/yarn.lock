@@ -12076,9 +12076,9 @@ material-colors@^1.2.1:
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
 material-symbols@^0.29.0:
-  version "0.29.0"
-  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.29.0.tgz#98f7f014c46f04deda8c8cbbd5a0535d5acf9be1"
-  integrity sha512-uxhDjVd3OcNZRpGtNTvpGDn8MJRc+VVF0e2EuV+jfXLUjs2wL/pVT7HxKeKrVaDTBA37wF4/z2jobs1l8mA7MQ==
+  version "0.29.1"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.29.1.tgz#fc4bf1735df18178e433b2e3697390038ef6cfe8"
+  integrity sha512-kZACL+R/u+bbvPBQJifF3pDH8Pko0MR1V8+NwTQ1S8pXH36uAOnl86qY6dHqOy2ut8EfYL/w0HL7wd9eYBSMCg==
 
 math-intrinsics@^1.0.0, math-intrinsics@^1.1.0:
   version "1.1.0"
