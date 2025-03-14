@@ -18,11 +18,22 @@ import { useContext } from 'react';
 
 import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
 
-const useAutoRefresh = () => {
+const emptyFn = () => null;
+const useAutoRefresh = (isContextOptional: boolean = false) => {
   const autoRefresh = useContext(AutoRefreshContext);
 
-  if (!autoRefresh) {
+  if (!autoRefresh && !isContextOptional) {
     throw new Error('useAutoRefresh hook needs to be used inside AutoRefreshContext.Provider');
+  }
+
+  if (!autoRefresh && isContextOptional) {
+    return {
+      refreshConfig: null,
+      startAutoRefresh: emptyFn,
+      stopAutoRefresh: emptyFn,
+      restartAutoRefresh: emptyFn,
+      animationId: null,
+    };
   }
 
   return autoRefresh;
