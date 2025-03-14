@@ -183,7 +183,7 @@ const goToStartInputStep = async () => {
 };
 
 const startInput = async () => {
-  const startInputButton = await screen.findByTestId('start-input-button');
+  const startInputButton = await screen.findByRole('button', { name: /Start Input/i, hidden: true });
 
   fireEvent.click(startInputButton);
 };
