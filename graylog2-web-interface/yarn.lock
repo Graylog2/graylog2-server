@@ -5365,15 +5365,10 @@ camelize@^1.0.0:
   resolved "https://registry.yarnpkg.com/camelize/-/camelize-1.0.0.tgz#164a5483e630fa4321e5af07020e531831b2609b"
   integrity sha1-FkpUg+Yw+kMh5a8HAg5TGDGyYJs=
 
-caniuse-lite@^1.0.30001332, caniuse-lite@^1.0.30001503, caniuse-lite@^1.0.30001663:
-  version "1.0.30001668"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001668.tgz"
-  integrity sha512-nWLrdxqCdblixUO+27JtGJJE/txpJlyUy5YN1u53wLZkP0emYCo5zgS6QYft7VUYR42LGgi/S5hdLZTrnyIddw==
-
-caniuse-lite@^1.0.30001687, caniuse-lite@^1.0.30001688:
-  version "1.0.30001699"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001699.tgz#a102cf330d153bf8c92bfb5be3cd44c0a89c8c12"
-  integrity sha512-b+uH5BakXZ9Do9iK+CkDmctUSEqZl+SP056vc5usa0PL+ev5OHw003rZXcnjNDv3L8P5j6rwT6C0BPKSikW08w==
+caniuse-lite@^1.0.30001332, caniuse-lite@^1.0.30001503, caniuse-lite@^1.0.30001663, caniuse-lite@^1.0.30001687, caniuse-lite@^1.0.30001688:
+  version "1.0.30001704"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001704.tgz"
+  integrity sha512-+L2IgBbV6gXB4ETf0keSvLr7JUrRVbIaB/lrQ1+z8mRcQiisG5k+lG6O4n6Y5q6f5EuNfaYXKgymucphlEXQew==
 
 canvas-fit@^1.5.0:
   version "1.5.0"
@@ -7719,7 +7714,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-prettier "10.1.1"
     eslint-import-resolver-webpack "0.13.10"
     eslint-plugin-compat "6.0.2"
-    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-cf881367-ce93-480a-90bf-7ac7198d7161-1741997471861/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "28.11.0"
     eslint-plugin-jest-dom "5.5.0"
@@ -9329,12 +9324,12 @@ graphemer@^1.4.0:
     "@tanstack/react-query" "4.36.1"
     "@types/jquery" "3.5.32"
     "@types/react" "18.3.13"
-    babel-preset-graylog "file:packages/babel-preset-graylog"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.2.0-SNAPSHOT-c7db9081-1882-4ae5-9c92-3bf2163af9de-1741997471749/node_modules/babel-preset-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.2.0-SNAPSHOT-c7db9081-1882-4ae5-9c92-3bf2163af9de-1741997471749/node_modules/eslint-config-graylog"
     formik "2.4.6"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.2.0-SNAPSHOT-c7db9081-1882-4ae5-9c92-3bf2163af9de-1741997471749/node_modules/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.47"
