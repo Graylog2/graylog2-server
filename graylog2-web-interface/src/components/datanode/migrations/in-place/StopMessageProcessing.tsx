@@ -40,9 +40,14 @@ const StopMessageProcessing = ({ currentStep, onTriggerStep, hideActions }: Migr
       <Panel.Body>
         <p>Please stop your OpenSearch cluster before proceeding.</p>
         <p>
-          If you are migrating existing OpenSearch data by pointing the data node to its data directory, make sure that
-          the user running the data node (usually graylog-datanode) has permissions to write to the data directory set
-          in the data node configuration.
+          If you are migrating existing OpenSearch data by pointing the data node to its data directory, make sure to
+          change the owner of the data directory to the user running the data node (usually graylog-datanode) and reset
+          the correct permissions, e.g. by running
+        </p>
+        <p>
+          <code>sudo chown -R graylog-datanode:graylog-datanode &lt;your_data_directory&gt;</code>
+          <br />
+          <code>sudo chmod -R 750 &lt;your_data_directory&gt;</code>
         </p>
       </Panel.Body>
     </StyledHelpPanel>

@@ -20,8 +20,8 @@ import styled from 'styled-components';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
-import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import ClusterManagementOverview from 'components/datanode/ClusterManagement/ClusterManagementOverview';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
 const StyledCol = styled(Col)`
   footer,
@@ -44,10 +44,10 @@ const StyledCol = styled(Col)`
 `;
 
 const DataNodesClusterManagementPage = () => (
-  <DocumentTitle title="Data Nodes Cluster Management">
-    <DataNodesPageNavigation />
+  <DocumentTitle title="Data Node Dashboard">
+    <ClusterConfigurationPageNavigation />
     <PageHeader
-      title="Data Nodes Cluster Management"
+      title="Data Node Dashboard"
       documentationLink={{
         title: 'Data Nodes documentation',
         path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,

@@ -24,14 +24,15 @@ const AuthenticationOverviewPage = loadAsync(() => import('./AuthenticationOverv
 const AuthenticationPage = loadAsync(() => import('./AuthenticationPage'));
 const AuthenticatorsPage = loadAsync(() => import('./AuthenticatorsPage'));
 const AuthenticatorsEditPage = loadAsync(() => import('./AuthenticatorsEditPage'));
+const ClusterConfigurationPage = loadAsync(() => import('./ClusterConfigurationPage'));
 const ConfigurationsPage = loadAsync(() => import('./ConfigurationsPage'));
 const ContentPacksPage = loadAsync(() => import('./ContentPacksPage'));
 const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitionPage'));
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
-const DataNodesPage = loadAsync(() => import('./DataNodesPage'));
 const DataNodePage = loadAsync(() => import('./DataNodePage'));
+const DataNodeUpgradePage = loadAsync(() => import('./DataNodeUpgradePage'));
 const DataNodesClusterManagementPage = loadAsync(() => import('./DataNodesClusterManagementPage'));
 const DataNodesClusterConfigurationPage = loadAsync(() => import('./DataNodesClusterConfigurationPage'));
 const DataNodesMigrationPage = loadAsync(() => import('./DataNodesMigrationPage'));
@@ -72,7 +73,6 @@ const LUTCachesPage = loadAsync(() => import('./LUTCachesPage'));
 const LUTDataAdaptersPage = loadAsync(() => import('./LUTDataAdaptersPage'));
 const LUTTablesPage = loadAsync(() => import('./LUTTablesPage'));
 const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
-const NodesPage = loadAsync(() => import('./NodesPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
 const PipelinesOverviewPage = loadAsync(() => import('./PipelinesOverviewPage'));
@@ -122,14 +122,15 @@ export {
   AuthenticationOverviewPage,
   AuthenticatorsPage,
   AuthenticatorsEditPage,
+  ClusterConfigurationPage,
   ConfigurationsPage,
   ContentPacksPage,
   CreateEventDefinitionPage,
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
-  DataNodesPage,
   DataNodePage,
+  DataNodeUpgradePage,
   DataNodesClusterManagementPage,
   DataNodesClusterConfigurationPage,
   DataNodesMigrationPage,
@@ -170,7 +171,6 @@ export {
   LUTDataAdaptersPage,
   LUTTablesPage,
   NodeInputsPage,
-  NodesPage,
   NotFoundPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,

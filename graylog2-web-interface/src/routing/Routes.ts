@@ -81,6 +81,15 @@ const Routes = {
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
+    CLUSTER: {
+      NODES: '/system/cluster',
+      NODE_SHOW: (nodeId: string) => `/system/cluster/node/${nodeId}`,
+      DATANODE_DASHBOARD: '/system/cluster/datanode-dashboard',
+      DATANODE_CONFIGURATION: '/system/cluster/datanode-configuration',
+      DATANODE_MIGRATION: '/system/cluster/datanode-migration',
+      DATANODE_UPGRADE: '/system/cluster/datanode-upgrade',
+      DATANODE_SHOW: (dataNodeId: string) => `/system/cluster/datanode/${dataNodeId}`,
+    },
     CONFIGURATIONS: '/system/configurations',
     configurationsSection: (section: string, pluginSection?: string) =>
       `/system/configurations/${section}${pluginSection ? `/${pluginSection}` : ''}`,
@@ -124,17 +133,6 @@ const Routes = {
     INPUT_DIAGNOSIS: (input: string) => `/system/input/diagnosis/${input}`,
     LOGGING: '/system/logging',
     METRICS: (nodeId: string) => `/system/metrics/node/${nodeId}`,
-    NODES: {
-      LIST: '/system/nodes',
-      SHOW: (nodeId: string) => `/system/nodes/${nodeId}`,
-    },
-    DATANODES: {
-      LIST: '/system/datanodes',
-      SHOW: (dataNodeId: string) => `/system/datanodes/${dataNodeId}`,
-      CLUSTER: '/system/datanodes/cluster',
-      CONFIGURATION: '/system/datanodes/configuration',
-      MIGRATION: '/system/datanodes/migration',
-    },
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
@@ -168,6 +166,9 @@ const Routes = {
       },
       OVERVIEW: '/system/users',
       show: (userId: string) => `/system/users/${userId}`,
+    },
+    USERS_TOKEN_MANAGEMENT: {
+      overview: '/system/tokenmanagement/overview',
     },
     AUTHZROLES: {
       OVERVIEW: '/system/roles',

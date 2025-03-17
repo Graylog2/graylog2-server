@@ -18,5 +18,5 @@ package org.graylog.datanode.process.configuration.beans;
 
 
 public interface DatanodeConfigurationBean<T extends ConfigurationBuildParams> {
-    DatanodeConfigurationPart buildConfigurationPart(T trustedCertificates);
+    DatanodeConfigurationPart buildConfigurationPart(T configurationParams);
 }

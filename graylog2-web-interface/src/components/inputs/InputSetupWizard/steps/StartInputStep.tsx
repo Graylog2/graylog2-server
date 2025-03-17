@@ -19,6 +19,7 @@ import { useEffect, useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -28,14 +29,10 @@ import useSetupInputMutations from 'components/inputs/InputSetupWizard/hooks/use
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Button, Row, Col } from 'components/bootstrap';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
-import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard//hooks/useInputSetupWizardSteps';
-import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
-import {
-  checkHasPreviousStep,
-  checkHasNextStep,
-  getStepData,
-} from 'components/inputs/InputSetupWizard/helpers/stepHelper';
-import type { RoutingStepData } from 'components/inputs/InputSetupWizard/steps/SetupRoutingStep';
+import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
+import useInputSetupWizardStepsHelper from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardStepsHelper';
+import { INPUT_WIZARD_STEPS, INPUT_WIZARD_FLOWS } from 'components/inputs/InputSetupWizard/types';
+import type { OpenStepsData } from 'components/inputs/InputSetupWizard/types';
 import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
 import ProgressMessage from 'components/inputs/InputSetupWizard/steps/components/ProgressMessage';
 
@@ -45,6 +42,7 @@ export type ProcessingSteps =
   | 'createStream'
   | 'startStream'
   | 'createPipeline'
+  | 'connectPipeline'
   | 'setupRouting'
   | 'deleteStream'
   | 'deletePipeline'
@@ -52,12 +50,22 @@ export type ProcessingSteps =
   | 'result';
 
 const StartInputStep = () => {
+  const inputSetupWizards = usePluginEntities('inputSetupWizard');
+  const ExtraSetupWizardStep = useMemo(
+    () => inputSetupWizards?.find((plugin) => !!plugin.ExtraSetupWizardStep)?.ExtraSetupWizardStep,
+    [inputSetupWizards],
+  );
+
+  const { checkHasPreviousStep, checkHasNextStep, getStepData } = useInputSetupWizardStepsHelper<OpenStepsData>();
+
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const navigateTo = useNavigate();
   const { goToPreviousStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
-  const { stepsData } = useInputSetupWizardSteps();
+  const isIlluminateFlow = wizardData.flow === INPUT_WIZARD_FLOWS.ILLUMINATE;
+
+  const { stepsData } = useInputSetupWizardSteps<OpenStepsData>();
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
   const [startInputStatus, setStartInputStatus] = useState<
@@ -75,6 +83,7 @@ const StartInputStep = () => {
     deleteStreamMutation,
     deletePipelineMutation,
     deleteRoutingRuleMutation,
+    connectPipelineMutation,
   } = useSetupInputMutations();
 
   const stepMutations = useMemo<{ [key in ProcessingSteps]?: UseMutationResult }>(
@@ -83,8 +92,9 @@ const StartInputStep = () => {
       startStream: startStreamMutation,
       createPipeline: createPipelineMutation,
       setupRouting: updateRoutingMutation,
+      connectPipeline: connectPipelineMutation,
     }),
-    [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation],
+    [createStreamMutation, startStreamMutation, createPipelineMutation, updateRoutingMutation, connectPipelineMutation],
   );
 
   const rollBackMutations = useMemo<{ [key in ProcessingSteps]?: UseMutationResult }>(
@@ -140,7 +150,13 @@ const StartInputStep = () => {
   };
 
   const setupInput = async () => {
-    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+    if (isIlluminateFlow) {
+      startInput();
+
+      return;
+    }
+
+    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUT_SETUP_WIZARD.START_INPUT, {
       app_pathname: telemetryPathName,
@@ -154,17 +170,24 @@ const StartInputStep = () => {
 
     switch (routingStepData.streamType) {
       case 'NEW':
-        if (routingStepData.shouldCreateNewPipeline) {
-          createPipeline(routingStepData.newStream);
-        }
-
         createStreamMutation.mutateAsync(routingStepData.newStream, {
-          onSuccess: (response) => {
-            startStreamMutation.mutateAsync(response.stream_id);
+          onSuccess: (streamResponse) => {
+            startStreamMutation.mutateAsync(streamResponse.stream_id);
 
-            updateRoutingMutation.mutateAsync({ input_id: inputId, stream_id: response.stream_id }).finally(() => {
-              startInput();
-            });
+            if (routingStepData.shouldCreateNewPipeline) {
+              createPipeline(routingStepData.newStream).then((pipelineResponse) => {
+                connectPipelineMutation.mutateAsync({
+                  streamId: streamResponse.stream_id,
+                  pipelineId: pipelineResponse.id,
+                });
+              });
+            }
+
+            updateRoutingMutation
+              .mutateAsync({ input_id: inputId, stream_id: streamResponse.stream_id })
+              .finally(() => {
+                startInput();
+              });
           },
         });
 
@@ -191,7 +214,7 @@ const StartInputStep = () => {
   };
 
   const rollback = () => {
-    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING);
     const createdStreamId = createStreamMutation.data?.stream_id;
     const createdPipelineId = createPipelineMutation.data?.id;
     const routingRuleId = updateRoutingMutation.data?.rule_id;
@@ -264,7 +287,11 @@ const StartInputStep = () => {
   };
 
   const isInputStartable = () => {
-    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+    if (isIlluminateFlow) {
+      return true;
+    }
+
+    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING);
 
     if (!routingStepData) return false;
     if (routingStepData.newStream || routingStepData.streamId || routingStepData.streamType === 'DEFAULT') return true;
@@ -275,7 +302,7 @@ const StartInputStep = () => {
   const getProgressEntityName = (stepName, mutations) => {
     const mutation = mutations[stepName];
 
-    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING) as RoutingStepData;
+    const routingStepData = getStepData(stepsData, INPUT_WIZARD_STEPS.SETUP_ROUTING);
 
     const name = mutation.data?.title ?? mutation.data?.name ?? undefined;
 
@@ -322,7 +349,7 @@ const StartInputStep = () => {
   const renderNextButton = () => {
     if (startInputStatus === 'NOT_STARTED' || startInputStatus === 'ROLLED_BACK') {
       return (
-        <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary" data-testid="start-input-button">
+        <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary">
           Start Input
         </Button>
       );
@@ -330,11 +357,7 @@ const StartInputStep = () => {
 
     if (startInputStatus === 'FAILED' || startInputStatus === 'ROLLING_BACK') {
       return (
-        <Button
-          disabled={startInputStatus === 'ROLLING_BACK'}
-          onClick={handleRollback}
-          bsStyle="primary"
-          data-testid="rollback-input-button">
+        <Button disabled={startInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary">
           Rollback Input
         </Button>
       );
@@ -342,12 +365,8 @@ const StartInputStep = () => {
 
     if (hasNextStep) {
       return (
-        <Button
-          disabled={startInputStatus === 'RUNNING'}
-          onClick={goToInputDiagnosis}
-          bsStyle="primary"
-          data-testid="input-diagnosis-button">
-          Input Diagnosis
+        <Button disabled={startInputStatus === 'RUNNING'} onClick={goToInputDiagnosis} bsStyle="primary">
+          Launch Input Diagnosis
         </Button>
       );
     }
@@ -382,6 +401,7 @@ const StartInputStep = () => {
                     isError={startInputStatus === 'FAILED'}
                   />
                 )}
+                {isIlluminateFlow && startInputStatus === 'SUCCESS' && <ExtraSetupWizardStep />}
               </>
             ))}
 

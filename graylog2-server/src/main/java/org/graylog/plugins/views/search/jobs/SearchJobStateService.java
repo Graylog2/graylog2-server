@@ -203,4 +203,22 @@ public class SearchJobStateService {
             return Optional.empty();
         }
     }
+
+    public Optional<SearchJobExecutionState> getExecutionStateForLatestUserJob(final String user) {
+        final Document doc = collection.find(Filters.eq(OWNER_FIELD, user), Document.class)
+                .projection(include(STATUS_FIELD, PROGRESS_FIELD))
+                .sort(Sorts.descending(CREATED_AT_FIELD))
+                .first();
+        if (doc != null) {
+            return Optional.of(
+                    new SearchJobExecutionState(
+                            SearchJobStatus.valueOf(doc.get(STATUS_FIELD, String.class)),
+                            doc.getInteger(PROGRESS_FIELD, 0)
+                    )
+            );
+        } else {
+            return Optional.empty();
+        }
+
+    }
 }

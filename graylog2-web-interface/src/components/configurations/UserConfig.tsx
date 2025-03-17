@@ -88,6 +88,7 @@ const UserConfig = () => {
   };
 
   const timeoutIntervalValidator = (milliseconds: number) => milliseconds >= 1000;
+  const defaultTokenTtlValidator = (milliseconds: number) => milliseconds >= 86400000;
 
   const modalTitle = 'Update User Configuration';
 
@@ -105,8 +106,12 @@ const UserConfig = () => {
             <dd>{viewConfig.enable_global_session_timeout ? 'Enabled' : 'Disabled'}</dd>
             <dt>Timeout interval:</dt>
             <dd>{viewConfig.enable_global_session_timeout ? viewConfig.global_session_timeout_interval : '-'}</dd>
+            <dt>Restrict access tokens to admins:&nbsp;</dt>
+            <dd>{viewConfig.restrict_access_token_to_admins ? 'Enabled' : 'Disabled'}</dd>
             <dt>Allow access token for external users:&nbsp;</dt>
             <dd>{viewConfig.allow_access_token_for_external_user ? 'Enabled' : 'Disabled'}</dd>
+            <dt>Default TTL for new tokens:</dt>
+            <dd>{viewConfig.default_ttl_for_new_tokens ? viewConfig.default_ttl_for_new_tokens : '-'}</dd>
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">
@@ -161,11 +166,35 @@ const UserConfig = () => {
                         <Col sm={12}>
                           <FormikInput
                             type="checkbox"
+                            name="restrict_access_token_to_admins"
+                            id="restrict_access_token_to_admins"
+                            label={<LabelSpan>Restrict access tokens to admins</LabelSpan>}
+                          />
+                          <InputDescription help="If enabled, it will restrict the creation of access tokens to admins." />
+                        </Col>
+                        <Col sm={12}>
+                          <FormikInput
+                            type="checkbox"
                             name="allow_access_token_for_external_user"
                             id="allow_access_token_for_external_user"
                             label={<LabelSpan>Allow access token for external users</LabelSpan>}
                           />
-                          <InputDescription help="If enabled, it will allow external users to use access tokens." />
+                          <InputDescription help="If enabled, it will allow external users to create access tokens." />
+                        </Col>
+                        <Col sm={12}>
+                          <fieldset>
+                            <ISODurationInput
+                              id="default_ttl_for_new_tokens"
+                              duration={values.default_ttl_for_new_tokens}
+                              update={(value) => setFieldValue('default_ttl_for_new_tokens', value)}
+                              label="Default TTL for new tokens (as ISO8601 Duration)"
+                              help="Tokens will be automatically invalidated after this amount of time."
+                              validator={defaultTokenTtlValidator}
+                              errorText="invalid (min: 1 day)"
+                              disabled={!values.default_ttl_for_new_tokens}
+                              required
+                            />
+                          </fieldset>
                         </Col>
                       </Row>
                     </div>
