@@ -54,8 +54,8 @@ const DataNodeUpgradeHelp = () => {
           OpenSearch to use only the available shards.
         </p>
         <p>
-          After a node has been upgraded and you click on <em>Confirm Upgrade</em>, shard replication will be re-enabled and
-          all shards that were unavailable due to the node being upgraded will be re-allocated and the cluster will
+          After a node has been upgraded and you click on <em>Confirm Upgrade</em>, shard replication will be re-enabled
+          and all shards that were unavailable due to the node being upgraded will be re-allocated and the cluster will
           return to a GREEN state.
         </p>
       </Popover.Dropdown>
