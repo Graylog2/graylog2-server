@@ -1,5 +1,5 @@
 type = "c"
-message = "Set default User-Agent in HTTP client to 'Graylog'"
+message = "Set default `User-Agent` header in HTTP client to `Graylog`."
 
 issues = [""]
 pulls = ["21864"]
