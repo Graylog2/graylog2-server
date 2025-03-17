@@ -38,6 +38,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
+import org.graylog2.bootstrap.preflight.PasswordSecretPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
@@ -190,6 +191,9 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
         modules.add(new SchedulerBindings());
 
         final Injector preflightInjector = getPreflightInjector(modules);
+        // explicitly call the PasswordSecretPreflightCheck also when showing preflight web to make sure
+        // data node isn't provisioned with the wrong password_secret
+        preflightInjector.getInstance(PasswordSecretPreflightCheck.class).runCheck();
         GuiceInjectorHolder.setInjector(preflightInjector);
         try {
             doRunWithPreflightInjector(preflightInjector);

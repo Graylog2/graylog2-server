@@ -84,8 +84,7 @@ const navigationBindings: PluginExports = {
           AppConfig.isCloud() && !AppConfig.isFeatureEnabled('cloud_inputs') ? [Routes.SYSTEM.INPUTS] : [],
         ),
         [
-          Routes.SYSTEM.NODES.LIST,
-          Routes.SYSTEM.DATANODES.LIST,
+          Routes.SYSTEM.CLUSTER.NODES,
           Routes.SYSTEM.OUTPUTS,
           Routes.SYSTEM.LOGGING,
           Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE,

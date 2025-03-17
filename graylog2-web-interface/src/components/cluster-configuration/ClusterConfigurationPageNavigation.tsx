@@ -33,6 +33,7 @@ const ClusterConfigurationPageNavigation = () => {
       title: 'Data Node Certificate Management',
       path: Routes.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
     },
+    isDatanodeConfiguredAndUsed && { title: 'Data Node Upgrade', path: Routes.SYSTEM.CLUSTER.DATANODE_UPGRADE },
     showDatanodeMigration &&
       enableDataNodeMigration && { title: 'Data Node Migration', path: Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION },
   ];
