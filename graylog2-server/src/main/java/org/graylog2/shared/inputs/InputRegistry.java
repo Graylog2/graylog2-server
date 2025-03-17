@@ -18,39 +18,48 @@ package org.graylog2.shared.inputs;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
 
 @Singleton
 public class InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
 
-    private final Set<IOState<MessageInput>> inputStates = Sets.newConcurrentHashSet();
+    private final ConcurrentMap<String, IOState<MessageInput>> inputStates = new ConcurrentHashMap<>();
+    private final IOState.Factory<MessageInput> inputStateFactory;
+    private final FeatureFlags featureFlags;
 
-    public Set<IOState<MessageInput>> getInputStates() {
-        return ImmutableSet.copyOf(inputStates);
+    @Inject
+    public InputRegistry(IOState.Factory<MessageInput> inputStateFactory, FeatureFlags featureFlags) {
+        this.inputStateFactory = inputStateFactory;
+        this.featureFlags = featureFlags;
     }
 
-    public IOState<MessageInput> getInputState(String inputId) {
-        for (IOState<MessageInput> inputState : inputStates) {
-            if (inputState.getStoppable().getPersistId().equals(inputId)) {
-                return inputState;
-            }
-        }
+    public Set<IOState<MessageInput>> getInputStates() {
+        return ImmutableSet.copyOf(inputStates.values());
+    }
 
-        return null;
+    @Nullable
+    public IOState<MessageInput> getInputState(String inputId) {
+        return inputStates.get(inputId);
     }
 
     public Set<IOState<MessageInput>> getRunningInputs() {
         ImmutableSet.Builder<IOState<MessageInput>> runningInputs = ImmutableSet.builder();
-        for (IOState<MessageInput> inputState : inputStates) {
+        for (IOState<MessageInput> inputState : inputStates.values()) {
             if (inputState.getState() == IOState.Type.RUNNING) {
                 runningInputs.add(inputState);
             }
@@ -59,7 +68,7 @@ public class InputRegistry {
     }
 
     public boolean hasTypeRunning(Class klazz) {
-        for (IOState<MessageInput> inputState : inputStates) {
+        for (IOState<MessageInput> inputState : inputStates.values()) {
             if (inputState.getStoppable().getClass().equals(klazz)) {
                 return true;
             }
@@ -72,68 +81,84 @@ public class InputRegistry {
         return getRunningInputs().size();
     }
 
+    @Nullable
     public MessageInput getRunningInput(String inputId) {
-        for (IOState<MessageInput> inputState : inputStates) {
-            if (inputState.getStoppable().getId().equals(inputId)) {
-                return inputState.getStoppable();
-            }
-        }
+        final IOState<MessageInput> state = inputStates.get(inputId);
 
-        return null;
+        return state != null ? state.getStoppable() : null;
     }
 
+    @Nullable
     public IOState<MessageInput> getRunningInputState(String inputStateId) {
-        for (IOState<MessageInput> inputState : inputStates) {
-            if (inputState.getStoppable().getId().equals(inputStateId)) {
-                return inputState;
-            }
-        }
-
-        return null;
+        return inputStates.get(inputStateId);
     }
 
-    public boolean remove(MessageInput input) {
-        final IOState<MessageInput> inputState = this.stop(input);
-        input.terminate();
+    public boolean remove(String inputId) {
+        final var inputState = inputStates.get(inputId);
         if (inputState != null) {
-            inputState.setState(IOState.Type.TERMINATED);
+            return remove(inputState);
         }
-
-        return inputStates.remove(inputState);
+        return false;
     }
 
     public boolean remove(IOState<MessageInput> inputState) {
-        final MessageInput messageInput = inputState.getStoppable();
-        return remove(messageInput);
+        return remove(inputState.getStoppable());
+    }
+
+    public boolean remove(MessageInput input) {
+        stop(input);
+        return inputStates.remove(input.getId()) != null;
     }
 
     public IOState<MessageInput> stop(MessageInput input) {
-        IOState<MessageInput> inputState = getRunningInputState(input.getId());
+        final var inputState = inputStates.get(input.getId());
 
         if (inputState != null) {
-            inputState.setState(IOState.Type.STOPPING);
             try {
-                input.stop();
+                inputState.triggerStop();
             } catch (Exception e) {
                 LOG.warn("Stopping input {} failed, removing anyway: {}", input.toIdentifier(), e);
             }
-            inputState.setState(IOState.Type.STOPPED);
         }
 
         return inputState;
     }
 
-    public void setup(IOState<MessageInput> inputState) {
-        remove(inputState);
-        inputState.setState(IOState.Type.SETUP);
-        inputStates.add(inputState);
+    public void setup(String inputId) {
+        final IOState<MessageInput> inputState = inputStates.get(inputId);
+        if (inputState != null) {
+            inputState.triggerSetup();
+            remove(inputState);
+        }
     }
 
-    public boolean add(IOState<MessageInput> messageInputIOState) {
-        return inputStates.add(messageInputIOState);
+    private IOState<MessageInput> createInputState(MessageInput messageInput) {
+        if (featureFlags.isOn("SETUP_MODE") && messageInput.getDesiredState() == IOState.Type.SETUP) {
+            return inputStateFactory.create(messageInput, IOState.Type.SETUP);
+        }
+        return inputStateFactory.create(messageInput);
+    }
+
+    public IOState<MessageInput> add(MessageInput messageInput) {
+        return inputStates.merge(
+                messageInput.getId(),
+                createInputState(messageInput),
+                (existingState, newSate) -> {
+                    switch (existingState.getState()) {
+                        case RUNNING, STARTING, FAILING -> {
+                        }
+                        default -> existingState.setStoppable(messageInput);
+                    }
+                    return existingState;
+                }
+        );
     }
 
     public Stream<IOState<MessageInput>> stream() {
-        return inputStates.stream();
+        return inputStates.values().stream();
+    }
+
+    private MessageInput getMessageInput(IOState<MessageInput> inputState) {
+        return requireNonNull(inputState.getStoppable(), "IOState#stoppable cannot be null");
     }
 }
