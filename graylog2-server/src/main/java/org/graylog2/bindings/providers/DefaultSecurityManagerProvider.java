@@ -16,6 +16,9 @@
  */
 package org.graylog2.bindings.providers;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
@@ -30,13 +33,9 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.security.InMemoryRolePermissionResolver;
-import org.graylog2.security.MongoDbSessionDAO;
 import org.graylog2.security.OrderedAuthenticatingRealms;
+import org.graylog2.security.sessions.SessionDAO;
 import org.graylog2.shared.security.ThrowingFirstSuccessfulStrategy;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +47,7 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
     private DefaultSecurityManager sm = null;
 
     @Inject
-    public DefaultSecurityManagerProvider(MongoDbSessionDAO mongoDbSessionDAO,
+    public DefaultSecurityManagerProvider(SessionDAO sessionDAO,
                                           Map<String, AuthorizingRealm> authorizingOnlyRealms,
                                           InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                                           OrderedAuthenticatingRealms orderedAuthenticatingRealms) {
@@ -83,7 +82,7 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
         sm.setSubjectDAO(subjectDAO);
 
         final DefaultSessionManager defaultSessionManager = (DefaultSessionManager) sm.getSessionManager();
-        defaultSessionManager.setSessionDAO(mongoDbSessionDAO);
+        defaultSessionManager.setSessionDAO(sessionDAO);
         defaultSessionManager.setDeleteInvalidSessions(true);
         defaultSessionManager.setSessionValidationInterval(TimeUnit.MINUTES.toMillis(5));
         defaultSessionManager.setCacheManager(new MemoryConstrainedCacheManager());
