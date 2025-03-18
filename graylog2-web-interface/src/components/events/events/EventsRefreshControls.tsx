@@ -31,18 +31,11 @@ import type { RefreshConfig } from 'views/components/contexts/AutoRefreshContext
 import { durationToMS } from 'util/DateTime';
 
 const EventsRefreshControls = () => {
-  const { refetch } = useTableFetchContext();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { config } = useSearchConfiguration();
   const autoRefreshTimerangeOptions = config?.auto_refresh_timerange_options;
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
-
-  const defaultInterval = useDefaultInterval();
-  const defaultRefreshConfig: RefreshConfig = useMemo(
-    () => ({ enabled: true, interval: durationToMS(defaultInterval) }),
-    [defaultInterval],
-  );
 
   const onSelectInterval = useCallback(
     (interval: string) => {
@@ -57,7 +50,7 @@ const EventsRefreshControls = () => {
   );
 
   const onToggle = useCallback(
-    (enabled) => {
+    (enabled: boolean) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ALERTS_REFRESH_CONTROL_TOGGLED, {
         app_pathname: 'alerts',
         app_section: 'alerts-page',
@@ -68,6 +61,8 @@ const EventsRefreshControls = () => {
     [sendTelemetry],
   );
 
+  const defaultInterval = useDefaultInterval();
+
   if (!config) {
     return null;
   }
@@ -75,18 +70,16 @@ const EventsRefreshControls = () => {
   const intervalOptions = autoRefreshTimerangeOptions ? Object.entries(autoRefreshTimerangeOptions) : [];
 
   return (
-    <AutoRefreshProvider onRefresh={refetch} defaultRefreshConfig={defaultRefreshConfig}>
-      <RefreshControls
-        disable={false}
-        intervalOptions={intervalOptions}
-        isLoadingMinimumInterval={isLoadingMinimumInterval}
-        minimumRefreshInterval={minimumRefreshInterval}
-        defaultInterval={defaultInterval}
-        humanName="Evets"
-        onToggle={onToggle}
-        onSelectInterval={onSelectInterval}
-      />
-    </AutoRefreshProvider>
+    <RefreshControls
+      disable={false}
+      intervalOptions={intervalOptions}
+      isLoadingMinimumInterval={isLoadingMinimumInterval}
+      minimumRefreshInterval={minimumRefreshInterval}
+      defaultInterval={defaultInterval}
+      humanName="Evets"
+      onToggle={onToggle}
+      onSelectInterval={onSelectInterval}
+    />
   );
 };
 
