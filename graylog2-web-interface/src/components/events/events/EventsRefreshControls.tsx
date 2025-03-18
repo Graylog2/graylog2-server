@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -25,10 +25,6 @@ import useLocation from 'routing/useLocation';
 import useMinimumRefreshInterval from 'views/hooks/useMinimumRefreshInterval';
 import RefreshControls from 'components/common/RefreshControls';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
-import AutoRefreshProvider from 'views/components/contexts/AutoRefreshProvider';
-import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
-import type { RefreshConfig } from 'views/components/contexts/AutoRefreshContext';
-import { durationToMS } from 'util/DateTime';
 
 const EventsRefreshControls = () => {
   const location = useLocation();
