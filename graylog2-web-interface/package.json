@@ -113,7 +113,7 @@
   },
   "devDependencies": {
     "@cfaester/enzyme-adapter-react-18": "0.7.1",
-    "@cyclonedx/webpack-plugin": "^4.0.1",
+    "@cyclonedx/webpack-plugin": "^5.0.1",
     "@graylog/prettier-config": "^1.0.3",
     "@types/chroma-js": "^2.1.3",
     "@types/crossfilter": "0.0.38",
