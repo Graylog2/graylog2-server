@@ -219,7 +219,7 @@ describe('InputSetupWizard Setup Routing', () => {
     it('should show a warning if the input is already in use', async () => {
       renderWizard();
 
-      await screen.findByText('Input already in use');
+      await screen.findByText('Input already in use - Message Duplication Risk!');
       await screen.findByText('In use stream 1');
       await screen.findByText('In use stream 2');
       await screen.findByText('In use pipeline 1');
