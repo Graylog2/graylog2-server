@@ -43,8 +43,8 @@ import {
 import type { TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
-import type Parameter from 'views/logic/parameters/Parameter';
 import type { ParameterMap } from 'views/logic/parameters/Parameter';
+import type Parameter from 'views/logic/parameters/Parameter';
 import type { JobIds } from 'views/stores/SearchJobs';
 import type Search from 'views/logic/search/Search';
 import { setParameters } from 'views/logic/slices/viewSlice';
@@ -147,6 +147,7 @@ export type SearchExecutors = {
     widgetMapping?: WidgetMapping;
     page?: number;
     perPage?: number;
+    stopPolling?: (progress: number) => boolean;
   }) => Promise<SearchExecutionResult>;
   cancelJob: (jobIds: JobIds) => Promise<null>;
 };
@@ -173,19 +174,21 @@ export const executeSearchJob =
     page,
     perPage,
     searchExecutors,
+    stopPolling,
   }: {
     jobIds: JobIds;
     widgetMapping?: WidgetMapping;
     page?: number;
     perPage?: number;
     searchExecutors: SearchExecutors;
+    stopPolling?: (progress: number) => boolean;
   }) =>
   (dispatch: ViewsDispatch, _getState) => {
     dispatch(setJobIds(jobIds));
     dispatch(loading());
 
     return searchExecutors
-      .executeJobResult({ jobIds, widgetMapping, page, perPage })
+      .executeJobResult({ jobIds, widgetMapping, page, perPage, stopPolling })
       .then(searchExecutors.resultMapper)
       .then((result) => {
         dispatch(setJobIds(null));
@@ -206,6 +209,7 @@ export const executeWithExecutionState =
     widgetMapping,
     page,
     perPage,
+    stopPolling,
   }: {
     search: Search;
     activeQuery: string;
@@ -215,6 +219,7 @@ export const executeWithExecutionState =
     widgetMapping?: WidgetMapping;
     page?: number;
     perPage?: number;
+    stopPolling?: (progress: number) => boolean;
   }) =>
   (dispatch: ViewsDispatch) =>
     dispatch(parseSearch(search, searchExecutors.parse))
@@ -224,7 +229,9 @@ export const executeWithExecutionState =
 
         return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
       })
-      .then((jobIds: JobIds) => dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage })));
+      .then((jobIds: JobIds) =>
+        dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling })),
+      );
 
 export const execute =
   ({
@@ -233,12 +240,14 @@ export const execute =
     widgetMapping,
     page,
     perPage,
+    stopPolling,
   }: {
     search: Search;
     activeQuery: string;
     widgetMapping?: WidgetMapping;
     page?: number;
     perPage?: number;
+    stopPolling?: (progress: number) => boolean;
   }) =>
   (dispatch: ViewsDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
     const state = getState();
@@ -255,6 +264,7 @@ export const execute =
         widgetMapping,
         page,
         perPage,
+        stopPolling,
       }),
     );
   };
