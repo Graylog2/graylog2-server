@@ -24,45 +24,50 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import StreamsStore, { type Stream } from 'stores/streams/StreamsStore';
 import { isPermitted } from 'util/PermissionsMixin';
 
-const StreamRuleConnector = styled.div(({ theme }) => css`
-  margin-top: 10px;
-  margin-bottom: 13px;
+const StreamRuleConnector = styled.div(
+  ({ theme }) => css`
+    margin-top: 10px;
+    margin-bottom: 13px;
 
-  label {
-    font-size: ${theme.fonts.size.small};
-  }
+    label {
+      font-size: ${theme.fonts.size.small};
+    }
 
-  .form-group {
-    margin-bottom: 5px;
-  }
+    .form-group {
+      margin-bottom: 5px;
+    }
 
-  .radio {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
+    .radio {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
 
-  input[type='radio'] {
-    margin-top: 2px;
-    margin-bottom: 2px;
-  }
-`);
+    input[type='radio'] {
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+  `,
+);
 
 type Props = {
-  stream: Stream,
-  onChange: () => void,
-}
+  stream: Stream;
+  onChange: () => void;
+};
 
 const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
-  const [matchingType, setMatchingType] = useState<'AND'|'OR'|undefined>(undefined);
+  const [matchingType, setMatchingType] = useState<'AND' | 'OR' | undefined>(undefined);
   const currentUser = useCurrentUser();
-  const disabled = stream.is_default || !stream.is_editable || !isPermitted(currentUser.permissions, `streams:edit:${stream.id}`);
+  const disabled =
+    stream.is_default || !stream.is_editable || !isPermitted(currentUser.permissions, `streams:edit:${stream.id}`);
 
-  const handleTypeChange = (newValue: 'AND'|'OR') => {
+  const handleTypeChange = (newValue: 'AND' | 'OR') => {
     StreamsStore.update(stream.id, { matching_type: newValue }, (response) => {
       onChange();
 
-      UserNotification.success(`Messages will now be routed into the stream when ${newValue === 'AND' ? 'all' : 'any'} rules are matched`,
-        'Success');
+      UserNotification.success(
+        `Messages will now be routed into the stream when ${newValue === 'AND' ? 'all' : 'any'} rules are matched`,
+        'Success',
+      );
 
       return response;
     });
@@ -71,25 +76,31 @@ const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
   return (
     <StreamRuleConnector>
       <div>
-        <Input id="streamrule-and-connector"
-               type="radio"
-               label="A message must match all of the following rules"
-               checked={stream.matching_type === 'AND'}
-               onChange={() => setMatchingType('AND')}
-               disabled={disabled} />
-        <Input id="streamrule-or-connector"
-               type="radio"
-               label="A message must match at least one of the following rules"
-               checked={stream.matching_type === 'OR'}
-               onChange={() => setMatchingType('OR')}
-               disabled={disabled} />
+        <Input
+          id="streamrule-and-connector"
+          type="radio"
+          label="A message must match all of the following rules"
+          checked={stream.matching_type === 'AND'}
+          onChange={() => setMatchingType('AND')}
+          disabled={disabled}
+        />
+        <Input
+          id="streamrule-or-connector"
+          type="radio"
+          label="A message must match at least one of the following rules"
+          checked={stream.matching_type === 'OR'}
+          onChange={() => setMatchingType('OR')}
+          disabled={disabled}
+        />
       </div>
       {matchingType && (
-        <ConfirmDialog show
-                       title={`Switch matching type to ${matchingType === 'AND' ? 'ALL' : 'ANY'}`}
-                       onConfirm={() => handleTypeChange(matchingType)}
-                       onCancel={() => setMatchingType(undefined)}>
-          You are about to change how rules are applied to this stream, do you want to continue? Changes will take effect immediately.
+        <ConfirmDialog
+          show
+          title={`Switch matching type to ${matchingType === 'AND' ? 'ALL' : 'ANY'}`}
+          onConfirm={() => handleTypeChange(matchingType)}
+          onCancel={() => setMatchingType(undefined)}>
+          You are about to change how rules are applied to this stream, do you want to continue? Changes will take
+          effect immediately.
         </ConfirmDialog>
       )}
     </StreamRuleConnector>

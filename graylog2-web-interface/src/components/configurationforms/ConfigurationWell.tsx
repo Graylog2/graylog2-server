@@ -14,104 +14,175 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import styled, { css } from 'styled-components';
 
 import { Well } from 'components/bootstrap';
+import type {
+  ConfigurationField,
+  ConfigurationFieldValue,
+  EncryptedFieldValue,
+} from 'components/configurationforms/types';
 
-type ConfigurationWellProps = {
+const PASSWORD_PLACEHOLDER = '********';
+
+type Props = {
   id: string;
-  configuration?: any;
-  typeDefinition?: any;
+  configuration: {
+    [key: string]: ConfigurationFieldValue;
+  };
+  typeDefinition?: {
+    requested_configuration: {
+      [key: string]: ConfigurationField;
+    };
+  };
 };
 
-class ConfigurationWell extends React.Component<ConfigurationWellProps, {
-  [key: string]: any;
-}> {
-  PASSWORD_PLACEHOLDER = '********';
+const RegularField = ({ id, value, name }: { id: string; value: ConfigurationFieldValue; name: string }) => {
+  let finalValue;
 
-  static defaultProps = {
-    configuration: undefined,
-    typeDefinition: {},
-  };
+  if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
+    finalValue = <i>{'<empty>'}</i>;
+  } else {
+    finalValue = Array.isArray(value) ? value.join(', ') : String(value);
+  }
 
-  _formatRegularField = (value, key) => {
-    const { id } = this.props;
-    let finalValue;
+  return (
+    <li key={`${id}-${name}`}>
+      <div className="key">{name}:</div> <div className="value">{finalValue}</div>
+    </li>
+  );
+};
 
-    if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
-      finalValue = <i>{'<empty>'}</i>;
-    } else {
-      finalValue = Array.isArray(value) ? value.join(', ') : String(value);
-    }
+const InlineBinaryField = ({ id, value, name }: { id: string; value: ConfigurationFieldValue; name: string }) => {
+  let finalValue;
 
-    return (<li key={`${id}-${key}`}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
-  };
+  if (value === null || value === undefined || value === '') {
+    finalValue = <i>{'<empty>'}</i>;
+  } else {
+    finalValue = <i>{'<uploaded file content>'}</i>;
+  }
 
-  _formatEncryptedField = (value, key) => {
-    const { id } = this.props;
-    let finalValue;
+  return (
+    <li key={`${id}-${name}`}>
+      <div className="key">{name}:</div> <div className="value">{finalValue}</div>
+    </li>
+  );
+};
 
-    if (!value.is_set) {
-      finalValue = <i>{'<empty>'}</i>;
-    } else {
-      finalValue = this.PASSWORD_PLACEHOLDER;
-    }
+const EncryptedField = ({ id, value, name }: { id: string; value: EncryptedFieldValue<unknown>; name: string }) => {
+  let finalValue;
 
-    return (<li key={`${id}-${key}`}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
-  };
+  if (!value.is_set) {
+    finalValue = <i>{'<empty>'}</i>;
+  } else {
+    finalValue = PASSWORD_PLACEHOLDER;
+  }
 
-  _formatPasswordField = (_value, key) => {
-    const { id } = this.props;
+  return (
+    <li key={`${id}-${name}`}>
+      <div className="key">{name}:</div> <div className="value">{finalValue}</div>
+    </li>
+  );
+};
 
-    return (
-      <li key={`${id}-${key}`}>
-        <div className="key">{key}:</div>
-        <div className="value">{this.PASSWORD_PLACEHOLDER}</div>
-      </li>
-    );
-  };
+const PasswordField = ({ id, name }: { id: string; name: string }) => (
+  <li key={`${id}-${name}`}>
+    <div className="key">{name}:</div> <div className="value">{PASSWORD_PLACEHOLDER}</div>
+  </li>
+);
 
-  _formatConfiguration = (_id, config, typeDefinition) => {
-    if (!config) {
-      return ('');
-    }
+const isPasswordField = (field: ConfigurationField) =>
+  field?.type === 'text' && (field.attributes.includes('is_password') || field.attributes.includes('is_sensitive'));
 
-    const formattedItems = Object.keys(config).sort().map((key) => {
+const Configuration = ({
+  id: _id,
+  config,
+  typeDefinition = undefined,
+}: {
+  id: string;
+  config: Props['configuration'];
+  typeDefinition?: Props['typeDefinition'];
+}) => {
+  if (!config) {
+    return '';
+  }
+
+  const formattedItems = Object.keys(config)
+    .sort()
+    .map((key) => {
       const value = config[key];
-      const requestedConfiguration = (typeDefinition && typeDefinition.requested_configuration ? typeDefinition.requested_configuration[key] : undefined);
+      const requestedConfiguration = typeDefinition?.requested_configuration?.[key];
 
-      if (requestedConfiguration
-        && (requestedConfiguration.attributes.indexOf('is_password') > -1 || requestedConfiguration.attributes.indexOf('is_sensitive') > -1)) {
-        return this._formatPasswordField(value, key);
+      if (requestedConfiguration && 'is_encrypted' in requestedConfiguration && requestedConfiguration.is_encrypted) {
+        return <EncryptedField id={_id} value={value as EncryptedFieldValue<unknown>} name={key} />;
       }
 
-      if (requestedConfiguration && requestedConfiguration.is_encrypted) {
-        return this._formatEncryptedField(value, key);
+      if (isPasswordField(requestedConfiguration)) {
+        return <PasswordField id={_id} name={key} />;
       }
 
-      return this._formatRegularField(value, key);
+      if (requestedConfiguration?.type === 'inline_binary') {
+        return <InlineBinaryField id={_id} value={value} name={key} />;
+      }
+
+      return <RegularField id={_id} value={value} name={key} />;
     });
 
-    if (formattedItems.length < 1) {
-      formattedItems.push(<li key="placeholder">-- no configuration --</li>);
+  if (formattedItems.length < 1) {
+    formattedItems.push(<li key="placeholder">-- no configuration --</li>);
+  }
+
+  return <ul>{formattedItems}</ul>;
+};
+
+const StyledWell = styled(Well)(
+  ({ theme }) => css`
+    margin-top: 5px;
+    margin-bottom: 0;
+    padding: 9px;
+    font-family: ${theme.fonts.family.monospace};
+    word-wrap: break-word;
+
+    ul {
+      padding: 0;
+      margin: 0;
     }
 
-    return (
-      <ul>
-        {formattedItems}
-      </ul>
-    );
-  };
+    white-space: pre-line;
 
-  render() {
-    const { id, configuration, typeDefinition } = this.props;
+    .configuration-section {
+      margin-bottom: 10px;
+    }
 
-    return (
-      <Well bsSize="small" className="configuration-well react-configuration-well">
-        {this._formatConfiguration(id, configuration, typeDefinition)}
-      </Well>
-    );
-  }
-}
+    li:not(:last-child) {
+      margin-bottom: 5px;
+    }
+
+    .key {
+      display: inline;
+    }
+
+    .alert-callback .key {
+      display: inline-block;
+      min-width: 140px;
+      vertical-align: top;
+    }
+
+    .value {
+      display: inline;
+    }
+
+    .alert-callback .value {
+      display: inline-block;
+    }
+  `,
+);
+
+const ConfigurationWell = ({ id, configuration, typeDefinition = undefined }: Props) => (
+  <StyledWell bsSize="small">
+    <Configuration id={id} config={configuration} typeDefinition={typeDefinition} />
+  </StyledWell>
+);
 
 export default ConfigurationWell;

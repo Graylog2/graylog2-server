@@ -21,7 +21,7 @@ import { ListGroup } from 'components/bootstrap';
 import ControlledTableListHeader from './ControlledTableListHeader';
 import ControlledTableListItem from './ControlledTableListItem';
 
-const ControlledTableList = ({ children }: { children: Array<React.ReactNode>}) => {
+const ControlledTableList = ({ children }: { children: Array<React.ReactNode> }) => {
   let effectiveChildren;
 
   if (children.length === 0) {
@@ -32,9 +32,7 @@ const ControlledTableList = ({ children }: { children: Array<React.ReactNode>}) 
 
   return (
     <div>
-      <ListGroup>
-        {effectiveChildren}
-      </ListGroup>
+      <ListGroup>{effectiveChildren}</ListGroup>
     </div>
   );
 };

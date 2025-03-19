@@ -213,7 +213,7 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
                     })
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            throw InputProcessingException.create("Unable to parse ipfix journal message", rawMessage);
+            throw InputProcessingException.create("Unable to parse ipfix journal message", e, rawMessage);
         }
     }
 

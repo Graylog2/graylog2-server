@@ -25,7 +25,9 @@ import { Link } from 'components/common/router';
 
 import ReportedErrorBoundary from './ReportedErrorBoundary';
 
-jest.mock('routing/withLocation', () => (Component) => (props) => <Component {...props} location={{ pathname: '/' }} />);
+jest.mock('routing/withLocation', () => (Component) => (props) => (
+  <Component {...props} location={{ pathname: '/' }} />
+));
 
 describe('ReportedErrorBoundary', () => {
   it('displays child component if there is no error', async () => {
@@ -74,7 +76,10 @@ describe('ReportedErrorBoundary', () => {
     const response = { status: 404, body: { message: 'The error message' } };
 
     await suppressConsole(() => {
-      ErrorsActions.report({ ...createNotFoundError(new FetchError('The error message', response.status, response)), type: 'UnkownReportedError' });
+      ErrorsActions.report({
+        ...createNotFoundError(new FetchError('The error message', response.status, response)),
+        type: 'UnkownReportedError',
+      });
     });
 
     await waitFor(() => expect(screen.queryByText('Hello World!')).toBeNull());
@@ -91,7 +96,9 @@ describe('ReportedErrorBoundary', () => {
     const response = { status: 403, body: { message: 'The request error message' } };
 
     await suppressConsole(() => {
-      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response.status, response)));
+      ErrorsActions.report(
+        createUnauthorizedError(new FetchError('The request error message', response.status, response)),
+      );
     });
 
     await screen.findByText('Missing Permissions');
@@ -101,12 +108,12 @@ describe('ReportedErrorBoundary', () => {
   });
 
   it('resets error when navigation changes', async () => {
-    render((
+    render(
       <>
         <Link to="/">Go back</Link>
         <ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>
-      </>
-    ));
+      </>,
+    );
 
     await screen.findByText('Hello World!');
 
@@ -115,7 +122,9 @@ describe('ReportedErrorBoundary', () => {
     expect(screen.getByText('Hello World!')).not.toBeNull();
 
     await suppressConsole(() => {
-      ErrorsActions.report(createUnauthorizedError(new FetchError('The request error message', response.status, response)));
+      ErrorsActions.report(
+        createUnauthorizedError(new FetchError('The request error message', response.status, response)),
+      );
     });
 
     await screen.findByText('Missing Permissions');

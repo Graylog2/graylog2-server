@@ -18,17 +18,20 @@ package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoException;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.NonDeletableSystemScope;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.MongoIndexSet;
@@ -41,7 +44,6 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +54,7 @@ import java.util.Optional;
 
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
+import static org.graylog.events.processor.DBEventDefinitionService.SYSTEM_NOTIFICATION_EVENT_DEFINITION;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_PREFIX;
 import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE;
@@ -130,9 +133,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void checkIndexPrefixConflicts(String indexPrefix, String configKey) {
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.notEquals(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
-                DBQuery.is(FIELD_INDEX_PREFIX, indexPrefix)
+        final Bson query = Filters.and(
+                Filters.ne(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
+                Filters.eq(FIELD_INDEX_PREFIX, indexPrefix)
         );
 
         if (indexSetService.findOne(query).isPresent()) {
@@ -143,9 +146,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private Optional<IndexSetConfig> getEventsIndexSetConfig(String indexPrefix) {
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.is(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
-                DBQuery.is(FIELD_INDEX_PREFIX, indexPrefix)
+        final Bson query = Filters.and(
+                Filters.eq(FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
+                Filters.eq(FIELD_INDEX_PREFIX, indexPrefix)
         );
         return indexSetService.findOne(query);
     }
@@ -177,9 +180,12 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
             LOG.info("Successfully created events index-set <{}/{}>", savedIndexSet.id(), savedIndexSet.title());
 
             return mongoIndexSetFactory.create(savedIndexSet);
-        } catch (DuplicateKeyException e) {
-            LOG.error("Couldn't create index-set <{}/{}>", indexSetTitle, indexPrefix);
-            throw new RuntimeException(e.getMessage());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                LOG.error("Couldn't create index-set <{}/{}>", indexSetTitle, indexPrefix);
+                throw new RuntimeException(e.getMessage());
+            }
+            throw e;
         }
     }
 
@@ -207,23 +213,25 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void ensureSystemNotificationEventsDefinition() {
-        if (dbService.getSystemEventDefinitions().isEmpty()) {
-            EventDefinitionDto eventDto =
-                    EventDefinitionDto.builder()
-                            .title("System notification events")
-                            .description("Reserved event definition for system notification events")
-                            .alert(false)
-                            .priority(1)
-                            .keySpec(ImmutableList.of())
-                            .notificationSettings(EventNotificationSettings.builder()
-                                    .gracePeriodMs(0) // Defaults to 0 in the UI
-                                    .backlogSize(0) // Defaults to 0 in the UI
-                                    .build())
-                            .config(SystemNotificationEventProcessorConfig.builder().build())
-                            .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
-                            .scope(SystemNotificationEventEntityScope.NAME)
-                            .build();
-            dbService.save(eventDto);
+        try (java.util.stream.Stream<EventDefinitionDto> eventDefinitionStream = dbService.streamSystemEventDefinitions()) {
+            if (eventDefinitionStream.findAny().isEmpty()) {
+                EventDefinitionDto eventDto =
+                        EventDefinitionDto.builder()
+                                .title(SYSTEM_NOTIFICATION_EVENT_DEFINITION)
+                                .description("Reserved event definition for system notification events")
+                                .alert(false)
+                                .priority(1)
+                                .keySpec(ImmutableList.of())
+                                .notificationSettings(EventNotificationSettings.builder()
+                                        .gracePeriodMs(0) // Defaults to 0 in the UI
+                                        .backlogSize(0) // Defaults to 0 in the UI
+                                        .build())
+                                .config(SystemNotificationEventProcessorConfig.builder().build())
+                                .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
+                                .scope(NonDeletableSystemScope.NAME)
+                                .build();
+                dbService.save(eventDto);
+            }
         }
     }
 }

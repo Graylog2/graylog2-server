@@ -32,12 +32,13 @@ import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 type SigmaEventDefinitionConfig = EventDefinition['config'] & {
-  sigma_rule_id: string,
-}
+  sigma_rule_id: string;
+};
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
@@ -51,34 +52,36 @@ const ViewEventDefinitionPage = () => {
   const [showSigmaModal, setShowSigmaModal] = useState(false);
   const [refetch, setRefetch] = useState(true);
 
-  const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal')
-    .find((entity: { key: string }) => entity.key === 'coreSigmaModal');
+  const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal').find(
+    (entity: { key: string }) => entity.key === 'coreSigmaModal',
+  );
 
   const CoreSigmaModal = pluggableSigmaModal
-    ? pluggableSigmaModal.component as React.FC<{ ruleId: string, onCancel: () => void, onConfirm: () => void }>
+    ? (pluggableSigmaModal.component as React.FC<{ ruleId: string; onCancel: () => void; onConfirm: () => void }>)
     : null;
 
-  const isSystemEventDefinition = (): boolean => eventDefinition?.config?.type === 'system-notifications-v1';
-
   useEffect(() => {
-    if (currentUser && isPermitted(currentUser.permissions, `eventdefinitions:read:${params.definitionId}`) && refetch) {
-      EventDefinitionsActions.get(params.definitionId)
-        .then(
-          (response) => {
-            const eventDefinitionResp = response.event_definition;
+    if (
+      currentUser &&
+      isPermitted(currentUser.permissions, `eventdefinitions:read:${params.definitionId}`) &&
+      refetch
+    ) {
+      EventDefinitionsActions.get(params.definitionId).then(
+        (response) => {
+          const eventDefinitionResp = response.event_definition;
 
-            // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
-            // backend. This field will be removed in the event definitions store before sending an event definition
-            // back to the server.
-            eventDefinitionResp.config._is_scheduled = response.context.scheduler.is_scheduled;
-            setEventDefinition(eventDefinitionResp);
-          },
-          (error) => {
-            if (error.status === 404) {
-              history.push(Routes.ALERTS.DEFINITIONS.LIST);
-            }
-          },
-        );
+          // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
+          // backend. This field will be removed in the event definitions store before sending an event definition
+          // back to the server.
+          eventDefinitionResp.config._is_scheduled = response.context.scheduler.is_scheduled;
+          setEventDefinition(eventDefinitionResp);
+        },
+        (error) => {
+          if (error.status === 404) {
+            history.push(Routes.ALERTS.DEFINITIONS.LIST);
+          }
+        },
+      );
 
       EventNotificationsActions.listAll();
 
@@ -125,50 +128,56 @@ const ViewEventDefinitionPage = () => {
     <>
       <DocumentTitle title={`View "${eventDefinition.title}" Event Definition`}>
         <EventsPageNavigation />
-        <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
-                    actions={(
-                      <ButtonToolbar>
-                        <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
-                          <Button bsStyle="success" onClick={onEditEventDefinition}>Edit Event Definition</Button>
-                        </IfPermitted>
-                        {!isSystemEventDefinition() && (
-                          <IfPermitted permissions="eventdefinitions:create">
-                            <Button onClick={() => setShowDialog(true)} bsStyle="success">Duplicate Event
-                              Definition
-                            </Button>
-                          </IfPermitted>
-                        )}
-                      </ButtonToolbar>
-                  )}
-                    documentationLink={{
-                      title: 'Alerts documentation',
-                      path: DocsHelper.PAGES.ALERTS,
-                    }}>
-          <span>
-            Event Definitions allow you to create Events from different Conditions and alert on them.
-          </span>
+        <PageHeader
+          title={`View "${eventDefinition.title}" Event Definition`}
+          actions={
+            <ButtonToolbar>
+              <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
+                <Button bsStyle="success" onClick={onEditEventDefinition}>
+                  Edit Event Definition
+                </Button>
+              </IfPermitted>
+              {!isSystemEventDefinition(eventDefinition) && (
+                <IfPermitted permissions="eventdefinitions:create">
+                  <Button onClick={() => setShowDialog(true)} bsStyle="success">
+                    Duplicate Event Definition
+                  </Button>
+                </IfPermitted>
+              )}
+            </ButtonToolbar>
+          }
+          documentationLink={{
+            title: 'Alerts documentation',
+            path: DocsHelper.PAGES.ALERTS,
+          }}>
+          <span>Event Definitions allow you to create Events from different Conditions and alert on them.</span>
         </PageHeader>
 
         <Row className="content">
           <Col md={12}>
-            <EventDefinitionSummary eventDefinition={eventDefinition}
-                                    currentUser={currentUser}
-                                    notifications={notifications} />
+            <EventDefinitionSummary
+              eventDefinition={eventDefinition}
+              currentUser={currentUser}
+              notifications={notifications}
+            />
           </Col>
         </Row>
       </DocumentTitle>
       {showDialog && (
-        <ConfirmDialog title="Copy Event Definition"
-                       show
-                       onConfirm={() => handleDuplicateEvent()}
-                       onCancel={() => setShowDialog(false)}>
+        <ConfirmDialog
+          title="Copy Event Definition"
+          show
+          onConfirm={() => handleDuplicateEvent()}
+          onCancel={() => setShowDialog(false)}>
           {`Are you sure you want to create a copy of "${eventDefinition.title}"?`}
         </ConfirmDialog>
       )}
       {showSigmaModal && CoreSigmaModal && (
-        <CoreSigmaModal ruleId={(eventDefinition.config as SigmaEventDefinitionConfig).sigma_rule_id}
-                        onCancel={onSigmaModalClose}
-                        onConfirm={onSigmaModalClose} />
+        <CoreSigmaModal
+          ruleId={(eventDefinition.config as SigmaEventDefinitionConfig).sigma_rule_id}
+          onCancel={onSigmaModalClose}
+          onConfirm={onSigmaModalClose}
+        />
       )}
     </>
   );

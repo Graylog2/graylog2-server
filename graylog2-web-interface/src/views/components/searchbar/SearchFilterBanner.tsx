@@ -45,16 +45,16 @@ export const SearchFilterExplanation = () => (
       <i>Search filters</i> contain their own query and extend the main query using the <b>AND</b> operator.
     </p>
     <p>
-      Filters can be saved separately and reused in saved searches and dashboards.
-      Updating a saved filter will automatically affect the search results of searches which include the filter.
+      Filters can be saved separately and reused in saved searches and dashboards. Updating a saved filter will
+      automatically affect the search results of searches which include the filter.
     </p>
   </>
 );
 
 type Props = {
-  onHide: () => void,
-  pluggableControls: Array<SearchBarControl>
-}
+  onHide: () => void;
+  pluggableControls: Array<SearchBarControl>;
+};
 
 const SearchFilterBanner = ({ onHide, pluggableControls }: Props) => {
   const hasSearchFiltersPlugin = !!pluggableControls.find((control) => control.id === 'search-filters');
@@ -68,9 +68,7 @@ const SearchFilterBanner = ({ onHide, pluggableControls }: Props) => {
       Filters
       <SearchFilterHelp title="Search Filters" trigger={['click']}>
         <SearchFilterExplanation />
-        <p>
-          Search filters and parameters are available for the enterprise version.
-        </p>
+        <p>Search filters and parameters are available for the enterprise version.</p>
         <StyledButtonBar>
           <Button onClick={onHide} bsSize="xs">
             Hide controls

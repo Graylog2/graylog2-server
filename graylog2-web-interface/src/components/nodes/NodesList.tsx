@@ -25,8 +25,8 @@ import { useStore } from 'stores/connect';
 import NodeListItem from './NodeListItem';
 
 type Props = {
-  nodes?: {},
-}
+  nodes?: {};
+};
 
 const NodesList = ({ nodes }: Props) => {
   const { clusterOverview } = useStore(ClusterOverviewStore);
@@ -38,7 +38,9 @@ const NodesList = ({ nodes }: Props) => {
       return [];
     }
 
-    return Object.keys(nodes).map((nodeID) => <NodeListItem key={nodeID} node={nodes[nodeID]} systemOverview={clusterOverview[nodeID]} />);
+    return Object.keys(nodes).map((nodeID) => (
+      <NodeListItem key={nodeID} node={nodes[nodeID]} systemOverview={clusterOverview[nodeID]} />
+    ));
   }, [clusterOverview, nodes]);
 
   if (_isLoading) {
@@ -51,11 +53,10 @@ const NodesList = ({ nodes }: Props) => {
     <Row className="content">
       <Col md={12}>
         <h2>
-          There <Pluralize value={nodesNo} singular="is" plural="are" /> {nodesNo} active <Pluralize value={nodesNo} singular="node" plural="nodes" />
+          There <Pluralize value={nodesNo} singular="is" plural="are" /> {nodesNo} active{' '}
+          <Pluralize value={nodesNo} singular="node" plural="nodes" />
         </h2>
-        <EntityList bsNoItemsStyle="info"
-                    noItemsText="There are no active nodes."
-                    items={_formattedNodes} />
+        <EntityList bsNoItemsStyle="info" noItemsText="There are no active nodes." items={_formattedNodes} />
       </Col>
     </Row>
   );

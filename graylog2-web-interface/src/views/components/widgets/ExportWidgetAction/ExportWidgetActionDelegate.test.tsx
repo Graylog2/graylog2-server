@@ -24,12 +24,12 @@ import useWidgetExportActionComponent from 'views/components/widgets/useWidgetEx
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 
 jest.mock('views/components/widgets/useWidgetExportActionComponent');
-const renderExportWidgetActionDelegate = () => render(
-  <OriginalExportWidgetActionDelegate widget={AggregationWidget.empty()} />,
-);
+const renderExportWidgetActionDelegate = () =>
+  render(<OriginalExportWidgetActionDelegate widget={AggregationWidget.empty()} />);
 
 describe('ExtraMenuWidgetActions', () => {
-  const plugExplanation = /export aggregation widget feature is available for the enterprise version\. graylog provides option to export your data into most popular file formats such as csv, json, yaml, xml etc\./i;
+  const plugExplanation =
+    /export aggregation widget feature is available for the enterprise version\. graylog provides option to export your data into most popular file formats such as csv, json, yaml, xml etc\./i;
 
   it('Render plug when there is no WidgetExportActionComponent', async () => {
     asMock(useWidgetExportActionComponent).mockReturnValue(null);
@@ -44,7 +44,11 @@ describe('ExtraMenuWidgetActions', () => {
   });
 
   it('Render original WidgetExportActionComponent without a plug', async () => {
-    asMock(useWidgetExportActionComponent).mockReturnValue(() => <button type="button" title="dummy export action">dummy export action</button>);
+    asMock(useWidgetExportActionComponent).mockReturnValue(() => (
+      <button type="button" title="dummy export action">
+        dummy export action
+      </button>
+    ));
 
     renderExportWidgetActionDelegate();
     const exportButton = await screen.findByRole('button', { name: /dummy export action/i });

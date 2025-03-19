@@ -32,29 +32,53 @@ const TemplatesHelper = () => {
         </thead>
         <tbody>
           <tr>
-            <td><code>{_buildVariableName('operatingSystem')}</code></td>
-            <td>Name of the operating system the sidecar is running on, e.g. <code>&quot;Linux&quot;, &quot;Windows&quot;</code></td>
+            <td>
+              <code>{_buildVariableName('operatingSystem')}</code>
+            </td>
+            <td>
+              Name of the operating system the sidecar is running on, e.g.{' '}
+              <code>&quot;Linux&quot;, &quot;Windows&quot;</code>
+            </td>
           </tr>
           <tr>
-            <td><code>{_buildVariableName('nodeName')}</code></td>
+            <td>
+              <code>{_buildVariableName('nodeName')}</code>
+            </td>
             <td>The name of the sidecar, defaults to hostname if not set.</td>
           </tr>
           <tr>
-            <td><code>{_buildVariableName('nodeId')}</code></td>
+            <td>
+              <code>{_buildVariableName('nodeId')}</code>
+            </td>
             <td>UUID of the sidecar.</td>
           </tr>
           <tr>
-            <td><code>{_buildVariableName('sidecarVersion')}</code></td>
+            <td>
+              <code>{_buildVariableName('sidecarVersion')}</code>
+            </td>
             <td>Version string of the running sidecar.</td>
           </tr>
           <tr>
-            <td><code>{_buildVariableName('spoolDir')}</code></td>
+            <td>
+              <code>{_buildVariableName('spoolDir')}</code>
+            </td>
             <td>A directory that is unique per configuration and can be used to store collector data.</td>
           </tr>
           <tr>
-            <td><code>{_buildVariableName('tags.<tag>')}</code></td>
-            <td>A map of tags that are set for the sidecar. This can be used to render conditional configuration snippets. e.g.: <br />
-              <code> &lt;#if sidecar.tags.webserver??&gt;<br />&nbsp;&nbsp;- /var/log/apache/*.log<br />&lt;/#if&gt;  </code>
+            <td>
+              <code>{_buildVariableName('tags.<tag>')}</code>
+            </td>
+            <td>
+              A map of tags that are set for the sidecar. This can be used to render conditional configuration snippets.
+              e.g.: <br />
+              <code>
+                {' '}
+                &lt;#if sidecar.tags.webserver??&gt;
+                <br />
+                &nbsp;&nbsp;- /var/log/apache/*.log
+                <br />
+                &lt;/#if&gt;{' '}
+              </code>
             </td>
           </tr>
         </tbody>

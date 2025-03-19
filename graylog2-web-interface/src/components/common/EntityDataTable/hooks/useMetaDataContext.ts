@@ -25,7 +25,7 @@ const useMetaDataContext = <M = unknown>() => {
     throw new Error('useMetaDataContext hook needs to be used inside MetaDataProvider');
   }
 
-  return context as {meta: M };
+  return context as { meta: M };
 };
 
 export default useMetaDataContext;

@@ -42,6 +42,7 @@ import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.BatchSizeConfig;
 import org.graylog2.plugin.Tools;
+import org.graylog2.security.hashing.PBKDF2PasswordAlgorithm;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
@@ -171,6 +172,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
 
+    @Parameter(value = "user_password_pbkdf2_iterations", validators = PositiveIntegerValidator.class)
+    private int userPasswordPbkdf2Iterations = PBKDF2PasswordAlgorithm.DEFAULT_ITERATIONS;
+
     @Parameter(value = "content_packs_loader_enabled")
     private boolean contentPacksLoaderEnabled = false;
 
@@ -249,6 +253,18 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     @Parameter(value = "field_value_suggestion_mode", required = true, converter = FieldValueSuggestionModeConverter.class)
     private FieldValueSuggestionMode fieldValueSuggestionMode = FieldValueSuggestionMode.ON;
+
+    @Parameter(value = "search_query_engine_indexer_jobs_pool_size", validators = PositiveIntegerValidator.class)
+    private int searchQueryEngineIndexerJobsPoolSize = 4;
+
+    @Parameter("search_query_engine_indexer_jobs_queue_size")
+    private int searchQueryEngineIndexerJobsQueueSize = 0;
+
+    @Parameter(value = "search_query_engine_data_lake_jobs_pool_size", validators = PositiveIntegerValidator.class)
+    private int searchQueryEngineDataLakeJobsPoolSize = 4;
+
+    @Parameter("search_query_engine_data_lake_jobs_queue_size")
+    private int searchQueryEngineDataLakeJobsQueueSize = 0;
 
     @Documentation("""
             Enabling this parameter will activate automatic security configuration. Graylog server will
@@ -570,6 +586,22 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     public boolean selfsignedStartupEnabled() {
         return selfsignedStartup;
+    }
+
+    public int searchQueryEngineIndexerJobsPoolSize() {
+        return searchQueryEngineIndexerJobsPoolSize;
+    }
+
+    public int searchQueryEngineIndexerJobsQueueSize() {
+        return searchQueryEngineIndexerJobsQueueSize;
+    }
+
+    public int searchQueryEngineDataLakeJobsPoolSize() {
+        return searchQueryEngineDataLakeJobsPoolSize;
+    }
+
+    public int searchQueryEngineDataLakeJobsQueueSize() {
+        return searchQueryEngineDataLakeJobsQueueSize;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

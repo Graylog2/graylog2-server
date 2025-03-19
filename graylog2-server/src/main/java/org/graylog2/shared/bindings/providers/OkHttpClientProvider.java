@@ -18,9 +18,15 @@ package org.graylog2.shared.bindings.providers;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Splitter;
+import com.google.common.net.HttpHeaders;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import okhttp3.Authenticator;
 import okhttp3.Challenge;
 import okhttp3.Credentials;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -31,12 +37,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -51,6 +51,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Provider for a configured {@link okhttp3.OkHttpClient}.
  *
+ * @see org.graylog2.plugin.BaseConfiguration#getHttpUserAgent()
  * @see org.graylog2.plugin.BaseConfiguration#getHttpConnectTimeout()
  * @see org.graylog2.plugin.BaseConfiguration#getHttpReadTimeout()
  * @see org.graylog2.plugin.BaseConfiguration#getHttpWriteTimeout()
@@ -59,6 +60,29 @@ import static java.util.Objects.requireNonNull;
 @Singleton
 public class OkHttpClientProvider implements Provider<OkHttpClient> {
     private static final Logger LOG = LoggerFactory.getLogger(OkHttpClientProvider.class);
+
+    static class UserAgentInterceptor implements Interceptor {
+        private final String userAgent;
+
+        public UserAgentInterceptor(String userAgent) {
+            this.userAgent = userAgent;
+        }
+
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Request originalRequest = chain.request();
+            // Add our default user agent, but only if none is set
+            if (originalRequest.header(HttpHeaders.USER_AGENT) == null) {
+                final var builder = originalRequest.newBuilder();
+                final var newRequest = builder.header(HttpHeaders.USER_AGENT, userAgent).build();
+                return chain.proceed(newRequest);
+            } else {
+                return chain.proceed(originalRequest);
+            }
+        }
+    }
+
+    protected final String userAgent;
     protected final Duration connectTimeout;
     protected final Duration readTimeout;
     protected final Duration writeTimeout;
@@ -67,12 +91,14 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
     private final ProxySelectorProvider proxySelectorProvider;
 
     @Inject
-    public OkHttpClientProvider(@Named("http_connect_timeout") Duration connectTimeout,
+    public OkHttpClientProvider(@Named("http_user_agent") String userAgent,
+                                @Named("http_connect_timeout") Duration connectTimeout,
                                 @Named("http_read_timeout") Duration readTimeout,
                                 @Named("http_write_timeout") Duration writeTimeout,
                                 @Named("http_proxy_uri") @Nullable URI httpProxyUri,
                                 TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
                                 ProxySelectorProvider proxySelectorProvider) {
+        this.userAgent = requireNonNull(userAgent);
         this.connectTimeout = requireNonNull(connectTimeout);
         this.readTimeout = requireNonNull(readTimeout);
         this.writeTimeout = requireNonNull(writeTimeout);
@@ -85,6 +111,7 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
     public OkHttpClient get() {
         final OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .retryOnConnectionFailure(true)
+                .addInterceptor(new UserAgentInterceptor(userAgent))
                 .connectTimeout(connectTimeout.getQuantity(), connectTimeout.getUnit())
                 .writeTimeout(writeTimeout.getQuantity(), writeTimeout.getUnit())
                 .readTimeout(readTimeout.getQuantity(), readTimeout.getUnit());

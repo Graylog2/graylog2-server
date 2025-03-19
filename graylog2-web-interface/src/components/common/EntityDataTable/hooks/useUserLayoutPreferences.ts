@@ -27,28 +27,36 @@ const preferencesFromJSON = ({
   displayed_attributes,
   sort,
   per_page,
+  custom_preferences,
 }: TableLayoutPreferencesJSON): TableLayoutPreferences => ({
   displayedAttributes: displayed_attributes,
   sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
   perPage: per_page,
+  customPreferences: custom_preferences,
 });
-const fetchUserLayoutPreferences = (entityId: string) => fetch(
-  'GET',
-  qualifyUrl(`/entitylists/preferences/${entityId}`),
-).then((res) => preferencesFromJSON(res ?? {}));
+const fetchUserLayoutPreferences = (entityId: string) =>
+  fetch('GET', qualifyUrl(`/entitylists/preferences/${entityId}`)).then((res) => preferencesFromJSON(res ?? {}));
 
-const useUserLayoutPreferences = (entityId: string): { data: TableLayoutPreferences, isInitialLoading: boolean } => {
-  const { data, isInitialLoading } = useQuery(
+const useUserLayoutPreferences = <T>(
+  entityId: string,
+): { data: TableLayoutPreferences<T>; isInitialLoading: boolean; refetch: () => void } => {
+  const { data, isInitialLoading, refetch } = useQuery(
     ['table-layout', entityId],
-    () => defaultOnError(fetchUserLayoutPreferences(entityId), `Loading layout preferences for "${entityId}" overview failed with`),
+    () =>
+      defaultOnError(
+        fetchUserLayoutPreferences(entityId),
+        `Loading layout preferences for "${entityId}" overview failed with`,
+      ),
     {
       keepPreviousData: true,
       staleTime: 60 * (60 * 1000), // 1 hour
-    });
+    },
+  );
 
   return {
     data: data ?? INITIAL_DATA,
     isInitialLoading,
+    refetch,
   };
 };
 

@@ -32,20 +32,24 @@ import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { EventDefinition } from '../event-definitions-types';
+import { isSystemEventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
-const priorityOptions = map(EventDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: upperFirst(value.name) }));
+const priorityOptions = map(EventDefinitionPriorityEnum.properties, (value, key) => ({
+  value: key,
+  label: upperFirst(value.name),
+})).sort((a, b) => Number(b.value) - Number(a.value));
 
 type Props = {
-  eventDefinition: EventDefinition,
+  eventDefinition: EventDefinition;
   validation: {
     errors: {
-      title?: string,
-    }
-  },
-  onChange: (name: string, value: string | number) => void,
-  canEdit: boolean,
-}
+      title?: string;
+    };
+  };
+  onChange: (name: string, value: string | number) => void;
+  canEdit: boolean;
+};
 
 const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Props) => {
   const { pathname } = useLocation();
@@ -68,60 +72,80 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Pr
     onChange('priority', toNumber(nextPriority));
   };
 
-  const readOnly = !canEdit
-    || eventDefinition.config.type === 'system-notifications-v1'
-    || eventDefinition.config.type === 'sigma-v1';
+  const readOnly = !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1';
 
   return (
     <Row>
       <Col md={7} lg={6}>
         <h2 className={commonStyles.title}>Event Details</h2>
         <fieldset>
-          <Input id="event-definition-title"
-                 name="title"
-                 label="Title"
-                 type="text"
-                 bsStyle={validation.errors.title ? 'error' : null}
-                 help={get(validation, 'errors.title[0]', 'Title for this Event Definition, Events and Alerts created from it.')}
-                 value={eventDefinition.title}
-                 onChange={handleChange}
-                 readOnly={readOnly}
-                 required />
+          <Input
+            id="event-definition-title"
+            name="title"
+            label="Title"
+            type="text"
+            bsStyle={validation.errors.title ? 'error' : null}
+            help={get(
+              validation,
+              'errors.title[0]',
+              'Title for this Event Definition, Events and Alerts created from it.',
+            )}
+            value={eventDefinition.title}
+            onChange={handleChange}
+            readOnly={readOnly}
+            required
+          />
 
-          <Input id="event-definition-description"
-                 name="description"
-                 label={<span>Description <small className="text-muted">(Optional)</small></span>}
-                 type="textarea"
-                 help="Longer description for this Event Definition."
-                 value={eventDefinition.description}
-                 onChange={handleChange}
-                 readOnly={readOnly}
-                 rows={2} />
+          <Input
+            id="event-definition-description"
+            name="description"
+            label={
+              <span>
+                Description <small className="text-muted">(Optional)</small>
+              </span>
+            }
+            type="textarea"
+            help="Longer description for this Event Definition."
+            value={eventDefinition.description}
+            onChange={handleChange}
+            readOnly={readOnly}
+            rows={2}
+          />
 
           <div style={{ width: '100%' }}>
-            <ControlLabel>Remediation Steps  <small className="text-muted">(Optional)</small></ControlLabel>
+            <ControlLabel>
+              Remediation Steps <small className="text-muted">(Optional)</small>
+            </ControlLabel>
             {readOnly ? (
-              <MarkdownPreview show
-                               withFullView
-                               height={150}
-                               value={eventDefinition.remediation_steps || 'No remediation steps given'} />
+              <MarkdownPreview
+                show
+                withFullView
+                height={150}
+                value={eventDefinition.remediation_steps || 'No remediation steps given'}
+              />
             ) : (
-              <MarkdownEditor id="event-definition-remediation-steps"
-                              readOnly={readOnly}
-                              height={150}
-                              value={eventDefinition.remediation_steps}
-                              onChange={(newValue: string) => handleChange({ target: { name: 'remediation_steps', value: newValue } })} />
+              <MarkdownEditor
+                id="event-definition-remediation-steps"
+                readOnly={readOnly}
+                height={150}
+                value={eventDefinition.remediation_steps}
+                onChange={(newValue: string) =>
+                  handleChange({ target: { name: 'remediation_steps', value: newValue } })
+                }
+              />
             )}
           </div>
 
           <FormGroup controlId="event-definition-priority">
             <ControlLabel>Priority</ControlLabel>
-            <Select options={priorityOptions}
-                    value={toString(eventDefinition.priority)}
-                    onChange={handlePriorityChange}
-                    clearable={false}
-                    disabled={readOnly}
-                    required />
+            <Select
+              options={priorityOptions}
+              value={toString(eventDefinition.priority)}
+              onChange={handlePriorityChange}
+              clearable={false}
+              disabled={readOnly}
+              required
+            />
             <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
           </FormGroup>
         </fieldset>

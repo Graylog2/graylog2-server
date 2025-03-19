@@ -17,17 +17,19 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 
 const fetchDataNode = async (datanodeId: string) => fetch('GET', qualifyUrl(`/datanode/${datanodeId}`));
 
-const useDataNode = (datanodeId: string) : {
-  data: DataNode,
-  refetch: () => void,
-  isInitialLoading: boolean,
-  error: any,
+const useDataNode = (
+  datanodeId: string,
+): {
+  data: DataNode;
+  refetch: () => void;
+  isInitialLoading: boolean;
+  error: any;
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery(
     ['datanode'],
@@ -38,12 +40,12 @@ const useDataNode = (datanodeId: string) : {
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
     error,
-  });
+  };
 };
 
 export default useDataNode;

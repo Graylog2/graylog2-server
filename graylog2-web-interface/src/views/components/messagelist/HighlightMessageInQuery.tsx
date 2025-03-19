@@ -21,7 +21,7 @@ import useQuery from 'routing/useQuery';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement;
 };
 
 const HighlightMessageInQuery = ({ children }: Props) => {
@@ -29,10 +29,10 @@ const HighlightMessageInQuery = ({ children }: Props) => {
   const { highlightMessage } = query ?? {};
 
   return highlightMessage ? (
-    <HighlightMessageContext.Provider value={highlightMessage.toString()}>
-      {children}
-    </HighlightMessageContext.Provider>
-  ) : children;
+    <HighlightMessageContext.Provider value={highlightMessage.toString()}>{children}</HighlightMessageContext.Provider>
+  ) : (
+    children
+  );
 };
 
 export default HighlightMessageInQuery;

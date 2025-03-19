@@ -16,6 +16,7 @@
  */
 import type { Sort, Attribute } from 'stores/PaginationTypes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
@@ -27,8 +28,7 @@ export const commonEventAttributes: Array<Attribute> = [
     sortable: true,
     searchable: false,
     filterable: true,
-    filter_options: Object.keys(EventDefinitionPriorityEnum.properties)
-      .map((num) => ({ value: num, title: num })),
+    filter_options: Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
   },
   {
     id: 'timestamp',
@@ -108,13 +108,13 @@ export const eventsTableSpecificAttributes: Array<Attribute> = [
     type: 'BOOLEAN',
     sortable: true,
     filterable: true,
-    filter_options: [{ value: 'false', title: 'Event' }, { value: 'true', title: 'Alert' }],
+    filter_options: [
+      { value: 'false', title: 'Event' },
+      { value: 'true', title: 'Alert' },
+    ],
   },
 ];
-export const additionalAttributes: Array<Attribute> = [
-  ...eventsTableSpecificAttributes,
-  ...detailsAttributes,
-];
+export const additionalAttributes: Array<Attribute> = [...eventsTableSpecificAttributes, ...detailsAttributes];
 
 export const eventsTableElements = {
   defaultLayout: {
@@ -146,3 +146,14 @@ export const eventsTableElements = {
     'timerange_start',
   ],
 };
+
+type EventsMetricsAction = {
+  id: string;
+  component: React.ComponentType<MiddleSectionProps>;
+};
+
+declare module 'graylog-web-plugin/plugin' {
+  interface PluginExports {
+    'events.metrics.actions'?: Array<EventsMetricsAction>;
+  }
+}

@@ -14,15 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 
 import EventsWidgetConfig from './EventsWidgetConfig';
 import EventsWidget from './EventsWidget';
 
-export const CreateEventsWidget = () => EventsWidget.builder()
-  .newId()
-  .config(EventsWidgetConfig.createDefault())
-  .build();
+export const CreateEventsWidget = () =>
+  EventsWidget.builder().newId().config(EventsWidgetConfig.createDefault()).build();
 
-export default () => async (dispatch: AppDispatch) => dispatch(addWidget(CreateEventsWidget()));
+export default () => async (dispatch: ViewsDispatch) => dispatch(addWidget(CreateEventsWidget()));

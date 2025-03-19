@@ -28,14 +28,20 @@ type EntityIconProps = {
   entity: any;
 };
 
-const EntityIcon = ({
-  entity,
-}: EntityIconProps) => {
+const EntityIcon = ({ entity }: EntityIconProps) => {
   if (!entity.fromServer) {
-    return <span><Icon title="Content Pack" name="inventory_2" className={ContentPackEntitiesListStyle.contentPackEntity} /></span>;
+    return (
+      <span>
+        <Icon title="Content Pack" name="inventory_2" className={ContentPackEntitiesListStyle.contentPackEntity} />
+      </span>
+    );
   }
 
-  return <span><Icon title="Server" name="dns" /></span>;
+  return (
+    <span>
+      <Icon title="Server" name="dns" />
+    </span>
+  );
 };
 
 type ContentPackEntitiesListProps = {
@@ -46,15 +52,16 @@ type ContentPackEntitiesListProps = {
   readOnly?: boolean;
 };
 
-class ContentPackEntitiesList extends React.Component<ContentPackEntitiesListProps, {
-  [key: string]: any;
-}> {
+class ContentPackEntitiesList extends React.Component<
+  ContentPackEntitiesListProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     appliedParameter: {},
-    onParameterClear: () => {
-    },
-    onParameterApply: () => {
-    },
+    onParameterClear: () => {},
+    onParameterApply: () => {},
     readOnly: false,
   };
 
@@ -93,24 +100,20 @@ class ContentPackEntitiesList extends React.Component<ContentPackEntitiesListPro
   };
 
   _entityRowFormatter = (entity) => {
-    const {
-      contentPack,
-      appliedParameter,
-      onParameterApply,
-      onParameterClear,
-      readOnly,
-    } = this.props;
+    const { contentPack, appliedParameter, onParameterApply, onParameterClear, readOnly } = this.props;
 
     const applyParamComponent = (
-      <ContentPackApplyParameter parameters={contentPack.parameters}
-                                 entity={entity}
-                                 appliedParameter={appliedParameter[entity.id]}
-                                 onParameterApply={(key, value) => {
-                                   onParameterApply(entity.id, key, value);
-                                 }}
-                                 onParameterClear={(key) => {
-                                   onParameterClear(entity.id, key);
-                                 }} />
+      <ContentPackApplyParameter
+        parameters={contentPack.parameters}
+        entity={entity}
+        appliedParameter={appliedParameter[entity.id]}
+        onParameterApply={(key, value) => {
+          onParameterApply(entity.id, key, value);
+        }}
+        onParameterClear={(key) => {
+          onParameterClear(entity.id, key);
+        }}
+      />
     );
 
     const closeModal = () => {
@@ -122,15 +125,11 @@ class ContentPackEntitiesList extends React.Component<ContentPackEntitiesListPro
     };
 
     const applyModal = (
-      <BootstrapModalWrapper showModal={this.state.showApplyConfigModal}
-                             onHide={closeModal}
-                             bsSize="large">
+      <BootstrapModalWrapper showModal={this.state.showApplyConfigModal} onHide={closeModal} bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Edit</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          {applyParamComponent}
-        </Modal.Body>
+        <Modal.Body>{applyParamComponent}</Modal.Body>
         <Modal.Footer>
           <Button onClick={closeModal}>Close</Button>
         </Modal.Footer>
@@ -138,9 +137,11 @@ class ContentPackEntitiesList extends React.Component<ContentPackEntitiesListPro
     );
 
     const entityComponent = (
-      <ContentPackEntityConfig appliedParameter={appliedParameter[entity.id]}
-                               parameters={contentPack.parameters}
-                               entity={entity} />
+      <ContentPackEntityConfig
+        appliedParameter={appliedParameter[entity.id]}
+        parameters={contentPack.parameters}
+        entity={entity}
+      />
     );
 
     const closeShowModal = () => {
@@ -152,15 +153,14 @@ class ContentPackEntitiesList extends React.Component<ContentPackEntitiesListPro
     };
 
     const showModal = this.state.showConfigModalId && (
-      <BootstrapModalWrapper showModal={entity.id === this.state.showConfigModalId}
-                             onHide={closeShowModal}
-                             bsSize="large">
+      <BootstrapModalWrapper
+        showModal={entity.id === this.state.showConfigModalId}
+        onHide={closeShowModal}
+        bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Entity Config</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          {entityComponent}
-        </Modal.Body>
+        <Modal.Body>{entityComponent}</Modal.Body>
         <Modal.Footer>
           <Button onClick={closeShowModal}>Close</Button>
         </Modal.Footer>
@@ -175,25 +175,30 @@ class ContentPackEntitiesList extends React.Component<ContentPackEntitiesListPro
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.title}</td>
         <td>{entity.type.name}</td>
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.description}</td>
-        {!readOnly && <td><EntityIcon entity={entity} /></td>}
+        {!readOnly && (
+          <td>
+            <EntityIcon entity={entity} />
+          </td>
+        )}
         {!readOnly && <td>{appliedParameterCount}</td>}
         <td>
           <ButtonToolbar>
-            {!readOnly
-              && (
-                <Button bsStyle="primary"
-                        bsSize="xs"
-                        disabled={disableBtn}
-                        onClick={() => {
-                          open();
-                        }}>
-                  Edit
-                </Button>
-              )}
-            <Button bsSize="xs"
-                    onClick={() => {
-                      openShowModal(entity.id);
-                    }}>
+            {!readOnly && (
+              <Button
+                bsStyle="primary"
+                bsSize="xs"
+                disabled={disableBtn}
+                onClick={() => {
+                  open();
+                }}>
+                Edit
+              </Button>
+            )}
+            <Button
+              bsSize="xs"
+              onClick={() => {
+                openShowModal(entity.id);
+              }}>
               Show
             </Button>
           </ButtonToolbar>
@@ -216,17 +221,21 @@ class ContentPackEntitiesList extends React.Component<ContentPackEntitiesListPro
       <div>
         <h2>Entity list</h2>
         <br />
-        <SearchForm onSearch={this._filterEntities}
-                    onReset={() => {
-                      this._filterEntities('');
-                    }} />
-        <DataTable id="entity-list"
-                   headers={headers}
-                   className={ContentPackEntitiesListStyle.scrollable}
-                   sortBy={(entity) => entity.type.name}
-                   filterKeys={[]}
-                   rows={filteredEntities}
-                   dataRowFormatter={this._entityRowFormatter} />
+        <SearchForm
+          onSearch={this._filterEntities}
+          onReset={() => {
+            this._filterEntities('');
+          }}
+        />
+        <DataTable
+          id="entity-list"
+          headers={headers}
+          className={ContentPackEntitiesListStyle.scrollable}
+          sortBy={(entity) => entity.type.name}
+          filterKeys={[]}
+          rows={filteredEntities}
+          dataRowFormatter={this._entityRowFormatter}
+        />
       </div>
     );
   }

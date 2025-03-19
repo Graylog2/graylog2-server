@@ -23,8 +23,8 @@ import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import { useStore } from 'stores/connect';
 
 type Props = {
-  nodeId: string,
-}
+  nodeId: string;
+};
 const metricNames = {
   append: 'org.graylog2.journal.append.1-sec-rate',
   read: 'org.graylog2.journal.read.1-sec-rate',
@@ -39,7 +39,9 @@ const JournalState = ({ nodeId }: Props) => {
     Object.keys(metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, metricNames[metricShortName]));
 
     return () => {
-      Object.keys(metricNames).forEach((metricShortName) => MetricsActions.remove(nodeId, metricNames[metricShortName]));
+      Object.keys(metricNames).forEach((metricShortName) =>
+        MetricsActions.remove(nodeId, metricNames[metricShortName]),
+      );
     };
   }, [nodeId]);
 
@@ -58,11 +60,10 @@ const JournalState = ({ nodeId }: Props) => {
 
   return (
     <span>
-      The journal contains <strong>{numeral(_metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong> in {_metrics.segments}
-      {' '}<Pluralize value={_metrics.segments} singular="segment" plural="segments" />.{' '}
-      <strong>{numeral(_metrics.append).format('0,0')} messages</strong> appended, <strong>
-        {numeral(_metrics.read).format('0,0')} messages
-      </strong> read in the last second.
+      The journal contains <strong>{numeral(_metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong> in{' '}
+      {_metrics.segments} <Pluralize value={_metrics.segments} singular="segment" plural="segments" />.{' '}
+      <strong>{numeral(_metrics.append).format('0,0')} messages</strong> appended,{' '}
+      <strong>{numeral(_metrics.read).format('0,0')} messages</strong> read in the last second.
     </span>
   );
 };

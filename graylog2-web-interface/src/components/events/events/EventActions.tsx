@@ -30,14 +30,10 @@ const EventActions = ({ event }: { event: Event }) => {
   return (
     <>
       <ButtonToolbar>
-        <Button bsSize="xs" onClick={toggleExtraSection}>Details</Button>
-        {
-          moreActions.length ? (
-            <MoreActions>
-              {moreActions}
-            </MoreActions>
-          ) : null
-        }
+        <Button bsSize="xs" onClick={toggleExtraSection}>
+          Details
+        </Button>
+        {moreActions.length ? <MoreActions>{moreActions}</MoreActions> : null}
       </ButtonToolbar>
       {pluggableActionModals}
     </>

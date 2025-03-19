@@ -24,9 +24,9 @@ import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 type Props = {
-  eventDefinitionId: string,
-  displayAsLink?: boolean,
-}
+  eventDefinitionId: string;
+  displayAsLink?: boolean;
+};
 
 const EventDefinitionName = ({ eventDefinitionId, displayAsLink = true }: Props) => {
   const currentUser = useCurrentUser();

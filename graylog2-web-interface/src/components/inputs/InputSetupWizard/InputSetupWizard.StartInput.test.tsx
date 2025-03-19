@@ -18,10 +18,11 @@ import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
-import fetch from 'logic/rest/FetchProvider';
+import { PipelinesPipelines, Streams, PipelinesConnections } from '@graylog/server-api';
+
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
-import useStreams from 'components/streams/hooks/useStreams';
+import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilteredStreams';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import { streams } from 'fixtures/streams';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
@@ -29,7 +30,26 @@ import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
 import InputSetupWizard from './Wizard';
 
-jest.mock('components/streams/hooks/useStreams', () => jest.fn());
+jest.mock('@graylog/server-api', () => ({
+  PipelinesPipelines: {
+    createFromParser: jest.fn(),
+    routing: jest.fn(),
+    remove: jest.fn(),
+  },
+  Streams: {
+    create: jest.fn(),
+    resume: jest.fn(),
+    remove: jest.fn(),
+  },
+  PipelinesRules: {
+    remove: jest.fn(),
+  },
+  PipelinesConnections: {
+    connectStreams: jest.fn(),
+  },
+}));
+
+jest.mock('components/inputs/InputSetupWizard/hooks/useFilteredStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
 jest.mock('components/indices/hooks/useIndexSetsList');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
@@ -37,10 +57,7 @@ jest.mock('views/stores/StreamsStore', () => ({ StreamsStore: MockStore() }));
 jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 
 jest.mock('stores/inputs/InputStatesStore', () => ({
-  InputStatesStore: MockStore(
-    ['start', jest.fn(() => Promise.resolve())],
-    ['stop', jest.fn(() => Promise.resolve())],
-  ),
+  InputStatesStore: MockStore(['start', jest.fn(() => Promise.resolve())], ['stop', jest.fn(() => Promise.resolve())]),
 }));
 
 jest.mock('stores/nodes/NodesStore', () => ({
@@ -55,30 +72,24 @@ const input = {
   name: 'inputName',
   created_at: '',
   creator_user_id: 'creatorId',
-  static_fields: { },
-  attributes: { },
+  static_fields: {},
+  attributes: {},
 };
 
 const onClose = jest.fn();
 
-const renderWizard = () => (
+const renderWizard = () =>
   render(
     <InputSetupWizardProvider>
       <InputSetupWizard show input={input} onClose={onClose} />
     </InputSetupWizardProvider>,
-  )
-);
+  );
 
 const useStreamsResult = {
-  data: {
-    list: streams,
-    pagination: { total: 1 },
-    attributes: [],
-  },
-  isInitialLoading: false,
+  data: { streams, total: 1 },
+  isLoading: false,
   isFetching: false,
   error: undefined,
-  refetch: () => {},
 };
 
 const pipelinesConnectedMock = (response = []) => ({
@@ -91,59 +102,58 @@ const pipelinesConnectedMock = (response = []) => ({
 
 const useIndexSetsListResult = {
   data: {
-    indexSets:
-     [
-       {
-         id: 'default_id',
-         title: 'Default',
-         description: 'default index set',
-         index_prefix: 'default',
-         shards: 1,
-         replicas: 1,
-         rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
-         rotation_strategy: {
-           type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
-           max_docs_per_index: 20000000,
-         },
-         retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
-         retention_strategy: {
-           type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
-           max_number_of_indices: 2147483647,
-         },
-         index_analyzer: '',
-         index_optimization_max_num_segments: 0,
-         index_optimization_disabled: false,
-         field_type_refresh_interval: 1,
-         writable: true,
-         default: true,
-         can_be_default: true,
-       },
-       {
-         id: 'nox_id',
-         title: 'Nox',
-         description: 'nox index set',
-         index_prefix: 'nox',
-         shards: 1,
-         replicas: 1,
-         rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
-         rotation_strategy: {
-           type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
-           max_docs_per_index: 20000000,
-         },
-         retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
-         retention_strategy: {
-           type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
-           max_number_of_indices: 2147483647,
-         },
-         index_analyzer: '',
-         index_optimization_max_num_segments: 0,
-         index_optimization_disabled: false,
-         field_type_refresh_interval: 1,
-         writable: true,
-         default: false,
-         can_be_default: true,
-       },
-     ],
+    indexSets: [
+      {
+        id: 'default_id',
+        title: 'Default',
+        description: 'default index set',
+        index_prefix: 'default',
+        shards: 1,
+        replicas: 1,
+        rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+        rotation_strategy: {
+          type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+          max_docs_per_index: 20000000,
+        },
+        retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+        retention_strategy: {
+          type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
+          max_number_of_indices: 2147483647,
+        },
+        index_analyzer: '',
+        index_optimization_max_num_segments: 0,
+        index_optimization_disabled: false,
+        field_type_refresh_interval: 1,
+        writable: true,
+        default: true,
+        can_be_default: true,
+      },
+      {
+        id: 'nox_id',
+        title: 'Nox',
+        description: 'nox index set',
+        index_prefix: 'nox',
+        shards: 1,
+        replicas: 1,
+        rotation_strategy_class: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+        rotation_strategy: {
+          type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
+          max_docs_per_index: 20000000,
+        },
+        retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+        retention_strategy: {
+          type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
+          max_number_of_indices: 2147483647,
+        },
+        index_analyzer: '',
+        index_optimization_max_num_segments: 0,
+        index_optimization_disabled: false,
+        field_type_refresh_interval: 1,
+        writable: true,
+        default: false,
+        can_be_default: true,
+      },
+    ],
     indexSetsCount: 2,
     indexSetStats: null,
   },
@@ -153,15 +163,10 @@ const useIndexSetsListResult = {
   refetch: () => {},
 };
 
-const updateRoutingUrlRegEx = /.+(system\/pipelines\/pipeline\/routing)/i;
-const createStreamUrl = '/streams';
-const startStreamUrl = (streamId) => `/streams/${streamId}/resume`;
-const createPipelineUrlRegEx = /.+(system\/pipelines\/pipeline)/i;
-
 const newStreamConfig = {
   description: 'Wingardium new stream',
   index_set_id: 'default_id',
-  remove_matches_from_default_stream: undefined,
+  remove_matches_from_default_stream: true,
   title: 'Wingardium',
 };
 
@@ -172,18 +177,18 @@ const newPipelineConfig = {
 };
 
 const goToStartInputStep = async () => {
-  const nextButton = await screen.findByRole('button', { name: /Finish & Start Input/i, hidden: true });
+  const nextButton = await screen.findByRole('button', { name: /Next/i, hidden: true });
 
   fireEvent.click(nextButton);
 };
 
 const startInput = async () => {
-  const startInputButton = await screen.findByTestId('start-input-button');
+  const startInputButton = await screen.findByRole('button', { name: /Start Input/i, hidden: true });
 
   fireEvent.click(startInputButton);
 };
 
-const createStream = async (newPipeline = false) => {
+const createStream = async (newPipeline = false, removeFromDefault = true) => {
   const createStreamButton = await screen.findByRole('button', {
     name: /Create Stream/i,
     hidden: true,
@@ -208,15 +213,24 @@ const createStream = async (newPipeline = false) => {
     hidden: true,
   });
 
+  const removeFromDefaultCheckbox = await screen.findByRole('checkbox', {
+    name: /remove matches from ‘default stream’/i,
+    hidden: true,
+  });
+
   const submitButton = await screen.findByRole('button', {
-    name: 'Create',
+    name: 'Next',
     hidden: true,
   });
 
   fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
   fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
 
-  if (newPipeline) {
+  if (!removeFromDefault) {
+    fireEvent.click(removeFromDefaultCheckbox);
+  }
+
+  if (!newPipeline) {
     fireEvent.click(newPipelineCheckbox);
   }
 
@@ -224,69 +238,124 @@ const createStream = async (newPipeline = false) => {
   fireEvent.click(submitButton);
 };
 
-beforeEach(() => {
-  asMock(useStreams).mockReturnValue(useStreamsResult);
-  asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
-  asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
-  asMock(fetch).mockImplementation(() => Promise.resolve({}));
-});
-
 describe('InputSetupWizard Start Input', () => {
-  it('should render the Start Input step', async () => {
-    renderWizard();
-    goToStartInputStep();
-
-    expect(await screen.findByText(/Set up and start the Input according to the configuration made./i)).toBeInTheDocument();
+  beforeEach(() => {
+    asMock(useFilteredStreams).mockReturnValue(useStreamsResult);
+    asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
+    asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
   });
 
-  it('should start when default stream is selected', async () => {
-    renderWizard();
-    goToStartInputStep();
-    startInput();
+  describe('Start Input', () => {
+    it('should render the Start Input step', async () => {
+      renderWizard();
+      goToStartInputStep();
 
-    await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+      expect(
+        await screen.findByText(/Set up and start the Input according to the configuration made./i),
+      ).toBeInTheDocument();
+    });
 
-    expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
-    expect(await screen.findByText(/Input started sucessfully!/i)).toBeInTheDocument();
-  });
+    it('should start when default stream is selected', async () => {
+      renderWizard();
+      goToStartInputStep();
+      startInput();
 
-  it('should start input when an existing stream is selected', async () => {
-    renderWizard();
+      await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
 
-    const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+      expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
+      expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();
+    });
 
-    await selectEvent.openMenu(streamSelect);
+    it('should start input when an existing stream is selected', async () => {
+      renderWizard();
 
-    await selectEvent.select(streamSelect, 'One Stream');
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
 
-    goToStartInputStep();
-    startInput();
+      fireEvent.click(selectStreamButton);
 
-    await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'PUT',
-      expect.stringMatching(updateRoutingUrlRegEx),
-      { input_id: 'input-test-id', stream_id: 'streamId1' },
-    ));
+      await selectEvent.openMenu(streamSelect);
 
-    expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
-    expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Input started sucessfully!/i)).toBeInTheDocument();
+      await selectEvent.select(streamSelect, 'One Stream');
+
+      goToStartInputStep();
+      startInput();
+
+      await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+
+      await waitFor(() =>
+        expect(PipelinesPipelines.routing).toHaveBeenCalledWith({
+          input_id: 'input-test-id',
+          stream_id: 'streamId1',
+          remove_from_default: true,
+        }),
+      );
+
+      expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
+      expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
+      expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();
+    });
+
+    it('should not remove matches from default stream when unchecked', async () => {
+      renderWizard();
+
+      const selectStreamButton = await screen.findByRole('button', {
+        name: /Select Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(selectStreamButton);
+
+      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+
+      await selectEvent.openMenu(streamSelect);
+
+      await selectEvent.select(streamSelect, 'One Stream');
+
+      const removeFromDefaultCheckbox = await screen.findByRole('checkbox', {
+        name: /remove matches from ‘default stream’/i,
+        hidden: true,
+      });
+
+      fireEvent.click(removeFromDefaultCheckbox);
+      goToStartInputStep();
+      startInput();
+
+      await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
+
+      await waitFor(() =>
+        expect(PipelinesPipelines.routing).toHaveBeenCalledWith({
+          input_id: 'input-test-id',
+          stream_id: 'streamId1',
+          remove_from_default: false,
+        }),
+      );
+
+      expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
+      expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
+      expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();
+    });
   });
 
   describe('new stream', () => {
+    beforeEach(() => {
+      asMock(Streams.create).mockReturnValue(Promise.resolve({ stream_id: '1' }));
+    });
+
     it('should show the progress for all steps', async () => {
       renderWizard();
-      await waitFor(() => createStream(true));
+      await waitFor(() => createStream());
       goToStartInputStep();
       startInput();
 
       expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
       expect(await screen.findByText(/Stream "Wingardium" created!/i)).toBeInTheDocument();
-      expect(await screen.findByText(/Pipeline "Wingardium" created!/i)).toBeInTheDocument();
       expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
-      expect(await screen.findByText(/Input started sucessfully!/i)).toBeInTheDocument();
+      expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();
     });
 
     it('should start the input', async () => {
@@ -304,38 +373,16 @@ describe('InputSetupWizard Start Input', () => {
       goToStartInputStep();
       startInput();
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringContaining(createStreamUrl),
-        newStreamConfig,
-      ));
+      await waitFor(() => expect(Streams.create).toHaveBeenCalledWith(expect.objectContaining(newStreamConfig)));
     });
 
     it('should start the new stream', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve({ stream_id: 1 }));
-
       renderWizard();
       await waitFor(() => createStream());
       goToStartInputStep();
       startInput();
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringContaining(startStreamUrl(1)),
-      ));
-    });
-
-    it('should create the new pipeline', async () => {
-      renderWizard();
-      await waitFor(() => createStream(true));
-      goToStartInputStep();
-      startInput();
-
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        expect.stringMatching(createPipelineUrlRegEx),
-        newPipelineConfig,
-      ));
+      await waitFor(() => expect(Streams.resume).toHaveBeenCalled());
     });
 
     it('create routing for the new stream', async () => {
@@ -344,11 +391,55 @@ describe('InputSetupWizard Start Input', () => {
       goToStartInputStep();
       startInput();
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-        'PUT',
-        expect.stringMatching(updateRoutingUrlRegEx),
-        { input_id: 'input-test-id', stream_id: 'streamId1' },
-      ));
+      await waitFor(() =>
+        expect(PipelinesPipelines.routing).toHaveBeenCalledWith({
+          input_id: 'input-test-id',
+          stream_id: '1',
+          remove_from_default: undefined,
+        }),
+      );
+    });
+
+    describe('and new pipeline', () => {
+      beforeEach(() => {
+        asMock(PipelinesPipelines.createFromParser).mockReturnValue(
+          Promise.resolve({
+            id: '2',
+            stages: [],
+            description: undefined,
+            created_at: '',
+            title: 'Wingardium',
+            source: undefined,
+            modified_at: '',
+            errors: [],
+            _scope: undefined,
+          }),
+        );
+      });
+
+      it('should create the new pipeline', async () => {
+        renderWizard();
+        await waitFor(() => createStream(true));
+        goToStartInputStep();
+        startInput();
+
+        await waitFor(() =>
+          expect(PipelinesPipelines.createFromParser).toHaveBeenCalledWith(expect.objectContaining(newPipelineConfig)),
+        );
+
+        expect(await screen.findByText(/Pipeline "Wingardium" created!/i)).toBeInTheDocument();
+      });
+
+      it('should connect the new pipeline to the stream', async () => {
+        renderWizard();
+        await waitFor(() => createStream(true));
+        goToStartInputStep();
+        startInput();
+
+        await waitFor(() =>
+          expect(PipelinesConnections.connectStreams).toHaveBeenCalledWith({ pipeline_id: '2', stream_ids: ['1'] }),
+        );
+      });
     });
   });
 });

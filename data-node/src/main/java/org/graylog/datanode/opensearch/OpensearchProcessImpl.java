@@ -184,6 +184,11 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         return String.format(Locale.ROOT, "%s://%s:%d", protocol, host, port);
     }
 
+    @Override
+    public List<String> getOpensearchRoles() {
+        return opensearchConfiguration.map(OpensearchConfiguration::opensearchRoles).orElse(List.of());
+    }
+
     public void onEvent(OpensearchEvent event) {
         LOG.debug("Process event: " + event);
         this.processState.fire(event);
@@ -371,6 +376,11 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 .map(r -> r.nodes().get(r.clusterManagerNode()))
                 .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))
                 .orElse(false);
+    }
+
+    @Override
+    public List<String> configurationWarnings() {
+        return opensearchConfiguration.map(OpensearchConfiguration::warnings).orElse(List.of());
     }
 
     private Optional<ClusterStateResponse> requestClusterState(RestHighLevelClient client) {

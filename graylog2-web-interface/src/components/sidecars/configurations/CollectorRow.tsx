@@ -28,11 +28,11 @@ import type { Collector } from 'components/sidecars/types';
 import CopyCollectorModal from './CopyCollectorModal';
 
 type Props = {
-  collector: Collector,
-  onClone: (collector: string, name: string, callback: () => void) => void,
-  onDelete: (collector: Collector) => void,
-  validateCollector: (collector: Collector) => Promise<{ errors: { name: string[] } }>,
-}
+  collector: Collector;
+  onClone: (collector: string, name: string, callback: () => void) => void;
+  onDelete: (collector: Collector) => void;
+  validateCollector: (collector: Collector) => Promise<{ errors: { name: string[] } }>;
+};
 
 const CollectorRow = ({ collector, onClone, onDelete, validateCollector }: Props) => {
   const handleDelete = useCallback(() => {
@@ -44,11 +44,10 @@ const CollectorRow = ({ collector, onClone, onDelete, validateCollector }: Props
 
   return (
     <tr>
+      <td>{collector.name}</td>
       <td>
-        {collector.name}
-      </td>
-      <td>
-        <OperatingSystemIcon operatingSystem={collector.node_operating_system} /> {upperFirst(collector.node_operating_system)}
+        <OperatingSystemIcon operatingSystem={collector.node_operating_system} />{' '}
+        {upperFirst(collector.node_operating_system)}
       </td>
       <td>
         <ButtonToolbar>
@@ -56,9 +55,7 @@ const CollectorRow = ({ collector, onClone, onDelete, validateCollector }: Props
             <Button bsSize="xsmall">Edit</Button>
           </LinkContainer>
           <MoreActions>
-            <CopyCollectorModal collector={collector}
-                                validateCollector={validateCollector}
-                                copyCollector={onClone} />
+            <CopyCollectorModal collector={collector} validateCollector={validateCollector} copyCollector={onClone} />
             <MenuItem divider />
             <DeleteMenuItem onSelect={handleDelete} />
           </MoreActions>

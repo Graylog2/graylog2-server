@@ -38,6 +38,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
+import org.graylog2.bootstrap.preflight.PasswordSecretPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
@@ -190,6 +191,9 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
         modules.add(new SchedulerBindings());
 
         final Injector preflightInjector = getPreflightInjector(modules);
+        // explicitly call the PasswordSecretPreflightCheck also when showing preflight web to make sure
+        // data node isn't provisioned with the wrong password_secret
+        preflightInjector.getInstance(PasswordSecretPreflightCheck.class).runCheck();
         GuiceInjectorHolder.setInjector(preflightInjector);
         try {
             doRunWithPreflightInjector(preflightInjector);
@@ -302,6 +306,10 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
         // Give netty a better spot than /tmp to unpack its tcnative libraries
         if (System.getProperty("io.netty.native.workdir") == null) {
             System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
+        }
+        // The jna.tmpdir should reside in the native lib dir. (See: https://github.com/Graylog2/graylog2-server/issues/21223)
+        if (System.getProperty("jna.tmpdir") == null) {
+            System.setProperty("jna.tmpdir", pathConfiguration.getNativeLibDir().toAbsolutePath().resolve("jna").toString());
         }
         // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
         if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {

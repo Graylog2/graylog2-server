@@ -24,9 +24,9 @@ import type { Filter } from 'components/common/EntityFilters/types';
 import { ModalSubmit, FormikInput } from 'components/common';
 
 type Props = {
-  filter?: Filter,
-  onSubmit: (filter: { title: string, value: string }, closeDropdown?: boolean) => void,
-}
+  filter?: Filter;
+  onSubmit: (filter: { title: string; value: string }, closeDropdown?: boolean) => void;
+};
 
 const FilterInput = styled(FormikInput)`
   margin-bottom: 5px;
@@ -37,8 +37,8 @@ const Container = styled.div`
 `;
 
 type FormValues = {
-  value: string | undefined,
-}
+  value: string | undefined;
+};
 
 const validate = ({ value }: FormValues) => {
   if (!value || trim(value) === '') {
@@ -57,16 +57,20 @@ const GenericFilterInput = ({ filter = undefined, onSubmit }: Props) => {
       <Formik initialValues={initialValues} onSubmit={createFilter} validate={validate}>
         {({ isValid }) => (
           <Form>
-            <FilterInput type="text"
-                         id="generic-filters-input"
-                         name="value"
-                         formGroupClassName=""
-                         required
-                         placeholder="Enter value to filter for" />
-            <ModalSubmit submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
-                         bsSize="small"
-                         disabledSubmit={!isValid}
-                         displayCancel={false} />
+            <FilterInput
+              type="text"
+              id="generic-filters-input"
+              name="value"
+              formGroupClassName=""
+              required
+              placeholder="Enter value to filter for"
+            />
+            <ModalSubmit
+              submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
+              bsSize="small"
+              disabledSubmit={!isValid}
+              displayCancel={false}
+            />
           </Form>
         )}
       </Formik>

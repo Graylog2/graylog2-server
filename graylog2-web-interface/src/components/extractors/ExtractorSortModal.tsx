@@ -28,9 +28,12 @@ type ExtractorSortModalProps = {
   onSort: (...args: any[]) => void;
 };
 
-class ExtractorSortModal extends React.Component<ExtractorSortModalProps, {
-  [key: string]: any;
-}> {
+class ExtractorSortModal extends React.Component<
+  ExtractorSortModalProps,
+  {
+    [key: string]: any;
+  }
+> {
   constructor(props) {
     super(props);
 
@@ -74,11 +77,12 @@ class ExtractorSortModal extends React.Component<ExtractorSortModalProps, {
     const { input } = this.props;
 
     return (
-      <BootstrapModalWrapper showModal
-                             onHide={this._cancel}>
+      <BootstrapModalWrapper showModal onHide={this._cancel}>
         <Modal.Header closeButton>
           <Modal.Title>
-            <span>Sort extractors for <em>{input.title}</em></span>
+            <span>
+              Sort extractors for <em>{input.title}</em>
+            </span>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

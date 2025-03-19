@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { Spinner, ISODurationInput } from 'components/common';
 
 const StyledForm = styled.form`
   margin-top: 10px;
@@ -33,35 +33,53 @@ const StyledForm = styled.form`
 `;
 
 type Props = {
-  creatingToken?: boolean
-  disableForm?: boolean
-  onCreate: (tokenName: string) => void,
+  creatingToken?: boolean;
+  disableForm?: boolean;
+  onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => void;
 };
 
 const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate }: Props) => {
   const [tokenName, setTokenName] = useState('');
+  const [tokenTtl, setTokenTtl] = useState('P7D');
 
   const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    onCreate(tokenName);
+    onCreate({ tokenName, tokenTtl });
     setTokenName('');
+    setTokenTtl('');
   };
+
+  const ttlValidator = (milliseconds: number) => milliseconds >= 60000;
 
   return (
     <StyledForm className="form-inline" onSubmit={createToken}>
       <FormGroup controlId="create-token-input">
         <ControlLabel>Token Name</ControlLabel>
-        <FormControl type="text"
-                     disabled={disableForm}
-                     placeholder="What is this token for?"
-                     value={tokenName}
-                     onChange={(event) => setTokenName((event.target as HTMLInputElement).value)} />
+        <FormControl
+          type="text"
+          disabled={disableForm}
+          placeholder="What is this token for?"
+          value={tokenName}
+          onChange={(event) => setTokenName((event.target as HTMLInputElement).value)}
+        />{' '}
+        <ISODurationInput
+          id="token_creation_ttl"
+          duration={tokenTtl}
+          update={(value) => setTokenTtl(value)}
+          label="Token TTL"
+          help=""
+          validator={ttlValidator}
+          errorText="invalid (min: 1 minute)"
+          disabled={disableForm}
+          required
+        />
       </FormGroup>
-      <Button id="create-token"
-              disabled={disableForm || tokenName === '' || creatingToken}
-              type="submit"
-              bsStyle="primary">
-        {(creatingToken ? <Spinner text="Creating..." /> : 'Create Token')}
+      <Button
+        id="create-token"
+        disabled={disableForm || tokenName === '' || creatingToken}
+        type="submit"
+        bsStyle="primary">
+        {creatingToken ? <Spinner text="Creating..." /> : 'Create Token'}
       </Button>
     </StyledForm>
   );

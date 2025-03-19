@@ -36,17 +36,20 @@ describe('useFieldTypeUnits', () => {
   const sizeB = FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'size' });
   const sizeMb = FieldUnit.fromJSON({ abbrev: 'Mb', unit_type: 'size' });
   const percent = FieldUnit.fromJSON({ abbrev: '%', unit_type: 'percent' });
-  const units: UnitsConfig = UnitsConfig
-    .empty().toBuilder()
+  const units: UnitsConfig = UnitsConfig.empty()
+    .toBuilder()
     .setFieldUnit('fieldTime', timeH)
     .setFieldUnit('fieldSizeMb', sizeMb)
     .setFieldUnit('fieldPercent', percent)
     .build();
-  const testConfig: AggregationWidgetConfig = AggregationWidgetConfig.builder().series([
-    Series.create('avg', 'fieldTime')
-      .toBuilder()
-      .config(SeriesConfig.empty().toBuilder().name('Name1').build()).build(),
-  ]).units(units)
+  const testConfig: AggregationWidgetConfig = AggregationWidgetConfig.builder()
+    .series([
+      Series.create('avg', 'fieldTime')
+        .toBuilder()
+        .config(SeriesConfig.empty().toBuilder().name('Name1').build())
+        .build(),
+    ])
+    .units(units)
     .rowPivots([Pivot.createValues(['fieldSizeMb', 'fieldSize'])])
     .columnPivots([Pivot.createValues(['fieldPercent'])])
     .build();
@@ -54,23 +57,23 @@ describe('useFieldTypeUnits', () => {
   beforeEach(() => {
     asMock(useFeature).mockReturnValue(true);
 
-    asMock(useFieldTypesUnits).mockImplementation(() => (
-      {
-        fieldTime: timeMs,
-        fieldSize: sizeB,
-        filedNotInConfiguration: timeMs,
-      }
-    ));
+    asMock(useFieldTypesUnits).mockImplementation(() => ({
+      fieldTime: timeMs,
+      fieldSize: sizeB,
+      filedNotInConfiguration: timeMs,
+    }));
   });
 
   it('Creates unit config from config and predefined values only for values from pivots and metrics with priority for config values', () => {
     const { result } = renderHook(() => useWidgetUnits(testConfig));
 
-    expect(result.current).toEqual(new UnitsConfig({
-      fieldTime: timeH,
-      fieldSizeMb: sizeMb,
-      fieldSize: sizeB,
-      fieldPercent: percent,
-    }));
+    expect(result.current).toEqual(
+      new UnitsConfig({
+        fieldTime: timeH,
+        fieldSizeMb: sizeMb,
+        fieldSize: sizeB,
+        fieldPercent: percent,
+      }),
+    );
   });
 });

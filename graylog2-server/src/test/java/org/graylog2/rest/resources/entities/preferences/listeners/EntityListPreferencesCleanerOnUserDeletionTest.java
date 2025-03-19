@@ -22,6 +22,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
@@ -52,7 +53,8 @@ class EntityListPreferencesCleanerOnUserDeletionTest {
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider objectMapperProvider) {
         this.eventBus = new AsyncEventBus(MoreExecutors.directExecutor());
-        this.service = Mockito.spy(new EntityListPreferencesServiceImpl(mongodb.mongoConnection(), objectMapperProvider));
+        this.service = Mockito.spy(new EntityListPreferencesServiceImpl(
+                new MongoCollections(objectMapperProvider, mongodb.mongoConnection())));
         this.listener = new EntityListPreferencesCleanerOnUserDeletion(eventBus, service);
     }
 
@@ -67,7 +69,7 @@ class EntityListPreferencesCleanerOnUserDeletionTest {
                 .build();
         service.save(StoredEntityListPreferences.builder()
                 .preferencesId(preferenceId1)
-                .preferences(new EntityListPreferences(List.of(), 42, null))
+                .preferences(EntityListPreferences.create(List.of(), 42, null))
                 .build());
 
         final StoredEntityListPreferencesId preferenceId2 = StoredEntityListPreferencesId.builder()
@@ -76,7 +78,7 @@ class EntityListPreferencesCleanerOnUserDeletionTest {
                 .build();
         service.save(StoredEntityListPreferences.builder()
                 .preferencesId(preferenceId2)
-                .preferences(new EntityListPreferences(List.of(), 42, null))
+                .preferences(EntityListPreferences.create(List.of(), 42, null))
                 .build());
 
         //verify they are present
