@@ -46,10 +46,10 @@ const InputInUseAlert = ({ inputId }: Props = { inputId: undefined }) => {
   return (
     <Row>
       <Col md={12}>
-        <StyledAlert title="Input already in use" bsStyle="info">
+        <StyledAlert title="Input already in use - Message Duplication Risk!" bsStyle="info">
           {inputReferencesData.stream_refs.length > 0 && (
             <StreamListWrapper>
-              This Input is already used in the following Streams:
+              This Input is already referenced within the Stream Rules of the following Streams:
               <StyledList>
                 {inputReferencesData.stream_refs.map((stream) => (
                   <li key={stream.id}>{stream.name}</li>
@@ -59,7 +59,7 @@ const InputInUseAlert = ({ inputId }: Props = { inputId: undefined }) => {
           )}
           {inputReferencesData.pipeline_refs.length > 0 && (
             <>
-              This Input is already used in the following Pipelines:
+              This Input is already referenced within the Pipeline Rules of the following Pipelines:
               <StyledList>
                 {inputReferencesData.pipeline_refs.map((pipeline) => (
                   <li key={pipeline.id}>{pipeline.name}</li>
