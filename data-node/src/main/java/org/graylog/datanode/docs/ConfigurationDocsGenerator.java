@@ -20,7 +20,6 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ReflectionUtils;
 import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.ClassUtils;
-import org.graylog.datanode.commands.Datanode;
 import org.graylog.datanode.docs.printers.ConfigFileDocsPrinter;
 import org.graylog.datanode.docs.printers.ConfigurationSection;
 import org.graylog.datanode.docs.printers.CsvDocsPrinter;
@@ -32,13 +31,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -49,7 +51,7 @@ public class ConfigurationDocsGenerator {
      */
     public static void main(String[] args) throws IOException {
         final ConfigurationDocsGenerator generator = new ConfigurationDocsGenerator();
-        generator.generateDocumentation(parseDocumentationFormat(args), ConfigurationDocsGenerator::getDatanodeConfigurationBeans);
+        generator.generateDocumentation(parseDocumentationFormat(args), ConfigurationBeansSPI::loadConfigurationBeans);
     }
 
     @Nonnull
@@ -62,7 +64,7 @@ public class ConfigurationDocsGenerator {
         return new DocumentationFormat(format, file);
     }
 
-    protected void generateDocumentation(DocumentationFormat format, Supplier<List<Object>> configurationBeans) throws IOException {
+    public void generateDocumentation(DocumentationFormat format, Supplier<List<Object>> configurationBeans) throws IOException {
         final List<ConfigurationSection> sections = detectConfigurationSections(configurationBeans);
         try (final DocsPrinter writer = createWriter(format)) {
             writer.write(sections);
@@ -128,10 +130,6 @@ public class ConfigurationDocsGenerator {
                 .map(ConfigurationEntryWithSection::entry)
                 .sorted(Comparator.comparing(ConfigurationEntry::hasPriority, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
-    }
-
-    private static List<Object> getDatanodeConfigurationBeans() {
-        return new Datanode().getNodeCommandConfigurationBeans();
     }
 
     /**
