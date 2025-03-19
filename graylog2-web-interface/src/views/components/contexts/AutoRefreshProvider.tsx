@@ -22,9 +22,13 @@ import { v4 as uuid } from 'uuid';
 import type { RefreshConfig } from 'views/components/contexts/AutoRefreshContext';
 import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
 
-const AutoRefreshProvider = ({ children, onRefresh }: React.PropsWithChildren<{ onRefresh: () => void }>) => {
-  const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(null);
-  const [animationId, setAnimationId] = useState<string | null>(null);
+const AutoRefreshProvider = ({
+  children = null,
+  onRefresh,
+  defaultRefreshConfig = null,
+}: React.PropsWithChildren<{ defaultRefreshConfig?: RefreshConfig | null; onRefresh: () => void }>) => {
+  const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(defaultRefreshConfig);
+  const [animationId, setAnimationId] = useState<string | null>(defaultRefreshConfig?.enabled ? uuid() : null);
   const startAutoRefresh = useCallback((interval: number) => {
     setRefreshConfig({ enabled: true, interval });
     setAnimationId(uuid());
@@ -55,19 +59,18 @@ const AutoRefreshProvider = ({ children, onRefresh }: React.PropsWithChildren<{ 
     }
   }, [refreshConfig?.enabled]);
 
-  const contextValue = useMemo(() => ({
-    refreshConfig,
-    startAutoRefresh,
-    stopAutoRefresh,
-    animationId,
-    restartAutoRefresh,
-  }), [animationId, refreshConfig, restartAutoRefresh, startAutoRefresh, stopAutoRefresh]);
-
-  return (
-    <AutoRefreshContext.Provider value={contextValue}>
-      {children}
-    </AutoRefreshContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      refreshConfig,
+      startAutoRefresh,
+      stopAutoRefresh,
+      animationId,
+      restartAutoRefresh,
+    }),
+    [animationId, refreshConfig, restartAutoRefresh, startAutoRefresh, stopAutoRefresh],
   );
+
+  return <AutoRefreshContext.Provider value={contextValue}>{children}</AutoRefreshContext.Provider>;
 };
 
 export default AutoRefreshProvider;

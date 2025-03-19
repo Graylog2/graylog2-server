@@ -34,19 +34,23 @@ import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const StyledDefList = styled.dl.attrs({ className: 'deflist' })(({ theme }) => css`
-  &&.deflist {
-    dd {
-      padding-left: ${theme.spacings.md};
-      margin-left: 200px;
+const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
+  ({ theme }) => css`
+    &&.deflist {
+      dd {
+        padding-left: ${theme.spacings.md};
+        margin-left: 200px;
+      }
     }
-  }
-`);
+  `,
+);
 
-const LabelSpan = styled.span(({ theme }) => css`
-  margin-left: ${theme.spacings.sm};
-  font-weight: bold;
-`);
+const LabelSpan = styled.span(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.sm};
+    font-weight: bold;
+  `,
+);
 
 const UserConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -84,6 +88,7 @@ const UserConfig = () => {
   };
 
   const timeoutIntervalValidator = (milliseconds: number) => milliseconds >= 1000;
+  const defaultTokenTtlValidator = (milliseconds: number) => milliseconds >= 86400000;
 
   const modalTitle = 'Update User Configuration';
 
@@ -92,32 +97,38 @@ const UserConfig = () => {
       <h2>Users Configuration</h2>
       <p>These settings can be used to set a global session timeout value.</p>
 
-      {!viewConfig ? <Spinner /> : (
+      {!viewConfig ? (
+        <Spinner />
+      ) : (
         <>
           <StyledDefList>
             <dt>Global session timeout:</dt>
             <dd>{viewConfig.enable_global_session_timeout ? 'Enabled' : 'Disabled'}</dd>
             <dt>Timeout interval:</dt>
             <dd>{viewConfig.enable_global_session_timeout ? viewConfig.global_session_timeout_interval : '-'}</dd>
+            <dt>Restrict access tokens to admins:&nbsp;</dt>
+            <dd>{viewConfig.restrict_access_token_to_admins ? 'Enabled' : 'Disabled'}</dd>
+            <dt>Allow access token for external users:&nbsp;</dt>
+            <dd>{viewConfig.allow_access_token_for_external_user ? 'Enabled' : 'Disabled'}</dd>
+            <dt>Default TTL for new tokens:</dt>
+            <dd>{viewConfig.default_ttl_for_new_tokens ? viewConfig.default_ttl_for_new_tokens : '-'}</dd>
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">
             <p>
-              <Button type="button"
-                      bsSize="xs"
-                      bsStyle="info"
-                      onClick={() => {
-                        setShowModal(true);
-                      }}>
+              <Button
+                type="button"
+                bsSize="xs"
+                bsStyle="info"
+                onClick={() => {
+                  setShowModal(true);
+                }}>
                 Edit configuration
               </Button>
             </p>
           </IfPermitted>
 
-          <Modal show={showModal && !!formConfig}
-                 onHide={resetConfig}
-                 aria-modal="true"
-                 aria-labelledby="dialog_label">
+          <Modal show={showModal && !!formConfig} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
             <Formik onSubmit={saveConfig} initialValues={formConfig}>
               {({ isSubmitting, values, setFieldValue }) => (
                 <Form>
@@ -129,25 +140,60 @@ const UserConfig = () => {
                     <div>
                       <Row>
                         <Col sm={12}>
-                          <FormikInput type="checkbox"
-                                       name="enable_global_session_timeout"
-                                       id="enable_global_session_timeout"
-                                       label={(
-                                         <LabelSpan>Enable global session timeout</LabelSpan>
-                                       )} />
+                          <FormikInput
+                            type="checkbox"
+                            name="enable_global_session_timeout"
+                            id="enable_global_session_timeout"
+                            label={<LabelSpan>Enable global session timeout</LabelSpan>}
+                          />
                           <InputDescription help="If enabled, it will be set for all the users." />
                         </Col>
                         <Col sm={12}>
                           <fieldset>
-                            <ISODurationInput id="global_session_timeout_interval"
-                                              duration={values.global_session_timeout_interval}
-                                              update={(value) => setFieldValue('global_session_timeout_interval', value)}
-                                              label="Global session timeout interval (as ISO8601 Duration)"
-                                              help="Session automatically end after this amount of time, unless they are actively used."
-                                              validator={timeoutIntervalValidator}
-                                              errorText="invalid (min: 1 second)"
-                                              disabled={!values.enable_global_session_timeout}
-                                              required />
+                            <ISODurationInput
+                              id="global_session_timeout_interval"
+                              duration={values.global_session_timeout_interval}
+                              update={(value) => setFieldValue('global_session_timeout_interval', value)}
+                              label="Global session timeout interval (as ISO8601 Duration)"
+                              help="Session automatically end after this amount of time, unless they are actively used."
+                              validator={timeoutIntervalValidator}
+                              errorText="invalid (min: 1 second)"
+                              disabled={!values.enable_global_session_timeout}
+                              required
+                            />
+                          </fieldset>
+                        </Col>
+                        <Col sm={12}>
+                          <FormikInput
+                            type="checkbox"
+                            name="restrict_access_token_to_admins"
+                            id="restrict_access_token_to_admins"
+                            label={<LabelSpan>Restrict access tokens to admins</LabelSpan>}
+                          />
+                          <InputDescription help="If enabled, it will restrict the creation of access tokens to admins." />
+                        </Col>
+                        <Col sm={12}>
+                          <FormikInput
+                            type="checkbox"
+                            name="allow_access_token_for_external_user"
+                            id="allow_access_token_for_external_user"
+                            label={<LabelSpan>Allow access token for external users</LabelSpan>}
+                          />
+                          <InputDescription help="If enabled, it will allow external users to create access tokens." />
+                        </Col>
+                        <Col sm={12}>
+                          <fieldset>
+                            <ISODurationInput
+                              id="default_ttl_for_new_tokens"
+                              duration={values.default_ttl_for_new_tokens}
+                              update={(value) => setFieldValue('default_ttl_for_new_tokens', value)}
+                              label="Default TTL for new tokens (as ISO8601 Duration)"
+                              help="Tokens will be automatically invalidated after this amount of time."
+                              validator={defaultTokenTtlValidator}
+                              errorText="invalid (min: 1 day)"
+                              disabled={!values.default_ttl_for_new_tokens}
+                              required
+                            />
                           </fieldset>
                         </Col>
                       </Row>
@@ -155,11 +201,13 @@ const UserConfig = () => {
                   </Modal.Body>
 
                   <Modal.Footer>
-                    <ModalSubmit onCancel={resetConfig}
-                                 isSubmitting={isSubmitting}
-                                 isAsyncSubmit
-                                 submitLoadingText="Update configuration"
-                                 submitButtonText="Update configuration" />
+                    <ModalSubmit
+                      onCancel={resetConfig}
+                      isSubmitting={isSubmitting}
+                      isAsyncSubmit
+                      submitLoadingText="Update configuration"
+                      submitButtonText="Update configuration"
+                    />
                   </Modal.Footer>
                 </Form>
               )}

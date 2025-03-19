@@ -16,10 +16,43 @@
  */
 import * as React from 'react';
 
-const InputDiagnosisStep = () => (
-  <div>
-    Input Diagnosis
-  </div>
-);
+import { Button, Row } from 'components/bootstrap';
+import Routes from 'routing/Routes';
+import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
+
+import { StepWrapper, DescriptionCol, ButtonCol } from './components/StepWrapper';
+
+type Props = {
+  onClose: () => void;
+};
+
+const InputDiagnosisStep = ({ onClose }: Props) => {
+  const {
+    wizardData: { input },
+  } = useInputSetupWizard();
+
+  return (
+    <StepWrapper>
+      <Row>
+        <DescriptionCol md={12}>
+          <p>Test inputs and parsing without writing any data to the search cluster.</p>
+        </DescriptionCol>
+      </Row>
+      {input?.id && (
+        <Button
+          bsSize="xs"
+          bsStyle="primary"
+          onClick={() => window.open(Routes.SYSTEM.INPUT_DIAGNOSIS(input?.id), '_blank')}>
+          Go to Input Diagnosis
+        </Button>
+      )}
+      <Row>
+        <ButtonCol md={12}>
+          <Button onClick={onClose}>Finish</Button>
+        </ButtonCol>
+      </Row>
+    </StepWrapper>
+  );
+};
 
 export default InputDiagnosisStep;

@@ -15,82 +15,110 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Alert, Button, Row, Col } from 'components/bootstrap';
+import { Alert, Button, Row, Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
+import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
+import useInputSetupWizardStepsHelper from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardStepsHelper';
 import { defaultCompare } from 'logic/DefaultCompare';
-import type { StepData } from 'components/inputs/InputSetupWizard/types';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStreamForm from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
-import type { FormValues as CreateStreamFormValues } from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
-import { checkHasPreviousStep, checkHasNextStep, checkIsNextStepDisabled, enableNextStep, updateStepData, getStepData } from 'components/inputs/InputSetupWizard/helpers/stepHelper';
-import useStreams from 'components/streams/hooks/useStreams';
+import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilteredStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
+import type { OpenStepsData } from 'components/inputs/InputSetupWizard/types';
 
-const StepCol = styled(Col)(({ theme }) => css`
-  padding-left: ${theme.spacings.lg};
-  padding-right: ${theme.spacings.lg};
-  padding-top: ${theme.spacings.sm};
-`);
+import {
+  StepWrapper,
+  DescriptionCol,
+  ButtonCol,
+  StyledHeading,
+  StyledList,
+  RecommendedTooltip,
+} from './components/StepWrapper';
+import InputInUseAlert from './components/InputInUseAlert';
 
-const DescriptionCol = styled(Col)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
-`);
+const ExistingStreamCol = styled(Col)(
+  ({ theme }) => css`
+    padding-top: ${theme.spacings.sm};
+    padding-bottom: ${theme.spacings.md};
+  `,
+);
 
-const StyledHeading = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.md};
-`);
+const CreateStreamCol = styled(Col)(
+  ({ theme }) => css`
+    padding-top: ${theme.spacings.sm};
+    padding-bottom: ${theme.spacings.md};
+    border-right: 1px solid ${theme.colors.cards.border};
+  `,
+);
 
-const ExistingStreamCol = styled(Col)(({ theme }) => css`
-  padding-top: ${theme.spacings.sm};
-  padding-bottom: ${theme.spacings.md};
-`);
-
-const CreateStreamCol = styled(Col)(({ theme }) => css`
-  border-left: 1px solid ${theme.colors.cards.border};
-  padding-top: ${theme.spacings.sm};
-  padding-bottom: ${theme.spacings.md};
-`);
-
-const ButtonCol = styled(Col)(({ theme }) => css`
-  display: flex;
-  justify-content: flex-end;
-  gap: ${theme.spacings.xs};
-  margin-top: ${theme.spacings.lg};
-`);
-
-const ConntectedPipelinesList = styled.ul`
-  list-style-type: disc;
-  padding-left: 20px;
-`;
-
-interface RoutingStepData extends StepData {
-  streamId?: string,
-  newStream?: CreateStreamFormValues
-}
+const StyledLabel = styled.label(
+  ({ theme }) => css`
+    font-weight: normal;
+    line-height: 1.1;
+    margin-bottom: ${theme.spacings.sm};
+    display: inline-block;
+    font-size: ${theme.fonts.size.h3};
+    background: none;
+  `,
+);
 
 const SetupRoutingStep = () => {
-  const currentStepName = INPUT_WIZARD_STEPS.SETUP_ROUTING;
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, stepsData, setStepsData } = useInputSetupWizard();
-  const newStream: CreateStreamFormValues = getStepData(stepsData, currentStepName, 'newStream');
-  const [selectedStreamId, setSelectedStreamId] = useState(undefined);
+  const [showSelectStream, setShowSelectStream] = useState<boolean>(false);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
+  const currentStepName = useMemo(() => INPUT_WIZARD_STEPS.SETUP_ROUTING, []);
+  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
+  const { stepsData, setStepsData } = useInputSetupWizardSteps<OpenStepsData>();
+  const { checkHasPreviousStep, checkHasNextStep, updateStepData, getStepData } =
+    useInputSetupWizardStepsHelper<OpenStepsData>();
+  const newStream: OpenStepsData['SETUP_ROUTING']['newStream'] = getStepData(stepsData, currentStepName, 'newStream');
+  const selectedStreamId = getStepData(stepsData, currentStepName, 'streamId');
+  const isDefaultStream = getStepData(stepsData, currentStepName, 'streamType') === 'DEFAULT';
+  const removeFromDefault = getStepData(stepsData, currentStepName, 'removeMatchesFromDefault');
+  const removeFromDefaultStreamChecked = typeof removeFromDefault === 'undefined' ? true : removeFromDefault;
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
-  const isNextStepDisabled = checkIsNextStepDisabled(orderedSteps, activeStep, stepsData);
-  const { data: streamsData, isInitialLoading: isLoadingStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } });
-  const streams = streamsData?.list;
+  const { data: streamsData, isLoading: isLoadingStreams } = useFilteredStreams();
+  const streams = streamsData?.streams;
   const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
+
+  const defaultStepData = { streamType: 'DEFAULT' };
+
+  const isStepValid = useCallback(() => {
+    const stepData = getStepData(stepsData, currentStepName);
+    if (!stepData) return false;
+    const { streamType, streamId } = stepData;
+
+    if (showCreateStream && !newStream) return false;
+
+    switch (streamType) {
+      case 'NEW':
+        if (!newStream) return false;
+
+        return true;
+      case 'EXISTING':
+        if (!streamId) return false;
+
+        return true;
+      case 'DEFAULT':
+        return true;
+      default:
+        return false;
+    }
+  }, [currentStepName, newStream, showCreateStream, stepsData, getStepData]);
 
   useEffect(() => {
     if (orderedSteps && activeStep && stepsData) {
-      const withNextStepEnabled = enableNextStep(orderedSteps, activeStep, stepsData);
-      setStepsData(withNextStepEnabled);
+      if (!getStepData(stepsData, currentStepName)?.streamType) {
+        const withInitialStepsData = updateStepData(stepsData, currentStepName, defaultStepData);
+
+        setStepsData(withInitialStepsData);
+      }
     } // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // Initial setup: intentionally ommiting dependencies to prevent from unneccesary rerenders
 
   const options = useMemo(() => {
     if (!streams) return [];
@@ -102,108 +130,201 @@ const SetupRoutingStep = () => {
   }, [streams]);
 
   const handleStreamSelect = (streamId: string) => {
-    setSelectedStreamId(streamId);
+    if (streamId) {
+      setStepsData(
+        updateStepData(stepsData, currentStepName, {
+          streamId,
+          streamType: 'EXISTING',
+          removeMatchesFromDefault: removeFromDefaultStreamChecked,
+        }),
+      );
+    } else {
+      setStepsData(
+        updateStepData(stepsData, currentStepName, {
+          streamId: undefined,
+          streamType: 'DEFAULT',
+          removeMatchesFromDefault: undefined,
+        }),
+      );
+    }
+  };
+
+  const handleCreateStream = () => {
+    updateStepData(stepsData, currentStepName, defaultStepData);
+    setShowCreateStream(true);
+  };
+
+  const handleSelectStream = () => {
+    setShowSelectStream(true);
   };
 
   const onNextStep = () => {
-    setStepsData(
-      updateStepData(stepsData, currentStepName, { streamId: selectedStreamId } as RoutingStepData),
-    );
-
     goToNextStep();
   };
 
   const handleBackClick = () => {
-    setStepsData(
-      updateStepData(stepsData, currentStepName, {} as RoutingStepData, true),
-    );
+    setStepsData(updateStepData(stepsData, currentStepName, defaultStepData, true));
 
+    setShowSelectStream(false);
     setShowCreateStream(false);
 
     goToPreviousStep();
   };
 
-  const streamHasConnectedPipelines = streamPipelinesData && streamPipelinesData?.length > 0;
-
-  const submitStreamCreation = (values: CreateStreamFormValues) => {
+  const handleCheckRemoveFromDefaultStream = () => {
     setStepsData(
-      updateStepData(stepsData, currentStepName, { newStream: values } as RoutingStepData),
+      updateStepData(stepsData, currentStepName, {
+        removeMatchesFromDefault: !removeFromDefaultStreamChecked,
+      }),
     );
   };
 
-  const backButtonText = newStream ? 'Reset' : 'Back';
+  const streamHasConnectedPipelines = streamPipelinesData && streamPipelinesData?.length > 0;
+
+  const submitStreamCreation = ({
+    create_new_pipeline,
+    ...stream
+  }: OpenStepsData['SETUP_ROUTING']['newStream'] & { create_new_pipeline?: boolean }) => {
+    setStepsData(
+      updateStepData(stepsData, currentStepName, {
+        newStream: stream,
+        shouldCreateNewPipeline: create_new_pipeline ?? false,
+        streamType: 'NEW',
+      }),
+    );
+
+    onNextStep();
+  };
+
   const showNewStreamSection = newStream || showCreateStream;
+  const showSelectStreamSection = selectedStreamId || showSelectStream;
 
   return (
-    <Row>
-      <StepCol md={12}>
-        <Row>
-          <DescriptionCol md={12}>
-            <p>
-              Choose a Destination Stream to Route Messages from this Input to. Messages that are not
-              routed to any streams will be sent to the &quot;All Messages&quot; Stream.
-            </p>
-          </DescriptionCol>
-        </Row>
-        {selectedStreamId && streamHasConnectedPipelines && (
+    <StepWrapper>
+      <InputInUseAlert inputId={wizardData?.input?.id} />
+      {!showNewStreamSection && !showSelectStreamSection && (
+        <>
           <Row>
-            <Col md={12}>
-              <Alert title="Pipelines connected to stream" bsStyle="info">
-                The selected stream has existing pipelines connected to it:
-                <ConntectedPipelinesList>
-                  {streamPipelinesData.map((pipeline) => <li key={pipeline.title}>{pipeline.title}</li>)}
-                </ConntectedPipelinesList>
-              </Alert>
-            </Col>
+            <DescriptionCol md={12}>
+              <StyledList>
+                <li>Select a destination Stream to route messages from this input to.</li>
+                <li>
+                  <strong>We recommend creating a new stream for each new input.</strong> This will help categorise your
+                  messages into a basic schema.
+                </li>
+                <li>
+                  Messages that are not routed to any Stream will be routed to the <strong>Default Stream</strong>.
+                </li>
+                <li>
+                  Pipeline rules can be automatically created and attached to the <strong>Default Stream</strong> by
+                  this Wizard.
+                </li>
+              </StyledList>
+            </DescriptionCol>
           </Row>
-        )}
-        {showNewStreamSection ? (
+
           <Row>
-            <Col md={12}>
-              <StyledHeading>
-                Create new stream
-              </StyledHeading>
-              {newStream ? (
-                <>
-                  <p>This input will use a new stream: &quot;{newStream.title}&quot;.</p>
-                  <p>Matches will {!newStream.remove_matches_from_default_stream && ('not ')}be removed from the Default stream.</p>
-                  {newStream.create_new_pipeline && (<p>A new pipeline will be created.</p>)}
-                </>
-              ) : (
-                <CreateStreamForm submitForm={submitStreamCreation} />
-              )}
-            </Col>
-          </Row>
-        ) : (
-          <Row>
-            <ExistingStreamCol md={6}>
-              <StyledHeading>Choose an existing Stream</StyledHeading>
-              {!isLoadingStreams && (
-              <Select inputId="streams"
-                      onChange={handleStreamSelect}
-                      options={options}
-                      aria-label="All messages (Default)"
-                      clearable
-                      placeholder="All messages (Default)"
-                      value={selectedStreamId} />
-              )}
+            {!selectedStreamId && (
+              <CreateStreamCol md={6}>
+                <StyledHeading>Route to a new Stream</StyledHeading>
+                <RecommendedTooltip opened withArrow position="bottom" label="Recommended!">
+                  <Button onClick={handleCreateStream} bsStyle="primary">
+                    Create Stream
+                  </Button>
+                </RecommendedTooltip>
+              </CreateStreamCol>
+            )}
+            <ExistingStreamCol md={selectedStreamId ? 12 : 6}>
+              <StyledHeading>Route to an existing Stream</StyledHeading>
+              <Button onClick={handleSelectStream}>Select Stream</Button>
             </ExistingStreamCol>
-            <CreateStreamCol md={6}>
-              <StyledHeading>Route to a new Stream</StyledHeading>
-              <Button onClick={() => setShowCreateStream(true)} bsStyle="primary">Create Stream</Button>
-            </CreateStreamCol>
           </Row>
-        )}
-        {(hasPreviousStep || hasNextStep || showNewStreamSection) && (
+        </>
+      )}
+
+      {showNewStreamSection && (
+        <Row>
+          <Col md={12}>
+            <StyledHeading>Create new Stream</StyledHeading>
+            <CreateStreamForm submitForm={submitStreamCreation} handleBackClick={handleBackClick} />
+          </Col>
+        </Row>
+      )}
+      {showSelectStreamSection && (
+        <>
+          <Row>
+            <DescriptionCol md={12}>
+              <StyledLabel htmlFor="streams">Choose an existing Stream</StyledLabel>
+              <StyledList>
+                <li>Route messages from this input to an existing stream is selected.</li>
+                <li>
+                  Pipeline Rules will be created when the <strong>Start Input</strong> button is pressed.
+                </li>
+              </StyledList>
+            </DescriptionCol>
+          </Row>
+          {selectedStreamId && streamHasConnectedPipelines && (
+            <Row>
+              <Col md={12}>
+                <Alert title="Pipelines connected to target Stream" bsStyle="info">
+                  We recommending checking the impact of these prior to completing the Input Setup. The target Stream
+                  has the following Pipelines connected to it:
+                  <StyledList>
+                    {streamPipelinesData.map((pipeline) => (
+                      <li key={pipeline.title}>{pipeline.title}</li>
+                    ))}
+                  </StyledList>
+                </Alert>
+              </Col>
+            </Row>
+          )}
+          {!isLoadingStreams && (
+            <Row>
+              <Col md={12}>
+                <Select
+                  inputId="streams"
+                  onChange={handleStreamSelect}
+                  options={options}
+                  aria-label="All messages (Default)"
+                  clearable
+                  placeholder="All messages (Default)"
+                  value={selectedStreamId ?? getStepData(stepsData, currentStepName, 'streamId')}
+                />
+                {!isDefaultStream && (
+                  <Input
+                    id="existing_remove_matches_from_default_stream"
+                    type="checkbox"
+                    label="Remove matches from &lsquo;Default Stream&rsquo;"
+                    title="Remove matches from &lsquo;Default Stream&rsquo;"
+                    help={
+                      <span>
+                        Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.
+                      </span>
+                    }
+                    name="existing_remove_matches_from_default_stream"
+                    checked={removeFromDefaultStreamChecked}
+                    onChange={handleCheckRemoveFromDefaultStream}
+                  />
+                )}
+              </Col>
+            </Row>
+          )}
+        </>
+      )}
+
+      {(((hasPreviousStep || hasNextStep) && !showNewStreamSection) || showSelectStreamSection) && (
         <Row>
           <ButtonCol md={12}>
-            {(hasPreviousStep || showNewStreamSection) && (<Button onClick={handleBackClick}>{backButtonText}</Button>)}
-            {hasNextStep && (<Button disabled={isNextStepDisabled || (showCreateStream && !newStream)} onClick={onNextStep} bsStyle="primary">Finish & Start Input</Button>)}
+            {(hasPreviousStep || showSelectStreamSection) && <Button onClick={handleBackClick}>Back</Button>}
+            {hasNextStep && (
+              <Button disabled={!isStepValid()} onClick={onNextStep} bsStyle="primary">
+                Next
+              </Button>
+            )}
           </ButtonCol>
         </Row>
-        )}
-      </StepCol>
-    </Row>
+      )}
+    </StepWrapper>
   );
 };
 

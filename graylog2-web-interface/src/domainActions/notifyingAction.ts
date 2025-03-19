@@ -19,16 +19,23 @@ import { createNotFoundError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 
 type Notification = {
-  title?: string,
-  message?: string,
+  title?: string;
+  message?: string;
 };
 
-const _displaySuccessNotification = <T, Args extends Array<T>>(successNotification: (...Args) => Notification, ...args: Args) => {
+const _displaySuccessNotification = <T, Args extends Array<T>>(
+  successNotification: (...Args) => Notification,
+  ...args: Args
+) => {
   const { message, title } = successNotification(...args);
   UserNotification.success(message, title || 'Success');
 };
 
-const _displayErrorNotification = <T, Args extends Array<T>>(errorNotification: (error: string, ...Args) => Notification, error, ...args: Args) => {
+const _displayErrorNotification = <T, Args extends Array<T>>(
+  errorNotification: (error: string, ...Args) => Notification,
+  error,
+  ...args: Args
+) => {
   let errorMessage = String(error);
 
   if ((error?.status === 400 || error?.status === 500) && error?.additional?.body?.message) {
@@ -40,32 +47,37 @@ const _displayErrorNotification = <T, Args extends Array<T>>(errorNotification: 
 };
 
 type Props<F extends (...args: Array<any>) => any> = {
-  action: F,
-  success?: (...args: Parameters<F>) => Notification,
-  error: (error: string, ...args: Parameters<F>) => Notification,
-  notFoundRedirect?: boolean,
+  action: F;
+  success?: (...args: Parameters<F>) => Notification;
+  error: (error: string, ...args: Parameters<F>) => Notification;
+  notFoundRedirect?: boolean;
 };
 
 type PromiseResult<P extends Promise<any>> = P extends Promise<infer R> ? R : never;
 
-const notifyingAction = <F extends (...args: Array<any>) => Promise<any>>({
-  action,
-  success: successNotification,
-  error: errorNotification,
-  notFoundRedirect,
-}: Props<F>) => (...args: Parameters<typeof action>) => action(...args).then((result: PromiseResult<ReturnType<F>>) => {
-    if (successNotification) _displaySuccessNotification(successNotification, ...args);
+const notifyingAction =
+  <F extends (...args: Array<any>) => Promise<any>>({
+    action,
+    success: successNotification,
+    error: errorNotification,
+    notFoundRedirect,
+  }: Props<F>) =>
+  (...args: Parameters<typeof action>) =>
+    action(...args)
+      .then((result: PromiseResult<ReturnType<F>>) => {
+        if (successNotification) _displaySuccessNotification(successNotification, ...args);
 
-    return result;
-  }).catch((error) => {
-    if (notFoundRedirect && error?.status === 404) {
-      ErrorsActions.report(createNotFoundError(error));
-      throw error;
-    }
+        return result;
+      })
+      .catch((error) => {
+        if (notFoundRedirect && error?.status === 404) {
+          ErrorsActions.report(createNotFoundError(error));
+          throw error;
+        }
 
-    _displayErrorNotification(errorNotification, error, ...args);
+        _displayErrorNotification(errorNotification, error, ...args);
 
-    throw error;
-  });
+        throw error;
+      });
 
 export default notifyingAction;

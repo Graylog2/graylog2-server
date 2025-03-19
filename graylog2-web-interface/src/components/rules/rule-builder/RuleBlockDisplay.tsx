@@ -22,47 +22,55 @@ import { IconButton } from 'components/common';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
-import type { BlockType, RuleBlock } from './types';
+import type { BlockDict, BlockType, RuleBlock } from './types';
 import { RuleBuilderTypes } from './types';
 import { useRuleBuilder } from './RuleBuilderContext';
 
 type Props = {
-  block?: RuleBlock
-  negatable?: boolean,
-  onDelete: () => void,
-  onEdit: () => void,
-  onNegate: () => void,
-  onDuplicate: () => void,
-  onInsertAbove: () => void,
-  onInsertBelow: () => void,
-  returnType?: RuleBuilderTypes,
-  type: BlockType,
-}
+  block?: RuleBlock;
+  negatable?: boolean;
+  onDelete: () => void;
+  onEdit: () => void;
+  onNegate: () => void;
+  onDuplicate: () => void;
+  onInsertAbove: () => void;
+  onInsertBelow: () => void;
+  selectedBlockDict?: BlockDict;
+  type: BlockType;
+};
 
-const Highlighted = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.info};
-  font-weight: bold;
-`);
+const Highlighted = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.info};
+    font-weight: bold;
+  `,
+);
 
-const TypeLabel = styled(Label)(({ theme }) => css`
-  margin-left: ${theme.spacings.xs};
-`);
+const TypeLabel = styled(Label)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.xs};
+  `,
+);
 
-const StyledRow = styled(Row)<{ $hovered: boolean }>(({ theme, $hovered }) => css`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  margin: 0;
-  height: ${theme.spacings.xl};
-  background-color: ${$hovered ? theme.colors.table.row.backgroundHover : 'transparent'};
-  border-left: solid 1px ${theme.colors.gray[80]};
-`);
+const StyledRow = styled(Row)<{ $hovered: boolean }>(
+  ({ theme, $hovered }) => css`
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    height: ${theme.spacings.xl};
+    background-color: ${$hovered ? theme.colors.table.row.backgroundHover : 'transparent'};
+    border-left: solid 1px ${theme.colors.gray[80]};
+  `,
+);
 
 type NegationButtonProps = React.ComponentProps<typeof Button> & { $negate: boolean };
-const NegationButton: React.ComponentType<NegationButtonProps> = styled(Button)<{ $negate: boolean }>(({ theme, $negate }) => css`
-  opacity: ${$negate ? '1' : '0.3'};
-  margin-right: ${theme.spacings.sm};
-`);
+const NegationButton: React.ComponentType<NegationButtonProps> = styled(Button)<{ $negate: boolean }>(
+  ({ theme, $negate }) => css`
+    opacity: ${$negate ? '1' : '0.3'};
+    margin-right: ${theme.spacings.sm};
+  `,
+);
 
 const BlockTitle = styled.h5`
   text-overflow: ellipsis;
@@ -70,14 +78,16 @@ const BlockTitle = styled.h5`
   overflow: hidden;
 `;
 
-const ErrorMessage = styled.p(({ theme }) => css`
-  color: ${theme.colors.variant.danger};
-  font-size: 0.75rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  margin: 0;
-`);
+const ErrorMessage = styled.p(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.danger};
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 0;
+  `,
+);
 
 const ActionsContainer = styled.div`
   display: flex;
@@ -85,11 +95,28 @@ const ActionsContainer = styled.div`
   justify-content: end;
 `;
 
-const EditIconButton = styled(IconButton)(({ theme }) => css`
-  margin-right: ${theme.spacings.xs};
-`);
+const EditIconButton = styled(IconButton)(
+  ({ theme }) => css`
+    margin-right: ${theme.spacings.xs};
+  `,
+);
 
-const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType, type } : Props) => {
+const DeprecatedLabel = styled(Label)`
+  padding: 2px 8px;
+`;
+
+const RuleBlockDisplay = ({
+  block = undefined,
+  negatable = false,
+  onEdit,
+  onDelete,
+  onNegate,
+  onDuplicate,
+  onInsertAbove,
+  onInsertBelow,
+  selectedBlockDict = undefined,
+  type,
+}: Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
@@ -108,7 +135,7 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
     }
   };
 
-  const returnTypeLabel = readableReturnType(returnType);
+  const returnTypeLabel = readableReturnType(selectedBlockDict?.return_type);
 
   const highlightedRuleTitle = (termToHighlight: string, title: string = '') => {
     const parts = title.split(/('\$.*?')/);
@@ -121,49 +148,56 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
       return part;
     });
 
-    return (partsWithHighlight.map((item, index) => (
-
-      (
-
-        <React.Fragment key={index}>
-          {item}
-        </React.Fragment>
-      )
-    )));
+    return partsWithHighlight.map((item, index) => (
+      // eslint-disable-next-line react/no-array-index-key
+      <React.Fragment key={index}>{item}</React.Fragment>
+    ));
   };
 
   const errorMessage = block?.errors?.join(', ');
 
   return (
-    <StyledRow onMouseEnter={() => setShowActions(true)}
-               onMouseLeave={!isDropdownOpen ? () => setShowActions(false) : undefined}
-               $hovered={showActions}>
+    <StyledRow
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={!isDropdownOpen ? () => setShowActions(false) : undefined}
+      $hovered={showActions}>
       <Col xs={9} md={10}>
         <Row>
           <Col xs={10} md={9}>
             <BlockTitle title={block?.step_title}>
-              {negatable
-              && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
-              {highlightedOutput ? (
-                highlightedRuleTitle(highlightedOutput, block?.step_title)
-              ) : block?.step_title}
-              {block?.errors?.length > 0 && (
-                <ErrorMessage title={errorMessage}>{errorMessage}</ErrorMessage>
+              {negatable && (
+                <NegationButton
+                  bsStyle="primary"
+                  bsSize="xs"
+                  $negate={block?.negate}
+                  onClick={(e) => {
+                    e.target.blur();
+                    onNegate();
+                  }}>
+                  Not
+                </NegationButton>
               )}
+              {highlightedOutput ? highlightedRuleTitle(highlightedOutput, block?.step_title) : block?.step_title}
+              {selectedBlockDict?.deprecated && (
+                <span>
+                  &nbsp;
+                  <DeprecatedLabel bsStyle="warning" bsSize="xs">
+                    Deprecated
+                  </DeprecatedLabel>
+                </span>
+              )}
+              {block?.errors?.length > 0 && <ErrorMessage title={errorMessage}>{errorMessage}</ErrorMessage>}
             </BlockTitle>
           </Col>
           {block?.outputvariable && (
             <Col xs={2} md={3}>
-              <Label bsStyle="primary"
-                     onMouseEnter={() => setHighlightedOutput(block.outputvariable)}
-                     onMouseLeave={() => setHighlightedOutput(undefined)}>
+              <Label
+                bsStyle="primary"
+                onMouseEnter={() => setHighlightedOutput(block.outputvariable)}
+                onMouseLeave={() => setHighlightedOutput(undefined)}>
                 {`$${block.outputvariable}`}
               </Label>
-              {returnTypeLabel && (
-              <TypeLabel bsStyle="default">
-                {returnTypeLabel}
-              </TypeLabel>
-              )}
+              {returnTypeLabel && <TypeLabel bsStyle="default">{returnTypeLabel}</TypeLabel>}
             </Col>
           )}
         </Row>
@@ -178,16 +212,18 @@ const RuleBlockDisplay = ({ block, negatable = false, onEdit, onDelete, onNegate
         {showActions && type === 'action' && (
           <ActionsContainer>
             <EditIconButton name="edit_square" onClick={onEdit} title="Edit" />
-            <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
-                                   buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                                   bsSize="xsmall"
-                                   onToggle={handleDropdownToggle}
-                                   dropdownZIndex={1500}>
+            <OverlayDropdownButton
+              title={MORE_ACTIONS_TITLE}
+              buttonTitle={MORE_ACTIONS_HOVER_TITLE}
+              bsSize="xsmall"
+              onToggle={handleDropdownToggle}
+              dropdownZIndex={1500}>
               <MenuItem onClick={onEdit}>Edit</MenuItem>
-              <MenuItem onClick={() => {
-                onDuplicate();
-                handleDropdownToggle();
-              }}>
+              <MenuItem
+                onClick={() => {
+                  onDuplicate();
+                  handleDropdownToggle();
+                }}>
                 Duplicate
               </MenuItem>
               <MenuItem divider />

@@ -30,9 +30,7 @@ describe('DuplicateCommonWidgetSettings', () => {
   });
 
   it('duplicates query if present', () => {
-    const widget = Widget.builder()
-      .query(createElasticsearchQueryString('hello:world'))
-      .build();
+    const widget = Widget.builder().query(createElasticsearchQueryString('hello:world')).build();
     const widgetBuilder = Widget.builder();
 
     const result = DuplicateCommonWidgetSettings(widgetBuilder, widget);
@@ -41,9 +39,7 @@ describe('DuplicateCommonWidgetSettings', () => {
   });
 
   it('duplicates filter if present', () => {
-    const widget = Widget.builder()
-      .filter('hello:world')
-      .build();
+    const widget = Widget.builder().filter('hello:world').build();
     const widgetBuilder = Widget.builder();
 
     const result = DuplicateCommonWidgetSettings(widgetBuilder, widget);
@@ -52,9 +48,7 @@ describe('DuplicateCommonWidgetSettings', () => {
   });
 
   it('duplicates timerange if present', () => {
-    const widget = Widget.builder()
-      .timerange({ type: 'relative', range: 3600 })
-      .build();
+    const widget = Widget.builder().timerange({ type: 'relative', range: 3600 }).build();
     const widgetBuilder = Widget.builder();
 
     const result = DuplicateCommonWidgetSettings(widgetBuilder, widget);
@@ -63,9 +57,7 @@ describe('DuplicateCommonWidgetSettings', () => {
   });
 
   it('duplicates streams if present', () => {
-    const widget = Widget.builder()
-      .streams(['stream1', 'stream23', 'stream42'])
-      .build();
+    const widget = Widget.builder().streams(['stream1', 'stream23', 'stream42']).build();
     const widgetBuilder = Widget.builder();
 
     const result = DuplicateCommonWidgetSettings(widgetBuilder, widget);

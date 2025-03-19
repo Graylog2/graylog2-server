@@ -45,6 +45,10 @@ const iconName = (type: string) => {
       return 'fork_right';
     case 'input':
       return 'cell_tower';
+    case 'event-definition-id':
+      return 'edit_document';
+    case 'associated-assets':
+      return 'quick_reference';
     default:
       return 'help';
   }
@@ -59,8 +63,8 @@ const IconWrapper = styled.div`
 `;
 
 type Props = {
-  type: FieldType,
-  monospace?: boolean
+  type: FieldType;
+  monospace?: boolean;
 };
 
 const FieldTypeIcon = ({ type, monospace = true }: Props) => {

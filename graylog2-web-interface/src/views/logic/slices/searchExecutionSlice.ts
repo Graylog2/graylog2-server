@@ -14,41 +14,51 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import * as Immutable from 'immutable';
 import trim from 'lodash/trim';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import type { SearchExecution, RootState, GetState, SearchExecutionResult, ExtraArguments, JobIdsState } from 'views/types';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type {
+  SearchExecution,
+  RootState,
+  GetState,
+  SearchExecutionResult,
+  ExtraArguments,
+  JobIdsState,
+} from 'views/types';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
-import type View from 'views/logic/views/View';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { selectView, selectParameters, selectActiveQuery } from 'views/logic/slices/viewSelectors';
+import { selectParameters } from 'views/logic/slices/viewSelectors';
 import {
   selectGlobalOverride,
-  selectWidgetsToSearch,
-  selectSearchExecutionState, selectParameterBindings, selectJobIds,
+  selectSearchTypesToSearch,
+  selectSearchExecutionState,
+  selectJobIds,
+  selectParameterBindings,
 } from 'views/logic/slices/searchExecutionSelectors';
 import type { TimeRange } from 'views/logic/queries/Query';
-import ParameterBinding from 'views/logic/parameters/ParameterBinding';
-import type { ParameterMap } from 'views/logic/parameters/Parameter';
-import type Parameter from 'views/logic/parameters/Parameter';
-import { setParameters } from 'views/logic/slices/viewSlice';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import ParameterBinding from 'views/logic/parameters/ParameterBinding';
+import type Parameter from 'views/logic/parameters/Parameter';
+import type { ParameterMap } from 'views/logic/parameters/Parameter';
 import type { JobIds } from 'views/stores/SearchJobs';
+import type Search from 'views/logic/search/Search';
+import { setParameters } from 'views/logic/slices/viewSlice';
+import type { WidgetMapping } from 'views/logic/views/types';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
   initialState: {
-    widgetsToSearch: undefined,
+    searchTypesToSearch: undefined,
     executionState: SearchExecutionState.empty(),
     isLoading: false,
     result: undefined,
     jobIds: null,
-  } as SearchExecution,
+  },
   reducers: {
     loading: (state) => ({
       ...state,
@@ -67,9 +77,9 @@ const searchExecutionSlice = createSlice({
       ...state,
       executionState: state.executionState.toBuilder().globalOverride(action.payload).build(),
     }),
-    setWidgetsToSearch: (state, action: PayloadAction<Array<string>>) => ({
+    setSearchTypesToSearch: (state, action: PayloadAction<Array<string>>) => ({
       ...state,
-      widgetsToSearch: action.payload,
+      searchTypesToSearch: action.payload,
     }),
     setParameterValues: (state, action: PayloadAction<Immutable.Map<string, any>>) => {
       const parameterMap = action.payload;
@@ -91,8 +101,11 @@ const searchExecutionSlice = createSlice({
     addParameterBindings: (state, action: PayloadAction<Array<Parameter>>) => {
       const { parameterBindings } = state.executionState;
       const newParameters = action.payload;
-      const newParameterBindings = Immutable.Map<string, any>(newParameters.filter((parameter) => !!parameter.defaultValue)
-        .map((parameter) => [parameter.name, ParameterBinding.forValue(parameter.defaultValue)]));
+      const newParameterBindings = Immutable.Map<string, any>(
+        newParameters
+          .filter((parameter) => !!parameter.defaultValue)
+          .map((parameter) => [parameter.name, ParameterBinding.forValue(parameter.defaultValue)]),
+      );
       const mergedParameterBindings = parameterBindings.merge(newParameterBindings);
 
       return {
@@ -107,45 +120,72 @@ const searchExecutionSlice = createSlice({
   },
 });
 
-export const { loading, stopLoading, finishedLoading, updateGlobalOverride, setWidgetsToSearch, setParameterValues, setParameterBindings, setJobIds } = searchExecutionSlice.actions;
+export const {
+  loading,
+  stopLoading,
+  finishedLoading,
+  updateGlobalOverride,
+  setSearchTypesToSearch,
+  setParameterValues,
+  setParameterBindings,
+  setJobIds,
+} = searchExecutionSlice.actions;
 
 export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
 
 export type SearchExecutors = {
-  parse: SearchParser,
-  resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult,
-  startJob: (view: View, widgetsToSearch: string[], executionStateParam: SearchExecutionState, keepQueries?: string[]) => Promise<JobIds>,
-  executeJobResult: (jobIds: JobIds, view: View) => Promise<SearchExecutionResult>,
-  cancelJob: (jobIds: JobIds) => Promise<null>,
+  parse: SearchParser;
+  resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult;
+  startJob: (
+    search: Search,
+    searchTypesToSearch: string[],
+    executionStateParam: SearchExecutionState,
+    keepQueries?: string[],
+  ) => Promise<JobIds>;
+  executeJobResult: (params: {
+    jobIds: JobIds;
+    widgetMapping?: WidgetMapping;
+    page?: number;
+    perPage?: number;
+  }) => Promise<SearchExecutionResult>;
+  cancelJob: (jobIds: JobIds) => Promise<null>;
 };
 
-export const cancelExecutedJob = () => (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
-  const state = getState();
-  const jobIds = selectJobIds(state);
+export const cancelExecutedJob =
+  () =>
+  (dispatch: ViewsDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
+    const state = getState();
+    const jobIds = selectJobIds(state);
 
-  if (jobIds) {
-    dispatch(setJobIds(null));
+    if (jobIds) {
+      dispatch(setJobIds(null));
 
-    searchExecutors.cancelJob(jobIds);
-  }
-};
+      return searchExecutors.cancelJob(jobIds);
+    }
 
-export const executeWithExecutionState = (view: View, widgetsToSearch: Array<string>, executionState: SearchExecutionState, searchExecutors: SearchExecutors) => (
-  dispatch: AppDispatch,
-  getState: GetState,
-) => dispatch(parseSearch(view.search, searchExecutors.parse))
-  .then(() => {
-    dispatch(loading());
-    dispatch(cancelExecutedJob());
+    return Promise.resolve();
+  };
 
-    const activeQuery = selectActiveQuery(getState());
-
-    return searchExecutors.startJob(view, widgetsToSearch, executionState, [activeQuery]);
-  })
-  .then((jobIds: JobIds) => {
+export const executeSearchJob =
+  ({
+    jobIds,
+    widgetMapping,
+    page,
+    perPage,
+    searchExecutors,
+  }: {
+    jobIds: JobIds;
+    widgetMapping?: WidgetMapping;
+    page?: number;
+    perPage?: number;
+    searchExecutors: SearchExecutors;
+  }) =>
+  (dispatch: ViewsDispatch, _getState) => {
     dispatch(setJobIds(jobIds));
+    dispatch(loading());
 
-    return searchExecutors.executeJobResult(jobIds, view)
+    return searchExecutors
+      .executeJobResult({ jobIds, widgetMapping, page, perPage })
       .then(searchExecutors.resultMapper)
       .then((result) => {
         dispatch(setJobIds(null));
@@ -154,50 +194,109 @@ export const executeWithExecutionState = (view: View, widgetsToSearch: Array<str
 
         return dispatch(finishedLoading(result));
       });
-  });
+  };
 
-export const execute = () => (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
-  const state = getState();
-  const view = selectView(state);
-  const executionState = selectSearchExecutionState(state);
-  const widgetsToSearch = selectWidgetsToSearch(state);
+export const executeWithExecutionState =
+  ({
+    search,
+    activeQuery,
+    searchTypesToSearch,
+    executionState,
+    searchExecutors,
+    widgetMapping,
+    page,
+    perPage,
+  }: {
+    search: Search;
+    activeQuery: string;
+    searchTypesToSearch: Array<string>;
+    executionState: SearchExecutionState;
+    searchExecutors: SearchExecutors;
+    widgetMapping?: WidgetMapping;
+    page?: number;
+    perPage?: number;
+  }) =>
+  (dispatch: ViewsDispatch) =>
+    dispatch(parseSearch(search, searchExecutors.parse))
+      .then(() => {
+        dispatch(loading());
+        dispatch(cancelExecutedJob());
 
-  return dispatch(executeWithExecutionState(view, widgetsToSearch, executionState, searchExecutors));
-};
+        return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
+      })
+      .then((jobIds: JobIds) => dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage })));
 
-export const setGlobalOverrideQuery = (queryString: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
-  const newGlobalOverride = globalOverride.toBuilder().query(createElasticsearchQueryString(queryString)).build();
+export const execute =
+  ({
+    search,
+    activeQuery,
+    widgetMapping,
+    page,
+    perPage,
+  }: {
+    search: Search;
+    activeQuery: string;
+    widgetMapping?: WidgetMapping;
+    page?: number;
+    perPage?: number;
+  }) =>
+  (dispatch: ViewsDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
+    const state = getState();
+    const executionState = selectSearchExecutionState(state);
+    const searchTypesToSearch = selectSearchTypesToSearch(state);
 
-  return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
-};
+    return dispatch(
+      executeWithExecutionState({
+        search,
+        activeQuery,
+        searchTypesToSearch,
+        executionState,
+        searchExecutors,
+        widgetMapping,
+        page,
+        perPage,
+      }),
+    );
+  };
 
-export const setGlobalOverrideTimerange = (timerange: TimeRange) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
-  const newGlobalOverride = globalOverride.toBuilder().timerange(timerange).build();
+export const setGlobalOverrideQuery =
+  (queryString: string) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
+    const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
+    const newGlobalOverride = globalOverride.toBuilder().query(createElasticsearchQueryString(queryString)).build();
 
-  return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
-};
+    return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
+  };
 
-export const setGlobalOverride = (queryString: string, timerange: TimeRange) => (dispatch: AppDispatch, getState: () => RootState) => {
-  const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
-  const newGlobalOverride = globalOverride.toBuilder()
-    .query(createElasticsearchQueryString(queryString))
-    .timerange(timerange)
-    .build();
+export const setGlobalOverrideTimerange =
+  (timerange: TimeRange) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
+    const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
+    const newGlobalOverride = globalOverride.toBuilder().timerange(timerange).build();
 
-  return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
-};
+    return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
+  };
 
-export const declareParameters = (newParameters: ParameterMap) => async (dispatch: AppDispatch, getState: GetState) => {
-  const parameters = selectParameters(getState()).toArray();
-  const newParametersArray = newParameters.valueSeq().toArray();
-  await dispatch(searchExecutionSlice.actions.addParameterBindings(newParametersArray));
+export const setGlobalOverride =
+  (queryString: string, timerange: TimeRange) => (dispatch: ViewsDispatch, getState: () => RootState) => {
+    const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
+    const newGlobalOverride = globalOverride
+      .toBuilder()
+      .query(createElasticsearchQueryString(queryString))
+      .timerange(timerange)
+      .build();
 
-  return dispatch(setParameters([...parameters, ...newParametersArray]));
-};
+    return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
+  };
 
-export const removeParameter = (parameterName: string) => async (dispatch: AppDispatch, getState: GetState) => {
+export const declareParameters =
+  (newParameters: ParameterMap) => async (dispatch: ViewsDispatch, getState: GetState) => {
+    const parameters = selectParameters(getState()).toArray();
+    const newParametersArray = newParameters.valueSeq().toArray();
+    await dispatch(searchExecutionSlice.actions.addParameterBindings(newParametersArray));
+
+    return dispatch(setParameters([...parameters, ...newParametersArray]));
+  };
+
+export const removeParameter = (parameterName: string) => async (dispatch: ViewsDispatch, getState: GetState) => {
   const parameters = selectParameters(getState());
   const newParameters = parameters.filter((p) => p.name !== parameterName).toArray();
   const parameterBindings = selectParameterBindings(getState());
@@ -208,15 +307,19 @@ export const removeParameter = (parameterName: string) => async (dispatch: AppDi
   return dispatch(searchExecutionSlice.actions.setParameterBindings(newParameterBindings));
 };
 
-export const updateParameter = (parameterName: string, newParameter: Parameter) => async (dispatch: AppDispatch, getState: GetState) => {
-  const parameters = selectParameters(getState());
-  const newParameters = parameters.map((p) => (p.name === parameterName ? newParameter : p)).toArray();
-  const parameterBindings = selectParameterBindings(getState());
+export const updateParameter =
+  (parameterName: string, newParameter: Parameter) => async (dispatch: ViewsDispatch, getState: GetState) => {
+    const parameters = selectParameters(getState());
+    const newParameters = parameters.map((p) => (p.name === parameterName ? newParameter : p)).toArray();
+    const parameterBindings = selectParameterBindings(getState());
 
-  if (!trim(parameterBindings.get(parameterName, ParameterBinding.empty()).value) && newParameter.defaultValue) {
-    const newParameterBindings = parameterBindings.set(parameterName, ParameterBinding.forValue(newParameter.defaultValue));
-    await dispatch(searchExecutionSlice.actions.setParameterBindings(newParameterBindings));
-  }
+    if (!trim(parameterBindings.get(parameterName, ParameterBinding.empty()).value) && newParameter.defaultValue) {
+      const newParameterBindings = parameterBindings.set(
+        parameterName,
+        ParameterBinding.forValue(newParameter.defaultValue),
+      );
+      await dispatch(searchExecutionSlice.actions.setParameterBindings(newParameterBindings));
+    }
 
-  return dispatch(setParameters(newParameters));
-};
+    return dispatch(setParameters(newParameters));
+  };

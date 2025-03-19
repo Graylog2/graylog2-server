@@ -24,31 +24,29 @@ import { SessionStore } from 'stores/sessions/SessionStore';
 
 type ListResponse = {
   nodes: Array<NodeInfo>;
-
-}
-type NodesActionsType = {
-  list: () => Promise<ListResponse>,
 };
-export const NodesActions = singletonActions(
-  'core.Nodes',
-  () => Reflux.createActions<NodesActionsType>({
+type NodesActionsType = {
+  list: () => Promise<ListResponse>;
+};
+export const NodesActions = singletonActions('core.Nodes', () =>
+  Reflux.createActions<NodesActionsType>({
     list: { asyncResult: true },
   }),
 );
 export type NodeInfo = {
-  cluster_id: string,
-  hostname: string,
-  is_leader: boolean,
-  last_seen: string,
-  node_id: string,
-  short_node_id: string,
-  transport_address: string,
-  type: 'server',
+  cluster_id: string;
+  hostname: string;
+  is_leader: boolean;
+  last_seen: string;
+  node_id: string;
+  short_node_id: string;
+  transport_address: string;
+  type: 'server';
 };
 
 type NodesListResponse = {
-  nodes: Array<NodeInfo> | null | undefined,
-  total: number,
+  nodes: Array<NodeInfo> | null | undefined;
+  total: number;
 };
 
 export type NodesStoreState = {
@@ -56,9 +54,8 @@ export type NodesStoreState = {
   clusterId: string;
   nodeCount: number;
 };
-export const NodesStore = singletonStore(
-  'core.Nodes',
-  () => Reflux.createStore<NodesStoreState>({
+export const NodesStore = singletonStore('core.Nodes', () =>
+  Reflux.createStore<NodesStoreState>({
     listenables: [NodesActions],
     nodes: undefined,
     clusterId: undefined,
@@ -88,23 +85,25 @@ export const NodesStore = singletonStore(
     },
 
     list() {
-      const promise = this.promises.list || fetchPeriodically('GET', qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
-        .then((response: NodesListResponse) => {
-          this.nodes = {};
+      const promise =
+        this.promises.list ||
+        fetchPeriodically('GET', qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
+          .then((response: NodesListResponse) => {
+            this.nodes = {};
 
-          if (response.nodes) {
-            this.nodes = response.nodes
-              .map<[string, NodeInfo]>((node) => [node.node_id, node])
-              .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+            if (response.nodes) {
+              this.nodes = response.nodes
+                .map<[string, NodeInfo]>((node) => [node.node_id, node])
+                .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
 
-            this.clusterId = this._clusterId();
-            this.nodeCount = this._nodeCount();
-            this._propagateState();
-          }
+              this.clusterId = this._clusterId();
+              this.nodeCount = this._nodeCount();
+              this._propagateState();
+            }
 
-          return response;
-        })
-        .finally(() => delete this.promises.list);
+            return response;
+          })
+          .finally(() => delete this.promises.list);
 
       this.promises.list = promise;
 
@@ -116,9 +115,11 @@ export const NodesStore = singletonStore(
     },
 
     _clusterId() {
-      const nodeInCluster = Object.keys(this.nodes).map((id) => this.nodes[id]).find((node) => node.cluster_id);
+      const nodeInCluster = Object.keys(this.nodes)
+        .map((id) => this.nodes[id])
+        .find((node) => node.cluster_id);
 
-      return (nodeInCluster ? nodeInCluster.cluster_id.toUpperCase() : undefined);
+      return nodeInCluster ? nodeInCluster.cluster_id.toUpperCase() : undefined;
     },
 
     _nodeCount() {

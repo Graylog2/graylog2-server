@@ -240,6 +240,11 @@
             <artifactId>jjwt-jackson</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-backward-codecs</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
@@ -726,6 +731,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
+                            <includeScope>runtime</includeScope>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
@@ -834,6 +840,25 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <RestrictImports>
+                            <groups>
+                                <group>
+                                    <reason>Data Node packages must be allowed for the data-node/ module.</reason>
+                                    <allowedImports>
+                                        <allowedImport>org.graylog.datanode.**</allowedImport>
+                                    </allowedImports>
+                                </group>
+                            </groups>
+                        </RestrictImports>
+                    </rules>
+                </configuration>
             </plugin>
         </plugins>
     </build>

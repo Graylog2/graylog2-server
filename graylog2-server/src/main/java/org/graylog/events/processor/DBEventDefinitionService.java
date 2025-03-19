@@ -16,18 +16,21 @@
  */
 package org.graylog.events.processor;
 
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import org.bson.conversions.Bson;
 import org.graylog.events.notifications.EventNotificationConfig;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.NonDeletableSystemScope;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
@@ -38,6 +41,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -49,6 +53,7 @@ import java.util.stream.Stream;
 import static com.mongodb.client.model.Filters.elemMatch;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
+import static org.graylog.events.processor.EventDefinitionDto.FIELD_TITLE;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.stream;
 
@@ -56,6 +61,7 @@ public class DBEventDefinitionService {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
 
     public static final String COLLECTION_NAME = "event_definitions";
+    public static final String SYSTEM_NOTIFICATION_EVENT_DEFINITION = "System notification events";
 
     private final MongoCollection<EventDefinitionDto> collection;
     private final MongoUtils<EventDefinitionDto> mongoUtils;
@@ -175,44 +181,51 @@ public class DBEventDefinitionService {
     }
 
     /**
-     * Returns the list of event definitions that is using the given notification ID.
+     * Returns the stream of event definitions that is using the given notification ID.
      *
      * @param notificationId the notification ID
-     * @return the event definitions with the given notification ID
+     * @return stream of the event definitions with the given notification ID
      */
-    public List<EventDefinitionDto> getByNotificationId(String notificationId) {
+    @MustBeClosed
+    public Stream<EventDefinitionDto> streamByNotificationId(String notificationId) {
         final String field = String.format(Locale.US, "%s.%s",
                 EventDefinitionDto.FIELD_NOTIFICATIONS,
                 EventNotificationConfig.FIELD_NOTIFICATION_ID);
-        return stream(collection.find(eq(field, notificationId))).toList();
+        return stream(collection.find(eq(field, notificationId)));
     }
 
     /**
-     * Returns the list of system event definitions
+     * Returns the stream of system event definitions
      *
-     * @return the matching event definitions
+     * @return stream of the matching event definitions
      */
-    public List<EventDefinitionDto> getSystemEventDefinitions() {
-        return stream(collection.find(eq(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME))).toList();
+    @MustBeClosed
+    public Stream<EventDefinitionDto> streamSystemEventDefinitions() {
+        return stream(collection.find(
+                Filters.or(
+                        eq(FIELD_TITLE, SYSTEM_NOTIFICATION_EVENT_DEFINITION),
+                        eq(ScopedEntity.FIELD_SCOPE, NonDeletableSystemScope.NAME))));
     }
 
     /**
-     * Returns the list of event definitions that contain the given value in the specified array field
+     * Returns the stream of event definitions that contain the given value in the specified array field.
      */
     @NotNull
-    public List<EventDefinitionDto> getByArrayValue(String arrayField, String field, String value) {
-        return stream(collection.find(elemMatch(arrayField, eq(field, value)))).toList();
+    @MustBeClosed
+    public Stream<EventDefinitionDto> streamByArrayValue(String arrayField, String field, String value) {
+        return stream(collection.find(elemMatch(arrayField, eq(field, value))));
     }
 
     public boolean isMutable(EventDefinitionDto eventDefinition) {
         return scopedEntityMongoUtils.isMutable(eventDefinition);
     }
 
+    @MustBeClosed
     public Stream<EventDefinitionDto> streamAll() {
         return stream(collection.find());
     }
 
-    public List<EventDefinitionDto> getByIds(List<String> ids) {
+    public List<EventDefinitionDto> getByIds(Collection<String> ids) {
         return MongoUtils.stream(collection.find(MongoUtils.stringIdsIn(ids)))
                 .map(this::getEventDefinitionWithRefetchedFilters)
                 .toList();

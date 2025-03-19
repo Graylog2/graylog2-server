@@ -19,41 +19,38 @@ import * as Immutable from 'immutable';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { simpleFields, simpleQueryFields } from 'fixtures/fields';
+import { simpleFields } from 'fixtures/fields';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import { SimpleFieldTypesContextProvider } from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import AggregationWizard from './AggregationWizard';
 
-const widgetConfig = AggregationWidgetConfig
-  .builder()
-  .visualization(DataTable.type)
-  .build();
+const widgetConfig = AggregationWidgetConfig.builder().visualization(DataTable.type).build();
 
 jest.mock('views/hooks/useAggregationFunctions');
 
-const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
-
 describe('AggregationWizard', () => {
-  const renderSUT = (props: Partial<React.ComponentProps<typeof AggregationWizard>> = {}) => render((
-    <TestStoreProvider>
-      <FieldTypesContext.Provider value={fieldTypes}>
-        <AggregationWizard onChange={() => {}}
-                           onCancel={() => {}}
-                           config={widgetConfig}
-                           editing
-                           id="widget-id"
-                           type="AGGREGATION"
-                           fields={Immutable.List([])}
-                           {...props}>
-          <div>The Visualization</div>
-        </AggregationWizard>
-      </FieldTypesContext.Provider>
-    </TestStoreProvider>
-  ));
+  const renderSUT = (props: Partial<React.ComponentProps<typeof AggregationWizard>> = {}) =>
+    render(
+      <TestStoreProvider>
+        <SimpleFieldTypesContextProvider fields={simpleFields().toArray()}>
+          <AggregationWizard
+            onChange={() => {}}
+            onCancel={() => {}}
+            config={widgetConfig}
+            editing
+            id="widget-id"
+            type="AGGREGATION"
+            fields={Immutable.List([])}
+            {...props}>
+            <div>The Visualization</div>
+          </AggregationWizard>
+        </SimpleFieldTypesContextProvider>
+      </TestStoreProvider>,
+    );
 
   useViewsPlugin();
 
@@ -64,20 +61,13 @@ describe('AggregationWizard', () => {
   });
 
   it('should list available aggregation elements in element select', async () => {
-    const config = AggregationWidgetConfig
-      .builder()
-      .visualization(DataTable.type)
-      .build();
+    const config = AggregationWidgetConfig.builder().visualization(DataTable.type).build();
 
     renderSUT({ config });
 
     await userEvent.click(await screen.findByRole('button', { name: /add an element/i }));
     const addElementMenu = await screen.findByRole('menu');
-    const notConfiguredElements = [
-      'Metric',
-      'Grouping',
-      'Sort',
-    ];
+    const notConfiguredElements = ['Metric', 'Grouping', 'Sort'];
 
     notConfiguredElements.forEach((elementTitle) => {
       expect(within(addElementMenu).getByText(elementTitle)).toBeInTheDocument();

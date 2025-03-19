@@ -31,6 +31,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
+import org.graylog.testing.completebackend.apis.inputs.Inputs;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -67,6 +68,7 @@ public class GraylogApis implements GraylogRestApi {
     private final EventDefinitions eventDefinitions;
     private final Dashboards dashboards;
     private final Pipelines pipelines;
+    private final Inputs inputs;
 
     public GraylogApis(GraylogBackend backend) {
         this.backend = backend;
@@ -83,6 +85,7 @@ public class GraylogApis implements GraylogRestApi {
         this.eventDefinitions = new EventDefinitions(this);
         this.dashboards = new Dashboards(this);
         this.pipelines = new Pipelines(this);
+        this.inputs = new Inputs(this);
     }
 
     public RequestSpecification requestSpecification() {
@@ -154,6 +157,10 @@ public class GraylogApis implements GraylogRestApi {
 
     public Pipelines pipelines() {
         return pipelines;
+    }
+
+    public Inputs inputs() {
+        return inputs;
     }
 
     protected RequestSpecification prefix(final Users.User user) {

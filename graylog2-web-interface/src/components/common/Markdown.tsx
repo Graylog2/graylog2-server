@@ -20,11 +20,11 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
 type Props = {
-  text: string,
-}
+  text: string;
+};
 
 const Markdown = ({ text }: Props) => {
-  const markdown = useMemo(() => DOMPurify.sanitize(marked(text ?? '')), [text]);
+  const markdown = useMemo(() => DOMPurify.sanitize(marked(text ?? '', { async: false })), [text]);
 
   // eslint-disable-next-line react/no-danger
   return <div dangerouslySetInnerHTML={{ __html: markdown }} />;

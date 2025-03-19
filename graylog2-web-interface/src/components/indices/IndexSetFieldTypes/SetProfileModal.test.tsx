@@ -16,8 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
-import { QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import selectEvent from 'react-select-event';
 
 import useSetIndexSetProfileMutation from 'components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation';
@@ -25,8 +23,8 @@ import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
 import SetProfileModal from 'components/indices/IndexSetFieldTypes/SetProfileModal';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
-import useRemoveProfileFromIndexMutation
-  from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
+import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const selectItem = async (select: HTMLElement, option: string | RegExp) => {
   selectEvent.openMenu(select);
@@ -34,11 +32,12 @@ const selectItem = async (select: HTMLElement, option: string | RegExp) => {
   return selectEvent.select(select, option);
 };
 
-const renderModal = (currentProfile = 'profile-id-111') => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
-    <SetProfileModal currentProfile={currentProfile} onClose={() => {}} show />
-  </QueryParamProvider>,
-);
+const renderModal = (currentProfile = 'profile-id-111') =>
+  render(
+    <DefaultQueryParamProvider>
+      <SetProfileModal currentProfile={currentProfile} onClose={() => {}} show />
+    </DefaultQueryParamProvider>,
+  );
 
 jest.mock('routing/useParams', () => jest.fn());
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation', () => jest.fn());
@@ -93,7 +92,10 @@ describe('IndexSetFieldTypesList', () => {
     const select = await screen.findByLabelText(/Select profile/i);
     await selectItem(select, 'Profile-2');
     const submit = await screen.findByRole('button', { name: /Set Profile/i, hidden: true });
-    const checkBox = await screen.findByRole('checkbox', { name: /rotate affected indices after change/i, hidden: true });
+    const checkBox = await screen.findByRole('checkbox', {
+      name: /rotate affected indices after change/i,
+      hidden: true,
+    });
     fireEvent.click(checkBox);
     fireEvent.click(submit);
 
@@ -107,7 +109,10 @@ describe('IndexSetFieldTypesList', () => {
   it('run removeProfileFromIndex on submit without rotation', async () => {
     renderModal();
     const removeButton = await screen.findByRole('button', { name: /Remove profile/i, hidden: true });
-    const checkBox = await screen.findByRole('checkbox', { name: /rotate affected indices after change/i, hidden: true });
+    const checkBox = await screen.findByRole('checkbox', {
+      name: /rotate affected indices after change/i,
+      hidden: true,
+    });
     fireEvent.click(checkBox);
     fireEvent.click(removeButton);
 

@@ -16,8 +16,6 @@
  */
 package org.graylog.datanode.opensearch.cli;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryListener;
@@ -26,22 +24,25 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.exec.OS;
+import org.graylog.datanode.configuration.OpensearchConfigurationDir;
+import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.process.CommandLineProcess;
 import org.graylog.datanode.process.CommandLineProcessListener;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
+import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -52,8 +53,7 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     private final CommandLineProcess commandLineProcess;
     private final CommandLineProcessListener resultHandler;
-    private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-    private static final Path CONFIG = Path.of("opensearch.yml");
+
 
     /**
      * as long as OpenSearch is not supported on macOS, we have to fix the jdk path if we want to
@@ -63,7 +63,7 @@ public class OpensearchCommandLineProcess implements Closeable {
      */
     private void fixJdkOnMac(final OpensearchConfiguration config) {
         final var isMacOS = OS.isFamilyMac();
-        final var jdk = config.opensearchDistribution().directory().resolve("jdk.app");
+        final var jdk = config.getOpensearchDistribution().directory().resolve("jdk.app");
         final var jdkNotLinked = !Files.exists(jdk);
         if (isMacOS && jdkNotLinked) {
             // Link System jdk into startup folder, get path:
@@ -90,21 +90,37 @@ public class OpensearchCommandLineProcess implements Closeable {
     }
 
     private void writeOpenSearchConfig(final OpensearchConfiguration config) {
+        final OpensearchConfigurationDir confDir = config.getOpensearchConfigurationDir();
+        config.configFiles().forEach(cf -> persistConfigFile(confDir, cf));
+    }
+
+    private static void persistConfigFile(OpensearchConfigurationDir confDir, DatanodeConfigFile cf) {
         try {
-            final Path configFile = config.datanodeDirectories().createOpensearchProcessConfigurationFile(CONFIG);
-            mapper.writeValue(configFile.toFile(), getOpensearchConfigurationArguments(config));
+            final Path targetFile = confDir.createOpensearchProcessConfigurationFile(cf.relativePath());
+            try (final FileOutputStream file = new FileOutputStream(targetFile.toFile())) {
+                cf.write(file);
+            }
         } catch (IOException e) {
-            throw new RuntimeException("Could not generate OpenSearch config: " + e.getMessage(), e);
+            throw new OpensearchConfigurationException("Failed to create opensearch config file " + cf.relativePath(), e);
         }
     }
 
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
         fixJdkOnMac(config);
         configureOpensearchKeystoreSecrets(config);
-        final Path executable = config.opensearchDistribution().getOpensearchExecutable();
+        final Path executable = config.getOpensearchDistribution().getOpensearchExecutable();
         writeOpenSearchConfig(config);
+        logWarnings(config);
         resultHandler = new CommandLineProcessListener(listener);
         commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, config.getEnv());
+    }
+
+    private void logWarnings(OpensearchConfiguration config) {
+        if (!config.warnings().isEmpty()) {
+            LOG.warn("Your system is overriding forbidden opensearch configuration properties. " +
+                    "This may cause unexpected results and may break in any future release!");
+        }
+        config.warnings().forEach(LOG::warn);
     }
 
     private void configureOpensearchKeystoreSecrets(OpensearchConfiguration config) {
@@ -115,20 +131,6 @@ public class OpensearchCommandLineProcess implements Closeable {
         final Map<String, String> keystoreItems = config.getKeystoreItems();
         keystoreItems.forEach((key, value) -> opensearchCli.keystore().add(key, value));
         LOG.info("Added {} keystore items", keystoreItems.size());
-    }
-
-
-    private static Map<String, Object> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
-        Map<String, Object> allArguments = new LinkedHashMap<>(config.asMap());
-
-        // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,
-        // because we are using tar distriburion and opensearch does this only for docker dist. See opensearch-env script
-        // additionally, the env variables have to be prefixed with opensearch. (e.g. "opensearch.cluster.routing.allocation.disk.threshold_enabled")
-        config.getEnv().getEnv().entrySet().stream()
-                .filter(entry -> entry.getKey().matches("^opensearch\\.[a-z0-9_]+(?:\\.[a-z0-9_]+)+"))
-                .peek(entry -> LOG.info("Detected pass-through opensearch property {}:{}", entry.getKey().substring("opensearch.".length()), entry.getValue()))
-                .forEach(entry -> allArguments.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
-        return allArguments;
     }
 
     public void start() {

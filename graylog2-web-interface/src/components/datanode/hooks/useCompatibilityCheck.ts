@@ -21,8 +21,8 @@ import type { CompatibilityResponseType } from 'components/datanode/Types';
 import { qualifyUrl } from 'util/URLUtils';
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
 const fetchCompatibility = async () => {
   const url = 'datanodes/all/rest/indices-directory/compatibility';
@@ -30,28 +30,30 @@ const fetchCompatibility = async () => {
   return fetch('GET', qualifyUrl(url));
 };
 
-const useCompatibilityCheck = ({ enabled }: Options = { enabled: true }): {
-  data: { [hostname: string]: CompatibilityResponseType },
-  error: Error,
-  refetch: () => void,
-  isInitialLoading: boolean,
-  isError: boolean,
+const useCompatibilityCheck = (
+  { enabled }: Options = { enabled: true },
+): {
+  data: { [hostname: string]: CompatibilityResponseType };
+  error: Error;
+  refetch: () => void;
+  isInitialLoading: boolean;
+  isError: boolean;
 } => {
-  const { data, refetch, isInitialLoading, error, isError } = useQuery<{ [hostname: string]: CompatibilityResponseType }, Error>(
-    ['datanodes', 'compatibility'],
-    () => fetchCompatibility(),
-    {
-      keepPreviousData: true,
-      enabled,
-    });
+  const { data, refetch, isInitialLoading, error, isError } = useQuery<
+    { [hostname: string]: CompatibilityResponseType },
+    Error
+  >(['datanodes', 'compatibility'], () => fetchCompatibility(), {
+    keepPreviousData: true,
+    enabled,
+  });
 
-  return ({
+  return {
     data,
     error,
     refetch,
     isInitialLoading,
     isError,
-  });
+  };
 };
 
 export default useCompatibilityCheck;

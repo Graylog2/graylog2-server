@@ -17,8 +17,6 @@
 import React from 'react';
 import { render, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
-import { QueryParamProvider } from 'use-query-params';
 
 import { indexSets } from 'fixtures/indexSets';
 import { asMock, MockStore } from 'helpers/mocking';
@@ -28,6 +26,7 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import StreamsOverview from './StreamsOverview';
 
@@ -39,11 +38,12 @@ jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
   StreamRulesInputsActions: {
     list: jest.fn(),
   },
-  StreamRulesInputsStore: MockStore(['getInitialState', () => ({
-    inputs: [
-      { id: 'my-id', title: 'input title', name: 'name' },
-    ],
-  })]),
+  StreamRulesInputsStore: MockStore([
+    'getInitialState',
+    () => ({
+      inputs: [{ id: 'my-id', title: 'input title', name: 'name' }],
+    }),
+  ]),
 }));
 
 const attributes = [
@@ -76,23 +76,25 @@ const paginatedStreams = (exampleStream = stream) => ({
 });
 
 describe('StreamsOverview', () => {
-  const renderSut = () => render(
-    <QueryParamProvider adapter={ReactRouter6Adapter}>
-      <StreamsOverview indexSets={indexSets} />
-    </QueryParamProvider>,
-  );
+  const renderSut = () =>
+    render(
+      <DefaultQueryParamProvider>
+        <StreamsOverview indexSets={indexSets} />
+      </DefaultQueryParamProvider>,
+    );
 
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: { ...layoutPreferences, displayedAttributes: ['title', 'description', 'rules'] },
       isInitialLoading: false,
+      refetch: () => {},
     });
 
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
   });
 
   it('should render empty', async () => {
-    const emptyPaginatedStreams = ({
+    const emptyPaginatedStreams = {
       data: {
         pagination: {
           total: 0,
@@ -105,7 +107,7 @@ describe('StreamsOverview', () => {
       },
       refetch: () => {},
       isInitialLoading: false,
-    });
+    };
     asMock(useFetchEntities).mockReturnValue(emptyPaginatedStreams);
 
     renderSut();

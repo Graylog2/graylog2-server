@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -28,7 +30,8 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class PipelineConnections {
+public abstract class PipelineConnections implements MongoEntity,
+        BuildableMongoEntity<PipelineConnections, PipelineConnections.Builder> {
 
     @JsonProperty("id")
     @Nullable
@@ -60,7 +63,7 @@ public abstract class PipelineConnections {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements BuildableMongoEntity.Builder<PipelineConnections, Builder> {
         public abstract PipelineConnections build();
 
         public abstract Builder id(String id);

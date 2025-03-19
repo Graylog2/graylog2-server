@@ -23,17 +23,19 @@ import SearchExplainContext from 'views/components/contexts/SearchExplainContext
 import { IconButton } from 'components/common';
 
 type Props = {
-  activeQuery: string
-  widgetId: string
-}
+  activeQuery: string;
+  widgetId: string;
+};
 
-const WidgetWarmTierAlert = ({ activeQuery, widgetId } : Props) => {
+const WidgetWarmTierAlert = ({ activeQuery, widgetId }: Props) => {
   const { getExplainForWidget } = useContext(SearchExplainContext);
   const view = useView();
   const explainedWidget = getExplainForWidget(activeQuery, widgetId, view.widgetMapping);
 
-  const isWidgetInWarmTier = useMemo(() => explainedWidget?.searched_index_ranges.some((range) => range.is_warm_tiered),
-    [explainedWidget?.searched_index_ranges]);
+  const isWidgetInWarmTier = useMemo(
+    () => explainedWidget?.searched_index_ranges.some((range) => range.is_warm_tiered),
+    [explainedWidget?.searched_index_ranges],
+  );
 
   if (!isWidgetInWarmTier) return null;
 

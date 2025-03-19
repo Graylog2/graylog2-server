@@ -32,7 +32,7 @@ import '@mantine/dropzone/styles.css';
 const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);
 
-root.render((
+root.render(
   <PreflightThemeProvider>
     <GlobalThemeStyles />
     <DefaultQueryClientProvider>
@@ -43,5 +43,5 @@ root.render((
         </>
       </ThemeWrapper>
     </DefaultQueryClientProvider>
-  </PreflightThemeProvider>
-));
+  </PreflightThemeProvider>,
+);

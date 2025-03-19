@@ -24,12 +24,14 @@ import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
-import org.graylog.datanode.opensearch.configuration.beans.OpensearchConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +53,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart();
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
@@ -61,6 +63,10 @@ class SearchableSnapshotsConfigurationBeanTest {
 
         Assertions.assertThat(configurationPart.properties())
                 .containsKeys("s3.client.default.endpoint", "node.search.cache.size");
+    }
+
+    private OpensearchConfigurationParams emptyBuildParams() {
+        return new OpensearchConfigurationParams(Collections.emptyList(), Collections.emptyMap());
     }
 
     @Test
@@ -77,7 +83,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart();
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
@@ -103,7 +109,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 config,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
-        final OpensearchConfigurationPart configurationPart = bean.buildConfigurationPart();
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
 
         Assertions.assertThat(configurationPart.nodeRoles())
                 .isEmpty(); // no search role should be provided
@@ -132,11 +138,33 @@ class SearchableSnapshotsConfigurationBeanTest {
                 () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
 
         // 10GB cache requested on 8GB of free space, needs to throw an exception!
-        Assertions.assertThatThrownBy(bean::buildConfigurationPart)
+        Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(emptyBuildParams()))
                 .isInstanceOf(OpensearchConfigurationException.class)
                 .hasMessageContaining("There is not enough usable space for the node search cache. Your system has only 8gb available");
+    }
 
+    @Test
+    void testRepoConfigWithoutSearchRole(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final S3RepositoryConfiguration config = s3Configuration(Map.of());
 
+        // only path_repo in general datanode configuration
+        final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
+                datanodeConfiguration(Map.of(
+                        "node_roles", "cluster_manager,data,ingest,remote_cluster_client",
+                        "path_repo", "/mnt/data/snapshots",
+                        "node_search_cache_size", "10gb"
+                )),
+                config,
+                () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
+
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+
+        Assertions.assertThat(configurationPart.nodeRoles())
+                .isEmpty(); // no search role should be provided, we have to use only those that are given in the configuration
+
+        Assertions.assertThat(configurationPart.properties())
+                .containsEntry("path.repo", "/mnt/data/snapshots")
+                .doesNotContainEntry("node.search.cache.size", "10gb");
     }
 
     private S3RepositoryConfiguration s3Configuration(Map<String, String> properties) throws RepositoryException, ValidationException {

@@ -21,16 +21,11 @@ import userEvent from '@testing-library/user-event';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import { asMock } from 'helpers/mocking';
-import useAppDispatch from 'stores/useAppDispatch';
-import mockDispatch from 'views/test/mockDispatch';
-import { createSearch } from 'fixtures/searches';
-import type { RootState } from 'views/types';
-import { updateHighlightingRule, removeHighlightingRule } from 'views/logic/slices/highlightActions';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import HighlightingRule from './HighlightingRule';
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/logic/slices/highlightActions', () => ({
   updateHighlightingRule: jest.fn(() => Promise.resolve()),
@@ -41,35 +36,39 @@ describe('HighlightingRule', () => {
   useViewsPlugin();
 
   const rule = Rule.create('response_time', '250', undefined, StaticColor.create('#f44242'));
-  const view = createSearch();
-  const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
 
-  beforeEach(() => {
-    asMock(useAppDispatch).mockReturnValue(dispatch);
-  });
+  const SUT = (props: Partial<React.ComponentProps<typeof HighlightingRule>>) => (
+    <HighlightingRule rule={rule} onUpdate={() => Promise.resolve()} onDelete={() => Promise.resolve()} {...props} />
+  );
 
   it('should display field and value of rule', async () => {
-    render(<HighlightingRule rule={rule} />);
+    render(<SUT />);
 
     await screen.findByText('response_time');
     await screen.findByText(/250/);
   });
 
   it('should update rule if color was changed', async () => {
-    render(<HighlightingRule rule={rule} />);
+    const onUpdate = jest.fn(() => Promise.resolve());
+    render(<SUT onUpdate={onUpdate} />);
 
     const staticColorPicker = await screen.findByTestId('static-color-preview');
     userEvent.click(staticColorPicker);
-
     userEvent.click(await screen.findByTitle(/#fbfdd8/i));
 
     await waitFor(() => {
-      expect(updateHighlightingRule).toHaveBeenCalledWith(rule, { color: StaticColor.create('#fbfdd8') });
+      expect(onUpdate).toHaveBeenCalledWith(
+        rule,
+        rule.field,
+        rule.value,
+        rule.condition,
+        StaticColor.create('#fbfdd8'),
+      );
     });
   });
 
   it('should close popover when color was changed', async () => {
-    render(<HighlightingRule rule={rule} />);
+    render(<SUT />);
 
     const staticColorPicker = await screen.findByTestId('static-color-preview');
     userEvent.click(staticColorPicker);
@@ -83,7 +82,7 @@ describe('HighlightingRule', () => {
 
   describe('rule edit', () => {
     it('should show a edit modal', async () => {
-      render(<HighlightingRule rule={rule} />);
+      render(<SUT />);
       const editIcon = await screen.findByTitle('Edit this Highlighting Rule');
 
       expect(screen.queryByText('Edit Highlighting Rule')).not.toBeInTheDocument();
@@ -95,42 +94,31 @@ describe('HighlightingRule', () => {
   });
 
   describe('rule removal:', () => {
-    let oldConfirm = null;
-    let deleteIcon;
+    const findDeleteIcon = () => screen.findByTitle('Remove this Highlighting Rule');
 
-    beforeEach(async () => {
-      oldConfirm = window.confirm;
-      window.confirm = jest.fn(() => false);
+    useWindowConfirmMock();
 
-      // eslint-disable-next-line testing-library/no-render-in-setup
-      render(<HighlightingRule rule={rule} />);
-
-      deleteIcon = await screen.findByTitle('Remove this Highlighting Rule');
-    });
-
-    afterEach(() => {
-      window.confirm = oldConfirm;
-    });
-
-    it('asks for confirmation before rule is removed', () => {
-      userEvent.click(deleteIcon);
+    it('asks for confirmation before rule is removed', async () => {
+      render(<SUT />);
+      userEvent.click(await findDeleteIcon());
 
       expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove this highlighting?');
     });
 
     it('does not remove rule if confirmation was cancelled', async () => {
-      userEvent.click(deleteIcon);
+      render(<SUT />);
+      userEvent.click(await findDeleteIcon());
 
       await screen.findByText('response_time');
     });
 
     it('removes rule rule if confirmation was acknowledged', async () => {
+      const onDelete = jest.fn(() => Promise.resolve());
+      render(<SUT onDelete={onDelete} />);
       window.confirm = jest.fn(() => true);
-      userEvent.click(deleteIcon);
+      userEvent.click(await findDeleteIcon());
 
-      await waitFor(() => {
-        expect(removeHighlightingRule).toHaveBeenCalledWith(rule);
-      });
+      await waitFor(() => expect(onDelete).toHaveBeenCalledWith(rule));
     });
   });
 });

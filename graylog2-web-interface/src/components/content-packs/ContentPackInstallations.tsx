@@ -26,13 +26,15 @@ type ContentPackInstallationsProps = {
   onUninstall?: (...args: any[]) => void;
 };
 
-class ContentPackInstallations extends React.Component<ContentPackInstallationsProps, {
-  [key: string]: any;
-}> {
+class ContentPackInstallations extends React.Component<
+  ContentPackInstallationsProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     installations: [],
-    onUninstall: () => {
-    },
+    onUninstall: () => {},
   };
 
   constructor(props) {
@@ -55,9 +57,7 @@ class ContentPackInstallations extends React.Component<ContentPackInstallationsP
     };
 
     const installModal = (
-      <BootstrapModalWrapper showModal={this.state.showInstallModal}
-                             onHide={closeShowModal}
-                             bsSize="large">
+      <BootstrapModalWrapper showModal={this.state.showInstallModal} onHide={closeShowModal} bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>View Installation</Modal.Title>
         </Modal.Header>
@@ -72,23 +72,20 @@ class ContentPackInstallations extends React.Component<ContentPackInstallationsP
 
     return (
       <tr key={item}>
-        <td>
-          {item.comment}
-        </td>
+        <td>{item.comment}</td>
         <td>{item.content_pack_revision}</td>
         <td>
           <div className="pull-right">
             <ButtonToolbar>
-              <Button bsStyle="primary"
-                      bsSize="small"
-                      onClick={() => {
-                        onUninstall(item.content_pack_id, item._id);
-                      }}>
+              <Button
+                bsStyle="primary"
+                bsSize="small"
+                onClick={() => {
+                  onUninstall(item.content_pack_id, item._id);
+                }}>
                 Uninstall
               </Button>
-              <Button bsStyle="info"
-                      bsSize="small"
-                      onClick={openShowModal}>
+              <Button bsStyle="info" bsSize="small" onClick={openShowModal}>
                 View
               </Button>
               {installModal}
@@ -102,30 +99,32 @@ class ContentPackInstallations extends React.Component<ContentPackInstallationsP
   // eslint-disable-next-line class-methods-use-this
   headerFormater = (header) => {
     if (header === 'Action') {
-      return (<th className="text-right">{header}</th>);
+      return <th className="text-right">{header}</th>;
     }
 
-    return (<th>{header}</th>);
+    return <th>{header}</th>;
   };
 
   render() {
     const { installations } = this.props;
 
     if (!installations) {
-      return (<Spinner />);
+      return <Spinner />;
     }
 
     const headers = ['Comment', 'Version', 'Action'];
 
     return (
-      <DataTable id="content-packs-versions"
-                 headers={headers}
-                 headerCellFormatter={this.headerFormater}
-                 useNumericSort
-                 sortBy={(c) => c.content_pack_revision.toString()}
-                 dataRowFormatter={this.rowFormatter}
-                 rows={installations}
-                 filterKeys={[]} />
+      <DataTable
+        id="content-packs-versions"
+        headers={headers}
+        headerCellFormatter={this.headerFormater}
+        useNumericSort
+        sortBy={(c) => c.content_pack_revision.toString()}
+        dataRowFormatter={this.rowFormatter}
+        rows={installations}
+        filterKeys={[]}
+      />
     );
   }
 }

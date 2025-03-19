@@ -22,7 +22,6 @@ import styled, { css } from 'styled-components';
 import type QueryResult from 'views/logic/QueryResult';
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
 import SearchPagePreferencesContext from 'views/components/contexts/SearchPagePreferencesContext';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -36,12 +35,14 @@ import type { SidebarAction } from './sidebarActions';
 import sidebarActions from './sidebarActions';
 
 type Props = {
-  children: React.ReactElement,
-  results?: QueryResult
-  searchPageLayout?: SearchPreferencesLayout,
-  sections?: Array<SidebarSection>,
-  actions?: Array<SidebarAction>,
-  forceSideBarPinned?: boolean,
+  actions?: Array<SidebarAction>;
+  children?: React.ReactElement;
+  enableSidebarPinning?: boolean;
+  forceSideBarPinned?: boolean;
+  results?: QueryResult;
+  searchPageLayout?: SearchPreferencesLayout;
+  sections?: Array<SidebarSection>;
+  title: string;
 };
 
 const Container = styled.div`
@@ -50,14 +51,20 @@ const Container = styled.div`
   width: min-content;
 `;
 
-const ContentOverlay = styled.div(({ theme }) => css`
-  position: fixed;
-  inset: 0 0 0 50px;
-  background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
-  z-index: 5;
-`);
+const ContentOverlay = styled.div(
+  ({ theme }) => css`
+    position: fixed;
+    inset: 0 0 0 50px;
+    background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
+    z-index: 5;
+  `,
+);
 
-const _toggleSidebar = (initialSectionKey: string, activeSectionKey: string | undefined | null, setActiveSectionKey) => {
+const _toggleSidebar = (
+  initialSectionKey: string,
+  activeSectionKey: string | undefined | null,
+  setActiveSectionKey,
+) => {
   if (activeSectionKey) {
     setActiveSectionKey(null);
 
@@ -77,13 +84,23 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
   setActiveSectionKey(sectionKey);
 };
 
-const Sidebar = ({ searchPageLayout, results, children, sections = sidebarSections, actions = sidebarActions, forceSideBarPinned = false }: Props) => {
+const Sidebar = ({
+  searchPageLayout = undefined,
+  results = undefined,
+  children = undefined,
+  title,
+  sections = sidebarSections,
+  actions = sidebarActions,
+  forceSideBarPinned = false,
+  enableSidebarPinning = true,
+}: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
-  const queryId = useActiveQueryId();
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned || forceSideBarPinned;
   const initialSectionKey = sections[0].key;
-  const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(searchPageLayout?.config.sidebar.isPinned ? initialSectionKey : null);
+  const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(
+    searchPageLayout?.config.sidebar.isPinned ? initialSectionKey : null,
+  );
   const activeSection = sections.find((section) => section.key === activeSectionKey);
 
   const toggleSidebar = () => {
@@ -97,38 +114,47 @@ const Sidebar = ({ searchPageLayout, results, children, sections = sidebarSectio
     _toggleSidebar(initialSectionKey, activeSectionKey, setActiveSectionKey);
   };
 
-  const selectSidebarSection = (sectionKey: string) => _selectSidebarSection(sectionKey, activeSectionKey, setActiveSectionKey, toggleSidebar);
+  const selectSidebarSection = (sectionKey: string) =>
+    _selectSidebarSection(sectionKey, activeSectionKey, setActiveSectionKey, toggleSidebar);
   const SectionContent = activeSection?.content;
 
   return (
     <Container>
-      <SidebarNavigation activeSection={activeSection}
-                         selectSidebarSection={selectSidebarSection}
-                         sections={sections}
-                         sidebarIsPinned={sidebarIsPinned}
-                         actions={actions} />
+      <SidebarNavigation
+        activeSection={activeSection}
+        selectSidebarSection={selectSidebarSection}
+        sections={sections}
+        sidebarIsPinned={sidebarIsPinned}
+        actions={actions}
+      />
       {activeSection && !!SectionContent && (
-        <ContentColumn closeSidebar={toggleSidebar}
-                       searchPageLayout={searchPageLayout}
-                       sectionTitle={activeSection.title}
-                       forceSideBarPinned={forceSideBarPinned}>
-          <SectionContent results={results}
-                          queryId={queryId}
-                          sidebarChildren={children}
-                          sidebarIsPinned={sidebarIsPinned}
-                          toggleSidebar={toggleSidebar} />
+        <ContentColumn
+          closeSidebar={toggleSidebar}
+          title={title}
+          enableSidebarPinning={enableSidebarPinning}
+          searchPageLayout={searchPageLayout}
+          sectionTitle={activeSection.title}
+          forceSideBarPinned={forceSideBarPinned}>
+          <SectionContent
+            results={results}
+            sidebarChildren={children}
+            sidebarIsPinned={sidebarIsPinned}
+            toggleSidebar={toggleSidebar}
+          />
         </ContentColumn>
       )}
-      {(activeSection && !sidebarIsPinned) && (
-        <ContentOverlay onClick={toggleSidebar} />
-      )}
+      {activeSection && !sidebarIsPinned && <ContentOverlay onClick={toggleSidebar} />}
     </Container>
   );
 };
 
-const SidebarWithContext = ({ children, ...props }: React.ComponentProps<typeof Sidebar>) => (
+const SidebarWithContext = ({ children = undefined, ...props }: React.ComponentProps<typeof Sidebar>) => (
   <SearchPagePreferencesContext.Consumer>
-    {(searchPageLayout) => <Sidebar {...props} searchPageLayout={searchPageLayout}>{children}</Sidebar>}
+    {(searchPageLayout) => (
+      <Sidebar {...props} searchPageLayout={searchPageLayout}>
+        {children}
+      </Sidebar>
+    )}
   </SearchPagePreferencesContext.Consumer>
 );
 

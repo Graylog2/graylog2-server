@@ -17,8 +17,7 @@
 
 import { appPrefixed } from 'util/URLUtils';
 
-const isActiveRoute = (requestPath: string, path: string, end: string = undefined) => (
-  end ? requestPath === appPrefixed(path) : requestPath.indexOf(appPrefixed(path)) === 0
-);
+const isActiveRoute = (requestPath: string, path: string, end: string = undefined) =>
+  end ? requestPath === appPrefixed(path) : requestPath.indexOf(appPrefixed(path)) === 0;
 
 export default isActiveRoute;

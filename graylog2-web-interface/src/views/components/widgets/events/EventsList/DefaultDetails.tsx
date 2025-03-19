@@ -17,35 +17,35 @@
 import React, { useMemo } from 'react';
 
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
-import EventDetailsTable from 'components/events/events/EventDetailsTable';
+import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
 import { detailsAttributes } from 'components/events/Constants';
 import DropdownButton from 'components/bootstrap/DropdownButton';
 import useEventAction from 'components/events/events/hooks/useEventAction';
 
 type Props = {
-  event: Event,
-  eventDefinitionContext: EventDefinitionContext,
+  event: Event;
+  eventDefinitionContext: EventDefinitionContext;
 };
 
 const attributesList = detailsAttributes.map(({ id, title }) => ({ id, title }));
 
 const ActionsWrapper = ({ children }) => (
-  <DropdownButton title="Actions"
-                  buttonTitle="Actions">
+  <DropdownButton title="Actions" buttonTitle="Actions">
     {children}
   </DropdownButton>
 );
 
 const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
   const { moreActions, pluggableActionModals } = useEventAction(event);
-  const meta = useMemo(() => ({ context: { event_definitions: { [event.event_definition_id]: eventDefinitionContext } } }), [event.event_definition_id, eventDefinitionContext]);
+  const meta = useMemo(
+    () => ({ context: { event_definitions: { [event.event_definition_id]: eventDefinitionContext } } }),
+    [event.event_definition_id, eventDefinitionContext],
+  );
 
   return (
     <>
-      <EventDetailsTable attributesList={attributesList} event={event} meta={meta} />
-      <ActionsWrapper>
-        {moreActions}
-      </ActionsWrapper>
+      <GeneralEventDetailsTable attributesList={attributesList} event={event} meta={meta} />
+      <ActionsWrapper>{moreActions}</ActionsWrapper>
       {pluggableActionModals}
     </>
   );

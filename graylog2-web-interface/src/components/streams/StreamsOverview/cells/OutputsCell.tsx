@@ -22,8 +22,8 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import StreamCountBadge from 'components/streams/StreamCountBadge';
 
 type Props = {
-  stream: Stream
-}
+  stream: Stream;
+};
 
 const OutputsCell = ({ stream }: Props) => {
   const buttonRef = useRef();

@@ -483,6 +483,14 @@
                         <groupId>org.apache.directory.api</groupId>
                         <artifactId>api-ldap-schema-data</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcprov-jdk15on</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcpkix-jdk15on</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -614,7 +622,7 @@
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
                                     <artifactId>fb-contrib</artifactId>
-                                    <version>7.6.8</version>
+                                    <version>7.6.9</version>
                                 </plugin>
                             </plugins>
                         </configuration>
@@ -631,14 +639,23 @@
                         <artifactId>maven-pmd-plugin</artifactId>
                         <configuration>
                             <targetJdk>${maven.compiler.target}</targetJdk>
-                            <failOnViolation>false</failOnViolation>
+                            <failurePriority>1</failurePriority>
+                            <printFailingErrors>true</printFailingErrors>
+                            <linkXRef>false</linkXRef>
                             <excludeRoots>
                                 <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
                                 <excludeRoot>${project.build.directory}/generated-test-sources</excludeRoot>
                             </excludeRoots>
+                            <rulesets>
+                                <ruleset>/rulesets/java/maven-pmd-plugin-default.xml</ruleset>
+                                <ruleset>../config/pmd-rules.xml</ruleset>
+                            </rulesets>
                         </configuration>
                         <executions>
                             <execution>
+                                <phase>
+                                    validate
+                                </phase>
                                 <goals>
                                     <goal>check</goal>
                                 </goals>

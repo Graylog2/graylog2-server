@@ -17,9 +17,18 @@
 package org.graylog.plugins.views.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
-public record SearchJobIdentifier(@JsonProperty("id") String id,
-                                  @JsonProperty("search_id") String searchId,
-                                  @JsonProperty("owner") String owner,
-                                  @JsonProperty("executing_node") String executingNodeId) {}
+public record SearchJobIdentifier(@JsonProperty("id")
+                                  @ObjectId
+                                  @Id
+                                  String id,
+                                  @JsonProperty(SEARCH_ID_FIELD) String searchId,
+                                  @JsonProperty(OWNER_FIELD) String owner,
+                                  @JsonProperty(NODE_ID_FIELD) String executingNodeId) {
+    public static final String SEARCH_ID_FIELD = "search_id";
+    public static final String OWNER_FIELD = "owner";
+    public static final String NODE_ID_FIELD = "executing_node";
+}
 

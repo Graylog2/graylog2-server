@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.users;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -27,6 +28,27 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -42,6 +64,7 @@ import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -73,38 +96,15 @@ import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
+import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.net.URI;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -117,6 +117,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -147,6 +148,7 @@ public class UsersResource extends RestResource {
     private final UserSessionTerminationService sessionTerminationService;
     private final DefaultSecurityManager securityManager;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
+    private final ClusterConfigService clusterConfigService;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
@@ -162,7 +164,7 @@ public class UsersResource extends RestResource {
                          RoleService roleService,
                          MongoDBSessionService sessionService,
                          UserSessionTerminationService sessionTerminationService, DefaultSecurityManager securityManager,
-                         GlobalAuthServiceConfig globalAuthServiceConfig) {
+                         GlobalAuthServiceConfig globalAuthServiceConfig, ClusterConfigService clusterConfigService) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -172,6 +174,7 @@ public class UsersResource extends RestResource {
         this.securityManager = securityManager;
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
         this.globalAuthServiceConfig = globalAuthServiceConfig;
+        this.clusterConfigService = clusterConfigService;
     }
 
     /**
@@ -317,12 +320,10 @@ public class UsersResource extends RestResource {
                 builder.roles(userDTO.roles().stream().map(roleNameMap::get).collect(Collectors.toSet()));
             }
             userDTO.authServiceId().ifPresent(
-                    serviceId -> {
-                        builder.authServiceEnabled(activeAuthService.isPresent() && serviceId.equals(activeAuthService.get().id()));
-                    }
+                    serviceId -> builder.authServiceEnabled(activeAuthService.isPresent() && serviceId.equals(activeAuthService.get().id()))
             );
             return builder.build();
-        }).collect(Collectors.toList());
+        }).toList();
 
         final PaginatedList<UserOverviewDTO> userOverviewDTOS = new PaginatedList<>(users, result.pagination().total(),
                 result.pagination().page(), result.pagination().perPage());
@@ -710,6 +711,12 @@ public class UsersResource extends RestResource {
         return TokenList.create(tokenList.build());
     }
 
+    public record GenerateTokenTTL(Optional<Duration> tokenTTL) {
+        public Duration getTTL(Supplier<Duration> defaultSupplier) {
+            return this.tokenTTL.orElseGet(defaultSupplier);
+        }
+    }
+
     @POST
     @Path("{userId}/tokens/{name}")
     @ApiOperation("Generates a new access token for a user")
@@ -717,13 +724,19 @@ public class UsersResource extends RestResource {
     public Token generateNewToken(
             @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
-            @ApiParam(name = "JSON Body", value = "Placeholder because POST requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body) {
-        final User user = loadUserById(userId);
-        final String username = user.getName();
-        if (!isPermitted(USERS_TOKENCREATE, username)) {
-            throw new ForbiddenException("Not allowed to create tokens for user " + username);
+            @ApiParam(name = "JSON Body", value = "Can optionally contain the token's TTL.", defaultValue = "{\"token_ttl\":null}") GenerateTokenTTL body) {
+        final User futureOwner = loadUserById(userId);
+        final User currentUser = getCurrentUser();
+
+        if (currentUser == null) {
+            throw new ForbiddenException("Not allowed to create tokens for unknown user.");
         }
-        final AccessToken accessToken = accessTokenService.create(user.getName(), name);
+        validatePermissionForTokenCreation(currentUser, futureOwner);
+
+        if (body == null) {
+            body = new GenerateTokenTTL(Optional.empty());
+        }
+        final AccessToken accessToken = accessTokenService.create(futureOwner.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
 
         return Token.create(accessToken.getId(), accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }
@@ -753,6 +766,40 @@ public class UsersResource extends RestResource {
         } else {
             throw new NotFoundException("Couldn't find access token for user " + username);
         }
+    }
+
+    @VisibleForTesting
+    void validatePermissionForTokenCreation(User callingUser, User futureOwner) {
+        if (!isPermitted(USERS_TOKENCREATE, callingUser.getName())) {
+            throw new ForbiddenException(callingUser.getName() + " is not allowed to create token.");
+        }
+        if (isAdmin(callingUser)) {
+            // Not throwing an exception here, admin is allowed to create a token.
+            return;
+        }
+        if (!Objects.equals(callingUser.getId(), futureOwner.getId())) {
+            // Only admins are allowed to create tokens for other users, but we already checked for admin above.
+            throw new ForbiddenException("Only admins are allowed to create a token for another user.");
+        }
+        if (!isExternalUserAllowed(callingUser)) {
+            throw new ForbiddenException("External users are not allowed to create tokens.");
+        }
+        if (!isAllowedAsNoAdmin(callingUser)) {
+            throw new ForbiddenException("Only admins are allowed to create tokens.");
+        }
+    }
+
+    private boolean isAdmin(User user) {
+        final String adminRoleId = roleService.getAdminRoleObjectId();
+        return user.getRoleIds().contains(adminRoleId);
+    }
+
+    private boolean isAllowedAsNoAdmin(User user) {
+        return isAdmin(user) || !clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).restrictAccessTokenToAdmins();
+    }
+
+    private boolean isExternalUserAllowed(User user) {
+        return !user.isExternalUser() || clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).allowAccessTokenForExternalUsers();
     }
 
     private User loadUserById(String userId) {
@@ -798,8 +845,8 @@ public class UsersResource extends RestResource {
             wildcardPermissions = userManagementService.getWildcardPermissionsForUser(user);
             grnPermissions = userManagementService.getGRNPermissionsForUser(user);
         } else {
-            wildcardPermissions = ImmutableList.of();
-            grnPermissions = ImmutableList.of();
+            wildcardPermissions = List.of();
+            grnPermissions = List.of();
         }
 
         final Optional<AuthServiceBackendDTO> activeAuthService = globalAuthServiceConfig.getActiveBackendConfig();
@@ -849,7 +896,7 @@ public class UsersResource extends RestResource {
 
     private UserOverviewDTO getAdminUserDTO(AllUserSessions sessions) {
         final Optional<User> optionalAdmin = userManagementService.getRootUser();
-        if (!optionalAdmin.isPresent()) {
+        if (optionalAdmin.isEmpty()) {
             return null;
         }
         final User admin = optionalAdmin.get();

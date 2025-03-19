@@ -23,27 +23,30 @@ import type FetchError from 'logic/errors/FetchError';
 import { defaultOnError } from 'util/conditional/onError';
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const usePipelines = ({ enabled }: Options = { enabled: true }) : {
-  data: Array<PipelineType>,
-  refetch: () => void,
-  isInitialLoading: boolean,
+const usePipelines = (
+  { enabled }: Options = { enabled: true },
+): {
+  data: Array<PipelineType>;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery<Array<PipelineType>, FetchError>(
     ['pipelines'],
-    () => defaultOnError(PipelinesPipelines.getAll(), 'Loading pipelines failed with status', 'Could not load pipelines'),
+    () =>
+      defaultOnError(PipelinesPipelines.getAll(), 'Loading pipelines failed with status', 'Could not load pipelines'),
     {
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? [],
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default usePipelines;

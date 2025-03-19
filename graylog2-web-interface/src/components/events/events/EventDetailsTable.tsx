@@ -19,38 +19,46 @@ import { styled } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
-import useColumnRenderers from 'components/events/events/ColumnRenderers';
+import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
+import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
+import type { Attribute } from 'stores/PaginationTypes';
 
 const TD = styled.td`
   white-space: nowrap;
 `;
 
-type Props = {
-  attributesList: Array<{ id: string, title: string}>,
-  event: Event,
-  meta: EventsAdditionalData,
-}
-
-const EventDetailsTable = ({ event, attributesList, meta }: Props) => {
-  const { attributes: attributesRenderers } = useColumnRenderers();
-
-  return (
-    <Table condensed striped>
-      <tbody>
-        {attributesList.map((attribute) => {
-          const renderCell = attributesRenderers[attribute.id]?.renderCell;
-          const value = event[attribute.id];
-
-          return (
-            <tr key={attribute.id}>
-              <TD><b>{attribute.title}</b></TD>
-              <td>{renderCell ? renderCell(value, event, attribute, meta) : value}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </Table>
-  );
+type Props<T extends EntityBase, M = EventsAdditionalData> = {
+  attributesList: Array<{ id: string; title: string }>;
+  event: T;
+  meta?: M | {};
+  attributesRenderers: ColumnRenderersByAttribute<T, M>;
 };
+
+const EventDetailsTable = <E extends EntityBase = Event>({
+  event,
+  attributesList,
+  meta = {},
+  attributesRenderers,
+}: Props<E>) => (
+  <Table condensed striped>
+    <tbody>
+      {attributesList.map((attribute: Attribute) => {
+        const defaultTypeRenderer = DefaultColumnRenderers.types?.[attribute?.type]?.renderCell;
+        const typeRenderer = attributesRenderers?.types?.[attribute?.type]?.renderCell;
+        const renderCell = attributesRenderers[attribute.id]?.renderCell ?? typeRenderer ?? defaultTypeRenderer;
+        const value = event[attribute.id];
+
+        return (
+          <tr key={attribute.id}>
+            <TD>
+              <b>{attribute.title}</b>
+            </TD>
+            <td>{renderCell ? renderCell(value, event, attribute, meta) : value}</td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </Table>
+);
 
 export default EventDetailsTable;

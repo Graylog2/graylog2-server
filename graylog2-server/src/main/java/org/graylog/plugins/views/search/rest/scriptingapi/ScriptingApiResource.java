@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi;
 
-import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,15 +33,11 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.engine.SearchExecutor;
-import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationTabularResponseCreator;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.MessagesTabularResponseCreator;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryParamsToFullRequestSpecificationMapper;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
@@ -51,8 +46,6 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.utilities.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.util.List;
 import java.util.Set;
@@ -65,26 +58,13 @@ import static org.graylog2.shared.utilities.StringUtils.splitByComma;
 @Consumes({MediaType.APPLICATION_JSON})
 @RequiresAuthentication
 public class ScriptingApiResource extends RestResource implements PluginRestResource {
-
-    private final SearchExecutor searchExecutor;
-    private final EventBus serverEventBus;
-    private final SearchRequestSpecToSearchMapper searchCreator;
-    private final AggregationTabularResponseCreator aggregationTabularResponseCreator;
-    private final MessagesTabularResponseCreator messagesTabularResponseCreator;
+    private final ScriptingApiService service;
     private final QueryParamsToFullRequestSpecificationMapper queryParamsToFullRequestSpecificationMapper;
 
     @Inject
-    public ScriptingApiResource(final SearchExecutor searchExecutor,
-                                final EventBus serverEventBus,
-                                final SearchRequestSpecToSearchMapper searchCreator,
-                                final AggregationTabularResponseCreator aggregationTabularResponseCreator,
-                                final MessagesTabularResponseCreator messagesTabularResponseCreator,
+    public ScriptingApiResource(final ScriptingApiService service,
                                 final QueryParamsToFullRequestSpecificationMapper queryParamsToFullRequestSpecificationMapper) {
-        this.searchExecutor = searchExecutor;
-        this.serverEventBus = serverEventBus;
-        this.searchCreator = searchCreator;
-        this.aggregationTabularResponseCreator = aggregationTabularResponseCreator;
-        this.messagesTabularResponseCreator = messagesTabularResponseCreator;
+        this.service = service;
         this.queryParamsToFullRequestSpecificationMapper = queryParamsToFullRequestSpecificationMapper;
     }
 
@@ -96,18 +76,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @NoAuditEvent("Creating audit event manually in method body.")
     public TabularResponse executeQuery(@ApiParam(name = "queryRequestSpec") @Valid MessagesRequestSpec messagesRequestSpec,
                                         @Context SearchUser searchUser) {
-
         try {
-            //Step 1: map simple request to more complex search
-            Search search = searchCreator.mapToSearch(messagesRequestSpec, searchUser);
-
-            //Step 2: execute search as we usually do
-            final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
-            postAuditEvent(searchJob);
-
-            //Step 3: take complex response and try to map it to simpler, tabular form
-            return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob, searchUser, getSubject());
-
+            return service.executeQuery(messagesRequestSpec, searchUser, getSubject());
         } catch (IllegalArgumentException | ValidationException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
@@ -117,15 +87,15 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @ApiOperation(value = "Execute query specified by query parameters", nickname = "messagesByQueryParameters")
     @Path("messages")
     @NoAuditEvent("Creating audit event manually in method body.")
-    public TabularResponse executeQuery(@ApiParam(name = "query") @QueryParam("query") String query,
-                                        @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
-                                        @ApiParam(name = "stream_categories") @QueryParam("stream_categories") Set<String> streamCategories,
-                                        @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
-                                        @ApiParam(name = "fields") @QueryParam("fields") List<String> fields,
-                                        @ApiParam(name = "sort") @QueryParam("sort") String sort,
-                                        @ApiParam(name = "sort") @QueryParam("sortOrder") SortSpec.Direction sortOrder,
-                                        @ApiParam(name = "from") @QueryParam("from") int from,
-                                        @ApiParam(name = "size") @QueryParam("size") int size,
+    public TabularResponse executeQuery(@ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+                                        @ApiParam(name = "streams", value = "Comma separated list of streams to search in") Set<String> streams,
+                                        @ApiParam(name = "stream_categories", value = "Comma separated list of streams categories to search in") @QueryParam("stream_categories") Set<String> streamCategories,
+                                        @ApiParam(name = "timerange", value = "Timeframe to search in. See method description.", required = true) @QueryParam("timerange") String timerangeKeyword,
+                                        @ApiParam(name = "fields", value = "Fields from the message to show as columns in result") @QueryParam("fields") List<String> fields,
+                                        @ApiParam(name = "sort", value = "Field to sort on") @QueryParam("sort") String sort,
+                                        @ApiParam(name = "sortOrder", value = "Sort order - asc/desc") @QueryParam("sortOrder") SortSpec.Direction sortOrder,
+                                        @ApiParam(name = "from", value = "For paging results. Starting from result") @QueryParam("from") int from,
+                                        @ApiParam(name = "size", value = "Page size") @QueryParam("size") int size,
                                         @Context SearchUser searchUser) {
 
         try {
@@ -138,8 +108,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                     sortOrder,
                     from,
                     size);
-            return executeQuery(messagesRequestSpec, searchUser);
-        } catch (IllegalArgumentException ex) {
+            return service.executeQuery(messagesRequestSpec, searchUser, getSubject());
+        } catch (IllegalArgumentException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
     }
@@ -153,15 +123,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     public TabularResponse executeQuery(@ApiParam(name = "searchRequestSpec") @Valid AggregationRequestSpec aggregationRequestSpec,
                                         @Context SearchUser searchUser) {
         try {
-            //Step 1: map simple request to more complex search
-            Search search = searchCreator.mapToSearch(aggregationRequestSpec, searchUser);
-
-            //Step 2: execute search as we usually do
-            final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
-            postAuditEvent(searchJob);
-
-            //Step 3: take complex response and try to map it to simpler, tabular form
-            return aggregationTabularResponseCreator.mapToResponse(aggregationRequestSpec, searchJob, searchUser);
+            return service.executeAggregation(aggregationRequestSpec, searchUser);
         } catch (IllegalArgumentException | ValidationException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
@@ -171,12 +133,12 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @ApiOperation(value = "Execute aggregation specified by query parameters", nickname = "aggregateForQueryParameters")
     @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
-    public TabularResponse executeQuery(@ApiParam(name = "query") @QueryParam("query") String query,
-                                        @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
-                                        @ApiParam(name = "stream_categories") @QueryParam("stream_categories") Set<String> streamCategories,
-                                        @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
-                                        @ApiParam(name = "groups") @QueryParam("groups") List<String> groups,
-                                        @ApiParam(name = "metrics") @QueryParam("metrics") List<String> metrics,
+    public TabularResponse executeQuery(@ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+                                        @ApiParam(name = "streams", value = "Comma separated list of streams to search in (can be empty)", required = true) @QueryParam("streams") Set<String> streams,
+                                        @ApiParam(name = "stream_categories", value = "Comma separated list of streams categories to search in (can be empty)", required = true) @QueryParam("stream_categories") Set<String> streamCategories,
+                                        @ApiParam(name = "timerange", value = "Timeframe to search in. See method description.", required = true) @QueryParam("timerange") String timerangeKeyword,
+                                        @ApiParam(name = "group_by", value = "Group aggregation by fields/limits.", required = true) @QueryParam("groups") List<String> groups,
+                                        @ApiParam(name = "metrics", value = "Metrics to be used.", required = true) @QueryParam("metrics") List<String> metrics,
                                         @Context SearchUser searchUser) {
         try {
             AggregationRequestSpec aggregationRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(
@@ -187,14 +149,9 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                     splitByComma(groups),
                     splitByComma(metrics)
             );
-            return executeQuery(aggregationRequestSpec, searchUser);
-        } catch (IllegalArgumentException ex) {
+            return service.executeAggregation(aggregationRequestSpec, searchUser);
+        } catch (IllegalArgumentException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
-    }
-
-    private void postAuditEvent(SearchJob searchJob) {
-        final SearchJobExecutionEvent searchJobExecutionEvent = SearchJobExecutionEvent.create(getCurrentUser(), searchJob, DateTime.now(DateTimeZone.UTC));
-        this.serverEventBus.post(searchJobExecutionEvent);
     }
 }

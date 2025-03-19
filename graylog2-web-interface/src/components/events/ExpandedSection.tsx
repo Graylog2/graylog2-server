@@ -14,36 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 
-import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
-import type { Attribute } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
-import EventDetailsTable from 'components/events/events/EventDetailsTable';
+import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
+import useNonDisplayedAttributes from 'components/events/events/hooks/useNonDisplayedAttributes';
+import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
 type Props = {
-  defaultLayout: Parameters<typeof useTableLayout>[0],
-  event: Event,
-}
+  defaultLayout: DefaultLayout;
+  event: Event;
+};
 
 const ExpandedSection = ({ defaultLayout, event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
-  const { layoutConfig: { displayedAttributes }, isInitialLoading } = useTableLayout(defaultLayout);
-  const { attributes } = useTableFetchContext();
 
-  const nonDisplayedAttributes = useMemo(() => {
-    if (isInitialLoading) return [];
-
-    const displayedAttributesSet = new Set(displayedAttributes);
-
-    return attributes.filter(({ id }) => !displayedAttributesSet.has(id)).map(({ id, title }: Attribute) => ({ id, title }));
-  }, [attributes, displayedAttributes, isInitialLoading]);
+  const nonDisplayedAttributes = useNonDisplayedAttributes(defaultLayout);
 
   if (!nonDisplayedAttributes.length) return <em>No further details</em>;
 
-  return <EventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />;
+  return <GeneralEventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />;
 };
 
 export default ExpandedSection;

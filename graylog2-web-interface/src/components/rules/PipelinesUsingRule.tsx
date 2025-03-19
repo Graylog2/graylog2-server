@@ -27,32 +27,31 @@ type PipelinesUsingRuleProps = {
   create: boolean;
 };
 
-const PipelinesUsingRule = ({
-  create,
-}: PipelinesUsingRuleProps) => {
+const PipelinesUsingRule = ({ create }: PipelinesUsingRuleProps) => {
   const { usedInPipelines } = useContext(PipelineRulesContext);
 
   if (create) {
     return null;
   }
 
-  const formattedPipelines = () => usedInPipelines.map((pipeline) => (
-    <li key={pipeline.id}>
-      <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
-        {pipeline.title}
-      </Link>
-    </li>
-  ));
+  const formattedPipelines = () =>
+    usedInPipelines.map((pipeline) => (
+      <li key={pipeline.id}>
+        <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>{pipeline.title}</Link>
+      </li>
+    ));
 
   return (
-    <Input id="used-in-pipelines" label="Used in pipelines" help="Pipelines that use this rule in one or more of their stages.">
+    <Input
+      id="used-in-pipelines"
+      label="Used in pipelines"
+      help="Pipelines that use this rule in one or more of their stages.">
       <div className="form-control-static">
-        {usedInPipelines.length === 0
-          ? 'This rule is not being used in any pipelines.' : (
-            <ul className={RuleFormStyle.usedInPipelines}>
-              {formattedPipelines()}
-            </ul>
-          )}
+        {usedInPipelines.length === 0 ? (
+          'This rule is not being used in any pipelines.'
+        ) : (
+          <ul className={RuleFormStyle.usedInPipelines}>{formattedPipelines()}</ul>
+        )}
       </div>
     </Input>
   );

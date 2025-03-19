@@ -45,10 +45,12 @@ export const DEFAULT_LAYOUT = {
 
 const COLUMNS_ORDER = ['field_name', 'type', 'origin', 'is_reserved'];
 
-const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(({ theme, $value }) => css`
-  color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
-  margin-right: 5px;
-`);
+const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(
+  ({ theme, $value }) => css`
+    color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
+    margin-right: 5px;
+  `,
+);
 const isEntitySelectable = (fieldType: IndexSetFieldType) => !fieldType.isReserved;
 const FilterValueRenderers = {
   is_reserved: (value: 'true' | 'false', title: string) => (
@@ -66,50 +68,59 @@ const IndexSetFieldTypesList = () => {
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
   const customColumnRenderers = useCustomColumnRenderers();
 
-  const onSubmitCallback = useCallback((response: FieldTypePutResponse, refetchFieldTypes: () => void) => {
-    const newEntityFieldName = response?.[indexSetId]?.fieldName;
+  const onSubmitCallback = useCallback(
+    (response: FieldTypePutResponse, refetchFieldTypes: () => void) => {
+      const newEntityFieldName = response?.[indexSetId]?.fieldName;
 
-    if (newEntityFieldName && selectedEntitiesData[newEntityFieldName]) {
-      setSelectedEntitiesData({ ...selectedEntitiesData, [newEntityFieldName]: response[indexSetId] });
-    }
+      if (newEntityFieldName && selectedEntitiesData[newEntityFieldName]) {
+        setSelectedEntitiesData({ ...selectedEntitiesData, [newEntityFieldName]: response[indexSetId] });
+      }
 
-    refetchFieldTypes();
-  }, [indexSetId, selectedEntitiesData]);
-  const indexFieldTypeChangeAllowed = useMemo(() => isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
-  const renderActions = useCallback((fieldType: IndexSetFieldType) => (
-    <FieldTypeActions fieldType={fieldType}
-                      indexSetId={indexSetId}
-                      onSubmitCallback={onSubmitCallback} />
-  ), [indexSetId, onSubmitCallback]);
-
-  const bulkSelection = useMemo(() => ({
-    onChangeSelection: (selectedItemsIds: Array<string>, list: Array<IndexSetFieldType>) => {
-      setSelectedEntitiesData((cur) => {
-        const selectedItemsIdsSet = new Set(selectedItemsIds);
-        const filtratedCurrentItems = pickBy(cur, (_, fieldName) => selectedItemsIdsSet.has(fieldName));
-        const filtratedCurrentEntries = list.filter(({ fieldName }) => selectedItemsIdsSet.has(fieldName));
-        const listOfCurrentEntries = keyBy(filtratedCurrentEntries, 'id');
-
-        return ({ ...filtratedCurrentItems, ...listOfCurrentEntries });
-      });
+      refetchFieldTypes();
     },
-    actions: <BulkActions indexSetId={indexSetId} selectedEntitiesData={selectedEntitiesData} />,
-    isEntitySelectable,
-  }), [indexSetId, selectedEntitiesData]);
+    [indexSetId, selectedEntitiesData],
+  );
+  const indexFieldTypeChangeAllowed = useMemo(() => isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
+  const renderActions = useCallback(
+    (fieldType: IndexSetFieldType) => (
+      <FieldTypeActions fieldType={fieldType} indexSetId={indexSetId} onSubmitCallback={onSubmitCallback} />
+    ),
+    [indexSetId, onSubmitCallback],
+  );
+
+  const bulkSelection = useMemo(
+    () => ({
+      onChangeSelection: (selectedItemsIds: Array<string>, list: Array<IndexSetFieldType>) => {
+        setSelectedEntitiesData((cur) => {
+          const selectedItemsIdsSet = new Set(selectedItemsIds);
+          const filtratedCurrentItems = pickBy(cur, (_, fieldName) => selectedItemsIdsSet.has(fieldName));
+          const filtratedCurrentEntries = list.filter(({ fieldName }) => selectedItemsIdsSet.has(fieldName));
+          const listOfCurrentEntries = keyBy(filtratedCurrentEntries, 'id');
+
+          return { ...filtratedCurrentItems, ...listOfCurrentEntries };
+        });
+      },
+      actions: <BulkActions indexSetId={indexSetId} selectedEntitiesData={selectedEntitiesData} />,
+      isEntitySelectable,
+    }),
+    [indexSetId, selectedEntitiesData],
+  );
 
   return (
-    <PaginatedEntityTable<IndexSetFieldType> humanName="index set field types"
-                                             columnsOrder={COLUMNS_ORDER}
-                                             entityActions={indexFieldTypeChangeAllowed && renderActions}
-                                             tableLayout={DEFAULT_LAYOUT}
-                                             topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile />}
-                                             fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
-                                             keyFn={keyFn}
-                                             bulkSelection={bulkSelection}
-                                             expandedSectionsRenderer={expandedSections}
-                                             entityAttributesAreCamelCase
-                                             filterValueRenderers={FilterValueRenderers}
-                                             columnRenderers={customColumnRenderers} />
+    <PaginatedEntityTable<IndexSetFieldType>
+      humanName="index set field types"
+      columnsOrder={COLUMNS_ORDER}
+      entityActions={indexFieldTypeChangeAllowed && renderActions}
+      tableLayout={DEFAULT_LAYOUT}
+      topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile />}
+      fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
+      keyFn={keyFn}
+      bulkSelection={bulkSelection}
+      expandedSectionsRenderer={expandedSections}
+      entityAttributesAreCamelCase
+      filterValueRenderers={FilterValueRenderers}
+      columnRenderers={customColumnRenderers}
+    />
   );
 };
 

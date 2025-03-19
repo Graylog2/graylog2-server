@@ -21,10 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
-import org.mongojack.DBQuery;
-import org.mongojack.DBUpdate;
 
-import java.util.Map;
 import java.util.Optional;
 
 @JsonTypeInfo(
@@ -57,19 +54,6 @@ public interface JobSchedule {
      */
     @JsonIgnore
     Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock);
-
-    /**
-     * Returns a map with the schedule data. This can be used to update a MongoDB document with schedule
-     * data. (see {@link org.mongojack.JacksonDBCollection#update(DBQuery.Query, DBUpdate.Builder) JacksonDBCollection#update()})
-     *
-     * @param fieldPrefix the field prefix to use for the map key
-     * @return filled optional with a map, empty optional if there is no update data
-     * @deprecated This method won't be called by the persistence layer anymore.
-     */
-    @Deprecated
-    default Optional<Map<String, Object>> toDBUpdate(String fieldPrefix) {
-        return Optional.empty();
-    }
 
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)

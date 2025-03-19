@@ -15,38 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import { Button } from 'components/bootstrap';
 import { asMock } from 'helpers/mocking';
 import useStreams from 'components/streams/hooks/useStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
-import { useInputSetupWizard, InputSetupWizardProvider } from 'components/inputs/InputSetupWizard';
-import type { WizardData } from 'components/inputs/InputSetupWizard';
 
-import InputSetupWizard from './InputSetupWizard';
+import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
+import InputSetupWizard from './Wizard';
 
-const OpenWizardTestButton = ({ wizardData } : { wizardData: WizardData}) => {
-  const { openWizard } = useInputSetupWizard();
-
-  return (<Button onClick={() => openWizard(wizardData)}>Open Wizard!</Button>);
+const input = {
+  id: 'inputId',
+  title: 'inputTitle',
+  type: 'type',
+  global: false,
+  name: 'inputName',
+  created_at: '',
+  creator_user_id: 'creatorId',
+  static_fields: {},
+  attributes: {},
 };
 
-const CloseWizardTestButton = () => {
-  const { closeWizard } = useInputSetupWizard();
+const onClose = jest.fn();
 
-  return (<Button onClick={closeWizard}>Close Wizard!</Button>);
-};
-
-const renderWizard = (wizardData: WizardData = {}) => (
+const renderWizard = () =>
   render(
     <InputSetupWizardProvider>
-      <OpenWizardTestButton wizardData={wizardData} />
-      <CloseWizardTestButton />
-      <InputSetupWizard />
+      <InputSetupWizard show input={input} onClose={onClose} />
     </InputSetupWizardProvider>,
-  )
-);
+  );
 
 jest.mock('components/streams/hooks/useStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
@@ -76,28 +73,8 @@ describe('InputSetupWizard', () => {
   it('should render the wizard and shows routing step as first step', async () => {
     renderWizard();
 
-    const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
-
-    fireEvent.click(openButton);
-
-    const wizard = await screen.findByText('Setup Routing');
+    const wizard = await screen.findByText('Routing');
 
     expect(wizard).toBeInTheDocument();
-  });
-
-  it('should close the wizard', async () => {
-    renderWizard();
-    const openButton = await screen.findByRole('button', { name: /Open Wizard!/ });
-    const closeButton = await screen.findByRole('button', { name: /Close Wizard!/ });
-
-    fireEvent.click(openButton);
-
-    const wizard = await screen.findByText('Setup Routing');
-
-    expect(wizard).toBeInTheDocument();
-
-    fireEvent.click(closeButton);
-
-    expect(wizard).not.toBeInTheDocument();
   });
 });

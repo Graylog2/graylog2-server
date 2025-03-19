@@ -57,9 +57,8 @@ describe('formDataAdapter', () => {
     expect(Object.keys(configuration).sort()).toEqual(Object.keys(mappings).sort());
 
     Object.entries(configuration).forEach(([key, value]) => {
-      const formDataValue = (mappings[key] === 'key' || mappings[key] === 'secret'
-        ? formData[mappings[key]]
-        : formData[mappings[key]].value);
+      const formDataValue =
+        mappings[key] === 'key' || mappings[key] === 'secret' ? formData[mappings[key]] : formData[mappings[key]].value;
 
       expect(value).toEqual(formDataValue);
     });
@@ -97,9 +96,8 @@ describe('formDataAdapter', () => {
         return;
       }
 
-      const formDataValue = (mappings[key] === 'key' || mappings[key] === 'secret'
-        ? formData[mappings[key]]
-        : formData[mappings[key]].value);
+      const formDataValue =
+        mappings[key] === 'key' || mappings[key] === 'secret' ? formData[mappings[key]] : formData[mappings[key]].value;
 
       expect(value).toEqual(formDataValue);
     });
@@ -139,16 +137,19 @@ describe('formDataAdapter', () => {
       global: true,
     };
 
-    const request = testAWSRequest({
-      awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
-      awsCloudWatchAssumeARN: { value: '' },
-      awsCloudWatchAwsKey: { value: 'mykey' },
-      awsEndpointCloudWatch: { value: undefined },
-      awsEndpointDynamoDB: { value: undefined },
-      awsEndpointIAM: { value: undefined },
-      awsEndpointKinesis: { value: undefined },
-      awsCloudWatchAwsSecret: { value: 'mysecret' },
-    }, options);
+    const request = testAWSRequest(
+      {
+        awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
+        awsCloudWatchAssumeARN: { value: '' },
+        awsCloudWatchAwsKey: { value: 'mykey' },
+        awsEndpointCloudWatch: { value: undefined },
+        awsEndpointDynamoDB: { value: undefined },
+        awsEndpointIAM: { value: undefined },
+        awsEndpointKinesis: { value: undefined },
+        awsCloudWatchAwsSecret: { value: 'mysecret' },
+      },
+      options,
+    );
 
     expect(request).toMatchObject(options);
   });

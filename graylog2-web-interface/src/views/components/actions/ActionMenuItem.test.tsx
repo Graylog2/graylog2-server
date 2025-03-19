@@ -25,12 +25,12 @@ import { createSearch } from 'fixtures/searches';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
 import { asMock } from 'helpers/mocking';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import wrapWithMenu from 'helpers/components/wrapWithMenu';
 
 import OriginalActionMenuItem from './ActionMenuItem';
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 const ActionMenuItem = wrapWithMenu(OriginalActionMenuItem);
 
@@ -66,7 +66,7 @@ describe('ActionMenuItem', () => {
   beforeEach(() => {
     const view = createSearch();
     const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
   });
 
   it('should display help text for actions with handler', () => {
@@ -76,12 +76,16 @@ describe('ActionMenuItem', () => {
       help: () => ({ title: 'The help title', description: 'The help description' }),
     };
 
-    render(<ActionMenuItem action={action}
-                           handlerArgs={handlerArgs}
-                           onMenuToggle={() => {}}
-                           overflowingComponents={{ foo: <span /> }}
-                           setOverflowingComponents={() => {}}
-                           type="value" />);
+    render(
+      <ActionMenuItem
+        action={action}
+        handlerArgs={handlerArgs}
+        onMenuToggle={() => {}}
+        overflowingComponents={{ foo: <span /> }}
+        setOverflowingComponents={() => {}}
+        type="value"
+      />,
+    );
 
     expect(screen.getByTestId('menu-item-help')).toBeInTheDocument();
   });
@@ -93,12 +97,16 @@ describe('ActionMenuItem', () => {
       help: () => ({ title: 'The help title', description: 'The help description' }),
     };
 
-    render(<ActionMenuItem action={action}
-                           handlerArgs={handlerArgs}
-                           onMenuToggle={() => {}}
-                           overflowingComponents={{ foo: <span /> }}
-                           setOverflowingComponents={() => {}}
-                           type="value" />);
+    render(
+      <ActionMenuItem
+        action={action}
+        handlerArgs={handlerArgs}
+        onMenuToggle={() => {}}
+        overflowingComponents={{ foo: <span /> }}
+        setOverflowingComponents={() => {}}
+        type="value"
+      />,
+    );
 
     expect(screen.getByTestId('menu-item-help')).toBeInTheDocument();
   });
