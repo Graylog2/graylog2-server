@@ -104,7 +104,7 @@ type FormValues<T extends string | undefined> = T extends undefined
     : never;
 
 const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
-  valuesPrefix,
+  valuesPrefix = undefined,
 }: {
   valuesPrefix?: ValuesPrefix;
 }) => {
