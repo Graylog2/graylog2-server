@@ -35,6 +35,8 @@ type FormValues = {
 type Props = {
   submitForm: (values: FormValues) => void;
   handleBackClick: () => void;
+  prevCreatedStream?: OpenStepsData['SETUP_ROUTING']['newStream'];
+  prevShouldCreateNewPipeline?: OpenStepsData['SETUP_ROUTING']['shouldCreateNewPipeline'];
 };
 
 const NewIndexSetButton = styled(Button)(
@@ -43,7 +45,12 @@ const NewIndexSetButton = styled(Button)(
   `,
 );
 
-const CreateStreamForm = ({ submitForm, handleBackClick }: Props) => {
+const CreateStreamForm = ({
+  submitForm,
+  handleBackClick,
+  prevCreatedStream = undefined,
+  prevShouldCreateNewPipeline = true,
+}: Props) => {
   const [indexSetsRefetchInterval, setIndexSetsRefetchInterval] = useState<false | number>(false);
   const { data: indexSetsData, isSuccess: isIndexSetsSuccess } = useIndexSetsList(false, indexSetsRefetchInterval);
 
@@ -72,16 +79,16 @@ const CreateStreamForm = ({ submitForm, handleBackClick }: Props) => {
 
   const { indexSets } = indexSetsData;
 
-  const initialValues = {
-    description: undefined,
-    title: undefined,
-    index_set_id: indexSets?.find((indexSet) => indexSet.default)?.id,
-    remove_matches_from_default_stream: true,
-    create_new_pipeline: true,
+  const initialFormValues = {
+    description: prevCreatedStream?.description ?? undefined,
+    title: prevCreatedStream?.title ?? undefined,
+    index_set_id: prevCreatedStream?.index_set_id ?? indexSets?.find((indexSet) => indexSet.default)?.id,
+    remove_matches_from_default_stream: prevCreatedStream?.remove_matches_from_default_stream ?? true,
+    create_new_pipeline: prevShouldCreateNewPipeline,
   };
 
   return (
-    <Formik<FormValues> initialValues={initialValues} onSubmit={submitForm} validate={validate}>
+    <Formik<FormValues> initialValues={initialFormValues} onSubmit={submitForm} validate={validate}>
       {({ isValid, isValidating, dirty, values }) => (
         <Form>
           <FormikInput label="Title" name="title" id="title" help="A descriptive name of the new stream" />
@@ -129,7 +136,10 @@ const CreateStreamForm = ({ submitForm, handleBackClick }: Props) => {
           <Row>
             <ButtonCol md={12}>
               <Button onClick={handleBackClick}>Back</Button>
-              <Button bsStyle="primary" type="submit" disabled={isValidating || !isValid || !dirty}>
+              <Button
+                bsStyle="primary"
+                type="submit"
+                disabled={isValidating || !isValid || (!dirty && !prevCreatedStream)}>
                 Next
               </Button>
             </ButtonCol>
