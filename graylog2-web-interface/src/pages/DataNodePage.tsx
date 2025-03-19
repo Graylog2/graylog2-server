@@ -19,13 +19,13 @@ import styled, { css } from 'styled-components';
 
 import type { DataNode } from 'components/datanode/Types';
 import useParams from 'routing/useParams';
-import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
 import DocsHelper from 'util/DocsHelper';
 import { Row, Col, Label } from 'components/bootstrap';
 import { DocumentTitle, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
 import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import useDataNode from 'components/datanode/hooks/useDataNode';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
 const StyledHorizontalDl = styled.dl(
   ({ theme }) => css`
@@ -74,7 +74,7 @@ const DataNodePage = () => {
 
   return (
     <DocumentTitle title={`Data Nodes: ${datanode.hostname}`}>
-      <DataNodesPageNavigation />
+      <ClusterConfigurationPageNavigation />
       <PageHeader
         title={`Data Nodes: ${datanode.hostname}`}
         documentationLink={{
