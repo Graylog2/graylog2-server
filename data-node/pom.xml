@@ -44,7 +44,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.15.0</opensearch.version>
+        <opensearch.version>2.19.1</opensearch.version>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -556,7 +556,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
                             <sha512>
-                                a72f218b581903b1ddf1072498560bc5304516ed57feb39735f920985740366c2779ed9174251a13b9a9dabdfc184119c325bb387dadf96485dc7964ecf32d54
+                                72af27eaab94f0dad092d5a97bfda0baeb995a390cdfb94ce076424216032f0d7c5081001997b95a0954bee15a44b824e8b7ecd2066b920ac6cbb313b7be24de
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -580,7 +580,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
                             <sha512>
-                                866c348ac39b7b35e671917349269383c75e1f9d10768742067807569180d1914fd09c6ae7e71d5e74bd77c8c8165ea17c19290b71f887f074dfe8e68dff66bb
+                                eeffe5b2d3363be9eacf53f87f0b516ccc2b4c39283c190903f3d3d8783bfb2e6b05fc625c5f4a50feb62fd0cf16ee130cf913b2330264502cb033c77a641970
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -606,7 +606,7 @@
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                de44a181133a33a08703e8464b52aa2ac29d1d9918d9478c307b98909a571baaaf0c9dcb664349802c3dd85fa53275bd2228248fd129179631b9096d470eb8d5
+                                a5c4aad59ac2d50cb6be1b7b8dde0cfd43ca5380f8b9b4251ddd24315c818f7cb8c64621aa618738718eb4691725f9de98f9cd9d37ffe60119b32ec7421d02cd
                             </sha512>
                         </configuration>
                     </execution>
@@ -656,6 +656,7 @@
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-security-analytics"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-sql"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-observability"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/query-insights"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-alerting"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-custom-codecs"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-geospatial"/>
@@ -668,6 +669,7 @@
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-security-analytics"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-sql"/>
                                 <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins//opensearch-observability"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins//query-insights"/>
                             </target>
                         </configuration>
                     </execution>
