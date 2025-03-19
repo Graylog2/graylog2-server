@@ -50,16 +50,19 @@ import type Search from 'views/logic/search/Search';
 import { setParameters } from 'views/logic/slices/viewSlice';
 import type { WidgetMapping } from 'views/logic/views/types';
 
+const initialState = {
+  searchTypesToSearch: undefined,
+  executionState: SearchExecutionState.empty(),
+  isLoading: false,
+  result: undefined,
+  jobIds: null,
+};
+
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
-  initialState: {
-    searchTypesToSearch: undefined,
-    executionState: SearchExecutionState.empty(),
-    isLoading: false,
-    result: undefined,
-    jobIds: null,
-  },
+  initialState,
   reducers: {
+    resetState: () => initialState,
     loading: (state) => ({
       ...state,
       isLoading: true,
@@ -125,6 +128,7 @@ export const {
   stopLoading,
   finishedLoading,
   updateGlobalOverride,
+  resetState,
   setSearchTypesToSearch,
   setParameterValues,
   setParameterBindings,
