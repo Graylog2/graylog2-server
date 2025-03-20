@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.users;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -101,10 +102,10 @@ import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -711,8 +712,8 @@ public class UsersResource extends RestResource {
         return TokenList.create(tokenList.build());
     }
 
-    public record GenerateTokenTTL(Optional<Duration> tokenTTL) {
-        public Duration getTTL(Supplier<Duration> defaultSupplier) {
+    public record GenerateTokenTTL(@JsonProperty Optional<PeriodDuration> tokenTTL) {
+        public PeriodDuration getTTL(Supplier<PeriodDuration> defaultSupplier) {
             return this.tokenTTL.orElseGet(defaultSupplier);
         }
     }
@@ -736,7 +737,7 @@ public class UsersResource extends RestResource {
         if (body == null) {
             body = new GenerateTokenTTL(Optional.empty());
         }
-        final AccessToken accessToken = accessTokenService.create(futureOwner.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
+        final AccessToken accessToken = accessTokenService.create(futureOwner.getName(), name, body.getTTL(() -> PeriodDuration.of(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens())));
 
         return Token.create(accessToken.getId(), accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }
