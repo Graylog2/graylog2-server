@@ -144,7 +144,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     }
 
     @Override
-    public MoreSearch.Histogram eventHistogram(int buckets, String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
+    public MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
                                                Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
                                                ZoneId timeZone, Map<String, Set<String>> extraFilters) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
@@ -162,7 +162,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                 .timeZone(timeZone)
                 .minDocCount(0)
                 .extendedBounds(new LongBounds(Tools.buildElasticSearchTimeFormat(timerange.from()), Tools.buildElasticSearchTimeFormat(timerange.to())));
-        
+
         final var dateInterval = new DateHistogramInterval(interval.getQuantity().toString() + interval.getUnit());
 
         if (interval.getQuantity().intValue() > 1) {
