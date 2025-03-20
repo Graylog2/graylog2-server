@@ -36,6 +36,7 @@ import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 
 import java.util.Set;
 
@@ -45,9 +46,11 @@ import java.util.Set;
  */
 public class GraylogNodeModule extends Graylog2Module {
     private final GraylogNodeConfiguration configuration;
+    private final ChainingClassLoader chainingClassLoader;
 
-    public GraylogNodeModule(final GraylogNodeConfiguration configuration) {
+    public GraylogNodeModule(final GraylogNodeConfiguration configuration, final ChainingClassLoader chainingClassLoader) {
         this.configuration = configuration;
+        this.chainingClassLoader = chainingClassLoader;
     }
 
     @Override
@@ -55,7 +58,7 @@ public class GraylogNodeModule extends Graylog2Module {
         bind(GraylogNodeConfiguration.class).toInstance(configuration);
         if (configuration.withMongoDb()) {
             install(new MongoDbConnectionModule());
-            install(new ObjectMapperModule());
+            install(new ObjectMapperModule(chainingClassLoader));
         }
         if (configuration.withScheduler()) {
             install(new SchedulerBindings());
