@@ -19,9 +19,9 @@ package org.graylog.plugins.views.search.searchtypes;
 import org.graylog.plugins.views.search.SearchType;
 
 /**
- * Marker interface for search types that are not search engine related, but Data Warehouse/Iceberg related
+ * Marker interface for search types that are not search engine related, but Data Lake/Iceberg related
  */
-public interface DataWarehouseSearchType extends SearchType {
+public interface DataLakeSearchType extends SearchType {
 
     String PREFIX = "data_warehouse_";
 }
