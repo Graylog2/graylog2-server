@@ -34,7 +34,8 @@ import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/
 import useUserDateTime from 'hooks/useUserDateTime';
 import { toUTCFromTz, adjustFormat } from 'util/DateTime';
 import type { TimeRange } from 'views/logic/queries/Query';
-import { isTypeAbsolute, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 
 const config = AggregationWidgetConfig.builder()
   .visualization('line')
@@ -170,11 +171,13 @@ type Props = MiddleSectionProps & {
 };
 const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fetchEventsHistogram }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
-  const { data, isInitialLoading } = useQuery(
+  const { data, isInitialLoading, refetch } = useQuery(
     ['events', 'histogram', searchParams],
     () => eventsHistogramFetcher(searchParams),
     { keepPreviousData: true },
   );
+
+  useOnRefresh(refetch);
 
   const alerts = parseTypeFilter(searchParams?.filters?.get('alert')?.[0]);
   const onZoom = useCallback(
