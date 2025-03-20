@@ -20,7 +20,6 @@ import com.codahale.metrics.Meter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 
@@ -103,7 +102,7 @@ public class InputFailure implements Failure {
 
     @Nonnull
     @Override
-    public FailureObjectBuilder failureObjectBuilder(ObjectMapper objectMapper, @NonNull Meter invalidTimestampMeter, boolean includeFailedMessage) {
+    public FailureObjectBuilder failureObjectBuilder(ObjectMapper objectMapper, @Nonnull Meter invalidTimestampMeter, boolean includeFailedMessage) {
         FailureObjectBuilder builder = new FailureObjectBuilder(this);
         rawMessage.getLastSourceNode().ifPresent(sourceNode -> builder
                 .put(FIELD_GL2_SOURCE_INPUT, sourceNode.inputId)
