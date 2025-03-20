@@ -25,6 +25,7 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
@@ -34,8 +35,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.AutoDateHistogramAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedAutoDateHistogram;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.LongBounds;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
@@ -47,6 +50,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
@@ -150,12 +154,25 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                 .size(0)
                 .trackTotalHits(true);
 
-        final var histogramAggregation = new AutoDateHistogramAggregationBuilder(histogramAggregationName)
+        final var autoInterval = AutoInterval.create();
+        final var interval = autoInterval.toDateInterval(timerange);
+
+        final var histogramAggregation = new DateHistogramAggregationBuilder(histogramAggregationName)
                 .field(EventDto.FIELD_EVENT_TIMESTAMP)
                 .timeZone(timeZone)
-                .setNumBuckets(buckets);
+                .minDocCount(0)
+                .extendedBounds(new LongBounds(Tools.buildElasticSearchTimeFormat(timerange.from()), Tools.buildElasticSearchTimeFormat(timerange.to())));
+        
+        final var dateInterval = new DateHistogramInterval(interval.getQuantity().toString() + interval.getUnit());
+
+        if (interval.getQuantity().intValue() > 1) {
+            histogramAggregation.fixedInterval(dateInterval);
+        } else {
+            histogramAggregation.calendarInterval(dateInterval);
+        }
 
         final var termsAggregation = AggregationBuilders.terms(termsAggregationName)
+                .minDocCount(0)
                 .field(EventDto.FIELD_ALERT);
 
         searchSourceBuilder.aggregation(histogramAggregation.subAggregation(termsAggregation));
@@ -172,7 +189,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
         final var searchResult = client.search(searchRequest, "Unable to perform search query");
 
-        final ParsedAutoDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
+        final ParsedDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
         final var histogramBuckets = histogramResult.getBuckets();
 
         final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
