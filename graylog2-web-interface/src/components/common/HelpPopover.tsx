@@ -33,7 +33,13 @@ const StyledButton = styled(Button)(
   `,
 );
 
-const DiagnosisHelp = ({ helpText, children = null }: Props) => {
+const StyledIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.warning};
+  `,
+);
+
+const HelpPopover = ({ helpText, children = null }: Props) => {
   const [showHelp, setShowHelp] = useState(false);
   const toggleHelp = () => setShowHelp((cur) => !cur);
 
@@ -47,8 +53,8 @@ const DiagnosisHelp = ({ helpText, children = null }: Props) => {
       closeOnClickOutside
       withinPortal>
       <Popover.Target>
-        <StyledButton bsStyle="transparent" bsSize={children ? 'xs' : 'medium'} onClick={toggleHelp}>
-          {children || <Icon name="question_mark" />}
+        <StyledButton bsStyle="transparent" bsSize={children ? "xsmall" : "medium"} onClick={toggleHelp}>
+          {children || <StyledIcon name="help" type="regular" />}
         </StyledButton>
       </Popover.Target>
       <Popover.Dropdown>{helpText}</Popover.Dropdown>
@@ -56,4 +62,4 @@ const DiagnosisHelp = ({ helpText, children = null }: Props) => {
   );
 };
 
-export default DiagnosisHelp;
+export default HelpPopover;

@@ -36,8 +36,8 @@ import type { InputState } from 'stores/inputs/InputStatesStore';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
-import DiagnosisHelp from 'components/inputs/InputDiagnosis/DiagnosisHelp';
 import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
+import HelpPopover from 'components/common/HelpPopover';
 
 const LeftCol = styled.div(
   ({ theme }) => css`
@@ -207,16 +207,16 @@ const InputDiagnosisPage = () => {
                 {input.attributes?.bind_address && input.attributes?.port && (
                   <>
                     <StyledListGroupItem>
-                      <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_LISTENING_ON}>
+                      <HelpPopover helpText={DIAGNOSIS_HELP.INPUT_LISTENING_ON}>
                         <strong>This Input is listening on</strong>
-                      </DiagnosisHelp>
+                      </HelpPopover>
                       : Bind address {input.attributes?.bind_address}, Port {input.attributes?.port}.
                     </StyledListGroupItem>
                     <StyledListGroupItem>
-                      <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_LISTENING_FOR}>
+                      <HelpPopover helpText={DIAGNOSIS_HELP.INPUT_LISTENING_FOR}>
                         {' '}
                         <strong>This Input is listening for</strong>
-                      </DiagnosisHelp>
+                      </HelpPopover>
                       : {'tcp_keepalive' in (input.attributes || {}) ? 'TCP Traffic.' : 'UDP Traffic.'}
                     </StyledListGroupItem>
                   </>
@@ -231,7 +231,7 @@ const InputDiagnosisPage = () => {
                     data-testid="state-indicator"
                     bsStyle={isInputStateDown ? 'danger' : 'success'}
                   />
-                  <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_STATE} />
+                  <HelpPopover helpText={DIAGNOSIS_HELP.INPUT_STATE} />
                 </>
               }>
               <StyledP>
@@ -262,9 +262,9 @@ const InputDiagnosisPage = () => {
                     <strong>Total Messages received by Input</strong>: {inputMetrics.incomingMessagesTotal} events
                   </StyledListGroupItem>
                   <StyledListGroupItem>
-                    <DiagnosisHelp helpText={DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED}>
+                    <HelpPopover helpText={DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED}>
                       <strong>Empty Messages discarded</strong>
-                    </DiagnosisHelp>
+                    </HelpPopover>
                     : {inputMetrics.emptyMessages}
                   </StyledListGroupItem>
                   {Number.isInteger(inputMetrics.open_connections) &&
@@ -277,9 +277,9 @@ const InputDiagnosisPage = () => {
                   {Number.isInteger(inputMetrics.read_bytes_1sec) &&
                     Number.isInteger(inputMetrics.read_bytes_total) && (
                       <StyledListGroupItem>
-                        <DiagnosisHelp helpText={DIAGNOSIS_HELP.NETWORK_IO}>
+                        <HelpPopover helpText={DIAGNOSIS_HELP.NETWORK_IO}>
                           <strong>Network I/O</strong>
-                        </DiagnosisHelp>
+                        </HelpPopover>
                         :
                         <NetworkStats
                           readBytes1Sec={inputMetrics.read_bytes_1sec}
@@ -299,7 +299,7 @@ const InputDiagnosisPage = () => {
             headerLeftSection={
               <>
                 <StatusColorIndicator bsStyle={hasReceivedMessage ? 'success' : 'gray'} />
-                <DiagnosisHelp helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />
+                <HelpPopover helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />
               </>
             }
             actions={<ShowReceivedMessagesButton input={input} />}>
