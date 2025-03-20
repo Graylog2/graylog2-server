@@ -32,11 +32,6 @@ import static java.util.Objects.requireNonNull;
 public class ObjectMapperModule extends Graylog2Module {
     private final ClassLoader classLoader;
 
-    @VisibleForTesting
-    public ObjectMapperModule() {
-        this(ObjectMapperModule.class.getClassLoader());
-    }
-
     public ObjectMapperModule(ClassLoader classLoader) {
         this.classLoader = requireNonNull(classLoader);
     }
