@@ -246,7 +246,12 @@ const SetupRoutingStep = () => {
         <Row>
           <Col md={12}>
             <StyledHeading>Create new Stream</StyledHeading>
-            <CreateStreamForm submitForm={submitStreamCreation} handleBackClick={handleBackClick} />
+            <CreateStreamForm
+              submitForm={submitStreamCreation}
+              handleBackClick={handleBackClick}
+              prevCreatedStream={stepsData?.SETUP_ROUTING?.newStream}
+              prevShouldCreateNewPipeline={stepsData?.SETUP_ROUTING?.shouldCreateNewPipeline}
+            />
           </Col>
         </Row>
       )}
