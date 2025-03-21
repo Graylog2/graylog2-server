@@ -17,6 +17,7 @@
 import type { PropsWithChildren } from 'react';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import type { ColorVariant } from '@graylog/sawmill';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -24,6 +25,7 @@ import Popover from 'components/common/Popover';
 
 type Props = PropsWithChildren<{
   helpText: string|React.ReactNode;
+  bsStyle?: ColorVariant;
 }>;
 
 const StyledButton = styled(Button)(
@@ -33,13 +35,13 @@ const StyledButton = styled(Button)(
   `,
 );
 
-const StyledIcon = styled(Icon)(
-  ({ theme }) => css`
-    color: ${theme.colors.variant.warning};
+const StyledIcon = styled(Icon)<{ $bsStyle: ColorVariant }>(
+  ({ $bsStyle, theme }) => css`
+    color: ${theme.colors.variant[$bsStyle]};
   `,
 );
 
-const HelpPopoverButton = ({ helpText, children = null }: Props) => {
+const HelpPopoverButton = ({ helpText, bsStyle = "warning", children = null }: Props) => {
   const [showHelp, setShowHelp] = useState(false);
   const toggleHelp = () => setShowHelp((cur) => !cur);
 
@@ -54,7 +56,7 @@ const HelpPopoverButton = ({ helpText, children = null }: Props) => {
       withinPortal>
       <Popover.Target>
         <StyledButton bsStyle="transparent" bsSize={children ? "xsmall" : "medium"} onClick={toggleHelp}>
-          {children || <StyledIcon name="help" type="regular" />}
+          {children || <StyledIcon name="help" type="regular" $bsStyle={bsStyle} />}
         </StyledButton>
       </Popover.Target>
       <Popover.Dropdown>{helpText}</Popover.Dropdown>
