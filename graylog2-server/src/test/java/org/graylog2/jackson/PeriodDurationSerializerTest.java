@@ -19,39 +19,29 @@ package org.graylog2.jackson;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.threeten.extra.PeriodDuration;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@RunWith(Parameterized.class)
 public class PeriodDurationSerializerTest {
     private final ObjectMapper mapper = new ObjectMapperProvider().get();
 
-    private final String input;
-    private final String expectedSerialized;
-
-    public PeriodDurationSerializerTest(String input, String expectedSerialized) {
-        this.input = input;
-        this.expectedSerialized = expectedSerialized;
+    public static Stream<Arguments> data() {
+        return Stream.of(
+                Arguments.of("P1Y", "\"P1Y\""),
+                Arguments.of("PT12H", "\"PT12H\""),
+                Arguments.of("P1YT12H", "\"P1YT12H\"")
+        );
     }
 
-    @Parameterized.Parameters(name = "Input \"{0}\" serializes to \"{1}\"")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {"P1Y", "\"P1Y\""},
-                {"PT12H", "\"PT12H\""},
-                {"P1YT12H", "\"P1YT12H\""}
-        });
-    }
-
-    @Test
-    public void testSerialization() throws JsonProcessingException {
+    @ParameterizedTest(name = "Input \"{0}\" serializes to \"{1}\"")
+    @MethodSource("data")
+    void testSerialization(String input, String expectedSerialized) throws JsonProcessingException {
         final PeriodDuration instance = PeriodDuration.parse(input);
         final String serialized = mapper.writeValueAsString(instance);
         assertThat(serialized).isEqualTo(expectedSerialized);
