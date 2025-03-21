@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.engine.validation;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
@@ -25,9 +26,11 @@ import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.DataLakeSearchType;
 
-import java.util.Optional;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,22 +57,39 @@ public class DataLakeSearchValidator implements SearchValidator {
     public Set<SearchError> validate(final Query query,
                                      final SearchUser searchUser) {
         if (containsDataLakeSearchElements(query)) {
+            Set<SearchError> errors = new HashSet<>();
             final BackendQuery backendQuery = query.query();
             if (!isDataLakeBackend(backendQuery)) {
-                return Set.of(new QueryError(query, "Data Lake query must contain Data Lake Backend"));
+                errors.add(new QueryError(query, "Data Lake query must contain Data Lake Backend"));
             }
             final ImmutableSet<SearchType> searchTypes = query.searchTypes();
             if (searchTypes.size() != 1) {
-                return Set.of(new QueryError(query, "Data Lake query can contain only one search type"));
-            }
-            final Optional<SearchType> first = searchTypes.stream().findFirst();
-
-            final Set<String> streams = first.get().streams();
-            if (streams == null || streams.size() > 1) {
-                return Set.of(new SearchTypeError(query, first.get().id(),
-                        "Data Lake preview can be executed on only 1 stream, search type contained more"));
+                errors.add(new QueryError(query, "Data Lake query can contain only one search type"));
             }
 
+            searchTypes.forEach(searchType -> {
+                final Set<String> streams = searchType.streams();
+                if (streams == null || streams.size() > 1) {
+                    errors.add(new SearchTypeError(query, searchType.id(),
+                            "Data Lake preview can be executed on only 1 stream, search type contained more"));
+                }
+                final Set<String> streamCategories = searchType.streamCategories();
+                if (streamCategories != null && !streamCategories.isEmpty()) {
+                    errors.add(new SearchTypeError(query, searchType.id(),
+                            "Search Type for Data Lake preview cannot use stream categories"));
+                }
+                final List<UsedSearchFilter> searchFilters = searchType.filters();
+                if (searchFilters != null && !searchFilters.isEmpty()) {
+                    errors.add(new SearchTypeError(query, searchType.id(),
+                            "Search Type for Data Lake preview cannot use search filters"));
+                }
+                final Filter filter = searchType.filter();
+                if (filter != null) {
+                    errors.add(new SearchTypeError(query, searchType.id(),
+                            "Search Type for Data Lake preview cannot use 'filter' field"));
+                }
+            });
+            return errors;
         }
         return Set.of();
     }
