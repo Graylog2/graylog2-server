@@ -63,6 +63,7 @@ const Header = styled.div(
     align-items: center;
   `,
 );
+
 const StyledP = styled.p(
   ({ theme }) => css`
     &&.description {
@@ -70,6 +71,7 @@ const StyledP = styled.p(
     }
   `,
 );
+
 const StyledSectionGrid = styled(SectionGrid)<{ $rows?: string }>(
   ({ $rows, theme }) => css`
     grid-template-rows: ${$rows || '1fr'};
@@ -81,6 +83,7 @@ const InputNodeInfo = styled.div`
   max-width: 500px;
   white-space: break-spaces;
 `;
+
 const StyledListGroup = styled(ListGroup)(
   ({ theme }) => css`
     border: 1px solid ${theme.colors.table.row.divider};
@@ -88,12 +91,46 @@ const StyledListGroup = styled(ListGroup)(
     border-radius: ${theme.spacings.xs};
   `,
 );
+
 const StyledListGroupItem = styled(ListGroupItem)`
   background-color: transparent;
 `;
+
 const StyledSpan = styled.span`
   padding-left: ${({ theme }) => theme.spacings.xs};
 `;
+
+const TroubleshootingContainer = styled.div`
+  max-height: 400px;
+  overflow-y: scroll;
+`;
+
+const TroubleshootingHeading = styled.h3(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.md};
+  `,
+);
+
+const Troubleshootingbox = styled.div(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.md};
+  `,
+);
+
+export const StyledList = styled.ul(
+  ({ theme }) => css`
+    list-style-type: disc;
+    padding-left: 20px;
+
+    li {
+      margin-bottom: ${theme.spacings.xs};
+    }
+
+    ul {
+      margin-top: ${theme.spacings.xs};
+    }
+  `,
+);
 
 const NodeListItem = ({
   detailedMessage,
@@ -248,7 +285,89 @@ const InputDiagnosisPage = () => {
               </StyledListGroup>
             </Section>
           </StyledSectionGrid>
-          <Section title="Troubleshooting" />
+          <Section title="Troubleshooting">
+            <TroubleshootingContainer>
+              <Troubleshootingbox>
+                <TroubleshootingHeading>Input is in a failed state.</TroubleshootingHeading>
+                <StyledList>
+                  <li>
+                    When an Input fails on one or more Graylog nodes, the Message field of the State panel will show a
+                    short error message; a full length error message may be found in Graylog’s server.log file.
+                  </li>
+                  <li>
+                    An input configured to use a specified port will fail if that port is privileged (and Graylog is not
+                    running as Root), or already in use by another Input or application.
+                  </li>
+                  <li>An input will fail if it is unable to route to the specified IP.</li>
+                  <li>
+                    An input that requires an internet connection in order to connect to an API will fail if it has no
+                    internet connection or else is unable to route to that API.
+                  </li>
+                  <li>A TCP input will fail if it has an invalid or expired certificate.</li>
+                  <li>
+                    Inputs that connect to an external API (for example, the Microsoft Azure Input) require
+                    configuration changes at the source to enable Graylog to collect logs. The steps required will be
+                    detailed on the appropriate documentation sub-page for that Input. An input that connects to an
+                    external API will fail if incorrectly configured at either the Graylog side, or (as applicable) the
+                    side hosting the API.
+                  </li>
+                </StyledList>
+              </Troubleshootingbox>
+              <Troubleshootingbox>
+                <TroubleshootingHeading>
+                  Input is running on all nodes, but messages are not reaching the Input.
+                </TroubleshootingHeading>
+                <StyledList>
+                  <li>
+                    Check the Network I/O field of the Received Traffic panel. If no traffic is showing here, that
+                    suggests a connectivity problem.
+                    <StyledList>
+                      <li>
+                        If no traffic is showing, first troubleshoot network connectivity between the Graylog server(s)
+                        and the log source. This may be achieved by running ping, telnet or tracert commands.
+                      </li>
+                      <li>
+                        For Inputs that connect to an external API, check Graylog’s server.log file - authentication
+                        failures (invalid logins or permissions to perform the action on the API) will be printed in
+                        full here.
+                      </li>
+                    </StyledList>
+                  </li>
+
+                  <li>
+                    If traffic is showing on the Network I/O field of the Received Traffic panel, but no messages have
+                    been received, this suggests the messages are not being sent in a format appropriate to the Input.
+                    <StyledList>
+                      <li>TCP input cannot read UDP traffic, and vice versa.</li>
+                      <li>
+                        A message with no content will be discarded. This can be monitored via the Empty Messages
+                        Discarded field.
+                      </li>
+                      <li>
+                        Listener Inputs expect messages in a limited range of formats and may be unable to read messages
+                        in foreign formats. For troubleshooting purposes, the Raw Text Input has the most permissive
+                        requirements.
+                      </li>
+                    </StyledList>
+                  </li>
+                </StyledList>
+              </Troubleshootingbox>
+              <Troubleshootingbox>
+                <TroubleshootingHeading>
+                  Input is running on all nodes, messages are reaching the Input, but some (or all) are showing as
+                  Message Errors.
+                </TroubleshootingHeading>
+                <StyledList>
+                  <li>
+                    On Licensed Enterprise clusters, Failure Processing can be enabled to allow storage of messages that
+                    error at each stage - input, processing, and writing to the search cluster, along with details of
+                    the failure - see the failure_cause and failure_details fields. Navigate to the Message Error panel
+                    and click on the message count to examine individual failed messages.
+                  </li>
+                </StyledList>
+              </Troubleshootingbox>
+            </TroubleshootingContainer>
+          </Section>
           <StyledSectionGrid $columns="1fr" $rows="1fr 1fr">
             <Section
               headerLeftSection={<StatusColorIndicator bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'} />}
