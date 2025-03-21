@@ -107,11 +107,6 @@ public record SearchJobDTO(
     }
 
     public static SearchJobDTO fromSearchJobState(final SearchJobState searchJob) {
-        //TODO: bring back when deprecated method in DataWarehouseQueryResource is gone
-//        if (loadedSearch.isEmpty()) {
-//            //TODO: less hardcore error handling?
-//            throw new IllegalStateException("Search Job stored in the database references missing Search");
-//        }
         final SearchJobStatus status = searchJob.status();
         final ExecutionInfo executionInfo = new ExecutionInfo(
                 status != RUNNING,
