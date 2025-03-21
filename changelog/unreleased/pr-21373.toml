@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix an issue when performing Export to dashboard from the search page and Search filters become hidden, but still apply"
+
+issues = ["graylog-plugin-enterprise#9023"]
+pulls = ["21373"]
