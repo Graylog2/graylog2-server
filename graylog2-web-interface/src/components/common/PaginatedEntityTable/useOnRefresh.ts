@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.searchtypes;
+import { useContext, useEffect } from 'react';
 
-import org.graylog.plugins.views.search.SearchType;
+import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
 
-/**
- * Marker interface for search types that are not search engine related, but Data Warehouse/Iceberg related
- */
-public interface DataWarehouseSearchType extends SearchType {
+const useOnRefresh = (fn: () => void) => {
+  const context = useContext(AutoRefreshContext);
+  useEffect(() => {
+    if (context?.animationId !== null) {
+      fn();
+    }
+  }, [context?.animationId, fn]);
+};
 
-    String PREFIX = "data_warehouse_";
-}
+export default useOnRefresh;

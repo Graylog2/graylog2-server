@@ -58,6 +58,7 @@ const docsHelper = {
     TIME_FRAME_SELECTOR: 'making_sense_of_your_log_data/time_frame_selector.html',
     UPGRADE_GUIDE: 'upgrading_graylog/upgrading_graylog.html',
     USERS_ROLES: 'setting_up_graylog/users_teams.htm',
+    DATA_LAKE_PREVIEW: 'setting_up_graylog/data_lake_preview.htm',
     WELCOME: '', // Welcome page to the documentation
   },
 

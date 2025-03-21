@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
+import moment from 'moment';
 
 import Spinner from 'components/common/Spinner';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -31,7 +32,10 @@ import GenericPlot, { type PlotLayout, type ChartConfig } from 'views/components
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
 import useUserDateTime from 'hooks/useUserDateTime';
-import { toUTCFromTz } from 'util/DateTime';
+import { toUTCFromTz, adjustFormat } from 'util/DateTime';
+import type { TimeRange } from 'views/logic/queries/Query';
+import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 
 const config = AggregationWidgetConfig.builder()
   .visualization('line')
@@ -104,8 +108,19 @@ const layout: Partial<PlotLayout> = {
   legend: { y: yLegendPosition(height) },
 };
 
+const prepareTimeRangeForGraph = (timerange: TimeRange) => {
+  if (isTypeRelativeWithStartOnly(timerange)) {
+    const from = moment().utc().subtract(timerange.range, 'seconds');
+    const to = moment();
+
+    return [adjustFormat(from, 'internal'), adjustFormat(to, 'internal')];
+  }
+
+  return [timerange.from, timerange.to];
+};
+
 const EventsGraph = ({
-  data: { results },
+  data: { results, timerange },
   alerts,
   onZoom,
 }: {
@@ -121,6 +136,17 @@ const EventsGraph = ({
     [alerts, results.buckets.alerts, results.buckets.events],
   );
 
+  const _layout = useMemo(
+    () => ({
+      ...layout,
+      xaxis: {
+        ...layout.xaxis,
+        range: prepareTimeRangeForGraph(timerange),
+      },
+    }),
+    [timerange],
+  );
+
   return (
     <GraphContainer>
       <InteractiveContext.Provider value={false}>
@@ -128,7 +154,7 @@ const EventsGraph = ({
           {(dimensions) => (
             <PlotLegend config={config} chartData={chartData} height={height} width={dimensions.width}>
               <InteractiveContext.Provider value>
-                <GenericPlot chartData={chartData} layout={layout} onZoom={onZoom} setChartColor={defaultSetColor} />
+                <GenericPlot chartData={chartData} layout={_layout} onZoom={onZoom} setChartColor={defaultSetColor} />
               </InteractiveContext.Provider>
             </PlotLegend>
           )}
@@ -145,11 +171,13 @@ type Props = MiddleSectionProps & {
 };
 const EventsHistogram = ({ searchParams, setFilters, eventsHistogramFetcher = fetchEventsHistogram }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
-  const { data, isInitialLoading } = useQuery(
+  const { data, isInitialLoading, refetch } = useQuery(
     ['events', 'histogram', searchParams],
     () => eventsHistogramFetcher(searchParams),
     { keepPreviousData: true },
   );
+
+  useOnRefresh(refetch);
 
   const alerts = parseTypeFilter(searchParams?.filters?.get('alert')?.[0]);
   const onZoom = useCallback(
