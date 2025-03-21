@@ -23,7 +23,7 @@ import { Icon } from 'components/common';
 import Popover from 'components/common/Popover';
 
 type Props = PropsWithChildren<{
-  helpText: string;
+  helpText: string|React.ReactNode;
 }>;
 
 const StyledButton = styled(Button)(
@@ -39,7 +39,7 @@ const StyledIcon = styled(Icon)(
   `,
 );
 
-const HelpPopover = ({ helpText, children = null }: Props) => {
+const HelpPopoverButton = ({ helpText, children = null }: Props) => {
   const [showHelp, setShowHelp] = useState(false);
   const toggleHelp = () => setShowHelp((cur) => !cur);
 
@@ -62,4 +62,4 @@ const HelpPopover = ({ helpText, children = null }: Props) => {
   );
 };
 
-export default HelpPopover;
+export default HelpPopoverButton;
