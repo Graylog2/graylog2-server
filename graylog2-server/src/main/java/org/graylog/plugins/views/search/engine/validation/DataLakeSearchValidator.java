@@ -20,17 +20,18 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.searchtypes.DataWarehouseSearchType;
+import org.graylog.plugins.views.search.searchtypes.DataLakeSearchType;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DataWarehouseSearchValidator implements SearchValidator {
+public class DataLakeSearchValidator implements SearchValidator {
 
     @Override
     public Set<SearchError> validate(final Search search,
@@ -39,9 +40,9 @@ public class DataWarehouseSearchValidator implements SearchValidator {
         assert search.queries() != null;
         assert !search.queries().isEmpty();
 
-        if (containsDataWarehouseSearchElements(search)) {
+        if (containsDataLakeSearchElements(search)) {
             if (search.queries().size() > 1) {
-                return wholeSearchInvalid(search, "Data Warehouse elements present in Search, only 1 query allowed for those type of searches");
+                return wholeSearchInvalid(search, "Data Lake elements present in Search, only 1 query allowed for those type of searches");
             }
             return validate(search.queries().stream().findFirst().get(), searchUser);
         } else {
@@ -52,30 +53,38 @@ public class DataWarehouseSearchValidator implements SearchValidator {
     @Override
     public Set<SearchError> validate(final Query query,
                                      final SearchUser searchUser) {
-        if (containsDataWarehouseSearchElements(query)) {
+        if (containsDataLakeSearchElements(query)) {
+            final BackendQuery backendQuery = query.query();
+            if (!isDataLakeBackend(backendQuery)) {
+                return Set.of(new QueryError(query, "Data Lake query must contain Data Lake Backend"));
+            }
             final ImmutableSet<SearchType> searchTypes = query.searchTypes();
             if (searchTypes.size() != 1) {
-                return Set.of(new QueryError(query, "Data Warehouse query can contain only one search type"));
+                return Set.of(new QueryError(query, "Data Lake query can contain only one search type"));
             }
             final Optional<SearchType> first = searchTypes.stream().findFirst();
 
             final Set<String> streams = first.get().streams();
             if (streams == null || streams.size() > 1) {
                 return Set.of(new SearchTypeError(query, first.get().id(),
-                        "Data Warehouse preview can be executed on only 1 stream, search type contained more"));
+                        "Data Lake preview can be executed on only 1 stream, search type contained more"));
             }
 
         }
         return Set.of();
     }
 
-    public static boolean containsDataWarehouseSearchElements(final Search search) {
-        return search.queries().stream().anyMatch(DataWarehouseSearchValidator::containsDataWarehouseSearchElements);
+    public static boolean containsDataLakeSearchElements(final Search search) {
+        return search.queries().stream().anyMatch(DataLakeSearchValidator::containsDataLakeSearchElements);
     }
 
-    public static boolean containsDataWarehouseSearchElements(final Query query) {
-        return (query.query().type().startsWith(DataWarehouseSearchType.PREFIX))
-                || (query.searchTypes().stream().anyMatch(searchType -> searchType instanceof DataWarehouseSearchType));
+    public static boolean containsDataLakeSearchElements(final Query query) {
+        return isDataLakeBackend(query.query())
+                || (query.searchTypes().stream().anyMatch(searchType -> searchType instanceof DataLakeSearchType));
+    }
+
+    private static boolean isDataLakeBackend(final BackendQuery backendQuery) {
+        return backendQuery.type().startsWith(DataLakeSearchType.PREFIX);
     }
 
     private Set<SearchError> wholeSearchInvalid(final Search search, final String explanation) {

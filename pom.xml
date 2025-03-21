@@ -123,7 +123,7 @@
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.71.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>33.4.0-jre</guava.version>
+        <guava.version>33.4.5-jre</guava.version>
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
@@ -151,7 +151,7 @@
         <log4j.version>2.24.3</log4j.version>
         <lucene.version>9.12.0</lucene.version>
         <metrics.version>4.2.30</metrics.version>
-        <mongodb-driver.version>5.3.1</mongodb-driver.version>
+        <mongodb-driver.version>5.4.0</mongodb-driver.version>
         <mongojack.version>5.0.2</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.119.Final</netty.version>
@@ -195,7 +195,7 @@
         <equalsverifier.version>3.19.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
-        <junit-jupiter.version>5.12.0</junit-jupiter.version>
+        <junit-jupiter.version>5.12.1</junit-jupiter.version>
         <mockito.version>5.16.1</mockito.version>
         <restassured.version>5.5.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
@@ -207,7 +207,7 @@
         <yarn.version>v1.22.22</yarn.version>
 
         <!-- Plugin versions -->
-        <license-maven.version>4.6</license-maven.version>
+        <license-maven.version>5.0.0</license-maven.version>
         <download-maven-plugin.version>1.6.8.1</download-maven-plugin.version>
         <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
@@ -921,6 +921,7 @@
                             org.junit.jupiter.params.shadow.**
                             org.apache.http.util.**
                             io.trino.hadoop.$internal.**
+                            autovalue.shaded.org.**
 
                             @defaultMessage Use jakarta.inject.
                             com.google.inject.Inject
@@ -949,6 +950,7 @@
 
                             org.jetbrains.annotations.NotNull @ Use jakarta.annotation.Nonnull
                             org.jetbrains.annotations.Nullable @ Use jakarta.annotation.Nullable
+                            org.checkerframework.checker.nullness.qual.** @ Use jakarta.annotation.**
 
                             com.mongodb.DuplicateKeyException @ Use org.graylog2.database.utils.MongoUtil#isDuplicateKeyError(MongoException)
 
