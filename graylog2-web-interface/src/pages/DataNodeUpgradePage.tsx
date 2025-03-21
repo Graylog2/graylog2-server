@@ -118,7 +118,7 @@ const DataNodeUpgradePage = () => {
 
   const numberOfNodes = (data?.outdated_nodes?.length || 0) + (data?.up_to_date_nodes?.length || 0);
 
-  const showRollingUpgrade = upgradeMethod === 'rolling-upgrade' && numberOfNodes > 2;
+  const showRollingUpgrade = upgradeMethod === 'rolling-upgrade' && (!!nodeInProgress || numberOfNodes > 2);
 
   return (
     <DocumentTitle title="Data Node Upgrade">
