@@ -737,7 +737,7 @@ public class UsersResource extends RestResource {
         if (body == null) {
             body = new GenerateTokenTTL(Optional.empty());
         }
-        final AccessToken accessToken = accessTokenService.create(futureOwner.getName(), name, body.getTTL(() -> PeriodDuration.of(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens())));
+        final AccessToken accessToken = accessTokenService.create(futureOwner.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
 
         return Token.create(accessToken.getId(), accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }

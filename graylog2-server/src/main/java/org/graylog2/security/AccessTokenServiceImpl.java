@@ -144,7 +144,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public AccessToken create(String username, String name) {
-        final PeriodDuration defaultTTL = PeriodDuration.of(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens());
+        final PeriodDuration defaultTTL = configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens();
         return create(username, name, defaultTTL);
     }
 

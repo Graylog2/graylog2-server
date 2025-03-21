@@ -298,7 +298,7 @@ public class UsersResourceTest {
         when(userManagementService.loadById(USERNAME)).thenReturn(userImplFactory.create(owningUser));
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + callingUserName)).thenReturn(true);
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, false, Duration.ofDays(30)));
+                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, false, PeriodDuration.of(Duration.ofDays(30))));
         when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)))).thenReturn(accessToken);
 
         return Token.create(tokenId.toHexString(), TOKEN_NAME, token, lastAccess);
@@ -324,7 +324,7 @@ public class UsersResourceTest {
         when(userManagementService.loadById(USERNAME)).thenReturn(user);
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(true);
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), allowExternalUser, false, Duration.ofDays(30)));
+                .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), allowExternalUser, false, PeriodDuration.of(Duration.ofDays(30))));
         if (accessToken != null) {
             when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)))).thenReturn(accessToken);
         }
