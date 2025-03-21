@@ -14,14 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.searchtypes;
+package org.graylog2.bootstrap.preflight;
 
-import org.graylog.plugins.views.search.SearchType;
+import org.graylog2.security.encryption.EncryptedValue;
 
-/**
- * Marker interface for search types that are not search engine related, but Data Warehouse/Iceberg related
- */
-public interface DataWarehouseSearchType extends SearchType {
-
-    String PREFIX = "data_warehouse_";
+public record PreflightEncryptedSecret(EncryptedValue encryptedSecret) {
 }

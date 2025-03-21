@@ -36,8 +36,8 @@ const FieldTypeValueRenderer: PluginExports['fieldTypeValueRenderer'] = [
     type: 'boolean',
     render: (value, field, Component) => <Component value={String(value)} field={field} />,
   },
-  { type: 'input', render: (_flied, value) => <InputField value={String(value)} /> },
-  { type: 'node', render: (_flied, value) => <NodeField value={String(value)} /> },
+  { type: 'input', render: (value) => <InputField value={String(value)} /> },
+  { type: 'node', render: (value) => <NodeField value={String(value)} /> },
   {
     type: 'streams',
     render: (value: string | Array<string>) => <StreamsField value={value} />,

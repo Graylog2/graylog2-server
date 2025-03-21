@@ -71,17 +71,28 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
       </StyledP>
       <StyledListGroup>
         <StyledListGroupItem>
-          Message Error at Input <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT} />:{' '}
-          {messageErrors.failures_inputs_codecs}
+          <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT}>
+            <strong>Message Error at Input</strong>
+          </DiagnosisHelp>
+          :{' '}
+          <LinkCompoment failureType="input" inputId={inputId}>
+            {messageErrors.failures_inputs_codecs}
+          </LinkCompoment>
         </StyledListGroupItem>
         <StyledListGroupItem>
-          Message failed to process <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS} />:{' '}
+          <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS}>
+            <strong>Message failed to process</strong>
+          </DiagnosisHelp>
+          :{' '}
           <LinkCompoment failureType="processing" inputId={inputId}>
             {messageErrors.failures_processing}
           </LinkCompoment>
         </StyledListGroupItem>
         <StyledListGroupItem>
-          Message failed to index <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_INDEX} />:{' '}
+          <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_INDEX}>
+            <strong>Message failed to index</strong>
+          </DiagnosisHelp>
+          :{' '}
           <LinkCompoment failureType="indexing" inputId={inputId}>
             {messageErrors.failures_indexing}
           </LinkCompoment>

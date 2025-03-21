@@ -725,16 +725,18 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
             @ApiParam(name = "JSON Body", value = "Can optionally contain the token's TTL.", defaultValue = "{\"token_ttl\":null}") GenerateTokenTTL body) {
-        final User user = loadUserById(userId);
-        final String username = user.getName();
+        final User futureOwner = loadUserById(userId);
+        final User currentUser = getCurrentUser();
 
-        if (!isTokenCreationAllowed(user)) {
-            throw new ForbiddenException("Not allowed to create tokens for user " + username);
+        if (currentUser == null) {
+            throw new ForbiddenException("Not allowed to create tokens for unknown user.");
         }
+        validatePermissionForTokenCreation(currentUser, futureOwner);
+
         if (body == null) {
             body = new GenerateTokenTTL(Optional.empty());
         }
-        final AccessToken accessToken = accessTokenService.create(user.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
+        final AccessToken accessToken = accessTokenService.create(futureOwner.getName(), name, body.getTTL(() -> clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens()));
 
         return Token.create(accessToken.getId(), accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }
@@ -767,16 +769,24 @@ public class UsersResource extends RestResource {
     }
 
     @VisibleForTesting
-    boolean isTokenCreationAllowed(User user) {
-        final boolean allowed = isPermitted(USERS_TOKENCREATE, user.getName());
-        final boolean isAdmin = isAdmin(user);
-        if (isAdmin) {
-            return allowed;
+    void validatePermissionForTokenCreation(User callingUser, User futureOwner) {
+        if (!isPermitted(USERS_TOKENCREATE, callingUser.getName())) {
+            throw new ForbiddenException(callingUser.getName() + " is not allowed to create token.");
         }
-        final boolean externalAllowed = isExternalUserAllowed(user);
-        final boolean adminAllowed = isAllowedAsNoAdmin(user);
-
-        return allowed && externalAllowed && adminAllowed;
+        if (isAdmin(callingUser)) {
+            // Not throwing an exception here, admin is allowed to create a token.
+            return;
+        }
+        if (!Objects.equals(callingUser.getId(), futureOwner.getId())) {
+            // Only admins are allowed to create tokens for other users, but we already checked for admin above.
+            throw new ForbiddenException("Only admins are allowed to create a token for another user.");
+        }
+        if (!isExternalUserAllowed(callingUser)) {
+            throw new ForbiddenException("External users are not allowed to create tokens.");
+        }
+        if (!isAllowedAsNoAdmin(callingUser)) {
+            throw new ForbiddenException("Only admins are allowed to create tokens.");
+        }
     }
 
     private boolean isAdmin(User user) {

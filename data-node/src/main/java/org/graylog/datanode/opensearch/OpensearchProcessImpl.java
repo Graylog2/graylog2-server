@@ -378,6 +378,11 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 .orElse(false);
     }
 
+    @Override
+    public List<String> configurationWarnings() {
+        return opensearchConfiguration.map(OpensearchConfiguration::warnings).orElse(List.of());
+    }
+
     private Optional<ClusterStateResponse> requestClusterState(RestHighLevelClient client) {
         try {
             final Response response = client.getLowLevelClient().performRequest(new Request("GET", "_cluster/state/"));

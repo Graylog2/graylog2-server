@@ -53,7 +53,7 @@ const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
       {clusterNodes.graylogNodes.map((graylogNode) => (
         <tr key={graylogNode.nodeName}>
           <td>
-            <Link to={Routes.SYSTEM.NODES.SHOW(graylogNode.nodeInfo.node_id)}>{graylogNode.nodeName}</Link>
+            <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(graylogNode.nodeInfo.node_id)}>{graylogNode.nodeName}</Link>
           </td>
           <td>{graylogNode.type}</td>
           <td>{getRoleLabels(graylogNode.role)}</td>
@@ -68,7 +68,7 @@ const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
       {clusterNodes.dataNodes.map((dataNode) => (
         <tr key={dataNode.nodeName}>
           <td>
-            <Link to={Routes.SYSTEM.DATANODES.SHOW(dataNode.nodeInfo.node_id)}>{dataNode.nodeName}</Link>
+            <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(dataNode.nodeInfo.node_id)}>{dataNode.nodeName}</Link>
           </td>
           <td>{dataNode.type}</td>
           <td>{getRoleLabels(dataNode.role)}</td>

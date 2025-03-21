@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { Spinner, ISODurationInput } from 'components/common';
 
 const StyledForm = styled.form`
   margin-top: 10px;
@@ -35,17 +35,21 @@ const StyledForm = styled.form`
 type Props = {
   creatingToken?: boolean;
   disableForm?: boolean;
-  onCreate: (tokenName: string) => void;
+  onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => void;
 };
 
 const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate }: Props) => {
   const [tokenName, setTokenName] = useState('');
+  const [tokenTtl, setTokenTtl] = useState('P7D');
 
   const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    onCreate(tokenName);
+    onCreate({ tokenName, tokenTtl });
     setTokenName('');
+    setTokenTtl('');
   };
+
+  const ttlValidator = (milliseconds: number) => milliseconds >= 60000;
 
   return (
     <StyledForm className="form-inline" onSubmit={createToken}>
@@ -57,6 +61,17 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
           placeholder="What is this token for?"
           value={tokenName}
           onChange={(event) => setTokenName((event.target as HTMLInputElement).value)}
+        />{' '}
+        <ISODurationInput
+          id="token_creation_ttl"
+          duration={tokenTtl}
+          update={(value) => setTokenTtl(value)}
+          label="Token TTL"
+          help=""
+          validator={ttlValidator}
+          errorText="invalid (min: 1 minute)"
+          disabled={disableForm}
+          required
         />
       </FormGroup>
       <Button

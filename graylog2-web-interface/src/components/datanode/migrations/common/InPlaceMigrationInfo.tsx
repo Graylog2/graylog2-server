@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, {css} from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import {Panel} from 'components/bootstrap';
+import { Panel } from 'components/bootstrap';
 
 export const StyledPanel = styled(Panel)<{ bsStyle: string }>(
   ({ bsStyle = 'default', theme }) => css`
@@ -40,9 +40,11 @@ const InPlaceMigrationInfo = () => (
     <Panel.Body>
       For In-Place migrations, please ensure the configuration of your Data Nodes in <code>datanode.conf</code>,
       specifically the <code>opensearch_data_location</code> configuration option, points to the correct existing
-      OpenSearch data directory on every node.<br />
-      During the time of the migration, both the Data Node&apos;s and the OpenSearch&apos;s system user will need
-      to be able to access and write to the data directory. To ensure this, you can run for example<br />
+      OpenSearch data directory on every node.
+      <br />
+      During the time of the migration, both the Data Node&apos;s and the OpenSearch&apos;s system user will need to be
+      able to access and write to the data directory. To ensure this, you can run for example
+      <br />
       <code>sudo chmod -R 757 &lt;your_data_directory&gt;</code>
     </Panel.Body>
   </StyledPanel>

@@ -18,10 +18,10 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
-import type {MigrationStepComponentProps} from 'components/datanode/Types';
-import {Panel} from 'components/bootstrap';
-import {Icon} from 'components/common';
-import {StyledPanel} from 'components/datanode/migrations/MigrationWelcomeStep';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
+import { Panel } from 'components/bootstrap';
+import { Icon } from 'components/common';
+import { StyledPanel } from 'components/datanode/migrations/MigrationWelcomeStep';
 
 const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
@@ -41,11 +41,12 @@ const StopMessageProcessing = ({ currentStep, onTriggerStep, hideActions }: Migr
         <p>Please stop your OpenSearch cluster before proceeding.</p>
         <p>
           If you are migrating existing OpenSearch data by pointing the data node to its data directory, make sure to
-          change the owner of the data directory to the user running the data node (usually graylog-datanode) and
-          reset the correct permissions, e.g. by running
+          change the owner of the data directory to the user running the data node (usually graylog-datanode) and reset
+          the correct permissions, e.g. by running
         </p>
         <p>
-          <code>sudo chown -R graylog-datanode:graylog-datanode &lt;your_data_directory&gt;</code><br />
+          <code>sudo chown -R graylog-datanode:graylog-datanode &lt;your_data_directory&gt;</code>
+          <br />
           <code>sudo chmod -R 750 &lt;your_data_directory&gt;</code>
         </p>
       </Panel.Body>

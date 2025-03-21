@@ -349,7 +349,7 @@ const StartInputStep = () => {
   const renderNextButton = () => {
     if (startInputStatus === 'NOT_STARTED' || startInputStatus === 'ROLLED_BACK') {
       return (
-        <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary" data-testid="start-input-button">
+        <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary">
           Start Input
         </Button>
       );
@@ -357,11 +357,7 @@ const StartInputStep = () => {
 
     if (startInputStatus === 'FAILED' || startInputStatus === 'ROLLING_BACK') {
       return (
-        <Button
-          disabled={startInputStatus === 'ROLLING_BACK'}
-          onClick={handleRollback}
-          bsStyle="primary"
-          data-testid="rollback-input-button">
+        <Button disabled={startInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary">
           Rollback Input
         </Button>
       );
@@ -369,12 +365,8 @@ const StartInputStep = () => {
 
     if (hasNextStep) {
       return (
-        <Button
-          disabled={startInputStatus === 'RUNNING'}
-          onClick={goToInputDiagnosis}
-          bsStyle="primary"
-          data-testid="input-diagnosis-button">
-          Input Diagnosis
+        <Button disabled={startInputStatus === 'RUNNING'} onClick={goToInputDiagnosis} bsStyle="primary">
+          Launch Input Diagnosis
         </Button>
       );
     }

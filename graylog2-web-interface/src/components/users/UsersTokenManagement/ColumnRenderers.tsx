@@ -17,8 +17,8 @@
 import * as React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import type {Token} from 'components/users/UsersTokenManagement/hooks/useTokens';
-import {Timestamp} from 'components/common';
+import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
+import { Timestamp } from 'components/common';
 import IsExternalUserCell from 'components/users/UsersTokenManagement/cells/IsExternalUserCell';
 
 const customColumnRenderers = (): ColumnRenderers<Token> => ({
@@ -40,21 +40,19 @@ const customColumnRenderers = (): ColumnRenderers<Token> => ({
       width: 0.2,
     },
     created_at: {
-      renderCell: (_created_at: string, token) => token?.created_at
-        && <Timestamp dateTime={token.created_at}/>,
+      renderCell: (_created_at: string, token) => token?.created_at && <Timestamp dateTime={token.created_at} />,
       width: 0.2,
     },
     last_access: {
-      renderCell: (_last_access: string, token) => token?.last_access
-        && <Timestamp dateTime={token.last_access}/>,
+      renderCell: (_last_access: string, token) => token?.last_access && <Timestamp dateTime={token.last_access} />,
       width: 0.2,
     },
     external_user: {
-      renderCell: (_external_user: boolean, token) => <IsExternalUserCell token={token}/>,
+      renderCell: (_external_user: boolean, token) => <IsExternalUserCell token={token} />,
       width: 0.2,
     },
     title: {
-      renderCell: (_title: string, token) => token.title ? token.title : "N/A",
+      renderCell: (_title: string, token) => (token.title ? token.title : 'N/A'),
       width: 0.2,
     },
   },

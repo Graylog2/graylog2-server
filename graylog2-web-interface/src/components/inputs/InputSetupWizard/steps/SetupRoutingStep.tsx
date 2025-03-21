@@ -19,18 +19,26 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button, Row, Col, Input } from 'components/bootstrap';
-import { Select, Tooltip } from 'components/common';
+import { Select } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
 import useInputSetupWizardStepsHelper from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardStepsHelper';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { INPUT_WIZARD_STEPS } from 'components/inputs/InputSetupWizard/types';
 import CreateStreamForm from 'components/inputs/InputSetupWizard/steps/components/CreateStreamForm';
-import useStreams from 'components/streams/hooks/useStreams';
+import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilteredStreams';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import type { OpenStepsData } from 'components/inputs/InputSetupWizard/types';
 
-import { StepWrapper, DescriptionCol, ButtonCol, StyledHeading } from './components/StepWrapper';
+import {
+  StepWrapper,
+  DescriptionCol,
+  ButtonCol,
+  StyledHeading,
+  StyledList,
+  RecommendedTooltip,
+} from './components/StepWrapper';
+import InputInUseAlert from './components/InputInUseAlert';
 
 const ExistingStreamCol = styled(Col)(
   ({ theme }) => css`
@@ -47,20 +55,6 @@ const CreateStreamCol = styled(Col)(
   `,
 );
 
-const StyledTooltip = styled(Tooltip)(
-  ({ theme }) => css`
-    &.mantine-Tooltip-tooltip {
-      background-color: ${theme.colors.global.background}!important;
-      font-size: ${theme.fonts.size.small}!important;
-    }
-  `,
-);
-
-const StyledList = styled.ul`
-  list-style-type: disc;
-  padding-left: 20px;
-`;
-
 const StyledLabel = styled.label(
   ({ theme }) => css`
     font-weight: normal;
@@ -76,7 +70,7 @@ const SetupRoutingStep = () => {
   const [showSelectStream, setShowSelectStream] = useState<boolean>(false);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
   const currentStepName = useMemo(() => INPUT_WIZARD_STEPS.SETUP_ROUTING, []);
-  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep } = useInputSetupWizard();
+  const { goToPreviousStep, goToNextStep, orderedSteps, activeStep, wizardData } = useInputSetupWizard();
   const { stepsData, setStepsData } = useInputSetupWizardSteps<OpenStepsData>();
   const { checkHasPreviousStep, checkHasNextStep, updateStepData, getStepData } =
     useInputSetupWizardStepsHelper<OpenStepsData>();
@@ -87,13 +81,8 @@ const SetupRoutingStep = () => {
   const removeFromDefaultStreamChecked = typeof removeFromDefault === 'undefined' ? true : removeFromDefault;
   const hasPreviousStep = checkHasPreviousStep(orderedSteps, activeStep);
   const hasNextStep = checkHasNextStep(orderedSteps, activeStep);
-  const { data: streamsData, isInitialLoading: isLoadingStreams } = useStreams({
-    query: '',
-    page: 1,
-    pageSize: 0,
-    sort: { direction: 'asc', attributeId: 'title' },
-  });
-  const streams = streamsData?.list;
+  const { data: streamsData, isLoading: isLoadingStreams } = useFilteredStreams();
+  const streams = streamsData?.streams;
   const { data: streamPipelinesData } = usePipelinesConnectedStream(selectedStreamId, !!selectedStreamId);
 
   const defaultStepData = { streamType: 'DEFAULT' };
@@ -203,14 +192,16 @@ const SetupRoutingStep = () => {
         streamType: 'NEW',
       }),
     );
+
+    onNextStep();
   };
 
-  const backButtonText = newStream ? 'Reset' : 'Back';
   const showNewStreamSection = newStream || showCreateStream;
   const showSelectStreamSection = selectedStreamId || showSelectStream;
 
   return (
     <StepWrapper>
+      <InputInUseAlert inputId={wizardData?.input?.id} />
       {!showNewStreamSection && !showSelectStreamSection && (
         <>
           <Row>
@@ -236,11 +227,11 @@ const SetupRoutingStep = () => {
             {!selectedStreamId && (
               <CreateStreamCol md={6}>
                 <StyledHeading>Route to a new Stream</StyledHeading>
-                <StyledTooltip opened withArrow position="bottom" label="Recommended!">
+                <RecommendedTooltip opened withArrow position="bottom" label="Recommended!">
                   <Button onClick={handleCreateStream} bsStyle="primary">
                     Create Stream
                   </Button>
-                </StyledTooltip>
+                </RecommendedTooltip>
               </CreateStreamCol>
             )}
             <ExistingStreamCol md={selectedStreamId ? 12 : 6}>
@@ -255,20 +246,12 @@ const SetupRoutingStep = () => {
         <Row>
           <Col md={12}>
             <StyledHeading>Create new Stream</StyledHeading>
-            {newStream ? (
-              <>
-                <p>This Input will use a new stream: &quot;{newStream.title}&quot;.</p>
-                <p>
-                  Matches will {!newStream.remove_matches_from_default_stream && 'not '}be removed from the Default
-                  Stream.
-                </p>
-                {getStepData(stepsData, currentStepName, 'shouldCreateNewPipeline') && (
-                  <p>A new Pipeline will be created.</p>
-                )}
-              </>
-            ) : (
-              <CreateStreamForm submitForm={submitStreamCreation} />
-            )}
+            <CreateStreamForm
+              submitForm={submitStreamCreation}
+              handleBackClick={handleBackClick}
+              prevCreatedStream={stepsData?.SETUP_ROUTING?.newStream}
+              prevShouldCreateNewPipeline={stepsData?.SETUP_ROUTING?.shouldCreateNewPipeline}
+            />
           </Col>
         </Row>
       )}
@@ -276,11 +259,11 @@ const SetupRoutingStep = () => {
         <>
           <Row>
             <DescriptionCol md={12}>
-              <StyledLabel>Choose an existing Stream</StyledLabel>
+              <StyledLabel htmlFor="streams">Choose an existing Stream</StyledLabel>
               <StyledList>
                 <li>Route messages from this input to an existing stream is selected.</li>
                 <li>
-                  Pipeline Rules will be created when the <strong>Finish & Start Input</strong> button is pressed.
+                  Pipeline Rules will be created when the <strong>Start Input</strong> button is pressed.
                 </li>
               </StyledList>
             </DescriptionCol>
@@ -334,12 +317,10 @@ const SetupRoutingStep = () => {
         </>
       )}
 
-      {(hasPreviousStep || hasNextStep || showNewStreamSection || showSelectStreamSection) && (
+      {(((hasPreviousStep || hasNextStep) && !showNewStreamSection) || showSelectStreamSection) && (
         <Row>
           <ButtonCol md={12}>
-            {(hasPreviousStep || showNewStreamSection || showSelectStreamSection) && (
-              <Button onClick={handleBackClick}>{backButtonText}</Button>
-            )}
+            {(hasPreviousStep || showSelectStreamSection) && <Button onClick={handleBackClick}>Back</Button>}
             {hasNextStep && (
               <Button disabled={!isStepValid()} onClick={onNextStep} bsStyle="primary">
                 Next

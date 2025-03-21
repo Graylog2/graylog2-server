@@ -20,7 +20,7 @@ import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.engine.normalization.DecorateQueryStringsNormalizer;
 import org.graylog.plugins.views.search.engine.normalization.PluggableSearchNormalization;
 import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
-import org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchValidator;
+import org.graylog.plugins.views.search.engine.validation.DataLakeSearchValidator;
 import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidation;
 import org.graylog.plugins.views.search.engine.validation.SearchTypesMatchBackendQueryValidator;
 import org.graylog.plugins.views.search.engine.validation.SearchValidation;
@@ -38,6 +38,6 @@ public class EngineBindings extends ViewsModule {
         registerSearchValidator(TimeRangeValidator.class);
         registerSearchValidator(SearchTypesMatchBackendQueryValidator.class);
         //while DW searches are enterprise only, the validation should probably be present in gl-server, i.e. to discover invalid searches even if a client has lost the license
-        registerSearchValidator(DataWarehouseSearchValidator.class);
+        registerSearchValidator(DataLakeSearchValidator.class);
     }
 }
