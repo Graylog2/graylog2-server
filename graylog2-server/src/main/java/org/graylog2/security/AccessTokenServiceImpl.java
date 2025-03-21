@@ -48,11 +48,12 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.time.Duration;
+import java.time.Period;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,12 +144,12 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public AccessToken create(String username, String name) {
-        final Duration defaultTTL = configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens();
+        final PeriodDuration defaultTTL = configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens();
         return create(username, name, defaultTTL);
     }
 
     @Override
-    public AccessToken create(String username, String name, Duration ttl) {
+    public AccessToken create(String username, String name, PeriodDuration ttl) {
         Map<String, Object> fields = Maps.newHashMap();
         AccessTokenImpl accessToken;
         String id = null;
@@ -163,7 +164,9 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             fields.put(AccessTokenImpl.USERNAME, username);
             fields.put(AccessTokenImpl.NAME, name);
             fields.put(AccessTokenImpl.CREATED_AT, nowUTC);
-            fields.put(AccessTokenImpl.EXPIRES_AT, nowUTC.plus(ttl.toMillis()));
+            // This is kind of ugly, as we're still using joda-time. Once we're with java.time, one can use "nowUtc.plus(ttl)".
+            // Until then, we need to add all fields of the period and the duration separately:
+            fields.put(AccessTokenImpl.EXPIRES_AT, addTtlPeriodDuration(nowUTC, ttl));
             fields.put(AccessTokenImpl.LAST_ACCESS, Tools.dateTimeFromDouble(0)); // aka never.
             accessToken = new AccessTokenImpl(fields);
             try {
@@ -179,6 +182,11 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             throw new IllegalStateException("Could not create unique access token, tried 10 times. This is bad.");
         }
         return accessToken;
+    }
+
+    private DateTime addTtlPeriodDuration(DateTime dt, PeriodDuration ttl) {
+        final Period p = ttl.getPeriod();
+        return dt.plusYears(p.getYears()).plusMonths(p.getMonths()).plusDays(p.getDays()).plus(ttl.getDuration().toMillis());
     }
 
     @Override

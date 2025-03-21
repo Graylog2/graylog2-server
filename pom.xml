@@ -176,6 +176,7 @@
         <streamex.version>0.8.3</streamex.version>
         <swagger.version>1.6.15</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
+        <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
@@ -492,6 +493,11 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcutil-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.threeten</groupId>
+                <artifactId>threeten-extra</artifactId>
+                <version>${threeten-extra.version}</version>
             </dependency>
 
             <!-- test -->

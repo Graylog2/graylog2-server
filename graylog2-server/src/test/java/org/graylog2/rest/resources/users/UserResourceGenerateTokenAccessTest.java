@@ -45,6 +45,7 @@ import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -192,7 +193,7 @@ public class UserResourceGenerateTokenAccessTest {
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(isPermitted);
         if (!isAdmin) {
             when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                    .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), confAllowExternal, confDenyNonAdmins, Duration.ofDays(30)));
+                    .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), confAllowExternal, confDenyNonAdmins, PeriodDuration.of(Duration.ofDays(30))));
         }
     }
 }
