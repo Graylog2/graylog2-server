@@ -25,6 +25,7 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
@@ -34,7 +35,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.AutoDateHistogramAggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ParsedAutoDateHistogram;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -47,6 +50,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
@@ -108,6 +112,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                 .from((page - 1) * perPage)
                 .size(perPage)
                 .trackTotalHits(true);
+
         final var sortBuilders = createSorting(sorting);
         sortBuilders.forEach(searchSourceBuilder::sort);
 
@@ -139,7 +144,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     }
 
     @Override
-    public MoreSearch.Histogram eventHistogram(int buckets, String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
+    public MoreSearch.Histogram eventHistogram(String queryString, AbsoluteRange timerange, Set<String> affectedIndices,
                                                Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, ZoneId timeZone,
                                                Map<String, Set<String>> extraFilters) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
@@ -149,10 +154,22 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
                 .size(0)
                 .trackTotalHits(true);
 
-        final var histogramAggregation = new AutoDateHistogramAggregationBuilder(histogramAggregationName)
+        final var autoInterval = AutoInterval.create();
+        final var interval = autoInterval.toDateInterval(timerange);
+
+        final var histogramAggregation = new DateHistogramAggregationBuilder(histogramAggregationName)
                 .field(EventDto.FIELD_EVENT_TIMESTAMP)
                 .timeZone(timeZone)
-                .setNumBuckets(buckets);
+                .minDocCount(0)
+                .extendedBounds(new ExtendedBounds(Tools.buildElasticSearchTimeFormat(timerange.from()), Tools.buildElasticSearchTimeFormat(timerange.to())));
+
+        final var dateInterval = new DateHistogramInterval(interval.getQuantity().toString() + interval.getUnit());
+
+        if (interval.getQuantity().intValue() > 1) {
+            histogramAggregation.fixedInterval(dateInterval);
+        } else {
+            histogramAggregation.calendarInterval(dateInterval);
+        }
 
         final var termsAggregation = AggregationBuilders.terms(termsAggregationName)
                 .field(EventDto.FIELD_ALERT);
