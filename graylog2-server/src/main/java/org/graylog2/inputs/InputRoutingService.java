@@ -48,7 +48,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class InputRoutingService {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InputRoutingService.class);
     private static final String GL_ROUTING_RULE_PREFIX = "gl_route_";
-    private static final Pattern GL_ROUTING_RULE_REGEX = Pattern.compile(GL_ROUTING_RULE_PREFIX + "(\\w+)\\[(\\w+)\\]_to_(\\w+)");
+    private static final Pattern GL_ROUTING_RULE_REGEX = Pattern.compile(GL_ROUTING_RULE_PREFIX + "(.+)\\[(\\w+)\\]_to_(.+)");
 
     private final RuleService ruleService;
     private final InputService inputService;
@@ -132,7 +132,7 @@ public class InputRoutingService {
     }
 
     private String createSystemRuleRegex(String inputId, String inputName) {
-        return GL_ROUTING_RULE_PREFIX + inputName + "\\[" + inputId + "\\]_to_.*";
+        return GL_ROUTING_RULE_PREFIX + Pattern.quote(inputName) + "\\[" + inputId + "\\]_to_.*";
     }
 
     private String replaceInputName(String ruleName, String oldInputName, String newInputName) {
