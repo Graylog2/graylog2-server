@@ -16,29 +16,31 @@
  */
 package org.graylog.storage.elasticsearch7.fieldtypes.streams;
 
+import jakarta.inject.Inject;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.ExistsQueryBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.FiltersAggregator;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.ParsedFilters;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.plugin.Message;
 
-import jakarta.inject.Inject;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
+import static org.graylog2.utilities.Entry.createEntry;
 
+public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
+    private static final String AGG_NAME = "fields";
     private static final int SEARCH_MAX_BUCKETS_ES = 10_000;
 
     private final ElasticsearchClient client;
@@ -50,35 +52,31 @@ public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
 
     @Override
     public Map<String, Set<String>> getStreams(final List<String> fieldNames, final String indexName) {
-        final List<MultiSearchResponse.Item> multiSearchResponse = client.msearch(fieldNames.stream()
-                        .map(fieldName -> createSearchRequest(fieldName, indexName))
-                        .collect(Collectors.toList()),
+        final List<MultiSearchResponse.Item> multiSearchResponse = client.msearch(List.of(createSearchRequest(fieldNames, indexName)),
                 "Unable to retrieve fields types aggregations");
 
+        final var response = multiSearchResponse.get(0);
+        final ParsedFilters aggregation = response.getResponse().getAggregations().get(AGG_NAME);
 
-        final List<Set<String>> streamsPerField = multiSearchResponse.stream()
-                .map(item -> retrieveStreamsFromAggregationInResponse(item.getResponse()))
-                .toList();
-
-        Map<String, Set<String>> result = new HashMap<>(fieldNames.size());
-        for (int i = 0; i < fieldNames.size(); i++) {
-            result.put(fieldNames.get(i), streamsPerField.get(i));
-        }
-
-        return result;
-
+        return fieldNames.stream()
+                .map(fieldName -> createEntry(fieldName, aggregation.getBucketByKey(fieldName)))
+                .map(entry -> entry.withValue(retrieveStreamsFromAggregationInResponse(entry.getValue())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
     public Set<String> getStreams(final String fieldName, final String indexName) {
-        final SearchRequest searchRequest = createSearchRequest(fieldName, indexName);
+        final SearchRequest searchRequest = createSearchRequest(List.of(fieldName), indexName);
 
         final SearchResponse searchResult = client.search(searchRequest, "Unable to retrieve fields types aggregations");
 
-        return retrieveStreamsFromAggregationInResponse(searchResult);
+        final ParsedFilters aggregation = searchResult.getAggregations().get(AGG_NAME);
+        final var bucket = aggregation.getBucketByKey(fieldName);
+
+        return retrieveStreamsFromAggregationInResponse(bucket);
     }
 
-    private Set<String> retrieveStreamsFromAggregationInResponse(final SearchResponse searchResult) {
+    private Set<String> retrieveStreamsFromAggregationInResponse(ParsedFilters.ParsedBucket searchResult) {
         final Aggregations aggregations = searchResult.getAggregations();
         if (aggregations != null) {
             final Aggregation streamsAggregation = aggregations.get(Message.FIELD_STREAMS);
@@ -95,23 +93,28 @@ public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
         return Set.of();
     }
 
-    private SearchRequest createSearchRequest(final String fieldName, final String indexName) {
-        final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(fieldName);
+    private SearchRequest createSearchRequest(List<String> fieldNames, final String indexName) {
+        final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(fieldNames);
         return new SearchRequest(indexName)
                 .source(searchSourceBuilder);
     }
 
-    private SearchSourceBuilder createSearchSourceBuilder(final String fieldName) {
+    private SearchSourceBuilder createSearchSourceBuilder(final List<String> fieldNames) {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(new ExistsQueryBuilder(fieldName))
                 .trackTotalHits(false)
                 .size(0);
 
-        searchSourceBuilder.aggregation(AggregationBuilders
-                .terms(Message.FIELD_STREAMS)
-                .field(Message.FIELD_STREAMS)
-                .size(SEARCH_MAX_BUCKETS_ES));
+        final var filters = fieldNames.stream()
+                .map(fieldName -> new FiltersAggregator.KeyedFilter(fieldName, QueryBuilders.existsQuery(fieldName)))
+                .toList();
+
+        final var filtersAggregation = AggregationBuilders.filters(AGG_NAME, filters.toArray(new FiltersAggregator.KeyedFilter[]{})).otherBucket(false)
+                .subAggregation(AggregationBuilders
+                        .terms(Message.FIELD_STREAMS)
+                        .field(Message.FIELD_STREAMS)
+                        .size(SEARCH_MAX_BUCKETS_ES));
+
+        searchSourceBuilder.aggregation(filtersAggregation);
         return searchSourceBuilder;
     }
-
 }
