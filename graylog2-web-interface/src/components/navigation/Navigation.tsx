@@ -65,7 +65,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
           {AppConfig.isCloud() ? (
             <GlobalThroughput disabled />
           ) : (
-            <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
+            <LinkContainer to={Routes.SYSTEM.CLUSTER.NODES}>
               <GlobalThroughput />
             </LinkContainer>
           )}

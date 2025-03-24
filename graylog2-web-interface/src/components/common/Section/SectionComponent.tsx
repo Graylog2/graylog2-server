@@ -65,11 +65,12 @@ const FlexWrapper = styled.div(
   `,
 );
 
+export const SectionCol = styled(Col)``;
 const SectionComponent = ({
   children,
   title,
   showLoading = false,
-  headerActions,
+  headerActions = undefined,
   className = '',
   collapsible = false,
   defaultClosed = false,
@@ -79,7 +80,7 @@ const SectionComponent = ({
 
   return (
     <Row className={`content ${className}`}>
-      <Col xs={12}>
+      <SectionCol xs={12}>
         <Header>
           <Headline>
             {title}
@@ -101,7 +102,7 @@ const SectionComponent = ({
         </Header>
         {!collapsible && children}
         {collapsible && <Collapse in={opened}>{children}</Collapse>}
-      </Col>
+      </SectionCol>
     </Row>
   );
 };

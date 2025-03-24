@@ -111,7 +111,7 @@ describe('Input Diagnosis Page', () => {
     const runningNodeLink = await screen.findByRole('link', { name: /node id: test-node-id-1/i });
 
     expect(hasHref(runningNodeLink) ? runningNodeLink.href : null).toEqual(
-      'http://localhost/system/nodes/test-node-id-1',
+      'http://localhost/system/cluster/node/test-node-id-1',
     );
   });
 

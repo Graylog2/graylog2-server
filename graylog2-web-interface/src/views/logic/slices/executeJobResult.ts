@@ -73,21 +73,23 @@ export const pollJob = ({
   depth = 1,
   page,
   perPage,
+  stopPolling,
 }: {
   jobIds: JobIds;
   result: SearchJobType | null;
   depth?: number;
   page?: number;
   perPage?: number;
+  stopPolling?: (progress: number) => boolean;
 }): Promise<SearchJobType> =>
   new Promise((resolve) => {
-    if (result?.execution?.done || result?.execution?.cancelled) {
+    if (stopPolling?.(result?.progress ?? 0) || result?.execution?.done || result?.execution?.cancelled) {
       resolve(result);
     } else {
       delay(getDelayTime(depth)).then(() => {
         resolve(
           runPollJob({ jobIds, page, perPage }).then((res) =>
-            pollJob({ jobIds, result: res, depth: depth + 1, page, perPage }),
+            pollJob({ jobIds, result: res, depth: depth + 1, page, perPage, stopPolling }),
           ),
         );
       });
@@ -99,11 +101,13 @@ export const executeJobResult = async ({
   widgetMapping,
   page,
   perPage,
+  stopPolling,
 }: {
   jobIds: JobIds;
   widgetMapping?: WidgetMapping;
   page?: number;
   perPage?: number;
+  stopPolling?: (progress: number) => boolean;
 }): Promise<SearchExecutionResult> =>
   pollJob({
     jobIds: { asyncSearchId, nodeId },
@@ -111,6 +115,7 @@ export const executeJobResult = async ({
     depth: 1,
     page,
     perPage,
+    stopPolling,
   }).then((result) => ({
     result: new SearchResult(result),
     widgetMapping,

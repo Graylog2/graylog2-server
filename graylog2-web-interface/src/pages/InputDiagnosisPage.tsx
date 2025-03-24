@@ -107,7 +107,7 @@ const NodeListItem = ({
   if (nodeId) {
     return (
       <StyledListGroupItem>
-        <Link to={Routes.SYSTEM.NODES.SHOW(nodeId)}>
+        <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>
           <>
             {nodeId && (
               <>
@@ -312,7 +312,9 @@ const InputDiagnosisPage = () => {
                 {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
                   <StyledListGroupItem key={stream.stream_id}>
                     <Link
-                      to={`/search?q=gl2_source_input%3A+${input.id}&rangetype=relative&streams=${stream.stream_id}&from=900`}>
+                      to={Routes.search_with_query(`gl2_source_input:${input.id}`, 'relative', { relative: 900 }, [
+                        stream.stream_id,
+                      ])}>
                       <strong>{stream.stream_name}</strong>:
                     </Link>
                     <StyledSpan>{stream.count}</StyledSpan>
