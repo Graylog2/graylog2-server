@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -72,6 +73,8 @@ public class PivotAggregationSearchTest {
     private NotificationService notificationService;
     @Mock
     private StreamService streamService;
+    @Mock
+    private SearchNormalization searchNormalization;
 
     private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of, (categories) -> Stream.of());
 
@@ -545,6 +548,7 @@ public class PivotAggregationSearchTest {
                 notificationService,
                 queryStringDecorators,
                 streamService,
+                searchNormalization,
                 false
         );
     }
