@@ -71,6 +71,7 @@ public class TokenUsageServiceImpl implements TokenUsageService {
                 .map(AccessTokenEntity::userName)
                 .distinct()
                 .map(userService::load)
+                //Here, we're losing information about users that have been deleted in the meantime:
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(User::getName, Function.identity()));
         LOG.debug("Found {} distinct users for current page of access tokens.", usersOfThisPage.size());
@@ -92,13 +93,16 @@ public class TokenUsageServiceImpl implements TokenUsageService {
                 .toList();
 
         return new PaginatedList<>(tokenUsage, currentPage.pagination().total(), page, perPage);
-
     }
 
     @Nonnull
-    private TokenUsageDTO toDTO(AccessTokenEntity dto, Map<String, User> usersOfThisPage, Map<String, String> authServiceIdToTitle) {
-        final String username = dto.userName();
+    private TokenUsageDTO toDTO(AccessTokenEntity token, Map<String, User> usersOfThisPage, Map<String, String> authServiceIdToTitle) {
+        final String username = token.userName();
         final User user = usersOfThisPage.get(username);
+        if (user == null) {
+            LOG.warn("User \"{}\" not found for token named \"{}\".", username, token.name());
+            return TokenUsageDTO.create(token.id(), username, null, token.name(), token.createdAt(), token.lastAccess(), false, "UNKNOWN", true);
+        }
         final boolean isExternal = user.isExternalUser();
         final String authBackend;
         if (isExternal) {
@@ -109,6 +113,6 @@ public class TokenUsageServiceImpl implements TokenUsageService {
             authBackend = "";
         }
 
-        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess(), isExternal, authBackend);
+        return TokenUsageDTO.create(token.id(), username, user.getId(), token.name(), token.createdAt(), token.lastAccess(), isExternal, authBackend, false);
     }
 }
