@@ -184,7 +184,7 @@ public class ElasticsearchClient {
                 : RequestOptions.DEFAULT;
     }
 
-    private ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
+    public static ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
         if (e instanceof ElasticsearchException elasticsearchException) {
             if (isIndexNotFoundException(elasticsearchException)) {
                 throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
@@ -211,7 +211,7 @@ public class ElasticsearchClient {
         return new ElasticsearchException(errorMessage, e);
     }
 
-    private boolean isInvalidWriteTargetException(ElasticsearchException elasticsearchException) {
+    private static boolean isInvalidWriteTargetException(ElasticsearchException elasticsearchException) {
         try {
             final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
             return parsedException.reason().startsWith("no write index is defined for alias");
@@ -220,7 +220,7 @@ public class ElasticsearchClient {
         }
     }
 
-    private boolean isMasterNotDiscoveredException(ElasticsearchException elasticsearchException) {
+    private static boolean isMasterNotDiscoveredException(ElasticsearchException elasticsearchException) {
         try {
             final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
             return parsedException.type().equals("master_not_discovered_exception")
@@ -230,15 +230,15 @@ public class ElasticsearchClient {
         }
     }
 
-    private boolean isIndexNotFoundException(ElasticsearchException elasticsearchException) {
+    private static boolean isIndexNotFoundException(ElasticsearchException elasticsearchException) {
         return elasticsearchException.getMessage().contains("index_not_found_exception");
     }
 
-    private boolean isMapperParsingExceptionException(ElasticsearchException openSearchException) {
+    private static boolean isMapperParsingExceptionException(ElasticsearchException openSearchException) {
         return openSearchException.getMessage().contains("mapper_parsing_exception");
     }
 
-    private boolean isBatchSizeTooLargeException(ElasticsearchException elasticsearchException) {
+    private static boolean isBatchSizeTooLargeException(ElasticsearchException elasticsearchException) {
         if (elasticsearchException instanceof ElasticsearchStatusException statusException) {
             if (statusException.getCause() instanceof ResponseException responseException) {
                 return (responseException.getResponse().getStatusLine().getStatusCode() == 429);

@@ -57,7 +57,12 @@ public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
 
 
         final List<Set<String>> streamsPerField = multiSearchResponse.stream()
-                .map(item -> retrieveStreamsFromAggregationInResponse(item.getResponse()))
+                .map(item -> {
+                    if (item.isFailure()) {
+                        throw ElasticsearchClient.exceptionFrom(item.getFailure(), "Error while retrieving field types");
+                    }
+                    return retrieveStreamsFromAggregationInResponse(item.getResponse())
+                })
                 .toList();
 
         Map<String, Set<String>> result = new HashMap<>(fieldNames.size());
