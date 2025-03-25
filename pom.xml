@@ -170,12 +170,13 @@
         <shiro.version>2.0.2</shiro.version>
         <snakeyaml.version>2.4</snakeyaml.version>
         <snappy-java.version>1.1.10.7</snappy-java.version>
-        <oshi.version>6.7.1</oshi.version>
+        <oshi.version>6.8.0</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.3</streamex.version>
         <swagger.version>1.6.15</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
+        <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
@@ -492,6 +493,11 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcutil-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.threeten</groupId>
+                <artifactId>threeten-extra</artifactId>
+                <version>${threeten-extra.version}</version>
             </dependency>
 
             <!-- test -->

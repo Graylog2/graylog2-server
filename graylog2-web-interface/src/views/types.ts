@@ -310,8 +310,9 @@ type SearchActionModalProps = React.PropsWithRef<{
 };
 
 type AssetInformationComponentProps = {
-  identifiers: unknown;
-  addToQuery: (id: string) => void;
+  assetIds: unknown;
+  direction?: 'col' | 'row';
+  addToQuery?: (id: string) => void;
 };
 
 type SearchAction = {
