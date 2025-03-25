@@ -102,7 +102,7 @@ public class StreamListFingerprintTest {
 
         // The fingerprint depends on the hashCode of each stream and stream rule and might change if the underlying
         // implementation changed.
-        assertEquals("dc859599e0c4564322fbb7535796e96147ad766b", fingerprint.getFingerprint());
+        assertEquals("d669c1037a49c956ef8f25033abc065c2fb259d4", fingerprint.getFingerprint());
     }
 
     @Test

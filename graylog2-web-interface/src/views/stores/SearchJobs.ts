@@ -43,6 +43,7 @@ export type SearchJobType = {
   id: SearchJobId;
   search: Search;
   search_id: SearchId;
+  progress: number;
   results: { [id: string]: any };
   execution: ExecutionInfoType;
   owner: string;

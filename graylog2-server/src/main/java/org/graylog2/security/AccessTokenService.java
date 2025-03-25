@@ -22,9 +22,9 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
+import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +40,7 @@ public interface AccessTokenService extends PersistedService {
     List<AccessToken> loadAll(String username);
 
     /**
-     * Please use {@link #create(String, String, Duration)} instead.
+     * Please use {@link #create(String, String, PeriodDuration)} instead.
      * Internally, the above-mentioned method is called with the currently configured default ttl.
      *
      * @deprecated
@@ -48,7 +48,7 @@ public interface AccessTokenService extends PersistedService {
     @Deprecated(since = "6.2.0")
     AccessToken create(String username, String name);
 
-    AccessToken create(String username, String name, Duration ttl);
+    AccessToken create(String username, String name, PeriodDuration ttl);
 
     DateTime touch(AccessToken accessToken) throws ValidationException;
 

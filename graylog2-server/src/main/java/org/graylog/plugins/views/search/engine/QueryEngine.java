@@ -49,7 +49,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchValidator.containsDataWarehouseSearchElements;
+import static org.graylog.plugins.views.search.engine.validation.DataLakeSearchValidator.containsDataLakeSearchElements;
 
 @Singleton
 public class QueryEngine {
@@ -129,7 +129,7 @@ public class QueryEngine {
                 // generate and run each query, making sure we never let an exception escape
                 // if need be we default to an empty result with a failed state and the wrapped exception
                 CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors, timezone),
-                                containsDataWarehouseSearchElements(query) ? dataLakeJobsQueryPool : indexerJobsQueryPool)
+                                containsDataLakeSearchElements(query) ? dataLakeJobsQueryPool : indexerJobsQueryPool)
                         .handle((queryResult, throwable) -> {
                             if (throwable != null) {
                                 final Throwable cause = throwable.getCause();
