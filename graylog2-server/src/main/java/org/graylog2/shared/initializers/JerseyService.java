@@ -63,7 +63,6 @@ import org.graylog2.shared.rest.OptionalResponseFilter;
 import org.graylog2.shared.rest.PrintModelProcessor;
 import org.graylog2.shared.rest.RequestIdFilter;
 import org.graylog2.shared.rest.RestAccessLogFilter;
-import org.graylog2.shared.rest.VerboseCsrfProtectionFilter;
 import org.graylog2.shared.rest.XHRFilter;
 import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.BadRequestExceptionMapper;
@@ -267,7 +266,8 @@ public class JerseyService extends AbstractIdleService {
                 .registerClasses(
                         ShiroSecurityContextFilter.class,
                         ShiroRequestHeadersBinder.class,
-                        VerboseCsrfProtectionFilter.class,
+// TODO: add annotation to bypass CSRF protection for specific resources instead of deactivating the filter
+//                        VerboseCsrfProtectionFilter.class,
                         JacksonXmlBindJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JsonMappingExceptionMapper.class,
