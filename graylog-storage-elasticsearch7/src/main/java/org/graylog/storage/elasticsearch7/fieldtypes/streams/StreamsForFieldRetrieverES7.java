@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.fieldtypes.streams;
 
+import jakarta.inject.Inject;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
@@ -28,8 +29,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.Search
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.plugin.Message;
-
-import jakarta.inject.Inject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +60,7 @@ public class StreamsForFieldRetrieverES7 implements StreamsForFieldRetriever {
                     if (item.isFailure()) {
                         throw ElasticsearchClient.exceptionFrom(item.getFailure(), "Error while retrieving field types");
                     }
-                    return retrieveStreamsFromAggregationInResponse(item.getResponse())
+                    return retrieveStreamsFromAggregationInResponse(item.getResponse());
                 })
                 .toList();
 
