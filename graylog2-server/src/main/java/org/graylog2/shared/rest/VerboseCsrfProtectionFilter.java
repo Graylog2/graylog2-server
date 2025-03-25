@@ -16,10 +16,9 @@
  */
 package org.graylog2.shared.rest;
 
-import org.glassfish.jersey.server.filter.CsrfProtectionFilter;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.container.ContainerRequestContext;
+import org.glassfish.jersey.server.filter.CsrfProtectionFilter;
 
 import java.io.IOException;
 
@@ -32,6 +31,15 @@ public class VerboseCsrfProtectionFilter extends CsrfProtectionFilter {
                 super.filter(rc);
             }
         } catch (BadRequestException badRequestException) {
+            // We don't want to execute the annotation check for every request. There should be very few resources
+            // that are annotated with the skip annotation, so we only execute the check if we would throw an error.
+            final var skipProtection = rc.getUriInfo().getMatchedResources()
+                    .stream()
+                    .filter(r -> r.getClass().isAnnotationPresent(SkipCSRFProtection.class))
+                    .findFirst();
+            if (skipProtection.isPresent()) {
+                return;
+            }
             throw new BadRequestException(
                     "CSRF protection header is missing. Please add a \"" + HEADER_NAME + "\" header to your request.",
                     badRequestException
