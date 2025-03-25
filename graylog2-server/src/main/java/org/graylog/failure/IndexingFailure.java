@@ -22,7 +22,6 @@ import com.google.common.base.Objects;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.messageq.Acknowledgeable;
@@ -110,7 +109,7 @@ public class IndexingFailure implements Failure {
     @Nonnull
     @Override
     public FailureObjectBuilder failureObjectBuilder(ObjectMapper objectMapper,
-                                                     @NonNull Meter invalidTimestampMeter,
+                                                     @Nonnull Meter invalidTimestampMeter,
                                                      boolean includeFailedMessage) {
         Map<String, Object> fields = failedMessage.toElasticSearchObject(objectMapper, invalidTimestampMeter);
         fields.put(Message.FIELD_ID, failedMessage.getId());

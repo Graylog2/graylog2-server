@@ -128,7 +128,7 @@ public class MoreSearch {
         if (affectedIndices == null || affectedIndices.isEmpty()) {
             return Histogram.empty(effectiveTimeRange);
         }
-        return moreSearchAdapter.eventHistogram(30, queryString, effectiveTimeRange, affectedIndices, eventStreams,
+        return moreSearchAdapter.eventHistogram(queryString, effectiveTimeRange, affectedIndices, eventStreams,
                 filterString, forbiddenSourceStreams, timeZone, parameters.filter().extraFilters());
     }
 
