@@ -22,12 +22,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for resources that shouldn't be protected with the {@link VerboseCsrfProtectionFilter}.
+ * Annotation for resource methods that shouldn't be protected with the {@link VerboseCsrfProtectionFilter}.
  * <p>
  * <strong>WARNING:</strong> This annotation must be used carefully! There are only a few use cases where we need
  * the annotation.
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SkipCSRFProtection {
     String value() default "Unknown reason";
