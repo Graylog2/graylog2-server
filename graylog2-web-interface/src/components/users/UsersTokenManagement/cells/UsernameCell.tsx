@@ -14,32 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
-import { Label } from 'components/bootstrap';
+import Routes from 'routing/Routes';
+import { Link } from 'components/common/router';
+import { Token } from '../hooks/useTokens';
 
 type Props = {
   token: Token;
 };
 
-const Wrapper = styled.div<{ $enabled: boolean }>(
-  ({ theme, $enabled }) => css`
-    color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
-    width: fit-content;
-  `,
+const UsernameCell = ({ token }: Props) => (
+  <Link to={Routes.SYSTEM.USERS.show(token.user_id)}>{token.username}</Link>
 );
 
-const IsExternalUserCell = ({ token }: Props) => {
-  const isExternal = token?.external_user;
-
-  return (
-    <Wrapper $enabled={isExternal}>
-      <Label bsStyle={isExternal ? 'success' : 'default'} >{isExternal? 'Yes': 'No'}</Label>
-    </Wrapper>
-  );
-};
-
-export default IsExternalUserCell;
+export default UsernameCell;
