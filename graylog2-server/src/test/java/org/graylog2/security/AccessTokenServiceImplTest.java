@@ -304,8 +304,8 @@ public class AccessTokenServiceImplTest {
         final List<AccessTokenService.ExpiredToken> expiredTokens = accessTokenService.findExpiredTokens(Tools.nowUTC());
         final List<AccessTokenService.ExpiredToken> expected =
                 List.of(
-                        new AccessTokenService.ExpiredToken("54e3deadbeefdeadbeefaffe", "web", DateTime.parse("2015-03-14T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf"),
-                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf")
+                        new AccessTokenService.ExpiredToken("54e3deadbeefdeadbeefaffe", "web", DateTime.parse("2015-03-14T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf", "user"),
+                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), "679918ce5cc8a61bb95c95bf", "user")
                 );
 
         assertThat(expiredTokens).isNotEmpty();
