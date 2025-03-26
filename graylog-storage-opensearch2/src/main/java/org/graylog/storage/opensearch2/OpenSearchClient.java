@@ -184,29 +184,29 @@ public class OpenSearchClient {
                 : RequestOptions.DEFAULT;
     }
 
-    public static OpenSearchException exceptionFrom(Exception e, String errorMessage) {
+    public static RuntimeException exceptionFrom(Exception e, String errorMessage) {
         if (e instanceof OpenSearchException openSearchException) {
             if (isIndexNotFoundException(openSearchException)) {
-                throw IndexNotFoundException.create(errorMessage + openSearchException.getResourceId(), openSearchException.getIndex().getName());
+                return IndexNotFoundException.create(errorMessage + openSearchException.getResourceId(), openSearchException.getIndex().getName());
             }
             if (isMasterNotDiscoveredException(openSearchException)) {
-                throw new MasterNotDiscoveredException();
+                return new MasterNotDiscoveredException();
             }
             if (isInvalidWriteTargetException(openSearchException)) {
                 final Matcher matcher = invalidWriteTarget.matcher(openSearchException.getMessage());
                 if (matcher.find()) {
                     final String target = matcher.group("target");
-                    throw InvalidWriteTargetException.create(target);
+                    return InvalidWriteTargetException.create(target);
                 }
             }
             if (isBatchSizeTooLargeException(openSearchException)) {
-                throw new BatchSizeTooLargeException(openSearchException.getMessage());
+                return new BatchSizeTooLargeException(openSearchException.getMessage());
             }
             if (isMapperParsingExceptionException(openSearchException)) {
-                throw new MapperParsingException(openSearchException.getMessage());
+                return new MapperParsingException(openSearchException.getMessage());
             }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
-            throw new BatchSizeTooLargeException(e.getMessage());
+            return new BatchSizeTooLargeException(e.getMessage());
         }
         return new OpenSearchException(errorMessage, e);
     }

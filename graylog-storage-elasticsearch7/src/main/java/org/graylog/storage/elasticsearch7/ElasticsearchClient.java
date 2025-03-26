@@ -184,29 +184,29 @@ public class ElasticsearchClient {
                 : RequestOptions.DEFAULT;
     }
 
-    public static ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
+    public static RuntimeException exceptionFrom(Exception e, String errorMessage) {
         if (e instanceof ElasticsearchException elasticsearchException) {
             if (isIndexNotFoundException(elasticsearchException)) {
-                throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
+                return IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }
             if (isMasterNotDiscoveredException(elasticsearchException)) {
-                throw new MasterNotDiscoveredException();
+                return new MasterNotDiscoveredException();
             }
             if (isInvalidWriteTargetException(elasticsearchException)) {
                 final Matcher matcher = invalidWriteTarget.matcher(elasticsearchException.getMessage());
                 if (matcher.find()) {
                     final String target = matcher.group("target");
-                    throw InvalidWriteTargetException.create(target);
+                    return InvalidWriteTargetException.create(target);
                 }
             }
             if (isBatchSizeTooLargeException(elasticsearchException)) {
-                throw new BatchSizeTooLargeException(elasticsearchException.getMessage());
+                return new BatchSizeTooLargeException(elasticsearchException.getMessage());
             }
             if (isMapperParsingExceptionException(elasticsearchException)) {
-                throw new MapperParsingException(elasticsearchException.getMessage());
+                return new MapperParsingException(elasticsearchException.getMessage());
             }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
-            throw new BatchSizeTooLargeException(e.getMessage());
+            return new BatchSizeTooLargeException(e.getMessage());
         }
         return new ElasticsearchException(errorMessage, e);
     }
