@@ -29,6 +29,7 @@ import org.graylog2.security.AccessTokenEntity;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.shared.tokenusage.TokenUsageService;
 import org.graylog2.shared.users.UserService;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,6 +110,9 @@ public class TokenUsageServiceImpl implements TokenUsageService {
             authBackend = "";
         }
 
-        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess(), isExternal, authBackend);
+        //If the token was never accessed, we return null to make it more obvious in the frontend:
+        final DateTime lastAccess = dto.lastAccess().getMillis() == 0 ? null : dto.lastAccess();
+
+        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), lastAccess, isExternal, authBackend);
     }
 }
