@@ -122,8 +122,15 @@ public class InputRoutingService {
         return ruleService.save(ruleDao);
     }
 
+    // Create a human-readable name for a routing rule
     private String getSystemRuleName(String inputName, String inputId, String streamName) {
-        return GL_ROUTING_RULE_PREFIX + inputName + "[" + inputId + "]_to_" + streamName;
+        return GL_ROUTING_RULE_PREFIX + sanitize(inputName)
+                + "[" + inputId + "]_to_"
+                + sanitize(streamName);
+    }
+
+    private String sanitize(String s) {
+        return s.replace('\"', '*');
     }
 
     private boolean isSystemRulePattern(String ruleName) {
@@ -132,7 +139,7 @@ public class InputRoutingService {
     }
 
     private String createSystemRuleRegex(String inputId, String inputName) {
-        return GL_ROUTING_RULE_PREFIX + Pattern.quote(inputName) + "\\[" + inputId + "\\]_to_.*";
+        return GL_ROUTING_RULE_PREFIX + Pattern.quote(sanitize(inputName)) + "\\[" + inputId + "\\]_to_.*";
     }
 
     private String replaceInputName(String ruleName, String oldInputName, String newInputName) {
@@ -157,7 +164,7 @@ public class InputRoutingService {
         ruleService.loadAllByTitle(createSystemRuleRegex(event.inputId(), event.oldInputTitle()))
                 .forEach(ruleDao -> {
                     String oldRuleTitle = ruleDao.title();
-                    String newRuleTitle = replaceInputName(oldRuleTitle, event.oldInputTitle(), event.newInputTitle());
+                    String newRuleTitle = replaceInputName(oldRuleTitle, sanitize(event.oldInputTitle()), sanitize(event.newInputTitle()));
                     String newSource = ruleDao.source().replace(oldRuleTitle, newRuleTitle);
                     ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build(), false);
                     handleRuleRenamed(oldRuleTitle, newRuleTitle);
