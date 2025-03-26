@@ -190,25 +190,29 @@ const DataNodeUpgradePage = () => {
               <DataNodeUpgradeHelp />
             </h3>
             <StyledHorizontalDl>
-              <dt>Shard Replication:</dt>
-              <dd>
-                <ShardReplicationContainer>
-                  {data?.shard_replication_enabled ? (
-                    <Label bsStyle="success" bsSize="xs">
-                      Enabled
-                    </Label>
-                  ) : (
-                    <Label bsStyle="warning" bsSize="xs">
-                      Disabled
-                    </Label>
-                  )}
-                  &nbsp;
-                  <Switch
-                    checked={!!data?.shard_replication_enabled}
-                    onChange={data?.shard_replication_enabled ? stopShardReplication : startShardReplication}
-                  />
-                </ShardReplicationContainer>
-              </dd>
+              {(upgradeMethod === 'rolling-upgrade') && (
+                <>
+                  <dt>Shard Replication:</dt>
+                  <dd>
+                    <ShardReplicationContainer>
+                      {data?.shard_replication_enabled ? (
+                        <Label bsStyle="success" bsSize="xs">
+                          Enabled
+                        </Label>
+                      ) : (
+                        <Label bsStyle="warning" bsSize="xs">
+                          Disabled
+                        </Label>
+                      )}
+                      &nbsp;
+                      <Switch
+                        checked={!!data?.shard_replication_enabled}
+                        onChange={data?.shard_replication_enabled ? stopShardReplication : startShardReplication}
+                      />
+                    </ShardReplicationContainer>
+                  </dd>
+                </>
+              )}
               <dt>Cluster Manager:</dt>
               <dd>{data?.cluster_state?.manager_node?.name}</dd>
               <dt>Number of Nodes:</dt>
