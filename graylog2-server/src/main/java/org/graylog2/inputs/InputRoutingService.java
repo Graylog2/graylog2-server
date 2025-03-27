@@ -130,7 +130,8 @@ public class InputRoutingService {
     }
 
     private String sanitize(String s) {
-        return s.replace('\"', '*');
+        return s.replace('\"', '*')
+                .replace('\\', '*');
     }
 
     private boolean isSystemRulePattern(String ruleName) {
