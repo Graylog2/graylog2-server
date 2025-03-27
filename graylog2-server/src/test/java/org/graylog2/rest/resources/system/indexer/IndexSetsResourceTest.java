@@ -116,7 +116,7 @@ public class IndexSetsResourceTest {
         final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false);
+        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -133,7 +133,7 @@ public class IndexSetsResourceTest {
         final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false);
+        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -147,7 +147,7 @@ public class IndexSetsResourceTest {
     public void list0() {
         when(indexSetService.findAll()).thenReturn(Collections.emptyList());
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false);
+        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
