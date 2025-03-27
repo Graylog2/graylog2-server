@@ -190,15 +190,15 @@ public class AccessTokenEntityServiceImplTest {
         final String username = dto.userName();
         final boolean isExternal = user.isExternalUser();
         final String authBackend;
-        if (isExternal) {
+        if (user.getAuthServiceId() != null) {
             authBackend = Optional.ofNullable(authBackendName)
                     .orElse("<" + user.getAuthServiceId() + "> (DELETED)");
         } else {
-            //User is not external, so this field stays empty.
-            authBackend = "";
+            //User isn't associated with an auth-service:
+            authBackend = "Internal";
         }
 
-        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess().getMillis() == 0 ? null : dto.lastAccess(), isExternal, authBackend);
+        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess().getMillis() == 0 ? null : dto.lastAccess(), dto.expiresAt(), isExternal, authBackend);
     }
 
     public static class UserFactory implements UserImpl.Factory {
