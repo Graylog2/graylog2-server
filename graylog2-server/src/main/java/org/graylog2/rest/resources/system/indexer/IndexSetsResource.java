@@ -78,6 +78,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.indexer.IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE;
 
 @RequiresAuthentication
 @Api(value = "System/IndexSets", description = "Index sets")
@@ -128,15 +129,30 @@ public class IndexSetsResource extends RestResource {
                                  @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
                                  @QueryParam("limit") @DefaultValue("0") int limit,
                                  @ApiParam(name = "stats", value = "Include index set stats.")
-                                 @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
+                                     @QueryParam("stats") @DefaultValue("false") boolean computeStats,
+                                 @ApiParam(name = "security", value = "Include index sets related to security.")
+                                     @QueryParam("security") @DefaultValue("true") boolean includeSecurity) {
 
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         List<IndexSetConfig> allowedConfigurations = indexSetService.findAll()
                 .stream()
                 .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
+                .filter(indexSet -> includeSecurity || !isSecurityIndexSet(indexSet))
                 .toList();
 
         return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, allowedConfigurations);
+    }
+
+    private boolean isSecurityIndexSet(IndexSetConfig indexSet) {
+        // TODO: base this on something more reliable than title
+        if (indexSet.indexTemplateType().isPresent()) {
+            if (indexSet.indexTemplateType().get().equals(ILLUMINATE_INDEX_TEMPLATE_TYPE)
+                    || indexSet.indexTemplateType().get().equals("investigation_messages")) {
+                return true;
+            }
+        }
+        return indexSet.title().equals("Graylog Anomaly Detector Messages")
+                || indexSet.title().equals("Graylog Investigation Events");
     }
 
     @GET
