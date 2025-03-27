@@ -37,8 +37,6 @@ public abstract class TokenSummary {
     public abstract DateTime lastAccess();
     @JsonProperty
     public abstract DateTime createdAt();
-    @JsonProperty
-    public abstract DateTime tokenTtl();
     @JsonCreator
     public static TokenSummary create(@JsonProperty("id") String id,
                                       @JsonProperty("name") String name,
