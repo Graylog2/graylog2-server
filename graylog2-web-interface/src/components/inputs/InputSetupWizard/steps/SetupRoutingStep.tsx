@@ -242,7 +242,8 @@ const SetupRoutingStep = () => {
                 </li>
                 <li>
                   Pipeline rules can be automatically created and attached to the <strong>Default Stream</strong> by
-                  this Wizard.
+                  this Wizard. These rules will be placed in the system managed Default Routing Pipeline, and will be
+                  automatically renamed (or deleted) to accurately reflect the state of this Input.
                 </li>
               </StyledList>
             </DescriptionCol>
@@ -300,9 +301,9 @@ const SetupRoutingStep = () => {
                   inputId="streams"
                   onChange={handleStreamSelect}
                   options={options}
-                  aria-label="All messages (Default)"
+                  aria-label="Default Stream"
                   clearable
-                  placeholder="All messages (Default)"
+                  placeholder="Default Stream"
                   value={selectedStreamId ?? getStepData(stepsData, currentStepName, 'streamId')}
                 />
                 {!isDefaultStream && (
