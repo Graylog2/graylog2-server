@@ -52,7 +52,11 @@ const CreateStreamForm = ({
   prevShouldCreateNewPipeline = true,
 }: Props) => {
   const [indexSetsRefetchInterval, setIndexSetsRefetchInterval] = useState<false | number>(false);
-  const { data: indexSetsData, isSuccess: isIndexSetsSuccess } = useIndexSetsList(false, indexSetsRefetchInterval);
+  const { data: indexSetsData, isSuccess: isIndexSetsSuccess } = useIndexSetsList(
+    false,
+    indexSetsRefetchInterval,
+    false,
+  );
 
   const validate = (values: FormValues) => {
     let errors = {};

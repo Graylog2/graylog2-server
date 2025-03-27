@@ -27,9 +27,10 @@ type State = {
   indexSets: Array<IndexSet>;
   indexSetStats: IndexSetsStats | null;
 };
-const getUrl = (stats: boolean) => qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
-const fetchIndexSetsList = (stats: boolean): Promise<State> =>
-  fetch('GET', getUrl(stats)).then((response: IndexSetsResponseType) => ({
+const getUrl = (stats: boolean, security: boolean) =>
+  qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats, security).url);
+const fetchIndexSetsList = (stats: boolean, include_security: boolean): Promise<State> =>
+  fetch('GET', getUrl(stats, include_security)).then((response: IndexSetsResponseType) => ({
     indexSetsCount: response.total,
     indexSets: response.index_sets,
     indexSetStats: response.stats,
@@ -40,6 +41,7 @@ const initialData: State = { indexSets: [], indexSetsCount: null, indexSetStats:
 const useIndexSetsList = (
   stats: boolean = false,
   refetchInterval: number | false = false,
+  include_security: boolean = false,
 ): {
   data: State;
   refetch: () => void;
@@ -50,7 +52,7 @@ const useIndexSetsList = (
     ['IndexSetsList', stats],
     () =>
       defaultOnError(
-        fetchIndexSetsList(stats),
+        fetchIndexSetsList(stats, include_security),
         'Loading index sets with list failed with status',
         'Could not load index sets list',
       ),
