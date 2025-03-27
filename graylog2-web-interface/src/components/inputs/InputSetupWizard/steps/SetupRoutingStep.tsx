@@ -18,6 +18,8 @@ import * as React from 'react';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
+import Routes from 'routing/Routes';
+import { Link } from 'components/common/router';
 import { Alert, Button, Row, Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
@@ -65,6 +67,10 @@ const StyledLabel = styled.label(
     background: none;
   `,
 );
+
+const StyledAlert = styled(Alert)`
+  margin-top: 0;
+`;
 
 const SetupRoutingStep = () => {
   const [showSelectStream, setShowSelectStream] = useState<boolean>(false);
@@ -202,6 +208,25 @@ const SetupRoutingStep = () => {
   return (
     <StepWrapper>
       <InputInUseAlert inputId={wizardData?.input?.id} />
+      {selectedStreamId && streamHasConnectedPipelines && (
+        <Row>
+          <Col md={12}>
+            <StyledAlert bsStyle="warning" title="Pipelines connected to target Stream">
+              We recommending checking the impact of these prior to completing the Input Setup. The target Stream has
+              the following Pipelines connected to it:
+              <StyledList>
+                {streamPipelinesData.map((pipeline) => (
+                  <li key={pipeline.title}>
+                    <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)} target="_blank">
+                      {pipeline.title}
+                    </Link>
+                  </li>
+                ))}
+              </StyledList>
+            </StyledAlert>
+          </Col>
+        </Row>
+      )}
       {!showNewStreamSection && !showSelectStreamSection && (
         <>
           <Row>
@@ -268,21 +293,6 @@ const SetupRoutingStep = () => {
               </StyledList>
             </DescriptionCol>
           </Row>
-          {selectedStreamId && streamHasConnectedPipelines && (
-            <Row>
-              <Col md={12}>
-                <Alert title="Pipelines connected to target Stream" bsStyle="info">
-                  We recommending checking the impact of these prior to completing the Input Setup. The target Stream
-                  has the following Pipelines connected to it:
-                  <StyledList>
-                    {streamPipelinesData.map((pipeline) => (
-                      <li key={pipeline.title}>{pipeline.title}</li>
-                    ))}
-                  </StyledList>
-                </Alert>
-              </Col>
-            </Row>
-          )}
           {!isLoadingStreams && (
             <Row>
               <Col md={12}>
