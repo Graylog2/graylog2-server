@@ -88,7 +88,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-const MessageRenderer = ({ message, eventId }: { message: string; eventId: string }) => {
+export const MessageRenderer = ({ message, eventId }: { message: string; eventId: string }) => {
   const { toggleSection } = useExpandedSections();
 
   const toggleExtraSection = () => toggleSection(eventId, 'restFieldsExpandedSection');
