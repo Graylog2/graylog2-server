@@ -45,7 +45,7 @@ const customColumnRenderers = (): ColumnRenderers<Token> => ({
       width: 0.2,
     },
     last_access: {
-      renderCell: (_last_access: string, token) => token?.last_access && <Timestamp dateTime={token.last_access} />,
+      renderCell: (_last_access: string, token) => (token?.last_access ? <Timestamp dateTime={token.last_access}/> : 'Never'),
       width: 0.2,
     },
     external_user: {
