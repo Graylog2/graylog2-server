@@ -66,32 +66,45 @@ public class DataLakeSearchValidator implements SearchValidator {
             if (searchTypes.size() != 1) {
                 errors.add(new QueryError(query, "Data Lake query can contain only one search type"));
             }
+            final List<UsedSearchFilter> searchFilters = query.filters();
+            if (searchFilters != null && !searchFilters.isEmpty()) {
+                errors.add(new QueryError(query, "Query for Data Lake preview cannot use search filters"));
+            }
+            final Filter filter = query.filter();
+            if (filter != null) {
+                errors.add(new QueryError(query, "Query for Data Lake preview cannot use 'filter' field"));
+            }
 
-            searchTypes.forEach(searchType -> {
-                final Set<String> streams = searchType.streams();
-                if (streams == null || streams.size() > 1) {
-                    errors.add(new SearchTypeError(query, searchType.id(),
-                            "Data Lake preview can be executed on only 1 stream, search type contained more"));
-                }
-                final Set<String> streamCategories = searchType.streamCategories();
-                if (streamCategories != null && !streamCategories.isEmpty()) {
-                    errors.add(new SearchTypeError(query, searchType.id(),
-                            "Search Type for Data Lake preview cannot use stream categories"));
-                }
-                final List<UsedSearchFilter> searchFilters = searchType.filters();
-                if (searchFilters != null && !searchFilters.isEmpty()) {
-                    errors.add(new SearchTypeError(query, searchType.id(),
-                            "Search Type for Data Lake preview cannot use search filters"));
-                }
-                final Filter filter = searchType.filter();
-                if (filter != null) {
-                    errors.add(new SearchTypeError(query, searchType.id(),
-                            "Search Type for Data Lake preview cannot use 'filter' field"));
-                }
-            });
+            searchTypes.forEach(searchType -> errors.addAll(validateSearchType(query, searchType)));
             return errors;
         }
         return Set.of();
+    }
+
+    private Set<SearchError> validateSearchType(final Query query,
+                                                final SearchType searchType) {
+        Set<SearchError> errors = new HashSet<>();
+        final Set<String> streams = searchType.streams();
+        if (streams == null || streams.size() > 1) {
+            errors.add(new SearchTypeError(query, searchType.id(),
+                    "Data Lake preview can be executed on only 1 stream, search type contained more"));
+        }
+        final Set<String> streamCategories = searchType.streamCategories();
+        if (streamCategories != null && !streamCategories.isEmpty()) {
+            errors.add(new SearchTypeError(query, searchType.id(),
+                    "Search Type for Data Lake preview cannot use stream categories"));
+        }
+        final List<UsedSearchFilter> searchFilters = searchType.filters();
+        if (searchFilters != null && !searchFilters.isEmpty()) {
+            errors.add(new SearchTypeError(query, searchType.id(),
+                    "Search Type for Data Lake preview cannot use search filters"));
+        }
+        final Filter filter = searchType.filter();
+        if (filter != null) {
+            errors.add(new SearchTypeError(query, searchType.id(),
+                    "Search Type for Data Lake preview cannot use 'filter' field"));
+        }
+        return errors;
     }
 
     public static boolean containsDataLakeSearchElements(final Search search) {
