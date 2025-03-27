@@ -35,11 +35,15 @@ public abstract class TokenSummary {
 
     @JsonProperty
     public abstract DateTime lastAccess();
-
+    @JsonProperty
+    public abstract DateTime createdAt();
+    @JsonProperty
+    public abstract DateTime tokenTtl();
     @JsonCreator
     public static TokenSummary create(@JsonProperty("id") String id,
                                       @JsonProperty("name") String name,
-                                      @JsonProperty("last_access") DateTime lastAccess) {
-        return new AutoValue_TokenSummary(id, name, lastAccess);
+                                      @JsonProperty("last_access") DateTime lastAccess,
+                                      @JsonProperty("created_at") DateTime createdAt) {
+        return new AutoValue_TokenSummary(id, name, lastAccess, createdAt);
     }
 }
