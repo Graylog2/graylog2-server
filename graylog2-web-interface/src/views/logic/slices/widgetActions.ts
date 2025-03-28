@@ -79,7 +79,7 @@ export const addWidget =
     const activeViewState = selectActiveViewState(getState());
     const newViewState = activeViewState.toBuilder().widgetPositions(newWidgetPositions).widgets(newWidgets).build();
 
-    return dispatch(updateViewState(activeQuery, newViewState));
+    return dispatch(updateViewState(activeQuery, newViewState)).then(() => widget.id);
   };
 
 export const updateWidget = (id: string, updatedWidget: Widget) => (dispatch: ViewsDispatch, getState: GetState) => {

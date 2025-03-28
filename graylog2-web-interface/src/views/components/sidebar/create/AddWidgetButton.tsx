@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import sortBy from 'lodash/sortBy';
 import upperCase from 'lodash/upperCase';
-import { useState } from 'react';
 
 import useLocation from 'routing/useLocation';
 import { Button } from 'components/bootstrap';
@@ -31,6 +31,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
@@ -53,7 +54,7 @@ export type CreatorProps = {
   view: View;
 };
 type CreatorType = 'preset' | 'generic' | 'investigations' | 'events';
-type CreatorFunction = () => (dispatch: ViewsDispatch, getState: GetState) => unknown;
+type CreatorFunction = () => (dispatch: ViewsDispatch, getState: GetState) => Promise<string>;
 
 type FunctionalCreator = {
   func: CreatorFunction;
@@ -92,6 +93,7 @@ const CreateMenuItem = ({
   const sendTelemetry = useSendTelemetry();
   const dispatch = useViewsDispatch();
   const disabled = creator.useCondition?.() === false;
+  const { setWidgetEditing } = useContext(WidgetFocusContext);
 
   const createHandlerFor = () => {
     if (isCreatorFunc(creator)) {
@@ -106,7 +108,9 @@ const CreateMenuItem = ({
 
         onClick();
 
-        dispatch(creator.func());
+        dispatch(creator.func()).then((widgetId) => {
+          setWidgetEditing(widgetId);
+        });
       };
     }
 
@@ -171,8 +175,6 @@ const GroupCreateMenuItems = ({
   </>
 );
 
-const createGroup = (creators: Array<Creator>, type: CreatorType) => creators.filter((c) => c.type === type);
-
 type Props = {
   onClick: () => void;
 };
@@ -180,10 +182,12 @@ type Props = {
 const AddWidgetButton = ({ onClick }: Props) => {
   const [overflowingComponents, setOverflowingComponents] = useState<OverflowingComponents>({});
   const creators = usePluginEntities('creators');
-  const presets = createGroup(creators, 'preset');
-  const generic = createGroup(creators, 'generic');
-  const investigationsCreator = createGroup(creators, 'investigations');
-  const eventsCreator = createGroup(creators, 'events');
+  const {
+    preset: presets,
+    generic,
+    events: eventsCreator,
+    investigations: investigationsCreator,
+  } = useMemo(() => Object.groupBy(creators, (creator) => creator.type), [creators]);
   const components: Array<React.ReactNode> = Object.values(overflowingComponents);
 
   return (
