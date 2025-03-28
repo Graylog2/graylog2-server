@@ -182,7 +182,9 @@ const ApiRoutes = {
     rebuildSingle: (index: string) => ({ url: `/system/indices/ranges/${index}/rebuild` }),
   },
   IndexSetsApiController: {
-    list: (stats) => ({ url: `/system/indices/index_sets?stats=${stats}` }),
+    list: (stats: boolean, security: boolean = false) => ({
+      url: `/system/indices/index_sets?stats=${stats}&security=${security}`,
+    }),
     listPaginated: (skip, limit, stats) => ({
       url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}`,
     }),
