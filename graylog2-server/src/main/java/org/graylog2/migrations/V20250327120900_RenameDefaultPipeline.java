@@ -62,17 +62,17 @@ public class V20250327120900_RenameDefaultPipeline extends Migration {
         PipelineDao dao;
         try {
             dao = pipelineService.loadByName(OLD_PIPELINE_NAME);
+            final PipelineDao toSave = dao.toBuilder()
+                    .title(GL_INPUT_ROUTING_PIPELINE)
+                    .source(dao.source().replace(OLD_PIPELINE_NAME, GL_INPUT_ROUTING_PIPELINE))
+                    .modifiedAt(DateTime.now(DateTimeZone.UTC))
+                    .build();
+
+            pipelineService.save(toSave, false);
+
         } catch (NotFoundException e) {
-            return;
+            // no pipeline - nothing to do
         }
-
-        final PipelineDao toSave = dao.toBuilder()
-                .title(GL_INPUT_ROUTING_PIPELINE)
-                .source(dao.source().replace(OLD_PIPELINE_NAME, GL_INPUT_ROUTING_PIPELINE))
-                .modifiedAt(DateTime.now(DateTimeZone.UTC))
-                .build();
-
-        pipelineService.save(toSave, false);
 
         markMigrationApplied();
     }
