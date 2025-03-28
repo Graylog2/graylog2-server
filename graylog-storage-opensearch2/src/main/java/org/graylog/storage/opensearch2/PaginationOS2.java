@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch2;
 
 import jakarta.inject.Inject;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
@@ -26,6 +27,7 @@ import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.searches.ChunkCommand;
 
+import java.util.List;
 import java.util.Set;
 
 public class PaginationOS2 implements MultiChunkResultRetriever {
@@ -46,8 +48,13 @@ public class PaginationOS2 implements MultiChunkResultRetriever {
     public ChunkedResult retrieveChunkedResult(final ChunkCommand chunkCommand) {
         final SearchSourceBuilder searchQuery = searchRequestFactory.create(chunkCommand);
         final SearchRequest request = buildSearchRequest(searchQuery, chunkCommand.indices());
-        final SearchResponse result = client.search(request, "Unable to perform search-after pagination search");
-        return new PaginationResultOS2(resultMessageFactory, client, request, result, searchQuery.toString(), chunkCommand.fields(), chunkCommand.limit().orElse(-1));
+        // doing a msearch so that it results in a POST so we don't have to deal with possible errors where the request exceeds HTTP parameter lengths
+        final var result = client.msearch(List.of(request), "Unable to perform search-after pagination search");
+        if(result.size() != 1) {
+            // we put in one request, so we expect exactly one result to come back
+            throw new RuntimeException("MSearch with one request should result in exactly one result, but was: " + result.size());
+        }
+        return new PaginationResultOS2(resultMessageFactory, client, request, result.get(0).getResponse(), searchQuery.toString(), chunkCommand.fields(), chunkCommand.limit().orElse(-1));
     }
 
     private SearchRequest buildSearchRequest(final SearchSourceBuilder query,
