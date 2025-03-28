@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 import type { EditWidgetComponentProps } from 'views/types';
@@ -118,7 +119,7 @@ const AggregationWizard = ({
   children,
   onCancel,
 }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
-  const initialFormValues = _initialFormValues(config);
+  const initialFormValues = useMemo(() => _initialFormValues(config), [config]);
 
   return (
     <WidgetConfigForm
