@@ -38,8 +38,6 @@ import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -101,7 +99,7 @@ public class VersionProbeImpl implements VersionProbe {
     public Optional<SearchVersion> probe(final Collection<URI> hosts) {
         try {
             return RetryerBuilder.<Optional<SearchVersion>>newBuilder()
-                    .retryIfResult(input -> !input.isPresent())
+                    .retryIfResult(input -> input.isEmpty())
                     .retryIfExceptionOfType(IOException.class)
                     .retryIfRuntimeException()
                     .withRetryListener(new RetryListener() {
@@ -136,7 +134,7 @@ public class VersionProbeImpl implements VersionProbe {
     private Optional<SearchVersion> probeAllHosts(final Collection<URI> hosts) {
         return hosts
                 .stream()
-                .map(host -> probeSingleHost(host))
+                .map(this::probeSingleHost)
                 .filter(Optional::isPresent)
                 .findFirst()
                 .orElse(Optional.empty());

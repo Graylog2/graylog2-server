@@ -17,11 +17,16 @@
 package org.graylog2.storage.versionprobe;
 
 import org.graylog2.storage.SearchVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 
 public interface VersionProbe {
+
+    Logger LOG = LoggerFactory.getLogger(VersionProbe.class); // keep the original implementation class name for compat reasons
+
     Optional<SearchVersion> probe(final Collection<URI> hosts);
 }
