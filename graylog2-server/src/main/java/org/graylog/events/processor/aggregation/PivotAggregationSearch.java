@@ -401,8 +401,8 @@ public class PivotAggregationSearch implements AggregationSearch {
         return permittedStreams.loadAllMessageStreams((streamId) -> true);
     }
 
-    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, User user,
-                                   long searchWithinMs, long executeEveryMs) throws EventProcessorException {
+    protected SearchJob getSearchJob(AggregationEventProcessorParameters parameters, User user,
+                           long searchWithinMs, long executeEveryMs) throws EventProcessorException {
         final var username = user.name();
         final Query queryWithSearchFilters = searchNormalization.postValidation(
                 getAggregationQuery(parameters, searchWithinMs, executeEveryMs),
