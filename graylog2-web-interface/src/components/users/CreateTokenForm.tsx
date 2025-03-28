@@ -30,23 +30,28 @@ const StyledForm = styled.form`
       width: 300px;
     }
   }
+  .input-group {
+    width: 300px;
+  }
 `;
 
 type Props = {
   creatingToken?: boolean;
   disableForm?: boolean;
   onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => void;
+  defaultTtl?: string,
+  disableTtl?: boolean,
 };
 
-const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate }: Props) => {
+const CreateTokenForm = ({ creatingToken = false, disableForm = false, defaultTtl = 'P30D', disableTtl = false, onCreate }: Props) => {
   const [tokenName, setTokenName] = useState('');
-  const [tokenTtl, setTokenTtl] = useState('P7D');
+  const [tokenTtl, setTokenTtl] = useState(defaultTtl);
 
   const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
     onCreate({ tokenName, tokenTtl });
     setTokenName('');
-    setTokenTtl('');
+    setTokenTtl(defaultTtl);
   };
 
   const ttlValidator = (milliseconds: number) => milliseconds >= 60000;
@@ -61,7 +66,9 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
           placeholder="What is this token for?"
           value={tokenName}
           onChange={(event) => setTokenName((event.target as HTMLInputElement).value)}
-        />{' '}
+        />
+      </FormGroup>
+      {!disableTtl && (
         <ISODurationInput
           id="token_creation_ttl"
           duration={tokenTtl}
@@ -73,7 +80,7 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
           disabled={disableForm}
           required
         />
-      </FormGroup>
+      )}
       <Button
         id="create-token"
         disabled={disableForm || tokenName === '' || creatingToken}
