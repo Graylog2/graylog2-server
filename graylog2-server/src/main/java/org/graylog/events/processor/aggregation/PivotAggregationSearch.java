@@ -528,7 +528,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .id(QUERY_ID)
                 .searchTypes(searchTypes)
                 .query(decorateQuery(config))
-                .timerange(parameters.timerange());
+                .timerange(parameters.timerange())
+                .filters(config.filters());
 
         final Set<String> streams = getStreams(parameters);
         if (!streams.isEmpty()) {
