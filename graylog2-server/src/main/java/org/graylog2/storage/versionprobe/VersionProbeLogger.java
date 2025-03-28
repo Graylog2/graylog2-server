@@ -18,34 +18,29 @@ package org.graylog2.storage.versionprobe;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class VersionProbeLogger implements VersionProbeListener {
 
-    public static final VersionProbeListener INSTANCE = new VersionProbeLogger(LoggerFactory.getLogger(VersionProbe.class));
+    public static final VersionProbeListener INSTANCE = new VersionProbeLogger();
 
-    private final Logger logger;
-
-    private VersionProbeLogger(Logger logger) {
-        this.logger = logger;
+    private VersionProbeLogger() {
     }
 
     @Override
     public void onRetry(long attemptNumber, long connectionAttempts, @Nullable Throwable cause) {
         if (connectionAttempts == 0) {
-            logger.info("Indexer is not available. Retry #{}", attemptNumber);
+            VersionProbe.LOG.info("Indexer is not available. Retry #{}", attemptNumber);
         } else {
-            logger.info("Indexer is not available. Retry #{}/{}", attemptNumber, connectionAttempts);
+            VersionProbe.LOG.info("Indexer is not available. Retry #{}/{}", attemptNumber, connectionAttempts);
         }
     }
 
     @Override
     public void onError(@Nonnull String message, @Nullable Throwable cause) {
         if (cause != null) {
-            logger.error(message, cause);
+            VersionProbe.LOG.error(message, cause);
         } else {
-            logger.error(message);
+            VersionProbe.LOG.error(message);
         }
     }
 }

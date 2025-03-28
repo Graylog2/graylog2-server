@@ -37,9 +37,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-public class ESVersionCheckPeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(ESVersionCheckPeriodical.class);
-    private final SearchVersion initialElasticsearchVersion;
+public class SearchVersionCheckPeriodical extends Periodical {
+    private static final Logger LOG = LoggerFactory.getLogger(SearchVersionCheckPeriodical.class);
+    private final SearchVersion initialSearchVersion;
     private final Optional<SearchVersion> versionOverride;
     private final VersionProbeFactory versionProbeFactory;
     private final NotificationService notificationService;
@@ -47,15 +47,15 @@ public class ESVersionCheckPeriodical extends Periodical {
     private final boolean useJwtAuthentication;
 
     @Inject
-    public ESVersionCheckPeriodical(@DetectedSearchVersion SearchVersion elasticsearchVersion,
-                                    @Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
-                                    VersionProbeFactory versionProbeFactory,
-                                    NotificationService notificationService,
-                                    @IndexerHosts List<URI> indexerHosts,
-                                    @Named("indexer_use_jwt_authentication") boolean useJwtAuthentication,
-                                    @RunsWithDataNode Boolean runsWithDataNode
+    public SearchVersionCheckPeriodical(@DetectedSearchVersion SearchVersion elasticsearchVersion,
+                                        @Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
+                                        VersionProbeFactory versionProbeFactory,
+                                        NotificationService notificationService,
+                                        @IndexerHosts List<URI> indexerHosts,
+                                        @Named("indexer_use_jwt_authentication") boolean useJwtAuthentication,
+                                        @RunsWithDataNode Boolean runsWithDataNode
                                     ) {
-        this.initialElasticsearchVersion = elasticsearchVersion;
+        this.initialSearchVersion = elasticsearchVersion;
         this.versionOverride = Optional.ofNullable(versionOverride);
         this.versionProbeFactory = versionProbeFactory;
         this.notificationService = notificationService;
@@ -106,29 +106,29 @@ public class ESVersionCheckPeriodical extends Periodical {
     @Override
     public void doRun() {
         if (versionOverride.isPresent()) {
-            LOG.debug("Elasticsearch version is set manually. Not running check.");
+            LOG.debug("Search indexer version is set manually. Not running check.");
             return;
         }
 
         final VersionProbe limitedProbe = this.versionProbeFactory.create(1, Duration.seconds(1), useJwtAuthentication, VersionProbeLogger.INSTANCE);
 
         limitedProbe.probe(indexerHosts).ifPresent(version -> {
-            if (compatible(this.initialElasticsearchVersion, version)) {
+            if (compatible(this.initialSearchVersion, version)) {
                 notificationService.fixed(Notification.Type.ES_VERSION_MISMATCH);
             } else {
-                LOG.warn("Elasticsearch version currently running ({}) is incompatible with the one Graylog was started " +
-                        "with ({}) - a restart is required!", version, initialElasticsearchVersion);
+                LOG.warn("Search indexer version currently running ({}) is incompatible with the one Graylog was started " +
+                        "with ({}) - a restart is required!", version, initialSearchVersion);
                 final Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.ES_VERSION_MISMATCH)
                         .addSeverity(Notification.Severity.URGENT)
-                        .addDetail("initial_version", initialElasticsearchVersion.toString())
+                        .addDetail("initial_version", initialSearchVersion.toString())
                         .addDetail("current_version", version.toString());
                 notificationService.publishIfFirst(notification);
             }
         });
     }
 
-    private boolean compatible(SearchVersion initialElasticsearchMajorVersion, SearchVersion version) {
-        return initialElasticsearchMajorVersion.version().majorVersion() == version.version().majorVersion();
+    private boolean compatible(SearchVersion initialSearchMajorVersion, SearchVersion version) {
+        return initialSearchMajorVersion.version().majorVersion() == version.version().majorVersion();
     }
 }

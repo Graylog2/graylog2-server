@@ -56,7 +56,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 public class VersionProbeImpl implements VersionProbe {
-    private static final Logger LOG = LoggerFactory.getLogger(VersionProbe.class); // keep the original implementation class name for compat reasons
 
     private final ObjectMapper objectMapper;
     private final OkHttpClient okHttpClient;

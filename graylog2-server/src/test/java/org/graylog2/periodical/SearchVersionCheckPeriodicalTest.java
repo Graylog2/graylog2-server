@@ -40,7 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-class ESVersionCheckPeriodicalTest {
+class SearchVersionCheckPeriodicalTest {
 
     private NotificationService notificationService;
 
@@ -116,7 +116,7 @@ class ESVersionCheckPeriodicalTest {
     }
 
     private Periodical createPeriodical(SearchVersion initialVersion, @Nullable SearchVersion versionOverride, VersionProbeFactory versionProbe) {
-        return new ESVersionCheckPeriodical(
+        return new SearchVersionCheckPeriodical(
                 initialVersion,
                 versionOverride,
                 versionProbe,
