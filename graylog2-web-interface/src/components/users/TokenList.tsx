@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState } from 'react';
+import React, {useMemo, useState} from 'react';
 import styled from 'styled-components';
 
 import {
@@ -27,12 +27,13 @@ import {
   NoEntitiesExist,
   RelativeTime,
 } from 'components/common';
-import { Button, ButtonToolbar, Panel, Table } from 'components/bootstrap';
-import type { Token, TokenSummary } from 'stores/users/UsersStore';
-import { sortByDate } from 'util/SortUtils';
-import { Headline } from 'components/common/Section/SectionComponent';
+import {Button, ButtonToolbar, Panel, Table} from 'components/bootstrap';
+import type {Token, TokenSummary} from 'stores/users/UsersStore';
+import {sortByDate} from 'util/SortUtils';
+import {Headline} from 'components/common/Section/SectionComponent';
 
 import CreateTokenForm from './CreateTokenForm';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 const StyledTokenPanel = styled(Panel)`
   &.panel {
@@ -63,6 +64,7 @@ type Props = {
 };
 
 const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDelete, tokens = [] }: Props) => {
+  const currentUser = useCurrentUser();
   const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
 
@@ -92,7 +94,7 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
 
   return (
     <>
-      <IfPermitted permissions="users:tokencreate">
+      <IfPermitted permissions={['users:tokencreate', `users:tokencreate:${currentUser.username}`]} anyPermissions>
         <Headline>Create And Edit Tokens</Headline>
         <CreateTokenForm onCreate={handleTokenCreation} creatingToken={creatingToken} />
       </IfPermitted>
