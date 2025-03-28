@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix comparison of messages widget to avoid unnecessary refresh."
+
+pulls = ["22161"]
+issues = ["22153"]

@@ -36,9 +36,9 @@ export type WidgetState = {
   stream_categories: Array<string>;
 };
 
-type DeserializesWidgets = {
-  fromJSON: (value) => Widget;
-};
+interface DeserializesWidgets {
+  fromJSON: (value: any) => Widget;
+}
 
 const isNullish = (o: any) => o === null || o === undefined;
 
@@ -265,6 +265,17 @@ class Builder {
     return new Widget(id, type, config, filter, timerange, query, streams, streamCategories, filters);
   }
 }
+
+export const widgetAttributesForComparison: Array<keyof Widget> = [
+  'id',
+  'config',
+  'filter',
+  'timerange',
+  'query',
+  'streams',
+  'streamCategories',
+  'filters',
+];
 
 Widget.Builder = Builder;
 
