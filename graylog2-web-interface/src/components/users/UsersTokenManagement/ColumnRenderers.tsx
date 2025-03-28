@@ -20,6 +20,7 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
 import { Timestamp } from 'components/common';
 import IsExternalUserCell from 'components/users/UsersTokenManagement/cells/IsExternalUserCell';
+import ErrorPopover from 'components/lookup-tables/ErrorPopover';
 
 const customColumnRenderers = (): ColumnRenderers<Token> => ({
   attributes: {
@@ -32,7 +33,7 @@ const customColumnRenderers = (): ColumnRenderers<Token> => ({
       width: 0.2,
     },
     username: {
-      renderCell: (_username: string, token) => token.username,
+      renderCell: (_username: string, token) => <>{token.user_deleted && <ErrorPopover placement="right" errorText="User does not exist." title="Token user error" />}{token.username}</>,
       width: 0.2,
     },
     NAME: {
