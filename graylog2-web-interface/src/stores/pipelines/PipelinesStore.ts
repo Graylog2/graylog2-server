@@ -150,7 +150,9 @@ export const PipelinesStore = singletonStore('core.Pipelines', () =>
       const url = qualifyUrl(ApiRoutes.PipelinesController.get(pipelineId).url);
       const promise = fetch('GET', url);
 
-      promise.then(this._updatePipelinesState, failCallback);
+      promise.then((response) => {
+        this._updatePipelinesState(response);
+      }, failCallback);
     },
 
     save(pipelineSource) {
