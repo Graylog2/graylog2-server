@@ -116,12 +116,12 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
         </StyledTokenPanel>
       )}
       <hr />
+      
+      <Headline>Tokens</Headline>
       <StyledSearchForm onSearch={updateQuery} onReset={updateQuery} label="Filter" useLoadingState={false} />
-
-      <>
-         {effectiveTokens.length === 0 ? (
-           <NoEntitiesExist>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</NoEntitiesExist>
-         ): (
+      {effectiveTokens.length === 0 ? (
+        <NoEntitiesExist>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</NoEntitiesExist>
+      ): (
         <Table striped bordered condensed>
           <thead>
             <tr>
@@ -155,8 +155,7 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
             )})}
           </tbody>
         </Table>
-         )}
-      </>
+      )}
     </>
   );
 };

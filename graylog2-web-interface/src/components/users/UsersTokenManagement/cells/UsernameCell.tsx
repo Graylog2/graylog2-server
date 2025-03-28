@@ -18,7 +18,8 @@ import * as React from 'react';
 
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
-import { Token } from '../hooks/useTokens';
+
+import type { Token } from '../hooks/useTokens';
 
 type Props = {
   token: Token;
