@@ -276,7 +276,7 @@ describe('InputSetupWizard Start Input', () => {
 
       fireEvent.click(selectStreamButton);
 
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+      const streamSelect = await screen.findByLabelText(/Default Stream/i);
 
       await selectEvent.openMenu(streamSelect);
 
@@ -310,7 +310,7 @@ describe('InputSetupWizard Start Input', () => {
 
       fireEvent.click(selectStreamButton);
 
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+      const streamSelect = await screen.findByLabelText(/Default Stream/i);
 
       await selectEvent.openMenu(streamSelect);
 
