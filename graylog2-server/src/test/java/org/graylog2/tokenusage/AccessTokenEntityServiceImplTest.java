@@ -36,6 +36,7 @@ import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,8 +106,8 @@ public class AccessTokenEntityServiceImplTest {
 
     @Test
     public void onlyLocalUsersDoesntHitTheAuthBackendService() {
-        final AccessTokenEntity token1 = mkToken(1);
-        final AccessTokenEntity token2 = mkToken(2);
+        final AccessTokenEntity token1 = mkToken(1, Tools.nowUTC());
+        final AccessTokenEntity token2 = mkToken(2, Tools.nowUTC());
         final User user1 = mkUser(1, false);
         final User user2 = mkUser(2, false);
         when(accessTokenService.findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER)))
@@ -128,8 +129,8 @@ public class AccessTokenEntityServiceImplTest {
 
     @Test
     public void tokensFromExternalUsersShowAuthBackends() {
-        final AccessTokenEntity token1 = mkToken(1);
-        final AccessTokenEntity token2 = mkToken(2);
+        final AccessTokenEntity token1 = mkToken(1, Tools.nowUTC());
+        final AccessTokenEntity token2 = mkToken(2, Tools.dateTimeFromDouble(0));
         final User user1 = mkUser(1, true);
         final User user2 = mkUser(2, true);
         final AuthServiceBackendDTO authService1 = mkAuthService();
@@ -154,13 +155,13 @@ public class AccessTokenEntityServiceImplTest {
     //Just some helper methods
 
 
-    private AccessTokenEntity mkToken(int number) {
+    private AccessTokenEntity mkToken(int number, DateTime lastAccess) {
         return AccessTokenEntity.Builder.create()
                 .id("tokenId" + number)
                 .name("tokenName" + number)
                 .userName("userName" + number)
                 .createdAt(Tools.nowUTC().minusDays(number))
-                .lastAccess(Tools.nowUTC())
+                .lastAccess(lastAccess)
                 .expiresAt(Tools.nowUTC().plusDays(number))
                 .build();
     }
@@ -189,15 +190,15 @@ public class AccessTokenEntityServiceImplTest {
         final String username = dto.userName();
         final boolean isExternal = user.isExternalUser();
         final String authBackend;
-        if (isExternal) {
+        if (user.getAuthServiceId() != null) {
             authBackend = Optional.ofNullable(authBackendName)
                     .orElse("<" + user.getAuthServiceId() + "> (DELETED)");
         } else {
-            //User is not external, so this field stays empty.
-            authBackend = "";
+            //User isn't associated with an auth-service:
+            authBackend = "Internal";
         }
 
-        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess(), isExternal, authBackend);
+        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess().getMillis() == 0 ? null : dto.lastAccess(), dto.expiresAt(), isExternal, authBackend);
     }
 
     public static class UserFactory implements UserImpl.Factory {
