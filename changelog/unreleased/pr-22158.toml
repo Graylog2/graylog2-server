@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fix 'Caught an unhandled exception while executing event processor' when search request to OpenSearch has to many indices."
+
+issues = ["21554"]
+pulls = ["22158"]
