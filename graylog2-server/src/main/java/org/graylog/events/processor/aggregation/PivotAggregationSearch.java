@@ -39,6 +39,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -100,6 +101,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final PermittedStreams permittedStreams;
     private final NotificationService notificationService;
     private final QueryStringDecorators queryStringDecorators;
+    private final SearchNormalization searchNormalization;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
@@ -113,7 +115,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   MoreSearch moreSearch,
                                   PermittedStreams permittedStreams,
                                   NotificationService notificationService,
-                                  QueryStringDecorators queryStringDecorators) {
+                                  QueryStringDecorators queryStringDecorators,
+                                  SearchNormalization searchNormalization) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
@@ -126,6 +129,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.permittedStreams = permittedStreams;
         this.notificationService = notificationService;
         this.queryStringDecorators = queryStringDecorators;
+        this.searchNormalization = searchNormalization;
     }
 
     private String metricName(SeriesSpec series) {
@@ -369,11 +373,14 @@ public class PivotAggregationSearch implements AggregationSearch {
         return results.build();
     }
 
-    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, User user,
+    protected SearchJob getSearchJob(AggregationEventProcessorParameters parameters, User user,
                                    long searchWithinMs, long executeEveryMs) throws EventProcessorException {
         final var username = user.name();
+        final Query queryWithSearchFilters = searchNormalization.postValidation(
+                getAggregationQuery(parameters, searchWithinMs, executeEveryMs),
+                ParameterProvider.of(config.queryParameters()));
         Search search = Search.builder()
-                .queries(ImmutableSet.of(getAggregationQuery(parameters, searchWithinMs, executeEveryMs), getSourceStreamsQuery(parameters)))
+                .queries(ImmutableSet.of(queryWithSearchFilters, getSourceStreamsQuery(parameters)))
                 .parameters(config.queryParameters())
                 .build();
         // This adds all streams if none were provided
@@ -493,7 +500,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .id(QUERY_ID)
                 .searchTypes(searchTypes)
                 .query(decorateQuery(config))
-                .timerange(parameters.timerange());
+                .timerange(parameters.timerange())
+                .filters(config.filters());
 
         final Set<String> streams = getStreams(parameters);
         if (!streams.isEmpty()) {
