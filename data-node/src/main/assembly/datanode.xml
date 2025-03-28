@@ -76,6 +76,8 @@
         </file>
         <file>
             <source>${project.basedir}/../misc/datanode.conf</source>
+            <!-- use the following line if you want to distribute the generated version instead of manually created -->
+            <!--<source>${project.build.directory}/datanode.conf.example</source>-->
             <destName>datanode.conf.example</destName>
             <outputDirectory>.</outputDirectory>
         </file>
