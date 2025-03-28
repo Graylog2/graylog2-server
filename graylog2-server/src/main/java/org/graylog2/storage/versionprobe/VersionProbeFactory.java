@@ -14,22 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage;
+package org.graylog2.storage.versionprobe;
 
-import com.google.inject.BindingAnnotation;
-import org.graylog2.storage.versionprobe.VersionProbe;
+import com.github.joschi.jadconfig.util.Duration;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public interface VersionProbeFactory {
+    /**
+     * Create a VersionProbe instance with all defaults from the graylog server configuration
+     */
+    VersionProbe createDefault();
 
-/**
- * @see org.graylog2.storage.providers.ElasticsearchVersionProvider
- * @see VersionProbe
- */
-@Target({ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-@BindingAnnotation
-public @interface DetectedSearchVersion {
+    /**
+     * Create instance with specific connection details and custom listener
+     */
+    VersionProbe create(int probeAttempts, Duration probeDelay, boolean useJwtAuthentication, VersionProbeListener versionProbeListener);
 }

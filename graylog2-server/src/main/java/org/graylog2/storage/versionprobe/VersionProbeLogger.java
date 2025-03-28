@@ -19,12 +19,15 @@ package org.graylog2.storage.versionprobe;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VersionProbeLogger implements VersionProbeListener {
 
+    public static final VersionProbeListener INSTANCE = new VersionProbeLogger(LoggerFactory.getLogger(VersionProbe.class));
+
     private final Logger logger;
 
-    public VersionProbeLogger(Logger logger) {
+    private VersionProbeLogger(Logger logger) {
         this.logger = logger;
     }
 

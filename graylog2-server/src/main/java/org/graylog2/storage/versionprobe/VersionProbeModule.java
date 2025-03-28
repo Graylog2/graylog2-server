@@ -14,22 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage;
+package org.graylog2.storage.versionprobe;
 
-import com.google.inject.BindingAnnotation;
-import org.graylog2.storage.versionprobe.VersionProbe;
+import com.google.inject.AbstractModule;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-/**
- * @see org.graylog2.storage.providers.ElasticsearchVersionProvider
- * @see VersionProbe
- */
-@Target({ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-@BindingAnnotation
-public @interface DetectedSearchVersion {
+public class VersionProbeModule extends AbstractModule {
+    @Override
+    protected void configure() {
+        install(new FactoryModuleBuilder()
+                .implement(VersionProbe.class, VersionProbeImpl.class)
+                .build(VersionProbeFactory.class));
+    }
 }

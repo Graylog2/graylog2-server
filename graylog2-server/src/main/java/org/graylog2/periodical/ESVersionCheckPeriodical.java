@@ -16,15 +16,19 @@
  */
 package org.graylog2.periodical;
 
+import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog2.configuration.IndexerHosts;
+import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.versionprobe.VersionProbeFactory;
 import org.graylog2.storage.versionprobe.VersionProbe;
+import org.graylog2.storage.versionprobe.VersionProbeLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,21 +41,26 @@ public class ESVersionCheckPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ESVersionCheckPeriodical.class);
     private final SearchVersion initialElasticsearchVersion;
     private final Optional<SearchVersion> versionOverride;
-    private final List<URI> elasticsearchHosts;
-    private final VersionProbe versionProbe;
+    private final VersionProbeFactory versionProbeFactory;
     private final NotificationService notificationService;
+    private final List<URI> indexerHosts;
+    private final boolean useJwtAuthentication;
 
     @Inject
     public ESVersionCheckPeriodical(@DetectedSearchVersion SearchVersion elasticsearchVersion,
                                     @Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
-                                    @IndexerHosts List<URI> elasticsearchHosts,
-                                    VersionProbe versionProbe,
-                                    NotificationService notificationService) {
+                                    VersionProbeFactory versionProbeFactory,
+                                    NotificationService notificationService,
+                                    @IndexerHosts List<URI> indexerHosts,
+                                    @Named("indexer_use_jwt_authentication") boolean useJwtAuthentication,
+                                    @RunsWithDataNode Boolean runsWithDataNode
+                                    ) {
         this.initialElasticsearchVersion = elasticsearchVersion;
         this.versionOverride = Optional.ofNullable(versionOverride);
-        this.elasticsearchHosts = elasticsearchHosts;
-        this.versionProbe = versionProbe;
+        this.versionProbeFactory = versionProbeFactory;
         this.notificationService = notificationService;
+        this.indexerHosts = indexerHosts;
+        this.useJwtAuthentication = runsWithDataNode || useJwtAuthentication;
     }
 
     @Override
@@ -101,9 +110,9 @@ public class ESVersionCheckPeriodical extends Periodical {
             return;
         }
 
-        final Optional<SearchVersion> probedVersion = this.versionProbe.probe(this.elasticsearchHosts);
+        final VersionProbe limitedProbe = this.versionProbeFactory.create(1, Duration.seconds(1), useJwtAuthentication, VersionProbeLogger.INSTANCE);
 
-        probedVersion.ifPresent(version -> {
+        limitedProbe.probe(indexerHosts).ifPresent(version -> {
             if (compatible(this.initialElasticsearchVersion, version)) {
                 notificationService.fixed(Notification.Type.ES_VERSION_MISMATCH);
             } else {
