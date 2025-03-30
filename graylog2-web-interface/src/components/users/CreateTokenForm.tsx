@@ -46,7 +46,6 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, onCreate 
     event.preventDefault();
     onCreate({ tokenName, tokenTtl });
     setTokenName('');
-    setTokenTtl('');
   };
 
   const ttlValidator = (milliseconds: number) => milliseconds >= 60000;
