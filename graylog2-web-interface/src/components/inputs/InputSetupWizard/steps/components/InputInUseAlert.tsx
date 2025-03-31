@@ -17,6 +17,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import Routes from 'routing/Routes';
+import { Link } from 'components/common/router';
 import { Alert, Row, Col } from 'components/bootstrap';
 import useInputReferences from 'components/inputs/InputSetupWizard/hooks/useInputReferences';
 
@@ -46,13 +48,17 @@ const InputInUseAlert = ({ inputId }: Props = { inputId: undefined }) => {
   return (
     <Row>
       <Col md={12}>
-        <StyledAlert title="Input already in use - Message Duplication Risk!" bsStyle="info">
+        <StyledAlert bsStyle="danger" title="Input already in use - Message Duplication Risk!">
           {inputReferencesData.stream_refs.length > 0 && (
             <StreamListWrapper>
               This Input is already referenced within the Stream Rules of the following Streams:
               <StyledList>
                 {inputReferencesData.stream_refs.map((stream) => (
-                  <li key={stream.id}>{stream.name}</li>
+                  <li key={stream.id}>
+                    <Link to={Routes.stream_view(stream.id)} target="_blank">
+                      {stream.name}
+                    </Link>
+                  </li>
                 ))}
               </StyledList>
             </StreamListWrapper>
@@ -62,11 +68,16 @@ const InputInUseAlert = ({ inputId }: Props = { inputId: undefined }) => {
               This Input is already referenced within the Pipeline Rules of the following Pipelines:
               <StyledList>
                 {inputReferencesData.pipeline_refs.map((pipeline) => (
-                  <li key={pipeline.id}>{pipeline.name}</li>
+                  <li key={pipeline.id}>
+                    <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)} target="_blank">
+                      {pipeline.name}
+                    </Link>
+                  </li>
                 ))}
               </StyledList>
             </>
           )}
+          To prevent potential duplication, remove any existing routing before continuing.
         </StyledAlert>
       </Col>
     </Row>
