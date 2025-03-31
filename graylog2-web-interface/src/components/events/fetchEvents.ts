@@ -41,6 +41,7 @@ type FiltersResult = {
     aggregation_timerange?: { from?: string; to?: string; type: string; range?: number };
     key?: Array<string>;
     id?: Array<string>;
+    part_of_detection_chain?: string;
   };
   timerange?: TimeRange;
 };
@@ -88,6 +89,11 @@ export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRan
 
   if (filters.get('id')?.length > 0) {
     result.filter.id = filters.get('id');
+  }
+
+  if (filters.get('part_of_detection_chain')?.length > 0) {
+    // eslint-disable-next-line prefer-destructuring
+    result.filter.part_of_detection_chain = filters.get('part_of_detection_chain')[0];
   }
 
   return result;
