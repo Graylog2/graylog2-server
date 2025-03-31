@@ -31,9 +31,9 @@ import {Button, ButtonToolbar, Panel, Table} from 'components/bootstrap';
 import type {Token, TokenSummary} from 'stores/users/UsersStore';
 import {sortByDate} from 'util/SortUtils';
 import {Headline} from 'components/common/Section/SectionComponent';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import CreateTokenForm from './CreateTokenForm';
-import useCurrentUser from 'hooks/useCurrentUser';
 
 const StyledTokenPanel = styled(Panel)`
   &.panel {
