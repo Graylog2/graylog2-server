@@ -626,7 +626,7 @@ public class PivotAggregationSearchTest {
                 queryEngine,
                 EventsConfigurationTestProvider.create(),
                 moreSearch,
-                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
+                new PermittedStreams(() -> Stream.of("00001")),
                 notificationService,
                 new QueryStringDecorators(Optional.empty()),
                 searchNormalization
@@ -641,7 +641,7 @@ public class PivotAggregationSearchTest {
                 .build();
         job.addQueryResultFuture(TEST_USER, CompletableFuture.completedFuture(queryResult));
         job.seal();
-        when(searchJobService.create(any(), eq(TEST_USER), eq(0))).thenReturn(job);
+        when(searchJobService.create(any(), eq(TEST_USER))).thenReturn(job);
         when(queryEngine.execute(any(), anySet(), any())).thenReturn(job).thenReturn(job);
         pivotAggregationSearch.getSearchJob(parameters,
                 new AggregationSearch.User(TEST_USER, DateTimeZone.UTC), WINDOW_LENGTH, WINDOW_LENGTH);
