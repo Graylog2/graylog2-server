@@ -16,7 +16,7 @@
  */
 import { Map } from 'immutable';
 
-import Widget from 'views/logic/widgets/Widget';
+import Widget, { widgetAttributesForComparison } from 'views/logic/widgets/Widget';
 import type { WidgetState } from 'views/logic/widgets/Widget';
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
@@ -61,9 +61,7 @@ export default class EventsWidget extends Widget {
 
   equals(other: any) {
     if (other instanceof EventsWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) =>
-        isDeepEqual(this._value[key], other[key]),
-      );
+      return widgetAttributesForComparison.every((key) => isDeepEqual(this._value[key], other[key]));
     }
 
     return false;
@@ -71,9 +69,7 @@ export default class EventsWidget extends Widget {
 
   equalsForSearch(other: any) {
     if (other instanceof EventsWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) =>
-        isEqualForSearch(this._value[key], other[key]),
-      );
+      return widgetAttributesForComparison.every((key) => isEqualForSearch(this._value[key], other[key]));
     }
 
     return false;
