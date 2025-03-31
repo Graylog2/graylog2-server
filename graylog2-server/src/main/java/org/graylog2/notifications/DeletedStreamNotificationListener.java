@@ -27,10 +27,10 @@ public class DeletedStreamNotificationListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeletedStreamNotificationListener.class);
 
-    private final NotificationService notificationService;
+    private final NotificationPersistenceService notificationService;
 
     @Inject
-    public DeletedStreamNotificationListener(EventBus eventBus, NotificationService notificationService) {
+    public DeletedStreamNotificationListener(EventBus eventBus, NotificationPersistenceService notificationService) {
         this.notificationService = notificationService;
         eventBus.register(this);
     }

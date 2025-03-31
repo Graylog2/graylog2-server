@@ -35,7 +35,7 @@ import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationPersistenceService;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -78,7 +78,7 @@ public class MigrationActionsImpl implements MigrationActions {
     private final ElasticsearchVersionProvider searchVersionProvider;
     private final List<URI> elasticsearchHosts;
 
-    private final NotificationService notificationService;
+    private final NotificationPersistenceService notificationService;
 
     private final FeatureFlags featureFlags;
 
@@ -93,7 +93,7 @@ public class MigrationActionsImpl implements MigrationActions {
                                 final DatanodeRestApiProxy datanodeProxy,
                                 ElasticsearchVersionProvider searchVersionProvider,
                                 @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
-                                NotificationService notificationService, FeatureFlags featureFlags) {
+                                NotificationPersistenceService notificationService, FeatureFlags featureFlags) {
         this.stateMachineContext = stateMachineContext;
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
