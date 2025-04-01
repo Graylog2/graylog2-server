@@ -147,7 +147,7 @@ class InputRoutingServiceTest {
         final RuleDao ruleDao = loadFixture("org/graylog2/inputs/routing/InputRoutingRule1.json", RuleDao.class);
         when(ruleService.loadAllByTitle(anyString())).thenReturn(List.of(ruleDao));
 
-        String pipelineSource = "pipeline \"All Messages Routing\"\nstage 0 match EITHER\nrule \"gl_route_inputName_to_streamName\"\nend";
+        String pipelineSource = "pipeline \"Default Routing\"\nstage 0 match EITHER\nrule \"gl_route_inputName_to_streamName\"\nend";
         when(pipelineService.loadByName(anyString())).thenReturn(PipelineDao.builder().id("pipelineId1").title("pipelineDao").source(pipelineSource).build());
 
         inputRoutingService.handleInputRenamed(new InputRenamedEvent(INPUT_ID, INPUT_NAME, INPUT_NEW_NAME));

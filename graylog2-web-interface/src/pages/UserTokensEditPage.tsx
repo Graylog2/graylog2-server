@@ -116,7 +116,7 @@ const UserEditPage = ({ params }: Props) => {
       </PageHeader>
 
       <Row className="content">
-        <Col lg={8}>
+        <Col lg={12}>
           {loadedUser ? (
             <TokenList
               tokens={tokens}
