@@ -55,7 +55,7 @@ const CreateStreamForm = ({
   const { data: indexSetsData, isSuccess: isIndexSetsSuccess } = useIndexSetsList(
     false,
     indexSetsRefetchInterval,
-    false,
+    true,
   );
 
   const validate = (values: FormValues) => {

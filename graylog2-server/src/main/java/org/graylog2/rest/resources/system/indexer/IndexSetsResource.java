@@ -75,7 +75,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.indexer.IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE;
@@ -96,6 +98,7 @@ public class IndexSetsResource extends RestResource {
     private final ClusterConfigService clusterConfigService;
     private final SystemJobManager systemJobManager;
     private final DataTieringStatusService tieringStatusService;
+    private final Set<OpenIndexSetFilter> openIndexSetFilters;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -106,7 +109,8 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
                              final SystemJobManager systemJobManager,
-                             final DataTieringStatusService tieringStatusService) {
+                             final DataTieringStatusService tieringStatusService,
+                             Set<OpenIndexSetFilter> openIndexSetFilters) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -116,6 +120,7 @@ public class IndexSetsResource extends RestResource {
         this.clusterConfigService = clusterConfigService;
         this.systemJobManager = systemJobManager;
         this.tieringStatusService = tieringStatusService;
+        this.openIndexSetFilters = openIndexSetFilters;
     }
 
     @GET
@@ -129,30 +134,21 @@ public class IndexSetsResource extends RestResource {
                                  @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
                                  @QueryParam("limit") @DefaultValue("0") int limit,
                                  @ApiParam(name = "stats", value = "Include index set stats.")
-                                     @QueryParam("stats") @DefaultValue("false") boolean computeStats,
-                                 @ApiParam(name = "security", value = "Include index sets related to security.")
-                                     @QueryParam("security") @DefaultValue("true") boolean includeSecurity) {
+                                 @QueryParam("stats") @DefaultValue("false") boolean computeStats,
+                                 @ApiParam(name = "only_open", value = "Include only graylog open indices.")
+                                 @QueryParam("only_open") @DefaultValue("false") boolean onlyOpen) {
 
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
-        List<IndexSetConfig> allowedConfigurations = indexSetService.findAll()
+        Stream<IndexSetConfig> indexSetConfigStream = indexSetService.findAll()
                 .stream()
-                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
-                .filter(indexSet -> includeSecurity || !isSecurityIndexSet(indexSet))
-                .toList();
-
-        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, allowedConfigurations);
-    }
-
-    private boolean isSecurityIndexSet(IndexSetConfig indexSet) {
-        // TODO: base this on something more reliable than title
-        if (indexSet.indexTemplateType().isPresent()) {
-            if (indexSet.indexTemplateType().get().equals(ILLUMINATE_INDEX_TEMPLATE_TYPE)
-                    || indexSet.indexTemplateType().get().equals("investigation_messages")) {
-                return true;
+                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()));
+        if (onlyOpen) {
+            for (OpenIndexSetFilter filter : openIndexSetFilters) {
+                indexSetConfigStream = filter.apply(indexSetConfigStream);
             }
         }
-        return indexSet.title().equals("Graylog Anomaly Detector Messages")
-                || indexSet.title().equals("Graylog Investigation Events");
+        List<IndexSetConfig> list = indexSetConfigStream.toList();
+        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, list);
     }
 
     @GET
