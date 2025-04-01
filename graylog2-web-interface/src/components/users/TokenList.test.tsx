@@ -77,6 +77,7 @@ describe('<TokenList />', () => {
         token: 'beef2003',
         id: 'abc3',
         last_access: '1970-01-01T00:00:00.000Z',
+        expires_at: '2020-01-01T00:00:00.000Z',
         tokenTtl: 'PT72H',
       });
     });
