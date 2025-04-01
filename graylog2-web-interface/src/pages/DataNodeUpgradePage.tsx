@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Row, Col, Button, Table, Label, SegmentedControl, Alert, Modal } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner, Icon, Switch } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import useDataNodeUpgradeStatus, {
   getNodeToUpgrade,
@@ -222,10 +222,20 @@ const DataNodeUpgradePage = () => {
                         </Label>
                       )}
                       &nbsp;
-                      <Switch
-                        checked={!!data?.shard_replication_enabled}
-                        onChange={data?.shard_replication_enabled ? stopShardReplication : startShardReplication}
-                      />
+                      <HelpPopoverButton helpText={
+                        <>
+                          <p>
+                            After you click on <em><b>Start Upgrade Process</b></em> of a node, shard allocation will be set to no replication to allow OpenSearch to use only the available shards.
+                          </p>
+                          <p>
+                            After a node has been upgraded and you click on <em><b>Confirm Upgrade</b></em>, shard replication will be re-enabled and all shards that were unavailable due to the node being upgraded will be re-allocated.
+                          </p>
+                          <br />
+                          <Button onClick={data?.shard_replication_enabled ? stopShardReplication : startShardReplication} bsStyle="warning" bsSize="xsmall">
+                            Force {data?.shard_replication_enabled ? 'Disabled' : 'Enabled'}
+                          </Button>
+                        </>
+                      } />
                     </ShardReplicationContainer>
                   </dd>
                 </>
