@@ -22,9 +22,9 @@ import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
 
 import { Select } from 'components/common';
-import { MarkdownEditor, MarkdownPreview } from 'components/common/MarkdownEditor';
-import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
+import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import usePluginEntities from 'hooks/usePluginEntities';
 import * as FormsUtils from 'util/FormsUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -54,6 +54,20 @@ type Props = {
 const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState(false);
+  const pluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm');
+
+  const eventProcedureForm = React.useMemo(
+    () => pluggableEventProcedureForm.map(({ component: PluggableEventProcedureForm }) => (
+      <PluggableEventProcedureForm
+        eventDefinition={eventDefinition}
+        onClose={() => setShowAddEventProcedureForm(false)}
+        onSave={() => { }}
+        canEdit={canEdit}
+      />
+    )),
+    [pluggableEventProcedureForm],
+  );
 
   const handleChange = (event) => {
     const { name } = event.target;
@@ -73,84 +87,81 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Pr
   };
 
   const readOnly = !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1';
+  const hasEventProcedure = !!eventDefinition?.event_procedure;
 
   return (
-    <Row>
-      <Col md={7} lg={6}>
-        <h2 className={commonStyles.title}>Event Details</h2>
-        <fieldset>
-          <Input
-            id="event-definition-title"
-            name="title"
-            label="Title"
-            type="text"
-            bsStyle={validation.errors.title ? 'error' : null}
-            help={get(
-              validation,
-              'errors.title[0]',
-              'Title for this Event Definition, Events and Alerts created from it.',
-            )}
-            value={eventDefinition.title}
-            onChange={handleChange}
-            readOnly={readOnly}
-            required
-          />
-
-          <Input
-            id="event-definition-description"
-            name="description"
-            label={
-              <span>
-                Description <small className="text-muted">(Optional)</small>
-              </span>
-            }
-            type="textarea"
-            help="Longer description for this Event Definition."
-            value={eventDefinition.description}
-            onChange={handleChange}
-            readOnly={readOnly}
-            rows={2}
-          />
-
-          <div style={{ width: '100%' }}>
-            <ControlLabel>
-              Remediation Steps <small className="text-muted">(Optional)</small>
-            </ControlLabel>
-            {readOnly ? (
-              <MarkdownPreview
-                show
-                withFullView
-                height={150}
-                value={eventDefinition.remediation_steps || 'No remediation steps given'}
-              />
-            ) : (
-              <MarkdownEditor
-                id="event-definition-remediation-steps"
+    <>
+      <Row>
+        <Col md={7} lg={12}>
+          <h2 className={commonStyles.title}>Event Details</h2>
+          <fieldset>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem' }}>
+              <Input
+                id="event-definition-title"
+                name="title"
+                label="Title"
+                type="text"
+                bsStyle={validation.errors.title ? 'error' : null}
+                help={get(
+                  validation,
+                  'errors.title[0]',
+                  'Title for this Event Definition, Events and Alerts created from it.',
+                )}
+                value={eventDefinition.title}
+                onChange={handleChange}
                 readOnly={readOnly}
-                height={150}
-                value={eventDefinition.remediation_steps}
-                onChange={(newValue: string) =>
-                  handleChange({ target: { name: 'remediation_steps', value: newValue } })
-                }
+                required
               />
-            )}
-          </div>
 
-          <FormGroup controlId="event-definition-priority">
-            <ControlLabel>Priority</ControlLabel>
-            <Select
-              options={priorityOptions}
-              value={toString(eventDefinition.priority)}
-              onChange={handlePriorityChange}
-              clearable={false}
-              disabled={readOnly}
-              required
+              <FormGroup controlId="event-definition-priority">
+                <ControlLabel>Priority</ControlLabel>
+                <Select
+                  options={priorityOptions}
+                  value={toString(eventDefinition.priority)}
+                  onChange={handlePriorityChange}
+                  clearable={false}
+                  disabled={readOnly}
+                  required
+                />
+                <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
+              </FormGroup>
+            </div>
+
+            <Input
+              id="event-definition-description"
+              name="description"
+              label={
+                <span>
+                  Description <small className="text-muted">(Optional)</small>
+                </span>
+              }
+              type="textarea"
+              help="Longer description for this Event Definition."
+              value={eventDefinition.description}
+              onChange={handleChange}
+              readOnly={readOnly}
+              rows={2}
             />
-            <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
-          </FormGroup>
-        </fieldset>
-      </Col>
-    </Row>
+
+            {(hasEventProcedure || showAddEventProcedureForm) ? (
+              <>
+                {eventProcedureForm}
+              </>
+            ) : (
+              <>
+                <ControlLabel>
+                  Event Procedure Summary
+                </ControlLabel>
+                <p>This Event does not have any Event Procedures yet.</p>
+                <Button bsStyle="success" onClick={() => setShowAddEventProcedureForm(true)}>
+                  Add Event Procedure
+                </Button>
+              </>
+            )}
+          </fieldset>
+        </Col>
+      </Row>
+    </>
   );
 };
 
