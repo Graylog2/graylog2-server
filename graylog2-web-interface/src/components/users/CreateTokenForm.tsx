@@ -30,6 +30,7 @@ const StyledForm = styled.form`
       width: 300px;
     }
   }
+
   .input-group {
     width: 300px;
   }
@@ -39,11 +40,17 @@ type Props = {
   creatingToken?: boolean;
   disableForm?: boolean;
   onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => void;
-  defaultTtl?: string,
-  disableTtl?: boolean,
+  defaultTtl?: string;
+  disableTtl?: boolean;
 };
 
-const CreateTokenForm = ({ creatingToken = false, disableForm = false, defaultTtl = 'P30D', disableTtl = false, onCreate }: Props) => {
+const CreateTokenForm = ({
+  creatingToken = false,
+  disableForm = false,
+  defaultTtl = 'P30D',
+  disableTtl = false,
+  onCreate,
+}: Props) => {
   const [tokenName, setTokenName] = useState('');
   const [tokenTtl, setTokenTtl] = useState(defaultTtl);
 

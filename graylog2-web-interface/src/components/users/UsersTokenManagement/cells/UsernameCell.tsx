@@ -25,8 +25,6 @@ type Props = {
   token: Token;
 };
 
-const UsernameCell = ({ token }: Props) => (
-  <Link to={Routes.SYSTEM.USERS.show(token.user_id)}>{token.username}</Link>
-);
+const UsernameCell = ({ token }: Props) => <Link to={Routes.SYSTEM.USERS.show(token.user_id)}>{token.username}</Link>;
 
 export default UsernameCell;
