@@ -369,7 +369,7 @@ public class RestPermissions implements PluginPermissions {
                     RestPermissions.DASHBOARDS_CREATE
             )),
             BuiltinRole.create("Event Definition Creator", "Allows creation of Event Definitions (built-in)", ImmutableSet.of(
-                    RestPermissions.EVENT_DEFINITIONS_CREATE
+                    RestPermissions.EVENT_DEFINITIONS_CREATE, RestPermissions.LOOKUP_TABLES_READ
             )),
             BuiltinRole.create("Event Notification Creator", "Allows creation of Event Notifications (built-in)", ImmutableSet.of(
                     RestPermissions.EVENT_NOTIFICATIONS_CREATE
