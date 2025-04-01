@@ -38,14 +38,21 @@ public abstract class TokenSummary {
     @JsonProperty
     @Nullable
     public abstract DateTime lastAccess();
+
     @JsonProperty
     @Nullable
     public abstract DateTime createdAt();
+
+    @JsonProperty
+    @Nullable
+    public abstract DateTime expiresAt();
+
     @JsonCreator
     public static TokenSummary create(@JsonProperty("id") String id,
                                       @JsonProperty("name") String name,
                                       @Nullable @JsonProperty("last_access") DateTime lastAccess,
-                                      @Nullable @JsonProperty("created_at") DateTime createdAt) {
-        return new AutoValue_TokenSummary(id, name, lastAccess, createdAt);
+                                      @Nullable @JsonProperty("created_at") DateTime createdAt,
+                                      @Nullable @JsonProperty("last_access") DateTime expiresAt) {
+        return new AutoValue_TokenSummary(id, name, lastAccess, createdAt, expiresAt);
     }
 }
