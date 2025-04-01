@@ -14,43 +14,48 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security;
+package org.graylog2.security.jwt;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Suppliers;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
-
-import com.github.joschi.jadconfig.util.Duration;
+import org.graylog2.configuration.ElasticsearchClientConfiguration;
+import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.security.JwtSecret;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-/**
- * Caution, this provider returns not just the token itself but also the "Bearer " prefix, so the value can be directly
- * used as an HTTP header content.
- */
-@Singleton
-public class IndexerJwtAuthTokenProvider implements Provider<String> {
-    private final Supplier<String> authHeaderBearerString;
+public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken> {
+    private final Supplier<Optional<String>> cachingSupplier;
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexerJwtAuthTokenProvider.class);
 
     @Inject
     public IndexerJwtAuthTokenProvider(JwtSecret jwtSecret,
-                                       @Named("indexer_jwt_auth_token_expiration_duration") final Duration tokenExpirationDuration,
-                                       @Named("indexer_jwt_auth_token_caching_duration") final Duration cachingDuration) {
-        authHeaderBearerString = Suppliers.memoizeWithExpiration(() -> {
-            LOG.debug("Creating new JWT token, expiration set to {}", tokenExpirationDuration);
-            return "Bearer " + createToken(jwtSecret, tokenExpirationDuration);
+                                       ElasticsearchClientConfiguration configuration,
+                                       @RunsWithDataNode final boolean runsWithDataNode
+    ) {
+        this(jwtSecret, configuration.indexerJwtAuthTokenExpirationDuration(), configuration.indexerJwtAuthTokenCachingDuration(), runsWithDataNode || configuration.indexerUseJwtAuthentication());
+    }
+
+    public IndexerJwtAuthTokenProvider(JwtSecret jwtSecret, Duration tokenExpirationDuration, Duration cachingDuration, boolean useJwtAuthentication) {
+        cachingSupplier = Suppliers.memoizeWithExpiration(() -> {
+            // TODO: can we run this check outside of the supplier? Is the @RunsWithDataNode stable through the server lifetime?
+            if (useJwtAuthentication) {
+                LOG.info("Creating new JWT token, expiration set to {}", tokenExpirationDuration);
+                return Optional.of(createToken(jwtSecret, tokenExpirationDuration));
+            } else {
+                return Optional.empty();
+            }
         }, cachingDuration.toSeconds(), TimeUnit.SECONDS);
     }
 
@@ -71,8 +76,7 @@ public class IndexerJwtAuthTokenProvider implements Provider<String> {
         return builder.compact();
     }
 
-    @Override
-    public String get() {
-        return authHeaderBearerString.get();
+    public IndexerJwtAuthToken get() {
+        return new IndexerJwtAuthToken(cachingSupplier);
     }
 }

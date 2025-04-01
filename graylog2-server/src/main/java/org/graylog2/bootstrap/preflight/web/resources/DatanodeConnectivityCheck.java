@@ -19,12 +19,10 @@ package org.graylog2.bootstrap.preflight.web.resources;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import okhttp3.OkHttpClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import org.graylog2.storage.SearchVersion;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.storage.versionprobe.VersionProbe;
 import org.graylog2.storage.versionprobe.VersionProbeLogger;
 import org.slf4j.Logger;
@@ -42,8 +40,8 @@ public class DatanodeConnectivityCheck {
     private final VersionProbe versionProbe;
 
     @Inject
-    public DatanodeConnectivityCheck(ObjectMapper objectMapper, OkHttpClient okHttpClient, @Named("indexer_use_jwt_authentication") boolean opensearchUseJwtAuthentication, IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
-        this.versionProbe = new VersionProbe(objectMapper, okHttpClient, 1, Duration.seconds(1), true, opensearchUseJwtAuthentication, indexerJwtAuthTokenProvider);
+    public DatanodeConnectivityCheck(ObjectMapper objectMapper, OkHttpClient okHttpClient, IndexerJwtAuthToken indexerJwtAuthTokenProvider) {
+        this.versionProbe = new VersionProbe(objectMapper, okHttpClient, 1, Duration.seconds(1), indexerJwtAuthTokenProvider);
     }
 
     public ConnectionCheckResult probe(DataNodeDto node) {

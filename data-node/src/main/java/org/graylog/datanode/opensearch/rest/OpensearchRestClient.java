@@ -44,10 +44,9 @@ public class OpensearchRestClient {
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
 
                 builder.setHttpClientConfigCallback(httpClientBuilder -> {
-                    httpClientBuilder.addInterceptorLast((HttpRequestInterceptor) (request, context) -> {
-                        final String jwtToken = datanodeConfiguration.indexerJwtAuthTokenProvider().get();
-                        request.addHeader("Authorization", jwtToken);
-                    });
+                    datanodeConfiguration.indexerJwtAuthToken().headerValue().ifPresent(
+                            authToken -> httpClientBuilder.addInterceptorLast(
+                                    (HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", authToken)));
                     httpClientBuilder.setSSLContext(sslContext);
                     return httpClientBuilder;
                 });
