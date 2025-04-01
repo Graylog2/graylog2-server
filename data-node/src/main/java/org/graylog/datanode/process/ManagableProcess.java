@@ -16,11 +16,6 @@
  */
 package org.graylog.datanode.process;
 
-import com.github.oxo42.stateless4j.delegates.Trace;
-import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
-import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
-
 public interface ManagableProcess<T, EVENT, STATE> {
 
     void configure(T configuration);

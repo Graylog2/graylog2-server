@@ -22,6 +22,7 @@ import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
+import org.graylog.testing.completebackend.NoPluginJarsProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -60,6 +61,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     private final boolean withMailServerEnabled;
     private final boolean withWebhookServerEnabled;
     private final Map<String, String> additionalConfigurationParameters;
+    private final Class<? extends PluginJarsProvider> datanodePluginJarsProvider;
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
                                           Lifecycle lifecycle,
@@ -70,10 +72,15 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                                           SearchVersion esVersion,
                                           MongodbServer mongoVersion,
                                           List<URL> mongoDBFixtures,
-                                          List<String> enabledFeatureFlags, boolean withMailServerEnabled, boolean withWebhookServerEnabled, Map<String, String> additionalConfigurationParameters) {
+                                          List<String> enabledFeatureFlags,
+                                          boolean withMailServerEnabled,
+                                          boolean withWebhookServerEnabled,
+                                          Map<String, String> additionalConfigurationParameters,
+                                          Class<? extends PluginJarsProvider> datanodePluginJarsProvider,
+                                          String datanodePluginJarsProviderId) {
         super(
-                parent.getUniqueId().append(SEGMENT_TYPE, createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters, enabledFeatureFlags)),
-                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters, enabledFeatureFlags)
+                parent.getUniqueId().append(SEGMENT_TYPE, createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters, enabledFeatureFlags, datanodePluginJarsProviderId)),
+                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters, enabledFeatureFlags, datanodePluginJarsProviderId)
         );
         setParent(parent);
         this.lifecycle = lifecycle;
@@ -86,6 +93,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.withMailServerEnabled = withMailServerEnabled;
         this.withWebhookServerEnabled = withWebhookServerEnabled;
         this.additionalConfigurationParameters = additionalConfigurationParameters;
+        this.datanodePluginJarsProvider = datanodePluginJarsProvider;
     }
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
@@ -104,16 +112,18 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.withMailServerEnabled = false;
         this.withWebhookServerEnabled = false;
         this.additionalConfigurationParameters = new HashMap<>();
+        this.datanodePluginJarsProvider = NoPluginJarsProvider.class;
     }
 
     protected static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion searchVersion,
-                                      MongodbServer mongoVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, Map<String, String> additionalConfigurationParameters, List<String> enabledFeatureFlags) {
+                                      MongodbServer mongoVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, Map<String, String> additionalConfigurationParameters, List<String> enabledFeatureFlags, String datanodePluginJarsProviderId) {
         final ImmutableMap.Builder<String, Object> values = ImmutableMap.<String, Object>builder()
                 .put("Lifecycle", lifecycle.name())
                 .put("MavenProjectDirProvider", mavenProjectDirProvider)
                 .put("PluginJarsProvider", pluginJarsProvider)
                 .put("Search", searchVersion)
-                .put("MongoDB", mongoVersion.getVersion());
+                .put("MongoDB", mongoVersion.getVersion())
+                .put("DatanodePluginJarsProvider", datanodePluginJarsProviderId);
 
         if(withMailServerEnabled) {
             values.put("Mailserver", "enabled");
@@ -218,11 +228,15 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                 return Arrays.stream(config.searchVersions()).anyMatch(version -> isCompatible(override, version));
             }
         } else {
-            return getSearchServers(config).contains(this.getSearchVersion());
+            return getSearchServers(config).contains(this.getSearchVersion()) && datanodePluginJarsProvider.equals(config.datanodePluginJarsProvider());
         }
     }
 
     private static Set<SearchVersion> getSearchServers(ContainerMatrixTestsConfiguration config) {
         return Stream.of(config.searchVersions()).map(SearchServer::getSearchVersion).collect(Collectors.toSet());
+    }
+
+    public Class<? extends PluginJarsProvider> getDatanodePluginJarsProvider() {
+        return datanodePluginJarsProvider;
     }
 }
