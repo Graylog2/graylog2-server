@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, {useMemo, useState} from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -27,10 +27,10 @@ import {
   NoEntitiesExist,
   RelativeTime,
 } from 'components/common';
-import {Button, ButtonToolbar, Panel, Table} from 'components/bootstrap';
-import type {Token, TokenSummary} from 'stores/users/UsersStore';
-import {sortByDate} from 'util/SortUtils';
-import {Headline} from 'components/common/Section/SectionComponent';
+import { Button, ButtonToolbar, Panel, Table } from 'components/bootstrap';
+import type { Token, TokenSummary } from 'stores/users/UsersStore';
+import { sortByDate } from 'util/SortUtils';
+import { Headline } from 'components/common/Section/SectionComponent';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 import CreateTokenForm from './CreateTokenForm';
@@ -118,12 +118,12 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
         </StyledTokenPanel>
       )}
       <hr />
-      
+
       <Headline>Tokens</Headline>
       <StyledSearchForm onSearch={updateQuery} onReset={updateQuery} label="Filter" useLoadingState={false} />
       {effectiveTokens.length === 0 ? (
         <NoEntitiesExist>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</NoEntitiesExist>
-      ): (
+      ) : (
         <Table striped bordered condensed>
           <thead>
             <tr>
@@ -138,23 +138,26 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
               const tokenNeverUsed = Date.parse(token.last_access) === 0;
 
               return (
-              <tr key={token.id}>
-                <td>{token.name}</td>
-                <td><Timestamp dateTime={token.created_at} /></td>
-                <td>{tokenNeverUsed ? 'Never used' : <RelativeTime dateTime={token.last_access} />}</td>
-                <td>
-                  <ButtonToolbar className="pull-right">
-                    <Button
-                      bsSize="xsmall"
-                      disabled={deletingToken === token.id}
-                      bsStyle="danger"
-                      onClick={deleteToken(token)}>
-                      {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
-                    </Button>
-                  </ButtonToolbar>
-                </td>
-              </tr>
-            )})}
+                <tr key={token.id}>
+                  <td>{token.name}</td>
+                  <td>
+                    <Timestamp dateTime={token.created_at} />
+                  </td>
+                  <td>{tokenNeverUsed ? 'Never used' : <RelativeTime dateTime={token.last_access} />}</td>
+                  <td>
+                    <ButtonToolbar className="pull-right">
+                      <Button
+                        bsSize="xsmall"
+                        disabled={deletingToken === token.id}
+                        bsStyle="danger"
+                        onClick={deleteToken(token)}>
+                        {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
+                      </Button>
+                    </ButtonToolbar>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       )}
