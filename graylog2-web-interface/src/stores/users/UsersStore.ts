@@ -66,6 +66,7 @@ export type TokenSummary = {
   id: string;
   name: string;
   last_access: string;
+  created_at: string;
   tokenTtl: string;
 };
 

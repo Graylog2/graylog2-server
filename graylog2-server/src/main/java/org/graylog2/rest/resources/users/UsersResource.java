@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.users;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -101,10 +102,10 @@ import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -705,14 +706,14 @@ public class UsersResource extends RestResource {
 
         final ImmutableList.Builder<TokenSummary> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
-            tokenList.add(TokenSummary.create(token.getId(), token.getName(), token.getLastAccess()));
+            tokenList.add(TokenSummary.create(token.getId(), token.getName(), token.getLastAccess(), token.getCreatedAt()));
         }
 
         return TokenList.create(tokenList.build());
     }
 
-    public record GenerateTokenTTL(Optional<Duration> tokenTTL) {
-        public Duration getTTL(Supplier<Duration> defaultSupplier) {
+    public record GenerateTokenTTL(@JsonProperty Optional<PeriodDuration> tokenTTL) {
+        public PeriodDuration getTTL(Supplier<PeriodDuration> defaultSupplier) {
             return this.tokenTTL.orElseGet(defaultSupplier);
         }
     }

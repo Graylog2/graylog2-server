@@ -95,7 +95,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
             .put(PipelineDao.FIELD_TITLE, SearchQueryField.create(PipelineDao.FIELD_TITLE))
             .put(PipelineDao.FIELD_DESCRIPTION, SearchQueryField.create(PipelineDao.FIELD_DESCRIPTION))
             .build();
-    public static final String GL_INPUT_ROUTING_PIPELINE = "All Messages Routing";
+    public static final String GL_INPUT_ROUTING_PIPELINE = "Default Routing";
 
     private final SearchQueryParser searchQueryParser;
     private final PaginatedPipelineService paginatedPipelineService;
