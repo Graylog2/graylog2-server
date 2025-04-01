@@ -16,7 +16,7 @@
  */
 package org.graylog.storage.opensearch2.sniffer.impl;
 
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
