@@ -130,6 +130,7 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
               <th>Token Name</th>
               <th>Created</th>
               <th>Last Access</th>
+              <th>Expires At</th>
               <th className="text-right">Actions</th>
             </tr>
           </thead>
@@ -142,6 +143,9 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
                   <td>{token.name}</td>
                   <td>
                     <Timestamp dateTime={token.created_at} />
+                  </td>
+                  <td>
+                    <Timestamp dateTime={token.expires_at} />
                   </td>
                   <td>{tokenNeverUsed ? 'Never used' : <RelativeTime dateTime={token.last_access} />}</td>
                   <td>
