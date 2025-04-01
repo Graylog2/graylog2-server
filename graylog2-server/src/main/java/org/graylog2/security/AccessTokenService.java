@@ -86,7 +86,8 @@ public interface AccessTokenService extends PersistedService {
      * @param id        ID of the token.
      * @param tokenName Name of the token.
      * @param expiresAt Expiration date/time of the token.
-     * @param userId    ID of the owning user.
+     * @param userId    ID of the owning user. Can be null, in case the token belongs to a user which doesn't exist in the database.
+     * @param username  The username of the owner.
      */
-    record ExpiredToken(String id, String tokenName, DateTime expiresAt, String userId) {}
+    record ExpiredToken(String id, String tokenName, DateTime expiresAt, String userId, String username) {}
 }
