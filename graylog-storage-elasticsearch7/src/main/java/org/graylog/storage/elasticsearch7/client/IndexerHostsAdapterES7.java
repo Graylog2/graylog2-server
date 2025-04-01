@@ -35,7 +35,7 @@ public class IndexerHostsAdapterES7 implements IndexerHostsAdapter {
     }
 
     @Override
-    public List<URI> getCurrentHosts() {
+    public List<URI> getActiveHosts() {
         return client.getLowLevelClient().getNodes().stream()
                 .map(Node::getHost)
                 .map(HttpHost::toURI)

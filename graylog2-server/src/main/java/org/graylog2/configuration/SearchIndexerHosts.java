@@ -19,6 +19,6 @@ package org.graylog2.configuration;
 import java.net.URI;
 import java.util.List;
 
-public record SearchIndexerHosts(List<URI> configuredHosts, List<URI> initialHosts, List<URI> actualHosts) {
+public record SearchIndexerHosts(List<URI> configuredHosts, List<URI> initialHosts, List<URI> activeHosts) {
 
 }

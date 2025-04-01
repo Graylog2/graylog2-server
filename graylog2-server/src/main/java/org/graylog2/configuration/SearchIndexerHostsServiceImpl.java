@@ -42,6 +42,6 @@ public class SearchIndexerHostsServiceImpl implements SearchIndexerHostsService 
 
     @Override
     public SearchIndexerHosts getHosts() {
-        return new SearchIndexerHosts(configuredHosts, initialHosts, indexerHostsAdapter.getCurrentHosts());
+        return new SearchIndexerHosts(configuredHosts, initialHosts, indexerHostsAdapter.getActiveHosts());
     }
 }

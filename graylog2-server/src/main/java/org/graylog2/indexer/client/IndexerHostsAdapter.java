@@ -25,5 +25,5 @@ public interface IndexerHostsAdapter {
      * changes caused by sniffers and dynamic infrastructure changes. Unlike the fixed "elasticsearch_hosts" configuration
      * property, this may change during every call and gives real-time information.
      */
-    List<URI> getCurrentHosts();
+    List<URI> getActiveHosts();
 }
