@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.RateLimiter;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.CsrRequester;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
@@ -52,18 +53,32 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
     private final Supplier<Boolean> isServerInPreflightMode;
 
     private final RateLimiter rateLimiter;
+    private final String hostname;
 
     @Inject
-    public DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, ClusterConfigService clusterConfigService, CsrRequester csrRequester, PreflightConfigService preflightConfigService) {
-        this(datanodeKeystore, () -> clusterConfigService.get(RenewalPolicy.class), csrRequester, () -> isInPreflight(preflightConfigService));
+    public DataNodeCertRenewalPeriodical(
+            DatanodeKeystore datanodeKeystore,
+            ClusterConfigService clusterConfigService,
+            CsrRequester csrRequester,
+            PreflightConfigService preflightConfigService,
+            Configuration configuration
+    ) {
+        this(
+                datanodeKeystore,
+                () -> clusterConfigService.get(RenewalPolicy.class),
+                csrRequester,
+                () -> isInPreflight(preflightConfigService),
+                configuration.getHostname()
+        );
     }
 
-    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode) {
+    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode, String hostname) {
         this.datanodeKeystore = datanodeKeystore;
         this.renewalPolicySupplier = renewalPolicySupplier;
         this.csrRequester = csrRequester;
         this.isServerInPreflightMode = isServerInPreflightMode;
         this.rateLimiter = RateLimiter.create(1.0 / CSR_TRIGGER_PERIOD.toSeconds());
+        this.hostname = hostname;
     }
 
     @Override
@@ -98,7 +113,15 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private boolean needsNewCertificate(RenewalPolicy renewalPolicy) {
         final Date expiration = datanodeKeystore.getCertificateExpiration();
-        return expiration == null || expiresSoon(expiration, renewalPolicy);
+        return expiration == null || expiresSoon(expiration, renewalPolicy) || hostnameChanged();
+    }
+
+    private boolean hostnameChanged() {
+        final boolean hostnameChanged = !datanodeKeystore.getSubjectAlternativeNames().contains(hostname);
+        if(hostnameChanged) {
+            LOG.info("Datanode hostname changed, certificate will be renewed now");
+        }
+        return hostnameChanged;
     }
 
     private boolean expiresSoon(Date expiration, RenewalPolicy renewalPolicy) {

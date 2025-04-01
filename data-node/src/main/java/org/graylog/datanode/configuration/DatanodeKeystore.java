@@ -23,7 +23,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.CsrGenerator;
@@ -39,28 +38,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.Security;
-import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertPath;
-import java.security.cert.CertPathValidator;
-import java.security.cert.CertPathValidatorException;
-import java.security.cert.CertPathValidatorResult;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.PKIXParameters;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
@@ -70,6 +61,7 @@ public class DatanodeKeystore {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     }
 
+    public static final RandomStringUtils RANDOM_STRING_UTILS = RandomStringUtils.secure();
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystore.class);
     private final DatanodeDirectories datanodeDirectories;
@@ -172,7 +164,7 @@ public class DatanodeKeystore {
     }
 
     public synchronized InMemoryKeystoreInformation getSafeCopy() throws DatanodeKeystoreException {
-        final char[] randomKeystorePassword = RandomStringUtils.randomAlphabetic(256).toCharArray();
+        final char[] randomKeystorePassword = RANDOM_STRING_UTILS.nextAlphanumeric(256).toCharArray();
         try {
             final KeyStore reencrypted = KeystoreUtils.newStoreCopyContent(loadKeystore(), passwordSecret.toCharArray(), randomKeystorePassword);
             return new InMemoryKeystoreInformation(reencrypted, randomKeystorePassword);
@@ -197,6 +189,19 @@ public class DatanodeKeystore {
                 return null;
             }
         } catch (KeyStoreException | DatanodeKeystoreException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public synchronized Set<String> getSubjectAlternativeNames() {
+        try {
+            final Certificate certificate = loadKeystore().getCertificate(DATANODE_KEY_ALIAS);
+            final X509Certificate cert = (X509Certificate) certificate;
+            return cert.getSubjectAlternativeNames().stream()
+                    .map(san -> san.get(1))
+                    .map(Object::toString)
+                    .collect(Collectors.toSet());
+        } catch (KeyStoreException | DatanodeKeystoreException | CertificateParsingException e) {
             throw new RuntimeException(e);
         }
     }

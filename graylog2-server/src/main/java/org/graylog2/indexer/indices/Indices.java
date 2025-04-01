@@ -36,7 +36,6 @@ import org.graylog2.indexer.IndexMappingTemplate;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
-import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
@@ -249,7 +248,7 @@ public class Indices {
 
             indicesAdapter.create(indexName, settings, mappings);
         } catch (Exception e) {
-            if ((indexSettings != null || indexMapping != null) && e instanceof MapperParsingException) {
+            if ((indexSettings != null || indexMapping != null)) {
                 LOG.info("Couldn't create index {}. Error: {}. Fall back to default settings/mappings and retry.", indexName, e.getMessage(), e);
                 return create(indexName, indexSet, null, null);
             }
