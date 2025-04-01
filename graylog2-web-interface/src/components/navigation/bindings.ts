@@ -22,12 +22,14 @@ import filterMenuItems, { filterCloudMenuItems } from 'util/conditional/filterMe
 import AppConfig from 'util/AppConfig';
 
 export const SYSTEM_DROPDOWN_TITLE = 'System';
+export const SEARCH_LINK_TITLE = 'Search';
+export const DASHBOARDS_LINK_TITLE = 'Dashboards';
 
 const navigationBindings: PluginExports = {
   navigation: [
     {
       path: Routes.SEARCH,
-      description: 'Search',
+      description: SEARCH_LINK_TITLE,
     },
     {
       path: Routes.STREAMS,
@@ -39,11 +41,11 @@ const navigationBindings: PluginExports = {
     },
     {
       path: Routes.DASHBOARDS,
-      description: 'Dashboards',
+      description: DASHBOARDS_LINK_TITLE,
     },
     {
       description: SYSTEM_DROPDOWN_TITLE,
-      position: 'last' as const,
+      position: { last: true },
       children: filterCloudMenuItems(
         filterMenuItems(
           [
@@ -53,8 +55,7 @@ const navigationBindings: PluginExports = {
               description: 'Configurations',
               permissions: ['clusterconfigentry:read'],
             },
-            { path: Routes.SYSTEM.NODES.LIST, description: 'Nodes' },
-            { path: Routes.SYSTEM.DATANODES.LIST, description: 'Data Nodes', permissions: ['datanodes:read'] },
+            { path: Routes.SYSTEM.CLUSTER.NODES, description: 'Cluster Configuration' },
             { path: Routes.SYSTEM.INPUTS, description: 'Inputs', permissions: ['inputs:read'] },
             { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },
             { path: Routes.SYSTEM.INDICES.LIST, description: 'Indices', permissions: ['indices:read'] },
@@ -83,8 +84,7 @@ const navigationBindings: PluginExports = {
           AppConfig.isCloud() && !AppConfig.isFeatureEnabled('cloud_inputs') ? [Routes.SYSTEM.INPUTS] : [],
         ),
         [
-          Routes.SYSTEM.NODES.LIST,
-          Routes.SYSTEM.DATANODES.LIST,
+          Routes.SYSTEM.CLUSTER.NODES,
           Routes.SYSTEM.OUTPUTS,
           Routes.SYSTEM.LOGGING,
           Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE,

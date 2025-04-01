@@ -69,7 +69,8 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                         startupFailuresCounter::increment)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
-                .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED);
+                .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
+                .permitReentry(OpensearchEvent.PROCESS_STARTED); // allow restarts when the process is already starting
 
         // the process is running and responding to the REST status, it's available for any usage
         config.configure(OpensearchState.AVAILABLE)

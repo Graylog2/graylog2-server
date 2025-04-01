@@ -33,8 +33,8 @@ import {
   CreateEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
-  DataNodesPage,
   DataNodePage,
+  DataNodeUpgradePage,
   DataNodesClusterManagementPage,
   DataNodesClusterConfigurationPage,
   DataNodesMigrationPage,
@@ -72,7 +72,6 @@ import {
   LUTDataAdaptersPage,
   LUTTablesPage,
   NodeInputsPage,
-  NodesPage,
   NotFoundPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
@@ -113,6 +112,7 @@ import {
   ViewEventDefinitionPage,
   SidecarFailureTrackingPage,
   IndexSetFieldTypesPage,
+  ClusterConfigurationPage,
 } from 'pages';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
@@ -122,6 +122,7 @@ import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
+import TokenManagementPage from 'pages/TokenManagementPage';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -217,7 +218,7 @@ const AppRouter = () => {
             },
 
             enableInputsRoute && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
+            { path: RoutePaths.SYSTEM.INPUT_DIAGNOSIS(':inputId'), element: <InputDiagnosisPage /> },
             !isCloud && { path: RoutePaths.node_inputs(':nodeId'), element: <NodeInputsPage /> },
             !isCloud && { path: RoutePaths.global_input_extractors(':inputId'), element: <ExtractorsPage /> },
             !isCloud && { path: RoutePaths.local_input_extractors(':nodeId', ':inputId'), element: <ExtractorsPage /> },
@@ -291,22 +292,27 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.PIPELINES.SIMULATOR, element: <SimulatorPage /> },
             { path: RoutePaths.SYSTEM.PIPELINES.PIPELINE(':pipelineId'), element: <PipelineDetailsPage /> },
 
-            !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
-            { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterManagementPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODES, element: <ClusterConfigurationPage /> },
             !isCloud && {
-              path: RoutePaths.SYSTEM.DATANODES.CONFIGURATION,
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_DASHBOARD,
+              element: <DataNodesClusterManagementPage />,
+            },
+            !isCloud && {
+              path: RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
               element: <DataNodesClusterConfigurationPage />,
             },
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE, element: <DataNodeUpgradePage /> },
             !isCloud &&
               enableDataNodeMigration && {
-                path: RoutePaths.SYSTEM.DATANODES.MIGRATION,
+                path: RoutePaths.SYSTEM.CLUSTER.DATANODE_MIGRATION,
                 element: <DataNodesMigrationPage />,
               },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.SHOW(':dataNodeId'), element: <DataNodePage /> },
+
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODE_SHOW(':nodeId'), element: <ShowNodePage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(':dataNodeId'), element: <DataNodePage /> },
+
+            !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
+            { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 
@@ -343,6 +349,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.USERS.show(':userId'), element: <UserDetailsPage /> },
             { path: RoutePaths.SYSTEM.USERS.edit(':userId'), element: <UserEditPage /> },
             { path: RoutePaths.SYSTEM.USERS.TOKENS.edit(':userId'), element: <UserTokensEditPage /> },
+            { path: RoutePaths.SYSTEM.USERS_TOKEN_MANAGEMENT.overview, element: <TokenManagementPage /> },
 
             { path: RoutePaths.SYSTEM.AUTHZROLES.OVERVIEW, element: <RolesOverviewPage /> },
             { path: RoutePaths.SYSTEM.AUTHZROLES.show(':roleId'), element: <RoleDetailsPage /> },

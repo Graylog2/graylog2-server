@@ -256,7 +256,6 @@ export const TELEMETRY_EVENT_TYPE = {
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',
     INPUT_CREATED: 'Inputs Input Created',
-    FIND_MORE_CLICKED: 'Inputs Find More Inputs Clicked',
     INPUT_DELETED: 'Inputs Input Deleted',
     INPUT_EDIT_CLICKED: 'Inputs Input Edit Clicked',
     INPUT_UPDATED: 'Inputs Input Updated',
@@ -269,6 +268,9 @@ export const TELEMETRY_EVENT_TYPE = {
     INPUT_START_CLICKED: 'Inputs Input Start Clicked',
     INPUT_STOP_CLICKED: 'Inputs Input Stop Clicked',
     INPUT_SETUP_CLICKED: 'Inputs Input Setup Clicked',
+  },
+  INPUT_SETUP_WIZARD: {
+    START_INPUT: 'Input Setup Wizard Start Input Clicked',
   },
   OUTPUTS: {
     OUTPUT_CREATED: 'Outputs Output Created',

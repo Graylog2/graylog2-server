@@ -211,6 +211,7 @@ const ApiRoutes = {
     list: () => ({ url: '/system/inputs' }),
     get: (id: string) => ({ url: `/system/inputs/${id}` }),
     globalRecentMessage: (inputId: string) => ({ url: `/${inputId}` }),
+    references: (inputId: string) => ({ url: `/system/inputs/references/${inputId}` }),
   },
   InputStatesController: {
     start: (inputId: string) => ({ url: `/system/inputstates/${inputId}` }),
@@ -276,6 +277,7 @@ const ApiRoutes = {
   StreamsApiController: {
     index: () => ({ url: '/streams' }),
     paginated: () => ({ url: '/streams/paginated' }),
+    withoutSecurityDefaults: () => ({ url: '/streams/no_security' }),
     get: (streamId: string) => ({ url: `/streams/${streamId}` }),
     bulk_delete: () => ({ url: '/streams/bulk_delete' }),
     bulk_resume: () => ({ url: '/streams/bulk_resume' }),
@@ -287,6 +289,7 @@ const ApiRoutes = {
     pause: (streamId: string) => ({ url: `/streams/${streamId}/pause` }),
     resume: (streamId: string) => ({ url: `/streams/${streamId}/resume` }),
     testMatch: (streamId: string) => ({ url: `/streams/${streamId}/testMatch` }),
+    byIndexSet: (indexSetId: string) => ({ url: `/streams/byIndex/${indexSetId}` }),
   },
   StreamOutputsApiController: {
     add: (streamId: string) => ({ url: `/streams/${streamId}/outputs` }),
@@ -440,6 +443,9 @@ const ApiRoutes = {
     delete_token: (userId: string, tokenName: string) => ({ url: `/users/${userId}/tokens/${tokenName}` }),
     list_tokens: (userId: string) => ({ url: `/users/${userId}/tokens` }),
     setStatus: (userId: string, accountStatus) => ({ url: `/users/${userId}/status/${accountStatus}` }),
+  },
+  TokenManagementController: {
+    paginated: () => ({ url: '/token_usage/paginated' }),
   },
   DashboardsController: {
     show: (id) => ({ url: `/dashboards/${id}` }),

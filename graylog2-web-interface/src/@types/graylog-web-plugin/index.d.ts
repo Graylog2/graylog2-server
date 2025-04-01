@@ -55,7 +55,7 @@ type PluginNavigation = {
   requiredFeatureFlag?: string;
   perspective?: string;
   BadgeComponent?: React.ComponentType<{ text: string }>;
-  position?: 'last' | undefined;
+  position?: { last: true } | { after: string } | undefined;
   permissions?: string | Array<string>;
   useIsValidLicense?: () => boolean;
 } & (PluginNavigationLink | PluginNavigationDropdown);
@@ -160,6 +160,12 @@ type InputSetupWizard = {
   EnterpriseInputSetupWizard: React.ComponentType<{
     openSteps: { [key in InputSetupWizardStep]?: StepType };
   }>;
+  InputFailureLink: React.ComponentType<{
+    failureType: string;
+    inputId: string;
+    children: React.ReactNode;
+  }>;
+  ExtraSetupWizardStep: React.ComponentType;
 };
 
 type License = {

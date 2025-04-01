@@ -40,12 +40,16 @@ import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.reporting.OutputDirectoryProvider;
 import org.junit.platform.engine.support.hierarchical.ContainerMatrixHierarchicalTestEngine;
 import org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutorService;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -193,7 +197,26 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
         JupiterConfiguration configuration = new CachingJupiterConfiguration(
-                new DefaultJupiterConfiguration(discoveryRequest.getConfigurationParameters()));
+                new DefaultJupiterConfiguration(discoveryRequest.getConfigurationParameters(), new OutputDirectoryProvider() {
+                    private static Path root;
+
+                    @Override
+                    public Path getRootDirectory() {
+                        try {
+                            if (root == null) {
+                                root = Files.createTempDirectory(Paths.get("target"), "container-matrix-tests");
+                            }
+                            return root;
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    @Override
+                    public Path createOutputDirectory(TestDescriptor testDescriptor) throws IOException {
+                        return getRootDirectory().resolve(testDescriptor.getUniqueId().toString());
+                    }
+                }));
         final ContainerMatrixEngineDescriptor engineDescriptor = new ContainerMatrixEngineDescriptor(uniqueId, "Graylog Container Matrix Tests", configuration);
 
         if (testAgainstRunningESMongoDB()) {

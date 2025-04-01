@@ -25,6 +25,8 @@ import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.event.TestEvent;
+import org.graylog.events.fields.FieldValue;
+import org.graylog.events.fields.FieldValueType;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
@@ -55,6 +57,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -143,7 +146,7 @@ public class AggregationSearchUtilsTest {
                 ))
                 .build();
 
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
 
         assertThat(eventsWithContext).hasSize(1);
 
@@ -261,7 +264,7 @@ public class AggregationSearchUtilsTest {
                 ))
                 .build();
 
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
 
         assertThat(eventsWithContext).hasSize(1);
         assertThat(eventsWithContext.get(0).eventModifierState()).hasSize(1);
@@ -354,7 +357,7 @@ public class AggregationSearchUtilsTest {
                 ))
                 .build();
 
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
 
         assertThat(eventsWithContext).hasSize(1);
 
@@ -380,6 +383,107 @@ public class AggregationSearchUtilsTest {
 
             assertThat(event.getGroupByFields().get("group_field_one")).isEqualTo("one");
             assertThat(event.getGroupByFields().get("group_field_two")).isEqualTo("two");
+        });
+    }
+
+    @Test
+    public void testEventsFromAggregationResultWithEventDecorator() throws EventProcessorException {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
+
+        // We expect to get the end of the aggregation timerange as event time
+        final TestEvent event1 = new TestEvent(timerange.to());
+        final TestEvent event2 = new TestEvent(timerange.to());
+        when(eventFactory.createEvent(any(EventDefinition.class), any(DateTime.class), anyString()))
+                .thenReturn(event1)  // first invocation return value
+                .thenReturn(event2); // second invocation return value
+
+        // There should only be one result because the second result's "abc123" value is less than 40. (it is 23)
+        // See result builder below
+        final AggregationConditions conditions = AggregationConditions.builder()
+                .expression(Expr.And.create(
+                        Expr.Greater.create(Expr.NumberReference.create("abc123"), Expr.NumberValue.create(40.0d)),
+                        Expr.Lesser.create(Expr.NumberReference.create("xyz789"), Expr.NumberValue.create(2.0d))
+                ))
+                .build();
+
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(), conditions, emptyList());
+        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
+                .timerange(timerange)
+                .build();
+
+        final AggregationSearchUtils searchUtils = new AggregationSearchUtils(
+                eventDefinitionDto,
+                (AggregationEventProcessorConfig) eventDefinitionDto.config(),
+                Set.of(),
+                searchFactory,
+                eventStreamService,
+                messageFactory,
+                permittedStreams
+        );
+
+        final AggregationResult result = AggregationResult.builder()
+                .effectiveTimerange(timerange)
+                .totalAggregatedMessages(1)
+                .sourceStreams(ImmutableSet.of("stream-1", "stream-2", "stream-3"))
+                .keyResults(ImmutableList.of(
+                        AggregationKeyResult.builder()
+                                .key(ImmutableList.of("one", "two"))
+                                .timestamp(timerange.to())
+                                .seriesValues(ImmutableList.of(
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(42.0d)
+                                                .series(Count.builder()
+                                                        .id("abc123")
+                                                        .field("source")
+                                                        .build())
+                                                .build(),
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(1.0d)
+                                                .series(Cardinality.builder()
+                                                        .id("xyz789")
+                                                        .field("source")
+                                                        .build())
+                                                .build()
+                                ))
+                                .build(),
+                        AggregationKeyResult.builder()
+                                .key(ImmutableList.of(now.toString(), "one", "two"))
+                                .seriesValues(ImmutableList.of(
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(23.0d) // Doesn't match condition
+                                                .series(Count.builder()
+                                                        .id("abc123")
+                                                        .field("source")
+                                                        .build())
+                                                .build(),
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(1.0d)
+                                                .series(Cardinality.builder()
+                                                        .id("xyz789")
+                                                        .field("source")
+                                                        .build())
+                                                .build()
+                                ))
+                                .build()
+                ))
+                .build();
+
+        final Consumer<Event> eventDecorator = (event) -> {
+            event.setField("decorated_field", FieldValue.builder().dataType(FieldValueType.STRING).value("decorated value").build());
+        };
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, eventDecorator);
+
+        assertThat(eventsWithContext).hasSize(1);
+
+        assertThat(eventsWithContext.get(0)).satisfies(eventWithContext -> {
+            final Event event = eventWithContext.event();
+
+            assertThat(event.getField("decorated_field").value()).isEqualTo("decorated value");
         });
     }
 
@@ -410,7 +514,7 @@ public class AggregationSearchUtilsTest {
                 permittedStreams
         );
         final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
 
         assertThat(eventsWithContext).hasSize(1);
 
@@ -473,7 +577,7 @@ public class AggregationSearchUtilsTest {
                 permittedStreams
         );
         final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result);
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
 
         assertThat(eventsWithContext).hasSize(1);
 

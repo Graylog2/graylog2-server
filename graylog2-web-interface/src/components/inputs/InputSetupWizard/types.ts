@@ -16,9 +16,16 @@
  */
 
 import type { Input } from 'components/messageloaders/Types';
+import type { StreamConfiguration } from 'components/inputs/InputSetupWizard/hooks/useSetupInputMutations';
+
+export const INPUT_WIZARD_FLOWS = {
+  ILLUMINATE: 'ILLUMINATE',
+  NON_ILLUMINATE: 'NON_ILLUMINATE',
+} as const;
+
+export type InputSetupWizardFlow = (typeof INPUT_WIZARD_FLOWS)[keyof typeof INPUT_WIZARD_FLOWS];
 
 export const INPUT_WIZARD_STEPS = {
-  SELECT_CATEGORY: 'SELECT_CATEGORY',
   INSTALL_ILLUMINATE: 'INSTALL_ILLUMINATE',
   SELECT_ILLUMINATE: 'SELECT_ILLUMINATE',
   SETUP_ROUTING: 'SETUP_ROUTING',
@@ -26,18 +33,19 @@ export const INPUT_WIZARD_STEPS = {
   START_INPUT: 'START_INPUT',
 } as const;
 
-export const INPUT_WIZARD_CATEGORIES = {
-  GENERIC: 'GENERIC',
-} as const;
-
 export type InputSetupWizardStep = (typeof INPUT_WIZARD_STEPS)[keyof typeof INPUT_WIZARD_STEPS];
-export type InputSetupWizardCategory = (typeof INPUT_WIZARD_CATEGORIES)[keyof typeof INPUT_WIZARD_CATEGORIES];
-
-export type StepsData = {
-  [key in InputSetupWizardStep]?: object;
-};
 
 export type WizardData = {
   input?: Input;
-  category?: InputSetupWizardCategory;
+  flow: InputSetupWizardFlow;
+};
+
+export type OpenStepsData = {
+  SETUP_ROUTING?: {
+    streamId?: string;
+    newStream?: StreamConfiguration;
+    shouldCreateNewPipeline?: boolean;
+    streamType: 'NEW' | 'EXISTING' | 'DEFAULT';
+    removeMatchesFromDefault?: boolean;
+  };
 };

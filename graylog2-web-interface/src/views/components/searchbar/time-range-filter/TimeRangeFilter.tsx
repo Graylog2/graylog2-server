@@ -52,8 +52,9 @@ type Props = {
   position?: 'bottom' | 'bottom-start' | 'right';
   showPresetDropdown?: boolean;
   validTypes?: Array<SupportedTimeRangeType>;
-  value: TimeRange | NoTimeRangeOverride;
+  value?: TimeRange | NoTimeRangeOverride;
   withinPortal?: boolean;
+  submitOnPresetChange?: boolean;
 };
 
 const TimeRangeFilter = ({
@@ -62,12 +63,13 @@ const TimeRangeFilter = ({
   noOverride = false,
   value = NO_TIMERANGE_OVERRIDE,
   onChange,
-  validTypes,
+  validTypes = undefined,
   position = 'bottom-start',
-  className,
+  className = undefined,
   showPresetDropdown = true,
   limitDuration,
   withinPortal = true,
+  submitOnPresetChange = true,
 }: Props) => {
   const containerRef = useRef();
   const { showDropdownButton } = useContext(TimeRangeFilterSettingsContext);
@@ -114,6 +116,7 @@ const TimeRangeFilter = ({
             setCurrentTimeRange={onChange}
             showPresetDropdown={showPresetDropdown}
             hasErrorOnMount={hasErrorOnMount}
+            submitOnPresetChange={submitOnPresetChange}
           />
         )}
         <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />

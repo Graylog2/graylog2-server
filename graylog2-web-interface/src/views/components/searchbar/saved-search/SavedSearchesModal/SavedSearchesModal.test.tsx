@@ -23,11 +23,10 @@ import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import useSavedSearches from 'views/hooks/useSavedSearches';
-import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
-import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { adminUser } from 'fixtures/users';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import SavedSearchesModal from './SavedSearchesModal';
 
@@ -74,6 +73,7 @@ jest.mock('routing/Routes', () => ({
 }));
 
 describe('SavedSearchesModal', () => {
+  useWindowConfirmMock();
   const defaultPaginatedSearches = createPaginatedSearches();
 
   beforeEach(() => {
@@ -83,7 +83,6 @@ describe('SavedSearchesModal', () => {
       isInitialLoading: false,
     });
 
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
     asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutate: () => {} });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });
@@ -150,7 +149,6 @@ describe('SavedSearchesModal', () => {
     });
 
     it('should call `onDelete` if saved search is deleted', async () => {
-      window.confirm = jest.fn(() => true);
       const onDelete = jest.fn(() => Promise.resolve());
 
       render(

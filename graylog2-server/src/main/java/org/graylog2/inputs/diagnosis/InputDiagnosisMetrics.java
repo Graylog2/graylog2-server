@@ -61,5 +61,4 @@ public class InputDiagnosisMetrics {
                 .filter(e -> !registry.getCounters().containsKey(e.getKey()))
                 .forEach(e -> e.getValue().add(0L));
     }
-
 }

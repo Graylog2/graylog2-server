@@ -24,7 +24,8 @@ import type { WidgetEditingState, WidgetFocusingState } from 'views/components/c
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import { execute, setGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
+import { setGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
+import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
@@ -55,8 +56,12 @@ jest.mock(
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
-  execute: jest.fn(() => async () => {}),
   setGlobalOverride: jest.fn(() => async () => {}),
+}));
+
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  executeActiveQuery: jest.fn(() => async () => {}),
 }));
 
 const DashboardSearchBar = () => (
@@ -96,7 +101,7 @@ describe('DashboardSearchBar', () => {
 
     userEvent.click(searchButton);
 
-    await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(executeActiveQuery).toHaveBeenCalledTimes(1));
   });
 
   it(
@@ -121,7 +126,7 @@ describe('DashboardSearchBar', () => {
       userEvent.click(searchButton);
 
       await waitFor(() => expect(setGlobalOverride).toHaveBeenCalledWith('', { type: 'relative', from: 300 }));
-      await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(executeActiveQuery).toHaveBeenCalledTimes(1));
     },
     applyTimeoutMultiplier(10000),
   );

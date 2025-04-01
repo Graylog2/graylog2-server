@@ -101,6 +101,19 @@ public class Configuration implements CommonNodeConfiguration {
     @Parameter(value = "opensearch_config_location", required = true, validators = DirectoryWritableValidator.class)
     private Path opensearchConfigLocation = Path.of("datanode/config");
 
+    @Documentation("""
+            Path to the file with configuration properties overriding default opensearch parameters.
+            Required format is java properties file.
+
+            If the path is relative, datanode will try to resolve the file relative to the configured "config_location"
+            path.
+
+            Caution! Overriding opensearch configuration parameters is not supported and may break in any future release.
+            Use at your own risk.
+            """)
+    @Parameter(value = "opensearch_configuration_overrides_file")
+    private Path opensearchConfigurationOverridesFile = null;
+
     @Documentation("Source directory of the additional configuration files for the Datanode. Additional certificates can be provided here.")
     @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)
     private Path configLocation = null;
@@ -151,6 +164,11 @@ public class Configuration implements CommonNodeConfiguration {
     @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
+    @Documentation("Transport keystore alias name. Optional. Default is the first alias.")
+    @Parameter(value = "transport_certificate_alias")
+    private String datanodeTransportCertificateAlias;
+
+
     @Documentation("Relative path (to config_location) to a keystore used for opensearch REST layer TLS")
     @Parameter(value = "http_certificate")
     private String datanodeHttpCertificate = null;
@@ -158,6 +176,11 @@ public class Configuration implements CommonNodeConfiguration {
     @Documentation("Password for a keystore defined in http_certificate")
     @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
+
+    @Documentation("Http keystore alias name. Optional. Default is the first alias.")
+    @Parameter(value = "http_certificate_alias")
+    private String datanodeHttpCertificateAlias;
+
 
     @Documentation("You MUST set a secret to secure/pepper the stored user passwords here. Use at least 16 characters." +
             "Generate one by using for example: pwgen -N 1 -s 96 \n" +
@@ -680,4 +703,14 @@ public class Configuration implements CommonNodeConfiguration {
         return true;
     }
 
+    public Path getOpensearchConfigurationOverridesFile() {
+        return opensearchConfigurationOverridesFile;
+    }
+    public String getDatanodeTransportCertificateAlias() {
+        return datanodeTransportCertificateAlias;
+    }
+
+    public String getDatanodeHttpCertificateAlias() {
+        return datanodeHttpCertificateAlias;
+    }
 }

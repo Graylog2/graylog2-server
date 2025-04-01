@@ -71,7 +71,9 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20240312140000_RemoveFieldTypeMappingsManagerRole.class);
         addMigration(V202404170856_UpdateIndexSetTemplates.class);
         addMigration(V20240927120300_DataNodeMigrationIndexSet.class);
+        addMigration(V20250304102900_ScopeMigration.class);
         addMigration(V20250206105400_TokenManagementConfiguration.class);
         addMigration(V20250219134200_DefaultTTLForNewTokens.class);
+        addMigration(V20250327120900_RenameDefaultPipeline.class);
     }
 }

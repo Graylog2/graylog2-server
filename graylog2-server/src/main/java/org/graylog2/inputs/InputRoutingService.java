@@ -23,12 +23,13 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
-import org.graylog.plugins.pipelineprocessor.db.SystemPipelineRuleScope;
+import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineUtils;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
@@ -47,7 +48,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class InputRoutingService {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InputRoutingService.class);
     private static final String GL_ROUTING_RULE_PREFIX = "gl_route_";
-    private static final Pattern GL_ROUTING_RULE_REGEX = Pattern.compile(GL_ROUTING_RULE_PREFIX + "(\\w+)\\[(\\w+)\\]_to_(\\w+)");
+    private static final Pattern GL_ROUTING_RULE_REGEX = Pattern.compile(GL_ROUTING_RULE_PREFIX + "(.+)\\[(\\w+)\\]_to_(.+)");
 
     private final RuleService ruleService;
     private final InputService inputService;
@@ -112,7 +113,7 @@ public class InputRoutingService {
                         + ");\nend\n";
 
         RuleDao ruleDao = RuleDao.builder()
-                .scope(SystemPipelineRuleScope.NAME)
+                .scope(DeletableSystemScope.NAME)
                 .title(ruleName)
                 .description("Input setup wizard routing rule")
                 .source(ruleSource)
@@ -121,8 +122,16 @@ public class InputRoutingService {
         return ruleService.save(ruleDao);
     }
 
+    // Create a human-readable name for a routing rule
     private String getSystemRuleName(String inputName, String inputId, String streamName) {
-        return GL_ROUTING_RULE_PREFIX + inputName + "[" + inputId + "]_to_" + streamName;
+        return GL_ROUTING_RULE_PREFIX + sanitize(inputName)
+                + "[" + inputId + "]_to_"
+                + sanitize(streamName);
+    }
+
+    private String sanitize(String s) {
+        return s.replace('\"', '*')
+                .replace('\\', '*');
     }
 
     private boolean isSystemRulePattern(String ruleName) {
@@ -130,8 +139,8 @@ public class InputRoutingService {
         return matcher.matches();
     }
 
-    private boolean isSystemRulePattern(String ruleName, String inputId, String inputName) {
-        return ruleName.matches(GL_ROUTING_RULE_PREFIX + inputName + "\\[" + inputId + "\\]_to_.*");
+    private String createSystemRuleRegex(String inputId, String inputName) {
+        return GL_ROUTING_RULE_PREFIX + Pattern.quote(sanitize(inputName)) + "\\[" + inputId + "\\]_to_.*";
     }
 
     private String replaceInputName(String ruleName, String oldInputName, String newInputName) {
@@ -153,11 +162,10 @@ public class InputRoutingService {
      */
     @Subscribe
     public void handleInputRenamed(InputRenamedEvent event) {
-        ruleService.loadAll().stream()
-                .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.inputId(), event.oldInputTitle()))
+        ruleService.loadAllByTitle(createSystemRuleRegex(event.inputId(), event.oldInputTitle()))
                 .forEach(ruleDao -> {
                     String oldRuleTitle = ruleDao.title();
-                    String newRuleTitle = replaceInputName(oldRuleTitle, event.oldInputTitle(), event.newInputTitle());
+                    String newRuleTitle = replaceInputName(oldRuleTitle, sanitize(event.oldInputTitle()), sanitize(event.newInputTitle()));
                     String newSource = ruleDao.source().replace(oldRuleTitle, newRuleTitle);
                     ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build(), false);
                     handleRuleRenamed(oldRuleTitle, newRuleTitle);
@@ -190,18 +198,22 @@ public class InputRoutingService {
      */
     @Subscribe
     public void handleInputDeleted(InputDeletedEvent event) {
-        ruleService.loadAll().stream()
-                .filter(ruleDao -> isSystemRulePattern(ruleDao.title(), event.inputId(), event.inputTitle()))
-                .forEach(ruleDao -> {
-                    ruleService.delete(ruleDao.id());
-                    handleRuleDeleted(ruleDao.title());
-                });
+        ruleService.loadAllByTitle(createSystemRuleRegex(event.inputId(), event.inputTitle()))
+                .forEach(ruleService::delete);
+    }
+
+    @Subscribe
+    public void handleRuleDeleted(RulesChangedEvent event) {
+        event.deletedRules().stream()
+                .map(RulesChangedEvent.Reference::title)
+                .filter(this::isSystemRulePattern)
+                .forEach(this::deleteFromDefaultPipeline);
     }
 
     /**
      * Update default pipeline when a routing rule is deleted.
      */
-    private void handleRuleDeleted(String ruleTitle) {
+    private void deleteFromDefaultPipeline(String ruleTitle) {
         try {
             PipelineDao pipelineDao = pipelineService.loadByName(GL_INPUT_ROUTING_PIPELINE);
             PipelineSource pipelineSource = PipelineSource.fromDao(pipelineRuleParser, pipelineDao);

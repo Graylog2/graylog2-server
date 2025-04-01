@@ -16,7 +16,7 @@
  */
 import { useMutation } from '@tanstack/react-query';
 
-import { PipelinesPipelines, Streams, PipelinesRules } from '@graylog/server-api';
+import { PipelinesPipelines, Streams, PipelinesRules, PipelinesConnections } from '@graylog/server-api';
 
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import type { Stream } from 'logic/streams/types';
@@ -25,6 +25,7 @@ import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
 export type RoutingParams = {
   stream_id?: string;
   input_id: string;
+  remove_from_default?: boolean;
 };
 
 export type StreamConfiguration = Pick<Stream, 'index_set_id' | 'title' | 'remove_matches_from_default_stream'> &
@@ -51,6 +52,7 @@ const createPipeline = (pipeline: PipelineConfiguration): Promise<PipelineType> 
     created_at: undefined,
     modified_at: undefined,
     stages: [{ stage: 0, rules: [], match: 'EITHER' } as StageType],
+    _scope: undefined,
     ...pipeline,
   };
 
@@ -68,8 +70,10 @@ const deleteStream = async (streamId: string) => Streams.remove(streamId);
 const deletePipeline = async (pipelineId: string) => PipelinesPipelines.remove(pipelineId);
 
 const deleteRoutingRule = async (ruleId: string) => PipelinesRules.remove(ruleId);
+const connectPipeline = async ({ pipelineId, streamId }: { pipelineId: string; streamId: string }) =>
+  PipelinesConnections.connectStreams({ stream_ids: [streamId], pipeline_id: pipelineId });
 
-const usePipelineRoutingMutation = () => {
+const useSetupInputMutations = () => {
   const createStreamMutation = useMutation(createStream);
   const startStreamMutation = useMutation(startStream);
   const createPipelineMutation = useMutation(createPipeline);
@@ -77,6 +81,7 @@ const usePipelineRoutingMutation = () => {
   const deleteStreamMutation = useMutation(deleteStream);
   const deletePipelineMutation = useMutation(deletePipeline);
   const deleteRoutingRuleMutation = useMutation(deleteRoutingRule);
+  const connectPipelineMutation = useMutation(connectPipeline);
 
   return {
     createStreamMutation,
@@ -86,7 +91,8 @@ const usePipelineRoutingMutation = () => {
     deleteStreamMutation,
     deletePipelineMutation,
     deleteRoutingRuleMutation,
+    connectPipelineMutation,
   };
 };
 
-export default usePipelineRoutingMutation;
+export default useSetupInputMutations;

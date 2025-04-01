@@ -54,7 +54,6 @@ import type { ParameterBindings } from 'views/logic/search/SearchExecutionState'
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type SearchResult from 'views/logic/SearchResult';
-import type { WidgetMapping } from 'views/logic/views/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
@@ -62,6 +61,8 @@ import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
 import type { Event } from 'components/events/events/types';
 import type { PluggableReducer } from 'store';
+import type { WidgetMapping } from 'views/logic/views/types';
+import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -122,11 +123,6 @@ export interface WidgetExport {
   searchTypes: (widget: Widget) => Array<any>;
   titleGenerator?: (widget: { config: Widget['config'] }) => string;
   exportComponent?: React.ComponentType<{ widget: Widget }>;
-}
-
-export interface VisualizationConfigProps {
-  config: WidgetConfig;
-  onChange: (newConfig: WidgetConfig) => void;
 }
 
 type BaseField = {
@@ -221,7 +217,7 @@ export interface SystemConfiguration {
   component: React.ComponentType<SystemConfigurationComponentProps>;
 }
 
-export type SearchTypeResult = {
+export type GenericResult = {
   type: string;
   effective_timerange: AbsoluteTimeRange;
   total: number;
@@ -234,7 +230,7 @@ export type MessageResult = {
 };
 
 export interface SearchTypeResultTypes {
-  generic: SearchTypeResult;
+  generic: GenericResult;
   messages: MessageResult;
 }
 
@@ -250,7 +246,8 @@ export interface ActionContexts {
   parameterBindings?: ParameterBindings;
 }
 
-export type SearchTypeResults = { [id: string]: SearchTypeResultTypes[keyof SearchTypeResultTypes] };
+export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];
+export type SearchTypeResults = { [id: string]: SearchTypeResult };
 
 export type MessagePreviewOption = {
   title: string;
@@ -313,8 +310,9 @@ type SearchActionModalProps = React.PropsWithRef<{
 };
 
 type AssetInformationComponentProps = {
-  identifiers: unknown;
-  addToQuery: (id: string) => void;
+  assetIds: unknown;
+  direction?: 'col' | 'row';
+  addToQuery?: (id: string) => void;
 };
 
 type SearchAction = {
@@ -447,7 +445,7 @@ export interface ViewState {
 
 export type SearchExecutionResult = {
   result: SearchResult;
-  widgetMapping: WidgetMapping;
+  widgetMapping?: WidgetMapping;
 };
 
 export type JobIdsState = JobIds | null;
@@ -455,7 +453,7 @@ export interface SearchExecution {
   executionState: SearchExecutionState;
   result: SearchExecutionResult;
   isLoading: boolean;
-  widgetsToSearch: Array<string>;
+  searchTypesToSearch: Array<string>;
   jobIds?: JobIds | null;
 }
 
@@ -508,6 +506,10 @@ declare module 'graylog-web-plugin/plugin' {
     enterpriseWidgets?: Array<WidgetExport>;
     useExternalActions?: Array<() => ExternalActionsHookData>;
     fieldActions?: Array<ActionDefinition>;
+    fieldTypeValueRenderer?: Array<{
+      type: string;
+      render: (value: unknown, field: string, render: React.ComponentType<ValueRendererProps>) => React.ReactNode;
+    }>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
     systemConfigurations?: Array<SystemConfiguration>;

@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
@@ -25,28 +23,6 @@ import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
-
-import menuItemStyles from './styles/menuItem';
-
-class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
-  // eslint-disable-next-line class-methods-use-this
-  isActive({ props }, activeKey, activeHref) {
-    // NOTE: had to override library as it doesn't respect setting `active={false}`
-    if (props.active === false) {
-      return false;
-    }
-
-    if (
-      props.active ||
-      (activeKey != null && props.eventKey === activeKey) ||
-      (activeHref && props.href === activeHref)
-    ) {
-      return true;
-    }
-
-    return props.active;
-  }
-}
 
 const StyledMenuDropdown = styled(Menu.Dropdown)`
   z-index: 1032 !important;
@@ -67,14 +43,14 @@ const DropdownTrigger = styled.button<{ $active: boolean }>(
     ${$active ? activeIndicatorStyles(theme) : ''}
 
     &:hover,
-  &:focus {
+    &:focus {
       color: ${theme.colors.variant.darker.default};
       background-color: transparent;
     }
   `,
 );
 
-const NavItem = styled.span`
+const NavItem = styled.li`
   display: inline-flex;
   align-items: center;
   min-height: ${NAV_ITEM_HEIGHT};
@@ -86,20 +62,20 @@ const NavItem = styled.span`
 `;
 
 type Props = {
+  Badge?: React.ComponentType<{ text: React.ReactNode }>;
   title?: React.ReactNode;
   inactiveTitle?: string;
-  badge?: React.ComponentType<{ text: React.ReactNode }>;
   noCaret?: boolean;
   hoverTitle?: string;
 };
 
 const NavDropdown = ({
-  title,
-  inactiveTitle,
-  badge: Badge,
+  inactiveTitle = undefined,
+  Badge = undefined,
+  title = undefined,
   noCaret = false,
-  children,
-  hoverTitle,
+  children = undefined,
+  hoverTitle = undefined,
 }: React.PropsWithChildren<Props>) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
@@ -118,10 +94,5 @@ const NavDropdown = ({
   );
 };
 
-const ModifiedNavDropdown = styled(ModifiedBootstrapNavDropdown)`
-  ${menuItemStyles}
-`;
-
 /** @component */
 export default NavDropdown;
-export { ModifiedNavDropdown };

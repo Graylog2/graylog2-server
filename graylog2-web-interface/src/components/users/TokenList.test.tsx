@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import type { Optional } from 'utility-types';
 
@@ -24,8 +24,22 @@ import OriginalTokenList from 'components/users/TokenList';
 jest.mock('components/common/ClipboardButton', () => 'clipboard-button');
 
 const tokens = [
-  { name: 'Acme', token: 'beef2001', id: 'abc1', last_access: '2020-12-08T16:46:00Z' },
-  { name: 'Hamfred', token: 'beef2002', id: 'abc2', last_access: '1970-01-01T00:00:00.000Z' },
+  {
+    name: 'Acme',
+    token: 'beef2001',
+    id: 'abc1',
+    last_access: '2020-12-08T16:46:00Z',
+    created_at: '2020-12-08T00:00:00Z',
+    tokenTtl: 'P30D',
+  },
+  {
+    name: 'Hamfred',
+    token: 'beef2002',
+    id: 'abc2',
+    last_access: '1970-01-01T00:00:00.000Z',
+    created_at: '1970-01-01T00:00:00Z',
+    tokenTtl: 'PT48H',
+  },
 ];
 const TokenList = (props: Optional<React.ComponentProps<typeof OriginalTokenList>, 'onCreate' | 'onDelete'>) => (
   <OriginalTokenList onCreate={async () => tokens[0]} onDelete={() => {}} {...props} />
@@ -52,10 +66,17 @@ describe('<TokenList />', () => {
   });
 
   it('should add new token and display it', async () => {
-    const createFn = jest.fn((tokenName: string) => {
+    const createFn = jest.fn(({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => {
       expect(tokenName).toEqual('hans');
+      expect(tokenTtl).toEqual('PT72H');
 
-      return Promise.resolve({ name: 'hans', token: 'beef2003', id: 'abc3', last_access: '1970-01-01T00:00:00.000Z' });
+      return Promise.resolve({
+        name: 'hans',
+        token: 'beef2003',
+        id: 'abc3',
+        last_access: '1970-01-01T00:00:00.000Z',
+        tokenTtl: 'PT72H',
+      });
     });
 
     render(<TokenList tokens={tokens} onCreate={createFn} onDelete={() => {}} />);
@@ -63,12 +84,15 @@ describe('<TokenList />', () => {
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
     userEvent.type(nameInput, 'hans');
 
+    const ttlInput = await screen.findByLabelText('Token TTL');
+    fireEvent.change(ttlInput, { target: { value: 'PT72H' } });
+
     const createToken = await screen.findByRole('button', { name: 'Create Token' });
     createToken.click();
 
     await screen.findByText('beef2003');
 
-    expect(createFn).toHaveBeenCalledWith('hans');
+    expect(createFn).toHaveBeenCalledWith({ 'tokenName': 'hans', 'tokenTtl': 'PT72H' });
   });
 
   it('should delete a token', async () => {

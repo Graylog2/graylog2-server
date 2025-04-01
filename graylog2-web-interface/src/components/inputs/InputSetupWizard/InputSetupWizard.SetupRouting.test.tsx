@@ -20,8 +20,10 @@ import selectEvent from 'react-select-event';
 
 import { asMock } from 'helpers/mocking';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
-import useStreams from 'components/streams/hooks/useStreams';
+import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilteredStreams';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
+import useInputReferences from 'components/inputs/InputSetupWizard/hooks/useInputReferences';
+import useStreamsByIndexSet from 'components/inputs/InputSetupWizard/hooks/useStreamsByIndexSet';
 
 import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
 import InputSetupWizard from './Wizard';
@@ -47,16 +49,22 @@ const renderWizard = () =>
     </InputSetupWizardProvider>,
   );
 
-jest.mock('components/streams/hooks/useStreams');
+jest.mock('components/inputs/InputSetupWizard/hooks/useFilteredStreams');
 jest.mock('hooks/usePipelinesConnectedStream');
 jest.mock('components/indices/hooks/useIndexSetsList');
+jest.mock('components/inputs/InputSetupWizard/hooks/useInputReferences');
+jest.mock('components/inputs/InputSetupWizard/hooks/useStreamsByIndexSet');
 
 const useStreamsResult = (list = []) => ({
-  data: { list: list, pagination: { total: 1 }, attributes: [] },
-  isInitialLoading: false,
+  data: { streams: list, total: 1 },
+  isLoading: false,
   isFetching: false,
   error: undefined,
-  refetch: () => {},
+});
+
+const useStreamByIndexSetResult = (data = { total: 0, streams: [] }) => ({
+  data,
+  isLoading: false,
 });
 
 const pipelinesConnectedMock = (response = []) => ({
@@ -66,6 +74,21 @@ const pipelinesConnectedMock = (response = []) => ({
   error: undefined,
   isError: false,
 });
+
+const useInputReferencesResult = {
+  isLoading: false,
+  data: {
+    isInputAlreadyInUse: true,
+    stream_refs: [
+      { name: 'In use stream 1', id: 'stream_1' },
+      { name: 'In use stream 2', id: 'stream_2' },
+    ],
+    pipeline_refs: [
+      { name: 'In use pipeline 1', id: 'pipeline_1' },
+      { name: 'In use pipeline 2', id: 'pipeline_2' },
+    ],
+  },
+};
 
 const useIndexSetsListResult = {
   data: {
@@ -141,7 +164,7 @@ const getStreamCreateFormFields = async () => {
     hidden: true,
   });
 
-  const indexSetSelect = await screen.findByLabelText(/Index Set/i);
+  const indexSetSelect = await screen.findByLabelText('Index Set');
 
   const removeMatchesCheckbox = await screen.findByRole('checkbox', {
     name: /Remove matches from/i,
@@ -154,7 +177,7 @@ const getStreamCreateFormFields = async () => {
   });
 
   const submitButton = await screen.findByRole('button', {
-    name: 'Create',
+    name: 'Next',
     hidden: true,
   });
 
@@ -169,238 +192,186 @@ const getStreamCreateFormFields = async () => {
 };
 
 beforeEach(() => {
-  asMock(useStreams).mockReturnValue(useStreamsResult());
+  asMock(useFilteredStreams).mockReturnValue(useStreamsResult());
   asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
   asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
 });
 
 describe('InputSetupWizard Setup Routing', () => {
-  it('should render the Setup Routing step', async () => {
-    renderWizard();
-
-    const routingStepText = await screen.findByText(
-      /Select a destination Stream to route messages from this input to./i,
-    );
-
-    expect(routingStepText).toBeInTheDocument();
-  });
-
-  describe('Stream Selection', () => {
-    it('should show the stream select when clicking on choose stream', async () => {
-      renderWizard();
-      const selectStreamButton = await screen.findByRole('button', {
-        name: /Select Stream/i,
-        hidden: true,
-      });
-
-      fireEvent.click(selectStreamButton);
-
-      await screen.findByLabelText(/All messages \(Default\)/i);
+  describe('with existing stream', () => {
+    beforeEach(() => {
+      asMock(useStreamsByIndexSet).mockReturnValue(useStreamByIndexSetResult());
+      asMock(useFilteredStreams).mockReturnValue(useStreamsResult());
+      asMock(usePipelinesConnectedStream).mockReturnValue(pipelinesConnectedMock());
+      asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
+      asMock(useInputReferences).mockReturnValue(useInputReferencesResult);
     });
 
-    it('should only show editable existing streams', async () => {
-      asMock(useStreams).mockReturnValue(
-        useStreamsResult([
-          { id: 'alohoid', title: 'Aloho', is_editable: true },
-          { id: 'moraid', title: 'Mora', is_editable: false },
-        ]),
+    it('should render the Setup Routing step', async () => {
+      renderWizard();
+      const routingStepText = await screen.findByText(
+        /Select a destination Stream to route messages from this input to./i,
       );
 
-      renderWizard();
-      const selectStreamButton = await screen.findByRole('button', {
-        name: /Select Stream/i,
-        hidden: true,
-      });
-
-      fireEvent.click(selectStreamButton);
-
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
-
-      await selectEvent.openMenu(streamSelect);
-
-      const alohoOption = await screen.findByText(/Aloho/i);
-      const moraOption = screen.queryByText(/Mora/i);
-
-      expect(alohoOption).toBeInTheDocument();
-      expect(moraOption).not.toBeInTheDocument();
+      expect(routingStepText).toBeInTheDocument();
     });
 
-    it('should not show existing default stream in select', async () => {
-      asMock(useStreams).mockReturnValue(
-        useStreamsResult([
-          { id: 'alohoid', title: 'Aloho', is_editable: true, is_default: true },
-          { id: 'moraid', title: 'Mora', is_editable: true },
-        ]),
-      );
-
+    it('should show a warning if the input is already in use', async () => {
       renderWizard();
 
-      const selectStreamButton = await screen.findByRole('button', {
-        name: /Select Stream/i,
-        hidden: true,
-      });
-
-      fireEvent.click(selectStreamButton);
-
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
-
-      await selectEvent.openMenu(streamSelect);
-
-      const moraOption = await screen.findByText(/Mora/i);
-      const alohoOption = screen.queryByText(/Aloho/i);
-
-      expect(moraOption).toBeInTheDocument();
-      expect(alohoOption).not.toBeInTheDocument();
+      await screen.findByText('Input already in use - Message Duplication Risk!');
+      await screen.findByText('In use stream 1');
+      await screen.findByText('In use stream 2');
+      await screen.findByText('In use pipeline 1');
+      await screen.findByText('In use pipeline 2');
     });
 
-    it('should allow the user to select a stream', async () => {
-      asMock(useStreams).mockReturnValue(
-        useStreamsResult([
-          { id: 'alohoid', title: 'Aloho', is_editable: true },
-          { id: 'moraid', title: 'Mora', is_editable: true },
-        ]),
-      );
+    describe('Stream Selection', () => {
+      it('should show the stream select when clicking on choose stream', async () => {
+        renderWizard();
+        const selectStreamButton = await screen.findByRole('button', {
+          name: /Select Stream/i,
+          hidden: true,
+        });
 
-      renderWizard();
+        fireEvent.click(selectStreamButton);
 
-      const selectStreamButton = await screen.findByRole('button', {
-        name: /Select Stream/i,
-        hidden: true,
+        await screen.findByLabelText(/Default Stream/i);
       });
 
-      fireEvent.click(selectStreamButton);
+      it('should only show editable existing streams', async () => {
+        asMock(useFilteredStreams).mockReturnValue(
+          useStreamsResult([
+            { id: 'alohoid', title: 'Aloho', is_editable: true },
+            { id: 'moraid', title: 'Mora', is_editable: false },
+          ]),
+        );
 
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+        renderWizard();
+        const selectStreamButton = await screen.findByRole('button', {
+          name: /Select Stream/i,
+          hidden: true,
+        });
 
-      await selectEvent.openMenu(streamSelect);
+        fireEvent.click(selectStreamButton);
 
-      await selectEvent.select(streamSelect, 'Aloho');
-    });
+        const streamSelect = await screen.findByLabelText(/Default Stream/i);
 
-    it('should show a warning if the selected stream has connected pipelines', async () => {
-      asMock(useStreams).mockReturnValue(
-        useStreamsResult([
-          { id: 'alohoid', title: 'Aloho', is_editable: true },
-          { id: 'moraid', title: 'Mora', is_editable: true },
-        ]),
-      );
+        await selectEvent.openMenu(streamSelect);
 
-      asMock(usePipelinesConnectedStream).mockReturnValue(
-        pipelinesConnectedMock([
-          { id: 'pipeline1', title: 'Pipeline1' },
-          { id: 'pipeline2', title: 'Pipeline2' },
-        ]),
-      );
+        const alohoOption = await screen.findByText(/Aloho/i);
+        const moraOption = screen.queryByText(/Mora/i);
 
-      renderWizard();
-
-      const selectStreamButton = await screen.findByRole('button', {
-        name: /Select Stream/i,
-        hidden: true,
+        expect(alohoOption).toBeInTheDocument();
+        expect(moraOption).not.toBeInTheDocument();
       });
 
-      fireEvent.click(selectStreamButton);
+      it('should not show existing default stream in select', async () => {
+        asMock(useFilteredStreams).mockReturnValue(
+          useStreamsResult([
+            { id: 'alohoid', title: 'Aloho', is_editable: true, is_default: true },
+            { id: 'moraid', title: 'Mora', is_editable: true },
+          ]),
+        );
 
-      const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+        renderWizard();
 
-      await selectEvent.openMenu(streamSelect);
+        const selectStreamButton = await screen.findByRole('button', {
+          name: /Select Stream/i,
+          hidden: true,
+        });
 
-      await selectEvent.select(streamSelect, 'Aloho');
+        fireEvent.click(selectStreamButton);
 
-      const warning = await screen.findByText(/Pipelines connected to target Stream/i);
-      const warningPipeline1 = await screen.findByText(/Pipeline1/i);
-      const warningPipeline2 = await screen.findByText(/Pipeline2/i);
+        const streamSelect = await screen.findByLabelText(/Default Stream/i);
 
-      expect(warning).toBeInTheDocument();
-      expect(warningPipeline1).toBeInTheDocument();
-      expect(warningPipeline2).toBeInTheDocument();
+        await selectEvent.openMenu(streamSelect);
+
+        const moraOption = await screen.findByText(/Mora/i);
+        const alohoOption = screen.queryByText(/Aloho/i);
+
+        expect(moraOption).toBeInTheDocument();
+        expect(alohoOption).not.toBeInTheDocument();
+      });
+
+      it('should allow the user to select a stream', async () => {
+        asMock(useFilteredStreams).mockReturnValue(
+          useStreamsResult([
+            { id: 'alohoid', title: 'Aloho', is_editable: true },
+            { id: 'moraid', title: 'Mora', is_editable: true },
+          ]),
+        );
+
+        renderWizard();
+
+        const selectStreamButton = await screen.findByRole('button', {
+          name: /Select Stream/i,
+          hidden: true,
+        });
+
+        fireEvent.click(selectStreamButton);
+
+        const streamSelect = await screen.findByLabelText(/Default Stream/i);
+
+        await selectEvent.openMenu(streamSelect);
+        await selectEvent.select(streamSelect, 'Aloho');
+      });
+
+      it('should show a warning if the selected stream has connected pipelines', async () => {
+        asMock(useFilteredStreams).mockReturnValue(
+          useStreamsResult([
+            { id: 'alohoid', title: 'Aloho', is_editable: true },
+            { id: 'moraid', title: 'Mora', is_editable: true },
+          ]),
+        );
+
+        asMock(usePipelinesConnectedStream).mockReturnValue(
+          pipelinesConnectedMock([
+            { id: 'pipeline1', title: 'Pipeline1' },
+            { id: 'pipeline2', title: 'Pipeline2' },
+          ]),
+        );
+
+        renderWizard();
+
+        const selectStreamButton = await screen.findByRole('button', {
+          name: /Select Stream/i,
+          hidden: true,
+        });
+
+        fireEvent.click(selectStreamButton);
+
+        const streamSelect = await screen.findByLabelText(/Default Stream/i);
+
+        await selectEvent.openMenu(streamSelect);
+
+        await selectEvent.select(streamSelect, 'Aloho');
+
+        const warning = await screen.findByText(/Pipelines connected to target Stream/i);
+        const warningPipeline1 = await screen.findByText(/Pipeline1/i);
+        const warningPipeline2 = await screen.findByText(/Pipeline2/i);
+
+        expect(warning).toBeInTheDocument();
+        expect(warningPipeline1).toBeInTheDocument();
+        expect(warningPipeline2).toBeInTheDocument();
+      });
     });
   });
 
   describe('Stream creation', () => {
-    it('should allow the user to create a new stream', async () => {
-      asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
-
-      renderWizard();
-
-      const createStreamButton = await screen.findByRole('button', {
-        name: /Create Stream/i,
-        hidden: true,
-      });
-
-      fireEvent.click(createStreamButton);
-
-      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
-
-      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
-        await getStreamCreateFormFields();
-
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
-      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
-      await selectEvent.openMenu(indexSetSelect);
-      await selectEvent.select(indexSetSelect, 'Nox');
-      fireEvent.click(removeMatchesCheckbox);
-      fireEvent.click(newPipelineCheckbox);
-
-      await waitFor(() => expect(submitButton).toBeEnabled());
-      fireEvent.click(submitButton);
-
-      expect(await screen.findByText(/This input will use a new stream: "Wingardium"./i)).toBeInTheDocument();
-      expect(await screen.findByText(/Matches will be removed from the Default stream./i)).toBeInTheDocument();
-      expect(await screen.findByText(/A new pipeline will be created./i)).toBeInTheDocument();
-
-      expect(
-        await screen.findByRole('button', {
-          name: /Reset/i,
-          hidden: true,
+    beforeEach(() => {
+      asMock(useStreamsByIndexSet).mockReturnValue(
+        useStreamByIndexSetResult({
+          total: 2,
+          streams: [
+            { id: 'alohoid', title: 'Aloho', is_editable: true },
+            { id: 'moraid', title: 'Mora', is_editable: true },
+          ],
         }),
-      ).toBeInTheDocument();
+      );
     });
 
-    it('should disable and enable the next step button', async () => {
-      asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
-
-      renderWizard();
-
-      const createStreamButton = await screen.findByRole('button', {
-        name: /Create Stream/i,
-        hidden: true,
-      });
-
-      const nextStepButton = await screen.findByRole('button', {
-        name: /Skip & Start Input/i,
-        hidden: true,
-      });
-
-      expect(nextStepButton).toBeEnabled();
-
-      fireEvent.click(createStreamButton);
-
-      expect(nextStepButton).toBeDisabled();
-
-      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
-
-      const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
-        await getStreamCreateFormFields();
-
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
-      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
-      await selectEvent.openMenu(indexSetSelect);
-      await selectEvent.select(indexSetSelect, 'Nox');
-      fireEvent.click(removeMatchesCheckbox);
-      fireEvent.click(newPipelineCheckbox);
-
-      await waitFor(() => expect(submitButton).toBeEnabled());
-      fireEvent.click(submitButton);
-
-      expect(await screen.findByText(/This input will use a new stream: "Wingardium"./i)).toBeInTheDocument();
-
-      expect(nextStepButton).toBeEnabled();
-    });
-
-    it('should allow the user to reset the new stream', async () => {
-      asMock(useIndexSetsList).mockReturnValue(useIndexSetsListResult);
-
+    it('should allow the user to create a new stream', async () => {
       renderWizard();
 
       const createStreamButton = await screen.findByRole('button', {
@@ -415,27 +386,61 @@ describe('InputSetupWizard Setup Routing', () => {
       const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
         await getStreamCreateFormFields();
 
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
       fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
       await selectEvent.openMenu(indexSetSelect);
       await selectEvent.select(indexSetSelect, 'Nox');
       fireEvent.click(removeMatchesCheckbox);
       fireEvent.click(newPipelineCheckbox);
 
+      expect(submitButton).toBeDisabled();
+
+      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+
       await waitFor(() => expect(submitButton).toBeEnabled());
-      fireEvent.click(submitButton);
+    });
 
-      expect(await screen.findByText(/This input will use a new stream: "Wingardium"./i)).toBeInTheDocument();
+    it('should show a warning when the user selects the default index set', async () => {
+      renderWizard();
 
-      const resetButton = await screen.findByRole('button', {
-        name: /Reset/i,
+      const createStreamButton = await screen.findByRole('button', {
+        name: /Create Stream/i,
         hidden: true,
       });
 
-      fireEvent.click(resetButton);
+      fireEvent.click(createStreamButton);
 
-      expect(screen.queryByRole('heading', { name: /Create new stream/i, hidden: true })).not.toBeInTheDocument();
-      expect(await screen.findByRole('heading', { name: /Route to a new Stream/i, hidden: true })).toBeInTheDocument();
+      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+
+      const { titleInput, descriptionInput, indexSetSelect } = await getStreamCreateFormFields();
+
+      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await selectEvent.openMenu(indexSetSelect);
+      await selectEvent.select(indexSetSelect, 'Default');
+
+      expect(await screen.findByText(/You have selected the Default Index Set./i)).toBeInTheDocument();
+    });
+
+    it('should show a warning when the user selects an index set already associated with other streams', async () => {
+      renderWizard();
+
+      const createStreamButton = await screen.findByRole('button', {
+        name: /Create Stream/i,
+        hidden: true,
+      });
+
+      fireEvent.click(createStreamButton);
+
+      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+
+      const { titleInput, descriptionInput, indexSetSelect } = await getStreamCreateFormFields();
+
+      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await selectEvent.openMenu(indexSetSelect);
+      await selectEvent.select(indexSetSelect, 'Nox');
+
+      await screen.findByText(/Selected index set already associated with another stream/i);
     });
   });
 });

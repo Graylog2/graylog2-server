@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.users;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
@@ -31,6 +32,7 @@ import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserManagementService;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserConfiguration;
@@ -43,6 +45,7 @@ import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -53,7 +56,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
@@ -68,6 +71,8 @@ public class UserResourceGenerateTokenAccessTest {
 
     @Mock
     private UsersResource usersResource;
+    @Mock
+    private UserService userService;
     @Mock
     private PaginatedUserService paginatedUserService;
     @Mock
@@ -97,7 +102,7 @@ public class UserResourceGenerateTokenAccessTest {
                 new Permissions(ImmutableSet.of(new RestPermissions())));
         usersResource = new UsersResourceTest.TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
                 roleService, sessionService, new HttpConfiguration(), subject,
-                sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService);
+                sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, userService);
     }
 
     @Parameterized.Parameters(name = "{index}: permitted: {0}, external: {1}, admin: {2}, confAllowExternals: {3}, confOnlyAdmin: {4} => allowed: {5}")
@@ -176,8 +181,11 @@ public class UserResourceGenerateTokenAccessTest {
     public void testAccess() {
         final User user = mkUser();
         prepareMocks();
-        final boolean allowed = usersResource.isAccessAllowed(user);
-        assertEquals(expectedResult, allowed);
+        if (expectedResult) {
+            usersResource.validatePermissionForTokenCreation(user, user);
+        } else {
+            assertThrows(ForbiddenException.class, () -> usersResource.validatePermissionForTokenCreation(user, user));
+        }
     }
 
     private void prepareMocks() {
@@ -185,7 +193,7 @@ public class UserResourceGenerateTokenAccessTest {
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(isPermitted);
         if (!isAdmin) {
             when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
-                    .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), confAllowExternal, confDenyNonAdmins, Duration.ofDays(30)));
+                    .thenReturn(UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), confAllowExternal, confDenyNonAdmins, PeriodDuration.of(Duration.ofDays(30))));
         }
     }
 }

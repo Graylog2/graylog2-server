@@ -27,13 +27,13 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import { SimpleFieldTypesContextProvider } from 'views/components/contexts/TestFieldTypesContextProvider';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -44,8 +44,7 @@ const extendedTimeout = applyTimeoutMultiplier(30000);
 const fieldType = new FieldType('field_type', ['numeric'], []);
 const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);
 const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
-const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
-const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
+const fields = [fieldTypeMapping1, fieldTypeMapping2];
 
 const pivot0 = Pivot.createValues([fieldTypeMapping1.name]);
 const pivot1 = Pivot.createValues([fieldTypeMapping2.name]);
@@ -92,7 +91,7 @@ const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string 
 const renderSUT = (props = {}) =>
   render(
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={fieldTypes}>
+      <SimpleFieldTypesContextProvider fields={fields}>
         <AggregationWizard
           onChange={() => {}}
           onCancel={() => {}}
@@ -104,7 +103,7 @@ const renderSUT = (props = {}) =>
           {...props}>
           <span>The Visualization</span>
         </AggregationWizard>
-      </FieldTypesContext.Provider>
+      </SimpleFieldTypesContextProvider>
     </TestStoreProvider>,
   );
 
