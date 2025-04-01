@@ -129,8 +129,8 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
             <tr>
               <th>Token Name</th>
               <th>Created</th>
-              <th>Last Access</th>
               <th>Expires At</th>
+              <th>Last Access</th>
               <th className="text-right">Actions</th>
             </tr>
           </thead>
