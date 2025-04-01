@@ -108,6 +108,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.GetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
@@ -185,6 +186,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(RemoveField.NAME, RemoveField.class);
         addMessageProcessorFunction(RemoveSingleField.NAME, RemoveSingleField.class);
         addMessageProcessorFunction(RemoveMultipleFields.NAME, RemoveMultipleFields.class);
+        addMessageProcessorFunction(RemoveFieldsByValue.NAME, RemoveFieldsByValue.class);
         addMessageProcessorFunction(NormalizeFields.NAME, NormalizeFields.class);
 
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);

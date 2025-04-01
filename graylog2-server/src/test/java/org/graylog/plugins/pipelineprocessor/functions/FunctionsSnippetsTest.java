@@ -112,6 +112,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
@@ -242,6 +243,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(RemoveField.NAME, new RemoveField());
         functions.put(RemoveSingleField.NAME, new RemoveSingleField());
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
+        functions.put(RemoveFieldsByValue.NAME, new RemoveFieldsByValue());
         functions.put(NormalizeFields.NAME, new NormalizeFields());
 
         functions.put(DropMessage.NAME, new DropMessage());
@@ -1663,6 +1665,27 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("a_1")).isNull();
         assertThat(message.getField("f2")).isNull();
         assertThat(message.getField("f1")).isEqualTo("f1");
+    }
+
+    @Test
+    void removeFieldsByValue() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isNull(); // match regex
+        assertThat(message.getField("f2")).isNull(); // match regex
+        assertThat(message.getField("f3")).isEqualTo("stay in message");
+        assertThat(message.getField("f4")).isNull(); // match values
+        assertThat(message.getField("f5")).isEqualTo("stay in message");
+        assertThat(message.getField("f6")).isNull(); // match values
+        assertThat(message.getField("f7")).isEqualTo("f-7");
+        assertThat(message.getField("number_field")).isEqualTo(3L);
+        assertThat(message.getField("boolean_field")).isEqualTo(true);
+        assertThat(message.getField("array_field")).satisfies(value -> {
+            assertThat(value instanceof List<?>).isTrue();
+            assertThat(((List<String>) value)).containsAll(List.of("a", "b", "c"));
+        });
     }
 
     @Test

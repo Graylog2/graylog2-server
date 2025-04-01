@@ -1,0 +1,17 @@
+rule "remove_fields_by_value)"
+  when true
+then
+  set_field(field: "f1", value: "a.1");
+  set_field(field: "f2", value: "a_1");
+  set_field(field: "f3", value: "stay in message");
+  set_field(field: "f4", value: "-");
+  set_field(field: "f5", value: "stay in message");
+  set_field(field: "f6", value: "-");
+  set_field(field: "f7", value: "f-7");
+  set_field(field: "number_field", value: 3);
+  set_field(field: "boolean_field", value: true);
+  set_field(field: "array_field", value: ["a", "b", "c"]);
+
+  remove_fields_by_value(pattern:"a.1", values:["-"]);
+  remove_fields_by_value(values:["f.7"]);
+end
