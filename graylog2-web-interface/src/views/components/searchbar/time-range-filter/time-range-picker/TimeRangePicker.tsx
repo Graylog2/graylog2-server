@@ -148,14 +148,9 @@ const TimeRangePicker = ({
   setCurrentTimeRange,
   validTypes = allTimeRangeTypes,
   position,
-  limitDuration: configLimitDuration,
+  limitDuration,
   withinPortal = true,
 }: Props) => {
-  const { ignoreLimitDurationInTimeRangeDropdown } = useContext(TimeRangeInputSettingsContext);
-  const limitDuration = useMemo(
-    () => (ignoreLimitDurationInTimeRangeDropdown ? 0 : configLimitDuration),
-    [configLimitDuration, ignoreLimitDurationInTimeRangeDropdown],
-  );
   const { formatTime, userTimezone } = useUserDateTime();
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();

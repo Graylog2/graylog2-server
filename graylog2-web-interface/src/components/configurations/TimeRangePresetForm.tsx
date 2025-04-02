@@ -69,7 +69,6 @@ const contextSettings = {
   showDropdownButton: false,
   showPresetsButton: false,
   showAddToQuickListButton: false,
-  ignoreLimitDurationInTimeRangeDropdown: true,
 };
 
 const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, onRemove, limitDuration }: ItemProps) => {
@@ -136,12 +135,6 @@ const TimeRangePresetForm = ({
     [onUpdate, options],
   );
 
-  const { config } = useSearchConfiguration();
-  const limitDuration = useMemo(
-    () => moment.duration(config?.query_time_range_limit).asSeconds() ?? 0,
-    [config?.query_time_range_limit],
-  );
-
   const onRemove = useCallback(
     (idx: number) => {
       const newState = options.delete(idx);
@@ -166,7 +159,6 @@ const TimeRangePresetForm = ({
       }),
     );
   }, [onUpdate, options]);
-
   const customContentRender = useCallback(
     ({ item: { id, description, timerange }, index }) => (
       <TimeRangePresetFormItem
@@ -176,10 +168,10 @@ const TimeRangePresetForm = ({
         onChange={onChange}
         timerange={timerange}
         description={description}
-        limitDuration={limitDuration}
+        limitDuration={undefined}
       />
     ),
-    [limitDuration, onChange, onRemove],
+    [onChange, onRemove],
   );
 
   return (
