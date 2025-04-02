@@ -251,7 +251,7 @@ const TimeRangePicker = ({
               <NestedForm>
                 <Row>
                   <Col md={12}>
-                    <TimeRangePresetRow />
+                    <TimeRangePresetRow limitDuration={limitDuration} />
                     <TimeRangeTabs limitDuration={limitDuration} validTypes={validTypes} />
                   </Col>
                 </Row>
