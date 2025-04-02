@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Dispatch } from 'react';
-import React, { useCallback, useMemo } from 'react';
-import moment from 'moment/moment';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import Immutable from 'immutable';
 import debounce from 'lodash/debounce';
@@ -27,7 +26,6 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import generateId from 'logic/generateId';
-import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 export type TimeRangePreset = {
   timerange: TimeRange;
@@ -168,7 +166,7 @@ const TimeRangePresetForm = ({
         onChange={onChange}
         timerange={timerange}
         description={description}
-        limitDuration={undefined}
+        limitDuration={0}
       />
     ),
     [onChange, onRemove],

@@ -52,7 +52,7 @@ describe('TimeRangeFilterButtons', () => {
   const SUTTimeRangeFilterButtons = ({ onSubmit = () => {}, ...props }: SUTProps) => (
     <Formik initialValues={{ selectedFields: [] }} onSubmit={onSubmit}>
       <TimeRangeFilterButtons
-        limitDuration={undefined}
+        limitDuration={0}
         toggleShow={() => {}}
         onPresetSelectOpen={() => {}}
         setCurrentTimeRange={() => {}}

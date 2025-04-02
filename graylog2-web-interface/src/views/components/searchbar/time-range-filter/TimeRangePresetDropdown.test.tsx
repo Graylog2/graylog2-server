@@ -44,7 +44,7 @@ describe('TimeRangePresetDropdown', () => {
     });
 
     const onSelectOption = jest.fn();
-    render(<TimeRangePresetDropdown onChange={onSelectOption} limitDuration={undefined} />);
+    render(<TimeRangePresetDropdown onChange={onSelectOption} limitDuration={0} />);
 
     await openTimeRangePresetSelect();
     await screen.findByRole('menuitem', { name: /15 minutes/i });
