@@ -44,6 +44,7 @@ import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -236,13 +237,24 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public List<String> getPermissions() {
+        final boolean isAllowedToCreateTokens = isAllowedToCreateTokens();
         final Set<String> permissionSet = isServiceAccount() ? new HashSet<>() : new HashSet<>(this.permissions.userSelfEditPermissions(getName()));
+        if (!isAllowedToCreateTokens) {
+            permissionSet.remove(RestPermissions.USERS_TOKENCREATE + ":" + getName());
+        }
         @SuppressWarnings("unchecked")
-        final List<String> permissions = (List<String>) fields.get(PERMISSIONS);
-        if (permissions != null) {
-            permissionSet.addAll(permissions);
+        final List<String> permissionList = (List<String>) fields.get(PERMISSIONS);
+        if (permissionList != null) {
+            permissionSet.addAll(permissionList);
         }
         return new ArrayList<>(permissionSet);
+    }
+
+    private boolean isAllowedToCreateTokens() {
+        final UserConfiguration config = this.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
+        final boolean externalAllowed = config.allowAccessTokenForExternalUsers() || !isExternalUser();
+        final boolean allUsers = !config.restrictAccessTokenToAdmins();
+        return externalAllowed && allUsers;
     }
 
     @Override

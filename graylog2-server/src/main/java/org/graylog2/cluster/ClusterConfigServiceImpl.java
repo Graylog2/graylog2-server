@@ -19,7 +19,9 @@ package org.graylog2.cluster;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
@@ -42,6 +44,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -56,6 +59,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     private final ObjectMapper objectMapper;
     private final RestrictedChainingClassLoader chainingClassLoader;
     private final EventBus clusterEventBus;
+    private final Map<String, Object> clusterConfigCache = new MapMaker().weakKeys().makeMap();
 
     @Inject
     public ClusterConfigServiceImpl(final MongoJackObjectMapperProvider mapperProvider,
@@ -68,6 +72,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         this.objectMapper = checkNotNull(mapperProvider.get());
         this.chainingClassLoader = chainingClassLoader;
         this.clusterEventBus = checkNotNull(clusterEventBus);
+        clusterEventBus.registerClusterEventSubscriber(this);
     }
 
     @VisibleForTesting
@@ -90,10 +95,9 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         }
     }
 
-    @Override
-    public <T> T get(String key, Class<T> type) {
+    private <T> T get0(String key, Class<T> type) {
+        LOG.warn("##########Really loading config for {}.#########", key);
         ClusterConfig config = findClusterConfig(key);
-
         if (config == null) {
             LOG.debug("Couldn't find cluster config of type {}", key);
             return null;
@@ -107,8 +111,30 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         return result;
     }
 
+    @Override
+    public <T> T get(String key, Class<T> type) {
+        if (clusterConfigCache.containsKey(key)) {
+            LOG.warn("!!!!!!!!!!!!!!!!Config is cached for {}.!!!!!!!!!!!!!!!!", key);
+            //noinspection unchecked
+            return (T) clusterConfigCache.get(key);
+        }
+        final T fromDb = get0(key, type);
+        if (fromDb != null) {
+            // the cache doesn't like nulls, so cache it only if the value exists:
+            clusterConfigCache.put(key, fromDb);
+        }
+        return fromDb;
+    }
+
     private ClusterConfig findClusterConfig(String key) {
         return collection.find(Filters.eq("type", key)).first();
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleClusterConfigChangedEvent(ClusterConfigChangedEvent event) {
+        // Remove the cached value for this key
+        clusterConfigCache.remove(event.type());
     }
 
     @Override
