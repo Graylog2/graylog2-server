@@ -38,6 +38,9 @@ public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken
     private final Supplier<Optional<String>> cachingSupplier;
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexerJwtAuthTokenProvider.class);
+    private final JwtSecret jwtSecret;
+    private final Duration tokenExpirationDuration;
+    private final Duration cachingDuration;
 
     @Inject
     public IndexerJwtAuthTokenProvider(JwtSecret jwtSecret,
@@ -48,6 +51,10 @@ public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken
     }
 
     public IndexerJwtAuthTokenProvider(JwtSecret jwtSecret, Duration tokenExpirationDuration, Duration cachingDuration, boolean useJwtAuthentication) {
+        this.jwtSecret = jwtSecret;
+        this.tokenExpirationDuration = tokenExpirationDuration;
+        this.cachingDuration = cachingDuration;
+
         cachingSupplier = Suppliers.memoizeWithExpiration(() -> {
             // TODO: can we run this check outside of the supplier? Is the @RunsWithDataNode stable through the server lifetime?
             if (useJwtAuthentication) {
@@ -78,5 +85,9 @@ public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken
 
     public IndexerJwtAuthToken get() {
         return new IndexerJwtAuthToken(cachingSupplier);
+    }
+
+    public Provider<IndexerJwtAuthToken> alwaysEnabled() {
+        return new IndexerJwtAuthTokenProvider(jwtSecret, tokenExpirationDuration, cachingDuration, true);
     }
 }
