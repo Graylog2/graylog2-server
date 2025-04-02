@@ -17,7 +17,6 @@
 import * as React from 'react';
 import ReactDom from 'react-dom';
 import styled from 'styled-components';
-import DOMPurify from 'dompurify';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';

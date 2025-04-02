@@ -27,7 +27,7 @@ const Markdown = ({ text }: Props) => {
   const markdown = useMemo(() => DOMPurify.sanitize(marked(text ?? '', { async: false }), { USE_PROFILES: { html: false } }), [text]);
 
   // eslint-disable-next-line react/no-danger
-  return <div dangerouslySetInnerHTML={{ __html: markdown }} />;
+  return <div role="heading" aria-level={1} dangerouslySetInnerHTML={{ __html: markdown }} />;
 };
 
 export default Markdown;
