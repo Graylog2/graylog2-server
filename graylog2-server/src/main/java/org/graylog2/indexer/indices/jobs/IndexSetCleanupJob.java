@@ -17,15 +17,13 @@
 package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.ranges.MongoIndexRangeService;
 import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -38,7 +36,6 @@ public class IndexSetCleanupJob extends SystemJob {
     }
 
     private final Indices indices;
-    private final MongoIndexRangeService indexRangeService;
     private final IndexSet indexSet;
 
     private volatile boolean cancel;
@@ -46,9 +43,8 @@ public class IndexSetCleanupJob extends SystemJob {
     private final AtomicLong deleted = new AtomicLong(0L);
 
     @Inject
-    public IndexSetCleanupJob(final Indices indices, final MongoIndexRangeService indexRangeService, @Assisted final IndexSet indexSet) {
+    public IndexSetCleanupJob(final Indices indices, @Assisted final IndexSet indexSet) {
         this.indices = indices;
-        this.indexRangeService = indexRangeService;
         this.indexSet = indexSet;
         this.cancel = false;
     }
@@ -60,12 +56,7 @@ public class IndexSetCleanupJob extends SystemJob {
 
         this.total = managedIndices.length;
 
-        try {
-            LOG.info("Deleting index template <{}> from Elasticsearch", config.indexTemplateName());
-            indices.deleteIndexTemplate(indexSet);
-        } catch (Exception e) {
-            LOG.error("Unable to delete index template <{}>", config.indexTemplateName(), e);
-        }
+        deleteIndexTemplate(config);
 
         for (String indexName : managedIndices) {
             if (cancel) {
@@ -73,15 +64,21 @@ public class IndexSetCleanupJob extends SystemJob {
                 break;
             }
             try {
-                LOG.info("Removing index range information for index: {}", indexName);
-                indexRangeService.remove(indexName);
-
                 LOG.info("Deleting index <{}> in index set <{}> ({})", indexName, config.id(), config.title());
-                indices.delete(indexName);
+                indices.deleteIndex(indexName);
                 deleted.incrementAndGet();
             } catch (Exception e) {
                 LOG.error("Unable to delete index <{}>", indexName, e);
             }
+        }
+    }
+
+    private void deleteIndexTemplate(IndexSetConfig config) {
+        try {
+            LOG.info("Deleting index template <{}> from Elasticsearch", config.indexTemplateName());
+            indices.deleteIndexTemplate(indexSet);
+        } catch (Exception e) {
+            LOG.error("Unable to delete index template <{}>", config.indexTemplateName(), e);
         }
     }
 
