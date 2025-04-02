@@ -17,8 +17,9 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { SourceCodeEditor, Icon } from 'components/common';
+import { Icon } from 'components/common';
 
+import MDBaseEditor from './BaseEditor';
 import Preview from './Preview';
 import EditorModal from './EditorModal';
 
@@ -47,16 +48,6 @@ const Tab = styled.div<{ $active?: boolean }>`
     border: 1px solid ${({ theme }) => theme.colors.input.border};
     border-bottom-color: ${({ theme }) => theme.colors.global.contentBackground};
   `}
-`;
-
-const EditorStyles = styled.div`
-  & .ace_editor {
-    border-color: ${({ theme }) => theme.colors.input.border} !important;
-  }
-
-  & .ace_cursor {
-      border-color: ${({ theme }) => theme.colors.global.textDefault};
-  }
 `;
 
 const ExpandIcon = styled(Icon)`
@@ -94,10 +85,10 @@ function Editor({ id, value, height, readOnly, onChange, onFullMode }: Props) {
     if (onFullMode) onFullMode(fullMode);
   };
 
-  const handleOnChange = (newValue: string) => {
+  const handleOnChange = React.useCallback((newValue: string) => {
     setLocalValue(newValue);
     onChange(newValue);
-  };
+  }, [onChange]);
 
   return (
     <>
@@ -107,26 +98,20 @@ function Editor({ id, value, height, readOnly, onChange, onFullMode }: Props) {
           <Tab $active={showPreview} onClick={() => setShowPreview(true)}>Preview</Tab>
         </TabsRow>
         {!showPreview && (
-          <EditorStyles>
-            {/* @ts-ignore */}
-            <SourceCodeEditor id={id ?? 'md-editor'}
-                              mode="markdown"
-                              theme="light"
-                              toolbar={false}
-                              resizable={false}
-                              readOnly={readOnly}
-                              height={height}
-                              value={localValue}
-                              onChange={handleOnChange} />
-          </EditorStyles>
+          <MDBaseEditor id={id}
+                        onChange={handleOnChange}
+                        value={localValue}
+                        readOnly={readOnly}
+                        height={height}
+                        onBlur={handleOnChange} />
         )}
         <Preview value={localValue} height={height} show={showPreview} />
-        <ExpandIcon data-testid="expand-icon" name="expand" onClick={() => handleOnFullMode(true)} />
+        <ExpandIcon data-testid="expand-icon" name="expand_content" size="sm" onClick={() => handleOnFullMode(true)} />
       </div>
       {fullView && (
-        <EditorModal value={localValue}
+        <EditorModal show
+                     value={localValue}
                      readOnly={readOnly}
-                     show={fullView}
                      onChange={handleOnChange}
                      onClose={() => handleOnFullMode(false)} />
       )}
