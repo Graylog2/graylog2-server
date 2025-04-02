@@ -158,7 +158,7 @@ public class AccessTokenEntityServiceImplTest {
         AccessTokenEntity token = AccessTokenEntity.Builder.create()
                 .createdAt(null)
                 .expiresAt(null)
-                .lastAccess(null)
+                .lastAccess(Tools.nowUTC())
                 .id("tokenId1234")
                 .name("legacyToken")
                 .userName(user.getName())

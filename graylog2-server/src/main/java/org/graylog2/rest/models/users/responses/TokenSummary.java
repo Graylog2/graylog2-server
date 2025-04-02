@@ -36,7 +36,6 @@ public abstract class TokenSummary {
     public abstract String name();
 
     @JsonProperty
-    @Nullable
     public abstract DateTime lastAccess();
 
     @JsonProperty
@@ -50,9 +49,9 @@ public abstract class TokenSummary {
     @JsonCreator
     public static TokenSummary create(@JsonProperty("id") String id,
                                       @JsonProperty("name") String name,
-                                      @Nullable @JsonProperty("last_access") DateTime lastAccess,
+                                      @JsonProperty("last_access") DateTime lastAccess,
                                       @Nullable @JsonProperty("created_at") DateTime createdAt,
-                                      @Nullable @JsonProperty("last_access") DateTime expiresAt) {
+                                      @Nullable @JsonProperty("expires_at") DateTime expiresAt) {
         return new AutoValue_TokenSummary(id, name, lastAccess, createdAt, expiresAt);
     }
 }

@@ -111,10 +111,7 @@ public class TokenUsageServiceImpl implements TokenUsageService {
         }
 
         //If the token was never accessed, we return null to make it more obvious in the frontend:
-        DateTime lastAccess = token.lastAccess();
-        if (lastAccess == null || lastAccess.getMillis() == 0) {
-            lastAccess = null;
-        }
+        final DateTime lastAccess = token.lastAccess().getMillis() == 0 ? null : token.lastAccess();
 
         return TokenUsageDTO.create(token.id(), username, user.getId(), token.name(), token.createdAt(), lastAccess, token.expiresAt(), user.isExternalUser(), authBackend);
     }

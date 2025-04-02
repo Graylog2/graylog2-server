@@ -57,7 +57,6 @@ public abstract class AccessTokenEntity implements MongoEntity {
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
 
-    @Nullable
     @JsonProperty(FIELD_LAST_ACCESS)
     public abstract DateTime lastAccess();
 
@@ -89,7 +88,7 @@ public abstract class AccessTokenEntity implements MongoEntity {
         public abstract Builder createdAt(@Nullable DateTime createdAt);
 
         @JsonProperty(FIELD_LAST_ACCESS)
-        public abstract Builder lastAccess(@Nullable DateTime lastAccess);
+        public abstract Builder lastAccess(DateTime lastAccess);
 
         @JsonProperty(FIELD_EXPIRES_AT)
         public abstract Builder expiresAt(@Nullable DateTime expiresAt);

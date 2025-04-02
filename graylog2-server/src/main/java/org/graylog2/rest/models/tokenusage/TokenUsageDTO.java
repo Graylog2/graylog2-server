@@ -29,7 +29,7 @@ public record TokenUsageDTO(
         @JsonProperty(FIELD_USER_ID) String userId,
         @JsonProperty(FIELD_TOKEN_NAME) String tokenName,
         @Nullable @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
-        @Nullable @JsonProperty(FIELD_LAST_ACCESS) DateTime lastAccess,
+        @JsonProperty(FIELD_LAST_ACCESS) DateTime lastAccess,
         @Nullable @JsonProperty(FIELD_EXPIRES_AT) DateTime expiresAt,
         @JsonProperty(FIELD_USER_IS_EXTERNAL) boolean userIsExternal,
         @JsonProperty(FIELD_AUTH_BACKEND) String authBackend) {
@@ -49,7 +49,7 @@ public record TokenUsageDTO(
                                        @JsonProperty(FIELD_USER_ID) String userId,
                                        @JsonProperty(FIELD_TOKEN_NAME) String tokenName,
                                        @Nullable @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
-                                       @Nullable @JsonProperty(FIELD_LAST_ACCESS) DateTime lastAccess,
+                                       @JsonProperty(FIELD_LAST_ACCESS) DateTime lastAccess,
                                        @Nullable @JsonProperty(FIELD_EXPIRES_AT) DateTime expiresAt,
                                        @JsonProperty(FIELD_USER_IS_EXTERNAL) boolean userIsExternal,
                                        @Nullable @JsonProperty(FIELD_AUTH_BACKEND) String authBackend) {
