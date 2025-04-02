@@ -1,0 +1,2 @@
+type = "s"
+message = "Disallow HTML in the Event Definition Remediation Steps field. [GHSA-76vf-mpmx-777j](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-76vf-mpmx-777j)"
