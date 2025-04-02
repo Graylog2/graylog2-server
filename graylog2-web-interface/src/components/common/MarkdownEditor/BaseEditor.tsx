@@ -54,7 +54,7 @@ function MDBaseEditor({
     // Remove dangerous markdown
     const sanitizedValue = DOMPurify.sanitize(
       // Remove dangerous HTML
-      DOMPurify.sanitize(value, { USE_PROFILES: { html: false } })
+      DOMPurify.sanitize(value, { USE_PROFILES: { html: false } }),
     );
 
     if (onBlur) onBlur(sanitizedValue);
