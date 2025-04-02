@@ -24,10 +24,13 @@ type Props = {
 };
 
 const Markdown = ({ text }: Props) => {
-  const markdown = useMemo(() => DOMPurify.sanitize(marked(text ?? '', { async: false }), { USE_PROFILES: { html: false } }), [text]);
+  // Remove dangerous HTML
+  const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
+  // Remove dangerous markdown
+  const markdown = useMemo(() => DOMPurify.sanitize(marked(sanitizedText, { async: false })), [sanitizedText]);
 
   // eslint-disable-next-line react/no-danger
-  return <div role="heading" aria-level={1} dangerouslySetInnerHTML={{ __html: markdown }} />;
+  return <div dangerouslySetInnerHTML={{ __html: markdown }} />;
 };
 
 export default Markdown;
