@@ -302,7 +302,7 @@ public class MongoIndexSet implements IndexSet {
         LOG.info("Creating target index <{}>.", newTarget);
         if (!indices.create(newTarget, this)) {
             String title = "Error rotating index set";
-            String errorMsg = f("Could not create new target index <{}>.", newTarget);
+            String errorMsg = f("Could not create new target index <%s>.", newTarget);
             notificationService.publishIfFirst(
                     notificationService.build()
                             .addType(Notification.Type.GENERIC)

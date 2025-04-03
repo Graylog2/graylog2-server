@@ -28,6 +28,7 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -97,6 +98,8 @@ public class MongoIndexSetTest {
     @Mock
     private ActivityWriter activityWriter;
     private MongoIndexSet mongoIndexSet;
+    @Mock
+    private NotificationService notificationService;
 
     @Before
     public void setUp() {
@@ -357,6 +360,6 @@ public class MongoIndexSetTest {
     }
 
     private MongoIndexSet createIndexSet(IndexSetConfig indexSetConfig) {
-        return new MongoIndexSet(indexSetConfig, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        return new MongoIndexSet(indexSetConfig, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter, notificationService);
     }
 }

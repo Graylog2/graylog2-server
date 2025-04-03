@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.cluster.health.AbsoluteValueWatermarkSettings;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.cluster.health.NodeRole;
@@ -45,6 +46,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 public class IndexerClusterCheckerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerClusterCheckerThread.class);
     private static final int MINIMUM_OPEN_FILES_LIMIT = 64000;
+    public static final float SHARD_USAGE_THRESHOLD = 0.9f;
 
     private final NotificationService notificationService;
     private final Cluster cluster;
@@ -64,6 +66,7 @@ public class IndexerClusterCheckerThread extends Periodical {
         }
         checkOpenFiles();
         checkDiskUsage();
+        checkShardAllocation();
     }
 
     @VisibleForTesting
@@ -194,6 +197,27 @@ public class IndexerClusterCheckerThread extends Periodical {
                 }
             }
         }
+    }
+
+    @VisibleForTesting
+    void checkShardAllocation() {
+        ClusterShardAllocation clusterShardAllocation = cluster.clusterShardAllocation();
+        int maxShardsPerNode = clusterShardAllocation.maxShardsPerNode();
+        clusterShardAllocation.nodeShardAllocations().stream()
+                .filter(nodeShardAllocation -> ((float) nodeShardAllocation.shards() / maxShardsPerNode) > SHARD_USAGE_THRESHOLD)
+                .forEach(nodeShardAllocation -> {
+                    String node = nodeShardAllocation.node();
+                    int shards = nodeShardAllocation.shards();
+                    String message = String.format("Node %s has %d shards, reaching the maximum of %d shards per node.",
+                            node, shards, maxShardsPerNode);
+                    LOG.warn(message);
+                    notificationService.publishIfFirst(notificationService.buildNow()
+                            .addType(Notification.Type.ES_SHARD_ALLOCATION_MAXIMUM)
+                            .addSeverity(Notification.Severity.URGENT)
+                            .addDetail("max_shards", maxShardsPerNode)
+                            .addDetail("node", node)
+                            .addDetail("shards", shards));
+                });
     }
 
     private boolean notificationExists(Notification.Type type) {
