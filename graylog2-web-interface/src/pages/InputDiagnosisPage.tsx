@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Icon, LinkToNode, Section } from 'components/common';
 import useParams from 'routing/useParams';
-import { Button, ListGroup, ListGroupItem } from 'components/bootstrap';
+import { Alert, Button, ListGroup, ListGroupItem } from 'components/bootstrap';
 import type {
   StreamMessageCount,
   InputNodeStateInfo,
@@ -104,18 +104,6 @@ const TroubleshootingContainer = styled.div`
   max-height: 400px;
   overflow-y: scroll;
 `;
-
-const TroubleshootingHeading = styled.h3(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.md};
-  `,
-);
-
-const Troubleshootingbox = styled.div(
-  ({ theme }) => css`
-    margin-top: ${theme.spacings.md};
-  `,
-);
 
 export const StyledList = styled.ul(
   ({ theme }) => css`
@@ -228,7 +216,19 @@ const InputDiagnosisPage = () => {
       {input && (
         <StyledSectionGrid $columns="1fr 1fr" $rows="1fr 1fr">
           <StyledSectionGrid $columns="1fr" $rows="1fr 1fr">
-            <Section title="Information" headerLeftSection={<StatusColorIndicator />}>
+            <Section
+              title="Information"
+              preHeaderSection={<StatusColorIndicator radius="50%" />}
+              headerLeftSection={
+                <DiagnosisHelp
+                  helpText={`This Input Is Listening On
+                        ${DIAGNOSIS_HELP.INPUT_LISTENING_ON}
+            
+                        This Input is Listening For
+                        ${DIAGNOSIS_HELP.INPUT_LISTENING_FOR}
+                        `}
+                />
+              }>
               <StyledP>The address on which the Input is being run.</StyledP>
               <StyledListGroup>
                 <StyledListGroupItem>
@@ -244,17 +244,12 @@ const InputDiagnosisPage = () => {
                 {input.attributes?.bind_address && input.attributes?.port && (
                   <>
                     <StyledListGroupItem>
-                      <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_LISTENING_ON}>
-                        <strong>This Input is listening on</strong>
-                      </DiagnosisHelp>
-                      : Bind address {input.attributes?.bind_address}, Port {input.attributes?.port}.
+                      <strong>This Input is listening on</strong>: Bind address {input.attributes?.bind_address}, Port{' '}
+                      {input.attributes?.port}.
                     </StyledListGroupItem>
                     <StyledListGroupItem>
-                      <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_LISTENING_FOR}>
-                        {' '}
-                        <strong>This Input is listening for</strong>
-                      </DiagnosisHelp>
-                      : {'tcp_keepalive' in (input.attributes || {}) ? 'TCP Traffic.' : 'UDP Traffic.'}
+                      <strong>This Input is listening for</strong>:{' '}
+                      {'tcp_keepalive' in (input.attributes || {}) ? 'TCP Traffic.' : 'UDP Traffic.'}
                     </StyledListGroupItem>
                   </>
                 )}
@@ -262,15 +257,14 @@ const InputDiagnosisPage = () => {
             </Section>
             <Section
               title="State"
-              headerLeftSection={
-                <>
-                  <StatusColorIndicator
-                    data-testid="state-indicator"
-                    bsStyle={isInputStateDown ? 'danger' : 'success'}
-                  />
-                  <DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_STATE} />
-                </>
-              }>
+              preHeaderSection={
+                <StatusColorIndicator
+                  radius="50%"
+                  data-testid="state-indicator"
+                  bsStyle={isInputStateDown ? 'danger' : 'success'}
+                />
+              }
+              headerLeftSection={<DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_STATE} />}>
               <StyledP>
                 Number of Graylog nodes the Input is configured to run, and on how many it is running. If any are not
                 running, click to see any associated error messages.
@@ -287,8 +281,10 @@ const InputDiagnosisPage = () => {
           </StyledSectionGrid>
           <Section title="Troubleshooting">
             <TroubleshootingContainer>
-              <Troubleshootingbox>
-                <TroubleshootingHeading>Input is in a failed state.</TroubleshootingHeading>
+              <Alert>
+                <p>
+                  <strong>If Input is in a failed state.</strong>
+                </p>
                 <StyledList>
                   <li>
                     When an Input fails on one or more Graylog nodes, the Message field of the State panel will show a
@@ -312,11 +308,10 @@ const InputDiagnosisPage = () => {
                     side hosting the API.
                   </li>
                 </StyledList>
-              </Troubleshootingbox>
-              <Troubleshootingbox>
-                <TroubleshootingHeading>
-                  Input is running on all nodes, but messages are not reaching the Input.
-                </TroubleshootingHeading>
+                <br />
+                <p>
+                  <strong>If Input is running on all nodes, but messages are not reaching the Input.</strong>
+                </p>
                 <StyledList>
                   <li>
                     Check the Network I/O field of the Received Traffic panel. If no traffic is showing here, that
@@ -351,12 +346,13 @@ const InputDiagnosisPage = () => {
                     </StyledList>
                   </li>
                 </StyledList>
-              </Troubleshootingbox>
-              <Troubleshootingbox>
-                <TroubleshootingHeading>
-                  Input is running on all nodes, messages are reaching the Input, but some (or all) are showing as
-                  Message Errors.
-                </TroubleshootingHeading>
+                <br />
+                <p>
+                  <strong>
+                    If Input is running on all nodes, messages are reaching the Input, but some (or all) are showing as
+                    Message Errors.
+                  </strong>
+                </p>
                 <StyledList>
                   <li>
                     On Licensed Enterprise clusters, Failure Processing can be enabled to allow storage of messages that
@@ -365,12 +361,23 @@ const InputDiagnosisPage = () => {
                     and click on the message count to examine individual failed messages.
                   </li>
                 </StyledList>
-              </Troubleshootingbox>
+              </Alert>
             </TroubleshootingContainer>
           </Section>
           <StyledSectionGrid $columns="1fr" $rows="1fr 1fr">
             <Section
-              headerLeftSection={<StatusColorIndicator bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'} />}
+              preHeaderSection={
+                <StatusColorIndicator radius="50%" bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'} />
+              }
+              headerLeftSection={
+                <DiagnosisHelp
+                  helpText={`Empty Messages discarded
+                ${DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED}
+                
+                Network I/O
+                ${DIAGNOSIS_HELP.NETWORK_IO}`}
+                />
+              }
               title="Received Traffic">
               <StyledP>
                 Messages and network traffic that has reached the input. Note: metrics show the last 15 minutes only.
@@ -381,10 +388,7 @@ const InputDiagnosisPage = () => {
                     <strong>Total Messages received by Input</strong>: {inputMetrics.incomingMessagesTotal} events
                   </StyledListGroupItem>
                   <StyledListGroupItem>
-                    <DiagnosisHelp helpText={DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED}>
-                      <strong>Empty Messages discarded</strong>
-                    </DiagnosisHelp>
-                    : {inputMetrics.emptyMessages}
+                    <strong>Empty Messages discarded</strong>: {inputMetrics.emptyMessages}
                   </StyledListGroupItem>
                   {Number.isInteger(inputMetrics.open_connections) &&
                     Number.isInteger(inputMetrics.total_connections) && (
@@ -396,9 +400,7 @@ const InputDiagnosisPage = () => {
                   {Number.isInteger(inputMetrics.read_bytes_1sec) &&
                     Number.isInteger(inputMetrics.read_bytes_total) && (
                       <StyledListGroupItem>
-                        <DiagnosisHelp helpText={DIAGNOSIS_HELP.NETWORK_IO}>
-                          <strong>Network I/O</strong>
-                        </DiagnosisHelp>
+                        <strong>Network I/O</strong>
                         :
                         <NetworkStats
                           readBytes1Sec={inputMetrics.read_bytes_1sec}
@@ -414,13 +416,9 @@ const InputDiagnosisPage = () => {
             <DiagnosisMessageErrors messageErrors={inputMetrics.message_errors} inputId={inputId} />
           </StyledSectionGrid>
           <Section
+            preHeaderSection={<StatusColorIndicator radius="50%" bsStyle={hasReceivedMessage ? 'success' : 'gray'} />}
             title="Received Message count by Stream"
-            headerLeftSection={
-              <>
-                <StatusColorIndicator bsStyle={hasReceivedMessage ? 'success' : 'gray'} />
-                <DiagnosisHelp helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />
-              </>
-            }
+            headerLeftSection={<DiagnosisHelp helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />}
             actions={<ShowReceivedMessagesButton input={input} />}>
             <StyledP>
               Messages successfully ingested into Graylog from this Input in the last 15 minutes. Click on the Stream to

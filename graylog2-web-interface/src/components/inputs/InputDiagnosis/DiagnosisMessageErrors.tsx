@@ -64,38 +64,44 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
   const LinkCompoment = InputFailureLink || Component;
 
   return (
-    <Section title="Message Errors" headerLeftSection={<StatusColorIndicator bsStyle={hasError ? 'danger' : 'gray'} />}>
+    <Section
+      preHeaderSection={<StatusColorIndicator radius="50%" bsStyle={hasError ? 'danger' : 'gray'} />}
+      headerLeftSection={
+        <DiagnosisHelp
+          helpText={`Message Error at Input
+            ${DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT}
+
+            Message Failed to Process
+            ${DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS}
+
+            Message Errors
+            ${DIAGNOSIS_HELP.MESSAGE_FAILED_TO_INDEX}
+            `}
+        />
+      }
+      title="Message Errors">
       <StyledP>
         Messages can fail to process at the Input, at the processing pipeline, or when being indexed to the Search
         Cluster. Click on a category to view the associated messages.
       </StyledP>
       <StyledListGroup>
         <StyledListGroupItem>
-          <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT}>
-            <strong>Message Error at Input</strong>
-          </DiagnosisHelp>
-          :{' '}
           <LinkCompoment failureType="input" inputId={inputId}>
-            {messageErrors.failures_inputs_codecs}
+            <strong>Message Error at Input</strong>{' '}
           </LinkCompoment>
+          : {messageErrors.failures_inputs_codecs}
         </StyledListGroupItem>
         <StyledListGroupItem>
-          <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS}>
-            <strong>Message failed to process</strong>
-          </DiagnosisHelp>
-          :{' '}
           <LinkCompoment failureType="processing" inputId={inputId}>
-            {messageErrors.failures_processing}
+            <strong>Message failed to process</strong>{' '}
           </LinkCompoment>
+          : {messageErrors.failures_processing}
         </StyledListGroupItem>
         <StyledListGroupItem>
-          <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_INDEX}>
-            <strong>Message failed to index</strong>
-          </DiagnosisHelp>
-          :{' '}
           <LinkCompoment failureType="indexing" inputId={inputId}>
-            {messageErrors.failures_indexing}
+            <strong>Message failed to index</strong>{' '}
           </LinkCompoment>
+          : {messageErrors.failures_indexing}
         </StyledListGroupItem>
       </StyledListGroup>
     </Section>
