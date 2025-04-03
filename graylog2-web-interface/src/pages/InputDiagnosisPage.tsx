@@ -37,7 +37,7 @@ import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
 import DiagnosisHelp from 'components/inputs/InputDiagnosis/DiagnosisHelp';
-import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
+import { TITLE_COLUMN_WIDTH, DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
 
 const LeftCol = styled.div(
   ({ theme }) => css`
@@ -80,8 +80,9 @@ const StyledSectionGrid = styled(SectionGrid)<{ $rows?: string }>(
 );
 
 const InputNodeInfo = styled.div`
-  max-width: 500px;
+  max-width: ${450 + TITLE_COLUMN_WIDTH}px;
   white-space: break-spaces;
+  display: flex;
 `;
 
 const StyledListGroup = styled(ListGroup)(
@@ -94,7 +95,25 @@ const StyledListGroup = styled(ListGroup)(
 
 const StyledListGroupItem = styled(ListGroupItem)`
   background-color: transparent;
+  display: flex;
 `;
+
+const StyledTitle = styled.p(
+  ({ theme }) => css`
+    font-weight: bold;
+    width: ${TITLE_COLUMN_WIDTH}px;
+    margin-bottom: 0;
+    margin-right: ${theme.spacings.sm};
+  `,
+);
+
+const StyledTitleLink = styled(Link)(
+  ({ theme }) => css`
+    font-weight: bold;
+    width: ${TITLE_COLUMN_WIDTH}px;
+    margin-right: ${theme.spacings.sm};
+  `,
+);
 
 const StyledSpan = styled.span`
   padding-left: ${({ theme }) => theme.spacings.xs};
@@ -132,20 +151,12 @@ const NodeListItem = ({
   if (nodeId) {
     return (
       <StyledListGroupItem>
-        <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>
-          <>
-            {nodeId && (
-              <>
-                <strong>Node ID:</strong> {nodeId}
-              </>
-            )}
-            {detailedMessage && (
-              <InputNodeInfo>
-                <b>Message:</b> {detailedMessage}
-              </InputNodeInfo>
-            )}
-          </>
-        </Link>
+        <StyledTitle>Node ID:</StyledTitle> <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeId}</Link>
+        {detailedMessage && (
+          <InputNodeInfo>
+            <StyledTitle>Message:</StyledTitle> {detailedMessage}
+          </InputNodeInfo>
+        )}
       </StyledListGroupItem>
     );
   }
@@ -154,7 +165,7 @@ const NodeListItem = ({
     <StyledListGroupItem key={detailedMessage}>
       {detailedMessage && (
         <InputNodeInfo>
-          <strong>Message:</strong> {detailedMessage}
+          <StyledTitle>Message:</StyledTitle> {detailedMessage}
         </InputNodeInfo>
       )}
     </StyledListGroupItem>
@@ -174,7 +185,8 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
     return (
       <>
         <StyledListGroupItem>
-          <strong>{capitalize(state)}</strong>: {inputNodeStates.states[state].length}/{inputNodeStates.total} nodes
+          <StyledTitle>{capitalize(state)}:</StyledTitle>
+          {inputNodeStates.states[state].length}/{inputNodeStates.total} nodes
         </StyledListGroupItem>
         {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
           <NodeListItem key={node_id} detailedMessage={detailed_message} nodeId={node_id} />
@@ -185,7 +197,8 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
 
   return (
     <StyledListGroupItem>
-      <strong>{state}</strong>: {inputNodeStates.states[state].length}/{inputNodeStates.total}
+      <StyledTitle>{state}:</StyledTitle>
+      {inputNodeStates.states[state].length}/{inputNodeStates.total}
     </StyledListGroupItem>
   );
 };
@@ -221,10 +234,10 @@ const InputDiagnosisPage = () => {
               preHeaderSection={<StatusColorIndicator radius="50%" />}
               headerLeftSection={
                 <DiagnosisHelp
-                  helpText={`This Input Is Listening On
+                  helpText={`This Input Is Listening On:
                         ${DIAGNOSIS_HELP.INPUT_LISTENING_ON}
             
-                        This Input is Listening For
+                        This Input is Listening For:
                         ${DIAGNOSIS_HELP.INPUT_LISTENING_FOR}
                         `}
                 />
@@ -232,23 +245,25 @@ const InputDiagnosisPage = () => {
               <StyledP>The address on which the Input is being run.</StyledP>
               <StyledListGroup>
                 <StyledListGroupItem>
-                  <strong>Input Title</strong>: {input.title}
+                  <StyledTitle>Input Title:</StyledTitle>
+                  {input.title}
                 </StyledListGroupItem>
                 <StyledListGroupItem>
-                  <strong>Input Type</strong>: {input.name}
+                  <StyledTitle>Input Type:</StyledTitle>
+                  {input.name}
                 </StyledListGroupItem>
                 <StyledListGroupItem>
-                  <strong>This Input is running on</strong> :{' '}
+                  <StyledTitle>This Input is running on:</StyledTitle>
                   {input.global ? 'all graylog nodes' : <LinkToNode nodeId={input.node} />}
                 </StyledListGroupItem>
                 {input.attributes?.bind_address && input.attributes?.port && (
                   <>
                     <StyledListGroupItem>
-                      <strong>This Input is listening on</strong>: Bind address {input.attributes?.bind_address}, Port{' '}
-                      {input.attributes?.port}.
+                      <StyledTitle>This Input is listening on:</StyledTitle>Bind address{' '}
+                      {input.attributes?.bind_address}, Port {input.attributes?.port}.
                     </StyledListGroupItem>
                     <StyledListGroupItem>
-                      <strong>This Input is listening for</strong>:{' '}
+                      <StyledTitle>This Input is listening for:</StyledTitle>
                       {'tcp_keepalive' in (input.attributes || {}) ? 'TCP Traffic.' : 'UDP Traffic.'}
                     </StyledListGroupItem>
                   </>
@@ -371,10 +386,10 @@ const InputDiagnosisPage = () => {
               }
               headerLeftSection={
                 <DiagnosisHelp
-                  helpText={`Empty Messages discarded
+                  helpText={`Empty Messages discarded:
                 ${DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED}
-                
-                Network I/O
+
+                Network I/O:
                 ${DIAGNOSIS_HELP.NETWORK_IO}`}
                 />
               }
@@ -385,23 +400,24 @@ const InputDiagnosisPage = () => {
               {inputMetrics && (
                 <StyledListGroup>
                   <StyledListGroupItem>
-                    <strong>Total Messages received by Input</strong>: {inputMetrics.incomingMessagesTotal} events
+                    <StyledTitle>Total Messages received by Input:</StyledTitle>
+                    {inputMetrics.incomingMessagesTotal} events
                   </StyledListGroupItem>
                   <StyledListGroupItem>
-                    <strong>Empty Messages discarded</strong>: {inputMetrics.emptyMessages}
+                    <StyledTitle>Empty Messages discarded:</StyledTitle>
+                    {inputMetrics.emptyMessages}
                   </StyledListGroupItem>
                   {Number.isInteger(inputMetrics.open_connections) &&
                     Number.isInteger(inputMetrics.total_connections) && (
                       <StyledListGroupItem>
-                        <strong>Active Connections</strong>: {inputMetrics.open_connections}&nbsp; (
-                        {inputMetrics.total_connections} total)
+                        <StyledTitle>Active Connections:</StyledTitle>
+                        {inputMetrics.open_connections}&nbsp; ({inputMetrics.total_connections} total)
                       </StyledListGroupItem>
                     )}
                   {Number.isInteger(inputMetrics.read_bytes_1sec) &&
                     Number.isInteger(inputMetrics.read_bytes_total) && (
                       <StyledListGroupItem>
-                        <strong>Network I/O</strong>
-                        :
+                        <StyledTitle>Network I/O:</StyledTitle>
                         <NetworkStats
                           readBytes1Sec={inputMetrics.read_bytes_1sec}
                           readBytesTotal={inputMetrics.read_bytes_total}
@@ -428,12 +444,12 @@ const InputDiagnosisPage = () => {
               <StyledListGroup>
                 {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
                   <StyledListGroupItem key={stream.stream_id}>
-                    <Link
+                    <StyledTitleLink
                       to={Routes.search_with_query(`gl2_source_input:${input.id}`, 'relative', { relative: 900 }, [
                         stream.stream_id,
                       ])}>
-                      <strong>{stream.stream_name}</strong>:
-                    </Link>
+                      <strong>{stream.stream_name}:</strong>
+                    </StyledTitleLink>
                     <StyledSpan>{stream.count}</StyledSpan>
                   </StyledListGroupItem>
                 ))}

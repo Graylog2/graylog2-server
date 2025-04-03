@@ -23,7 +23,7 @@ import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 import DiagnosisHelp from './DiagnosisHelp';
-import { DIAGNOSIS_HELP } from './Constants';
+import { DIAGNOSIS_HELP, TITLE_COLUMN_WIDTH } from './Constants';
 
 type Props = {
   messageErrors: {
@@ -41,9 +41,21 @@ const StyledListGroup = styled(ListGroup)(
     border-radius: ${theme.spacings.xs};
   `,
 );
+
 const StyledListGroupItem = styled(ListGroupItem)`
   background-color: transparent;
+  display: flex;
 `;
+
+const StyledTitle = styled.p(
+  ({ theme }) => css`
+    font-weight: bold;
+    width: ${TITLE_COLUMN_WIDTH}px;
+    margin-bottom: 0;
+    margin-right: ${theme.spacings.sm};
+  `,
+);
+
 const StyledP = styled.p(
   ({ theme }) => css`
     &&.description {
@@ -68,13 +80,13 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
       preHeaderSection={<StatusColorIndicator radius="50%" bsStyle={hasError ? 'danger' : 'gray'} />}
       headerLeftSection={
         <DiagnosisHelp
-          helpText={`Message Error at Input
+          helpText={`Message Error at Input:
             ${DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT}
 
-            Message Failed to Process
+            Message Failed to Process:
             ${DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS}
 
-            Message Errors
+            Message Errors:
             ${DIAGNOSIS_HELP.MESSAGE_FAILED_TO_INDEX}
             `}
         />
@@ -87,21 +99,21 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
       <StyledListGroup>
         <StyledListGroupItem>
           <LinkCompoment failureType="input" inputId={inputId}>
-            <strong>Message Error at Input</strong>{' '}
+            <StyledTitle>Message Error at Input:</StyledTitle>
           </LinkCompoment>
-          : {messageErrors.failures_inputs_codecs}
+          {messageErrors.failures_inputs_codecs}
         </StyledListGroupItem>
         <StyledListGroupItem>
           <LinkCompoment failureType="processing" inputId={inputId}>
-            <strong>Message failed to process</strong>{' '}
+            <StyledTitle>Message failed to process:</StyledTitle>
           </LinkCompoment>
-          : {messageErrors.failures_processing}
+          {messageErrors.failures_processing}
         </StyledListGroupItem>
         <StyledListGroupItem>
           <LinkCompoment failureType="indexing" inputId={inputId}>
-            <strong>Message failed to index</strong>{' '}
+            <StyledTitle>Message failed to index:</StyledTitle>
           </LinkCompoment>
-          : {messageErrors.failures_indexing}
+          {messageErrors.failures_indexing}
         </StyledListGroupItem>
       </StyledListGroup>
     </Section>

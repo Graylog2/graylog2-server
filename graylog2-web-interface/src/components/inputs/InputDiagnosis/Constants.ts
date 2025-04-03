@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+export const TITLE_COLUMN_WIDTH = 500;
+
 export const DIAGNOSIS_HELP = {
   INPUT_LISTENING_ON:
     'Note that bind address needs to direct to the Graylog service. Note that the selected port needs to be free of port conflict with another input on each node. Remember that a local input on a single node might conflict with a global input that is runs on all nodes, causing the input to fail on a single input',
