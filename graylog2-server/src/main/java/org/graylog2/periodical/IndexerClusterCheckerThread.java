@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexerClusterCheckerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerClusterCheckerThread.class);
@@ -208,7 +209,7 @@ public class IndexerClusterCheckerThread extends Periodical {
                 .forEach(nodeShardAllocation -> {
                     String node = nodeShardAllocation.node();
                     int shards = nodeShardAllocation.shards();
-                    String message = String.format("Node %s has %d shards, reaching the maximum of %d shards per node.",
+                    String message = f("Node %s has %d shards, reaching the maximum of %d shards per node.",
                             node, shards, maxShardsPerNode);
                     LOG.warn(message);
                     notificationService.publishIfFirst(notificationService.buildNow()
