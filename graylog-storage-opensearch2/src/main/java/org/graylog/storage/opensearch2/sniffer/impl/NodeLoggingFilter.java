@@ -14,10 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.storage.opensearch2.sniffer.impl;
 
 import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.graylog.storage.opensearch2.sniffer.SnifferFilter;
+import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,16 +29,23 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class NodeListSniffer implements NodesSniffer {
-    private static final Logger LOG = LoggerFactory.getLogger(NodeListSniffer.class);
+public class NodeLoggingFilter implements SnifferFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(NodeLoggingFilter.class);
     private static final Set<String> savedNodes = ConcurrentHashMap.newKeySet();
+    private final ElasticsearchClientConfiguration configuration;
 
-    static NodeListSniffer create() {
-        return new NodeListSniffer();
+    @Inject
+    public NodeLoggingFilter(ElasticsearchClientConfiguration configuration) {
+        this.configuration = configuration;
     }
 
     @Override
-    public List<Node> sniff(final List<Node> nodes) {
+    public boolean enabled() {
+        return configuration.isNodeActivityLogger();
+    }
+
+    @Override
+    public List<Node> filterNodes(final List<Node> nodes) {
         final Set<String> currentNodes = nodes.stream().map(n -> n.getHost().toURI()).collect(Collectors.toSet());
 
         final Set<String> nodesAdded = Sets.difference(currentNodes, savedNodes);
