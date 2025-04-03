@@ -359,16 +359,26 @@ public class IndexSetsResource extends RestResource {
         if (indexSet.equals(defaultIndexSet)) {
             throw new BadRequestException("Default index set <" + indexSet.getConfig().id() + "> cannot be deleted!");
         }
+        deleteIndexSetAndFireEvents(id, indexSet);
 
-        if (indexSetService.delete(id) == 0) {
-            throw new NotFoundException("Couldn't delete index set with ID <" + id + ">");
-        } else {
-            if (deleteIndices) {
-                try {
-                    systemJobManager.submit(indexSetCleanupJobFactory.create(indexSet));
-                } catch (SystemJobConcurrencyException e) {
-                    LOG.error("Error running system job", e);
-                }
+        if (deleteIndices) {
+            LOG.info("Scheduling cleanup job to delete Elasticsearch indices for index set <{}>", id);
+            try {
+                systemJobManager.submit(indexSetCleanupJobFactory.create(indexSet));
+            } catch (SystemJobConcurrencyException e) {
+                LOG.error("Error scheduling index set cleanup job", e);
+            }
+        }
+    }
+
+    private void deleteIndexSetAndFireEvents(String id, IndexSet indexSet) {
+        indexSetService.delete(id);
+        final String[] managedIndices = indexSet.getManagedIndices();
+        for (String indexName : managedIndices) {
+            try {
+                indices.fireIndexDeletedEvents(indexName);
+            } catch (Exception e) {
+                LOG.error("Unable to clean up metadata for index <{}>", indexName, e);
             }
         }
     }
