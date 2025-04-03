@@ -14,23 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useMemo } from 'react';
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
+package org.graylog2.configuration;
 
-type Props = {
-  text: string;
-};
+import java.nio.file.Path;
 
-const Markdown = ({ text }: Props) => {
-  // Remove dangerous HTML
-  const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
-  // Remove dangerous markdown
-  const markdown = useMemo(() => DOMPurify.sanitize(marked(sanitizedText, { async: false })), [sanitizedText]);
+public interface NativeLibPathConfiguration {
 
-  // eslint-disable-next-line react/no-danger
-  return <div dangerouslySetInnerHTML={{ __html: markdown }} />;
-};
+    Path getNativeLibDir();
 
-export default Markdown;
+}

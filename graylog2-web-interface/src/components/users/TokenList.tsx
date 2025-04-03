@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState } from 'react';
+import React, {useMemo, useState} from 'react';
 import styled from 'styled-components';
 
 import {
@@ -27,10 +27,10 @@ import {
   NoEntitiesExist,
   RelativeTime,
 } from 'components/common';
-import { Button, ButtonToolbar, Panel, Table } from 'components/bootstrap';
-import type { Token, TokenSummary } from 'stores/users/UsersStore';
-import { sortByDate } from 'util/SortUtils';
-import { Headline } from 'components/common/Section/SectionComponent';
+import {Button, ButtonToolbar, Panel, Table} from 'components/bootstrap';
+import type {Token, TokenSummary} from 'stores/users/UsersStore';
+import {sortByDate} from 'util/SortUtils';
+import {Headline} from 'components/common/Section/SectionComponent';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 import CreateTokenForm from './CreateTokenForm';
@@ -130,12 +130,13 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
               <th>Token Name</th>
               <th>Created</th>
               <th>Last Access</th>
+              <th>Expires At</th>
               <th className="text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {effectiveTokens.map((token) => {
-              const tokenNeverUsed = Date.parse(token.last_access) === 0;
+              const tokenNeverUsed = !token.last_access || Date.parse(token.last_access) === 0;
 
               return (
                 <tr key={token.id}>
@@ -144,6 +145,9 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
                     <Timestamp dateTime={token.created_at} />
                   </td>
                   <td>{tokenNeverUsed ? 'Never used' : <RelativeTime dateTime={token.last_access} />}</td>
+                  <td>
+                    <Timestamp dateTime={token.expires_at} />
+                  </td>
                   <td>
                     <ButtonToolbar className="pull-right">
                       <Button

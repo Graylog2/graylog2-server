@@ -30,7 +30,7 @@ public record TokenUsageDTO(
         @JsonProperty(FIELD_TOKEN_NAME) String tokenName,
         @Nullable @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
         @JsonProperty(FIELD_LAST_ACCESS) DateTime lastAccess,
-        @JsonProperty(FIELD_EXPIRES_AT) DateTime expiresAt,
+        @Nullable @JsonProperty(FIELD_EXPIRES_AT) DateTime expiresAt,
         @JsonProperty(FIELD_USER_IS_EXTERNAL) boolean userIsExternal,
         @JsonProperty(FIELD_AUTH_BACKEND) String authBackend,
         @JsonProperty(FIELD_IS_USER_DELETED) boolean isUserDeleted) {
