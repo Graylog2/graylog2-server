@@ -44,7 +44,6 @@ import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
-import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -237,11 +236,8 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public List<String> getPermissions() {
-        final boolean isAllowedToCreateTokens = isAllowedToCreateTokens();
-        final Set<String> permissionSet = isServiceAccount() ? new HashSet<>() : new HashSet<>(this.permissions.userSelfEditPermissions(getName()));
-        if (!isAllowedToCreateTokens) {
-            permissionSet.remove(RestPermissions.USERS_TOKENCREATE + ":" + getName());
-        }
+        final boolean isAllowedToCreateTokens = this.permissions.isAllowedToCreateTokens(isExternalUser(), this.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES));
+        final Set<String> permissionSet = isServiceAccount() ? new HashSet<>() : new HashSet<>(this.permissions.userSelfEditPermissions(getName(), isAllowedToCreateTokens));
         @SuppressWarnings("unchecked")
         final List<String> permissionList = (List<String>) fields.get(PERMISSIONS);
         if (permissionList != null) {
@@ -250,12 +246,7 @@ public class UserImpl extends PersistedImpl implements User {
         return new ArrayList<>(permissionSet);
     }
 
-    private boolean isAllowedToCreateTokens() {
-        final UserConfiguration config = this.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
-        final boolean externalAllowed = config.allowAccessTokenForExternalUsers() || !isExternalUser();
-        final boolean allUsers = !config.restrictAccessTokenToAdmins();
-        return externalAllowed && allUsers;
-    }
+
 
     @Override
     public Set<Permission> getObjectPermissions() {
@@ -272,8 +263,9 @@ public class UserImpl extends PersistedImpl implements User {
     @Override
     public void setPermissions(final List<String> permissions) {
         final List<String> perms = Lists.newArrayList(permissions);
+        boolean isAllowedToCreateTokens = this.permissions.isAllowedToCreateTokens(isExternalUser(), this.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES));
         // Do not store the dynamic user self edit permissions
-        perms.removeAll(this.permissions.userSelfEditPermissions(getName()));
+        perms.removeAll(this.permissions.userSelfEditPermissions(getName(), isAllowedToCreateTokens));
         fields.put(PERMISSIONS, perms);
     }
 

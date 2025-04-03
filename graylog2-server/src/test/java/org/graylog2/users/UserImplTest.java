@@ -136,7 +136,7 @@ class UserImplTest {
         user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(CONFIG_ALL_ALLOWED);
 
-        assertThat(user.getPermissions()).containsAll(permissions.userSelfEditPermissions("foobar"));
+        assertThat(user.getPermissions()).containsAll(permissions.userSelfEditPermissions("foobar", true));
     }
 
     public static Stream<Arguments> tokenPermissionParameters() {
@@ -177,7 +177,7 @@ class UserImplTest {
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(CONFIG_ALL_ALLOWED);
 
         assertThat(user.getPermissions())
-            .containsAll(permissions.userSelfEditPermissions("foobar"))
+                .containsAll(permissions.userSelfEditPermissions("foobar", true))
             .contains("subject:action");
     }
 
@@ -207,7 +207,7 @@ class UserImplTest {
         user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(CONFIG_ALL_ALLOWED);
 
-        final Set<Permission> userSelfEditPermissions = permissions.userSelfEditPermissions("foobar").stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet());
+        final Set<Permission> userSelfEditPermissions = permissions.userSelfEditPermissions("foobar", true).stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet());
         assertThat(user.getObjectPermissions())
                 .containsAll(userSelfEditPermissions)
                 .contains(new CaseSensitiveWildcardPermission("subject:action"))
