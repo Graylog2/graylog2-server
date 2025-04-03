@@ -155,7 +155,7 @@ const UserConfig = () => {
                               duration={values.global_session_timeout_interval}
                               update={(value) => setFieldValue('global_session_timeout_interval', value)}
                               label="Global session timeout interval (as ISO8601 Duration)"
-                              help="Session automatically end after this amount of time, unless they are actively used."
+                              help="Session automatically end after this amount of time, unless they are actively used. Example, for 60 seconds: PT60S, for 60 minutes: PT60M"
                               validator={timeoutIntervalValidator}
                               errorText="invalid (min: 1 second)"
                               disabled={!values.enable_global_session_timeout}
@@ -188,7 +188,7 @@ const UserConfig = () => {
                               duration={values.default_ttl_for_new_tokens}
                               update={(value) => setFieldValue('default_ttl_for_new_tokens', value)}
                               label="Default TTL for new tokens (as ISO8601 Duration)"
-                              help="Tokens will be automatically invalidated after this amount of time."
+                              help="Tokens will be automatically invalidated after this amount of time. Example, for 24 hours: PT24H, for 30 days: PT30D"
                               validator={defaultTokenTtlValidator}
                               errorText="invalid (min: 1 day)"
                               disabled={!values.default_ttl_for_new_tokens}

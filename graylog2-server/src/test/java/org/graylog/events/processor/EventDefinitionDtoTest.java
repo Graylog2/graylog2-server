@@ -16,12 +16,15 @@
  */
 package org.graylog.events.processor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -132,6 +135,29 @@ public class EventDefinitionDtoTest {
         final ValidationResult validationResult = validate(invalidEventDefinition);
         assertThat(validationResult.failed()).isFalse();
         assertThat(validationResult.getErrors().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void testEventDefinitionHtmlSanitization() throws JsonProcessingException {
+        final EventDefinitionDto dto = EventDefinitionDto.builder()
+                .title("Test")
+                .description("description")
+                .priority(1)
+                .alert(false)
+                .keySpec(ImmutableList.of())
+                .config(TestEventProcessorConfig.builder()
+                        .message("This is a test event processor")
+                        .searchWithinMs(1000)
+                        .executeEveryMs(1000)
+                        .build())
+                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
+                .remediationSteps("<form></form> ## Heading")
+                .build();
+        final String testSubjectJson = new ObjectMapperProvider().get().writeValueAsString(dto);
+        // Markdown should be kept.
+        assertThat(testSubjectJson).contains("## Heading");
+        // HTML should be removed.
+        assertThat(testSubjectJson).doesNotContain("form");
     }
 
     private static ValidationResult validate(EventDefinitionDto eventDefinitionDto) {

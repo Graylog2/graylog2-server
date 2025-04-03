@@ -15,22 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
+
+import Routes from 'routing/Routes';
+import { Link } from 'components/common/router';
+
+import type { Token } from '../hooks/useTokens';
 
 type Props = {
-  text: string;
+  token: Token;
 };
 
-const Markdown = ({ text }: Props) => {
-  // Remove dangerous HTML
-  const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
-  // Remove dangerous markdown
-  const markdown = useMemo(() => DOMPurify.sanitize(marked(sanitizedText, { async: false })), [sanitizedText]);
+const UsernameCell = ({ token }: Props) => <Link to={Routes.SYSTEM.USERS.show(token.user_id)}>{token.username}</Link>;
 
-  // eslint-disable-next-line react/no-danger
-  return <div dangerouslySetInnerHTML={{ __html: markdown }} />;
-};
-
-export default Markdown;
+export default UsernameCell;
