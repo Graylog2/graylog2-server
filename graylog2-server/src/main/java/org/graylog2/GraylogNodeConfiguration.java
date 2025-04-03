@@ -18,7 +18,6 @@ package org.graylog2;
 
 import org.graylog2.plugin.ServerStatus;
 
-import java.nio.file.Path;
 import java.util.Set;
 
 /**
@@ -78,5 +77,4 @@ public interface GraylogNodeConfiguration {
     boolean isMessageRecordingsEnabled();
 
     boolean isCloud();
-
 }
