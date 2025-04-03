@@ -32,13 +32,13 @@ const EditorStyles = styled.div<{ $width: string }>`
 `;
 
 type Props = {
-  value: string,
-  onChange: (mdValue: string) => void,
-  width?: string,
-  id?: string,
-  readOnly?: boolean,
-  height?: number,
-  onBlur?: (mdValue: string) => void,
+  value: string;
+  onChange: (mdValue: string) => void;
+  width?: string;
+  id?: string;
+  readOnly?: boolean;
+  height?: number;
+  onBlur?: (mdValue: string) => void;
 };
 
 function MDBaseEditor({
@@ -48,13 +48,13 @@ function MDBaseEditor({
   readOnly = false,
   height = 200,
   width = '100%',
-  onBlur = undefined
+  onBlur = undefined,
 }: Props) {
   const handleOnBlur = React.useCallback(() => {
     // Remove dangerous markdown
     const sanitizedValue = DOMPurify.sanitize(
       // Remove dangerous HTML
-      DOMPurify.sanitize(value, { USE_PROFILES: { html: false } })
+      DOMPurify.sanitize(value, { USE_PROFILES: { html: false } }),
     );
 
     if (onBlur) onBlur(sanitizedValue);
