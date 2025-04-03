@@ -66,6 +66,11 @@ public abstract class DatanodeBootstrap extends AbstractNodeCommand {
     protected abstract void startNodeRegistration(Injector injector);
 
     @Override
+    protected void beforeStart() {
+        super.beforeStart();
+    }
+
+    @Override
     protected void beforeInjectorCreation(Set<Plugin> plugins) {
         runPreFlightChecks(plugins);
     }
