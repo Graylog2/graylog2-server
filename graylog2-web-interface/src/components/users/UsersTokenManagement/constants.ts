@@ -28,6 +28,7 @@ export const DEFAULT_LAYOUT = {
     'user_id',
     'NAME',
     'created_at',
+    'expires_at',
     'last_access',
     'external_user',
     'title',
@@ -39,7 +40,8 @@ export const COLUMNS_ORDER = [
   'user_id',
   'NAME',
   'created_at',
-  'last_access',
+  'last_access',    
+  'expires_at',
   'external_user',
   'title',
 ];

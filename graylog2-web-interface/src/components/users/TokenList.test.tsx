@@ -30,6 +30,7 @@ const tokens = [
     id: 'abc1',
     last_access: '2020-12-08T16:46:00Z',
     created_at: '2020-12-08T00:00:00Z',
+    expires_at: '2022-01-01T00:00:00Z',
     tokenTtl: 'P30D',
   },
   {
@@ -37,7 +38,8 @@ const tokens = [
     token: 'beef2002',
     id: 'abc2',
     last_access: '1970-01-01T00:00:00.000Z',
-    created_at: '1970-01-01T00:00:00Z',
+    created_at: '1970-01-01T00:00:00Z', 
+    expires_at: '2022-01-01T00:00:00Z',
     tokenTtl: 'PT48H',
   },
 ];
@@ -75,6 +77,7 @@ describe('<TokenList />', () => {
         token: 'beef2003',
         id: 'abc3',
         last_access: '1970-01-01T00:00:00.000Z',
+        expires_at: '2020-01-01T00:00:00.000Z',
         tokenTtl: 'PT72H',
       });
     });
