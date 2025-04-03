@@ -440,7 +440,7 @@ const InputDiagnosisPage = () => {
               Messages successfully ingested into Graylog from this Input in the last 15 minutes. Click on the Stream to
               inspect the messages.
             </StyledP>
-            {inputMetrics.stream_message_count?.length && (
+            {inputMetrics.stream_message_count?.length ? (
               <StyledListGroup>
                 {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
                   <StyledListGroupItem key={stream.stream_id}>
@@ -454,6 +454,10 @@ const InputDiagnosisPage = () => {
                   </StyledListGroupItem>
                 ))}
               </StyledListGroup>
+            ) : (
+              <StyledP>
+                <em>No messages from this Input were routed into Streams in the last 15 minutes.</em>
+              </StyledP>
             )}
           </Section>
         </StyledSectionGrid>
