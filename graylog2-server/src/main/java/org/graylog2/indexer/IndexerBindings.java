@@ -23,7 +23,7 @@ import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.template.requirement.EnterprisePluginRequirement;
 import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirement;
 import org.graylog2.plugin.inject.Graylog2Module;
-import org.graylog2.rest.resources.system.indexer.OpenIndexSetFilter;
+import org.graylog2.rest.resources.system.indexer.OpenIndexSetFilterFactory;
 
 public class IndexerBindings extends Graylog2Module {
     @Override
@@ -34,6 +34,6 @@ public class IndexerBindings extends Graylog2Module {
         bind(IndexSetRegistry.class).to(MongoIndexSetRegistry.class);
 
         Multibinder.newSetBinder(binder(), IndexSetTemplateRequirement.class).addBinding().to(EnterprisePluginRequirement.class);
-        Multibinder.newSetBinder(binder(), OpenIndexSetFilter.class);
+        Multibinder.newSetBinder(binder(), OpenIndexSetFilterFactory.class);
     }
 }

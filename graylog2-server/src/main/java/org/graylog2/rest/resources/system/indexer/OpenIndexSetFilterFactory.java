@@ -18,9 +18,16 @@ package org.graylog2.rest.resources.system.indexer;
 
 import org.graylog2.indexer.indexset.IndexSetConfig;
 
-import java.util.stream.Stream;
+import java.util.function.Predicate;
 
-public interface OpenIndexSetFilter {
+/**
+ * Classes that implement this interface filter out Graylog index sets that are not open.
+ */
+public interface OpenIndexSetFilterFactory {
 
-    Stream<IndexSetConfig> apply(Stream<IndexSetConfig> indexSets);
+    /**
+     *
+     * @return predicate that filter out non-open Graylog index sets.
+     */
+    Predicate<IndexSetConfig> create();
 }

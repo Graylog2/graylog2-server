@@ -80,7 +80,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.indexer.IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE;
 
 @RequiresAuthentication
 @Api(value = "System/IndexSets", description = "Index sets")
@@ -98,7 +97,7 @@ public class IndexSetsResource extends RestResource {
     private final ClusterConfigService clusterConfigService;
     private final SystemJobManager systemJobManager;
     private final DataTieringStatusService tieringStatusService;
-    private final Set<OpenIndexSetFilter> openIndexSetFilters;
+    private final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -110,7 +109,7 @@ public class IndexSetsResource extends RestResource {
                              final ClusterConfigService clusterConfigService,
                              final SystemJobManager systemJobManager,
                              final DataTieringStatusService tieringStatusService,
-                             Set<OpenIndexSetFilter> openIndexSetFilters) {
+                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -120,7 +119,7 @@ public class IndexSetsResource extends RestResource {
         this.clusterConfigService = clusterConfigService;
         this.systemJobManager = systemJobManager;
         this.tieringStatusService = tieringStatusService;
-        this.openIndexSetFilters = openIndexSetFilters;
+        this.openIndexSetFilterFactories = openIndexSetFilterFactories;
     }
 
     @GET
@@ -143,12 +142,11 @@ public class IndexSetsResource extends RestResource {
                 .stream()
                 .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()));
         if (onlyOpen) {
-            for (OpenIndexSetFilter filter : openIndexSetFilters) {
-                indexSetConfigStream = filter.apply(indexSetConfigStream);
+            for (OpenIndexSetFilterFactory filterFactory : openIndexSetFilterFactories) {
+                indexSetConfigStream = indexSetConfigStream.filter(filterFactory.create());
             }
         }
-        List<IndexSetConfig> list = indexSetConfigStream.toList();
-        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, list);
+        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, indexSetConfigStream.toList());
     }
 
     @GET
