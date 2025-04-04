@@ -66,18 +66,19 @@ const UserConfig = () => {
       const config = getConfig(ConfigurationType.USER_CONFIG, configuration);
 
       setViewConfig(config);
-      setFormConfig(config);
+      setFormConfig({ ...config, restrict_access_token_to_admins: !config?.restrict_access_token_to_admins });
     });
   }, [configuration]);
 
-  const saveConfig = (values) => {
+  const saveConfig = (values: UserConfigType) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.USER_UPDATED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'user',
       app_action_value: 'configuration-save',
     });
-
-    ConfigurationsActions.update(ConfigurationType.USER_CONFIG, values).then(() => {
+    const newConfig = {...values,  restrict_access_token_to_admins: !values?.restrict_access_token_to_admins };
+    
+    ConfigurationsActions.update(ConfigurationType.USER_CONFIG, newConfig).then(() => {
       setShowModal(false);
     });
   };
@@ -107,9 +108,9 @@ const UserConfig = () => {
             <dt>Timeout interval:</dt>
             <dd>{viewConfig.enable_global_session_timeout ? viewConfig.global_session_timeout_interval : '-'}</dd>
             <dt>Allow users to create personal access tokens:&nbsp;</dt>
-            <dd>{viewConfig.restrict_access_token_to_admins ? 'Enabled' : 'Disabled'}</dd>
+            <dd>{!viewConfig.restrict_access_token_to_admins ? 'Enabled' : 'Disabled'}</dd>
             <dt>Allow access token for external users:&nbsp;</dt>
-            <dd>{viewConfig.allow_access_token_for_external_user ? 'Enabled' : 'Disabled'}</dd>
+            <dd>{viewConfig.allow_access_token_for_external_user ? 'Disabled' : 'Enabled'}</dd>
             <dt>Default TTL for new tokens:</dt>
             <dd>{viewConfig.default_ttl_for_new_tokens ? viewConfig.default_ttl_for_new_tokens : '-'}</dd>
           </StyledDefList>
