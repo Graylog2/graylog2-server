@@ -59,7 +59,6 @@ import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.configuration.NativeLibPathConfiguration;
-import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.featureflag.FeatureFlagsFactory;
@@ -148,8 +147,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
     protected CmdLineTool(String commandName, NodeConfiguration configuration) {
         jadConfig = new JadConfig();
-        jadConfig.addConverterFactory(new GuavaConverterFactory());
-        jadConfig.addConverterFactory(new JodaTimeConverterFactory());
+        addConverters(jadConfig);
 
         if (commandName == null) {
             if (this.getClass().isAnnotationPresent(Command.class)) {
@@ -402,8 +400,22 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
     protected NativeLibPathConfiguration parseAndGetNativeLibPathConfiguration(String configFile) {
         final NativeLibPathConfiguration pathConfiguration = (NativeLibPathConfiguration) configuration;
-        processConfiguration(new JadConfig(getConfigRepositories(configFile), pathConfiguration));
+        final JadConfig config = new JadConfig(getConfigRepositories(configFile), pathConfiguration);
+        addConverters(config);
+        processConfiguration(config);
         return pathConfiguration;
+    }
+
+    /**
+     * The server configuration file contains config values that require these converters.
+     * For example `root_timezone = America/Chicago`.
+     * <p>
+     * The converters must be added to each instance of JadConfig before calling `JadConfig.process()` or else
+     * configuration value parsing might fail.
+     */
+    private void addConverters(JadConfig config) {
+        config.addConverterFactory(new GuavaConverterFactory());
+        config.addConverterFactory(new JodaTimeConverterFactory());
     }
 
     private void installCommandConfig() {
