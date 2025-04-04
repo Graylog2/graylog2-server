@@ -170,7 +170,7 @@ const UserConfig = () => {
                             id="restrict_access_token_to_admins"
                             label={<LabelSpan>Allow users to create personal access tokens</LabelSpan>}
                           />
-                          <InputDescription help="If enabled, it will restrict the creation of access tokens to admins." />
+                          <InputDescription help="If enabled, it will allow users to create access tokens." />
                         </Col>
                         <Col sm={12}>
                           <FormikInput
