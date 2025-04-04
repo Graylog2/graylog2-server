@@ -72,13 +72,15 @@ const _createToken = (tokenName, userId, loadTokens, setCreatingToken, tokenTtl)
 
   setCreatingToken(true);
 
-  return promise.then((token) => {
-    loadTokens();
+  return promise
+    .then((token) => {
+      loadTokens();
 
-    return token;
-  }).finally(() => {
-    setCreatingToken(false);
-  });
+      return token;
+    })
+    .finally(() => {
+      setCreatingToken(false);
+    });
 };
 
 const UserEditPage = ({ params }: Props) => {
