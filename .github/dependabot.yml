@@ -16,10 +16,10 @@ updates:
       # Lucene >=10 requires JDK 21
       - dependency-name: "org.apache.lucene:lucene-queryparser"
         versions:
-          - "> 9"
+          - ">= 10"
       - dependency-name: "org.apache.lucene:lucene-analysis-common"
         versions:
-          - "> 9"
+          - ">= 10"
     open-pull-requests-limit: 25
     labels:
       - dependencies
