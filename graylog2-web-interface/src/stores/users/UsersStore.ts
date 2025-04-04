@@ -59,7 +59,7 @@ export type Token = {
   id: string;
   name: string;
   token: string;
-  last_access: string;  
+  last_access: string;
   expires_at: string;
 };
 
