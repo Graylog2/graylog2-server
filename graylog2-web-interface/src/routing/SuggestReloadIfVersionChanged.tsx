@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { Dialog } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import styled from 'styled-components';
 
 import Button from 'components/bootstrap/Button';
 import useServerVersion from 'routing/useServerVersion';
@@ -24,7 +25,12 @@ import useServerVersion from 'routing/useServerVersion';
 type Props = {
   reload?: () => void;
 };
-const SuggestReloadIfVersionChanged = ({ reload = window.location.reload }: Props) => {
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+const defaultReload = () => window.location.reload();
+const SuggestReloadIfVersionChanged = ({ reload = defaultReload }: Props) => {
   const [versionChanged, setVersionChanged] = useState<boolean>(false);
   const [dismissed, setDismissed] = useState<boolean>(false);
   const [version, setVersion] = useState<string>();
@@ -56,7 +62,9 @@ const SuggestReloadIfVersionChanged = ({ reload = window.location.reload }: Prop
         <strong>Graylog Version Changed</strong>
       </p>
       <p>Your Graylog version has changed. You need to reload the page to avoid running into errors.</p>
-      <Button onClick={reload}>Reload now</Button>
+      <ButtonContainer>
+        <Button onClick={reload}>Reload now</Button>
+      </ButtonContainer>
     </Dialog>
   ) : null;
 };
