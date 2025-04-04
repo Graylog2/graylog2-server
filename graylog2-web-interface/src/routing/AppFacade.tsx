@@ -21,7 +21,6 @@ import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import { useStore } from 'stores/connect';
 import 'bootstrap/less/bootstrap.less';
-import 'toastr/toastr.less';
 import type { Store } from 'stores/StoreTypes';
 import type { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
