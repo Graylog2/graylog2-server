@@ -130,12 +130,13 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
               <th>Token Name</th>
               <th>Created</th>
               <th>Last Access</th>
+              <th>Expires At</th>
               <th className="text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {effectiveTokens.map((token) => {
-              const tokenNeverUsed = Date.parse(token.last_access) === 0;
+              const tokenNeverUsed = !token.last_access || Date.parse(token.last_access) === 0;
 
               return (
                 <tr key={token.id}>
@@ -144,6 +145,9 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
                     <Timestamp dateTime={token.created_at} />
                   </td>
                   <td>{tokenNeverUsed ? 'Never used' : <RelativeTime dateTime={token.last_access} />}</td>
+                  <td>
+                    <Timestamp dateTime={token.expires_at} />
+                  </td>
                   <td>
                     <ButtonToolbar className="pull-right">
                       <Button

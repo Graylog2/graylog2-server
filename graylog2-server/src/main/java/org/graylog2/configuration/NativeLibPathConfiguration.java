@@ -14,36 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.configuration;
 
-import type { Sort } from 'stores/PaginationTypes';
+import java.nio.file.Path;
 
-export const ENTITY_TABLE_ID = 'token_usage';
-export const DEFAULT_LAYOUT = {
-  entityTableId: 'token_usage',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'NAME', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: [
-    'id',
-    'username',
-    'user_id',
-    'NAME',
-    'created_at',
-    'expires_at',
-    'last_access',
-    'external_user',
-    'title',
-  ],
-};
-export const COLUMNS_ORDER = [
-  'id',
-  'username',
-  'user_id',
-  'NAME',
-  'created_at',
-  'last_access',
-  'expires_at',
-  'external_user',
-  'title',
-];
+public interface NativeLibPathConfiguration {
 
-export const ADDITIONAL_ATTRIBUTES = [];
+    Path getNativeLibDir();
+
+}
