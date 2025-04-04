@@ -99,7 +99,7 @@ describe('<TokenList />', () => {
     expect(createFn).toHaveBeenCalledWith({ 'tokenName': 'hans', 'tokenTtl': 'PT72H' });
   });
 
-   it('should add new token for service account', async () => {
+  it('should add new token for service account', async () => {
     const createFn = jest.fn(({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => {
       expect(tokenName).toEqual('hans');
       expect(tokenTtl).toEqual('P100Y');
