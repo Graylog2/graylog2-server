@@ -15,7 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export const TITLE_COLUMN_WIDTH = 500;
+export const TITLE_COLUMN_WIDTH = {
+  narrow: 150,
+  wide: 300,
+};
 
 export const DIAGNOSIS_HELP = {
   INPUT_LISTENING_ON:

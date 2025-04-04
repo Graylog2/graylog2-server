@@ -50,9 +50,17 @@ const StyledListGroupItem = styled(ListGroupItem)`
 const StyledTitle = styled.p(
   ({ theme }) => css`
     font-weight: bold;
-    width: ${TITLE_COLUMN_WIDTH}px;
     margin-bottom: 0;
     margin-right: ${theme.spacings.sm};
+    width: ${TITLE_COLUMN_WIDTH.wide}px;
+
+    @media (max-width: ${theme.breakpoints.max.xl}) {
+      width: ${TITLE_COLUMN_WIDTH.narrow}px;
+    }
+
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      width: auto;
+    }
   `,
 );
 

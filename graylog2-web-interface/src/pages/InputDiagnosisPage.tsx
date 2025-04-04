@@ -79,11 +79,21 @@ const StyledSectionGrid = styled(SectionGrid)<{ $rows?: string }>(
   `,
 );
 
-const InputNodeInfo = styled.div`
-  max-width: ${450 + TITLE_COLUMN_WIDTH}px;
-  white-space: break-spaces;
-  display: flex;
-`;
+const InputNodeInfo = styled.div(
+  ({ theme }) => css`
+    max-width: ${450 + TITLE_COLUMN_WIDTH.wide}px;
+    white-space: break-spaces;
+    display: flex;
+
+    @media (max-width: ${theme.breakpoints.max.xl}) {
+      width: ${450 + TITLE_COLUMN_WIDTH.narrow}px;
+    }
+
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      width: 450px;
+    }
+  `,
+);
 
 const StyledListGroup = styled(ListGroup)(
   ({ theme }) => css`
@@ -101,17 +111,33 @@ const StyledListGroupItem = styled(ListGroupItem)`
 const StyledTitle = styled.p(
   ({ theme }) => css`
     font-weight: bold;
-    width: ${TITLE_COLUMN_WIDTH}px;
     margin-bottom: 0;
     margin-right: ${theme.spacings.sm};
+    width: ${TITLE_COLUMN_WIDTH.wide}px;
+
+    @media (max-width: ${theme.breakpoints.max.xl}) {
+      width: ${TITLE_COLUMN_WIDTH.narrow}px;
+    }
+
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      width: auto;
+    }
   `,
 );
 
 const StyledTitleLink = styled(Link)(
   ({ theme }) => css`
     font-weight: bold;
-    width: ${TITLE_COLUMN_WIDTH}px;
     margin-right: ${theme.spacings.sm};
+    width: ${TITLE_COLUMN_WIDTH.wide}px;
+
+    @media (max-width: ${theme.breakpoints.max.xl}) {
+      width: ${TITLE_COLUMN_WIDTH.narrow}px;
+    }
+
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      width: auto;
+    }
   `,
 );
 
