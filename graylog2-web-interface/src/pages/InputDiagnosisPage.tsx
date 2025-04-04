@@ -37,7 +37,7 @@ import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
 import DiagnosisHelp from 'components/inputs/InputDiagnosis/DiagnosisHelp';
-import { TITLE_COLUMN_WIDTH, DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
+import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
 
 const LeftCol = styled.div(
   ({ theme }) => css`
@@ -79,18 +79,15 @@ const StyledSectionGrid = styled(SectionGrid)<{ $rows?: string }>(
   `,
 );
 
-const InputNodeInfo = styled.div(
+const InputMessage = styled.p(
   ({ theme }) => css`
-    max-width: ${450 + TITLE_COLUMN_WIDTH.wide}px;
+    max-width: 69%;
+    margin-bottom: 0;
     white-space: break-spaces;
     display: flex;
 
-    @media (max-width: ${theme.breakpoints.max.xl}) {
-      width: ${450 + TITLE_COLUMN_WIDTH.narrow}px;
-    }
-
     @media (max-width: ${theme.breakpoints.max.md}) {
-      width: 450px;
+      max-width: 59%;
     }
   `,
 );
@@ -112,15 +109,11 @@ const StyledTitle = styled.p(
   ({ theme }) => css`
     font-weight: bold;
     margin-bottom: 0;
-    margin-right: ${theme.spacings.sm};
-    width: ${TITLE_COLUMN_WIDTH.wide}px;
-
-    @media (max-width: ${theme.breakpoints.max.xl}) {
-      width: ${TITLE_COLUMN_WIDTH.narrow}px;
-    }
+    margin-right: 1%;
+    width: 30%;
 
     @media (max-width: ${theme.breakpoints.max.md}) {
-      width: auto;
+      width: 40%;
     }
   `,
 );
@@ -128,15 +121,11 @@ const StyledTitle = styled.p(
 const StyledTitleLink = styled(Link)(
   ({ theme }) => css`
     font-weight: bold;
-    margin-right: ${theme.spacings.sm};
-    width: ${TITLE_COLUMN_WIDTH.wide}px;
-
-    @media (max-width: ${theme.breakpoints.max.xl}) {
-      width: ${TITLE_COLUMN_WIDTH.narrow}px;
-    }
+    margin-right: 3%;
+    width: 30%;
 
     @media (max-width: ${theme.breakpoints.max.md}) {
-      width: auto;
+      width: 40%;
     }
   `,
 );
@@ -179,9 +168,10 @@ const NodeListItem = ({
       <StyledListGroupItem>
         <StyledTitle>Node ID:</StyledTitle> <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeId}</Link>
         {detailedMessage && (
-          <InputNodeInfo>
-            <StyledTitle>Message:</StyledTitle> {detailedMessage}
-          </InputNodeInfo>
+          <>
+            <StyledTitle>Message:</StyledTitle>
+            <InputMessage>{detailedMessage}</InputMessage>
+          </>
         )}
       </StyledListGroupItem>
     );
@@ -190,9 +180,10 @@ const NodeListItem = ({
   return (
     <StyledListGroupItem key={detailedMessage}>
       {detailedMessage && (
-        <InputNodeInfo>
-          <StyledTitle>Message:</StyledTitle> {detailedMessage}
-        </InputNodeInfo>
+        <>
+          <StyledTitle>Message:</StyledTitle>
+          <InputMessage>{detailedMessage}</InputMessage>
+        </>
       )}
     </StyledListGroupItem>
   );

@@ -23,7 +23,7 @@ import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 import DiagnosisHelp from './DiagnosisHelp';
-import { DIAGNOSIS_HELP, TITLE_COLUMN_WIDTH } from './Constants';
+import { DIAGNOSIS_HELP } from './Constants';
 
 type Props = {
   messageErrors: {
@@ -51,15 +51,11 @@ const StyledTitle = styled.p(
   ({ theme }) => css`
     font-weight: bold;
     margin-bottom: 0;
-    margin-right: ${theme.spacings.sm};
-    width: ${TITLE_COLUMN_WIDTH.wide}px;
-
-    @media (max-width: ${theme.breakpoints.max.xl}) {
-      width: ${TITLE_COLUMN_WIDTH.narrow}px;
-    }
+    margin-right: 1%;
+    width: 30%;
 
     @media (max-width: ${theme.breakpoints.max.md}) {
-      width: auto;
+      width: 40%;
     }
   `,
 );
@@ -106,21 +102,27 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
       </StyledP>
       <StyledListGroup>
         <StyledListGroupItem>
-          <LinkCompoment failureType="input" inputId={inputId}>
-            <StyledTitle>Message Error at Input:</StyledTitle>
-          </LinkCompoment>
+          <StyledTitle>
+            <LinkCompoment failureType="input" inputId={inputId}>
+              Message Error at Input:
+            </LinkCompoment>
+          </StyledTitle>
           {messageErrors.failures_inputs_codecs}
         </StyledListGroupItem>
         <StyledListGroupItem>
-          <LinkCompoment failureType="processing" inputId={inputId}>
-            <StyledTitle>Message failed to process:</StyledTitle>
-          </LinkCompoment>
+          <StyledTitle>
+            <LinkCompoment failureType="processing" inputId={inputId}>
+              Message failed to process:
+            </LinkCompoment>
+          </StyledTitle>
           {messageErrors.failures_processing}
         </StyledListGroupItem>
         <StyledListGroupItem>
-          <LinkCompoment failureType="indexing" inputId={inputId}>
-            <StyledTitle>Message failed to index:</StyledTitle>
-          </LinkCompoment>
+          <StyledTitle>
+            <LinkCompoment failureType="indexing" inputId={inputId}>
+              Message failed to index:
+            </LinkCompoment>
+          </StyledTitle>
           {messageErrors.failures_indexing}
         </StyledListGroupItem>
       </StyledListGroup>
