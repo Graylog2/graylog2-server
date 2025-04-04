@@ -39,7 +39,7 @@ const tokens = [
     token: 'beef2002',
     id: 'abc2',
     last_access: '1970-01-01T00:00:00.000Z',
-    created_at: '1970-01-01T00:00:00Z', 
+    created_at: '1970-01-01T00:00:00Z',
     expires_at: '2022-01-01T00:00:00Z',
     tokenTtl: 'PT48H',
   },
