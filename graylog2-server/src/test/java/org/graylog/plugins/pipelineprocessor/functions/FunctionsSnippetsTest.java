@@ -112,10 +112,10 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
-import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
@@ -243,7 +243,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(RemoveField.NAME, new RemoveField());
         functions.put(RemoveSingleField.NAME, new RemoveSingleField());
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
-        functions.put(RemoveFieldsByValue.NAME, new RemoveFieldsByValue());
+        functions.put(RemoveStringFieldsByValue.NAME, new RemoveStringFieldsByValue());
         functions.put(NormalizeFields.NAME, new NormalizeFields());
 
         functions.put(DropMessage.NAME, new DropMessage());
@@ -1668,7 +1668,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    void removeFieldsByValue() {
+    void removeStringFieldsByValue() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);

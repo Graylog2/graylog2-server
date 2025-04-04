@@ -1,4 +1,4 @@
-rule "remove_fields_by_value)"
+rule "remove_string_fields_by_value"
   when true
 then
   set_field(field: "f1", value: "a.1");
@@ -12,6 +12,6 @@ then
   set_field(field: "boolean_field", value: true);
   set_field(field: "array_field", value: ["a", "b", "c"]);
 
-  remove_fields_by_value(pattern:"a.1", values:["-"]);
-  remove_fields_by_value(values:["f.7"]);
+  remove_string_fields_by_value(pattern:"a.1", values:["-"]);
+  remove_string_fields_by_value(values:["f.7"]);
 end
