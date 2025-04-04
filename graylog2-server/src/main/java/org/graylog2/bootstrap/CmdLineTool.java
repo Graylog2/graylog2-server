@@ -411,7 +411,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
      * For example `root_timezone = America/Chicago`.
      * <p>
      * The converters must be added to each instance of JadConfig before calling `JadConfig.process()` or else
-     * configuration value parsing might fail.
+     * configuration value parsing might fail which could halt server startup.
      */
     private void addConverters(JadConfig config) {
         config.addConverterFactory(new GuavaConverterFactory());
