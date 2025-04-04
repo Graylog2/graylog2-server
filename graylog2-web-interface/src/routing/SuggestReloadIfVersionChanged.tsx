@@ -61,7 +61,10 @@ const SuggestReloadIfVersionChanged = ({ reload = defaultReload }: Props) => {
       <p>
         <strong>Graylog Version Changed</strong>
       </p>
-      <p>Your Graylog version has changed. You need to reload the page to avoid running into errors.</p>
+      <p>
+        Your Graylog version has changed from <strong>{version}</strong> to <strong>{newVersion}</strong>.
+      </p>
+      <p>Please save your work and reload the page to avoid running into errors.</p>
       <ButtonContainer>
         <Button onClick={reload}>Reload now</Button>
       </ButtonContainer>
