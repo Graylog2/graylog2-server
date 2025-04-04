@@ -21,8 +21,8 @@ import { Section } from 'components/common';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
+import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
-import DiagnosisHelp from './DiagnosisHelp';
 import { DIAGNOSIS_HELP } from './Constants';
 
 type Props = {
@@ -71,27 +71,27 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
       </StyledP>
       <StyledListGroup>
         <StyledListGroupItem>
-          <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT}>
+          <HelpPopoverButton helpText={DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT}>
             <strong>Message Error at Input</strong>
-          </DiagnosisHelp>
+          </HelpPopoverButton>
           :{' '}
           <LinkCompoment failureType="input" inputId={inputId}>
             {messageErrors.failures_inputs_codecs}
           </LinkCompoment>
         </StyledListGroupItem>
         <StyledListGroupItem>
-          <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS}>
+          <HelpPopoverButton helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_PROCESS}>
             <strong>Message failed to process</strong>
-          </DiagnosisHelp>
+          </HelpPopoverButton>
           :{' '}
           <LinkCompoment failureType="processing" inputId={inputId}>
             {messageErrors.failures_processing}
           </LinkCompoment>
         </StyledListGroupItem>
         <StyledListGroupItem>
-          <DiagnosisHelp helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_INDEX}>
+          <HelpPopoverButton helpText={DIAGNOSIS_HELP.MESSAGE_FAILED_TO_INDEX}>
             <strong>Message failed to index</strong>
-          </DiagnosisHelp>
+          </HelpPopoverButton>
           :{' '}
           <LinkCompoment failureType="indexing" inputId={inputId}>
             {messageErrors.failures_indexing}
