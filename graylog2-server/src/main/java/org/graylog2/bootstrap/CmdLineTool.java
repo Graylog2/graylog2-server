@@ -58,6 +58,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
+import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
@@ -200,6 +201,11 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         // This needs to run before the first SSLContext is instantiated,
         // because it sets up the default SSLAlgorithmConstraints
         applySecuritySettings(parseAndGetTLSConfiguration(configFile));
+
+        // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
+        if (configuration instanceof NativeLibPathConfiguration) {
+            setNettyNativeDefaults(parseAndGetNativeLibPathConfiguration(configFile));
+        }
     }
 
     /**
@@ -249,6 +255,22 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         Security.addProvider(new BouncyCastleProvider());
     }
 
+
+    private void setNettyNativeDefaults(NativeLibPathConfiguration pathConfiguration) {
+        // Give netty a better spot than /tmp to unpack its tcnative libraries
+        if (System.getProperty("io.netty.native.workdir") == null) {
+            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
+        }
+        // The jna.tmpdir should reside in the native lib dir. (See: https://github.com/Graylog2/graylog2-server/issues/21223)
+        if (System.getProperty("jna.tmpdir") == null) {
+            System.setProperty("jna.tmpdir", pathConfiguration.getNativeLibDir().toAbsolutePath().resolve("jna").toString());
+        }
+        // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
+        if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
+            System.setProperty("io.netty.native.deleteLibAfterLoading", "false");
+        }
+    }
+
     private static void setSystemPropertyIfEmpty(String key, String value) {
         if (System.getProperty(key) == null) {
             System.setProperty(key, value);
@@ -268,8 +290,8 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     }
 
     public void doRun(Level logLevel) {
-        if (configuration instanceof PathConfiguration) {
-            PathConfiguration pathConfiguration = parseAndGetPathConfiguration(configFile);
+        if (configuration instanceof NativeLibPathConfiguration) {
+            NativeLibPathConfiguration pathConfiguration = parseAndGetNativeLibPathConfiguration(configFile);
 
             // Move the zstd temp folder from /tmp to our native lib dir to avoid issues with noexec-mounted /tmp directories.
             // See: https://github.com/Graylog2/graylog2-server/issues/17837
@@ -378,8 +400,8 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         return tlsConfiguration;
     }
 
-    protected PathConfiguration parseAndGetPathConfiguration(String configFile) {
-        final PathConfiguration pathConfiguration = new PathConfiguration();
+    protected NativeLibPathConfiguration parseAndGetNativeLibPathConfiguration(String configFile) {
+        final NativeLibPathConfiguration pathConfiguration = (NativeLibPathConfiguration) configuration;
         processConfiguration(new JadConfig(getConfigRepositories(configFile), pathConfiguration));
         return pathConfiguration;
     }

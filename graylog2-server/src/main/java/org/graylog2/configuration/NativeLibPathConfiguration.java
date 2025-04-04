@@ -14,25 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.configuration;
 
-import { singleton } from 'logic/singleton';
+import java.nio.file.Path;
 
-type TimeRangeInputSettings = {
-  showDropdownButton: boolean;
-  showPresetsButton: boolean;
-  showAddToQuickListButton: boolean;
-};
+public interface NativeLibPathConfiguration {
 
-const defaultValue = {
-  showDropdownButton: true,
-  showPresetsButton: true,
-  showAddToQuickListButton: true,
-};
+    Path getNativeLibDir();
 
-const TimeRangeInputSettingsContext = React.createContext<TimeRangeInputSettings>(defaultValue);
-
-export default singleton(
-  'views.components.contexts.TimeRangeInputSettingsContext',
-  () => TimeRangeInputSettingsContext,
-);
+}
