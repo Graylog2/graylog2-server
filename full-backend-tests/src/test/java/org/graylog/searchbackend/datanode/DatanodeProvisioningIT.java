@@ -45,8 +45,9 @@ import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.JwtSecret;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -131,13 +132,19 @@ public class DatanodeProvisioningIT {
             new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(getOpensearchPort())
                     .truststore(truststore)
-                    .jwtTokenProvider(new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60)))
+                    .jwtAuthToken(createJwtAuthToken())
                     .build())
                     .waitForNodesCount(1);
         } catch (Exception e) {
             log.error("Could not connect to Opensearch\n" + apis.backend().getSearchLogs());
             throw e;
         }
+    }
+
+    @Nonnull
+    private static IndexerJwtAuthToken createJwtAuthToken() {
+        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60), true);
+        return provider.get();
     }
 
     private List<DatanodeStatus> waitForDatanodesConnected(BasicAuthCredentials basicAuth) throws ExecutionException, RetryException {

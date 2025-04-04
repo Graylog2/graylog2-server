@@ -21,8 +21,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.JwtSecret;
+import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

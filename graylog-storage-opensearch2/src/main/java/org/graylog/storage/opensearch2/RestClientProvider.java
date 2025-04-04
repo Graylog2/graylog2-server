@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch2;
 
 import com.google.common.base.Suppliers;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
@@ -28,11 +29,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.IndexerHosts;
-import org.graylog2.configuration.RunsWithDataNode;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import jakarta.annotation.Nonnull;
 
 import java.net.URI;
 import java.util.List;
@@ -47,8 +46,7 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
     private final ElasticsearchClientConfiguration configuration;
     private final CredentialsProvider credentialsProvider;
     private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
-    private final Boolean runsWithDataNode;
-    private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
+    private final IndexerJwtAuthToken indexerJwtAuthToken;
 
     @Inject
     public RestClientProvider(
@@ -57,14 +55,12 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
             ElasticsearchClientConfiguration configuration,
             CredentialsProvider credentialsProvider,
             TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
-            @RunsWithDataNode Boolean runsWithDataNode,
-            IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
+            IndexerJwtAuthToken indexerJwtAuthToken) {
         this.shutdownService = shutdownService;
         this.configuration = configuration;
         this.credentialsProvider = credentialsProvider;
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
-        this.runsWithDataNode = runsWithDataNode;
-        this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
+        this.indexerJwtAuthToken = indexerJwtAuthToken;
         this.clientSupplier = Suppliers.memoize(() -> createClient(hosts));
     }
 
@@ -106,7 +102,7 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
     }
 
     public RestHighLevelClient buildBasicRestClient(List<URI> hosts) {
-        boolean isJwtAuthentication = runsWithDataNode || configuration.indexerUseJwtAuthentication();
+
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
         final var restClientBuilder = RestClient.builder(esHosts)
                 .setRequestConfigCallback(requestConfig -> {
@@ -115,7 +111,7 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
                                     .setSocketTimeout(Math.toIntExact(configuration.elasticsearchSocketTimeout().toMilliseconds()))
                                     .setExpectContinueEnabled(configuration.useExpectContinue());
                             // manually handle Auth if we use JWT
-                            if (!isJwtAuthentication) {
+                            if (!indexerJwtAuthToken.isJwtAuthEnabled()) {
                                 requestConfig.setAuthenticationEnabled(true);
                             }
                             return requestConfig;
@@ -126,11 +122,10 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
                             .setMaxConnTotal(configuration.elasticsearchMaxTotalConnections())
                             .setMaxConnPerRoute(configuration.elasticsearchMaxTotalConnectionsPerRoute());
 
-                    if (isJwtAuthentication) {
-                        httpClientConfig.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", indexerJwtAuthTokenProvider.get()));
-                    } else {
-                        httpClientConfig.setDefaultCredentialsProvider(credentialsProvider);
-                    }
+                    indexerJwtAuthToken.headerValue().ifPresentOrElse(
+                            authHeader -> httpClientConfig.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", authHeader)),
+                            () -> httpClientConfig.setDefaultCredentialsProvider(credentialsProvider)
+                    );
 
                     if (configuration.muteDeprecationWarnings()) {
                         httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());

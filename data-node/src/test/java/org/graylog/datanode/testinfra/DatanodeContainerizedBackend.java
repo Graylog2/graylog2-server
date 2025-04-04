@@ -17,15 +17,16 @@
 package org.graylog.datanode.testinfra;
 
 import com.github.joschi.jadconfig.util.Duration;
-import jakarta.inject.Provider;
+import jakarta.annotation.Nonnull;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.JwtSecret;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
@@ -33,7 +34,13 @@ public class DatanodeContainerizedBackend {
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
     static public final String SIGNING_SECRET = ContainerizedGraylogBackend.PASSWORD_SECRET;
 
-    public static final Provider<String> JWT_AUTH_TOKEN_PROVIDER = new IndexerJwtAuthTokenProvider(new JwtSecret(SIGNING_SECRET), Duration.seconds(120), Duration.seconds(60));
+    public static final IndexerJwtAuthToken JWT_AUTH_TOKEN = createJwtAuthToken(SIGNING_SECRET, Duration.seconds(120), Duration.seconds(60));
+
+    @Nonnull
+    private static IndexerJwtAuthToken createJwtAuthToken(String signingSecret, Duration tokenExpirationDuration, Duration cachingDuration) {
+        return new IndexerJwtAuthTokenProvider(new JwtSecret(signingSecret), tokenExpirationDuration, cachingDuration, true)
+                .get();
+    }
 
     public static final int DATANODE_REST_PORT = 8999;
     public static final int DATANODE_OPENSEARCH_HTTP_PORT = 9200;

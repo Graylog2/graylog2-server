@@ -16,14 +16,12 @@
  */
 package org.graylog.datanode.configuration;
 
-import org.graylog.datanode.Configuration;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.system.NodeId;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import org.graylog.datanode.Configuration;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 
 @Singleton
 public class DatanodeConfigurationProvider implements Provider<DatanodeConfiguration> {
@@ -33,14 +31,14 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     @Inject
     public DatanodeConfigurationProvider(
             final Configuration localConfiguration,
-            IndexerJwtAuthTokenProvider jwtTokenProvider,
+            IndexerJwtAuthToken jwtAuthToken,
             OpensearchDistributionProvider opensearchDistributionProvider,
             NodeId nodeId) {
         datanodeConfiguration = new DatanodeConfiguration(
                 opensearchDistributionProvider,
                 DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
                 localConfiguration.getProcessLogsBufferSize(),
-                jwtTokenProvider
+                jwtAuthToken
         );
     }
 
