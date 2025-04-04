@@ -16,7 +16,6 @@
  */
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
-import type User from 'src/logic/users/User';
 
 import {
   ClipboardButton,
@@ -33,6 +32,7 @@ import type { Token, TokenSummary } from 'stores/users/UsersStore';
 import { sortByDate } from 'util/SortUtils';
 import { Headline } from 'components/common/Section/SectionComponent';
 import useCurrentUser from 'hooks/useCurrentUser';
+import type User from 'logic/users/User';
 
 import CreateTokenForm from './CreateTokenForm';
 
