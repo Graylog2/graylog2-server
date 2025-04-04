@@ -22,7 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { Button, Title, Group, Space } from 'preflight/components/common';
 import Alert from 'components/bootstrap/Alert';
 import URLUtils from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import useDataNodes, { DATA_NODES_OVERVIEW_QUERY_KEY } from 'preflight/hooks/useDataNodes';
 
 const onProvisionCertificate = () => fetch('POST', URLUtils.qualifyUrl('api/generate'), undefined, false);

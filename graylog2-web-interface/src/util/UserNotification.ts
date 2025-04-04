@@ -14,37 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import toastr from 'toastr';
-
-import './UserNotification.css';
-
-const defaultSettings = {
-  debug: false,
-  positionClass: 'toast-bottom-full-width',
-  onclick: null,
-  showDuration: 300,
-  hideDuration: 1000,
-  timeOut: 7000,
-  extendedTimeOut: 1000,
-  escapeHtml: true,
-  closeButton: true,
-  closeHtml: '<button>Close</button>',
-  progressBar: true,
-  preventDuplicates: true,
-};
+import { notifications } from '@mantine/notifications';
 
 const UserNotification = {
-  error(message: string, title?: string) {
-    toastr.error(message, title ?? 'Error', {
-      ...defaultSettings,
-      timeOut: 10000,
+  error(message: string, title = 'Error') {
+    notifications.show({
+      message,
+      title,
+      autoClose: 10000,
+      color: 'red',
     });
   },
-  warning(message: string, title?: string) {
-    toastr.warning(message, title ?? 'Attention', defaultSettings);
+  warning(message: string, title = 'Attention') {
+    notifications.show({
+      message,
+      title,
+    });
   },
-  success(message: string, title?: string) {
-    toastr.success(message, title ?? 'Information', defaultSettings);
+  success(message: string, title = 'Success') {
+    notifications.show({
+      message,
+      title,
+      color: 'green',
+    });
   },
 };
 
