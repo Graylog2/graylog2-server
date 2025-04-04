@@ -110,7 +110,7 @@ const UserConfig = () => {
             <dt>Allow users to create personal access tokens:&nbsp;</dt>
             <dd>{!viewConfig.restrict_access_token_to_admins ? 'Enabled' : 'Disabled'}</dd>
             <dt>Allow access token for external users:&nbsp;</dt>
-            <dd>{viewConfig.allow_access_token_for_external_user ? 'Disabled' : 'Enabled'}</dd>
+            <dd>{viewConfig.allow_access_token_for_external_user ? 'Enabled' : 'Disabled'}</dd>
             <dt>Default TTL for new tokens:</dt>
             <dd>{viewConfig.default_ttl_for_new_tokens ? viewConfig.default_ttl_for_new_tokens : '-'}</dd>
           </StyledDefList>
