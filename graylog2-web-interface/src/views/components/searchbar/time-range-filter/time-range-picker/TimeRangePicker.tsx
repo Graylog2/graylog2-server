@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -31,7 +31,6 @@ import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { DateTime } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -148,14 +147,9 @@ const TimeRangePicker = ({
   setCurrentTimeRange,
   validTypes = allTimeRangeTypes,
   position,
-  limitDuration: configLimitDuration,
+  limitDuration,
   withinPortal = true,
 }: Props) => {
-  const { ignoreLimitDurationInTimeRangeDropdown } = useContext(TimeRangeInputSettingsContext);
-  const limitDuration = useMemo(
-    () => (ignoreLimitDurationInTimeRangeDropdown ? 0 : configLimitDuration),
-    [configLimitDuration, ignoreLimitDurationInTimeRangeDropdown],
-  );
   const { formatTime, userTimezone } = useUserDateTime();
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
@@ -251,7 +245,7 @@ const TimeRangePicker = ({
               <NestedForm>
                 <Row>
                   <Col md={12}>
-                    <TimeRangePresetRow />
+                    <TimeRangePresetRow limitDuration={limitDuration} />
                     <TimeRangeTabs limitDuration={limitDuration} validTypes={validTypes} />
                   </Col>
                 </Row>
