@@ -14,25 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useStore } from 'stores/connect';
+import { ServerAvailabilityStore } from 'stores/sessions/ServerAvailabilityStore';
 
-import { singleton } from 'logic/singleton';
+const useServerVersion = () => useStore(ServerAvailabilityStore, (state) => state.version);
 
-type TimeRangeInputSettings = {
-  showDropdownButton: boolean;
-  showPresetsButton: boolean;
-  showAddToQuickListButton: boolean;
-};
-
-const defaultValue = {
-  showDropdownButton: true,
-  showPresetsButton: true,
-  showAddToQuickListButton: true,
-};
-
-const TimeRangeInputSettingsContext = React.createContext<TimeRangeInputSettings>(defaultValue);
-
-export default singleton(
-  'views.components.contexts.TimeRangeInputSettingsContext',
-  () => TimeRangeInputSettingsContext,
-);
+export default useServerVersion;
