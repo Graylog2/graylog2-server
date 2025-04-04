@@ -59,6 +59,7 @@ import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.configuration.NativeLibPathConfiguration;
+import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.featureflag.FeatureFlagsFactory;
@@ -401,10 +402,7 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
 
     protected NativeLibPathConfiguration parseAndGetNativeLibPathConfiguration(String configFile) {
         final NativeLibPathConfiguration pathConfiguration = (NativeLibPathConfiguration) configuration;
-        final JadConfig config = new JadConfig(getConfigRepositories(configFile), pathConfiguration);
-        config.addConverterFactory(new GuavaConverterFactory());
-        config.addConverterFactory(new JodaTimeConverterFactory());
-        processConfiguration(config);
+        processConfiguration(new JadConfig(getConfigRepositories(configFile), pathConfiguration));
         return pathConfiguration;
     }
 

@@ -1,5 +1,5 @@
 type = "a"
-message = "Added remove_fields_by_value pipeline rule."
+message = "Added remove_string_fields_by_value pipeline rule."
 
 pulls = ["22205"]
 issues = ["22200"]
