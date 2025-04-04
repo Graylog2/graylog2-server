@@ -21,7 +21,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import moment from 'moment';
 
 import { Title, Space, Button, Group, NumberInput, Input } from 'preflight/components/common';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import Select from 'preflight/components/common/Select';
