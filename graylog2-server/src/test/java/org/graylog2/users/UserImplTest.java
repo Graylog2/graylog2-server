@@ -54,6 +54,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserImplTest {
+    private static final UserConfiguration CONFIG_ALL_ALLOWED = UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), true, false, PeriodDuration.parse("P30D"));
+    private static final UserConfiguration CONFIG_ALL_FORBIDDEN = UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, true, PeriodDuration.parse("P30D"));
+    private static final UserConfiguration CONFIG_EXTERNAL_FORBIDDEN = UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, false, PeriodDuration.parse("P30D"));
 
     @Mock
     private PasswordAlgorithmFactory passwordAlgorithmFactory;
@@ -214,7 +217,4 @@ class UserImplTest {
                 .extracting("class").containsOnlyOnce(AllPermission.class);
     }
 
-    private static final UserConfiguration CONFIG_ALL_ALLOWED = UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), true, false, PeriodDuration.parse("P30D"));
-    private static final UserConfiguration CONFIG_ALL_FORBIDDEN = UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, true, PeriodDuration.parse("P30D"));
-    private static final UserConfiguration CONFIG_EXTERNAL_FORBIDDEN = UserConfiguration.create(false, Duration.of(8, ChronoUnit.HOURS), false, false, PeriodDuration.parse("P30D"));
 }
