@@ -17,6 +17,7 @@
 package org.graylog2.tokenusage;
 
 import com.google.common.collect.ImmutableSet;
+import org.assertj.core.api.Assertions;
 import org.bson.types.ObjectId;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
@@ -149,6 +150,26 @@ public class AccessTokenEntityServiceImplTest {
         verify(userService).load("userName2");
         verify(dbAuthServiceBackendService).streamByIds(Set.of("auth-backend-id1", "auth-backend-id2"));
         verifyNoMoreInteractions(allMocks);
+    }
+
+    @Test
+    public void testLegacyToken() {
+        final User user = mkUser(1, true);
+        AccessTokenEntity token = AccessTokenEntity.Builder.create()
+                .createdAt(null)
+                .expiresAt(null)
+                .lastAccess(Tools.nowUTC())
+                .id("tokenId1234")
+                .name("legacyToken")
+                .userName(user.getName())
+                .build();
+        when(accessTokenService.findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER)))
+                .thenReturn(new PaginatedList<>(List.of(token), 1, PAGE, PER_PAGE));
+        when(userService.load(user.getName())).thenReturn(user);
+
+        testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER);
+        Assertions.assertThatCode(() -> testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER))
+                .doesNotThrowAnyException();
     }
 
 
