@@ -22,7 +22,7 @@ import { Button } from 'preflight/components/common';
 import fetch from 'logic/rest/FetchProvider';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 
 type Props = {
   setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>;
