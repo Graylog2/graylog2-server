@@ -22,6 +22,27 @@ declare global {
   const IS_CLOUD: boolean | undefined;
 }
 
+type Branding = {
+  product_name?: string;
+  favicon?: string;
+  logo?: string;
+  login?: {
+    background?: string;
+  };
+  welcome?: {
+    news?: { enabled: boolean; feed: string };
+    releases?: { enabled: boolean };
+  };
+  navigation?: {
+    home?: { icon: string };
+    user_menu?: { icon: string };
+    scratchpad?: { icon: string };
+    help?: { icon: string };
+  };
+  help_url?: string;
+  footer?: { enabled: boolean };
+};
+
 export type AppConfigs = {
   gl2ServerUrl: string;
   gl2AppPathPrefix: string;
@@ -31,6 +52,7 @@ export type AppConfigs = {
   featureFlags: { [key: string]: string };
   telemetry: { api_key: string; host: string; enabled: boolean };
   contentStream: { refresh_interval: string; rss_url: string };
+  branding: Branding | undefined;
 };
 
 declare global {
@@ -99,6 +121,10 @@ const AppConfig = {
 
   pluginUISettings(key: string): any {
     return appConfig()?.pluginUISettings?.[key] ?? {};
+  },
+
+  branding(): Branding | undefined {
+    return appConfig()?.branding;
   },
 };
 

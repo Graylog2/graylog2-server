@@ -8,7 +8,7 @@ public class SVG {
 
     @JsonCreator
     public SVG(String data) {
-        if (!data.startsWith("<svg")) {
+        if (!data.startsWith("<svg") && !data.startsWith("<?xml")) {
             throw new IllegalArgumentException("Invalid SVG data supplied: " + data);
         }
 
