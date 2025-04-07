@@ -93,12 +93,16 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
   };
 
   const updateQuery = (nextQuery?: string) => setQuery(nextQuery || '');
-  
+
   return (
     <>
       <IfPermitted permissions={['users:tokencreate', `users:tokencreate:${currentUser.username}`]} anyPermissions>
         <Headline>Create And Edit Tokens</Headline>
-        <CreateTokenForm onCreate={handleTokenCreation} creatingToken={creatingToken} defaultTtl={user.serviceAccount ? 'P100Y' : 'P30D'} />
+        <CreateTokenForm
+          onCreate={handleTokenCreation}
+          creatingToken={creatingToken}
+          defaultTtl={user.serviceAccount ? 'P100Y' : 'P30D'}
+        />
       </IfPermitted>
       {createdToken && (
         <StyledTokenPanel bsStyle="success">

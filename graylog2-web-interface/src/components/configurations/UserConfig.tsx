@@ -76,8 +76,8 @@ const UserConfig = () => {
       app_section: 'user',
       app_action_value: 'configuration-save',
     });
-    const newConfig = {...values,  restrict_access_token_to_admins: !values?.restrict_access_token_to_admins };
-    
+    const newConfig = { ...values, restrict_access_token_to_admins: !values?.restrict_access_token_to_admins };
+
     ConfigurationsActions.update(ConfigurationType.USER_CONFIG, newConfig).then(() => {
       setShowModal(false);
     });
