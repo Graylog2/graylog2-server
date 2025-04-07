@@ -22,11 +22,11 @@ import styled from 'styled-components';
 import type { BsSize } from 'components/bootstrap/types';
 
 const ModalOverlay = styled(MantineModal.Overlay)`
-  z-index: 1030;
+  z-index: 1040;
 `;
 
 const ModalContent = styled(MantineModal.Content)`
-  z-index: 1031;
+  z-index: 1050;
 `;
 
 const sizeForMantine = (size: BsSize) => {
