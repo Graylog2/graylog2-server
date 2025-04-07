@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useRef } from 'react';
+import React, { useRef } from 'react';
 import $ from 'jquery';
-import isString from 'lodash/isString';
 
 import ModalSubmit from 'components/common/ModalSubmit';
 
@@ -41,13 +40,13 @@ type Props = {
  * has, and providing form validation using HTML5 and our custom validation.
  */
 const BootstrapModalForm = ({
-  backdrop,
+  backdrop = undefined,
   submitButtonDisabled = false,
   formProps = {},
-  bsSize,
+  bsSize = undefined,
   show,
   submitButtonText = 'Submit',
-  onSubmitForm,
+  onSubmitForm = undefined,
   onCancel,
   title,
   children,
