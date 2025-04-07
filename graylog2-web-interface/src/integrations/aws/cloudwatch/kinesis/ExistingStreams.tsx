@@ -32,6 +32,26 @@ import Spinner from 'components/common/Spinner';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
 
+const AutoSetupContent = styled.div`
+  margin-bottom: 9px;
+`;
+
+const LoadingContent = styled(Modal.Body)`
+  text-align: center;
+`;
+
+const StyledSpinner = styled(Spinner)`
+  font-size: 48px;
+  color: #702785;
+`;
+
+const LoadingMessage = styled.p`
+  font-size: 16px;
+  font-weight: bold;
+  padding-top: 15px;
+  color: #a6afbd;
+`;
+
 type KinesisStreamsProps = {
   onSubmit: (...args: any[]) => void;
   onChange: (...args: any[]) => void;
@@ -82,7 +102,7 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisS
         </Button>
       </Panel>,
     );
-  }, []);
+  }, [clearSidebar, setSidebar, toggleSetup]);
 
   useEffect(() => {
     if (logDataStatus.error) {
@@ -95,7 +115,7 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisS
         ),
       });
     }
-  }, [logDataStatus.error]);
+  }, [logDataStatus.error, setLogDataUrl]);
 
   const handleSubmit = () => {
     setLogDataUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS.HEALTH_CHECK);
@@ -145,25 +165,5 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisS
     </>
   );
 };
-
-const AutoSetupContent = styled.div`
-  margin-bottom: 9px;
-`;
-
-const LoadingContent = styled(Modal.Body)`
-  text-align: center;
-`;
-
-const StyledSpinner = styled(Spinner)`
-  font-size: 48px;
-  color: #702785;
-`;
-
-const LoadingMessage = styled.p`
-  font-size: 16px;
-  font-weight: bold;
-  padding-top: 15px;
-  color: #a6afbd;
-`;
 
 export default KinesisStreams;

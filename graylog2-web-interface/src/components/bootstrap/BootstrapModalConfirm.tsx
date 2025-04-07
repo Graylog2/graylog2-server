@@ -18,6 +18,7 @@ import React from 'react';
 
 import ModalSubmit from 'components/common/ModalSubmit';
 
+import type { ModalSize } from './Modal';
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
@@ -29,6 +30,7 @@ type Props = {
   confirmButtonDisabled?: boolean;
   onConfirm: (e: React.BaseSyntheticEvent) => void;
   onCancel: () => void;
+  size?: ModalSize;
   children: React.ReactNode;
 };
 
