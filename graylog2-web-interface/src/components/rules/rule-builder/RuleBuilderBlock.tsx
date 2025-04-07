@@ -253,7 +253,7 @@ const RuleBuilderBlock = ({
           />
           {Boolean(insertMode) && (
             <Modal show bsSize="lg" enforceFocus onHide={resetInsertBlock}>
-              <Modal.Header closeButton>
+              <Modal.Header>
                 <Modal.Title>
                   Insert new action {insertMode} action N°{order + 1}
                 </Modal.Title>

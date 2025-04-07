@@ -36,7 +36,7 @@ type VerboseMessageModalProps = {
 
 const VerboseMessageModal = ({ showModal, onHide, collectorName, collectorVerbose }: VerboseMessageModalProps) => (
   <BootstrapModalWrapper showModal={showModal} onHide={onHide} bsSize="large">
-    <Modal.Header closeButton>
+    <Modal.Header>
       <Modal.Title>
         <span>
           Error Details for <em>{collectorName}</em>

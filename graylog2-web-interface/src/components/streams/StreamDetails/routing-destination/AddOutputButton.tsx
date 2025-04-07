@@ -110,7 +110,7 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
       </Button>
       {showAddOutput && (
         <BootstrapModalWrapper showModal role="alertdialog" onHide={() => setShowAddOutput(false)}>
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Add output to stream</Modal.Title>
           </Modal.Header>
           <Modal.Body>
