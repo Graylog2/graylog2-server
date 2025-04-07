@@ -14,92 +14,40 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { Modal as BootstrapModal } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+import { Modal as MantineModal } from '@mantine/core';
+import styled from 'styled-components';
 
-const Dialog = css`
-  margin-top: 55px;
-
-  .modal-content {
-    background-color: ${({ theme }) => theme.colors.global.contentBackground};
-    border-color: ${({ theme }) => theme.colors.variant.light.default};
-    height: 100%;
-  }
+const ModalOverlay = styled(MantineModal.Overlay)`
+  z-index: 1030;
 `;
 
-const Header = css`
-  border-bottom-color: ${({ theme }) => theme.colors.variant.light.default};
-
-  button.close {
-    color: currentColor;
-  }
+const ModalContent = styled(MantineModal.Content)`
+  z-index: 1031;
 `;
 
-const Title = css`
-  font-size: ${({ theme }) => theme.fonts.size.h3};
+type Props = {
+  onHide: () => void;
+  children: React.ReactNode;
+  show?: boolean;
+};
+
+const Modal = ({ onHide, show = false, children }: Props) => (
+  <MantineModal.Root opened={show} onClose={onHide} size="lg">
+    <ModalOverlay />
+    <ModalContent>{children}</ModalContent>
+  </MantineModal.Root>
+);
+
+Modal.Header = MantineModal.Header;
+
+Modal.Title = styled(MantineModal.Title)`
+  font-size: ${({ theme }) => theme.fonts.size.h2};
 `;
 
-const Footer = css`
-  border-top-color: ${({ theme }) => theme.colors.variant.light.default};
-`;
-
-const Body = css`
-  .form-group {
-    margin-bottom: 5px;
-  }
-`;
-
-const Modal = styled(BootstrapModal)`
-  .modal-backdrop {
-    height: 100000%; /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
-    z-index: 1030;
-  }
-
-  form {
-    margin-bottom: 0;
-  }
-
-  .modal-dialog {
-    ${Dialog}
-  }
-
-  .modal-header {
-    ${Header}
-  }
-
-  .modal-footer {
-    ${Footer}
-  }
-
-  .modal-title {
-    ${Title}
-  }
-
-  .modal-body {
-    ${Body}
-  }
-`;
-
-Modal.Dialog = styled(BootstrapModal.Dialog)`
-  ${Dialog}
-`;
-
-Modal.Header = styled(BootstrapModal.Header)`
-  ${Header}
-`;
-
-Modal.Title = styled(BootstrapModal.Title)`
-  ${Title}
-`;
-
-Modal.Body = styled(BootstrapModal.Body)`
-  ${Body}
-`;
-
-Modal.Footer = styled(BootstrapModal.Footer)`
-  ${Footer}
-`;
+Modal.Body = MantineModal.Body;
+Modal.Footer = MantineModal.Body;
 
 /** @component */
 export default Modal;
