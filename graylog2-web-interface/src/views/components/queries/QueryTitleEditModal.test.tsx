@@ -51,9 +51,9 @@ describe('QueryTitleEditModal', () => {
     await screen.findByText(modalHeadline);
   });
 
-  it('has correct initial input value', () => {
+  it('has correct initial input value', async () => {
     let modalRef;
-    const { getByDisplayValue } = render(
+    render(
       <QueryTitleEditModal
         ref={(ref) => {
           modalRef = ref;
@@ -64,7 +64,7 @@ describe('QueryTitleEditModal', () => {
 
     openModal(modalRef);
 
-    expect(getByDisplayValue('CurrentTitle')).not.toBeNull();
+    await screen.findByDisplayValue('CurrentTitle');
   });
 
   it('updates query title and closes', async () => {

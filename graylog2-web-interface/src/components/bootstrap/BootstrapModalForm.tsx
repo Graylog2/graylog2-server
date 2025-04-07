@@ -34,7 +34,6 @@ type Props = {
   onCancel: () => void;
   title: string | React.ReactNode;
   children: React.ReactNode;
-  modalTitle?: string | undefined;
 };
 
 /**
@@ -52,7 +51,6 @@ const BootstrapModalForm = ({
   onCancel,
   title,
   children,
-  modalTitle,
   ...restProps
 }: Props) => {
   const form = useRef(null);
@@ -78,16 +76,8 @@ const BootstrapModalForm = ({
 
   const body = <div className="container-fluid">{children}</div>;
 
-  const _title = useMemo<string | undefined>(() => (isString(title) ? title : modalTitle), [modalTitle, title]);
-
   return (
-    <BootstrapModalWrapper
-      bsSize={bsSize}
-      showModal={show}
-      backdrop={backdrop}
-      onHide={onCancel}
-      title={_title}
-      {...restProps}>
+    <BootstrapModalWrapper bsSize={bsSize} showModal={show} backdrop={backdrop} onHide={onCancel} {...restProps}>
       <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
