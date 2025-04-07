@@ -198,7 +198,7 @@
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.1</junit-jupiter.version>
-        <mockito.version>5.16.1</mockito.version>
+        <mockito.version>5.17.0</mockito.version>
         <restassured.version>5.5.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.20.6</testcontainers.version>
