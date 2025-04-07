@@ -20,7 +20,7 @@ import Modal from './Modal';
 
 type Props = {
   title?: string | undefined;
-  backdrop?: boolean | 'static' | undefined;
+  backdrop?: boolean;
   bsSize?: 'lg' | 'large' | 'sm' | 'small';
   showModal: boolean;
   role?: string;
@@ -33,7 +33,7 @@ const BootstrapModalWrapper = ({
   children,
   onHide,
   bsSize,
-  backdrop = 'static',
+  backdrop,
   role = 'dialog',
   ...restProps
 }: Props) => (

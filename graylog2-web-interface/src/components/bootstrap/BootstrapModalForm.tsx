@@ -88,7 +88,7 @@ const BootstrapModalForm = ({
       onHide={onCancel}
       title={_title}
       {...restProps}>
-      <Modal.Header>
+      <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <form ref={form} onSubmit={submit} {...formProps} data-testid="modal-form">
