@@ -43,36 +43,34 @@ const sizeForMantine = (size: BsSize) => {
 };
 
 type Props = {
-  onHide?: () => void;
+  onHide: () => void;
   children: React.ReactNode;
   show?: boolean;
   bsSize?: 'lg' | 'large' | 'sm' | 'small';
   enforceFocus?: boolean;
   backdrop?: boolean;
+  closable?: boolean;
 };
 
 const Modal = ({
-  onHide = undefined,
+  onHide,
   show = false,
   children,
   bsSize = undefined,
   enforceFocus = false,
   backdrop = true,
-}: Props) => {
-  const closable = typeof onHide === 'function';
-
-  return (
-    <MantineModal.Root
-      opened={show}
-      onClose={onHide}
-      size={sizeForMantine(bsSize)}
-      trapFocus={enforceFocus}
-      closeOnEscape={closable}>
-      {backdrop && <ModalOverlay />}
-      <ModalContent>{children}</ModalContent>
-    </MantineModal.Root>
-  );
-};
+  closable = true,
+}: Props) => (
+  <MantineModal.Root
+    opened={show}
+    onClose={onHide}
+    size={sizeForMantine(bsSize)}
+    trapFocus={enforceFocus}
+    closeOnEscape={closable}>
+    {backdrop && <ModalOverlay />}
+    <ModalContent>{children}</ModalContent>
+  </MantineModal.Root>
+);
 
 Modal.Header = ({ children, showCloseButton = true }: { children: React.ReactNode; showCloseButton?: boolean }) => (
   <MantineModal.Header>

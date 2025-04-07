@@ -38,12 +38,7 @@ type KinesisStreamsProps = {
   toggleSetup?: (...args: any[]) => void;
 };
 
-const KinesisStreams = ({
-  onChange,
-  onSubmit,
-
-  toggleSetup = () => {},
-}: KinesisStreamsProps) => {
+const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisStreamsProps) => {
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState(null);
   const { availableStreams, setLogData } = useContext(ApiContext);
@@ -108,7 +103,7 @@ const KinesisStreams = ({
 
   return (
     <>
-      <Modal show={logDataStatus.loading} bsSize="small">
+      <Modal show={logDataStatus.loading} bsSize="small" onHide={() => {}} closable={false}>
         <LoadingContent>
           <StyledSpinner />
           <LoadingMessage>This request may take a few moments.</LoadingMessage>
