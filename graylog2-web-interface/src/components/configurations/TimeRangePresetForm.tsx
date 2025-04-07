@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Dispatch } from 'react';
-import React, { useCallback, useMemo } from 'react';
-import moment from 'moment/moment';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import Immutable from 'immutable';
 import debounce from 'lodash/debounce';
@@ -27,7 +26,6 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import generateId from 'logic/generateId';
-import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 export type TimeRangePreset = {
   timerange: TimeRange;
@@ -69,7 +67,6 @@ const contextSettings = {
   showDropdownButton: false,
   showPresetsButton: false,
   showAddToQuickListButton: false,
-  ignoreLimitDurationInTimeRangeDropdown: true,
 };
 
 const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, onRemove, limitDuration }: ItemProps) => {
@@ -136,12 +133,6 @@ const TimeRangePresetForm = ({
     [onUpdate, options],
   );
 
-  const { config } = useSearchConfiguration();
-  const limitDuration = useMemo(
-    () => moment.duration(config?.query_time_range_limit).asSeconds() ?? 0,
-    [config?.query_time_range_limit],
-  );
-
   const onRemove = useCallback(
     (idx: number) => {
       const newState = options.delete(idx);
@@ -166,7 +157,6 @@ const TimeRangePresetForm = ({
       }),
     );
   }, [onUpdate, options]);
-
   const customContentRender = useCallback(
     ({ item: { id, description, timerange }, index }) => (
       <TimeRangePresetFormItem
@@ -176,10 +166,10 @@ const TimeRangePresetForm = ({
         onChange={onChange}
         timerange={timerange}
         description={description}
-        limitDuration={limitDuration}
+        limitDuration={0}
       />
     ),
-    [limitDuration, onChange, onRemove],
+    [onChange, onRemove],
   );
 
   return (

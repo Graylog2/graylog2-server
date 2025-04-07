@@ -149,7 +149,7 @@
         <kafka.version>3.9.0</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.24.3</log4j.version>
-        <lucene.version>9.12.0</lucene.version>
+        <lucene.version>9.12.1</lucene.version>
         <metrics.version>4.2.30</metrics.version>
         <mongodb-driver.version>5.4.0</mongodb-driver.version>
         <mongojack.version>5.0.2</mongojack.version>
@@ -187,18 +187,18 @@
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.6</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
-        <poi.version>5.4.0</poi.version>
+        <poi.version>5.4.1</poi.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0.AM27</apacheds-server.version>
         <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>3.19.2</equalsverifier.version>
+        <equalsverifier.version>3.19.3</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.1</junit-jupiter.version>
-        <mockito.version>5.16.1</mockito.version>
+        <mockito.version>5.17.0</mockito.version>
         <restassured.version>5.5.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.20.6</testcontainers.version>
@@ -662,7 +662,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.8</version>
+                    <version>3.9</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
