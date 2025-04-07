@@ -319,8 +319,9 @@ type AssetInformationComponentProps = {
 
 type EventProcedureFormProps = {
   eventDefinition: EventDefinition;
+  eventDefinitionEventProcedure: string | undefined;
   onClose: () => void;
-  onSave: () => void;
+  onSave: (eventProcedureId: string) => void;
   canEdit: boolean;
 };
 

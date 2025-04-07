@@ -73,7 +73,7 @@ type Props = {
   };
   entityTypes: {};
   notifications: Array<EventNotification>;
-  defaults: { default_backlog_size: number };
+  defaults: { default_backlog_size: number; };
   onChange: (key: string, value: unknown) => void;
   onChangeStep: (step: string) => void;
   onCancel: () => void;
@@ -126,13 +126,18 @@ const EventDefinitionForm = ({
     [canEdit, eventDefinition._scope],
   );
 
+  const eventProcedureId = React.useMemo(
+    () => eventDefinition?.event_procedure || undefined,
+    [eventDefinition?.event_procedure]
+  );
+
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
 
   const steps = [
     {
       key: STEP_KEYS[0],
       title: 'Event Details',
-      component: <EventDetailsForm {...defaultStepProps} canEdit={canEdit} />,
+      component: <EventDetailsForm {...defaultStepProps} eventDefinitionEventProcedure={eventProcedureId} canEdit={canEdit} />,
     },
     {
       key: STEP_KEYS[1],

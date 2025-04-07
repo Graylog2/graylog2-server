@@ -42,6 +42,7 @@ const priorityOptions = map(EventDefinitionPriorityEnum.properties, (value, key)
 
 type Props = {
   eventDefinition: EventDefinition;
+  eventDefinitionEventProcedure: string;
   validation: {
     errors: {
       title?: string;
@@ -51,22 +52,27 @@ type Props = {
   canEdit: boolean;
 };
 
-const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Props) => {
+const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, validation, onChange, canEdit }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState(false);
   const pluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm');
 
+  const onSave = (eventProcedureId: string) => {
+    onChange('event_procedure', eventProcedureId);
+  };
+
   const eventProcedureForm = React.useMemo(
     () => pluggableEventProcedureForm.map(({ component: PluggableEventProcedureForm }) => (
       <PluggableEventProcedureForm
         eventDefinition={eventDefinition}
+        eventDefinitionEventProcedure={eventDefinitionEventProcedure}
         onClose={() => setShowAddEventProcedureForm(false)}
-        onSave={() => { }}
+        onSave={onSave}
         canEdit={canEdit}
       />
     )),
-    [pluggableEventProcedureForm],
+    [pluggableEventProcedureForm, eventDefinition, eventDefinitionEventProcedure, showAddEventProcedureForm, onSave, canEdit],
   );
 
   const handleChange = (event) => {
@@ -145,7 +151,11 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Pr
 
             {(hasEventProcedure || showAddEventProcedureForm) ? (
               <>
-                {eventProcedureForm}
+                {
+                  eventProcedureForm.map((form, index) => (
+                    <div key={`form-${index}`}>{form}</div>
+                  ))
+                }
               </>
             ) : (
               <>
