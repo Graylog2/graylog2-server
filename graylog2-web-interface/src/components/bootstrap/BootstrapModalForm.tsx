@@ -24,7 +24,7 @@ import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  backdrop?: boolean | 'static' | undefined;
+  backdrop?: boolean;
   submitButtonDisabled?: boolean;
   formProps?: object;
   bsSize?: 'lg' | 'large' | 'sm' | 'small';
@@ -88,7 +88,7 @@ const BootstrapModalForm = ({
       onHide={onCancel}
       title={_title}
       {...restProps}>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <form ref={form} onSubmit={submit} {...formProps} data-testid="modal-form">

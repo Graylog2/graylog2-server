@@ -47,7 +47,7 @@ const BootstrapModalConfirm = ({
   onConfirm,
   ...restProps
 }: Props) => (
-  <BootstrapModalWrapper showModal={showModal} onHide={onCancel} role="alertdialog" {...restProps}>
+  <BootstrapModalWrapper showModal={showModal} onHide={onCancel} {...restProps}>
     <Modal.Header>
       <Modal.Title>{title}</Modal.Title>
     </Modal.Header>
