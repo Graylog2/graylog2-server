@@ -43,11 +43,12 @@ type Props = {
   onHide: () => void;
   children: React.ReactNode;
   show?: boolean;
-  bsSize?: 'lg' | 'large';
+  bsSize?: 'lg' | 'large' | 'small';
+  enforceFocus?: boolean;
 };
 
-const Modal = ({ onHide, show = false, children, bsSize = undefined }: Props) => (
-  <MantineModal.Root opened={show} onClose={onHide} size={sizeForMantine(bsSize)}>
+const Modal = ({ onHide, show = false, children, bsSize = undefined, enforceFocus = false }: Props) => (
+  <MantineModal.Root opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus={enforceFocus}>
     <ModalOverlay />
     <ModalContent>{children}</ModalContent>
   </MantineModal.Root>
