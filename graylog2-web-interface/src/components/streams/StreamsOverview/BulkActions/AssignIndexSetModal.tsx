@@ -69,7 +69,7 @@ const AssignIndexSetModal = ({ toggleShowModal, indexSets, refetchStreams, descr
   };
 
   return (
-    <Modal title={modalTitle} onHide={toggleShowModal} show>
+    <Modal onHide={toggleShowModal} show>
       <Formik initialValues={{ index_set_id: undefined }} onSubmit={onSubmit} validate={validate}>
         {({ isSubmitting, isValidating }) => (
           <Form>
