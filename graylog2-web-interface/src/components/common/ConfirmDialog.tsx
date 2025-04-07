@@ -26,7 +26,7 @@ const StyledModal = styled(Modal)`
 
 type Props = {
   show?: boolean;
-  onConfirm: (event) => void;
+  onConfirm: () => void;
   onCancel?: () => void;
   title: string | React.ReactNode;
   children: React.ReactNode;

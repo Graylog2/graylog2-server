@@ -108,7 +108,7 @@ const KinesisStreams = ({
 
   return (
     <>
-      <Modal show={logDataStatus.loading} keyboard={false} onHide={() => {}} bsSize="small">
+      <Modal show={logDataStatus.loading} closeOnEscape={false} onHide={() => {}} bsSize="small">
         <LoadingContent>
           <StyledSpinner />
           <LoadingMessage>This request may take a few moments.</LoadingMessage>

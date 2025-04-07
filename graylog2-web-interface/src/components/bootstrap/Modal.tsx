@@ -49,6 +49,7 @@ type Props = {
   bsSize?: 'lg' | 'large' | 'sm' | 'small';
   enforceFocus?: boolean;
   backdrop?: boolean;
+  closeOnEscape?: boolean;
 };
 
 const Modal = ({
@@ -58,8 +59,14 @@ const Modal = ({
   bsSize = undefined,
   enforceFocus = false,
   backdrop = true,
+  closeOnEscape = true,
 }: Props) => (
-  <MantineModal.Root opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus={enforceFocus}>
+  <MantineModal.Root
+    opened={show}
+    onClose={onHide}
+    size={sizeForMantine(bsSize)}
+    trapFocus={enforceFocus}
+    closeOnEscape={closeOnEscape}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
   </MantineModal.Root>
@@ -74,5 +81,4 @@ Modal.Title = styled(MantineModal.Title)`
 Modal.Body = MantineModal.Body;
 Modal.Footer = MantineModal.Body;
 
-/** @component */
 export default Modal;

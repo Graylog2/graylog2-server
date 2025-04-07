@@ -49,7 +49,7 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
   };
 
   return (
-    <BootstrapModalWrapper showModal bsSize="lg" role="alertdialog" onHide={onCancel}>
+    <BootstrapModalWrapper showModal bsSize="lg" onHide={onCancel}>
       <Formik<StreamOutputFilterRuleValues>
         initialValues={{
           ...filterRule,
