@@ -19,6 +19,8 @@ import * as React from 'react';
 import { Modal as MantineModal } from '@mantine/core';
 import styled from 'styled-components';
 
+import type { BsSize } from 'components/bootstrap/types';
+
 const ModalOverlay = styled(MantineModal.Overlay)`
   z-index: 1030;
 `;
@@ -27,14 +29,25 @@ const ModalContent = styled(MantineModal.Content)`
   z-index: 1031;
 `;
 
+const sizeForMantine = (size: BsSize) => {
+  switch (size) {
+    case 'lg':
+    case 'large':
+      return 'xl';
+    default:
+      return 'lg';
+  }
+};
+
 type Props = {
   onHide: () => void;
   children: React.ReactNode;
   show?: boolean;
+  bsSize?: 'lg' | 'large';
 };
 
-const Modal = ({ onHide, show = false, children }: Props) => (
-  <MantineModal.Root opened={show} onClose={onHide} size="lg">
+const Modal = ({ onHide, show = false, children, bsSize = undefined }: Props) => (
+  <MantineModal.Root opened={show} onClose={onHide} size={sizeForMantine(bsSize)}>
     <ModalOverlay />
     <ModalContent>{children}</ModalContent>
   </MantineModal.Root>
