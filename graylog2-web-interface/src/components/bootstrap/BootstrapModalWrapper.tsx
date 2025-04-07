@@ -26,7 +26,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-const BootstrapModalWrapper = ({ showModal, children, onHide, bsSize, backdrop }: Props) => (
+const BootstrapModalWrapper = ({ showModal, children, onHide, bsSize = undefined, backdrop = undefined }: Props) => (
   <Modal show={showModal} onHide={onHide} bsSize={bsSize} backdrop={backdrop}>
     {children}
   </Modal>

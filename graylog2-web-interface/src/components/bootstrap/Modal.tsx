@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-// eslint-disable-next-line no-restricted-imports
 import { Modal as MantineModal } from '@mantine/core';
 import styled from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
+
+export type ModalSize = 'lg' | 'large' | 'sm' | 'small';
 
 const ModalOverlay = styled(MantineModal.Overlay)`
   z-index: 1040;
@@ -46,7 +47,7 @@ type Props = {
   onHide: () => void;
   children: React.ReactNode;
   show?: boolean;
-  bsSize?: 'lg' | 'large' | 'sm' | 'small';
+  bsSize?: ModalSize;
   enforceFocus?: boolean;
   backdrop?: boolean;
   closable?: boolean;
