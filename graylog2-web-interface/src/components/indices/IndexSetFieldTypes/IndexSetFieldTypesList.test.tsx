@@ -270,7 +270,7 @@ describe('IndexSetFieldTypesList', () => {
       const resetButton = await within(tableRow).findByRole('button', { name: /reset/i });
       fireEvent.click(resetButton);
       await screen.findByLabelText(/Remove field type overrides/i);
-      const modal = await screen.findByTestId('modal-form');
+      const modal = await screen.findByRole('dialog');
       await within(modal).findByText('Rotate affected indices after change');
 
       expect(modal).toHaveTextContent(
@@ -297,7 +297,7 @@ describe('IndexSetFieldTypesList', () => {
       const resetButton = await within(tableRow).findByRole('button', { name: /reset/i });
       fireEvent.click(resetButton);
       await screen.findByLabelText(/Remove field type overrides/i);
-      const modal = await screen.findByTestId('modal-form');
+      const modal = await screen.findByRole('dialog');
       await within(modal).findByText('Rotate affected indices after change');
 
       expect(modal).toHaveTextContent(
@@ -448,7 +448,7 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const button = await screen.findByTitle('Set field type profile');
       fireEvent.click(button);
-      const modal = await screen.findByTestId('modal-form');
+      const modal = await screen.findByRole('dialog');
       await within(modal).findByRole('button', { name: /Set Profile/i, hidden: true });
     });
   });

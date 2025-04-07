@@ -19,17 +19,15 @@ import React from 'react';
 import Modal from './Modal';
 
 type Props = {
-  title?: string | undefined;
   backdrop?: boolean;
   bsSize?: 'lg' | 'large' | 'sm' | 'small';
   showModal: boolean;
-  role?: string;
   onHide: () => void;
   children: React.ReactNode;
 };
 
-const BootstrapModalWrapper = ({ showModal, children, onHide, bsSize, backdrop, ...restProps }: Props) => (
-  <Modal show={showModal} onHide={onHide} bsSize={bsSize} backdrop={backdrop} {...restProps}>
+const BootstrapModalWrapper = ({ showModal, children, onHide, bsSize, backdrop }: Props) => (
+  <Modal show={showModal} onHide={onHide} bsSize={bsSize} backdrop={backdrop}>
     {children}
   </Modal>
 );

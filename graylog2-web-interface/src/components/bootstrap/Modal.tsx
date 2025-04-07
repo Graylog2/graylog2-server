@@ -43,36 +43,43 @@ const sizeForMantine = (size: BsSize) => {
 };
 
 type Props = {
-  onHide: () => void;
+  onHide?: () => void;
   children: React.ReactNode;
   show?: boolean;
   bsSize?: 'lg' | 'large' | 'sm' | 'small';
   enforceFocus?: boolean;
   backdrop?: boolean;
-  closeOnEscape?: boolean;
 };
 
 const Modal = ({
-  onHide,
+  onHide = undefined,
   show = false,
   children,
   bsSize = undefined,
   enforceFocus = false,
   backdrop = true,
-  closeOnEscape = true,
-}: Props) => (
-  <MantineModal.Root
-    opened={show}
-    onClose={onHide}
-    size={sizeForMantine(bsSize)}
-    trapFocus={enforceFocus}
-    closeOnEscape={closeOnEscape}>
-    {backdrop && <ModalOverlay />}
-    <ModalContent>{children}</ModalContent>
-  </MantineModal.Root>
-);
+}: Props) => {
+  const closable = typeof onHide === 'function';
 
-Modal.Header = ({ children }: { children: React.ReactNode }) => <MantineModal.Header>{children}</MantineModal.Header>;
+  return (
+    <MantineModal.Root
+      opened={show}
+      onClose={onHide}
+      size={sizeForMantine(bsSize)}
+      trapFocus={enforceFocus}
+      closeOnEscape={closable}>
+      {backdrop && <ModalOverlay />}
+      <ModalContent>{children}</ModalContent>
+    </MantineModal.Root>
+  );
+};
+
+Modal.Header = ({ children, showCloseButton = true }: { children: React.ReactNode; showCloseButton?: boolean }) => (
+  <MantineModal.Header>
+    {children}
+    {showCloseButton && <MantineModal.CloseButton />}
+  </MantineModal.Header>
+);
 
 Modal.Title = styled(MantineModal.Title)`
   font-size: ${({ theme }) => theme.fonts.size.h2};
