@@ -31,6 +31,9 @@ const ModalContent = styled(MantineModal.Content)`
 
 const sizeForMantine = (size: BsSize) => {
   switch (size) {
+    case 'sm':
+    case 'small':
+      return 'md';
     case 'lg':
     case 'large':
       return 'xl';
@@ -43,13 +46,21 @@ type Props = {
   onHide: () => void;
   children: React.ReactNode;
   show?: boolean;
-  bsSize?: 'lg' | 'large' | 'small';
+  bsSize?: 'lg' | 'large' | 'sm' | 'small';
   enforceFocus?: boolean;
+  backdrop?: boolean;
 };
 
-const Modal = ({ onHide, show = false, children, bsSize = undefined, enforceFocus = false }: Props) => (
+const Modal = ({
+  onHide,
+  show = false,
+  children,
+  bsSize = undefined,
+  enforceFocus = false,
+  backdrop = true,
+}: Props) => (
   <MantineModal.Root opened={show} onClose={onHide} size={sizeForMantine(bsSize)} trapFocus={enforceFocus}>
-    <ModalOverlay />
+    {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
   </MantineModal.Root>
 );

@@ -108,12 +108,12 @@ const KinesisStreams = ({
 
   return (
     <>
-      <LoadingModal show={logDataStatus.loading} backdrop="static" keyboard={false} onHide={() => {}} bsSize="small">
+      <Modal show={logDataStatus.loading} keyboard={false} onHide={() => {}} bsSize="small">
         <LoadingContent>
           <StyledSpinner />
           <LoadingMessage>This request may take a few moments.</LoadingMessage>
         </LoadingContent>
-      </LoadingModal>
+      </Modal>
 
       <FormWrap
         onSubmit={handleSubmit}
@@ -153,14 +153,6 @@ const KinesisStreams = ({
 
 const AutoSetupContent = styled.div`
   margin-bottom: 9px;
-`;
-
-const LoadingModal = styled(Modal)`
-  > .modal-dialog {
-    width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-  }
 `;
 
 const LoadingContent = styled(Modal.Body)`
