@@ -118,7 +118,7 @@ const PermissionsConfig = () => {
             <Formik onSubmit={saveConfig} initialValues={config}>
               {({ isSubmitting }) => (
                 <Form>
-                  <Modal.Header closeButton>
+                  <Modal.Header>
                     <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                   </Modal.Header>
 

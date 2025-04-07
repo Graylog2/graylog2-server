@@ -83,7 +83,7 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
 
           return (
             <>
-              <Modal.Header closeButton>
+              <Modal.Header>
                 <Modal.Title>{title}</Modal.Title>
               </Modal.Header>
               <Modal.Body>

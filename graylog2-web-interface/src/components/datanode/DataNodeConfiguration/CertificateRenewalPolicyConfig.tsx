@@ -230,7 +230,7 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
         <Formik<FormConfig> onSubmit={saveConfig} initialValues={formConfig}>
           {({ values, setFieldValue, isSubmitting, isValid, isValidating }) => (
             <Form>
-              <Modal.Header closeButton>
+              <Modal.Header>
                 <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
               </Modal.Header>
 

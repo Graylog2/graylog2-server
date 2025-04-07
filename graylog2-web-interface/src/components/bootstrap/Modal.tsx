@@ -53,12 +53,7 @@ const Modal = ({ onHide, show = false, children, bsSize = undefined }: Props) =>
   </MantineModal.Root>
 );
 
-Modal.Header = ({ children, closeButton }: { children: React.ReactNode; closeButton: boolean }) => (
-  <MantineModal.Header>
-    {children}
-    {closeButton && <MantineModal.CloseButton />}
-  </MantineModal.Header>
-);
+Modal.Header = ({ children }: { children: React.ReactNode }) => <MantineModal.Header>{children}</MantineModal.Header>;
 
 Modal.Title = styled(MantineModal.Title)`
   font-size: ${({ theme }) => theme.fonts.size.h2};

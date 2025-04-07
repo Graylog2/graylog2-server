@@ -104,7 +104,7 @@ const ContentPackVersionItem = ({
       </td>
       {showInstallModal && (
         <BootstrapModalWrapper showModal={showInstallModal} onHide={onCloseInstallModal} bsSize="large">
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Install Content Pack</Modal.Title>
           </Modal.Header>
           <Modal.Body>

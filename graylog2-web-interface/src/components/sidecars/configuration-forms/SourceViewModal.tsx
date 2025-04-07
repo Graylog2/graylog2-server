@@ -94,7 +94,7 @@ class SourceViewModal extends React.Component<
   render() {
     return (
       <BootstrapModalWrapper showModal={this.props.showModal} onHide={this.props.onHide}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>
             <span>
               Configuration <em>{this.state.name}</em>

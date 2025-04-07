@@ -133,7 +133,7 @@ const UserConfig = () => {
             <Formik onSubmit={saveConfig} initialValues={formConfig}>
               {({ isSubmitting, values, setFieldValue }) => (
                 <Form>
-                  <Modal.Header closeButton>
+                  <Modal.Header>
                     <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
                   </Modal.Header>
 

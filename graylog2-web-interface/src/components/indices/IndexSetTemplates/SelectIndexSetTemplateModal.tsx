@@ -129,7 +129,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
 
   return (
     <Modal show={show} title="Index Set Templates" bsSize="large" onHide={handleClose}>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Index Set Templates</Modal.Title>
       </Modal.Header>
       <Modal.Body>

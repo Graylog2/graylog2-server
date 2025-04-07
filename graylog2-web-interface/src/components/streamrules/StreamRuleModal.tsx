@@ -119,7 +119,7 @@ const StreamRuleModal = ({
       <Formik<FormValues> initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
         {({ values, setFieldValue, isSubmitting, isValidating }) => (
           <Form>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>

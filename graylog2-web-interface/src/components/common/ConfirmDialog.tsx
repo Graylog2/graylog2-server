@@ -53,7 +53,7 @@ const ConfirmDialog = ({
 
   return (
     <StyledModal show={show} onHide={onHide}>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
 
