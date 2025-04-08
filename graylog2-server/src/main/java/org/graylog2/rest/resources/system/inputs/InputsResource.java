@@ -217,7 +217,7 @@ public class InputsResource extends AbstractInputsResource {
         try {
             throwBadRequestIfNotGlobal(lr);
             // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
-            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
+            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node(), isSetupWizard);
             if (config.isCloud() && !messageInput.isCloudCompatible()) {
                 throw new BadRequestException(String.format(Locale.ENGLISH,
                         "The input type <%s> is not allowed in the cloud environment!", lr.type()));
