@@ -2,6 +2,7 @@ package org.graylog2.web.customization;
 
 import com.google.common.base.Suppliers;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -14,9 +15,9 @@ public class CustomizationConfigProvider implements Provider<Config> {
     private final Supplier<Config> configSupplier;
 
     @Inject
-    public CustomizationConfigProvider(ClusterConfigService clusterConfigService) {
+    public CustomizationConfigProvider(ClusterConfigService clusterConfigService, @Named("isDevelopmentServer") boolean isDevelopment) {
         this.clusterConfigService = clusterConfigService;
-        this.configSupplier = Suppliers.memoize(this::retrieve);
+        this.configSupplier = isDevelopment ? this::retrieve : Suppliers.memoize(this::retrieve);
     }
 
     private Config retrieve() {
