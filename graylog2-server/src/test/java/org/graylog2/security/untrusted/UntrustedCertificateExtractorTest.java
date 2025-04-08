@@ -22,15 +22,11 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.assertj.core.api.Assertions;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.ssl.SSLContextConfigurator;
-import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
+import org.graylog2.TestHttpServer;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,10 +36,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -52,61 +45,34 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 
 class UntrustedCertificateExtractorTest {
 
-    private HttpServer httpsServer;
-
-    private static HttpServer startServer(KeyStore keyStore, String password) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
-        final ResourceConfig rc = new ResourceConfig()
-                .register(HelloResource.class);
-
-        SSLContextConfigurator sslCon = new SSLContextConfigurator();
-        sslCon.setKeyStoreBytes(keystoreToBytes(keyStore, password));
-        sslCon.setKeyStorePass(password);
-        sslCon.setTrustStoreBytes(keystoreToBytes(keyStore, password));
-        sslCon.setTrustStorePass(password);
-
-        GuiceInjectorHolder.createInjector(Collections.emptyList());
-
-        String baseUri = "https://localhost:" + findFreePort();
-
-        return GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUri), rc, true, new SSLEngineConfigurator(sslCon).setClientMode(false).setNeedClientAuth(false));
-    }
-
-    private static int findFreePort() throws IOException {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        }
-    }
-
-
-    private static byte[] keystoreToBytes(KeyStore keyStore, String password) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        keyStore.store(byteArrayOutputStream, password.toCharArray());
-        return byteArrayOutputStream.toByteArray();
-    }
+    private TestHttpServer httpsServer;
 
     @BeforeEach
     void setUp() throws Exception {
         final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned("junit-extractor-test").validity(Duration.ofDays(1)));
         final char[] password = "my-password".toCharArray();
         final KeyStore keystore = keyPair.toKeystore("ca", password);
-        httpsServer = startServer(keystore, "my-password");
 
+        httpsServer = TestHttpServer.builder()
+                .registerResource(HelloResource.class)
+                .withSsl(keystore, "my-password")
+                .build()
+                .start();
     }
 
     @AfterEach
     void tearDown() {
-        httpsServer.shutdown();
+        httpsServer.stop();
         GuiceInjectorHolder.resetInjector();
     }
 
     @Test
     void testExtraction() throws NoSuchAlgorithmException, IOException, KeyManagementException, KeyStoreException, CertificateException {
-        final String host = getHttpHost();
+        final String host = httpsServer.getBaseUri().toString();
 
         final OkHttpClient client = new OkHttpClient.Builder().build();
         final Request request = new Request.Builder().get().url(host).build();
@@ -129,12 +95,6 @@ class UntrustedCertificateExtractorTest {
             Assertions.assertThat(response.body().string()).isEqualTo("This is the response");
         }
 
-    }
-
-    @Nonnull
-    private String getHttpHost() {
-        final int port = httpsServer.getListeners().iterator().next().getPort();
-        return "https://localhost:" + port;
     }
 
     @Nonnull
