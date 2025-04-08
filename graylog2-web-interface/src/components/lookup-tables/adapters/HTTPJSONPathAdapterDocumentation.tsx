@@ -18,9 +18,9 @@
 import React from 'react';
 
 import { Alert, Col, Row } from 'components/bootstrap';
+import useProductName from 'customization/useProductName';
 
-const HTTPJSONPathAdapterDocumentation = () => {
-  const exampleJSON = `{
+const exampleJSON = `{
   "user": {
     "login": "jane",
     "full_name": "Jane Doe",
@@ -31,8 +31,8 @@ const HTTPJSONPathAdapterDocumentation = () => {
     }
   }
 }`;
-  const noMultiResult = '{"value": "Jane Doe"}';
-  const mapResult = `{
+const noMultiResult = '{"value": "Jane Doe"}';
+const mapResult = `{
   "login": "jane",
   "full_name": "Jane Doe",
   "roles": ["admin", "developer"],
@@ -41,14 +41,14 @@ const HTTPJSONPathAdapterDocumentation = () => {
     "cellphone": "+49123456789"
   }
 }`;
-  const smallMapResult = `{
+const smallMapResult = `{
   "email": "jane@example.com",
   "cellphone": "+49123456789"
 }`;
-  const listResult = `{
+const listResult = `{
   "value": ["admin", "developer"]
 }`;
-  const pipelineRule = `rule "lookup user"
+const pipelineRule = `rule "lookup user"
 when has_field("user_login")
 then
   // Get the user login from the message
@@ -64,6 +64,8 @@ then
   set_field("user_email", userData["email"]);
   set_field("user_cellphone", userData["cellphone"]);
 end`;
+const HTTPJSONPathAdapterDocumentation = () => {
+  const productName = useProductName();
 
   return (
     <div>
@@ -105,7 +107,7 @@ end`;
       <p style={{ marginBottom: 10, padding: 0 }}>
         This is the <em>User-Agent</em> header that will be used for the HTTP requests. You should include some contact
         details so owners of the services you query know whom to contact if issues arise. (like excessive API requests
-        from your Graylog cluster)
+        from your {productName} cluster)
       </p>
 
       <hr />

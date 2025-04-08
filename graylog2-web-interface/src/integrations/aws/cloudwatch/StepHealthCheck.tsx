@@ -27,6 +27,7 @@ import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/co
 import { ApiContext } from 'integrations/aws/context/Api';
 import { FormDataContext } from 'integrations/aws/context/FormData';
 import Icon from 'components/common/Icon';
+import useProductName from 'customization/useProductName';
 
 type StepHealthCheckProps = {
   onSubmit: (...args: any[]) => void;
@@ -37,6 +38,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const { logData, setLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
   const [pauseCountdown, setPauseCountdown] = useState(false);
+  const productName = useProductName();
 
   const [logDataProgress, setLogDataUrl] = useFetch(
     null,
@@ -144,7 +146,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
         }>
         {knownLog
           ? 'Take a look at what we have parsed so far and you can create Pipeline Rules to handle even more!'
-          : 'Not to worry, Graylog can still read in these log messages. We have parsed what we could and you can build Pipeline Rules to do the rest!'}
+          : `Not to worry, ${productName} can still read in these log messages. We have parsed what we could and you can build Pipeline Rules to do the rest!`}
       </Panel>
 
       <Input

@@ -100,7 +100,7 @@ class MetricsComponent extends React.Component<Props, State> {
               ) : (
                 <span>There was a problem fetching node metrics.</span>
               )}{' '}
-              Graylog will keep trying to get them in the background.
+              Attempts to retrieve them will continue in the background.
             </Alert>
           </Col>
         </Row>

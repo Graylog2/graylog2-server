@@ -34,6 +34,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useProductName from 'customization/useProductName';
 
 const Toolbar = styled(Row)(
   ({ theme }) => css`
@@ -70,10 +71,12 @@ const formatStatsString = (stats: IndexSetStats) => {
   return `${indices}, ${documents}, ${size}`;
 };
 
+const DEFAULT_PAGE_NUMBER = 1;
+const DEFAULT_PAGE_SIZE = 10;
+const SEARCH_MIN_TERM_LENGTH = 3;
+
 const IndexSetsComponent = () => {
-  const DEFAULT_PAGE_NUMBER = 1;
-  const DEFAULT_PAGE_SIZE = 10;
-  const SEARCH_MIN_TERM_LENGTH = 3;
+  const productName = useProductName();
   const { indexSetsCount, indexSets, indexSetStats, globalIndexSetStats } =
     useStore<IndexSetsStoreState>(IndexSetsStore);
   const { page, resetPage }: PaginationQueryParameterResult = usePaginationQueryParameter();
@@ -203,7 +206,7 @@ const IndexSetsComponent = () => {
     let { description } = indexSet;
 
     if (indexSet.default) {
-      description += `${description.endsWith('.') ? '' : '.'} Graylog will use this index set by default.`;
+      description += `${description.endsWith('.') ? '' : '.'} ${productName} will use this index set by default.`;
     }
 
     let statsString;

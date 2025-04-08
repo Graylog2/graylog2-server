@@ -16,6 +16,7 @@
  */
 import { useState } from 'react';
 
+import useProductName from 'customization/useProductName';
 import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 
@@ -27,6 +28,7 @@ type UseNotificationTestType = {
 
 const useNotificationTest = (): UseNotificationTestType => {
   const [testResults, setTestResults] = useState(undefined);
+  const productName = useProductName();
 
   const getNotificationTest = (notification: EventNotification) => {
     setTestResults({ [notification.id]: { isLoading: true, id: notification.id } });
@@ -50,7 +52,7 @@ const useNotificationTest = (): UseNotificationTestType => {
 
         if (errorResponse.status !== 400 || !errorResponse.additional.body || !errorResponse.additional.body.failed) {
           result.message =
-            errorResponse.responseMessage || 'Unknown errorResponse, please check your Graylog server logs.';
+            errorResponse.responseMessage || `Unknown errorResponse, please check your ${productName} server logs.`;
         }
 
         setTestResults({ [notification.id]: result });

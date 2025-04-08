@@ -114,8 +114,8 @@ class ProcessorSimulator extends React.Component<
             <p>
               Build an example message that will be used in the simulation.{' '}
               <strong>
-                No real messages stored in Graylog will be changed. All actions are purely simulated on the temporary
-                input you provide below.
+                No real messages will be altered. All actions are purely simulated on the temporary input you provide
+                below.
               </strong>
             </p>
             <Row className="row-sm">

@@ -21,6 +21,7 @@ import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
 import backgroundImage from 'images/auth/login-bg.svg';
 import { Logo } from 'components/perspectives/DefaultBrand';
+import useProductName from 'customization/useProductName';
 
 const LogoContainer = styled.div`
   display: block;
@@ -107,28 +108,32 @@ type Props = {
   children: React.ReactNode;
 };
 
-const LoginChrome = ({ children }: Props) => (
-  <LoginContainer>
-    <LoginBox>
-      <WelcomeMessage>Welcome to Graylog</WelcomeMessage>
-      {children}
-    </LoginBox>
-    <Background>
-      <NotificationsContainer>
-        <PublicNotifications readFromConfig />
-      </NotificationsContainer>
-      <BackgroundText>
-        <TextContainer>
-          <LogoContainer>
-            <Logo color="#ffffff" />
-          </LogoContainer>
-          <Claim>
-            Data. Insights. <Highlight>Answers.</Highlight>
-          </Claim>
-        </TextContainer>
-      </BackgroundText>
-    </Background>
-  </LoginContainer>
-);
+const LoginChrome = ({ children }: Props) => {
+  const productName = useProductName();
+
+  return (
+    <LoginContainer>
+      <LoginBox>
+        <WelcomeMessage>Welcome to {productName}</WelcomeMessage>
+        {children}
+      </LoginBox>
+      <Background>
+        <NotificationsContainer>
+          <PublicNotifications readFromConfig />
+        </NotificationsContainer>
+        <BackgroundText>
+          <TextContainer>
+            <LogoContainer>
+              <Logo color="#ffffff" />
+            </LogoContainer>
+            <Claim>
+              Data. Insights. <Highlight>Answers.</Highlight>
+            </Claim>
+          </TextContainer>
+        </BackgroundText>
+      </Background>
+    </LoginContainer>
+  );
+};
 
 export default LoginChrome;

@@ -14,15 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import AppConfig from './AppConfig';
 
-import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
+export const DEPRECATION_NOTICE = 'Deprecation Notice:';
 
-const IndexExpandedSection = ({ type }: ExpandedSectionProps) => (
-  <p>
-    Field type <i>{type}</i> comes from the search engine index mapping. It could have been created dynamically, set by
-    the system or come from historical profiles and/or custom mappings.
-  </p>
-);
+const deprecationNotice = (deprecatedMessage: string) =>
+  // eslint-disable-next-line no-console
+  AppConfig.gl2DevMode() && console.warn(DEPRECATION_NOTICE, deprecatedMessage);
 
-export default IndexExpandedSection;
+export default deprecationNotice;

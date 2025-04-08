@@ -23,6 +23,7 @@ import { AdvancedOptionsContext } from 'integrations/aws/context/AdvancedOptions
 import AdditionalFields from 'integrations/aws/common/AdditionalFields';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
 import { SectionTitle, SectionNote } from 'integrations/aws/common/sharedStyles';
+import useProductName from 'customization/useProductName';
 
 const INPUT_PATTERN = 'https://(.*)';
 const INPUT_MESSAGE = "Domain should begin with 'https://'";
@@ -46,6 +47,7 @@ type AWSCustomEndpointsProps = {
 
 const AWSCustomEndpoints = ({ onChange }: AWSCustomEndpointsProps) => {
   const { formData } = useContext(FormDataContext);
+  const productName = useProductName();
   const { isAWSCustomEndpointsVisible, setAWSCustomEndpointsVisibility } = useContext(AdvancedOptionsContext);
   const { awsEndpointCloudWatch, awsEndpointDynamoDB, awsEndpointIAM, awsEndpointKinesis } = formData;
 
@@ -59,7 +61,7 @@ const AWSCustomEndpoints = ({ onChange }: AWSCustomEndpointsProps) => {
       visible={isAWSCustomEndpointsVisible}
       onToggle={handleToggle}>
       <StyledSectionTitle>
-        Overrides the default AWS API endpoint URL that Graylog communicates with.
+        Overrides the default AWS API endpoint URL that {productName} communicates with.
       </StyledSectionTitle>
       <StyledSectionNote>
         Only specify these if you are using{' '}
