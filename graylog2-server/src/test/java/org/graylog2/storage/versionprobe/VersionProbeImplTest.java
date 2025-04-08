@@ -24,6 +24,7 @@ import io.jsonwebtoken.Jwts;
 import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
+import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -40,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Optional;
@@ -85,7 +87,7 @@ class VersionProbeImplTest {
         final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.url("/").url().toURI()));
         Assertions.assertThat(probedVersion)
                 .isPresent()
-                .hasValueSatisfying(searchVersion -> Assertions.assertThat(searchVersion).isEqualTo(SearchVersion.opensearch("2.15.0")));
+                .hasValue(SearchVersion.opensearch("2.15.0"));
 
         Assertions.assertThat(versionProbeListener.getErrors()).isEmpty();
         Assertions.assertThat(versionProbeListener.getRetries()).isEmpty();
@@ -152,6 +154,51 @@ class VersionProbeImplTest {
                 .anySatisfy(error -> Assertions.assertThat(error).contains("an exception occurred while deserializing error response"));
         Assertions.assertThat(versionProbeListenerWithWrongSecret.getRetries()).hasSize(3);
 
+    }
+
+    @Test
+    void testBasicAuth() {
+        final String username = RandomStringUtils.secure().nextAlphanumeric(10);
+        final String password = RandomStringUtils.secure().nextAlphanumeric(10);
+        server.setDispatcher(basicAuthDispatcher(Credentials.basic(username, password)));
+
+        final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
+        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 3, Duration.milliseconds(10), false, versionProbeListener);
+
+        final URI uri = server.url("/").newBuilder().username(username).password(password).build().uri();
+        final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(uri));
+        Assertions.assertThat(probedVersion)
+                .isPresent()
+                .hasValue(SearchVersion.opensearch("2.15.0"));
+
+        final String wrongPassword = RandomStringUtils.secure().nextAlphanumeric(10);
+        final URI wrongUri = server.url("/").newBuilder().username(username).password(wrongPassword).build().uri();
+
+        Assertions.assertThat(versionProbe.probe(Collections.singleton(wrongUri)))
+                .isEmpty();
+
+        Assertions.assertThat(versionProbeListener.getErrors())
+                .hasSize(4)
+                .contains("Unable to retrieve version from indexer node: Retrying failed to complete successfully after 3 attempts.");
+
+    }
+
+    private Dispatcher basicAuthDispatcher(String basicAuthCredentials) {
+        return new Dispatcher() {
+            @Nonnull
+            @Override
+            public MockResponse dispatch(@Nonnull RecordedRequest recordedRequest) throws InterruptedException {
+                final String auth = recordedRequest.getHeader(HttpHeaders.AUTHORIZATION);
+                if (auth != null && auth.equals(basicAuthCredentials)) {
+                    return new MockResponse()
+                            .setBody(OPENSEARCH_RESPONSE);
+                } else {
+                    return new MockResponse()
+                            .setBody("Unauthorized")
+                            .setResponseCode(Response.Status.UNAUTHORIZED.getStatusCode());
+                }
+            }
+        };
     }
 
     @Nonnull
