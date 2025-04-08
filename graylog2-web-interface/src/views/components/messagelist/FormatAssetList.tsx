@@ -36,7 +36,7 @@ const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: 
 
   const assetsList = React.useMemo(() => pluggableAssetListComponent.map(
     ({ component: PluggableAssetListItem }) => (
-      <PluggableAssetListItem identifiers={associated_assets} addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)} />
+      <PluggableAssetListItem assetIds={associated_assets} direction="col" addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)} />
     ),
   ), [pluggableAssetListComponent, associated_assets, dispatch, queryId, fieldType]);
 
