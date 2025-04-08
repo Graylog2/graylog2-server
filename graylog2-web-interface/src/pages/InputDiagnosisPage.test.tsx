@@ -100,15 +100,13 @@ describe('Input Diagnosis Page', () => {
     expect(await screen.findByText(/22/)).toBeInTheDocument();
     expect(await screen.findByText(/Test Stream 2/)).toBeInTheDocument();
     expect(await screen.findByText(/23/)).toBeInTheDocument();
-    expect(await screen.findByRole('link', { name: /node id: test-node-id-1/i })).toBeInTheDocument();
-    expect(
-      await screen.findByRole('link', { name: /node id: test-node-id-2 message: failed for testing/i }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: /test-node-id-1/i })).toBeInTheDocument();
+    expect(await screen.findByText(/failed for testing/i)).toBeInTheDocument();
   });
 
   it('shows link to nodes related to node state', async () => {
     render(<InputDiagnosisPage />);
-    const runningNodeLink = await screen.findByRole('link', { name: /node id: test-node-id-1/i });
+    const runningNodeLink = await screen.findByRole('link', { name: /test-node-id-1/i });
 
     expect(hasHref(runningNodeLink) ? runningNodeLink.href : null).toEqual(
       'http://localhost/system/cluster/node/test-node-id-1',

@@ -14,22 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import ViewsStoreProvider from '../views/stores/ViewsStoreProvider';
-
-export default (props) => {
-  const components =
-    PluginStore.exports('pages')
-      .map((c) => c.search || {})
-      .map((c) => c.component)
-      .filter((c) => c) || [];
-  const Component = components[0];
-
-  return (
-    <ViewsStoreProvider>
-      <Component {...props} />
-    </ViewsStoreProvider>
+export default () => {
+  const [Component] = useMemo(
+    () =>
+      PluginStore.exports('pages')
+        .map((c) => c.search || {})
+        .map((c) => c.component)
+        .filter((c) => c) ?? [],
+    [],
   );
+
+  return <Component />;
 };

@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.users;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.annotations.VisibleForTesting;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -101,10 +101,10 @@ import org.graylog2.users.UserOverviewDTO;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -705,14 +705,14 @@ public class UsersResource extends RestResource {
 
         final ImmutableList.Builder<TokenSummary> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
-            tokenList.add(TokenSummary.create(token.getId(), token.getName(), token.getLastAccess()));
+            tokenList.add(TokenSummary.create(token.getId(), token.getName(), token.getLastAccess(), token.getCreatedAt(), token.getExpiresAt()));
         }
 
         return TokenList.create(tokenList.build());
     }
 
-    public record GenerateTokenTTL(Optional<Duration> tokenTTL) {
-        public Duration getTTL(Supplier<Duration> defaultSupplier) {
+    public record GenerateTokenTTL(@JsonProperty Optional<PeriodDuration> tokenTTL) {
+        public PeriodDuration getTTL(Supplier<PeriodDuration> defaultSupplier) {
             return this.tokenTTL.orElseGet(defaultSupplier);
         }
     }
@@ -731,7 +731,9 @@ public class UsersResource extends RestResource {
         if (currentUser == null) {
             throw new ForbiddenException("Not allowed to create tokens for unknown user.");
         }
-        validatePermissionForTokenCreation(currentUser, futureOwner);
+        if (!isPermitted(USERS_TOKENCREATE, currentUser.getName())) {
+            throw new ForbiddenException(currentUser.getName() + " is not allowed to create token.");
+        }
 
         if (body == null) {
             body = new GenerateTokenTTL(Optional.empty());
@@ -768,50 +770,12 @@ public class UsersResource extends RestResource {
         }
     }
 
-    @VisibleForTesting
-    void validatePermissionForTokenCreation(User callingUser, User futureOwner) {
-        if (!isPermitted(USERS_TOKENCREATE, callingUser.getName())) {
-            throw new ForbiddenException(callingUser.getName() + " is not allowed to create token.");
-        }
-        if (isAdmin(callingUser)) {
-            // Not throwing an exception here, admin is allowed to create a token.
-            return;
-        }
-        if (!Objects.equals(callingUser.getId(), futureOwner.getId())) {
-            // Only admins are allowed to create tokens for other users, but we already checked for admin above.
-            throw new ForbiddenException("Only admins are allowed to create a token for another user.");
-        }
-        if (!isExternalUserAllowed(callingUser)) {
-            throw new ForbiddenException("External users are not allowed to create tokens.");
-        }
-        if (!isAllowedAsNoAdmin(callingUser)) {
-            throw new ForbiddenException("Only admins are allowed to create tokens.");
-        }
-    }
-
-    private boolean isAdmin(User user) {
-        final String adminRoleId = roleService.getAdminRoleObjectId();
-        return user.getRoleIds().contains(adminRoleId);
-    }
-
-    private boolean isAllowedAsNoAdmin(User user) {
-        return isAdmin(user) || !clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).restrictAccessTokenToAdmins();
-    }
-
-    private boolean isExternalUserAllowed(User user) {
-        return !user.isExternalUser() || clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).allowAccessTokenForExternalUsers();
-    }
-
     private User loadUserById(String userId) {
         final User user = userManagementService.loadById(userId);
         if (user == null) {
             throw new NotFoundException("Couldn't find user with ID <" + userId + ">");
         }
         return user;
-    }
-
-    private UserSummary toUserResponse(User user, AllUserSessions sessions) {
-        return toUserResponse(user, true, Optional.of(sessions));
     }
 
     private UserSummary toUserResponse(User user, boolean includePermissions, Optional<AllUserSessions> optSessions) {

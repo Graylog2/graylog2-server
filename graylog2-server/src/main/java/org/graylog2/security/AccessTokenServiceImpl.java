@@ -27,6 +27,7 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.UnwindOptions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
@@ -48,14 +49,16 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.time.Duration;
+import java.time.Period;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -66,8 +69,11 @@ import static com.mongodb.client.model.Aggregates.match;
 import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Aggregates.sort;
 import static com.mongodb.client.model.Aggregates.unwind;
+import static com.mongodb.client.model.Filters.lte;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
+import static com.mongodb.client.model.Sorts.ascending;
+import static com.mongodb.client.model.Sorts.orderBy;
 
 /**
  * Provides access to access tokens in the database.
@@ -143,12 +149,12 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public AccessToken create(String username, String name) {
-        final Duration defaultTTL = configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens();
+        final PeriodDuration defaultTTL = configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES).defaultTTLForNewTokens();
         return create(username, name, defaultTTL);
     }
 
     @Override
-    public AccessToken create(String username, String name, Duration ttl) {
+    public AccessToken create(String username, String name, PeriodDuration ttl) {
         Map<String, Object> fields = Maps.newHashMap();
         AccessTokenImpl accessToken;
         String id = null;
@@ -163,7 +169,9 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             fields.put(AccessTokenImpl.USERNAME, username);
             fields.put(AccessTokenImpl.NAME, name);
             fields.put(AccessTokenImpl.CREATED_AT, nowUTC);
-            fields.put(AccessTokenImpl.EXPIRES_AT, nowUTC.plus(ttl.toMillis()));
+            // This is kind of ugly, as we're still using joda-time. Once we're with java.time, one can use "nowUtc.plus(ttl)".
+            // Until then, we need to add all fields of the period and the duration separately:
+            fields.put(AccessTokenImpl.EXPIRES_AT, addTtlPeriodDuration(nowUTC, ttl));
             fields.put(AccessTokenImpl.LAST_ACCESS, Tools.dateTimeFromDouble(0)); // aka never.
             accessToken = new AccessTokenImpl(fields);
             try {
@@ -181,12 +189,17 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         return accessToken;
     }
 
+    private DateTime addTtlPeriodDuration(DateTime dt, PeriodDuration ttl) {
+        final Period p = ttl.getPeriod();
+        return dt.plusYears(p.getYears()).plusMonths(p.getMonths()).plusDays(p.getDays()).plus(ttl.getDuration().toMillis());
+    }
+
     @Override
     public DateTime touch(AccessToken accessToken) throws ValidationException {
         try {
             return lastAccessCache.get(accessToken.getId());
         } catch (ExecutionException e) {
-            LOG.debug("Ignoring error: " + e.getMessage());
+            LOG.debug("Ignoring error: {}", e.getMessage());
             return null;
         }
     }
@@ -265,18 +278,19 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
         final List<Bson> pipeline = List.of(
                 //Search fot tokens whose EXPIRES_AT is less than or equal to now:
-                match(new Document(AccessTokenImpl.EXPIRES_AT, new Document("$lte", expiredBefore.toDate()))),
+                match(lte(AccessTokenImpl.EXPIRES_AT, expiredBefore.toDate())),
                 // Sort by expiration date:
-                sort(new Document(AccessTokenImpl.EXPIRES_AT, 1)),
+                sort(orderBy(ascending(AccessTokenImpl.EXPIRES_AT))),
                 // Join in the user-collection on the username as "userDetails":
                 lookup(UserImpl.COLLECTION_NAME, AccessTokenImpl.USERNAME, UserImpl.USERNAME, join),
-                // Have a dedicated Doc for each user-id - we're working with a 1:1 relationship here, so it's safe:
-                unwind("$" + join),
+                // Have a dedicated Doc for each user-id. In case the user doesn't exist, we still keep the entire entry:
+                unwind("$" + join, new UnwindOptions().preserveNullAndEmptyArrays(true)),
                 // Load only token-id, expiration date and user-id:
                 project(fields(
                         include(AccessTokenImpl.ID_FIELD),
                         include(AccessTokenImpl.NAME),
                         include(AccessTokenImpl.EXPIRES_AT),
+                        include(AccessTokenImpl.USERNAME),
                         include(joinId)
                 ))
         );
@@ -285,12 +299,14 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final AggregateIterable<Document> aggregateIt = tokenColl.aggregate(pipeline);
         try (var stream = StreamSupport.stream(aggregateIt.spliterator(), false)) {
             return stream.map(d -> {
-                        final Document userDetails = d.get(join, Document.class);
+                final Optional<Document> userDetails = Optional.ofNullable(d.get(join, Document.class));
                         return new ExpiredToken(
                                 d.getObjectId(AccessTokenImpl.ID_FIELD).toString(),
                                 d.getString(AccessTokenImpl.NAME),
                                 new DateTime(d.getDate(AccessTokenImpl.EXPIRES_AT)).withZone(DateTimeZone.UTC),
-                                userDetails.getObjectId("_id").toString()
+                                //Return null for non-existing users, but definitely append the username from the token itself:
+                                userDetails.map(ud -> ud.getObjectId("_id").toString()).orElse(null),
+                                d.getString(AccessTokenImpl.USERNAME)
                         );
                     }
             ).toList();
