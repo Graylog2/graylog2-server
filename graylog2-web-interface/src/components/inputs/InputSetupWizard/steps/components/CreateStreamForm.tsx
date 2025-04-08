@@ -39,9 +39,23 @@ type Props = {
   prevShouldCreateNewPipeline?: OpenStepsData['SETUP_ROUTING']['shouldCreateNewPipeline'];
 };
 
+const SubHeadline = styled.h4(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.md};
+    margin-bottom: ${theme.spacings.xs};
+  `,
+);
+
+const IndexSetInfoText = styled.p(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.xs};
+    margin-bottom: ${theme.spacings.md};
+  `,
+);
+
 const NewIndexSetButton = styled(Button)(
   ({ theme }) => css`
-    margin-bottom: ${theme.spacings.xs};
+    margin-bottom: ${theme.spacings.md};
   `,
 );
 
@@ -52,7 +66,11 @@ const CreateStreamForm = ({
   prevShouldCreateNewPipeline = true,
 }: Props) => {
   const [indexSetsRefetchInterval, setIndexSetsRefetchInterval] = useState<false | number>(false);
-  const { data: indexSetsData, isSuccess: isIndexSetsSuccess } = useIndexSetsList(false, indexSetsRefetchInterval);
+  const { data: indexSetsData, isSuccess: isIndexSetsSuccess } = useIndexSetsList(
+    false,
+    indexSetsRefetchInterval,
+    true,
+  );
 
   const validate = (values: FormValues) => {
     let errors = {};
@@ -102,22 +120,6 @@ const CreateStreamForm = ({
             id="description"
             help="What kind of messages are routed into this stream?"
           />
-          <SelectedIndexSetAlert indexSets={indexSets} selectedIndexSetId={values.index_set_id} />
-
-          <IndexSetSelect
-            indexSets={indexSets}
-            help={
-              <>
-                Messages that match this stream will be written to the configured Index Set. Index Sets are used to
-                rationally partition data to allow faster searches.
-                <br />
-                We recommend creating a new Index Set for each Input type.
-              </>
-            }
-          />
-          <RecommendedTooltip opened withArrow position="right" label="Recommended!">
-            <NewIndexSetButton onClick={handleNewIndexSetClick}>Create a new Index Set</NewIndexSetButton>
-          </RecommendedTooltip>
           <FormikInput
             label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
             help={<span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>}
@@ -132,6 +134,18 @@ const CreateStreamForm = ({
             id="create_new_pipeline"
             type="checkbox"
           />
+          <SubHeadline>Selet Index Set</SubHeadline>
+          <SelectedIndexSetAlert indexSets={indexSets} selectedIndexSetId={values.index_set_id} />
+          <IndexSetInfoText>
+            Messages that match this stream will be written to the configured Index Set. Index Sets are used to
+            rationally partition data to allow faster searches.
+            <br />
+            We recommend creating a new Index Set for each Input type.
+          </IndexSetInfoText>
+          <RecommendedTooltip opened withArrow position="right" label="Recommended!">
+            <NewIndexSetButton onClick={handleNewIndexSetClick}>Create a new Index Set</NewIndexSetButton>
+          </RecommendedTooltip>
+          <IndexSetSelect label="Select Index Set" indexSets={indexSets} />
 
           <Row>
             <ButtonCol md={12}>

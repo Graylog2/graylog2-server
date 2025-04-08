@@ -20,8 +20,10 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.cluster.health.AbsoluteValueWatermarkSettings;
 import org.graylog2.indexer.cluster.health.ByteSize;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeRole;
+import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.PercentageWatermarkSettings;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
@@ -38,6 +40,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +53,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -191,6 +195,38 @@ public class IndexerClusterCheckerThreadTest {
 
         Notification publishedNotification = argument.getValue();
         assertThat(publishedNotification.getType()).isEqualTo(notificationType);
+    }
+
+    @Test
+    public void testShardAllocationThresholdNotReached() {
+        when(cluster.clusterShardAllocation()).thenReturn(
+                new ClusterShardAllocation(100, List.of(
+                        new NodeShardAllocation("node1", 90),
+                        new NodeShardAllocation("node2", 90)
+                ))
+        );
+
+        indexerClusterCheckerThread.checkShardAllocation();
+        verifyNoInteractions(notificationService);
+    }
+
+    @Test
+    public void testShardAllocationThresholdReached() {
+        when(cluster.clusterShardAllocation()).thenReturn(
+                new ClusterShardAllocation(100, List.of(
+                        new NodeShardAllocation("node1", 91),
+                        new NodeShardAllocation("node2", 90)
+                ))
+        );
+
+        Notification notification = new NotificationImpl();
+        when(notificationService.buildNow()).thenReturn(notification);
+        indexerClusterCheckerThread.checkShardAllocation();
+        ArgumentCaptor<Notification> argument = ArgumentCaptor.forClass(Notification.class);
+        verify(notificationService, times(1)).publishIfFirst(argument.capture());
+
+        Notification publishedNotification = argument.getValue();
+        assertThat(publishedNotification.getType()).isEqualTo(Notification.Type.ES_SHARD_ALLOCATION_MAXIMUM);
     }
 
     private Set<NodeDiskUsageStats> mockNodeDiskUsageStats() {

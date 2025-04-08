@@ -58,13 +58,13 @@ const TokenManagement = () => {
       <p>
         Find tokens created by a given user:
         <br />
-        <code>username: givenName</code>
+        <code>username:givenName</code>
         <br />
       </p>
       <p>
         Find token by a given token name:
         <br />
-        <code>name: tokenName</code>
+        <code>name:tokenName</code>
         <br />
       </p>
     </>

@@ -24,8 +24,7 @@ export const DIAGNOSIS_HELP = {
   NETWORK_IO: 'Note that this value can be used to detect connection attempts and invalid traffic to an input.',
   INPUT_STATE:
     'An Input in running State is ready to receive messages. An Input in a failed or failing state has encountered a problem; click on the button below to view the associated error message.',
-  MESSAGE_ERROR_AT_INPUT:
-    'Each input type expects to receive messages in a particular format. Messages that break this format can be rejected by the Input, in which case they will not proceed to processing. To resolve these cases, review the messages that are being sent. More descriptive errors can be found in Graylog’s server.log file.',
+  MESSAGE_ERROR_AT_INPUT: `Each input type expects to receive messages in a particular format. Messages that break this format can be rejected by the Input, in which case they will not proceed to processing. To resolve these cases, review the messages that are being sent. More descriptive errors can be found in Graylog’s server.log file.`,
   MESSAGE_FAILED_TO_PROCESS:
     'Within Graylog, extractors and pipelines can be used to perform processing operations on messages such as parsing out fields. A pipeline rule that tries to perform a nonsensical operation, or that modifies the properties of a field in the message to a format that conflicts with the data type or field length limits of that field, can fail to process. Messages that fail to process in this fashion can be reviewed within the Processing and Indexing Failures stream.',
   MESSAGE_FAILED_TO_INDEX:
