@@ -9,13 +9,14 @@ import java.util.Optional;
 public record Config(
         Optional<String> productName,
         Optional<String> favicon,
-        Optional<SVG> logo,
+        Optional<Logo> logo,
         Optional<String> helpUrl,
         Optional<Login> login,
         Optional<Welcome> welcome,
         Optional<Navigation> navigation,
         Optional<Footer> footer
 ) {
+    public record Logo(SVG light, SVG dark) {}
     public record Login(Optional<SVG> background) {}
 
     public record Welcome(Optional<WelcomeItem> news,
