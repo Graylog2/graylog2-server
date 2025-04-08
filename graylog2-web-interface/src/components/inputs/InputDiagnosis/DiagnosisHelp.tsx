@@ -33,6 +33,16 @@ const StyledButton = styled(Button)(
   `,
 );
 
+const StyledOverlay = styled(Popover.Dropdown)`
+  white-space: pre-line;
+`;
+
+const HelpIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.info};
+  `,
+);
+
 const DiagnosisHelp = ({ helpText, children = null }: Props) => {
   const [showHelp, setShowHelp] = useState(false);
   const toggleHelp = () => setShowHelp((cur) => !cur);
@@ -48,10 +58,10 @@ const DiagnosisHelp = ({ helpText, children = null }: Props) => {
       withinPortal>
       <Popover.Target>
         <StyledButton bsStyle="transparent" bsSize={children ? 'xs' : 'medium'} onClick={toggleHelp}>
-          {children || <Icon name="question_mark" />}
+          {children || <HelpIcon name="help" />}
         </StyledButton>
       </Popover.Target>
-      <Popover.Dropdown>{helpText}</Popover.Dropdown>
+      <StyledOverlay>{helpText}</StyledOverlay>
     </Popover>
   );
 };

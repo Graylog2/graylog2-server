@@ -14,15 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.statemachine.tracer;
+package org.graylog.datanode.process.statemachine.tracer;
 
 import jakarta.inject.Inject;
-import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
-import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StateMachineTransitionLogger implements StateMachineTracer {
+public class StateMachineTransitionLogger<STATE, EVENT> implements StateMachineTracer<STATE, EVENT> {
 
     private static final Logger LOG = LoggerFactory.getLogger(StateMachineTransitionLogger.class);
 
@@ -31,12 +29,12 @@ public class StateMachineTransitionLogger implements StateMachineTracer {
     }
 
     @Override
-    public void trigger(OpensearchEvent trigger) {
+    public void trigger(EVENT trigger) {
 
     }
 
     @Override
-    public void transition(OpensearchEvent trigger, OpensearchState source, OpensearchState destination) {
+    public void transition(EVENT trigger, STATE source, STATE destination) {
         if (!source.equals(destination)) {
             LOG.debug("Triggered {}, source state: {}, destination: {}", trigger, source, destination);
         }

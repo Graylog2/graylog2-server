@@ -17,10 +17,10 @@
 package org.graylog.testing.datanode;
 
 
+import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
-import java.nio.file.Path;
 import java.util.Map;
 
 public interface DatanodeDevContainerBuilder {
@@ -41,6 +41,8 @@ public interface DatanodeDevContainerBuilder {
     DatanodeDevContainerBuilder network(Network network);
 
     DatanodeDevContainerBuilder env(Map<String, String> env);
+
+    DatanodeDevContainerBuilder pluginJarsProvider(PluginJarsProvider pluginJarsProvider);
 
     GenericContainer<?> build();
 }

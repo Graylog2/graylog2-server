@@ -61,7 +61,7 @@ export default class EventsWidget extends Widget {
 
   equals(other: any) {
     if (other instanceof EventsWidget) {
-      return widgetAttributesForComparison.every((key) => isDeepEqual(this._value[key], other[key]));
+      return widgetAttributesForComparison.every((key) => isDeepEqual(this[key], other[key]));
     }
 
     return false;
@@ -69,7 +69,7 @@ export default class EventsWidget extends Widget {
 
   equalsForSearch(other: any) {
     if (other instanceof EventsWidget) {
-      return widgetAttributesForComparison.every((key) => isEqualForSearch(this._value[key], other[key]));
+      return widgetAttributesForComparison.every((key) => isEqualForSearch(this[key], other[key]));
     }
 
     return false;

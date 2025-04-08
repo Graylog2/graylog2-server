@@ -35,6 +35,7 @@ import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.Configuration.SafeClassesValidator;
 import org.graylog2.configuration.Documentation;
+import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ import java.util.Set;
  * Helper class to hold configuration of DataNode
  */
 @SuppressWarnings("FieldMayBeFinal")
-public class Configuration implements CommonNodeConfiguration {
+public class Configuration implements CommonNodeConfiguration, NativeLibPathConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
     public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
     public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";

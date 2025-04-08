@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Update Map when center/zoom parameters have been changed manually."
+
+issues = ["19002"]
+pulls = ["22220"]

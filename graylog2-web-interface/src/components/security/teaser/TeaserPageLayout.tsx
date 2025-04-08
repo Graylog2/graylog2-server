@@ -77,7 +77,7 @@ const StyledIcon = styled(Icon)`
 const LEFT_COLUMN_ITEM_LIST = [
   'Anomaly Detection AI',
   'Cloud Option',
-  'Achiving',
+  'Archiving',
   'Audit Logs for Graylog Cloud',
   'Dynamic Lookup Tables',
   'Advanced Alerting With Scripting',
@@ -93,7 +93,7 @@ const RIGHT_COLUMN_ITEM_LIST = [
   'Parameterized Dashboarding',
   'Input & Output Integrations',
   'Threat Management',
-  'Search Workflow, Temlplates & Filters',
+  'Search Workflow, Templates & Filters',
   'Integrated Search & Alerting',
   'SOAR Integrations',
 ];

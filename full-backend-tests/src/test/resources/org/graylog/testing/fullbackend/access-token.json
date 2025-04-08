@@ -13,6 +13,17 @@
       "token": "1f56ccn5hpokf9f8d91pn0j7tqlv7552f92jt6i4lnb3u7b5osjq",
       "username": "admin",
       "NAME": "test"
+    },
+    {
+      "_id": {
+        "$oid": "67ebf76d4979bc4f1ebb725a"
+      },
+      "last_access": {
+        "$date": "2020-02-26T21:50:12.454Z"
+      },
+      "token": "a61deeb7ef49fd4e53959b5d8b765b14a04546480bee5192d9086",
+      "username": "admin",
+      "NAME": "test"
     }
   ]
 }

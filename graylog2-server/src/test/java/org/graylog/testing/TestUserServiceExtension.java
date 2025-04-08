@@ -18,6 +18,7 @@ package org.graylog.testing;
 
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
+import static org.mockito.Mockito.mock;
 
 public class TestUserServiceExtension implements ParameterResolver {
     @Override
@@ -39,7 +41,7 @@ public class TestUserServiceExtension implements ParameterResolver {
 
         if (TestUserService.class.equals(parameterType)) {
             final MongoDBTestService dbTestService = requireNonNull((MongoDBTestService) extensionContext.getStore(MongoDBExtension.NAMESPACE).get(MongoDBTestService.class));
-            return new TestUserService(dbTestService.mongoConnection());
+            return new TestUserService(dbTestService.mongoConnection(), mock(ClusterConfigService.class));
         }
 
         throw new ParameterResolutionException("Unsupported parameter type: " + parameterContext.getParameter().getName());

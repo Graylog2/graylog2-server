@@ -22,6 +22,7 @@ import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.completebackend.GraylogBackendExtension;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
+import org.graylog.testing.completebackend.NoPluginJarsProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -98,4 +99,6 @@ public @interface ContainerMatrixTestsConfiguration {
     ConfigurationParameter[] additionalConfigurationParameters() default {};
 
     boolean withWebhookServerEnabled() default false;
+
+    Class<? extends PluginJarsProvider> datanodePluginJarsProvider() default NoPluginJarsProvider.class;
 }
