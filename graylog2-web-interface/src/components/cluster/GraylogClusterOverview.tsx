@@ -27,6 +27,7 @@ import { Spinner } from 'components/common';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import ClusterTrafficGraph from 'components/cluster/ClusterTrafficGraph';
 import GraphDaysContextProvider from 'components/common/Graph/contexts/GraphDaysContextProvider';
+import useProductName from 'customization/useProductName';
 
 const StyledDl = styled.dl`
   margin-bottom: 0;
@@ -37,7 +38,11 @@ const StyledH2 = styled.h2(
   `,
 );
 
-const Header = () => <StyledH2>Graylog cluster</StyledH2>;
+const Header = () => {
+  const productName = useProductName();
+
+  return <StyledH2>{productName} cluster</StyledH2>;
+};
 
 const ClusterInfo = () => {
   const nodes = useStore(NodesStore);

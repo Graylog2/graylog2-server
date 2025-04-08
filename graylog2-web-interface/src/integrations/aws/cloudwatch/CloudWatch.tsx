@@ -26,7 +26,6 @@ import { StepsContext } from 'integrations/aws/context/Steps';
 import { FormDataContext } from 'integrations/aws/context/FormData';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
-// import useHistory from 'routing/useHistory';
 
 import StepKinesis from './StepKinesis';
 import StepHealthCheck from './StepHealthCheck';

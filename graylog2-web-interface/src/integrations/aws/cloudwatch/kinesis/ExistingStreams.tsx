@@ -29,6 +29,7 @@ import { ApiRoutes, DocsRoutes } from 'integrations/aws/common/Routes';
 import { renderOptions } from 'integrations/aws/common/Options';
 import formValidation from 'integrations/aws/utils/formValidation';
 import Spinner from 'components/common/Spinner';
+import useProductName from 'customization/useProductName';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
 
@@ -48,6 +49,7 @@ const KinesisStreams = ({
   const [formError, setFormError] = useState(null);
   const { availableStreams, setLogData } = useContext(ApiContext);
   const { clearSidebar, setSidebar } = useContext(SidebarContext);
+  const productName = useProductName();
   const [logDataStatus, setLogDataUrl] = useFetch(
     null,
     (response) => {
@@ -71,8 +73,8 @@ const KinesisStreams = ({
           </p>
 
           <p>
-            Graylog also supports the ability to create a Kinesis stream for you and subscribe it to a CloudWatch log
-            group of your choice. Please be aware that this option will create additional resources in your AWS
+            {productName} also supports the ability to create a Kinesis stream for you and subscribe it to a CloudWatch
+            log group of your choice. Please be aware that this option will create additional resources in your AWS
             environment that will incur billing charges.
           </p>
         </AutoSetupContent>
@@ -87,7 +89,7 @@ const KinesisStreams = ({
         </Button>
       </Panel>,
     );
-  }, []);
+  }, [productName]);
 
   useEffect(() => {
     if (logDataStatus.error) {

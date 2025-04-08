@@ -23,6 +23,7 @@ declare global {
 }
 
 export type AppConfigs = {
+  branding: { product_name: string };
   gl2ServerUrl: string;
   gl2AppPathPrefix: string;
   rootTimeZone: string;
@@ -99,6 +100,10 @@ const AppConfig = {
 
   pluginUISettings(key: string): any {
     return appConfig()?.pluginUISettings?.[key] ?? {};
+  },
+
+  branding(): { product_name: string } | undefined {
+    return appConfig()?.branding;
   },
 };
 

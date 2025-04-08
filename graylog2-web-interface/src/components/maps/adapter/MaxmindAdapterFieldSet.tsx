@@ -46,8 +46,8 @@ const MaxmindAdapterFieldSet = ({
   const isCloud = AppConfig.isCloud();
 
   const pathsForCloud = {
-    IPINFO_STANDARD_LOCATION: '/etc/graylog/server/standard_location.mmdb',
-    IPINFO_ASN: '/etc/graylog/server/asn.mmdb',
+    IPINFO_STANDARD_LOCATION: '/etc/server/standard_location.mmdb',
+    IPINFO_ASN: '/etc/server/asn.mmdb',
   };
 
   const ipInfoDatabaseTypes = [

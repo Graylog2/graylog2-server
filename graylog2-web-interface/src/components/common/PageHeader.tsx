@@ -75,8 +75,8 @@ const Description = styled.p`
 `;
 
 const LIFECYCLE_DEFAULT_MESSAGES = {
-  experimental: 'This Graylog feature is new and should be considered experimental.',
-  legacy: 'This feature has been discontinued and will be removed in a future Graylog version.',
+  experimental: 'This feature is new and should be considered experimental.',
+  legacy: 'This feature has been discontinued and will be removed in a future version.',
 };
 
 const LifecycleIndicator = ({

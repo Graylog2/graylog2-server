@@ -115,9 +115,9 @@ class NotificationSettingsForm extends React.Component<
             clearable
           />
           <p>
-            Graylog sends Notifications for Alerts every time they occur. Set a Grace Period to control how long Graylog
-            should wait before sending Notifications again. Note that Events with keys will have a Grace Period for each
-            different key value.
+            Notifications for alerts are sent every time they occur. Set a Grace Period to control how long to wait
+            before sending Notifications again. Note that Events with keys will have a Grace Period for each different
+            key value.
           </p>
         </FormGroup>
 
