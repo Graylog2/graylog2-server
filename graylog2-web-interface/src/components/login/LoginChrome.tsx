@@ -44,26 +44,22 @@ const Background = styled.div`
   width: 100%;
 `;
 
-const svgDataUrl = (content: string) => `data:image/svg+xml;base64,${window.btoa(content)}`;
-
-const _backgroundImage = AppConfig.branding()?.login?.background
-  ? svgDataUrl(AppConfig.branding()?.login?.background)
-  : backgroundImage;
-
-const BackgroundText = styled.div`
-  z-index: -1;
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  vertical-align: middle;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  padding: 0 30px;
-  background-image: url(${_backgroundImage});
-  background-position: center;
-  background-size: cover;
-`;
+const BackgroundText = styled.div<{ $backgroundImage: string }>(
+  ({ $backgroundImage }) => css`
+    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    vertical-align: middle;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    padding: 0 30px;
+    background-image: url(${$backgroundImage});
+    background-position: center;
+    background-size: cover;
+  `,
+);
 
 const NotificationsContainer = styled.div`
   position: absolute;
@@ -119,11 +115,11 @@ const CustomLogo = styled.div`
   }
 `;
 
+const useCustomLogo = () =>
+  useMemo(() => (AppConfig.branding()?.logo ? DOMPurify.sanitize(AppConfig.branding()?.logo) : undefined), []);
+
 const CustomizableLogo = () => {
-  const customLogo = useMemo(
-    () => (AppConfig.branding()?.logo ? DOMPurify.sanitize(AppConfig.branding()?.logo) : undefined),
-    [],
-  );
+  const customLogo = useCustomLogo();
 
   return customLogo ? (
     <CustomLogo dangerouslySetInnerHTML={{ __html: customLogo }} />
@@ -143,23 +139,35 @@ type Props = {
   children: React.ReactNode;
 };
 
-const LoginChrome = ({ children }: Props) => (
-  <LoginContainer>
-    <LoginBox>
-      <WelcomeMessage>Welcome to Graylog</WelcomeMessage>
-      {children}
-    </LoginBox>
-    <Background>
-      <NotificationsContainer>
-        <PublicNotifications readFromConfig />
-      </NotificationsContainer>
-      <BackgroundText>
-        <TextContainer>
-          <CustomizableLogo />
-        </TextContainer>
-      </BackgroundText>
-    </Background>
-  </LoginContainer>
-);
+const svgDataUrl = (content: string) => `data:image/svg+xml;base64,${window.btoa(content)}`;
+const useLoginBackground = () =>
+  useMemo(
+    () =>
+      AppConfig.branding()?.login?.background ? svgDataUrl(AppConfig.branding()?.login?.background) : backgroundImage,
+    [],
+  );
+
+const LoginChrome = ({ children }: Props) => {
+  const loginBackground = useLoginBackground();
+
+  return (
+    <LoginContainer>
+      <LoginBox>
+        <WelcomeMessage>Welcome to Graylog</WelcomeMessage>
+        {children}
+      </LoginBox>
+      <Background>
+        <NotificationsContainer>
+          <PublicNotifications readFromConfig />
+        </NotificationsContainer>
+        <BackgroundText $backgroundImage={loginBackground}>
+          <TextContainer>
+            <CustomizableLogo />
+          </TextContainer>
+        </BackgroundText>
+      </Background>
+    </LoginContainer>
+  );
+};
 
 export default LoginChrome;
