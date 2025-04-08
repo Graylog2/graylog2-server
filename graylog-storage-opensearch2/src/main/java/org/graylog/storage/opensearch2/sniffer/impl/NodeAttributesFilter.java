@@ -14,21 +14,47 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.storage.opensearch2.sniffer.impl;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.graylog.storage.opensearch2.sniffer.SnifferFilter;
+import org.graylog2.configuration.ElasticsearchClientConfiguration;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-class FilteredOpenSearchNodesSniffer implements NodesSniffer {
-    private final String attribute;
-    private final String value;
+public class NodeAttributesFilter implements SnifferFilter {
 
-    static FilteredOpenSearchNodesSniffer create(String filter) {
+    private final boolean enabled;
+    private final Predicate<Node> filter;
+
+    @Inject
+    public NodeAttributesFilter(ElasticsearchClientConfiguration configuration) {
+        this(configuration.discoveryEnabled(), configuration.discoveryFilter());
+    }
+
+    public NodeAttributesFilter(boolean enabled, String filterString) {
+        this.enabled = enabled;
+        this.filter = create(filterString);
+    }
+
+    @Override
+    public boolean enabled() {
+        return enabled;
+    }
+
+    @Override
+    public List<Node> filterNodes(List<Node> nodes) {
+        return nodes.stream()
+                .filter(filter)
+                .collect(Collectors.toList());
+    }
+
+    static Predicate<Node> create(String filter) {
         final String attribute;
         final String value;
         if (!Strings.isNullOrEmpty(filter)) {
@@ -42,28 +68,15 @@ class FilteredOpenSearchNodesSniffer implements NodesSniffer {
             attribute = null;
             value = null;
         }
-
-        return new FilteredOpenSearchNodesSniffer(attribute, value);
+        return node -> nodeMatchesFilter(node, attribute, value);
     }
 
-    @VisibleForTesting
-    FilteredOpenSearchNodesSniffer(String attribute, String value) {
-        this.attribute = attribute;
-        this.value = value;
-    }
+    private static boolean nodeMatchesFilter(Node node, String attribute, String value) {
 
-    @Override
-    public List<Node> sniff(List<Node> nodes) {
         if (attribute == null || value == null) {
-            return nodes;
+            return true;
         }
 
-        return nodes.stream()
-                .filter(node -> nodeMatchesFilter(node, attribute, value))
-                .collect(Collectors.toList());
-    }
-
-    private boolean nodeMatchesFilter(Node node, String attribute, String value) {
         return node.getAttributes()
                 .getOrDefault(attribute, Collections.emptyList())
                 .contains(value);

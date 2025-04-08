@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.storage.opensearch2.sniffer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.graylog.storage.opensearch2.sniffer.impl.NodeAttributesFilter;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class FilteredOpenSearchNodesSnifferTest {
+class NodeAttributesFilterTest {
     private final Node nodeOnRack23 = nodeOnRack(23);
     private final Node nodeOnRack42 = nodeOnRack(42);
     private final Node nodeWithNoAttributes = mockNode(Collections.emptyMap());
@@ -39,45 +39,43 @@ class FilteredOpenSearchNodesSnifferTest {
     void doesNotFilterNodesIfNoFilterIsSet() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer(null, null);
+        final SnifferFilter nodesSniffer = new NodeAttributesFilter(false, null);
 
-        assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
+        assertThat(nodesSniffer.filterNodes(nodes)).isEqualTo(nodes);
     }
 
     @Test
     void worksWithEmptyNodesListIfFilterIsSet() throws Exception {
         final List<Node> nodes = Collections.emptyList();
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer("rack", "42");
+        final SnifferFilter nodesSniffer = new NodeAttributesFilter(true, "rack:42");
 
-        assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
+        assertThat(nodesSniffer.filterNodes(nodes)).isEqualTo(nodes);
     }
 
     @Test
     void returnsNodesMatchingGivenFilter() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer("rack", "42");
+        final SnifferFilter nodesSniffer = new NodeAttributesFilter(true, "rack:42");
 
-        assertThat(nodesSniffer.sniff(nodes)).containsExactly(nodeOnRack42);
+        assertThat(nodesSniffer.filterNodes(nodes)).containsExactly(nodeOnRack42);
     }
 
     @Test
     void returnsNoNodesIfFilterDoesNotMatch() throws Exception {
         final List<Node> nodes = mockNodes();
-
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer("location", "alaska");
-
-        assertThat(nodesSniffer.sniff(nodes)).isEmpty();
+        final SnifferFilter nodesSniffer = new NodeAttributesFilter(true, "location:alaska");
+        assertThat(nodesSniffer.filterNodes(nodes)).isEmpty();
     }
 
     @Test
     void returnsAllNodesIfFilterMatchesAll() throws Exception {
         final List<Node> nodes = mockNodes();
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer("always", "true");
+        final SnifferFilter nodesSniffer = new NodeAttributesFilter(true, "always:true");
 
-        assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
+        assertThat(nodesSniffer.filterNodes(nodes)).isEqualTo(nodes);
     }
 
     @Test
@@ -87,9 +85,9 @@ class FilteredOpenSearchNodesSnifferTest {
         ));
         final List<Node> nodes = Collections.singletonList(matchingNode);
 
-        final NodesSniffer nodesSniffer = new FilteredOpenSearchNodesSniffer("something", "42");
+        final SnifferFilter nodesSniffer = new NodeAttributesFilter(true, "something:42");
 
-        assertThat(nodesSniffer.sniff(nodes)).isEqualTo(nodes);
+        assertThat(nodesSniffer.filterNodes(nodes)).isEqualTo(nodes);
     }
 
     private Node nodeOnRack(int rackNo) {
@@ -110,11 +108,5 @@ class FilteredOpenSearchNodesSnifferTest {
 
     private List<Node> mockNodes() {
         return ImmutableList.of(nodeOnRack42, nodeOnRack23, nodeWithNoAttributes);
-    }
-
-    private NodesSniffer mockSniffer(List<Node> nodes) throws IOException {
-        final NodesSniffer mockSniffer = mock(NodesSniffer.class);
-        when(mockSniffer.sniff(nodes)).thenReturn(nodes);
-        return mockSniffer;
     }
 }
