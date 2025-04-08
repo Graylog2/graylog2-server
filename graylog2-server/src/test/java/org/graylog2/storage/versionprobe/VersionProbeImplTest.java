@@ -29,6 +29,7 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.JwtSecret;
@@ -37,7 +38,6 @@ import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -78,7 +78,7 @@ class VersionProbeImplTest {
     }
 
     @Test
-    void testSuccessfulVersionProbe() throws URISyntaxException, IOException {
+    void testSuccessfulVersionProbe() throws URISyntaxException {
         server.enqueue(new MockResponse().setBody(OPENSEARCH_RESPONSE));
         final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
         final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 100, Duration.milliseconds(10), false, versionProbeListener);
@@ -188,7 +188,7 @@ class VersionProbeImplTest {
 
     @Nonnull
     private static JwtSecret randomSecret() {
-        return new JwtSecret(RandomStringUtils.randomAlphabetic(96));
+        return new JwtSecret(RandomStringUtils.secure().nextAlphanumeric(96));
     }
 
 
