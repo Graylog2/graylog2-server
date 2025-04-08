@@ -269,9 +269,11 @@ describe('IndexSetFieldTypesList', () => {
       const tableRow = await screen.findByTestId('table-row-field-1');
       const resetButton = await within(tableRow).findByRole('button', { name: /reset/i });
       fireEvent.click(resetButton);
-      await screen.findByLabelText(/Remove field type overrides/i);
-      const modal = await screen.findByTestId('modal-form');
-      await within(modal).findByText('Rotate affected indices after change');
+
+      await screen.findByRole('heading', { name: /Remove field type overrides/i });
+      await screen.findByText('Rotate affected indices after change');
+
+      const modal = await screen.findByRole('dialog');
 
       expect(modal).toHaveTextContent(
         'After removing the overridden field type for field-1 in index set title, the settings of your search engine will be applied for fields: field-1',
@@ -296,9 +298,10 @@ describe('IndexSetFieldTypesList', () => {
       const tableRow = await screen.findByTestId('table-row-field-2');
       const resetButton = await within(tableRow).findByRole('button', { name: /reset/i });
       fireEvent.click(resetButton);
-      await screen.findByLabelText(/Remove field type overrides/i);
-      const modal = await screen.findByTestId('modal-form');
-      await within(modal).findByText('Rotate affected indices after change');
+      await screen.findByRole('heading', { name: /Remove field type overrides/i });
+      await screen.findByText('Rotate affected indices after change');
+
+      const modal = await screen.findByRole('dialog');
 
       expect(modal).toHaveTextContent(
         'After removing the overridden field type for field-2 in index set title, the settings from Profile-1 ( namely field-2: Boolean) will be applied',
@@ -448,7 +451,7 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const button = await screen.findByTitle('Set field type profile');
       fireEvent.click(button);
-      const modal = await screen.findByTestId('modal-form');
+      const modal = await screen.findByRole('dialog');
       await within(modal).findByRole('button', { name: /Set Profile/i, hidden: true });
     });
   });

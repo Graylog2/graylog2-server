@@ -51,9 +51,9 @@ describe('QueryTitleEditModal', () => {
     await screen.findByText(modalHeadline);
   });
 
-  it('has correct initial input value', () => {
+  it('has correct initial input value', async () => {
     let modalRef;
-    const { getByDisplayValue } = render(
+    render(
       <QueryTitleEditModal
         ref={(ref) => {
           modalRef = ref;
@@ -64,13 +64,15 @@ describe('QueryTitleEditModal', () => {
 
     openModal(modalRef);
 
-    expect(getByDisplayValue('CurrentTitle')).not.toBeNull();
+    const titleInput = await screen.findByRole('textbox', { name: /Title/i });
+
+    expect(titleInput).toHaveValue('CurrentTitle');
   });
 
   it('updates query title and closes', async () => {
     let modalRef;
     const onTitleChangeFn = jest.fn();
-    const { getByDisplayValue, getByRole, queryByText } = render(
+    const { getByRole, queryByText } = render(
       <QueryTitleEditModal
         ref={(ref) => {
           modalRef = ref;
@@ -80,7 +82,10 @@ describe('QueryTitleEditModal', () => {
     );
 
     openModal(modalRef);
-    const titleInput = getByDisplayValue('CurrentTitle');
+    const titleInput = await screen.findByRole('textbox', { name: /Title/i });
+
+    expect(titleInput).toHaveValue('CurrentTitle');
+
     const saveButton = getByRole('button', { name: /update title/i, hidden: true });
 
     fireEvent.change(titleInput, { target: { value: 'NewTitle' } });

@@ -97,7 +97,7 @@ const IndexSetUpdateForm = ({ initialValues, indexSets, stream }: Props) => {
           <Formik<FormValues> initialValues={_initialValues} onSubmit={onSave} validate={validate}>
             {({ isSubmitting, isValidating }) => (
               <Form>
-                <Modal.Header closeButton>
+                <Modal.Header>
                   <Modal.Title>Edit Stream IndexSet</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

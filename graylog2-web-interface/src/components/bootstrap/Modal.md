@@ -10,7 +10,7 @@ const ModalExample = () => {
       <Button onClick={toggleShow}>Open Modal</Button>
 
       <Modal show={show} onHide={toggleShow}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>Lorem Ipsum Presents:</Modal.Title>
         </Modal.Header>
 

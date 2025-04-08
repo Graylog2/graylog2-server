@@ -58,7 +58,7 @@ describe('ClusterSupportBundleOverview', () => {
 
     fireEvent.click(deleteButton);
 
-    const confirmButton = screen.getByRole('button', { name: /Confirm/i, hidden: true });
+    const confirmButton = await screen.findByRole('button', { name: /Confirm/i });
 
     expect(confirmButton).toBeInTheDocument();
 
