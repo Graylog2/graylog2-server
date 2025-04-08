@@ -29,6 +29,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -36,6 +37,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -209,7 +211,8 @@ public class InputsResource extends AbstractInputsResource {
     })
     @RequiresPermissions(RestPermissions.INPUTS_CREATE)
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true)
+    public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
+                           @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
         try {
             throwBadRequestIfNotGlobal(lr);
