@@ -22,115 +22,166 @@ import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.Nonnull;
-import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import okhttp3.OkHttpClient;
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.assertj.core.api.Assertions;
-import org.graylog2.TestHttpServer;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.JwtSecret;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Optional;
 
 class VersionProbeImplTest {
 
-    @Test
-    void testSuccessfulVersionProbe() {
-        TestHttpServer.withServer(builder -> builder.registerResource(OpensearchHealthResponse.class),
-                server -> {
-                    final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
-                    final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 100, Duration.milliseconds(10), false, versionProbeListener);
-                    final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.getBaseUri()));
-                    Assertions.assertThat(probedVersion)
-                            .isPresent()
-                            .hasValueSatisfying(searchVersion -> Assertions.assertThat(searchVersion).isEqualTo(SearchVersion.opensearch("2.15.0")));
+    public static final String OPENSEARCH_RESPONSE = """
+            {
+              "name" : "tdvorak-ThinkPad-T14s-Gen-1",
+              "cluster_name" : "datanode-cluster",
+              "cluster_uuid" : "-PmIXUWGQHukeW7275a9fg",
+              "version" : {
+                "distribution" : "opensearch",
+                "number" : "2.15.0",
+                "build_type" : "tar",
+                "build_hash" : "61dbcd0795c9bfe9b81e5762175414bc38bbcadf",
+                "build_date" : "2024-06-20T03:26:49.193630411Z",
+                "build_snapshot" : false,
+                "lucene_version" : "9.10.0",
+                "minimum_wire_compatibility_version" : "7.10.0",
+                "minimum_index_compatibility_version" : "7.0.0"
+              },
+              "tagline" : "The OpenSearch Project: https://opensearch.org/"
+            }
+            """;
+    private final MockWebServer server = new MockWebServer();
 
-                    Assertions.assertThat(versionProbeListener.getErrors()).isEmpty();
-                    Assertions.assertThat(versionProbeListener.getRetries()).isEmpty();
-                });
+    @BeforeEach
+    void setUp() throws IOException {
+        server.start();
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        server.shutdown();
+    }
+
+    @Test
+    void testSuccessfulVersionProbe() throws URISyntaxException, IOException {
+        server.enqueue(new MockResponse().setBody(OPENSEARCH_RESPONSE));
+        final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
+        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 100, Duration.milliseconds(10), false, versionProbeListener);
+        final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.url("/").url().toURI()));
+        Assertions.assertThat(probedVersion)
+                .isPresent()
+                .hasValueSatisfying(searchVersion -> Assertions.assertThat(searchVersion).isEqualTo(SearchVersion.opensearch("2.15.0")));
+
+        Assertions.assertThat(versionProbeListener.getErrors()).isEmpty();
+        Assertions.assertThat(versionProbeListener.getRetries()).isEmpty();
+
     }
 
     @Test
     void testFailingVersionProbe() {
-        TestHttpServer.withServer(
-                builder -> builder.registerResource(OpensearchUnauthorizedResponse.class),
-                server -> {
-                    final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
-                    final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 3, Duration.milliseconds(10), false, versionProbeListener);
-                    final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.getBaseUri().resolve("/unauthorized/")));
-                    Assertions.assertThat(probedVersion)
-                            .isEmpty();
 
-                    Assertions.assertThat(versionProbeListener.getErrors())
-                            .hasSize(4)
-                            .contains("Unable to retrieve version from indexer node: Retrying failed to complete successfully after 3 attempts.")
-                            .anySatisfy(error -> Assertions.assertThat(error).contains("an exception occurred while deserializing error response"));
-                });
+        server.setDispatcher(alwaysUnauthorized());
+
+        final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
+        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 3, Duration.milliseconds(10), false, versionProbeListener);
+        final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.url("/").uri()));
+        Assertions.assertThat(probedVersion)
+                .isEmpty();
+
+        Assertions.assertThat(versionProbeListener.getErrors())
+                .hasSize(4)
+                .contains("Unable to retrieve version from indexer node: Retrying failed to complete successfully after 3 attempts.")
+                .anySatisfy(error -> Assertions.assertThat(error).contains("an exception occurred while deserializing error response"));
+
+    }
+
+    @Nonnull
+    private static Dispatcher alwaysUnauthorized() {
+        return new Dispatcher() {
+            @Nonnull
+            @Override
+            public MockResponse dispatch(@Nonnull RecordedRequest recordedRequest) throws InterruptedException {
+                return new MockResponse()
+                        .setBody("unauthorized")
+                        .setResponseCode(Response.Status.UNAUTHORIZED.getStatusCode());
+            }
+        };
     }
 
     @Test
     void testVersionProbeWithJwtAuth() {
+
         final JwtSecret secret = randomSecret();
-        TestHttpServer.withServer(
-                builder -> {
-                    builder.registerResource(jwtAuthFilter(secret));
-                    builder.registerResource(OpensearchHealthResponse.class);
-                },
-                server -> {
-                    final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
 
-                    final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(secret), 3, Duration.milliseconds(10), true, versionProbeListener);
-                    final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.getBaseUri()));
-                    Assertions.assertThat(probedVersion)
-                            .isPresent()
-                            .hasValueSatisfying(searchVersion -> Assertions.assertThat(searchVersion).isEqualTo(SearchVersion.opensearch("2.15.0")));
+        server.setDispatcher(jwtCheckingDispatcher(secret));
 
-                    Assertions.assertThat(versionProbeListener.getErrors()).isEmpty();
-                    Assertions.assertThat(versionProbeListener.getRetries()).isEmpty();
+        final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
 
-                    final CollectingVersionProbeListener versionProbeListenerWithWrongSecret = new CollectingVersionProbeListener();
-                    final VersionProbe versionProbeWithWrongSecret = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 3, Duration.milliseconds(10), true, versionProbeListenerWithWrongSecret);
-                    final Optional<SearchVersion> probedVersionWithWrongSecret = versionProbeWithWrongSecret.probe(Collections.singleton(server.getBaseUri()));
-                    Assertions.assertThat(probedVersionWithWrongSecret)
-                            .isEmpty();
+        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(secret), 3, Duration.milliseconds(10), true, versionProbeListener);
+        final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.url("/").uri()));
+        Assertions.assertThat(probedVersion)
+                .isPresent()
+                .hasValueSatisfying(searchVersion -> Assertions.assertThat(searchVersion).isEqualTo(SearchVersion.opensearch("2.15.0")));
 
-                    Assertions.assertThat(versionProbeListenerWithWrongSecret.getErrors()).hasSize(4)
-                            .contains("Unable to retrieve version from indexer node: Retrying failed to complete successfully after 3 attempts.")
-                            .anySatisfy(error -> Assertions.assertThat(error).contains("an exception occurred while deserializing error response"));
-                    Assertions.assertThat(versionProbeListenerWithWrongSecret.getRetries()).hasSize(3);
-                });
+        Assertions.assertThat(versionProbeListener.getErrors()).isEmpty();
+        Assertions.assertThat(versionProbeListener.getRetries()).isEmpty();
+
+        final CollectingVersionProbeListener versionProbeListenerWithWrongSecret = new CollectingVersionProbeListener();
+        final VersionProbe versionProbeWithWrongSecret = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 3, Duration.milliseconds(10), true, versionProbeListenerWithWrongSecret);
+        final Optional<SearchVersion> probedVersionWithWrongSecret = versionProbeWithWrongSecret.probe(Collections.singleton(server.url("/").uri()));
+        Assertions.assertThat(probedVersionWithWrongSecret)
+                .isEmpty();
+
+        Assertions.assertThat(versionProbeListenerWithWrongSecret.getErrors()).hasSize(4)
+                .contains("Unable to retrieve version from indexer node: Retrying failed to complete successfully after 3 attempts.")
+                .anySatisfy(error -> Assertions.assertThat(error).contains("an exception occurred while deserializing error response"));
+        Assertions.assertThat(versionProbeListenerWithWrongSecret.getRetries()).hasSize(3);
+
     }
 
     @Nonnull
-    private static ContainerRequestFilter jwtAuthFilter(JwtSecret secret) {
-        return requestContext -> {
-            final Optional<? extends Jwt<?, ?>> parsedToken = Optional.ofNullable(requestContext.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
-                    .map(header -> header.substring("Bearer ".length()))
-                    .flatMap(token -> {
-                        final JwtParser parser = Jwts.parser()
-                                .verifyWith(secret.getSigningKey())
-                                .requireSubject("admin")
-                                .requireIssuer("graylog")
-                                .build();
-                        try {
-                            return Optional.of(parser.parse(token));
-                        } catch (Throwable e) {
-                            return Optional.empty();
-                        }
-                    });
+    private static Dispatcher jwtCheckingDispatcher(JwtSecret secret) {
+        return new Dispatcher() {
+            @Nonnull
+            @Override
+            public MockResponse dispatch(@Nonnull RecordedRequest recordedRequest) {
+                final Optional<? extends Jwt<?, ?>> parsedToken = Optional.ofNullable(recordedRequest.getHeaders().get(HttpHeaders.AUTHORIZATION))
+                        .map(header -> header.substring("Bearer ".length()))
+                        .flatMap(token -> {
+                            final JwtParser parser = Jwts.parser()
+                                    .verifyWith(secret.getSigningKey())
+                                    .requireSubject("admin")
+                                    .requireIssuer("graylog")
+                                    .build();
+                            try {
+                                return Optional.of(parser.parse(token));
+                            } catch (Throwable e) {
+                                return Optional.empty();
+                            }
+                        });
 
-            if (parsedToken.isEmpty()) {
-                requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-                        .entity("Failed to parse auth header")
-                        .type(MediaType.TEXT_PLAIN_TYPE)
-                        .build());
+                if (parsedToken.isEmpty()) {
+                    return new MockResponse()
+                            .setBody("Failed to parse auth header")
+                            .setResponseCode(Response.Status.UNAUTHORIZED.getStatusCode());
+                } else {
+                    return new MockResponse().setBody(OPENSEARCH_RESPONSE);
+                }
             }
         };
     }
