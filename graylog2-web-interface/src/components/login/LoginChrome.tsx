@@ -24,6 +24,7 @@ import PublicNotifications from 'components/common/PublicNotifications';
 import backgroundImage from 'images/auth/login-bg.svg';
 import { Logo } from 'components/perspectives/DefaultBrand';
 import AppConfig from 'util/AppConfig';
+import useThemes from 'theme/hooks/useThemes';
 
 const LogoContainer = styled.div`
   display: block;
@@ -115,11 +116,15 @@ const CustomLogo = styled.div`
   }
 `;
 
-const useCustomLogo = () =>
-  useMemo(() => (AppConfig.branding()?.logo ? DOMPurify.sanitize(AppConfig.branding()?.logo) : undefined), []);
+const useCustomLogo = (theme: 'dark' | 'light') =>
+  useMemo(
+    () => (AppConfig.branding()?.logo?.[theme] ? DOMPurify.sanitize(AppConfig.branding().logo[theme]) : undefined),
+    [theme],
+  );
 
 const CustomizableLogo = () => {
-  const customLogo = useCustomLogo();
+  const { colorScheme } = useThemes('dark', false);
+  const customLogo = useCustomLogo(colorScheme);
 
   return customLogo ? (
     <CustomLogo dangerouslySetInnerHTML={{ __html: customLogo }} />
