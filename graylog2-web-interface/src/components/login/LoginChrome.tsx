@@ -15,12 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import DOMPurify from 'dompurify';
 
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
 import backgroundImage from 'images/auth/login-bg.svg';
 import { Logo } from 'components/perspectives/DefaultBrand';
+import AppConfig from 'util/AppConfig';
 
 const LogoContainer = styled.div`
   display: block;
@@ -41,6 +44,12 @@ const Background = styled.div`
   width: 100%;
 `;
 
+const svgDataUrl = (content: string) => `data:image/svg+xml;base64,${window.btoa(content)}`;
+
+const _backgroundImage = AppConfig.branding()?.login?.background
+  ? svgDataUrl(AppConfig.branding()?.login?.background)
+  : backgroundImage;
+
 const BackgroundText = styled.div`
   z-index: -1;
   display: flex;
@@ -51,7 +60,7 @@ const BackgroundText = styled.div`
   height: 100%;
   width: 100%;
   padding: 0 30px;
-  background-image: url(${backgroundImage});
+  background-image: url(${_backgroundImage});
   background-position: center;
   background-size: cover;
 `;
@@ -103,6 +112,33 @@ const Highlight = styled.span(
   `,
 );
 
+const CustomLogo = styled.div`
+  svg {
+    width: 100%;
+    height: 200px;
+  }
+`;
+
+const CustomizableLogo = () => {
+  const customLogo = useMemo(
+    () => (AppConfig.branding()?.logo ? DOMPurify.sanitize(AppConfig.branding()?.logo) : undefined),
+    [],
+  );
+
+  return customLogo ? (
+    <CustomLogo dangerouslySetInnerHTML={{ __html: customLogo }} />
+  ) : (
+    <>
+      <LogoContainer>
+        <Logo color="#ffffff" />
+      </LogoContainer>
+      <Claim>
+        Data. Insights. <Highlight>Answers.</Highlight>
+      </Claim>
+    </>
+  );
+};
+
 type Props = {
   children: React.ReactNode;
 };
@@ -119,12 +155,7 @@ const LoginChrome = ({ children }: Props) => (
       </NotificationsContainer>
       <BackgroundText>
         <TextContainer>
-          <LogoContainer>
-            <Logo color="#ffffff" />
-          </LogoContainer>
-          <Claim>
-            Data. Insights. <Highlight>Answers.</Highlight>
-          </Claim>
+          <CustomizableLogo />
         </TextContainer>
       </BackgroundText>
     </Background>
