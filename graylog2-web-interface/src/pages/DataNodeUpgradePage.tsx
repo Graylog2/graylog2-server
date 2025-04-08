@@ -55,6 +55,7 @@ const StyledHorizontalDl = styled.dl(
 const ShardReplicationContainer = styled.div`
   display: flex;
   height: 20px;
+  align-items: center;
 `;
 
 type DataNodeUpgradeMethodType = 'cluster-restart' | 'rolling-upgrade';
