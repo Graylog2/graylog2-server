@@ -30,12 +30,13 @@ type Props = PropsWithChildren<{
   bsSize?: BsSize;
 }>;
 
-const StyledButton = styled(Button)(
-  ({ theme }) => css`
-    padding: 1px 0;
-    font-size: ${theme.fonts.size.body};
-  `,
-);
+const StyledButton = styled(Button)`
+  padding: 1px 0;
+`;
+
+const StyledOverlay = styled(Popover.Dropdown)`
+  white-space: pre-line;
+`;
 
 const StyledIcon = styled(Icon)<{ $bsStyle: ColorVariant }>(
   ({ $bsStyle, theme }) => css`
@@ -43,7 +44,7 @@ const StyledIcon = styled(Icon)<{ $bsStyle: ColorVariant }>(
   `,
 );
 
-const HelpPopoverButton = ({ helpText, bsStyle = "warning", bsSize = "xsmall", children = null }: Props) => {
+const HelpPopoverButton = ({ helpText, bsStyle = "info", bsSize = "medium" }: Props) => {
   const [showHelp, setShowHelp] = useState(false);
   const toggleHelp = () => setShowHelp((cur) => !cur);
 
@@ -58,10 +59,10 @@ const HelpPopoverButton = ({ helpText, bsStyle = "warning", bsSize = "xsmall", c
       withinPortal>
       <Popover.Target>
         <StyledButton bsStyle="transparent" bsSize={bsSize} onClick={toggleHelp}>
-          {children || <StyledIcon name="help" type="regular" $bsStyle={bsStyle} />}
+          <StyledIcon name="help" $bsStyle={bsStyle} />
         </StyledButton>
       </Popover.Target>
-      <Popover.Dropdown>{helpText}</Popover.Dropdown>
+      <StyledOverlay>{helpText}</StyledOverlay>
     </Popover>
   );
 };
