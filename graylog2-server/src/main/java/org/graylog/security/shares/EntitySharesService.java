@@ -270,6 +270,14 @@ public class EntitySharesService {
         return validationResult;
     }
 
+    /**
+     * Return all existing grants for the given entity
+     */
+    public Map<GRN, Capability> getGrants(GRN ownedEntity) {
+        return grantService.getForTarget(ownedEntity).stream()
+                .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability));
+    }
+
     private Map<GRN, Capability> getSelectedGranteeCapabilities(ImmutableSet<ActiveShare> activeShares, EntityShareRequest shareRequest) {
         // If the user doesn't submit a grantee selection we return the active shares as selection so the frontend
         // can just render it
