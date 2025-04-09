@@ -16,6 +16,8 @@
  */
 package org.graylog.security.entities;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
@@ -26,9 +28,6 @@ import org.graylog.security.GrantDTO;
 import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 @Singleton
 public class EntityOwnershipService {
@@ -65,9 +64,10 @@ public class EntityOwnershipService {
         registerNewEntity(grn, user);
     }
 
-    public void registerNewStream(String id, User user) {
+    public GRN registerNewStream(String id, User user) {
         final GRN grn = grnRegistry.newGRN(GRNTypes.STREAM, id);
         registerNewEntity(grn, user);
+        return grn;
     }
 
     //TODO: this method could replace all methods from registerNew... family, so that we don't have to add two methods and tests for each new GRN Type in the future

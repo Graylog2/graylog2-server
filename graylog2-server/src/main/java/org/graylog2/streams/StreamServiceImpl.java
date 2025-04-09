@@ -33,7 +33,10 @@ import com.mongodb.client.model.Projections;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
+import org.graylog.grn.GRN;
 import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
@@ -89,8 +92,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
     private final Set<StreamDeletionGuard> streamDeletionGuards;
-    private final CacheLoader<String, String> streamTitleLoader;
     private final LoadingCache<String, String> streamTitleCache;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public StreamServiceImpl(MongoConnection mongoConnection,
@@ -100,7 +103,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              MongoIndexSet.Factory indexSetFactory,
                              EntityOwnershipService entityOwnershipService,
                              ClusterEventBus clusterEventBus,
-                             Set<StreamDeletionGuard> streamDeletionGuards) {
+                             Set<StreamDeletionGuard> streamDeletionGuards,
+                             EntitySharesService entitySharesService) {
         super(mongoConnection);
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
@@ -109,8 +113,9 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
         this.streamDeletionGuards = streamDeletionGuards;
+        this.entitySharesService = entitySharesService;
 
-        this.streamTitleLoader = new CacheLoader<String, String>() {
+        final CacheLoader<String, String> streamTitleLoader = new CacheLoader<String, String>() {
             @Nonnull
             @Override
             public String load(@Nonnull String streamId) throws NotFoundException {
@@ -503,14 +508,16 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user) throws ValidationException {
+    public String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user, Optional<EntityShareRequest> shareRequestOptional) throws ValidationException {
         final String savedStreamId = super.save(stream);
         final Set<StreamRule> rules = streamRules.stream()
                 .map(rule -> streamRuleService.copy(savedStreamId, rule))
                 .collect(Collectors.toSet());
         streamRuleService.save(rules);
 
-        entityOwnershipService.registerNewStream(savedStreamId, user);
+        GRN grn = entityOwnershipService.registerNewStream(savedStreamId, user);
+        shareRequestOptional.ifPresent(entityShareRequest ->
+                entitySharesService.updateEntityShares(grn, entityShareRequest, user));
         clusterEventBus.post(StreamsChangedEvent.create(savedStreamId));
 
         return savedStreamId;

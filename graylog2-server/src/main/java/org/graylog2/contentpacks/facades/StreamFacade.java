@@ -23,6 +23,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -60,8 +61,6 @@ import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Collections;
 import java.util.List;
@@ -163,7 +162,8 @@ public class StreamFacade implements EntityFacade<Stream> {
                 null,
                 streamEntity.matchingType().asString(parameters),
                 streamEntity.removeMatches().asBoolean(parameters),
-                indexSetService.getDefault().id());
+                indexSetService.getDefault().id(),
+                null);
         final Stream stream = streamService.create(createStreamRequest, user.getName());
         final List<StreamRule> streamRules = streamEntity.streamRules().stream()
                 .map(streamRuleEntity -> createStreamRuleRequest(streamRuleEntity, parameters))
@@ -171,7 +171,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .collect(Collectors.toList());
         final String savedStreamId;
         try {
-            savedStreamId = streamService.saveWithRulesAndOwnership(stream, streamRules, user);
+            savedStreamId = streamService.saveWithRulesAndOwnership(stream, streamRules, user, Optional.empty());
         } catch (ValidationException e) {
             throw new ContentPackException("Couldn't create entity " + entity.toEntityDescriptor(), e);
         }

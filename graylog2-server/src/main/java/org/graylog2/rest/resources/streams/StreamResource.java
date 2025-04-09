@@ -221,7 +221,7 @@ public class StreamResource extends RestResource {
         final Set<StreamRule> streamRules = cr.rules().stream()
                 .map(streamRule -> streamRuleService.create(null, streamRule))
                 .collect(Collectors.toSet());
-        final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser());
+        final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser(), Optional.ofNullable(cr.entityShareRequest()));
 
         var result = new StreamCreatedResponse(id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
@@ -629,7 +629,7 @@ public class StreamResource extends RestResource {
         );
 
         final Stream stream = streamService.create(streamData);
-        final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules, userContext.getUser());
+        final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules, userContext.getUser(), Optional.empty());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
 
         final Set<ObjectId> outputIds = sourceStream.getOutputs().stream()

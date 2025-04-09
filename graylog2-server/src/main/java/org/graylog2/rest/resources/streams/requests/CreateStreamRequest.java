@@ -20,14 +20,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotEmpty;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotEmpty;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -60,6 +59,10 @@ public abstract class CreateStreamRequest {
     @JsonProperty("index_set_id")
     public abstract String indexSetId();
 
+    @JsonProperty("entity_share_request")
+    @Nullable
+    public abstract EntityShareRequest entityShareRequest();
+
     @JsonCreator
     public static CreateStreamRequest create(@JsonProperty("title") @NotEmpty String title,
                                              @JsonProperty("description") @Nullable String description,
@@ -67,7 +70,8 @@ public abstract class CreateStreamRequest {
                                              @JsonProperty("content_pack") @Nullable String contentPack,
                                              @JsonProperty("matching_type") @Nullable String matchingType,
                                              @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream,
-                                             @JsonProperty("index_set_id") String indexSetId) {
+                                             @JsonProperty("index_set_id") String indexSetId,
+                                             @JsonProperty("entity_share_request") @Nullable EntityShareRequest entityShareRequest) {
         return new AutoValue_CreateStreamRequest(
                 title,
                 description,
@@ -75,7 +79,8 @@ public abstract class CreateStreamRequest {
                 contentPack,
                 Stream.MatchingType.valueOfOrDefault(matchingType),
                 firstNonNull(removeMatchesFromDefaultStream, false),
-                indexSetId
+                indexSetId,
+                entityShareRequest
         );
     }
 }
