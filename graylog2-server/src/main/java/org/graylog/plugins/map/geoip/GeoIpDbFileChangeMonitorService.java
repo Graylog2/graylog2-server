@@ -21,10 +21,13 @@ import com.codahale.metrics.UniformReservoir;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import org.graylog.plugins.map.config.CloudDownloadException;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
-import org.graylog.plugins.map.config.S3DownloadException;
 import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.notifications.Notification;
@@ -35,10 +38,6 @@ import org.graylog2.plugin.validate.ConfigValidationException;
 import org.graylog2.rest.resources.system.GeoIpResolverConfigValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -160,7 +159,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                 LOG.error(message);
                 s3GeoIpFileService.cleanupTempFiles();
                 return changes;
-            } catch (S3DownloadException | IOException e) {
+            } catch (CloudDownloadException | IOException e) {
                 String message = "Failed to download Geo Processor DB files from S3. Unable to refresh. Leaving old files in place on disk.";
                 sendFailedSyncNotification(message);
                 LOG.error(message);
@@ -205,7 +204,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                                 s3GeoIpFileService.downloadFilesToTempLocation(config);
                                 s3GeoIpFileService.moveTempFilesToActive();
                             }
-                        } catch (S3DownloadException | IOException e) {
+                        } catch (CloudDownloadException | IOException e) {
                             String commonMessage = "Failed to pull new Geo-Location Processor database files from S3.";
                             sendFailedSyncNotification(commonMessage + " Geo-Location Processor may not be functional on all nodes.");
                             LOG.error("{} Geo-Location Processor will not be functional on this node.", commonMessage);

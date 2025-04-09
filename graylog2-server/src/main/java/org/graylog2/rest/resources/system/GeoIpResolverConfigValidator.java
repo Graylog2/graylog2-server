@@ -19,9 +19,10 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.UniformReservoir;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.plugins.map.config.CloudDownloadException;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
-import org.graylog.plugins.map.config.S3DownloadException;
 import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog.plugins.map.geoip.GeoAsnInformation;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
@@ -32,8 +33,6 @@ import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.graylog2.plugin.validate.ConfigValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -72,8 +71,7 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
     @Override
     public void validate(Object configObject) throws ConfigValidationException {
 
-        if (configObject instanceof GeoIpResolverConfig) {
-            final GeoIpResolverConfig config = (GeoIpResolverConfig) configObject;
+        if (configObject instanceof GeoIpResolverConfig config) {
 
             if (config.enabled()) {
                 validateConfig(config);
@@ -98,6 +96,10 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
             GeoIpResolverConfig curConfig = clusterConfigService.getOrDefault(GeoIpResolverConfig.class,
                     GeoIpResolverConfig.defaultConfig());
             boolean moveTemporaryFiles = false;
+            if (config.useS3() && config.useGcs()) {
+                throw new ConfigValidationException("Cannot use both S3 and GCS at the same time. Please choose at most one.");
+            }
+
             if (config.useS3()) {
                 if (s3GeoIpFileService.s3ClientIsNull()) {
                     throw new ConfigValidationException("Unable to use S3 for file refresh without AWS credentials. See documentation for steps to properly configure AWS credentials.");
@@ -126,6 +128,10 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
                 }
             }
 
+            if (config.useGcs()) {
+                //TODO: Implement GCS file download and validation
+            }
+
             // Validate the DB files
             validateGeoIpLocationResolver(config, timer);
             validateGeoIpAsnResolver(config, timer);
@@ -134,7 +140,7 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
             if (moveTemporaryFiles) {
                 s3GeoIpFileService.moveTempFilesToActive();
             }
-        } catch (IllegalArgumentException | IllegalStateException | S3DownloadException | IOException e) {
+        } catch (IllegalArgumentException | IllegalStateException | CloudDownloadException | IOException e) {
             throw new ConfigValidationException(e.getMessage());
         }
     }

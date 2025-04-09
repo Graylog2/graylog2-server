@@ -16,17 +16,14 @@
  */
 package org.graylog.plugins.map.config;
 
-import com.google.auto.value.AutoValue;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,9 +31,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Service for pulling Geo Location Processor ASN and city database files from an S3 bucket and storing them on disk.
+ * Service for pulling Geo Location Processor ASN and city database files from an GCP (Google Cloud Storage) bucket and storing them on disk.
  * The files will initially be downloaded to a temporary location on disk, then they will be validated by the
  * {@link org.graylog2.rest.resources.system.GeoIpResolverConfigValidator}, and after successful validation they will
  * be moved to the active location so that the Geo Location Processor can read them. The on-disk directory location
@@ -50,17 +50,13 @@ import java.time.Instant;
  * downloaded each time the service runs based on the lastModified times of the S3 objects.
  *
  * This class relies on the DefaultCredentialsProvider and not any settings that may be configured in the
- * Graylog AWS plugin configuration. See https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html#credentials-chain
+ * Graylog AWS plugin configuration. See {@see https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html#credentials-chain}
  * for how to configure your environment so that the default provider retrieves credentials properly.
  */
 @Singleton
-public class S3GeoIpFileService implements GeoIpCloudFileService {
-    private static final Logger LOG = LoggerFactory.getLogger(S3GeoIpFileService.class);
+public class GcsGeoIpFileService implements GeoIpCloudFileService {
+    private static final Logger LOG = LoggerFactory.getLogger(GcsGeoIpFileService.class);
 
-    public static final String S3_BUCKET_PREFIX = "s3://";
-    public static final String NULL_S3_CLIENT_MESSAGE = "Unable to create DefaultCredentialsProvider for the S3 Client. Geo Location Processor S3 file refresh is disabled.";
-
-    private S3Client s3Client;
     private final Path downloadDir;
     private final Path asnPath;
     private final Path cityPath;
@@ -73,7 +69,7 @@ public class S3GeoIpFileService implements GeoIpCloudFileService {
     private Instant tempCityFileLastModified = null;
 
     @Inject
-    public S3GeoIpFileService(GeoIpProcessorConfig config) {
+    public GcsGeoIpFileService(GeoIpProcessorConfig config) {
         this.downloadDir = config.getS3DownloadLocation();
         this.asnPath = downloadDir.resolve(GeoIpCloudFileService.ACTIVE_ASN_FILE);
         this.cityPath = downloadDir.resolve(GeoIpCloudFileService.ACTIVE_CITY_FILE);
@@ -95,31 +91,35 @@ public class S3GeoIpFileService implements GeoIpCloudFileService {
      */
     @Override
     public void downloadFilesToTempLocation(GeoIpResolverConfig config) throws CloudDownloadException {
-        if (s3ClientIsNull() || !ensureDownloadDirectory()) {
+        if (!ensureDownloadDirectory()) {
             return;
         }
 
         try {
             cleanupTempFiles();
-            BucketsAndKeys bucketsAndKeys = getBucketsAndKeys(config);
-            GetObjectResponse cityResponse = getS3Client().getObject(GetObjectRequest.builder()
-                    .bucket(bucketsAndKeys.cityBucket())
-                    .key(bucketsAndKeys.cityKey()).build(), tempCityPath);
-            setFilePermissions(tempCityPath);
-            tempCityFileLastModified = cityResponse.lastModified();
+            ObjectDetails objectDetails = extractObjectDetails(config);
+            Storage storage = getGcsStorage(config.gcsProjectId());
 
-            if (!config.asnDbPath().isEmpty()) {
-                GetObjectResponse asnResponse = getS3Client().getObject(GetObjectRequest.builder()
-                        .bucket(bucketsAndKeys.asnBucket())
-                        .key(bucketsAndKeys.asnKey()).build(), tempAsnPath);
-                setFilePermissions(tempAsnPath);
-                tempAsnFileLastModified = asnResponse.lastModified();
+            tempCityFileLastModified = downloadSingleFile(storage, objectDetails.cityDetails, tempCityPath);
+
+            if (objectDetails.asnDetails.isPresent()) {
+                tempAsnFileLastModified = downloadSingleFile(storage, objectDetails.asnDetails.get(), tempAsnPath);
             }
         } catch (Exception e) {
-            LOG.error("Failed to retrieve S3 files. {}", e.toString());
+            LOG.error("Failed to retrieve files from GCS.", e);
             cleanupTempFiles();
             throw new CloudDownloadException(e.getMessage());
         }
+    }
+
+    private Instant downloadSingleFile(Storage storage, GcsObjectDetails details, Path destFilePath) throws IOException {
+        Blob blob = storage.get(BlobId.of(details.bucket, details.object));
+        if (blob == null) {
+            throw new IOException("Failed to download file from GCS: " + details.bucket + "/" + details.object);
+        }
+        blob.downloadTo(destFilePath);
+        setFilePermissions(destFilePath);
+        return blob.getUpdateTimeOffsetDateTime().toInstant();
     }
 
     /**
@@ -130,34 +130,25 @@ public class S3GeoIpFileService implements GeoIpCloudFileService {
      */
     @Override
     public boolean fileRefreshRequired(GeoIpResolverConfig config) {
-        if (s3ClientIsNull()) {
-            return false;
-        }
         // If either database file doesn't already exist then they need to be downloaded
         if (!Files.exists(cityPath) || (!config.asnDbPath().isEmpty() && !Files.exists(asnPath))) {
             return true;
         }
-        BucketsAndKeys bucketsAndKeys = getBucketsAndKeys(config);
+        ObjectDetails objectDetails = extractObjectDetails(config);
+        final Storage storage = getGcsStorage(config.gcsProjectId());
+        Instant remoteCityFileUpdated = updateTimestampForGcsObject(storage, objectDetails.cityDetails);
 
-        S3Object cityObj = getS3Object(bucketsAndKeys.cityBucket(), bucketsAndKeys.cityKey());
-        if (cityObj == null) {
-            LOG.warn("No city database file '{}' found in S3 bucket '{}'. Aborting S3 file refresh.",
-                    bucketsAndKeys.cityKey(), bucketsAndKeys.cityBucket());
-            return false;
+        boolean asnFileUpdated = false;
+        if (objectDetails.asnDetails.isPresent()) {
+            asnFileUpdated = updateTimestampForGcsObject(storage, objectDetails.asnDetails.get()).isAfter(this.asnFileLastModified);
         }
 
-        boolean asnUpdated = false;
-        if (!config.asnDbPath().isEmpty()) {
-            S3Object asnObj = getS3Object(bucketsAndKeys.asnBucket(), bucketsAndKeys.asnKey());
-            if (asnObj == null) {
-                LOG.warn("No ASN database file '{}' found in S3 bucket '{}'. Aborting S3 file refresh.",
-                        bucketsAndKeys.asnKey(), bucketsAndKeys.asnBucket());
-                return false;
-            }
-            asnUpdated = asnObj.lastModified().isAfter(asnFileLastModified);
-        }
+        return remoteCityFileUpdated.isAfter(cityFileLastModified) || asnFileUpdated;
+    }
 
-        return cityObj.lastModified().isAfter(cityFileLastModified) || asnUpdated;
+    private Instant updateTimestampForGcsObject(Storage storage, GcsObjectDetails details) {
+        final Blob blob = storage.get(details.bucket(), details.object(), Storage.BlobGetOption.fields(Storage.BlobField.UPDATED));
+        return blob.getUpdateTimeOffsetDateTime().toInstant();
     }
 
     /**
@@ -240,10 +231,6 @@ public class S3GeoIpFileService implements GeoIpCloudFileService {
         }
     }
 
-    public boolean s3ClientIsNull() {
-        return getS3Client() == null;
-    }
-
     private void setFilePermissions(Path filePath) {
         File tempFile = filePath.toFile();
         if (!(tempFile.setExecutable(true)
@@ -256,52 +243,48 @@ public class S3GeoIpFileService implements GeoIpCloudFileService {
     }
 
     // Convert the asnDbPath and cityDbPath to S3 buckets and keys
-    private BucketsAndKeys getBucketsAndKeys(GeoIpResolverConfig config) {
-        String cityFile = config.cityDbPath();
-        int cityLastSlash = cityFile.lastIndexOf("/");
-        String cityBucket = cityFile.substring(S3_BUCKET_PREFIX.length(), cityLastSlash);
-        String cityKey = cityFile.substring(cityLastSlash + 1);
-        LOG.debug("City Bucket = {}, City Key = {}", cityBucket, cityKey);
+    private ObjectDetails extractObjectDetails(GeoIpResolverConfig config) {
+        final String groupBucket = "bucket";
+        final String groupObject = "object";
+        final Pattern pattern = Pattern.compile("^gs:\\/\\/(?<" + groupBucket + ">[-\\w]+)\\/(?<" + groupObject + ">[-\\w\\/\\.]+)$");
 
-        String asnBucket = "";
-        String asnKey = "";
-        if (!config.asnDbPath().isEmpty()) {
+
+        Matcher cityMatcher = pattern.matcher(config.cityDbPath());
+        final String cityBucket;
+        final String cityObject;
+        if (cityMatcher.find()) {
+            cityBucket = cityMatcher.group(groupBucket);
+            cityObject = cityMatcher.group(groupObject);
+        } else {
+            throw new IllegalArgumentException("Invalid GCS bucket and object path: " + config.cityDbPath());
+        }
+
+        // String could look like this:
+        // gs://core_team_dev/florian/GeoLite2-ASN.mmdb, but projectId is different: graylog-dev-421820
+
+        LOG.debug("City Bucket = {}, City Key = {}", cityBucket, cityObject);
+
+        Optional<GcsObjectDetails> asnDetails = Optional.empty();
+        if (!config.asnDbPath().isBlank()) {
             String asnFile = config.asnDbPath();
-            int asnLastSlash = asnFile.lastIndexOf("/");
-            asnBucket = asnFile.substring(S3_BUCKET_PREFIX.length(), asnLastSlash);
-            asnKey = asnFile.substring(asnLastSlash + 1);
+            final Matcher asnMatcher = pattern.matcher(asnFile);
+            if (asnMatcher.find()) {
+                String asnBucket = asnMatcher.group(groupBucket);
+                String asnObject = asnMatcher.group(groupObject);
+                asnDetails = Optional.of(new GcsObjectDetails(asnBucket, asnObject));
+                LOG.debug("ASN Bucket = {}, ASN Key = {}", asnBucket, asnObject);
+            } else {
+                LOG.debug("No ASN bucket and object found in path: {}", asnFile);
+            }
+        } else {
+            LOG.debug("No ASN path provided in configuration");
         }
-        LOG.debug("ASN Bucket = {}, ASN Key = {}", asnBucket, asnKey);
 
-        return BucketsAndKeys.create(asnBucket, asnKey, cityBucket, cityKey);
+        return new ObjectDetails(config.gcsProjectId(), new GcsObjectDetails(cityBucket, cityObject), asnDetails);
     }
 
-    // Gets the S3 object for the given bucket and key. Since the listObjectsV2 method takes only a prefix to filter
-    // objects a for loop is used to find the exact key in case there are objects in the S3 bucket with the exact key
-    // as a prefix.
-    private S3Object getS3Object(String bucket, String key) {
-        ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder().bucket(bucket).prefix(key).build();
-        ListObjectsV2Response listObjectsResponse = getS3Client().listObjectsV2(listObjectsRequest);
-        S3Object obj = null;
-        for (S3Object o : listObjectsResponse.contents()) {
-            if (o.key().equals(key)) {
-                obj = o;
-                break;
-            }
-        }
-        return obj;
-    }
-
-    private S3Client getS3Client() {
-        if (s3Client == null) {
-            try {
-                s3Client = S3Client.create();
-            } catch (Exception e) {
-                LOG.warn(NULL_S3_CLIENT_MESSAGE);
-                LOG.debug("If not trying to use the Geo Location Processor S3 file refresh feature, the following error can safely be ignored.\n\tERROR : {}", e.getMessage());
-            }
-        }
-        return s3Client;
+    private Storage getGcsStorage(String projectId) {
+        return StorageOptions.newBuilder().setProjectId(projectId).build().getService();
     }
 
     private boolean ensureDownloadDirectory() {
@@ -309,7 +292,7 @@ public class S3GeoIpFileService implements GeoIpCloudFileService {
             try {
                 Files.createDirectory(downloadDir);
             } catch (IOException e) {
-                LOG.error("Unable to create S3 download directory at {}. Geo-Location Processor S3 file refresh will be broken on this node.",
+                LOG.error("Unable to create download directory at {}. Geo-Location Processor file refresh will be broken on this node.",
                         downloadDir.toAbsolutePath());
             }
         }
@@ -317,21 +300,11 @@ public class S3GeoIpFileService implements GeoIpCloudFileService {
     }
 
     /**
-     * Helper class to break the asnDbPath and cityDbPath configuration options into a valid S3 bucket and key to use
-     * with the S3 client
+     * Helper class to break the asnDbPath and cityDbPath configuration options into a valid GCS bucket and object-name to use
+     * with the GCS client
      */
-    @AutoValue
-    static abstract class BucketsAndKeys {
-        public abstract String asnBucket();
+    record ObjectDetails(String projectId, GcsObjectDetails cityDetails, Optional<GcsObjectDetails> asnDetails) {}
 
-        public abstract String asnKey();
+    record GcsObjectDetails(String bucket, String object) {}
 
-        public abstract String cityBucket();
-
-        public abstract String cityKey();
-
-        public static BucketsAndKeys create(String asnBucket, String asnKey, String cityBucket, String cityKey) {
-            return new AutoValue_S3GeoIpFileService_BucketsAndKeys(asnBucket, asnKey, cityBucket, cityKey);
-        }
-    }
 }

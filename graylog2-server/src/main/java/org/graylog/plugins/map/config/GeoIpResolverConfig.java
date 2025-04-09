@@ -54,6 +54,13 @@ public abstract class GeoIpResolverConfig {
     @JsonProperty("use_s3")
     public abstract boolean useS3();
 
+    @JsonProperty("use_gcs")
+    public abstract boolean useGcs();
+
+    @JsonProperty("gcs_project_id")
+    @Nullable
+    public abstract String gcsProjectId();
+
     @JsonProperty(FIELD_REFRESH_INTERVAL_UNIT)
     @Nullable
     public abstract TimeUnit refreshIntervalUnit();
@@ -76,7 +83,9 @@ public abstract class GeoIpResolverConfig {
                                              @JsonProperty("asn_db_path") String asnDbPath,
                                              @JsonProperty(FIELD_REFRESH_INTERVAL_UNIT) TimeUnit refreshIntervalUnit,
                                              @JsonProperty(FIELD_REFRESH_INTERVAL) Long refreshInterval,
-                                             @JsonProperty("use_s3") boolean useS3) {
+                                             @JsonProperty("use_s3") boolean useS3,
+                                             @JsonProperty("use_gcs") boolean useGcs,
+                                             @JsonProperty("gcs_project_id") String gcsProjectId) {
         return builder()
                 .enabled(cityEnabled)
                 .enforceGraylogSchema(enforceGraylogSchema)
@@ -86,6 +95,8 @@ public abstract class GeoIpResolverConfig {
                 .refreshIntervalUnit(refreshIntervalUnit == null ? DEFAULT_INTERVAL_UNIT : refreshIntervalUnit)
                 .refreshInterval(refreshInterval == null ? DEFAULT_INTERVAL : refreshInterval)
                 .useS3(useS3)
+                .useGcs(useGcs)
+                .gcsProjectId(gcsProjectId)
                 .build();
     }
 
@@ -99,6 +110,7 @@ public abstract class GeoIpResolverConfig {
                 .refreshIntervalUnit(DEFAULT_INTERVAL_UNIT)
                 .refreshInterval(DEFAULT_INTERVAL)
                 .useS3(false)
+                .useGcs(false)
                 .build();
     }
 
@@ -125,6 +137,10 @@ public abstract class GeoIpResolverConfig {
         public abstract Builder refreshInterval(Long interval);
 
         public abstract Builder useS3(boolean useS3);
+
+        public abstract Builder useGcs(boolean useGcs);
+
+        public abstract Builder gcsProjectId(String gcsProjectId);
 
         public abstract GeoIpResolverConfig build();
     }
