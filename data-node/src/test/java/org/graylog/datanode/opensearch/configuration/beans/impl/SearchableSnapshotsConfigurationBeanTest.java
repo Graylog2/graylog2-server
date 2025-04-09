@@ -22,14 +22,18 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -51,6 +55,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 )),
                 config,
+                new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
@@ -59,10 +64,43 @@ class SearchableSnapshotsConfigurationBeanTest {
                 .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
 
         Assertions.assertThat(configurationPart.keystoreItems())
-                .containsKeys("s3.client.default.access_key", "s3.client.default.secret_key");
+                .map(OpensearchKeystoreItem::key)
+                .contains("s3.client.default.access_key", "s3.client.default.secret_key");
 
         Assertions.assertThat(configurationPart.properties())
                 .containsKeys("s3.client.default.endpoint", "node.search.cache.size");
+    }
+
+    @Test
+    void testGoogleCloudStorage(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
+        // no s3 repo configuration properties given by the user
+        final S3RepositoryConfiguration config = s3Configuration(Map.of());
+
+        final Path credentialsFile = Files.createTempFile(tempDir, "gcs-credentials", ".json");
+        final GCSRepositoryConfiguration gcsRepositoryConfiguration = gcsConfiguration(Map.of(
+                "gcs_credentials_file", credentialsFile.toAbsolutePath().toString()
+        ));
+
+        final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
+                datanodeConfiguration(Map.of(
+                        "node_search_cache_size", "10gb"
+                )),
+                config,
+                gcsRepositoryConfiguration,
+                () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
+
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
+
+        Assertions.assertThat(configurationPart.nodeRoles())
+                .contains(SearchableSnapshotsConfigurationBean.SEARCH_NODE_ROLE);
+
+        Assertions.assertThat(configurationPart.keystoreItems())
+                .hasSize(1)
+                .map(OpensearchKeystoreItem::key)
+                .contains("gcs.client.default.credentials_file");
+
+        Assertions.assertThat(configurationPart.properties())
+                .containsEntry("node.search.cache.size", "10gb");
     }
 
     private OpensearchConfigurationParams emptyBuildParams() {
@@ -81,6 +119,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 )),
                 config,
+                new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
@@ -107,6 +146,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 )),
                 config,
+                new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
@@ -135,6 +175,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 )),
                 config,
+                new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
 
         // 10GB cache requested on 8GB of free space, needs to throw an exception!
@@ -155,6 +196,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 )),
                 config,
+                new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams());
@@ -165,6 +207,12 @@ class SearchableSnapshotsConfigurationBeanTest {
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("path.repo", "/mnt/data/snapshots")
                 .doesNotContainEntry("node.search.cache.size", "10gb");
+    }
+
+    private GCSRepositoryConfiguration gcsConfiguration(Map<String, String> properties) throws ValidationException, RepositoryException {
+        final GCSRepositoryConfiguration configuration = new GCSRepositoryConfiguration();
+        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        return configuration;
     }
 
     private S3RepositoryConfiguration s3Configuration(Map<String, String> properties) throws RepositoryException, ValidationException {

@@ -16,23 +16,29 @@
  */
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -55,12 +61,14 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     static final String SEARCH_NODE_ROLE = "search";
     private final Configuration localConfiguration;
     private final S3RepositoryConfiguration s3RepositoryConfiguration;
+    private final GCSRepositoryConfiguration gcsRepositoryConfiguration;
     private final Provider<OpensearchUsableSpace> usableSpaceProvider;
 
     @Inject
-    public SearchableSnapshotsConfigurationBean(Configuration localConfiguration, S3RepositoryConfiguration s3RepositoryConfiguration, Provider<OpensearchUsableSpace> usableSpaceProvider) {
+    public SearchableSnapshotsConfigurationBean(Configuration localConfiguration, S3RepositoryConfiguration s3RepositoryConfiguration, GCSRepositoryConfiguration gcsRepositoryConfiguration, Provider<OpensearchUsableSpace> usableSpaceProvider) {
         this.localConfiguration = localConfiguration;
         this.s3RepositoryConfiguration = s3RepositoryConfiguration;
+        this.gcsRepositoryConfiguration = gcsRepositoryConfiguration;
         this.usableSpaceProvider = usableSpaceProvider;
     }
 
@@ -166,17 +174,22 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
         return builder.build();
     }
 
-    private Map<String, String> keystoreItems() {
-        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    private Collection<OpensearchKeystoreItem> keystoreItems() {
+        final ImmutableList.Builder<OpensearchKeystoreItem> builder = ImmutableList.builder();
         if (s3RepositoryConfiguration.isRepositoryEnabled()) {
-            builder.put("s3.client.default.access_key", s3RepositoryConfiguration.getS3ClientDefaultAccessKey());
-            builder.put("s3.client.default.secret_key", s3RepositoryConfiguration.getS3ClientDefaultSecretKey());
+            builder.add(new OpensearchKeystoreStringItem("s3.client.default.access_key", s3RepositoryConfiguration.getS3ClientDefaultAccessKey()));
+            builder.add(new OpensearchKeystoreStringItem("s3.client.default.secret_key", s3RepositoryConfiguration.getS3ClientDefaultSecretKey()));
+        }
+
+        if(gcsRepositoryConfiguration.isRepositoryEnabled()) {
+            // TODO: resolve path against datanode configuration dir
+            builder.add(new OpensearchKeystoreFileItem("gcs.client.default.credentials_file",  gcsRepositoryConfiguration.getGcsCredentialsFile()));
         }
         return builder.build();
     }
 
     private boolean snapshotsAreEnabled() {
-        return s3RepositoryConfiguration.isRepositoryEnabled() || isSharedFileSystemRepo();
+        return s3RepositoryConfiguration.isRepositoryEnabled() || isSharedFileSystemRepo() || gcsRepositoryConfiguration.isRepositoryEnabled();
     }
 
     private boolean isSharedFileSystemRepo() {
