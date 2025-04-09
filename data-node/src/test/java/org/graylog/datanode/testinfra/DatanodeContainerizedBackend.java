@@ -30,6 +30,8 @@ import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
+import java.time.Clock;
+
 public class DatanodeContainerizedBackend {
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
     static public final String SIGNING_SECRET = ContainerizedGraylogBackend.PASSWORD_SECRET;
@@ -38,7 +40,7 @@ public class DatanodeContainerizedBackend {
 
     @Nonnull
     private static IndexerJwtAuthToken createJwtAuthToken(String signingSecret, Duration tokenExpirationDuration, Duration cachingDuration) {
-        return new IndexerJwtAuthTokenProvider(new JwtSecret(signingSecret), tokenExpirationDuration, cachingDuration, true)
+        return new IndexerJwtAuthTokenProvider(new JwtSecret(signingSecret), tokenExpirationDuration, cachingDuration, true, Clock.systemDefaultZone())
                 .get();
     }
 

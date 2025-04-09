@@ -35,6 +35,7 @@ import org.hamcrest.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Clock;
 import java.util.concurrent.ExecutionException;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV,
@@ -83,7 +84,7 @@ public class DatanodeSelfsignedStartupIT {
 
     @Nonnull
     private static IndexerJwtAuthToken createJwtAuthToken() {
-        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60), true);
+        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60), true, Clock.systemDefaultZone());
         return provider.get();
     }
 }

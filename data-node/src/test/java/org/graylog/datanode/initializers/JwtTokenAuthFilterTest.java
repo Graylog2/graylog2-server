@@ -28,6 +28,7 @@ import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Optional;
@@ -94,6 +95,7 @@ class JwtTokenAuthFilterTest {
 
     @Nonnull
     private static String generateToken(String signingKey) {
-        return IndexerJwtAuthTokenProvider.createToken(new JwtSecret(signingKey), Duration.seconds(180));
+        final IndexerJwtAuthTokenProvider tokenProvider = new IndexerJwtAuthTokenProvider(new JwtSecret(signingKey), Duration.seconds(180), Duration.seconds(90), true, Clock.systemDefaultZone());
+        return tokenProvider.get().rawTokenValue().get();
     }
 }

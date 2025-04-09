@@ -24,7 +24,13 @@ import org.assertj.core.api.Assertions;
 import org.graylog2.security.JwtSecret;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+
 class IndexerIndexerJwtAuthTokenProviderTest {
+
     @Test
     void testTokenParsing() {
 
@@ -32,11 +38,15 @@ class IndexerIndexerJwtAuthTokenProviderTest {
 
         final JwtSecret jwtSecret = new JwtSecret(randomStringUtils.nextAlphabetic(96));
 
+        final Instant now = Instant.now();
+
         final IndexerJwtAuthTokenProvider tokenProvider = new IndexerJwtAuthTokenProvider(
                 jwtSecret,
+                Duration.seconds(90),
                 Duration.seconds(60),
-                Duration.seconds(60),
-                true);
+                true,
+                Clock.fixed(now, ZoneOffset.UTC)
+        );
 
         final IndexerJwtAuthToken bearerToken = tokenProvider.get();
 
@@ -51,6 +61,13 @@ class IndexerIndexerJwtAuthTokenProviderTest {
 
                     Assertions.assertThat(claims.getSubject()).isEqualTo("admin");
                     Assertions.assertThat(claims.getIssuer()).isEqualTo("graylog");
+
+                    // There is a small time difference between now and actually creating the token, in the .get() call
+                    // Additionally, there may be small difference, as JWT is using only seconds but now is more precise.
+                    // Let's give or take 5s, this won't change the validity of the test.
+                    final long delta = Duration.seconds(5).toMilliseconds();
+                    Assertions.assertThat(claims.getIssuedAt()).isCloseTo(now, delta);
+                    Assertions.assertThat(claims.getExpiration()).isCloseTo(now.plus(90, ChronoUnit.SECONDS), delta);
                 });
     }
 }

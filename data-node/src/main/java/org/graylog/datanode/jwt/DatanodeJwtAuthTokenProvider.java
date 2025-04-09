@@ -21,6 +21,8 @@ import org.graylog.datanode.Configuration;
 import org.graylog2.security.JwtSecret;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 
+import java.time.Clock;
+
 public class DatanodeJwtAuthTokenProvider extends IndexerJwtAuthTokenProvider {
 
     /**
@@ -28,6 +30,6 @@ public class DatanodeJwtAuthTokenProvider extends IndexerJwtAuthTokenProvider {
      */
     @Inject
     public DatanodeJwtAuthTokenProvider(JwtSecret jwtSecret, Configuration configuration) {
-        super(jwtSecret, configuration.getIndexerJwtAuthTokenExpirationDuration(), configuration.getIndexerJwtAuthTokenCachingDuration(), true);
+        super(jwtSecret, configuration.getIndexerJwtAuthTokenExpirationDuration(), configuration.getIndexerJwtAuthTokenCachingDuration(), true, Clock.systemDefaultZone());
     }
 }

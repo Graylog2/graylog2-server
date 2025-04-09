@@ -66,6 +66,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -143,7 +144,7 @@ public class DatanodeProvisioningIT {
 
     @Nonnull
     private static IndexerJwtAuthToken createJwtAuthToken() {
-        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60), true);
+        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60), true, Clock.systemDefaultZone());
         return provider.get();
     }
 

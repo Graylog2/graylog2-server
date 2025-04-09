@@ -28,6 +28,7 @@ import org.graylog2.security.JwtSecret;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Clock;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -41,31 +42,33 @@ public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken
     private final JwtSecret jwtSecret;
     private final Duration tokenExpirationDuration;
     private final Duration cachingDuration;
+    private final Clock clock;
 
     @Inject
     public IndexerJwtAuthTokenProvider(JwtSecret jwtSecret,
                                        ElasticsearchClientConfiguration configuration,
                                        @RunsWithDataNode final boolean runsWithDataNode
     ) {
-        this(jwtSecret, configuration.indexerJwtAuthTokenExpirationDuration(), configuration.indexerJwtAuthTokenCachingDuration(), runsWithDataNode || configuration.indexerUseJwtAuthentication());
+        this(jwtSecret, configuration.indexerJwtAuthTokenExpirationDuration(), configuration.indexerJwtAuthTokenCachingDuration(), runsWithDataNode || configuration.indexerUseJwtAuthentication(), Clock.systemDefaultZone());
     }
 
-    public IndexerJwtAuthTokenProvider(JwtSecret jwtSecret, Duration tokenExpirationDuration, Duration cachingDuration, boolean useJwtAuthentication) {
+    public IndexerJwtAuthTokenProvider(JwtSecret jwtSecret, Duration tokenExpirationDuration, Duration cachingDuration, boolean useJwtAuthentication, Clock clock) {
         this.jwtSecret = jwtSecret;
         this.tokenExpirationDuration = tokenExpirationDuration;
         this.cachingDuration = cachingDuration;
+        this.clock = clock;
         cachingSupplier = Suppliers.memoizeWithExpiration(() -> {
             if (useJwtAuthentication) {
                 LOG.debug("Creating new JWT token, expiration set to {}", tokenExpirationDuration);
-                return Optional.of(createToken(jwtSecret, tokenExpirationDuration));
+                return Optional.of(createToken());
             } else {
                 return Optional.empty();
             }
         }, cachingDuration.toSeconds(), TimeUnit.SECONDS);
     }
 
-    public static String createToken(final JwtSecret jwtSecret, final Duration tokenExpirationDuration) {
-        long nowMillis = System.currentTimeMillis();
+    private String createToken() {
+        long nowMillis = clock.millis();
         Date now = new Date(nowMillis);
 
         JwtBuilder builder = Jwts.builder()
@@ -86,6 +89,6 @@ public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken
     }
 
     public Provider<IndexerJwtAuthToken> alwaysEnabled() {
-        return new IndexerJwtAuthTokenProvider(jwtSecret, tokenExpirationDuration, cachingDuration, true);
+        return new IndexerJwtAuthTokenProvider(jwtSecret, tokenExpirationDuration, cachingDuration, true, Clock.systemDefaultZone());
     }
 }
