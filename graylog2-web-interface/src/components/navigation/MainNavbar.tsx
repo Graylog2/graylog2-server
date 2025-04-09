@@ -105,12 +105,13 @@ const useNavigationItems = () => {
   const { permissions } = useCurrentUser();
   const { activePerspective } = useActivePerspective();
   const allNavigationItems = usePluginEntities('navigation');
+  const navigationItems = useMemo(() => mergeDuplicateDropdowns(allNavigationItems), [allNavigationItems]);
+
+  const securityLicenseInvalid = !pluginLicenseValid(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
 
   return useMemo(() => {
-    const navigationItems = mergeDuplicateDropdowns(allNavigationItems);
     const enterpriseMenuIsMissing = !pluginMenuItemExists(navigationItems, DEFAULT_ENTERPRISE_NAV_ITEM.description);
     const securityMenuIsMissing = !pluginMenuItemExists(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
-    const securityLicenseInvalid = !pluginLicenseValid(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
     const isPermittedToEnterpriseOrSecurity = isPermitted(permissions, ['licenseinfos:read']);
 
     if (enterpriseMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
@@ -134,7 +135,7 @@ const useNavigationItems = () => {
     const itemsForActivePerspective = filterByPerspective(navigationItems, activePerspective?.id);
 
     return sortItemsByPosition(itemsForActivePerspective);
-  }, [activePerspective, allNavigationItems, permissions]);
+  }, [activePerspective?.id, navigationItems, permissions, securityLicenseInvalid]);
 };
 
 const MainNavbar = ({ pathname }: { pathname: string }) => {

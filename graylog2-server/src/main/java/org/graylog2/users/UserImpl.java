@@ -236,14 +236,17 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public List<String> getPermissions() {
-        final Set<String> permissionSet = isServiceAccount() ? new HashSet<>() : new HashSet<>(this.permissions.userSelfEditPermissions(getName()));
+        final boolean isAllowedToCreateTokens = this.permissions.isAllowedToCreateTokens(isExternalUser(), this.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES));
+        final Set<String> permissionSet = isServiceAccount() ? new HashSet<>() : new HashSet<>(this.permissions.userSelfEditPermissions(getName(), isAllowedToCreateTokens));
         @SuppressWarnings("unchecked")
-        final List<String> permissions = (List<String>) fields.get(PERMISSIONS);
-        if (permissions != null) {
-            permissionSet.addAll(permissions);
+        final List<String> permissionList = (List<String>) fields.get(PERMISSIONS);
+        if (permissionList != null) {
+            permissionSet.addAll(permissionList);
         }
         return new ArrayList<>(permissionSet);
     }
+
+
 
     @Override
     public Set<Permission> getObjectPermissions() {
@@ -260,8 +263,9 @@ public class UserImpl extends PersistedImpl implements User {
     @Override
     public void setPermissions(final List<String> permissions) {
         final List<String> perms = Lists.newArrayList(permissions);
+        boolean isAllowedToCreateTokens = this.permissions.isAllowedToCreateTokens(isExternalUser(), this.clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES));
         // Do not store the dynamic user self edit permissions
-        perms.removeAll(this.permissions.userSelfEditPermissions(getName()));
+        perms.removeAll(this.permissions.userSelfEditPermissions(getName(), isAllowedToCreateTokens));
         fields.put(PERMISSIONS, perms);
     }
 

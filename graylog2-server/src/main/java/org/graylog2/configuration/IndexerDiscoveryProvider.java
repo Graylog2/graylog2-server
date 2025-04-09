@@ -31,6 +31,7 @@ import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,6 +139,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
 
     private List<URI> discover() {
         return nodeService.allActive().values().stream()
+                .filter(n -> n.getDataNodeStatus() == DataNodeStatus.AVAILABLE) // avoid providing transport address of not fully initialized nodes
                 .map(Node::getTransportAddress)
                 .filter(address -> address != null && !address.isBlank())
                 .map(URI::create)

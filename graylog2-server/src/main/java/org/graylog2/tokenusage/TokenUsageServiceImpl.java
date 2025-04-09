@@ -29,6 +29,7 @@ import org.graylog2.security.AccessTokenEntity;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.shared.tokenusage.TokenUsageService;
 import org.graylog2.shared.users.UserService;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,7 @@ public class TokenUsageServiceImpl implements TokenUsageService {
                 .map(AccessTokenEntity::userName)
                 .distinct()
                 .map(userService::load)
+                //Here, we're losing information about users that have been deleted in the meantime:
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(User::getName, Function.identity()));
         LOG.debug("Found {} distinct users for current page of access tokens.", usersOfThisPage.size());
@@ -92,23 +94,30 @@ public class TokenUsageServiceImpl implements TokenUsageService {
                 .toList();
 
         return new PaginatedList<>(tokenUsage, currentPage.pagination().total(), page, perPage);
-
     }
 
     @Nonnull
-    private TokenUsageDTO toDTO(AccessTokenEntity dto, Map<String, User> usersOfThisPage, Map<String, String> authServiceIdToTitle) {
-        final String username = dto.userName();
+    private TokenUsageDTO toDTO(AccessTokenEntity token, Map<String, User> usersOfThisPage, Map<String, String> authServiceIdToTitle) {
+        final String username = token.userName();
         final User user = usersOfThisPage.get(username);
+        if (user == null) {
+            LOG.warn("User \"{}\" not found for token named \"{}\".", username, token.name());
+            return TokenUsageDTO.create(token.id(), username, null, token.name(), token.createdAt(), token.lastAccess(), token.expiresAt(), false, "UNKNOWN", true);
+        }
         final boolean isExternal = user.isExternalUser();
         final String authBackend;
-        if (isExternal) {
+
+        if (user.getAuthServiceId() != null) {
             authBackend = Optional.ofNullable(authServiceIdToTitle.get(user.getAuthServiceId()))
                     .orElse("<" + user.getAuthServiceId() + "> (DELETED)");
         } else {
-            //User is not external, so this field stays blank.
-            authBackend = "";
+            //User isn't associated with an auth-service:
+            authBackend = "Internal";
         }
 
-        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess(), isExternal, authBackend);
+        //If the token was never accessed, we return null to make it more obvious in the frontend:
+        final DateTime lastAccess = token.lastAccess().getMillis() == 0 ? null : token.lastAccess();
+
+        return TokenUsageDTO.create(token.id(), username, user.getId(), token.name(), token.createdAt(), lastAccess, token.expiresAt(), isExternal, authBackend, false);
     }
 }

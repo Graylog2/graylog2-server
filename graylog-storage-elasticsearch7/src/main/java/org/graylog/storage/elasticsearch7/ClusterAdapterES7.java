@@ -38,6 +38,7 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.PendingTasksStats;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettingsFactory;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
@@ -139,6 +140,12 @@ public class ClusterAdapterES7 implements ClusterAdapter {
                 response.getSetting("cluster.routing.allocation.disk.watermark.high"),
                 response.getSetting("cluster.routing.allocation.disk.watermark.flood_stage")
         );
+    }
+
+    @Override
+    public ClusterShardAllocation clusterShardAllocation() {
+        // unsupported in Elasticsearch, return empty
+        return new ClusterShardAllocation(Integer.MAX_VALUE, List.of());
     }
 
     @Override

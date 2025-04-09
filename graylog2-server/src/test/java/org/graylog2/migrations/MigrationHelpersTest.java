@@ -35,6 +35,7 @@ import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
+import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
 import org.graylog2.users.UserServiceImpl;
 import org.joda.time.DateTimeZone;
@@ -71,6 +72,8 @@ public class MigrationHelpersTest {
     public RoleService roleService;
     @Mock
     public RoleRemover roleRemover;
+    @Mock
+    public ClusterConfigService configService;
 
     private MigrationHelpers migrationHelpers;
 
@@ -195,6 +198,7 @@ public class MigrationHelpersTest {
         when(userService.load("test-user")).thenReturn(null);
         when(userService.create()).thenReturn(newUser(permissions));
         when(userService.save(any(User.class))).thenReturn("new-id");
+        when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
                                                "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
@@ -212,7 +216,7 @@ public class MigrationHelpersTest {
             assertThat(user.getEmail()).describedAs("user email").isEqualTo("test@example.com");
             assertThat(user.isReadOnly()).describedAs("user is read-only").isFalse();
             assertThat(user.getPermissions()).describedAs("user permissions")
-                    .containsOnlyElementsOf(permissions.userSelfEditPermissions("test-user"));
+                    .containsOnlyElementsOf(permissions.userSelfEditPermissions("test-user", false));
             assertThat(user.getRoleIds()).describedAs("user roles").containsOnly(
                     "54e3deadbeefdeadbeef0001",
                     "54e3deadbeefdeadbeef0002"
@@ -235,6 +239,7 @@ public class MigrationHelpersTest {
 
         when(userService.load("test-user")).thenReturn(existingUser);
         when(userService.save(any(User.class))).thenReturn("new-id");
+        when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
                                                "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
@@ -252,7 +257,7 @@ public class MigrationHelpersTest {
             assertThat(user.getEmail()).describedAs("user email").isEqualTo("test@example.com");
             assertThat(user.isReadOnly()).describedAs("user is read-only").isFalse();
             assertThat(user.getPermissions()).describedAs("user permissions")
-                    .containsOnlyElementsOf(permissions.userSelfEditPermissions("test-user"));
+                    .containsOnlyElementsOf(permissions.userSelfEditPermissions("test-user", false));
             assertThat(user.getRoleIds()).describedAs("user roles").containsOnly(
                     "54e3deadbeefdeadbeef0001",
                     "54e3deadbeefdeadbeef0002"
@@ -268,6 +273,7 @@ public class MigrationHelpersTest {
         when(userService.load("test-user")).thenReturn(null);
         when(userService.create()).thenReturn(newUser(permissions));
         when(userService.save(any(User.class))).thenThrow(ValidationException.class);
+        when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
                                                "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
@@ -279,7 +285,7 @@ public class MigrationHelpersTest {
     @MongoDBFixtures("duplicated-users.json")
     public void ensureUserWithDuplicates() throws ValidationException {
 
-        final TestUserService testUserService = new TestUserService(mongodb.mongoConnection());
+        final TestUserService testUserService = new TestUserService(mongodb.mongoConnection(), configService);
         migrationHelpers = new MigrationHelpers(roleService, testUserService, roleRemover);
 
         assertThat(testUserService.loadAll()).hasSize(2);
@@ -297,6 +303,6 @@ public class MigrationHelpersTest {
         final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(10);
         final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(), passwordAlgorithm);
 
-        return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), ImmutableMap.of());
+        return new UserImpl(passwordAlgorithmFactory, permissions, configService, ImmutableMap.of());
     }
 }

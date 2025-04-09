@@ -48,7 +48,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class InputRoutingService {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InputRoutingService.class);
     private static final String GL_ROUTING_RULE_PREFIX = "gl_route_";
-    private static final Pattern GL_ROUTING_RULE_REGEX = Pattern.compile(GL_ROUTING_RULE_PREFIX + "(\\w+)\\[(\\w+)\\]_to_(\\w+)");
+    private static final Pattern GL_ROUTING_RULE_REGEX = Pattern.compile(GL_ROUTING_RULE_PREFIX + "(.+)\\[(\\w+)\\]_to_(.+)");
 
     private final RuleService ruleService;
     private final InputService inputService;
@@ -122,8 +122,16 @@ public class InputRoutingService {
         return ruleService.save(ruleDao);
     }
 
+    // Create a human-readable name for a routing rule
     private String getSystemRuleName(String inputName, String inputId, String streamName) {
-        return GL_ROUTING_RULE_PREFIX + inputName + "[" + inputId + "]_to_" + streamName;
+        return GL_ROUTING_RULE_PREFIX + sanitize(inputName)
+                + "[" + inputId + "]_to_"
+                + sanitize(streamName);
+    }
+
+    private String sanitize(String s) {
+        return s.replace('\"', '*')
+                .replace('\\', '*');
     }
 
     private boolean isSystemRulePattern(String ruleName) {
@@ -132,7 +140,7 @@ public class InputRoutingService {
     }
 
     private String createSystemRuleRegex(String inputId, String inputName) {
-        return GL_ROUTING_RULE_PREFIX + inputName + "\\[" + inputId + "\\]_to_.*";
+        return GL_ROUTING_RULE_PREFIX + Pattern.quote(sanitize(inputName)) + "\\[" + inputId + "\\]_to_.*";
     }
 
     private String replaceInputName(String ruleName, String oldInputName, String newInputName) {
@@ -157,7 +165,7 @@ public class InputRoutingService {
         ruleService.loadAllByTitle(createSystemRuleRegex(event.inputId(), event.oldInputTitle()))
                 .forEach(ruleDao -> {
                     String oldRuleTitle = ruleDao.title();
-                    String newRuleTitle = replaceInputName(oldRuleTitle, event.oldInputTitle(), event.newInputTitle());
+                    String newRuleTitle = replaceInputName(oldRuleTitle, sanitize(event.oldInputTitle()), sanitize(event.newInputTitle()));
                     String newSource = ruleDao.source().replace(oldRuleTitle, newRuleTitle);
                     ruleService.save(ruleDao.toBuilder().title(newRuleTitle).source(newSource).build(), false);
                     handleRuleRenamed(oldRuleTitle, newRuleTitle);

@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
 
-public class PathConfiguration extends PluginPathConfiguration {
+public class PathConfiguration extends PluginPathConfiguration implements NativeLibPathConfiguration {
     public static final String ALLOWED_AUXILIARY_PATHS = "allowed_auxiliary_paths";
 
     protected static final Path DEFAULT_BIN_DIR = Paths.get("bin");

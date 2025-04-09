@@ -17,7 +17,6 @@
 package org.graylog.testing.fullbackend;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.BeforeAll;
@@ -42,12 +41,12 @@ class MongoDBFixturesWithClassLifecycleIT {
     }
 
     @ContainerMatrixTest
-    void oneTokenPresentWithTestMethodA() {
+    void tokensPresentWithTestMethodA() {
         assertTokenPresent();
     }
 
     @ContainerMatrixTest
-    void oneTokenPresentWithTestMethodB() {
+    void tokensPresentWithTestMethodB() {
         assertTokenPresent();
     }
 
@@ -63,7 +62,7 @@ class MongoDBFixturesWithClassLifecycleIT {
                 .jsonPath()
                 .getList("tokens");
 
-        assertThat(tokens).hasSize(1);
+        assertThat(tokens).hasSize(2);
     }
 
 }

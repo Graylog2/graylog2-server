@@ -16,6 +16,9 @@
  */
 package org.graylog2.inputs.transports.netty;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultHttpRequest;
@@ -235,7 +238,8 @@ public class HttpHandlerTest {
 
         httpRequest.content().writeBytes(GELF_MESSAGE);
 
-        channel = new EmbeddedChannel(new HttpHandler(true, expectedAuthHeader, expectedAuthHeaderValue, "/gelf"));
+        final DownstreamHandler downstreamHandler = new DownstreamHandler();
+        channel = new EmbeddedChannel(new HttpHandler(true, expectedAuthHeader, expectedAuthHeaderValue, "/gelf"), downstreamHandler);
         channel.writeInbound(httpRequest);
         channel.finish();
 
@@ -248,5 +252,25 @@ public class HttpHandlerTest {
         assertThat(headers.get(ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
         assertThat(headers.get(ACCESS_CONTROL_ALLOW_HEADERS)).isEqualTo("Authorization, Content-Type");
         assertThat(headers.get(CONNECTION)).isEqualTo(HttpHeaderValues.CLOSE.toString());
+        if (expectedStatus == HttpResponseStatus.ACCEPTED) {
+            assertThat(downstreamHandler.received).isTrue();
+        }else if (expectedStatus == HttpResponseStatus.UNAUTHORIZED) {
+            assertThat(downstreamHandler.received).isFalse();
+        } else {
+            throw new AssertionError("Unexpected status: " + expectedStatus);
+        }
+    }
+
+    /**
+     * Downstream handler for confirming that authorization failures halt message flow, and that message flow continues
+     * for authentication successes.
+     */
+    private class DownstreamHandler extends SimpleChannelInboundHandler<ByteBuf> {
+        public boolean received = false;
+
+        @Override
+        protected void channelRead0(ChannelHandlerContext channelHandlerContext, io.netty.buffer.ByteBuf httpRequest) throws Exception {
+            this.received = true;
+        }
     }
 }

@@ -21,7 +21,7 @@ import isEqualForSearch from 'views/stores/isEqualForSearch';
 import type { FiltersType } from 'views/types';
 import type { QueryString } from 'views/logic/queries/types';
 
-import Widget from './Widget';
+import Widget, { widgetAttributesForComparison } from './Widget';
 import MessagesWidgetConfig from './MessagesWidgetConfig';
 import type { WidgetState } from './Widget';
 
@@ -67,9 +67,7 @@ export default class MessagesWidget extends Widget {
 
   equals(other: any) {
     if (other instanceof MessagesWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) =>
-        isDeepEqual(this._value[key], other[key]),
-      );
+      return widgetAttributesForComparison.every((key) => isDeepEqual(this[key], other[key]));
     }
 
     return false;
@@ -81,9 +79,7 @@ export default class MessagesWidget extends Widget {
 
   equalsForSearch(other: any) {
     if (other instanceof MessagesWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) =>
-        isEqualForSearch(this._value[key], other[key]),
-      );
+      return widgetAttributesForComparison.every((key) => isEqualForSearch(this[key], other[key]));
     }
 
     return false;

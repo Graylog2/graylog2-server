@@ -108,7 +108,7 @@ export const FilterPreviewStore = singletonStore('core.FilterPreview', () =>
     },
 
     jobStatus(jobId, nodeId) {
-      return runPollJob({ nodeId, asyncSearchId: jobId });
+      return runPollJob({ jobIds: { nodeId, asyncSearchId: jobId } });
     },
 
     trackJob(search, executionState) {

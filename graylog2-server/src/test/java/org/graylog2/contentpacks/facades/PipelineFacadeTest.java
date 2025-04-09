@@ -74,6 +74,7 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog.plugins.pipelineprocessor.rest.PipelineResource.GL_INPUT_ROUTING_PIPELINE;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -335,7 +336,7 @@ public class PipelineFacadeTest {
         final EntityExcerpt expectedEntityExcerpt2 = EntityExcerpt.builder()
                 .id(ModelId.of("5a85c4854b900afd5d662be4"))
                 .type(ModelTypes.PIPELINE_V1)
-                .title("All Messages Routing")
+                .title(GL_INPUT_ROUTING_PIPELINE)
                 .build();
         final Set<EntityExcerpt> expected = Set.of(expectedEntityExcerpt1, expectedEntityExcerpt2);
 

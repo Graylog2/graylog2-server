@@ -72,7 +72,7 @@ const EventsRefreshControls = () => {
       isLoadingMinimumInterval={isLoadingMinimumInterval}
       minimumRefreshInterval={minimumRefreshInterval}
       defaultInterval={defaultInterval}
-      humanName="Evets"
+      humanName="Events"
       onToggle={onToggle}
       onSelectInterval={onSelectInterval}
     />

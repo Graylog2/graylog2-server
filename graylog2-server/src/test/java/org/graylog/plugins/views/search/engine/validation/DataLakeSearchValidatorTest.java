@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
@@ -145,12 +146,16 @@ class DataLakeSearchValidatorTest {
         doReturn("createdByAi").when(crappySearchType).id();
         doReturn(Set.of(mock(Stream.class), mock(Stream.class))).when(crappySearchType).streams(); //1. Search type error: 2 streams
         doReturn(Set.of("Heavy Stream Category")).when(crappySearchType).streamCategories(); //2. Search type error: stream categories forbidden
-        doReturn(List.of(mock(UsedSearchFilter.class))).when(crappySearchType).filters(); //3. Search type error: stream categories forbidden
-        doReturn(mock(Filter.class)).when(crappySearchType).filter(); //4. Search type error: stream categories forbidden
-        final Query queryWithManyErrors = testQuery(
-                ElasticsearchQueryString.of("GET"), //Query error : Wrong backend
-                Set.of(crappySearchType, mockDataLakeSearchType()) //Query error: Too many search types
+        doReturn(List.of(mock(UsedSearchFilter.class))).when(crappySearchType).filters(); //3. Search type error: search filters forbidden
+        doReturn(mock(Filter.class)).when(crappySearchType).filter(); //4. Search type error: filter field forbidden
+        Query queryWithManyErrors = testQuery(
+                ElasticsearchQueryString.of("GET"), //1st Query error : Wrong backend
+                Set.of(crappySearchType, mockDataLakeSearchType()) //2nd Query error: Too many search types
         );
+        queryWithManyErrors = queryWithManyErrors.toBuilder()
+                .filters(List.of(mock(UsedSearchFilter.class)))//3rd Query error : search filters forbidden
+                .filter(mock(Filter.class))//4th Query error : filter field forbidden
+                .build();
         final Search search = Search.builder()
                 .id("nvmd")
                 .queries(ImmutableSet.of(queryWithManyErrors))
@@ -159,10 +164,14 @@ class DataLakeSearchValidatorTest {
         assertTrue(DataLakeSearchValidator.containsDataLakeSearchElements(queryWithManyErrors));
         final Set<SearchError> errors = new DataLakeSearchValidator()
                 .validate(search, mock(SearchUser.class));
-        assertEquals(6, errors.size());
+        assertEquals(8, errors.size());
         assertEquals(4, errors.stream()
                 .filter(err -> err instanceof SearchTypeError)
                 .filter(searchError -> ((SearchTypeError) searchError).searchTypeId().equals("createdByAi"))
+                .count());
+        assertEquals(4, errors.stream()
+                .filter(err -> !(err instanceof SearchTypeError))
+                .filter(err -> err instanceof QueryError)
                 .count());
     }
 

@@ -16,7 +16,7 @@
       "_id": {
         "$oid": "54f9deadbeefdeadbeefaffe"
       },
-      "username": "user",
+      "username": "deleted_user",
       "token": "anothertoken",
       "NAME": "rest",
       "last_access": {

@@ -79,7 +79,7 @@ const GroupingsConfiguration = () => {
   } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
   const removeGrouping = useCallback(
-    (index) => () => {
+    (index: number) => () => {
       setValues(GroupingElement.onRemove(index, values));
     },
     [setValues, values],

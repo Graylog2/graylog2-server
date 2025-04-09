@@ -75,7 +75,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -95,6 +97,7 @@ public class IndexSetsResource extends RestResource {
     private final ClusterConfigService clusterConfigService;
     private final SystemJobManager systemJobManager;
     private final DataTieringStatusService tieringStatusService;
+    private final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -105,7 +108,8 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
                              final SystemJobManager systemJobManager,
-                             final DataTieringStatusService tieringStatusService) {
+                             final DataTieringStatusService tieringStatusService,
+                             final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -115,6 +119,7 @@ public class IndexSetsResource extends RestResource {
         this.clusterConfigService = clusterConfigService;
         this.systemJobManager = systemJobManager;
         this.tieringStatusService = tieringStatusService;
+        this.openIndexSetFilterFactories = openIndexSetFilterFactories;
     }
 
     @GET
@@ -128,15 +133,20 @@ public class IndexSetsResource extends RestResource {
                                  @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
                                  @QueryParam("limit") @DefaultValue("0") int limit,
                                  @ApiParam(name = "stats", value = "Include index set stats.")
-                                 @QueryParam("stats") @DefaultValue("false") boolean computeStats) {
+                                 @QueryParam("stats") @DefaultValue("false") boolean computeStats,
+                                 @ApiParam(name = "only_open", value = "Include only graylog open indices.")
+                                 @QueryParam("only_open") @DefaultValue("false") boolean onlyOpen) {
 
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
-        List<IndexSetConfig> allowedConfigurations = indexSetService.findAll()
+        Stream<IndexSetConfig> indexSetConfigStream = indexSetService.findAll()
                 .stream()
-                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
-                .toList();
-
-        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, allowedConfigurations);
+                .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()));
+        if (onlyOpen) {
+            for (OpenIndexSetFilterFactory filterFactory : openIndexSetFilterFactories) {
+                indexSetConfigStream = indexSetConfigStream.filter(filterFactory.create());
+            }
+        }
+        return getPagedIndexSetResponse(skip, limit, computeStats, defaultIndexSet, indexSetConfigStream.toList());
     }
 
     @GET
