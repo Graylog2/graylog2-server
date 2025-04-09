@@ -93,7 +93,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   };
 
   const readOnly = !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1';
-  const hasEventProcedure = !!eventDefinition?.event_procedure;
+  const hasEventProcedure = !!eventDefinitionEventProcedure;
 
   return (
     <>

@@ -128,7 +128,7 @@ const EventDefinitionForm = ({
 
   const eventProcedureId = React.useMemo(
     () => eventDefinition?.event_procedure || undefined,
-    [eventDefinition?.event_procedure]
+    [eventDefinition]
   );
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
