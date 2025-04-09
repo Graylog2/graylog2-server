@@ -21,13 +21,11 @@ import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationContext;
-import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
+import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog2.alerts.EmailRecipients;
-import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.jackson.TypeReferences;
 import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.notifications.Notification;
@@ -36,13 +34,10 @@ import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.web.customization.Config;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +48,6 @@ import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class EmailEventNotification implements EventNotification {
-    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
-
     public interface Factory extends EventNotification.Factory {
         @Override
         EmailEventNotification create();
@@ -67,11 +60,9 @@ public class EmailEventNotification implements EventNotification {
     private final NotificationService notificationService;
     private final NodeId nodeId;
     private final LookupTableService lookupTableService;
-    private final ObjectMapperProvider objectMapperProvider;
-    private final URI httpExternalUri;
     private final EmailRecipients.Factory emailRecipientsFactory;
     private final Engine templateEngine;
-    private final Config customizationConfig;
+    private final TemplateModelProvider templateModelProvider;
 
     @Inject
     public EmailEventNotification(EventNotificationService notificationCallbackService,
@@ -79,21 +70,17 @@ public class EmailEventNotification implements EventNotification {
                                   NotificationService notificationService,
                                   NodeId nodeId,
                                   LookupTableService lookupTableService,
-                                  ObjectMapperProvider objectMapperProvider,
-                                  HttpConfiguration httpConfiguration,
                                   EmailRecipients.Factory emailRecipientsFactory,
                                   Engine templateEngine,
-                                  Config customizationConfig) {
+                                  TemplateModelProvider templateModelProvider) {
         this.notificationCallbackService = notificationCallbackService;
         this.emailSender = emailSender;
         this.notificationService = notificationService;
         this.nodeId = nodeId;
         this.lookupTableService = lookupTableService;
-        this.objectMapperProvider = objectMapperProvider;
-        this.httpExternalUri = httpConfiguration.getHttpExternalUri();
         this.emailRecipientsFactory = emailRecipientsFactory;
         this.templateEngine = templateEngine;
-        this.customizationConfig = customizationConfig;
+        this.templateModelProvider = templateModelProvider;
     }
 
     @Override
@@ -154,11 +141,7 @@ public class EmailEventNotification implements EventNotification {
     }
 
     private Map<String, Object> getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog, DateTimeZone timeZone) {
-        final EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
-        Map<String, Object> model = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
-        model.put("http_external_uri", this.httpExternalUri);
-        model.put("product_name", customizationConfig.productName().orElse(DEFAULT_PRODUCT_NAME));
-        return model;
+        return templateModelProvider.of(ctx, backlog, timeZone);
     }
 
     private String getSender(EmailEventNotificationConfig config, Map<String, Object> model) throws ConfigurationError {

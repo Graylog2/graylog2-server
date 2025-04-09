@@ -26,11 +26,11 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.PermanentEventNotificationException;
+import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.integrations.notifications.types.util.RequestClient;
 import org.graylog2.bindings.providers.JsonSafeEngineProvider;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageFactory;
@@ -39,7 +39,6 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -57,6 +56,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -188,12 +188,11 @@ public class TeamsEventNotificationV2Test {
         when(notificationCallbackService.getBacklogForEvent(eventNotificationContext)).thenReturn(messageSummaries);
 
         teamsEventNotification = new TeamsEventNotificationV2(notificationCallbackService,
-                new ObjectMapperProvider(),
                 new JsonSafeEngineProvider().get(),
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                new HttpConfiguration());
+                mock(TemplateModelProvider.class));
     }
 
     @Test
