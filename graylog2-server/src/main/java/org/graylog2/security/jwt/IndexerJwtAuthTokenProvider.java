@@ -54,11 +54,9 @@ public class IndexerJwtAuthTokenProvider implements Provider<IndexerJwtAuthToken
         this.jwtSecret = jwtSecret;
         this.tokenExpirationDuration = tokenExpirationDuration;
         this.cachingDuration = cachingDuration;
-
         cachingSupplier = Suppliers.memoizeWithExpiration(() -> {
-            // TODO: can we run this check outside of the supplier? Is the @RunsWithDataNode stable through the server lifetime?
             if (useJwtAuthentication) {
-                LOG.info("Creating new JWT token, expiration set to {}", tokenExpirationDuration);
+                LOG.debug("Creating new JWT token, expiration set to {}", tokenExpirationDuration);
                 return Optional.of(createToken(jwtSecret, tokenExpirationDuration));
             } else {
                 return Optional.empty();

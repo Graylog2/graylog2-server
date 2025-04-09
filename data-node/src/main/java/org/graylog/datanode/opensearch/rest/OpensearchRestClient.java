@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.opensearch.rest;
 
+import jakarta.annotation.Nonnull;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
@@ -44,9 +45,9 @@ public class OpensearchRestClient {
                 sslContext.init(null, new TrustManager[]{tm}, new SecureRandom());
 
                 builder.setHttpClientConfigCallback(httpClientBuilder -> {
-                    datanodeConfiguration.indexerJwtAuthToken().headerValue().ifPresent(
-                            authToken -> httpClientBuilder.addInterceptorLast(
-                                    (HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", authToken)));
+                    if (datanodeConfiguration.indexerJwtAuthToken().isJwtAuthEnabled()) {
+                        httpClientBuilder.addInterceptorLast(jwtAuthHeaderInterceptor(datanodeConfiguration));
+                    }
                     httpClientBuilder.setSSLContext(sslContext);
                     return httpClientBuilder;
                 });
@@ -55,5 +56,11 @@ public class OpensearchRestClient {
             }
         }
         return new RestHighLevelClient(builder);
+    }
+
+    @Nonnull
+    private static HttpRequestInterceptor jwtAuthHeaderInterceptor(DatanodeConfiguration datanodeConfiguration) {
+        return (request, context) ->
+                datanodeConfiguration.indexerJwtAuthToken().headerValue().ifPresent(authToken -> request.addHeader("Authorization", authToken));
     }
 }
