@@ -37,6 +37,7 @@ import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.web.customization.Config;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,8 @@ import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class EmailEventNotification implements EventNotification {
+    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
+
     public interface Factory extends EventNotification.Factory {
         @Override
         EmailEventNotification create();
@@ -68,6 +71,7 @@ public class EmailEventNotification implements EventNotification {
     private final URI httpExternalUri;
     private final EmailRecipients.Factory emailRecipientsFactory;
     private final Engine templateEngine;
+    private final Config customizationConfig;
 
     @Inject
     public EmailEventNotification(EventNotificationService notificationCallbackService,
@@ -78,7 +82,8 @@ public class EmailEventNotification implements EventNotification {
                                   ObjectMapperProvider objectMapperProvider,
                                   HttpConfiguration httpConfiguration,
                                   EmailRecipients.Factory emailRecipientsFactory,
-                                  Engine templateEngine) {
+                                  Engine templateEngine,
+                                  Config customizationConfig) {
         this.notificationCallbackService = notificationCallbackService;
         this.emailSender = emailSender;
         this.notificationService = notificationService;
@@ -88,6 +93,7 @@ public class EmailEventNotification implements EventNotification {
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
         this.emailRecipientsFactory = emailRecipientsFactory;
         this.templateEngine = templateEngine;
+        this.customizationConfig = customizationConfig;
     }
 
     @Override
@@ -151,6 +157,7 @@ public class EmailEventNotification implements EventNotification {
         final EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
         Map<String, Object> model = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
         model.put("http_external_uri", this.httpExternalUri);
+        model.put("product_name", customizationConfig.productName().orElse(DEFAULT_PRODUCT_NAME));
         return model;
     }
 
