@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useRef } from 'react';
 import styled from 'styled-components';
 
-import {ConfirmDialog, IfPermitted} from 'components/common';
+import { ConfirmDialog, IfPermitted } from 'components/common';
 import { Button, MenuItem } from 'components/bootstrap';
 import type { DataNode } from 'components/datanode/Types';
 import { MoreActions } from 'components/common/EntityDataTable';
@@ -152,20 +152,18 @@ const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown'
   const isRemovingDatanode = dataNode.data_node_status === 'REMOVING';
 
   return (
-    <>
+    <IfPermitted permissions="datanode:start">
       {displayAs === 'dropdown' && (
-        <IfPermitted permissions="datanode:start">
-          <MoreActions>
-            <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
-            {!isDatanodeRunning && <MenuItem onSelect={handleStartDatanode}>Start</MenuItem>}
-            {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
-            {isDatanodeRemoved && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>}
-            {(!isDatanodeRemoved || isRemovingDatanode) && (
-              <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
-            )}
-            <MenuItem onSelect={() => setShowLogsDialog(true)}>Show logs</MenuItem>
-          </MoreActions>
-        </IfPermitted>
+        <MoreActions>
+          <MenuItem onSelect={() => renewDatanodeCertificate(dataNode.node_id)}>Renew certificate</MenuItem>
+          {!isDatanodeRunning && <MenuItem onSelect={handleStartDatanode}>Start</MenuItem>}
+          {isDatanodeRunning && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.STOP)}>Stop</MenuItem>}
+          {isDatanodeRemoved && <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REJOIN)}>Rejoin</MenuItem>}
+          {(!isDatanodeRemoved || isRemovingDatanode) && (
+            <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
+          )}
+          <MenuItem onSelect={() => setShowLogsDialog(true)}>Show logs</MenuItem>
+        </MoreActions>
       )}
       {displayAs === 'buttons' && (
         <>
@@ -210,7 +208,7 @@ const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown'
           onHide={() => setShowLogsDialog(false)}
         />
       )}
-    </>
+    </IfPermitted>
   );
 };
 

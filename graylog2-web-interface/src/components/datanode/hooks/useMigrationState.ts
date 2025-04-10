@@ -25,9 +25,13 @@ import { onError } from 'util/conditional/onError';
 
 export const MIGRATION_STATE_QUERY_KEY = ['migration-state'];
 
-const useMigrationState = (
-  refetchInterval: number | false = false,
-): {
+const useMigrationState = ({
+  refetchInterval = false,
+  enabled = true,
+}?: {
+  refetchInterval?: number | false;
+  enabled?: boolean;
+}): {
   currentStep: MigrationState;
   isLoading: boolean;
 } => {
@@ -35,6 +39,7 @@ const useMigrationState = (
     MIGRATION_STATE_QUERY_KEY,
     () => onError(Migration.status(), (error: Error) => UserNotification.error(error.message)),
     {
+      enabled,
       retry: 2,
       refetchInterval,
     },
