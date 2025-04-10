@@ -49,7 +49,7 @@ type Props = {
   currentUser: User;
 };
 
-const EventDefinitionSummary = ({ eventDefinition, notifications, validation, currentUser }: Props) => {
+const EventDefinitionSummary = ({ eventDefinition, notifications, validation = { errors: { title: '' } }, currentUser }: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
   const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
 
@@ -76,7 +76,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         {isEventProceduresEnabled ? (
           <>
             <dt style={{ margin: '16px 0 0' }}>Event Procedure</dt>
-            <dd></dd>
+            <dd />
           </>
 
         ) : (

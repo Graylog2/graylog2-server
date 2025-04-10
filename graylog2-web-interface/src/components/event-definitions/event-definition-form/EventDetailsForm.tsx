@@ -75,7 +75,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
         canEdit={canEdit}
       />
     )),
-    [pluggableEventProcedureForm, eventDefinition, eventDefinitionEventProcedure, showAddEventProcedureForm, onSave, canEdit],
+    [pluggableEventProcedureForm, eventDefinition, eventDefinitionEventProcedure, onSave, canEdit],
   );
 
   const handleChange = (event) => {
@@ -105,8 +105,8 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
           {(hasEventProcedure || showAddEventProcedureForm) ? (
             <>
               {
-                eventProcedureForm.map((form, index) => (
-                  <div key={`form-${index}`}>{form}</div>
+                eventProcedureForm.map((form) => (
+                  <div key={`event-procedure-form`}>{form}</div>
                 ))
               }
             </>
@@ -153,65 +153,63 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   };
 
   return (
-    <>
-      <Row>
-        <Col md={7} lg={12}>
-          <h2 className={commonStyles.title}>Event Details</h2>
-          <fieldset>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem' }}>
-              <Input
-                id="event-definition-title"
-                name="title"
-                label="Title"
-                type="text"
-                bsStyle={validation.errors.title ? 'error' : null}
-                help={get(
-                  validation,
-                  'errors.title[0]',
-                  'Title for this Event Definition, Events and Alerts created from it.',
-                )}
-                value={eventDefinition.title}
-                onChange={handleChange}
-                readOnly={readOnly}
-                required
-              />
-
-              <FormGroup controlId="event-definition-priority">
-                <ControlLabel>Priority</ControlLabel>
-                <Select
-                  options={priorityOptions}
-                  value={toString(eventDefinition.priority)}
-                  onChange={handlePriorityChange}
-                  clearable={false}
-                  disabled={readOnly}
-                  required
-                />
-                <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
-              </FormGroup>
-            </div>
-
+    <Row>
+      <Col md={7} lg={12}>
+        <h2 className={commonStyles.title}>Event Details</h2>
+        <fieldset>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem' }}>
             <Input
-              id="event-definition-description"
-              name="description"
-              label={
-                <span>
-                  Description <small className="text-muted">(Optional)</small>
-                </span>
-              }
-              type="textarea"
-              help="Longer description for this Event Definition."
-              value={eventDefinition.description}
+              id="event-definition-title"
+              name="title"
+              label="Title"
+              type="text"
+              bsStyle={validation.errors.title ? 'error' : null}
+              help={get(
+                validation,
+                'errors.title[0]',
+                'Title for this Event Definition, Events and Alerts created from it.',
+              )}
+              value={eventDefinition.title}
               onChange={handleChange}
               readOnly={readOnly}
-              rows={2}
+              required
             />
 
-            {renderEventProcedure()}
+            <FormGroup controlId="event-definition-priority">
+              <ControlLabel>Priority</ControlLabel>
+              <Select
+                options={priorityOptions}
+                value={toString(eventDefinition.priority)}
+                onChange={handlePriorityChange}
+                clearable={false}
+                disabled={readOnly}
+                required
+              />
+              <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
+            </FormGroup>
+          </div>
 
-          </fieldset>
-        </Col>
-      </Row>
-    </>
+          <Input
+            id="event-definition-description"
+            name="description"
+            label={
+              <span>
+                Description <small className="text-muted">(Optional)</small>
+              </span>
+            }
+            type="textarea"
+            help="Longer description for this Event Definition."
+            value={eventDefinition.description}
+            onChange={handleChange}
+            readOnly={readOnly}
+            rows={2}
+          />
+
+          {renderEventProcedure()}
+
+        </fieldset>
+      </Col>
+    </Row>
   );
 };
 
