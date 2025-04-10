@@ -102,7 +102,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             <>
               {
                 eventProcedureForm.map((form) => (
-                  <div key={`event-procedure-form`}>{form}</div>
+                  <div key="event-procedure-form">{form}</div>
                 ))
               }
             </>
