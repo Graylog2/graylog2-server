@@ -61,21 +61,17 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const pluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm');
   const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
 
-  const onSave = (eventProcedureId: string) => {
-    onChange('event_procedure', eventProcedureId);
-  };
-
   const eventProcedureForm = React.useMemo(
     () => pluggableEventProcedureForm.map(({ component: PluggableEventProcedureForm }) => (
       <PluggableEventProcedureForm
         eventDefinition={eventDefinition}
         eventDefinitionEventProcedure={eventDefinitionEventProcedure}
         onClose={() => setShowAddEventProcedureForm(false)}
-        onSave={onSave}
+        onSave={(eventProcedureId) => onChange('event_procedure', eventProcedureId)}
         canEdit={canEdit}
       />
     )),
-    [pluggableEventProcedureForm, eventDefinition, eventDefinitionEventProcedure, onSave, canEdit],
+    [pluggableEventProcedureForm, eventDefinition, eventDefinitionEventProcedure, canEdit, onChange],
   );
 
   const handleChange = (event) => {
