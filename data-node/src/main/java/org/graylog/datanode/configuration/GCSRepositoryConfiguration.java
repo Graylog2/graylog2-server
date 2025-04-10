@@ -17,13 +17,12 @@
 package org.graylog.datanode.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.validators.PathReadableValidator;
 import org.graylog2.configuration.Documentation;
 
 import java.nio.file.Path;
 
 public class GCSRepositoryConfiguration {
-    @Documentation("Path to Google Cloud Storage credentials file")
+    @Documentation("Path to Google Cloud Storage credentials file in JSON format. May be absolute or relative to config_location directory.")
     @Parameter(value = "gcs_credentials_file")
     private Path gcsCredentialsFile;
 
