@@ -97,8 +97,8 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
 
     return (
       <>
-        Unit <b>{unitName}</b> was defined for field <b>{field}</b> by Graylog. Changing this unit might represent data
-        incorrectly on the charts
+        Unit <b>{unitName}</b> was configured for field <b>{field}</b>. Changing this unit might represent data
+        incorrectly on the charts.
       </>
     );
   }, [field, predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType]);

@@ -54,7 +54,7 @@ const EditTokensAction = ({
 );
 
 const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
-  const tooltip = <>System users can only be modified in the Graylog configuration file.</>;
+  const tooltip = <>System users can only be modified in the server configuration file.</>;
 
   return (
     <>

@@ -77,10 +77,7 @@ class CollectorList extends React.Component<CollectorListProps> {
             </h2>
           </Col>
           <Col md={12}>
-            <p>
-              Manage Log Collectors that you can configure and supervise through Graylog Sidecar and Graylog Web
-              Interface.
-            </p>
+            <p>Manage Log Collectors that you can configure and supervise through sidecars and the web interface.</p>
           </Col>
         </Row>
 

@@ -21,9 +21,9 @@ import { Col, Row } from 'components/bootstrap';
 import KeyboardShortcutsList from 'components/hotkeys/KeyboardShortcutsList';
 
 const KeyboardShortcutsPage = () => (
-  <DocumentTitle title="Graylog Keyboard Shortcuts">
-    <PageHeader title="Graylog Keyboard Shortcuts">
-      <span>A list of all available shortcuts in Graylog</span>
+  <DocumentTitle title="Keyboard Shortcuts">
+    <PageHeader title="Keyboard Shortcuts">
+      <span>A list of all available shortcuts</span>
     </PageHeader>
     <Row className="content">
       <Col md={12}>

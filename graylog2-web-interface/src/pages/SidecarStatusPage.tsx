@@ -101,7 +101,7 @@ class SidecarStatusPage extends React.Component<
             title: 'Sidecars documentation',
             path: DocsHelper.PAGES.COLLECTOR_STATUS,
           }}>
-          <span>A status overview of the Graylog Sidecar.</span>
+          <span>A status overview of the Sidecar.</span>
         </PageHeader>
 
         <SidecarStatus sidecar={sidecar} collectors={collectors} />

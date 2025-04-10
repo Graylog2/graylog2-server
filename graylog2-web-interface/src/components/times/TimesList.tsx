@@ -23,8 +23,10 @@ import { Spinner, Timestamp, BrowserTime } from 'components/common';
 import { SystemStore } from 'stores/system/SystemStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { useStore } from 'stores/connect';
+import useProductName from 'customization/useProductName';
 
 const TimesList = () => {
+  const productName = useProductName();
   const [time, setTime] = useState(moment());
   const currentUser = useCurrentUser();
   const { system } = useStore(SystemStore);
@@ -49,7 +51,8 @@ const TimesList = () => {
 
         <p className="description">
           Dealing with timezones can be confusing. Here you can see the timezone applied to different components of your
-          system. You can check timezone settings of specific graylog-server nodes on their respective detail page.
+          system. You can check timezone settings of specific {productName} server nodes on their respective detail
+          page.
         </p>
 
         <dl className="system-dl">
@@ -63,7 +66,7 @@ const TimesList = () => {
           <dd>
             <BrowserTime dateTime={time} format={timeFormat} />
           </dd>
-          <dt>Graylog server:</dt>
+          <dt>{productName} server:</dt>
           <dd>
             <Timestamp dateTime={time} format={timeFormat} tz={serverTimezone} />
           </dd>

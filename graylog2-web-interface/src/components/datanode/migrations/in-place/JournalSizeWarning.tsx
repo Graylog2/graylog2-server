@@ -20,26 +20,31 @@ import styled from 'styled-components';
 import { Icon } from 'components/common';
 import { Panel } from 'components/bootstrap';
 import { StyledPanel } from 'components/datanode/migrations/MigrationWelcomeStep';
+import useProductName from 'customization/useProductName';
 
 const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
 
-const JournalSizeWarning = () => (
-  <StyledHelpPanel bsStyle="warning">
-    <Panel.Heading>
-      <Panel.Title componentClass="h3">
-        <Icon name="warning" /> Journal size warning
-      </Panel.Title>
-    </Panel.Heading>
-    <Panel.Body>
-      <p>
-        Please note that during migration you will have to stop processing on your Graylog node, this will result in the
-        journal growing in size. Therefore you will have to increase your journal volume size during the Journal size
-        downsize step or earlier.
-      </p>
-    </Panel.Body>
-  </StyledHelpPanel>
-);
+const JournalSizeWarning = () => {
+  const productName = useProductName();
+
+  return (
+    <StyledHelpPanel bsStyle="warning">
+      <Panel.Heading>
+        <Panel.Title componentClass="h3">
+          <Icon name="warning" /> Journal size warning
+        </Panel.Title>
+      </Panel.Heading>
+      <Panel.Body>
+        <p>
+          Please note that during migration you will have to stop processing on your {productName} node, this will
+          result in the journal growing in size. Therefore you will have to increase your journal volume size during the
+          Journal size downsize step or earlier.
+        </p>
+      </Panel.Body>
+    </StyledHelpPanel>
+  );
+};
 
 export default JournalSizeWarning;

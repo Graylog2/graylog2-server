@@ -23,6 +23,7 @@ import { BootstrapModalForm, Button, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { getValueFromInput } from 'util/FormsUtils';
+import useProductName from 'customization/useProductName';
 
 import { PLUGIN_API_ENDPOINT, PLUGIN_CONFIG_CLASS_NAME } from '../Constants';
 import UserNotification from '../../util/UserNotification';
@@ -45,7 +46,6 @@ const postConfigUpdate = (update) => {
 
   return fetch('PUT', url, update);
 };
-
 const AWSPluginConfiguration = ({
   config = {
     lookups_enabled: false,
@@ -55,6 +55,7 @@ const AWSPluginConfiguration = ({
     proxy_enabled: false,
   },
 }: Props) => {
+  const productName = useProductName();
   const [updateConfig, setUpdateConfig] = useState(_initialState(config));
   const [showAwsConfigModal, setShowAwsConfigModal] = useState(false);
 
@@ -108,8 +109,8 @@ const AWSPluginConfiguration = ({
 
       <p>
         Base configuration for all plugins the AWS module is providing. Note that some parameters will be stored in
-        MongoDB without encryption. Graylog users with required permissions will be able to read them in the
-        configuration dialog on this page.
+        MongoDB without encryption. Users with required permissions will be able to read them in the configuration
+        dialog on this page.
       </p>
 
       <dl className="deflist">
@@ -198,7 +199,7 @@ const AWSPluginConfiguration = ({
                 The AWS instance lookup message processor keeps a table of instances for fast address translation.
                 Define the AWS regions you want to include in the tables. This should be all regions you run AWS
                 services in. Remember that your IAM user needs permission for these regions or you will see warnings in
-                your graylog-server log files.
+                your {productName} server logs.
               </span>
             }
             name="lookup_regions"
@@ -213,7 +214,7 @@ const AWSPluginConfiguration = ({
             help={
               <span>
                 When enabled, we&apos;ll access the AWS APIs through the HTTP proxy configured (
-                <code>http_proxy_uri</code>) in your Graylog configuration file.
+                <code>http_proxy_uri</code>) in your ${productName} configuration file.
                 <br />
                 <em>Important:</em> You have to restart all AWS inputs for this configuration to take effect.
               </span>

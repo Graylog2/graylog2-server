@@ -23,45 +23,50 @@ import DocsHelper from 'util/DocsHelper';
 import { Button, Row, Col, Alert } from 'components/bootstrap';
 import { PageHeader, DocumentTitle, Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
+import useProductName from 'customization/useProductName';
 
-const RolesOverviewPage = () => (
-  <DocumentTitle title="Roles Overview">
-    <PageHeader
-      title="Roles Overview"
-      documentationLink={{
-        title: 'Permissions documentation',
-        path: DocsHelper.PAGES.USERS_ROLES,
-      }}
-      topActions={
-        <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-          <Button bsStyle="info">Roles Overview</Button>
-        </LinkContainer>
-      }>
-      <span>
-        Overview of Graylog&apos;s roles. Roles allow granting capabilities to users, like creating dashboards or event
-        definitions.
-      </span>
-    </PageHeader>
+const RolesOverviewPage = () => {
+  const productName = useProductName();
 
-    <Row className="content">
-      <Col xs={12}>
-        <Alert bsStyle="info" title={<>Granting Permissions</>}>
-          With Graylog 4.0, we&apos;ve updated the permissions system and changed the purpose of roles. The built-in
-          roles still allow granting capabilities to users, like creating dashboards or viewing the archive catalog. But
-          they no longer grant permissions for a specific dashboard or stream. It is also not possible to create an own
-          role. Granting permissions for a specific entity can now be done by using its{' '}
-          <b>
-            <Icon name="person_add" /> Share
-          </b>{' '}
-          button. You can find the button e.g. on the entities overview page. If you want to grant permissions for an
-          entity to multiple users at once, you can use teams. Learn more in the{' '}
-          <DocumentationLink page={DocsHelper.PAGES.PERMISSIONS} text="documentation" />.
-        </Alert>
-      </Col>
-    </Row>
+  return (
+    <DocumentTitle title="Roles Overview">
+      <PageHeader
+        title="Roles Overview"
+        documentationLink={{
+          title: 'Permissions documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+        topActions={
+          <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
+            <Button bsStyle="info">Roles Overview</Button>
+          </LinkContainer>
+        }>
+        <span>
+          Overview of all roles available in {productName}. Roles allow granting capabilities to users, like creating
+          dashboards or event definitions.
+        </span>
+      </PageHeader>
 
-    <RolesOverview />
-  </DocumentTitle>
-);
+      <Row className="content">
+        <Col xs={12}>
+          <Alert bsStyle="info" title={<>Granting Permissions</>}>
+            With version 4.0, we&apos;ve updated the permissions system and changed the purpose of roles. The built-in
+            roles still allow granting capabilities to users, like creating dashboards or viewing the archive catalog.
+            But they no longer grant permissions for a specific dashboard or stream. It is also not possible to create
+            an own role. Granting permissions for a specific entity can now be done by using its{' '}
+            <b>
+              <Icon name="person_add" /> Share
+            </b>{' '}
+            button. You can find the button e.g. on the entities overview page. If you want to grant permissions for an
+            entity to multiple users at once, you can use teams. Learn more in the{' '}
+            <DocumentationLink page={DocsHelper.PAGES.PERMISSIONS} text="documentation" />.
+          </Alert>
+        </Col>
+      </Row>
+
+      <RolesOverview />
+    </DocumentTitle>
+  );
+};
 
 export default RolesOverviewPage;

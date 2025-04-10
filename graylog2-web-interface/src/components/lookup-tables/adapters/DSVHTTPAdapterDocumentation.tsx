@@ -17,15 +17,18 @@
 import React from 'react';
 
 import { Alert } from 'components/bootstrap';
+import useProductName from 'customization/useProductName';
 
-const DSVHTTPAdapterDocumentation = () => {
-  const csvFile1 = `"127.0.0.1","localhost"
+const csvFile1 = `"127.0.0.1","localhost"
 "10.0.0.1","server1"
 "10.0.0.2","server2"`;
 
-  const csvFile2 = `'127.0.0.1';'e4:b2:11:d1:38:14'
+const csvFile2 = `'127.0.0.1';'e4:b2:11:d1:38:14'
 '10.0.0.1';'e4:b2:12:d1:48:28'
 '10.0.0.2';'e4:b2:11:d1:58:34'`;
+
+const DSVHTTPAdapterDocumentation = () => {
+  const productName = useProductName();
 
   return (
     <div>
@@ -38,7 +41,7 @@ const DSVHTTPAdapterDocumentation = () => {
             The file uses <strong>utf-8</strong> encoding
           </li>
           <li>
-            The file is accessible using the same URL by <strong>every</strong> Graylog server node
+            The file is accessible using the same URL by <strong>every</strong> {productName} server node
           </li>
         </ul>
       </Alert>
@@ -51,7 +54,7 @@ const DSVHTTPAdapterDocumentation = () => {
       <p style={{ marginBottom: 10, padding: 0 }}>
         Separator: <code>,</code>
         <br />
-        Quote character: <code>"</code>
+        Quote character: <code>&#34;</code>
         <br />
       </p>
 
@@ -64,7 +67,7 @@ const DSVHTTPAdapterDocumentation = () => {
       <p style={{ marginBottom: 10, padding: 0 }}>
         Separator: <code>;</code>
         <br />
-        Quote character: <code>'</code>
+        Quote character: <code>&#39;</code>
         <br />
       </p>
 

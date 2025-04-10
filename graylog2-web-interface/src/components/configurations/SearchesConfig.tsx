@@ -493,8 +493,8 @@ const SearchesConfig = () => {
             {!isLoadingMinimumRefreshInterval && (
               <Alert bsStyle="warning">
                 Please note, a minimum refresh interval of <ReadableDuration duration={minimumRefreshInterval} /> (
-                {minimumRefreshInterval}) has been configured in the graylog.conf. Only intervals which are equal or
-                above the minimum can be used.
+                {minimumRefreshInterval}) has been configured in the server configuration file. Only intervals which are
+                equal or above the minimum can be used.
               </Alert>
             )}
           </fieldset>

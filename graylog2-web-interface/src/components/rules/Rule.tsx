@@ -93,9 +93,8 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
           path: DocsHelper.PAGES.PIPELINE_RULES,
         }}>
         <span>
-          Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of
-          actions. Graylog evaluates the condition against a message and executes the actions if the condition is
-          satisfied.
+          Rules are a way of applying changes to messages. A rule consists of a condition and a list of actions. The
+          condition is evaluated against a message, and the actions are executed if the condition is satisfied.
         </span>
       </PageHeader>
       {isRuleBuilder ? (

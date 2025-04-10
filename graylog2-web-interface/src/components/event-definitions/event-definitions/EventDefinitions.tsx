@@ -33,7 +33,7 @@ const EmptyContent = () => (
       <EmptyEntity>
         <p>
           Create Event Definitions that are able to search, aggregate or correlate Messages and other Events, allowing
-          you to record significant Events in Graylog and alert on them.
+          you to record significant Events and alert on them.
         </p>
         <IfPermitted permissions="eventdefinitions:create">
           <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>

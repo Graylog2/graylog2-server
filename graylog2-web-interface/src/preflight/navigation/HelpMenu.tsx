@@ -45,7 +45,7 @@ const HelpMenu = () => (
         rightSection={<Icon name="open_in_new" />}
         href="https://docs.graylog.org/docs"
         target="_blank">
-        Graylog Documentation
+        documentation
       </Menu.Item>
       <Menu.Item
         component="a"
