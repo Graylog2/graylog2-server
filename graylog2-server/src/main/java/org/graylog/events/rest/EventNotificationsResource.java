@@ -17,6 +17,7 @@
 package org.graylog.events.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -50,6 +51,7 @@ import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -71,6 +73,7 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
+import javax.annotation.Nullable;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.util.List;
@@ -176,6 +179,11 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         return dbNotificationService.get(notificationId)
                 .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
     }
+
+    public record CreateNotificationRequest(
+            @JsonProperty("notification_dto") NotificationDto notificationDto,
+            @JsonProperty("entity_share_request") @Nullable EntityShareRequest shareRequest
+    ) {}
 
     @POST
     @ApiOperation("Create new notification definition")

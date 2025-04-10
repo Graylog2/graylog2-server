@@ -19,7 +19,10 @@ package org.graylog.events.notifications;
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
+import org.graylog.grn.GRN;
 import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
@@ -42,14 +45,17 @@ public class DBNotificationService {
     private final MongoCollection<NotificationDto> collection;
     private final MongoUtils<NotificationDto> mongoUtils;
     private final MongoPaginationHelper<NotificationDto> paginationHelper;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public DBNotificationService(MongoCollections mongoCollections,
-                                 EntityOwnershipService entityOwnerShipService) {
+                                 EntityOwnershipService entityOwnerShipService,
+                                 EntitySharesService entitySharesService) {
         this.collection = mongoCollections.collection(NOTIFICATION_COLLECTION_NAME, NotificationDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.entityOwnerShipService = entityOwnerShipService;
+        this.entitySharesService = entitySharesService;
     }
 
     public PaginatedList<NotificationDto> searchPaginated(SearchQuery query, Predicate<NotificationDto> filter,
@@ -61,9 +67,11 @@ public class DBNotificationService {
                 .page(page, filter);
     }
 
-    public NotificationDto saveWithOwnership(NotificationDto notificationDto, User user) {
+    public NotificationDto saveWithOwnership(NotificationDto notificationDto, User user, Optional<EntityShareRequest> shareRequestOptional) {
         final NotificationDto dto = save(notificationDto);
-        entityOwnerShipService.registerNewEventNotification(dto.id(), user);
+        GRN grn = entityOwnerShipService.registerNewEventNotification(dto.id(), user);
+        shareRequestOptional.ifPresent(entityShareRequest ->
+                entitySharesService.updateEntityShares(grn, entityShareRequest, user));
         return dto;
     }
 

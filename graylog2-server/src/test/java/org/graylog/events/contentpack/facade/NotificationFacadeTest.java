@@ -122,7 +122,7 @@ public class NotificationFacadeTest {
         eventDefinitionService = new DBEventDefinitionService(
                 mongoCollections, stateService, mock(EntityOwnershipService.class), null, new IgnoreSearchFilters(), mock(EntitySharesService.class));
 
-        notificationService = new DBNotificationService(mongoCollections, mock(EntityOwnershipService.class));
+        notificationService = new DBNotificationService(mongoCollections, mock(EntityOwnershipService.class), mock(EntitySharesService.class));
         notificationResourceHandler = new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, Maps.newHashMap());
         facade = new NotificationFacade(objectMapper, notificationResourceHandler, notificationService, userService);
     }

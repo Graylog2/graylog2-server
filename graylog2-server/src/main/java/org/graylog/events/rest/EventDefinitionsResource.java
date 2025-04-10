@@ -66,6 +66,7 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -92,6 +93,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -270,6 +272,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
         return dbService.getByIds(request.eventDefinitionIds());
     }
+
+    public record CreateEventRequest(
+            @JsonProperty("event_definition_dto") EventDefinitionDto eventDefinitionDto,
+            @JsonProperty("entity_share_request") @Nullable EntityShareRequest entityShareRequest
+    ) {}
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
