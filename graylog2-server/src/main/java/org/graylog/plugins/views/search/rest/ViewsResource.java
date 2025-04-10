@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
@@ -63,6 +64,7 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -85,10 +87,12 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -224,13 +228,18 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
     }
 
+    public record CreateViewRequest(
+            @JsonProperty("view_dto") ViewDTO viewDto,
+            @JsonProperty("entity_share_request") @Nullable EntityShareRequest shareRequest
+    ) {}
 
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") ViewDTO dto,
+    public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") CreateViewRequest createViewRequest,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) throws ValidationException {
+        ViewDTO dto = createViewRequest.viewDto();
         if (dto.type().equals(ViewDTO.Type.DASHBOARD) && !searchUser.canCreateDashboards()) {
             throw new ForbiddenException("User is not allowed to create new dashboards.");
         }
@@ -238,7 +247,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         validateIntegrity(dto, searchUser, true);
 
         final User user = userContext.getUser();
-        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
+        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user,
+                Optional.ofNullable(createViewRequest.shareRequest()));
         recentActivityService.create(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
         return result;
     }
