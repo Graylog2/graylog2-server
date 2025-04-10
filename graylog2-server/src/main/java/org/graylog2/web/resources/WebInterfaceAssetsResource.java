@@ -21,7 +21,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
-import com.google.common.io.Resources;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.GET;
@@ -43,9 +42,11 @@ import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.PluginAssets;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -56,7 +57,6 @@ import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.Date;
@@ -71,8 +71,11 @@ import static java.util.Objects.requireNonNull;
 @Path("")
 @CSP(group = CSP.DEFAULT)
 public class WebInterfaceAssetsResource {
+    private static final String ASSETS_PREFIX = "assets";
+    private static final String FAVICON = "favicon.png";
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;
+    private final CustomizationConfig customizationConfig;
     private final IndexHtmlGenerator indexHtmlGenerator;
     private final Set<Plugin> plugins;
     private final LoadingCache<URI, FileSystem> fileSystemCache;
@@ -81,11 +84,13 @@ public class WebInterfaceAssetsResource {
     public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator,
                                       Set<Plugin> plugins,
                                       MimetypesFileTypeMap mimeTypes,
-                                      HttpConfiguration httpConfiguration) {
+                                      HttpConfiguration httpConfiguration,
+                                      CustomizationConfig customizationConfig) {
         this.indexHtmlGenerator = indexHtmlGenerator;
         this.plugins = plugins;
         this.mimeTypes = requireNonNull(mimeTypes);
         this.httpConfiguration = httpConfiguration;
+        this.customizationConfig = customizationConfig;
         this.fileSystemCache = CacheBuilder.newBuilder()
                 .maximumSize(1024)
                 .build(new CacheLoader<>() {
@@ -104,7 +109,36 @@ public class WebInterfaceAssetsResource {
                 });
     }
 
-    @Path("assets/plugin/{plugin}/{filename}")
+    @Path(ASSETS_PREFIX + "/" + FAVICON)
+    @GET
+    public Response getFavicon(@Context ContainerRequest request) {
+        final var fileContents = customizationConfig.favicon()
+                .or(() -> {
+                    try {
+                        return Optional.of(Files.readAllBytes(readFile(false, FAVICON, this.getClass()).toPath()));
+                    } catch (URISyntaxException | IOException e) {
+                        return Optional.empty();
+                    }
+                })
+                .orElseThrow(NotFoundException::new);
+
+        final HashCode hashCode = Hashing.sha256().hashBytes(fileContents);
+        final EntityTag entityTag = new EntityTag(hashCode.toString());
+
+        final Response.ResponseBuilder response = request.evaluatePreconditions(entityTag);
+        if (response != null) {
+            return response.build();
+        }
+
+        final String contentType = firstNonNull(mimeTypes.getContentType(FAVICON), MediaType.APPLICATION_OCTET_STREAM);
+
+        return Response
+                .ok(fileContents, contentType)
+                .tag(entityTag)
+                .build();
+    }
+
+    @Path(ASSETS_PREFIX + "/plugin/{plugin}/{filename}")
     @GET
     public Response get(@Context Request request,
                         @Context HttpHeaders headers,
@@ -115,8 +149,8 @@ public class WebInterfaceAssetsResource {
         final var filenameWithoutSuffix = trimBasePath(filename, headers);
 
         try {
-            final URL resourceUrl = getResourceUri(true, filenameWithoutSuffix, plugin.metadata().getClass());
-            return getResponse(request, filenameWithoutSuffix, resourceUrl, true);
+            final File resource = readFile(true, filenameWithoutSuffix, plugin.metadata().getClass());
+            return getResponse(request, filenameWithoutSuffix, resource);
         } catch (URISyntaxException | IOException e) {
             throw new NotFoundException("Couldn't find " + filenameWithoutSuffix + " in plugin " + pluginName, e);
         }
@@ -126,15 +160,15 @@ public class WebInterfaceAssetsResource {
         return this.plugins.stream().filter(plugin -> plugin.metadata().getUniqueId().equals(pluginName)).findFirst();
     }
 
-    @Path("assets/{filename: .*}")
+    @Path(ASSETS_PREFIX + "/{filename: .*}")
     @GET
     public Response get(@Context ContainerRequest request,
                         @Context HttpHeaders headers,
                         @PathParam("filename") String filename) {
         final var filenameWithoutSuffix = trimBasePath(filename, headers);
         try {
-            final URL resourceUrl = getResourceUri(false, filenameWithoutSuffix, this.getClass());
-            return getResponse(request, filenameWithoutSuffix, resourceUrl, false);
+            final var resource = readFile(false, filenameWithoutSuffix, this.getClass());
+            return getResponse(request, filenameWithoutSuffix, resource);
         } catch (IOException | URISyntaxException e) {
             return generateIndexHtml(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
         }
@@ -162,29 +196,10 @@ public class WebInterfaceAssetsResource {
         return get(request, headers, originalLocation.getPath());
     }
 
-    private Response getResponse(Request request, String filename,
-                                 URL resourceUrl, boolean fromPlugin) throws IOException, URISyntaxException {
-        final URI uri = resourceUrl.toURI();
+    private Response getResponse(Request request, String filename, File resource) throws IOException, URISyntaxException {
+        final byte[] fileContents = Files.readAllBytes(resource.toPath());
 
-        final java.nio.file.Path path;
-        final byte[] fileContents;
-        switch (resourceUrl.getProtocol()) {
-            case "file": {
-                path = Paths.get(uri);
-                fileContents = Files.readAllBytes(path);
-                break;
-            }
-            case "jar": {
-                final FileSystem fileSystem = fileSystemCache.getUnchecked(uri);
-                path = fileSystem.getPath(pluginPrefixFilename(fromPlugin, filename));
-                fileContents = Resources.toByteArray(resourceUrl);
-                break;
-            }
-            default:
-                throw new IllegalArgumentException("Not a JAR or local file: " + resourceUrl);
-        }
-
-        final FileTime lastModifiedTime = Files.getLastModifiedTime(path);
+        final FileTime lastModifiedTime = Files.getLastModifiedTime(resource.toPath());
         final Date lastModified = Date.from(lastModifiedTime.toInstant());
         final HashCode hashCode = Hashing.sha256().hashBytes(fileContents);
         final EntityTag entityTag = new EntityTag(hashCode.toString());
@@ -208,13 +223,25 @@ public class WebInterfaceAssetsResource {
                 .build();
     }
 
-    private URL getResourceUri(boolean fromPlugin, String filename,
-                               Class<?> aClass) throws URISyntaxException, FileNotFoundException {
+    private File readFile(boolean fromPlugin, String filename, Class<?> aClass) throws URISyntaxException, IOException {
         final URL resourceUrl = aClass.getResource(pluginPrefixFilename(fromPlugin, filename));
         if (resourceUrl == null) {
             throw new FileNotFoundException("Resource file " + filename + " not found.");
         }
-        return resourceUrl;
+        final URI uri = resourceUrl.toURI();
+
+        switch (resourceUrl.getProtocol()) {
+            case "file": {
+                return new File(uri);
+            }
+            case "jar": {
+                final FileSystem fileSystem = fileSystemCache.getUnchecked(uri);
+                final java.nio.file.Path path = fileSystem.getPath(pluginPrefixFilename(fromPlugin, filename));
+                return path.toFile();
+            }
+            default:
+                throw new IllegalArgumentException("Not a JAR or local file: " + resourceUrl);
+        }
     }
 
     @Nonnull
