@@ -24,7 +24,7 @@ import java.nio.file.Path;
 
 public class GCSRepositoryConfiguration {
     @Documentation("Path to Google Cloud Storage credentials file")
-    @Parameter(value = "gcs_credentials_file", validators = PathReadableValidator.class)
+    @Parameter(value = "gcs_credentials_file")
     private Path gcsCredentialsFile;
 
     public Path getGcsCredentialsFile() {

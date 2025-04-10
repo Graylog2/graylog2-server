@@ -22,6 +22,7 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
@@ -54,6 +55,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 )),
+                datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
@@ -71,20 +73,27 @@ class SearchableSnapshotsConfigurationBeanTest {
                 .containsKeys("s3.client.default.endpoint", "node.search.cache.size");
     }
 
+    private DatanodeDirectories datanodeDirectories(Path tempDir) {
+        return new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir);
+    }
+
     @Test
     void testGoogleCloudStorage(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
         // no s3 repo configuration properties given by the user
         final S3RepositoryConfiguration config = s3Configuration(Map.of());
 
         final Path credentialsFile = Files.createTempFile(tempDir, "gcs-credentials", ".json");
+        // let's use the filename only. This should be automatically resolved against the datanode config source directory
+        final String credentialsFileName = credentialsFile.getFileName().toString();
         final GCSRepositoryConfiguration gcsRepositoryConfiguration = gcsConfiguration(Map.of(
-                "gcs_credentials_file", credentialsFile.toAbsolutePath().toString()
+                "gcs_credentials_file", credentialsFileName
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 )),
+                datanodeDirectories(tempDir),
                 config,
                 gcsRepositoryConfiguration,
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
@@ -118,6 +127,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "path_repo", "/mnt/data/snapshots",
                         "node_search_cache_size", "10gb"
                 )),
+                datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
@@ -145,6 +155,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 )),
+                datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
@@ -174,6 +185,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
                 )),
+                datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
@@ -195,6 +207,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "path_repo", "/mnt/data/snapshots",
                         "node_search_cache_size", "10gb"
                 )),
+                datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));

@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
@@ -60,13 +62,15 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
 
     static final String SEARCH_NODE_ROLE = "search";
     private final Configuration localConfiguration;
+    private final DatanodeDirectories datanodeDirectories;
     private final S3RepositoryConfiguration s3RepositoryConfiguration;
     private final GCSRepositoryConfiguration gcsRepositoryConfiguration;
     private final Provider<OpensearchUsableSpace> usableSpaceProvider;
 
     @Inject
-    public SearchableSnapshotsConfigurationBean(Configuration localConfiguration, S3RepositoryConfiguration s3RepositoryConfiguration, GCSRepositoryConfiguration gcsRepositoryConfiguration, Provider<OpensearchUsableSpace> usableSpaceProvider) {
+    public SearchableSnapshotsConfigurationBean(Configuration localConfiguration, DatanodeDirectories datanodeDirectories, S3RepositoryConfiguration s3RepositoryConfiguration, GCSRepositoryConfiguration gcsRepositoryConfiguration, Provider<OpensearchUsableSpace> usableSpaceProvider) {
         this.localConfiguration = localConfiguration;
+        this.datanodeDirectories = datanodeDirectories;
         this.s3RepositoryConfiguration = s3RepositoryConfiguration;
         this.gcsRepositoryConfiguration = gcsRepositoryConfiguration;
         this.usableSpaceProvider = usableSpaceProvider;
@@ -78,7 +82,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             final DatanodeConfigurationPart.Builder builder = DatanodeConfigurationPart.builder();
 
             final boolean searchRoleEnabled = searchRoleEnabled();
-            if(searchRoleEnabled) {
+            if (searchRoleEnabled) {
                 validateUsableSpace();
                 builder.addNodeRole(SEARCH_NODE_ROLE);
             }
@@ -157,7 +161,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     private Map<String, String> properties(boolean searchRoleEnabled) {
         final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
 
-        if(searchRoleEnabled) { // configure cache only if we also have the search role
+        if (searchRoleEnabled) { // configure cache only if we also have the search role
             builder.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
         }
 
@@ -181,9 +185,10 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             builder.add(new OpensearchKeystoreStringItem("s3.client.default.secret_key", s3RepositoryConfiguration.getS3ClientDefaultSecretKey()));
         }
 
-        if(gcsRepositoryConfiguration.isRepositoryEnabled()) {
-            // TODO: resolve path against datanode configuration dir
-            builder.add(new OpensearchKeystoreFileItem("gcs.client.default.credentials_file",  gcsRepositoryConfiguration.getGcsCredentialsFile()));
+        if (gcsRepositoryConfiguration.isRepositoryEnabled()) {
+            final Path credentialsFile = datanodeDirectories.resolveConfigurationSourceFile(gcsRepositoryConfiguration.getGcsCredentialsFile())
+                    .orElseThrow(() -> new IllegalArgumentException("Failed to resolve Google Cloud Storage credentials file. File not found: " + gcsRepositoryConfiguration.getGcsCredentialsFile()));
+            builder.add(new OpensearchKeystoreFileItem("gcs.client.default.credentials_file", credentialsFile));
         }
         return builder.build();
     }
