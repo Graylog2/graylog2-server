@@ -22,8 +22,9 @@ import com.codahale.metrics.UniformReservoir;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.map.config.CloudDownloadException;
+import org.graylog.plugins.map.config.GeoIpFileService;
+import org.graylog.plugins.map.config.GeoIpFileServiceFactory;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
-import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog.plugins.map.geoip.GeoAsnInformation;
 import org.graylog.plugins.map.geoip.GeoIpResolver;
 import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
@@ -56,15 +57,15 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
     //a database file that does not belong to the vendor selected
     private final InetAddress testAddress = InetAddress.getLoopbackAddress();
     private final GeoIpVendorResolverService geoIpVendorResolverService;
-    private final S3GeoIpFileService s3GeoIpFileService;
+    private final GeoIpFileServiceFactory geoIpFileServiceFactory;
     private final ClusterConfigService clusterConfigService;
 
     @Inject
     public GeoIpResolverConfigValidator(GeoIpVendorResolverService geoIpVendorResolverService,
-                                        S3GeoIpFileService s3GeoIpFileService,
+                                        GeoIpFileServiceFactory geoIpFileServiceFactory,
                                         ClusterConfigService clusterConfigService) {
         this.geoIpVendorResolverService = geoIpVendorResolverService;
-        this.s3GeoIpFileService = s3GeoIpFileService;
+        this.geoIpFileServiceFactory = geoIpFileServiceFactory;
         this.clusterConfigService = clusterConfigService;
     }
 
@@ -85,6 +86,7 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
 
     private void validateConfig(GeoIpResolverConfig config) throws ConfigValidationException {
         Timer timer = new Timer(new UniformReservoir());
+        final GeoIpFileService geoIpFileService = geoIpFileServiceFactory.create(config);
         try {
 
             if (!VALID_UNITS.contains(config.refreshIntervalUnit())) {
@@ -100,45 +102,36 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
                 throw new ConfigValidationException("Cannot use both S3 and GCS at the same time. Please choose at most one.");
             }
 
-            if (config.useS3()) {
-                if (s3GeoIpFileService.s3ClientIsNull()) {
-                    throw new ConfigValidationException("Unable to use S3 for file refresh without AWS credentials. See documentation for steps to properly configure AWS credentials.");
-                }
-                // Make sure the paths are valid S3 object paths
-                boolean asnFileExists = !config.asnDbPath().isEmpty();
-                if (config.cityDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX) &&
-                        (!asnFileExists || config.asnDbPath().startsWith(S3GeoIpFileService.S3_BUCKET_PREFIX))) {
-                    boolean bucketsChanged = !curConfig.cityDbPath().equals(config.cityDbPath()) || !curConfig.asnDbPath().equals(config.asnDbPath());
-                    if (bucketsChanged || s3GeoIpFileService.fileRefreshRequired(config)) {
-                        s3GeoIpFileService.downloadFilesToTempLocation(config);
-                        // Set the DB paths to the temp file locations so the newly downloaded files can be validated
-                        config = config.toBuilder()
-                                .cityDbPath(s3GeoIpFileService.getTempCityFile())
-                                .asnDbPath(asnFileExists ? s3GeoIpFileService.getTempAsnFile() : "")
-                                .build();
-                        moveTemporaryFiles = true;
-                    } else {
-                        config = config.toBuilder()
-                                .cityDbPath(s3GeoIpFileService.getActiveCityFile())
-                                .asnDbPath(asnFileExists ? s3GeoIpFileService.getActiveAsnFile() : "")
-                                .build();
-                    }
-                } else {
-                    throw new ConfigValidationException("Database file paths must be valid S3 object paths when using S3.");
-                }
-            }
+            if (config.useS3() || config.useGcs()) {
+                //Throws ConfigValidationException if the config is invalid:
+                geoIpFileService.validateConfiguration(config);
 
-            if (config.useGcs()) {
-                //TODO: Implement GCS file download and validation
+                boolean asnFileExists = !config.asnDbPath().isBlank();
+
+                //Configuration seems to be valid, let's check if we need to download the files:
+                boolean bucketsChanged = !curConfig.cityDbPath().equals(config.cityDbPath()) || !curConfig.asnDbPath().equals(config.asnDbPath());
+                if (bucketsChanged || geoIpFileService.fileRefreshRequired(config)) {
+                    geoIpFileService.downloadFilesToTempLocation(config);
+                    config = config.toBuilder()
+                            .cityDbPath(geoIpFileService.getTempCityFile())
+                            .asnDbPath(asnFileExists ? geoIpFileService.getTempAsnFile() : "")
+                            .build();
+                    moveTemporaryFiles = true;
+                } else {
+                    config = config.toBuilder()
+                            .cityDbPath(geoIpFileService.getActiveCityFile())
+                            .asnDbPath(asnFileExists ? geoIpFileService.getActiveAsnFile() : "")
+                            .build();
+                }
             }
 
             // Validate the DB files
             validateGeoIpLocationResolver(config, timer);
             validateGeoIpAsnResolver(config, timer);
 
-            // If the files were downloaded from S3 and validated successfully, move the temporary files to be active
+            // If the files were downloaded from the cloud and validated successfully, move the temporary files to be active
             if (moveTemporaryFiles) {
-                s3GeoIpFileService.moveTempFilesToActive();
+                geoIpFileService.moveTempFilesToActive();
             }
         } catch (IllegalArgumentException | IllegalStateException | CloudDownloadException | IOException e) {
             throw new ConfigValidationException(e.getMessage());
