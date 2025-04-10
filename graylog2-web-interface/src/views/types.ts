@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type React from 'react';
+import React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
 
@@ -325,6 +325,10 @@ type EventProcedureFormProps = {
   canEdit: boolean;
 };
 
+type EventProcedureSummaryProps = {
+  eventDefinitionEventProcedure: string | undefined;
+};
+
 type SearchAction = {
   component: React.ComponentType<SearchActionComponentProps>;
   key: string;
@@ -363,6 +367,11 @@ type EventProcedureForm = {
   component: React.ComponentType<EventProcedureFormProps>;
   key: string;
 };
+
+type EventProcedureSummary = {
+  component: React.ComponentType<EventProcedureSummaryProps>;
+  key: string;
+}
 
 export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>;
@@ -532,6 +541,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
+    'views.components.eventProcedureSummary'?: Array<EventProcedureSummary>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
