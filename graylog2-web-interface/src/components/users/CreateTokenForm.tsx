@@ -65,6 +65,7 @@ const CreateTokenForm = ({
 
   return (
     <StyledForm className="form-inline" onSubmit={createToken}>
+      <p>TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes PT60M, for 24 hours: PT24H, for 30 days: PT30D</p>
       <FormGroup controlId="create-token-input">
         <ControlLabel>Token Name</ControlLabel>
         <FormControl
