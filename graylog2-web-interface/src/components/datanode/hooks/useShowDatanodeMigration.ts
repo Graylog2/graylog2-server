@@ -30,21 +30,21 @@ const useShowDatanodeMigration = (): {
   showDatanodeMigration: boolean;
 } => {
   const { permissions } = useCurrentUser();
-  const canReadDataNode = React.useMemo(
+  const canStartDataNode = React.useMemo(
     () => permissions.includes('datanode:start') || permissions.includes('*'),
     [permissions],
   );
 
   const { data: isDatanodeConfiguredAndUsed } = useQuery(['show_datanode_migration'], fetchShowDatanodeMigration, {
-    enabled: canReadDataNode,
+    enabled: canStartDataNode,
   });
 
-  const { currentStep } = useMigrationState({ enabled: canReadDataNode });
+  const { currentStep } = useMigrationState({ enabled: canStartDataNode });
   const noMigrationInProgress = !currentStep || currentStep?.state === 'NEW' || currentStep?.state === 'FINISHED';
 
   return {
-    isDatanodeConfiguredAndUsed: canReadDataNode && !!isDatanodeConfiguredAndUsed,
-    showDatanodeMigration: canReadDataNode && (!isDatanodeConfiguredAndUsed || !noMigrationInProgress),
+    isDatanodeConfiguredAndUsed: canStartDataNode && !!isDatanodeConfiguredAndUsed,
+    showDatanodeMigration: canStartDataNode && (!isDatanodeConfiguredAndUsed || !noMigrationInProgress),
   };
 };
 
