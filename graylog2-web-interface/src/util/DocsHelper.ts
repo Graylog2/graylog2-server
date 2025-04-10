@@ -15,6 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import AppConfig from 'util/AppConfig';
+
+const docsUrl = AppConfig?.branding()?.help_url ?? 'https://go2docs.graylog.org/current';
+
 const docsHelper = {
   PAGES: {
     ALERTS: 'interacting_with_your_log_data/alerts.html',
@@ -63,7 +67,7 @@ const docsHelper = {
     WELCOME: '', // Welcome page to the documentation
   },
 
-  DOCS_URL: 'https://go2docs.graylog.org/current',
+  DOCS_URL: docsUrl,
 
   toString(path: string) {
     const baseUrl = this.DOCS_URL;
