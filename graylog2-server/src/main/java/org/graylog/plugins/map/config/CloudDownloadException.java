@@ -16,27 +16,8 @@
  */
 package org.graylog.plugins.map.config;
 
-import java.io.IOException;
-
-public interface GeoIpCloudFileService {
-    String ACTIVE_ASN_FILE = "asn-from-s3.mmdb";
-    String ACTIVE_CITY_FILE = "standard_location-from-s3.mmdb";
-    String TEMP_ASN_FILE = "temp-" + ACTIVE_ASN_FILE;
-    String TEMP_CITY_FILE = "temp-" + ACTIVE_CITY_FILE;
-
-    void downloadFilesToTempLocation(GeoIpResolverConfig config) throws CloudDownloadException;
-
-    boolean fileRefreshRequired(GeoIpResolverConfig config);
-
-    void moveTempFilesToActive() throws IOException;
-
-    String getTempAsnFile();
-
-    String getTempCityFile();
-
-    String getActiveAsnFile();
-
-    String getActiveCityFile();
-
-    void cleanupTempFiles();
+public class CloudDownloadException extends Exception {
+    public CloudDownloadException(String message) {
+        super(message);
+    }
 }

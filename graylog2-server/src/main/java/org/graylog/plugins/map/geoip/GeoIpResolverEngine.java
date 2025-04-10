@@ -21,8 +21,8 @@ import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.plugins.map.config.GeoIpFileService;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
-import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog2.plugin.Message;
 import org.graylog2.utilities.ReservedIpChecker;
 import org.slf4j.Logger;
@@ -75,15 +75,15 @@ public class GeoIpResolverEngine {
     private final boolean enforceGraylogSchema;
 
 
-    public GeoIpResolverEngine(GeoIpVendorResolverService resolverService, GeoIpResolverConfig config, S3GeoIpFileService s3GeoIpFileService,
+    public GeoIpResolverEngine(GeoIpVendorResolverService resolverService, GeoIpResolverConfig config, GeoIpFileService geoIpFileService,
                                MetricRegistry metricRegistry) {
         Timer resolveTime = metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime"));
 
         enforceGraylogSchema = config.enforceGraylogSchema();
-        if (config.useS3()) {
+        if (config.useS3() || config.useGcs()) {
             config = config.toBuilder()
-                    .asnDbPath(s3GeoIpFileService.getActiveAsnFile())
-                    .cityDbPath(s3GeoIpFileService.getActiveCityFile())
+                    .asnDbPath(geoIpFileService.getActiveAsnFile())
+                    .cityDbPath(geoIpFileService.getActiveCityFile())
                     .build();
         }
         ipLocationResolver = resolverService.createCityResolver(config, resolveTime);
@@ -178,15 +178,15 @@ public class GeoIpResolverEngine {
                 .stream()
                 .filter(e -> (!enforceGraylogSchema || ipAddressFields.containsKey(e))
                         && !e.startsWith(Message.INTERNAL_FIELD_PREFIX))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private InetAddress getValidRoutableInetAddress(Object fieldValue) {
         final InetAddress ipAddress;
-        if (fieldValue instanceof InetAddress) {
-            ipAddress = (InetAddress) fieldValue;
-        } else if (fieldValue instanceof String) {
-            ipAddress = getIpFromFieldValue((String) fieldValue);
+        if (fieldValue instanceof InetAddress inetAddressValue) {
+            ipAddress = inetAddressValue;
+        } else if (fieldValue instanceof String stringValue) {
+            ipAddress = getIpFromFieldValue(stringValue);
         } else {
             ipAddress = null;
         }
@@ -194,7 +194,6 @@ public class GeoIpResolverEngine {
     }
 
     private boolean areValidGeoNames(String... names) {
-
         for (String name : names) {
             if (StringUtils.isBlank(name) || "N/A".equalsIgnoreCase(name)) {
                 return false;
