@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
+import { Button, ControlLabel, FormControl, FormGroup, HelpBlock } from 'components/bootstrap';
 import { Spinner, ISODurationInput } from 'components/common';
 
 const StyledForm = styled.form`
@@ -65,7 +65,6 @@ const CreateTokenForm = ({
 
   return (
     <StyledForm className="form-inline" onSubmit={createToken}>
-      <p>TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes PT60M, for 24 hours: PT24H, for 30 days: PT30D</p>
       <FormGroup controlId="create-token-input">
         <ControlLabel>Token Name</ControlLabel>
         <FormControl
@@ -96,6 +95,7 @@ const CreateTokenForm = ({
         bsStyle="primary">
         {creatingToken ? <Spinner text="Creating..." /> : 'Create Token'}
       </Button>
+       <HelpBlock>TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes PT60M, for 24 hours: PT24H, for 30 days: PT30D</HelpBlock>
     </StyledForm>
   );
 };
