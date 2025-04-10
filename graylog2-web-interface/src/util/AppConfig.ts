@@ -25,7 +25,10 @@ declare global {
 type Branding = {
   product_name?: string;
   favicon?: string;
-  logo?: string;
+  logo?: {
+    light: string;
+    dark: string;
+  };
   login?: {
     background?: string;
   };

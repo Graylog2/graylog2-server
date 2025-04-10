@@ -16,23 +16,18 @@
  */
 package org.graylog2.web.customization;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import jakarta.inject.Inject;
 
-public class SVG {
-    private final String data;
+public class CustomizationConfig {
+    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
+    private final Config config;
 
-    @JsonCreator
-    public SVG(String data) {
-        if (!data.startsWith("<svg") && !data.startsWith("<?xml")) {
-            throw new IllegalArgumentException("Invalid SVG data supplied: " + data);
-        }
-
-        this.data = data;
+    @Inject
+    public CustomizationConfig(Config config) {
+        this.config = config;
     }
 
-    @JsonValue
-    public String data() {
-        return data;
+    public String productName() {
+        return config.productName().orElse(DEFAULT_PRODUCT_NAME);
     }
 }
