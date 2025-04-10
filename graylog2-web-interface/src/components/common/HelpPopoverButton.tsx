@@ -17,33 +17,34 @@
 import type { PropsWithChildren } from 'react';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import type { ColorVariant } from '@graylog/sawmill';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Popover from 'components/common/Popover';
+import type { BsSize } from 'components/bootstrap/types';
 
 type Props = PropsWithChildren<{
-  helpText: string;
+  helpText: string|React.ReactNode;
+  bsStyle?: ColorVariant;
+  bsSize?: BsSize;
 }>;
 
-const StyledButton = styled(Button)(
-  ({ theme }) => css`
-    padding: 1px 0;
-    font-size: ${theme.fonts.size.body};
-  `,
-);
+const StyledButton = styled(Button)`
+  padding: 1px 0;
+`;
 
 const StyledOverlay = styled(Popover.Dropdown)`
   white-space: pre-line;
 `;
 
-const HelpIcon = styled(Icon)(
-  ({ theme }) => css`
-    color: ${theme.colors.variant.info};
+const StyledIcon = styled(Icon)<{ $bsStyle: ColorVariant }>(
+  ({ $bsStyle, theme }) => css`
+    color: ${theme.colors.variant[$bsStyle]};
   `,
 );
 
-const DiagnosisHelp = ({ helpText, children = null }: Props) => {
+const HelpPopoverButton = ({ helpText, bsStyle = "info", bsSize = "medium" }: Props) => {
   const [showHelp, setShowHelp] = useState(false);
   const toggleHelp = () => setShowHelp((cur) => !cur);
 
@@ -57,8 +58,8 @@ const DiagnosisHelp = ({ helpText, children = null }: Props) => {
       closeOnClickOutside
       withinPortal>
       <Popover.Target>
-        <StyledButton bsStyle="transparent" bsSize={children ? 'xs' : 'medium'} onClick={toggleHelp}>
-          {children || <HelpIcon name="help" />}
+        <StyledButton bsStyle="transparent" bsSize={bsSize} onClick={toggleHelp}>
+          <StyledIcon name="help" $bsStyle={bsStyle} />
         </StyledButton>
       </Popover.Target>
       <StyledOverlay>{helpText}</StyledOverlay>
@@ -66,4 +67,4 @@ const DiagnosisHelp = ({ helpText, children = null }: Props) => {
   );
 };
 
-export default DiagnosisHelp;
+export default HelpPopoverButton;

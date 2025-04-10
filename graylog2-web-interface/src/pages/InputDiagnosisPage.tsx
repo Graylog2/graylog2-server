@@ -36,8 +36,8 @@ import type { InputState } from 'stores/inputs/InputStatesStore';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
-import DiagnosisHelp from 'components/inputs/InputDiagnosis/DiagnosisHelp';
 import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
+import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
 const LeftCol = styled.div(
   ({ theme }) => css`
@@ -250,7 +250,7 @@ const InputDiagnosisPage = () => {
               title="Information"
               preHeaderSection={<StatusColorIndicator radius="50%" />}
               headerLeftSection={
-                <DiagnosisHelp
+                <HelpPopoverButton
                   helpText={`This Input Is Listening On:
                         ${DIAGNOSIS_HELP.INPUT_LISTENING_ON}
             
@@ -296,7 +296,7 @@ const InputDiagnosisPage = () => {
                   bsStyle={isInputStateDown ? 'danger' : 'success'}
                 />
               }
-              headerLeftSection={<DiagnosisHelp helpText={DIAGNOSIS_HELP.INPUT_STATE} />}>
+              headerLeftSection={<HelpPopoverButton helpText={DIAGNOSIS_HELP.INPUT_STATE} />}>
               <StyledP>
                 Number of Graylog nodes the Input is configured to run, and on how many it is running. If any are not
                 running, click to see any associated error messages.
@@ -402,7 +402,7 @@ const InputDiagnosisPage = () => {
                 <StatusColorIndicator radius="50%" bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'} />
               }
               headerLeftSection={
-                <DiagnosisHelp
+                <HelpPopoverButton
                   helpText={`Empty Messages discarded:
                 ${DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED}
 
@@ -451,7 +451,7 @@ const InputDiagnosisPage = () => {
           <Section
             preHeaderSection={<StatusColorIndicator radius="50%" bsStyle={hasReceivedMessage ? 'success' : 'gray'} />}
             title="Received Message count by Stream"
-            headerLeftSection={<DiagnosisHelp helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />}
+            headerLeftSection={<HelpPopoverButton helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />}
             actions={<ShowReceivedMessagesButton input={input} />}>
             <StyledP>
               Messages successfully ingested into Graylog from this Input in the last 15 minutes. Click on the Stream to
