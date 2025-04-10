@@ -40,6 +40,7 @@ const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: s
     rules: undefined,
     content_pack: undefined,
     description: undefined,
+    entity_share_request: undefined,
     ...stream,
   });
 
