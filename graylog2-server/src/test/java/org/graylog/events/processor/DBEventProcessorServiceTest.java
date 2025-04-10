@@ -24,6 +24,7 @@ import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -70,7 +71,7 @@ public class DBEventProcessorServiceTest {
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
 
         this.dbService = new DBEventDefinitionService(mongoCollections,
-                stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
+                stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters(), mock(EntitySharesService.class));
     }
 
     @Test

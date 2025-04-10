@@ -49,6 +49,7 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -135,7 +136,7 @@ public class LegacyAlertConditionMigratorTest {
         final MongoCollections mongoCollections = new MongoCollections(mongoJackObjectMapperProvider, mongoConnection);
         final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoCollections, new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), clock, schedulerCapabilitiesService, Duration.minutes(5));
         notificationService = new DBNotificationService(mongoCollections, mock(EntityOwnershipService.class));
-        this.eventDefinitionService = new DBEventDefinitionService(mongoCollections, mock(DBEventProcessorStateService.class), mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
+        this.eventDefinitionService = new DBEventDefinitionService(mongoCollections, mock(DBEventProcessorStateService.class), mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters(), mock(EntitySharesService.class));
         this.eventDefinitionHandler = spy(new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock));
         this.notificationResourceHandler = spy(new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, eventNotificationFactories));
         this.userService = mock(UserService.class);
