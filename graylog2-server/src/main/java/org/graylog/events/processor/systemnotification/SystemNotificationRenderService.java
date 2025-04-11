@@ -23,13 +23,11 @@ import freemarker.core.TemplateConfiguration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationPersistenceService;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -48,13 +46,13 @@ public class SystemNotificationRenderService {
     private static final String KEY_DESCRIPTION = "_description";
     private static final String KEY_CLOUD = "_cloud";
     public static final String TEMPLATE_BASE_PATH = "/org/graylog2/freemarker/templates/";
-    private NotificationService notificationService;
-    private org.graylog2.Configuration graylogConfig;
+    private final NotificationPersistenceService notificationService;
+    private final org.graylog2.Configuration graylogConfig;
     private static final freemarker.template.Configuration cfg =
             new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_28);
 
     @Inject
-    public SystemNotificationRenderService(NotificationService notificationService,
+    public SystemNotificationRenderService(NotificationPersistenceService notificationService,
                                            org.graylog2.Configuration graylogConfig) {
         this.notificationService = notificationService;
         this.graylogConfig = graylogConfig;
@@ -118,13 +116,6 @@ public class SystemNotificationRenderService {
         }
     }
 
-    public class RenderResponse {
-        public String title;
-        public String description;
-
-        public RenderResponse(String title, String description) {
-            this.title = title;
-            this.description = description;
-        }
+    public record RenderResponse(String title, String description) {
     }
 }
