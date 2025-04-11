@@ -16,11 +16,9 @@
  */
 package org.graylog.plugins.map.config;
 
-import org.graylog2.plugin.validate.ConfigValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
@@ -33,17 +31,32 @@ public class LocalGeoIpFileService extends GeoIpFileService {
     }
 
     @Override
-    public void validateConfiguration(GeoIpResolverConfig config) throws ConfigValidationException {
-        //FIXME: Any kind of validation required here?
+    public String getType() {
+        return "Local";
     }
 
     @Override
-    protected Optional<Instant> downloadCityFile(GeoIpResolverConfig config, Path tempCityPath) throws IOException {
+    public String getPathPrefix() {
+        return "";
+    }
+
+    @Override
+    public boolean isCloud() {
+        return false;
+    }
+
+    @Override
+    public void validateConfiguration(GeoIpResolverConfig config) {
+        //No validation required here. As long as the file(s) exist and are in the right format, all is good. And all of that is checked elsewhere.
+    }
+
+    @Override
+    protected Optional<Instant> downloadCityFile(GeoIpResolverConfig config, Path tempCityPath) {
         return Optional.empty();
     }
 
     @Override
-    protected Optional<Instant> downloadAsnFile(GeoIpResolverConfig config, Path tempAsnPath) throws IOException {
+    protected Optional<Instant> downloadAsnFile(GeoIpResolverConfig config, Path tempAsnPath) {
         return Optional.empty();
     }
 

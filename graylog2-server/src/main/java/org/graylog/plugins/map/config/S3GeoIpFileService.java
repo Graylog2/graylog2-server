@@ -61,6 +61,21 @@ public class S3GeoIpFileService extends GeoIpFileService {
     }
 
     @Override
+    public String getType() {
+        return "S3";
+    }
+
+    @Override
+    public String getPathPrefix() {
+        return S3_BUCKET_PREFIX;
+    }
+
+    @Override
+    public boolean isCloud() {
+        return true;
+    }
+
+    @Override
     public void validateConfiguration(GeoIpResolverConfig config) throws ConfigValidationException {
         if (!isConnected()) {
             throw new ConfigValidationException("Unable to use S3 for file refresh without AWS credentials. See documentation for steps to properly configure AWS credentials.");
@@ -80,47 +95,38 @@ public class S3GeoIpFileService extends GeoIpFileService {
 
     @Override
     protected Optional<Instant> downloadCityFile(GeoIpResolverConfig config, Path tempCityPath) {
-        final BucketAndKey cityDetails = extractFromConfig(config.cityDbPath());
-        return Optional.of(download(cityDetails, tempCityPath));
+        final Optional<BucketAndObject> cityDetails = extractDetails(config.cityDbPath());
+        return cityDetails.map(details -> download(details, tempCityPath));
     }
 
     @Override
     protected Optional<Instant> downloadAsnFile(GeoIpResolverConfig config, Path tempAsnPath) {
-        final BucketAndKey asnDetails = extractFromConfig(config.asnDbPath());
-        return Optional.of(download(asnDetails, tempAsnPath));
+        final Optional<BucketAndObject> asnDetails = extractDetails(config.asnDbPath());
+        return asnDetails.map(details -> download(details, tempAsnPath));
     }
 
-    private Instant download(BucketAndKey details, Path destFilePath) {
+    private Instant download(BucketAndObject details, Path destFilePath) {
         GetObjectResponse s3Object = getS3Client().getObject(GetObjectRequest.builder()
                 .bucket(details.bucket())
-                .key(details.key()).build(), destFilePath);
+                .key(details.object()).build(), destFilePath);
         return s3Object.lastModified();
     }
 
     @Override
     protected Optional<Instant> getCityFileServerTimestamp(GeoIpResolverConfig config) {
-        final BucketAndKey cityDetails = extractFromConfig(config.cityDbPath());
-        return Optional.ofNullable(getS3Object(cityDetails.bucket(), cityDetails.key())).map(S3Object::lastModified);
+        final Optional<BucketAndObject> cityDetails = extractDetails(config.cityDbPath());
+        return cityDetails.map(details -> getS3Object(details.bucket(), details.object())).map(S3Object::lastModified);
     }
 
     @Override
     protected Optional<Instant> getAsnFileServerTimestamp(GeoIpResolverConfig config) {
-        final BucketAndKey asnDetails = extractFromConfig(config.asnDbPath());
-        return Optional.ofNullable(getS3Object(asnDetails.bucket(), asnDetails.key())).map(S3Object::lastModified);
+        final Optional<BucketAndObject> asnDetails = extractDetails(config.asnDbPath());
+        return asnDetails.map(details -> getS3Object(details.bucket(), details.object())).map(S3Object::lastModified);
     }
 
     @Override
     protected boolean isConnected() {
         return getS3Client() != null;
-    }
-
-    private BucketAndKey extractFromConfig(String path) {
-        //Config has been validated already, should be good. Also expect the path to be non-blank.
-        //TODO: Check if it makes sense to also convert to Pattern here, instead of manually parsing the path.
-        int lastSlash = path.lastIndexOf("/");
-        String bucket = path.substring(S3_BUCKET_PREFIX.length(), lastSlash);
-        String key = path.substring(lastSlash + 1);
-        return new BucketAndKey(bucket, key);
     }
 
     // Gets the S3 object for the given bucket and key. Since the listObjectsV2 method takes only a prefix to filter
@@ -142,11 +148,7 @@ public class S3GeoIpFileService extends GeoIpFileService {
     private S3Client getS3Client() {
         if (s3Client == null) {
             try {
-                s3Client = S3Client
-                        .builder()
-                        //FIXME: Remove after testing!
-                        .forcePathStyle(true)
-                        .build();
+                s3Client = S3Client.create();
             } catch (Exception e) {
                 LOG.warn(NULL_S3_CLIENT_MESSAGE);
                 LOG.debug("If not trying to use the Geo Location Processor S3 file refresh feature, the following error can safely be ignored.\n\tERROR : {}", e.getMessage());
@@ -154,6 +156,4 @@ public class S3GeoIpFileService extends GeoIpFileService {
         }
         return s3Client;
     }
-
-    record BucketAndKey(String bucket, String key) {}
 }

@@ -80,7 +80,7 @@ public class GeoIpResolverEngine {
         Timer resolveTime = metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime"));
 
         enforceGraylogSchema = config.enforceGraylogSchema();
-        if (config.useS3() || config.useGcs()) {
+        if (geoIpFileService.isCloud()) {
             config = config.toBuilder()
                     .asnDbPath(geoIpFileService.getActiveAsnFile())
                     .cityDbPath(geoIpFileService.getActiveCityFile())

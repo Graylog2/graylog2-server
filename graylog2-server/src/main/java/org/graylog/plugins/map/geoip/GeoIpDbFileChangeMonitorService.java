@@ -139,12 +139,11 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
         final GeoIpFileService geoIpFileService = geoIpFileServiceFactory.create(config);
 
         Map<DatabaseType, FileInfo.Change> changes = new EnumMap<>(DatabaseType.class);
-        // If using S3 for database file storage, check to see if the files are new
-        if (config.useS3() && geoIpFileService.fileRefreshRequired(config)) {
-            //FIXME: Change to also work with GCS
+        // If using cloud for database file storage, check to see if the files are new
+        if ((geoIpFileService.isCloud()) && geoIpFileService.fileRefreshRequired(config)) {
             try {
                 // Download the new files to a temporary location to be validated
-                LOG.debug("Pulling DB files from S3");
+                LOG.debug("Pulling DB files from the cloud");
                 geoIpFileService.downloadFilesToTempLocation(config);
                 GeoIpResolverConfig tempConfig = config.toBuilder()
                         .cityDbPath(geoIpFileService.getTempCityFile())
@@ -156,15 +155,15 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
 
                 // Now that the new files have passed validation, move them to the active file location
                 geoIpFileService.moveTempFilesToActive();
-                LOG.debug("Pulled new files from S3");
+                LOG.debug("Pulled new files from the cloud");
             } catch (IllegalArgumentException | IllegalStateException validationError) {
-                String message = "Geo Processor DB files from S3 failed validation. Upload valid files to S3. Leaving old files in place on disk.";
+                String message = "Geo Processor DB files from the cloud failed validation. Upload valid files. Leaving old files in place on disk.";
                 sendFailedSyncNotification(message);
                 LOG.error(message);
                 geoIpFileService.cleanupTempFiles();
                 return changes;
             } catch (CloudDownloadException | IOException e) {
-                String message = "Failed to download Geo Processor DB files from S3. Unable to refresh. Leaving old files in place on disk.";
+                String message = "Failed to download Geo Processor DB files from the cloud. Unable to refresh. Leaving old files in place on disk.";
                 sendFailedSyncNotification(message);
                 LOG.error(message);
                 return changes;
@@ -197,8 +196,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                 reScheduleRefreshIfNeeded();
                 String asnFile = config.asnDbPath();
                 String cityFile = config.cityDbPath();
-                if (config.useS3()) {
-                    //FIXME: Update to also work with GCS
+                if (geoIpFileService.isCloud()) {
                     cityFile = geoIpFileService.getActiveCityFile();
                     asnFile = geoIpFileService.getActiveAsnFile();
                     if (geoIpFileService.fileRefreshRequired(config)) {
@@ -211,7 +209,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                                 geoIpFileService.moveTempFilesToActive();
                             }
                         } catch (CloudDownloadException | IOException e) {
-                            String commonMessage = "Failed to pull new Geo-Location Processor database files from S3.";
+                            String commonMessage = "Failed to pull new Geo-Location Processor database files from the cloud.";
                             sendFailedSyncNotification(commonMessage + " Geo-Location Processor may not be functional on all nodes.");
                             LOG.error("{} Geo-Location Processor will not be functional on this node.", commonMessage);
                             return;
@@ -286,7 +284,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
         final Notification notification = notificationService.buildNow()
                 .addType(Notification.Type.GENERIC)
                 .addSeverity(Notification.Severity.NORMAL)
-                .addDetail("title", "Geo-Location Processor S3 Sync Failure")
+                .addDetail("title", "Geo-Location Processor cloud Sync Failure")
                 .addDetail("description", description);
         notificationService.publishIfFirst(notification);
     }

@@ -26,12 +26,18 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class GeoIpFileService {
-    private static final String ACTIVE_ASN_FILE = "asn-from-s3.mmdb";
-    private static final String ACTIVE_CITY_FILE = "standard_location-from-s3.mmdb";
+    private static final String ACTIVE_ASN_FILE = "asn-from-cloud.mmdb";
+    private static final String ACTIVE_CITY_FILE = "standard_location-from-cloud.mmdb";
     private static final String TEMP_ASN_FILE = "temp-" + ACTIVE_ASN_FILE;
     private static final String TEMP_CITY_FILE = "temp-" + ACTIVE_CITY_FILE;
+
+    private static final String BUCKET_GROUP = "bucket";
+    private static final String OBJECT_GROUP = "object";
 
     private final Path downloadDir;
     private final Path asnPath;
@@ -44,6 +50,8 @@ public abstract class GeoIpFileService {
     private Instant tempAsnFileLastModified = null;
     private Instant tempCityFileLastModified = null;
 
+    private final AtomicReference<Pattern> pathPattern = new AtomicReference<>();
+
     protected GeoIpFileService(GeoIpProcessorConfig config) {
         this.downloadDir = config.getS3DownloadLocation();
         this.asnPath = downloadDir.resolve(GeoIpFileService.ACTIVE_ASN_FILE);
@@ -55,6 +63,30 @@ public abstract class GeoIpFileService {
         }
         if (Files.exists(asnPath)) {
             asnFileLastModified = Instant.ofEpochMilli(asnPath.toFile().lastModified());
+        }
+    }
+
+    public abstract String getType();
+
+    public abstract String getPathPrefix();
+
+    public abstract boolean isCloud();
+
+    protected Pattern getPathPattern() {
+        if (pathPattern.get() == null) {
+            pathPattern.set(Pattern.compile("^" + Pattern.quote(getPathPrefix()) + "(?<" + BUCKET_GROUP + ">[-\\w]+)\\/(?<" + OBJECT_GROUP + ">[-\\w\\/\\.]+)$"));
+        }
+        return pathPattern.get();
+    }
+
+    protected Optional<BucketAndObject> extractDetails(String configPath) {
+        Matcher matcher = getPathPattern().matcher(configPath);
+        if (matcher.find()) {
+            String bucket = matcher.group(BUCKET_GROUP);
+            String object = matcher.group(OBJECT_GROUP);
+            return Optional.of(new BucketAndObject(bucket, object));
+        } else {
+            return Optional.empty();
         }
     }
 
@@ -122,10 +154,10 @@ public abstract class GeoIpFileService {
     }
 
     /**
-     * Checks to see if either the database files need to be pulled down from S3
+     * Checks to see if either the database files need to be pulled down from the cloud.
      *
      * @param config current Geo Location Processor configuration
-     * @return true if the files in S3 have been modified since they were last synced
+     * @return true if the files in the cloud have been modified since they were last synced
      */
     public boolean fileRefreshRequired(GeoIpResolverConfig config) {
         if (!isConnected()) {
@@ -156,7 +188,7 @@ public abstract class GeoIpFileService {
     protected abstract Optional<Instant> getAsnFileServerTimestamp(GeoIpResolverConfig config);
 
     /**
-     * Once the database files have been downloaded from S3 and then validated, move them to a fixed location for the
+     * Once the database files have been downloaded and then validated, move them to a fixed location for the
      * Geo Location processor to read and update the last modified variables.
      *
      * @throws IOException if the files fail to be moved to the active location
@@ -192,7 +224,7 @@ public abstract class GeoIpFileService {
 
     /**
      * Get the path to where the active ASN database file will be stored on disk. The file here will always be used by
-     * the Geo Location Processor if the Use S3 config option is enabled.
+     * the Geo Location Processor if the config option to use S3 or use GCS is enabled.
      *
      * @return active ASN database file path
      */
@@ -202,7 +234,7 @@ public abstract class GeoIpFileService {
 
     /**
      * Get the path to where the active city database file will be stored on disk. The file here will always be used by
-     * the Geo Location Processor if the Use S3 config option is enabled.
+     * the Geo Location Processor if the config option to use S3 or GCS is enabled.
      *
      * @return active city database file path
      */
@@ -230,4 +262,6 @@ public abstract class GeoIpFileService {
     }
 
     protected abstract Logger getLogger();
+
+    protected record BucketAndObject(String bucket, String object) {}
 }
