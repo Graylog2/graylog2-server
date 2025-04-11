@@ -23,9 +23,10 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { FormikInput, ModalSubmit, InputOptionalInfo } from 'components/common';
 import { Modal } from 'components/bootstrap';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
+import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
 
 type FormValues = Partial<
-  Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream'>
+  Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream' | 'entity_share_request' >
 >;
 
 const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => ({
@@ -33,6 +34,7 @@ const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexS
   description: initialValues.description ?? undefined,
   title: initialValues.title ?? undefined,
   remove_matches_from_default_stream: initialValues.remove_matches_from_default_stream ?? undefined,
+  entity_share_request: initialValues.entity_share_request ?? undefined,
 });
 
 const validate = (values: FormValues) => {
@@ -98,7 +100,11 @@ const StreamModal = ({
               />
 
               <IndexSetSelect indexSets={indexSets} />
-
+              <EntityCreateShareFormGroup
+                description='Search for a User or Team to add as collaborator on this stream.'
+                entityType='stream'
+                entityTitle=''
+              />
               <FormikInput
                 label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
                 help={
