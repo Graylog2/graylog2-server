@@ -16,7 +16,7 @@
   "dependencies": {
     "postcss-styled-syntax": "0.7.1",
     "stylelint": "16.16.0",
-    "stylelint-config-recommended": "15.0.0",
+    "stylelint-config-recommended": "16.0.0",
     "stylelint-config-standard": "37.0.0"
   }
 }
