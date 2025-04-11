@@ -49,8 +49,6 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
-import org.graylog.grn.GRN;
-import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
@@ -59,7 +57,7 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineCompactSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
-import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
@@ -171,7 +169,6 @@ public class StreamResource extends RestResource {
     private final BulkExecutor<Stream, UserContext> bulkStreamStopExecutor;
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineService pipelineService;
-    private final GRNRegistry grnRegistry;
     private final EntitySharesService entitySharesService;
 
     private final DbQueryCreator dbQueryCreator;
@@ -187,7 +184,6 @@ public class StreamResource extends RestResource {
                           MessageFactory messageFactory,
                           PipelineStreamConnectionsService pipelineStreamConnectionsService,
                           PipelineService pipelineService,
-                          GRNRegistry grnRegistry,
                           EntitySharesService entitySharesService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
@@ -197,7 +193,6 @@ public class StreamResource extends RestResource {
         this.messageFactory = messageFactory;
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
         this.pipelineService = pipelineService;
-        this.grnRegistry = grnRegistry;
         this.entitySharesService = entitySharesService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
@@ -231,16 +226,34 @@ public class StreamResource extends RestResource {
         final Set<StreamRule> streamRules = cr.rules().stream()
                 .map(streamRule -> streamRuleService.create(null, streamRule))
                 .collect(Collectors.toSet());
-        final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser(),
-                Optional.ofNullable(cr.entityShareRequest()));
+        final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser());
 
-        var result = new StreamCreatedResponse(id);
+        StreamCreatedResponse result = new StreamCreatedResponse(id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
                 .path("{streamId}")
                 .build(id);
 
         recentActivityService.create(id, GRNTypes.STREAM, userContext.getUser());
         return Response.created(streamUri).entity(result).build();
+    }
+
+    @POST
+    @Timed
+    @Path("/with-request")
+    @ApiOperation(value = "Create a stream with sharing request", response = StreamCreatedResponse.class)
+    @RequiresPermissions(RestPermissions.STREAMS_CREATE)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
+    public Response createWithRequest(@ApiParam @Valid @NotNull(message = "View request is mandatory") CreateEntityRequest<CreateStreamRequest> request,
+                                      @Context UserContext userContext) throws ValidationException {
+        final Response result = create(request.entity(), userContext);
+
+        if (request.shareRequest().isPresent() && result.getEntity() instanceof StreamCreatedResponse streamCreatedResponse) {
+            entitySharesService.updateEntityShares(GRNTypes.STREAM, streamCreatedResponse.streamId(), request.shareRequest().get(), userContext.getUser());
+        }
+
+        return result;
     }
 
     @GET
@@ -638,14 +651,11 @@ public class StreamResource extends RestResource {
                 StreamImpl.FIELD_DISABLED, true,
                 StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId()
         );
+
         final Stream stream = streamService.create(streamData);
-
-        final GRN grn = grnRegistry.newGRN(GRNTypes.STREAM, streamId);
-        EntityShareRequest entityShareRequest = EntityShareRequest.create(entitySharesService.getGrants(grn));
-        final String savedStreamId = streamService.saveWithRulesAndOwnership(
-                stream, newStreamRules, userContext.getUser(), Optional.of(entityShareRequest));
-
+        final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules, userContext.getUser());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
+
         final Set<ObjectId> outputIds = sourceStream.getOutputs().stream()
                 .map(Output::getId)
                 .map(ObjectId::new)

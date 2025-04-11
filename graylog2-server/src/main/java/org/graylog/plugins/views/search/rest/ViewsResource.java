@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
@@ -64,7 +63,8 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
-import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -87,12 +87,10 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -120,6 +118,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final StartPageService startPageService;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<ViewDTO, SearchUser> bulkExecutor;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public ViewsResource(ViewService dbService,
@@ -130,7 +129,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
                          ReferencedSearchFiltersHelper referencedSearchFiltersHelper,
                          AuditEventSender auditEventSender,
-                         ObjectMapper objectMapper) {
+                         ObjectMapper objectMapper,
+                         EntitySharesService entitySharesService) {
         this.dbService = dbService;
         this.startPageService = startPageService;
         this.recentActivityService = recentActivityService;
@@ -141,8 +141,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         this.searchFilterVisibilityChecker = searchFilterVisibilityChecker;
         this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
         this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
-
-
+        this.entitySharesService = entitySharesService;
     }
 
     @GET
@@ -228,18 +227,12 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
     }
 
-    public record CreateViewRequest(
-            @JsonProperty("view_dto") ViewDTO viewDto,
-            @JsonProperty("entity_share_request") @Nullable EntityShareRequest shareRequest
-    ) {}
-
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") CreateViewRequest createViewRequest,
+    public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") ViewDTO dto,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) throws ValidationException {
-        ViewDTO dto = createViewRequest.viewDto();
         if (dto.type().equals(ViewDTO.Type.DASHBOARD) && !searchUser.canCreateDashboards()) {
             throw new ForbiddenException("User is not allowed to create new dashboards.");
         }
@@ -247,10 +240,26 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         validateIntegrity(dto, searchUser, true);
 
         final User user = userContext.getUser();
-        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user,
-                Optional.ofNullable(createViewRequest.shareRequest()));
+        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
         recentActivityService.create(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
         return result;
+    }
+
+    @POST
+    @Path("/with-request")
+    @ApiOperation("Create a new view with sharing request")
+    @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
+    public ViewDTO createWithRequest(@ApiParam @Valid @NotNull(message = "View request is mandatory") CreateEntityRequest<ViewDTO> request,
+                                     @Context UserContext userContext,
+                                     @Context SearchUser searchUser) throws ValidationException {
+        final var dto = create(request.entity(), userContext, searchUser);
+
+        if (request.shareRequest().isPresent()) {
+            final var grnType = dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
+            entitySharesService.updateEntityShares(grnType, dto.id(), request.shareRequest().get(), searchUser.getUser());
+        }
+
+        return dto;
     }
 
     private void validateIntegrity(ViewDTO dto, SearchUser searchUser, boolean newCreation) {

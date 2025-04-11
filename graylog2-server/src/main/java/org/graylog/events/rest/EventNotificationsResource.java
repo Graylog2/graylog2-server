@@ -17,7 +17,6 @@
 package org.graylog.events.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +24,9 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -51,7 +52,8 @@ import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
-import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -73,7 +75,6 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.annotation.Nullable;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import java.util.List;
@@ -114,20 +115,22 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     private final NotificationResourceHandler resourceHandler;
     private final EmailConfiguration emailConfiguration;
     private final RecentActivityService recentActivityService;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public EventNotificationsResource(DBNotificationService dbNotificationService,
                                       Set<AlarmCallback> availableLegacyAlarmCallbacks,
                                       NotificationResourceHandler resourceHandler,
                                       EmailConfiguration emailConfiguration,
-                                      RecentActivityService recentActivityService) {
+                                      RecentActivityService recentActivityService,
+                                      EntitySharesService entitySharesService) {
         this.dbNotificationService = dbNotificationService;
         this.availableLegacyAlarmCallbacks = availableLegacyAlarmCallbacks;
         this.resourceHandler = resourceHandler;
         this.searchQueryParser = new SearchQueryParser(NotificationDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.emailConfiguration = emailConfiguration;
         this.recentActivityService = recentActivityService;
-
+        this.entitySharesService = entitySharesService;
     }
 
     @GET
@@ -180,11 +183,6 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                 .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
     }
 
-    public record CreateNotificationRequest(
-            @JsonProperty("notification_dto") NotificationDto notificationDto,
-            @JsonProperty("entity_share_request") @Nullable EntityShareRequest shareRequest
-    ) {}
-
     @POST
     @ApiOperation("Create new notification definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
@@ -198,6 +196,22 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         var entity = resourceHandler.create(dto, java.util.Optional.ofNullable(userContext.getUser()));
         recentActivityService.create(entity.id(), GRNTypes.EVENT_NOTIFICATION, userContext.getUser());
         return Response.ok().entity(entity).build();
+    }
+
+    @POST
+    @Path("/with-request")
+    @ApiOperation("Create new notification definition with sharing request")
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
+    @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
+    public Response createWithRequest(@ApiParam @Valid @NotNull(message = "View request is mandatory") CreateEntityRequest<NotificationDto> request,
+                                      @Context UserContext userContext) {
+        final Response result = create(request.entity(), userContext);
+
+        if (request.shareRequest().isPresent() && result.getEntity() instanceof NotificationDto dto) {
+            entitySharesService.updateEntityShares(GRNTypes.STREAM, dto.id(), request.shareRequest().get(), userContext.getUser());
+        }
+
+        return result;
     }
 
     @PUT
@@ -227,8 +241,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     }
 
     private void validateEmailConfiguration(NotificationDto dto, ValidationResult validationResult) {
-        if (dto.config() instanceof EmailEventNotificationConfig) {
-            EmailEventNotificationConfig emailEventNotificationConfig = (EmailEventNotificationConfig) dto.config();
+        if (dto.config() instanceof final EmailEventNotificationConfig emailEventNotificationConfig) {
             if (!emailConfiguration.isEnabled()) {
                 validationResult.addError("config", "Email transport is not configured in graylog.conf");
             }
@@ -328,8 +341,8 @@ public class EventNotificationsResource extends RestResource implements PluginRe
 
     // This is used to add user auto-completion to EmailAlarmCallback when the current user has permissions to list users
     private ConfigurationRequest getConfigurationRequest(AlarmCallback callback) {
-        if (callback instanceof EmailAlarmCallback && isPermitted(USERS_LIST)) {
-            return ((EmailAlarmCallback) callback).getEnrichedRequestedConfiguration();
+        if (callback instanceof EmailAlarmCallback emailAlarmCallback && isPermitted(USERS_LIST)) {
+            return emailAlarmCallback.getEnrichedRequestedConfiguration();
         }
         return callback.getRequestedConfiguration();
     }

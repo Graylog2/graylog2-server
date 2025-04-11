@@ -24,7 +24,6 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
-import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,13 +59,9 @@ public class NotificationResourceHandler {
      * @return the created event definition
      */
     public NotificationDto create(NotificationDto unsavedDto, Optional<User> user) {
-        return create(unsavedDto, user, Optional.empty());
-    }
-
-    public NotificationDto create(NotificationDto unsavedDto, Optional<User> user, Optional<EntityShareRequest> shareRequestOptional) {
         final NotificationDto dto;
         if (user.isPresent()) {
-            dto = notificationService.saveWithOwnership(prepareUpdate(unsavedDto), user.get(), shareRequestOptional);
+            dto = notificationService.saveWithOwnership(prepareUpdate(unsavedDto), user.get());
             LOG.debug("Created notification definition <{}/{}> with user <{}>", dto.id(), dto.title(), user.get());
         } else {
             dto = notificationService.save(prepareUpdate(unsavedDto));

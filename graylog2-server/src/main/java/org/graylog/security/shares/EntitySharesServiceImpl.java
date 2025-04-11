@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNType;
 import org.graylog.security.BuiltinCapabilities;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
@@ -49,6 +50,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 /**
  * Handler for sharing calls.
@@ -122,6 +124,19 @@ public class EntitySharesServiceImpl implements EntitySharesService {
         final ImmutableSet<ActiveShare> activeShares = getActiveShares(ownedEntity, sharingUser, availableGranteeGRNs);
 
         return granteeService.getModifiableGrantees(availableGrantees, activeShares);
+    }
+
+    /**
+     * Share / unshare an entity with one or more grantees.
+     *
+     * @param grnType     entity type
+     * @param id          entity id
+     * @param request     the request containing grantees and their capabilities
+     * @param sharingUser the user executing the request
+     */
+    public EntityShareResponse updateEntityShares(GRNType grnType, String id, EntityShareRequest request, User sharingUser) {
+        requireNonBlank(id, "entity ID cannot be null or empty");
+        return updateEntityShares(grnRegistry.newGRN(grnType, id), request, sharingUser);
     }
 
     /**

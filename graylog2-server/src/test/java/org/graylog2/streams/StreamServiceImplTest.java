@@ -19,7 +19,6 @@ package org.graylog2.streams;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog.security.shares.EntitySharesServiceImpl;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.NotFoundException;
@@ -60,15 +59,13 @@ public class StreamServiceImplTest {
     private MongoIndexSet.Factory factory;
     @Mock
     private EntityOwnershipService entityOwnershipService;
-    @Mock
-    private EntitySharesServiceImpl entitySharesService;
 
     private StreamService streamService;
 
     @Before
     public void setUp() {
         this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService,
-                outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus(), Set.of(), entitySharesService);
+                outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus(), Set.of());
     }
 
     @Test

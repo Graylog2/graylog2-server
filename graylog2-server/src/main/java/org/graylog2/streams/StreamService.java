@@ -17,7 +17,6 @@
 package org.graylog2.streams;
 
 import org.bson.types.ObjectId;
-import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
@@ -31,7 +30,6 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 public interface StreamService extends PersistedService {
@@ -41,8 +39,7 @@ public interface StreamService extends PersistedService {
 
     String save(Stream stream) throws ValidationException;
 
-    String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user,
-                                     Optional<EntityShareRequest> shareRequestOptional) throws ValidationException;
+    String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user) throws ValidationException;
 
     Stream load(String id) throws NotFoundException;
 

@@ -27,7 +27,6 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.plugin.database.users.User;
@@ -78,11 +77,7 @@ public class EventDefinitionHandler {
      * @return the created event definition
      */
     public EventDefinitionDto create(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
-        return create(unsavedEventDefinition, user, Optional.empty());
-    }
-
-    public EventDefinitionDto create(EventDefinitionDto unsavedEventDefinition, Optional<User> user, Optional<EntityShareRequest> entityShareRequest) {
-        final EventDefinitionDto eventDefinition = createEventDefinition(unsavedEventDefinition, user, entityShareRequest);
+        final EventDefinitionDto eventDefinition = createEventDefinition(unsavedEventDefinition, user);
 
         try {
             createJobDefinitionAndTriggerIfScheduledType(eventDefinition);
@@ -127,11 +122,7 @@ public class EventDefinitionHandler {
      * @return the created event definition
      */
     public EventDefinitionDto createWithoutSchedule(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
-        return createWithoutSchedule(unsavedEventDefinition, user, Optional.empty());
-    }
-
-    public EventDefinitionDto createWithoutSchedule(EventDefinitionDto unsavedEventDefinition, Optional<User> user, Optional<EntityShareRequest> entityShareRequest) {
-        return createEventDefinition(unsavedEventDefinition, user, entityShareRequest);
+        return createEventDefinition(unsavedEventDefinition, user);
     }
 
     /**
@@ -270,10 +261,10 @@ public class EventDefinitionHandler {
         deleteNotificationJobTriggers(getEventDefinitionOrThrowIAE(eventDefinitionId));
     }
 
-    private EventDefinitionDto createEventDefinition(EventDefinitionDto unsavedEventDefinition, Optional<User> user, Optional<EntityShareRequest> shareRequestOptional) {
+    private EventDefinitionDto createEventDefinition(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
         EventDefinitionDto eventDefinition;
         if (user.isPresent()) {
-            eventDefinition = eventDefinitionService.saveWithOwnership(unsavedEventDefinition, user.get(), shareRequestOptional);
+            eventDefinition = eventDefinitionService.saveWithOwnership(unsavedEventDefinition, user.get());
             LOG.debug("Created event definition <{}/{}> with user <{}>", eventDefinition.id(), eventDefinition.title(), user.get());
         } else {
             eventDefinition = eventDefinitionService.save(unsavedEventDefinition);
