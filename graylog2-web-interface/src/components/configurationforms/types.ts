@@ -98,6 +98,7 @@ export type FieldValue = string | number | boolean | void | Array<string>;
 
 export type EncryptedFieldValue<Value> = {
   set_value?: Value;
+  keep_value?: boolean;
   is_set?: boolean;
   delete_value?: boolean;
 };
