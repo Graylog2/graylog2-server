@@ -85,6 +85,10 @@ class SearchResult {
     return this._results.get(queryId);
   }
 
+  withErrors(errors: Array<SearchErrorResponse> | undefined) {
+    return new SearchResult({ ...this.result, errors });
+  }
+
   updateSearchTypes(searchTypeResults) {
     const updatedResult = this.result;
 

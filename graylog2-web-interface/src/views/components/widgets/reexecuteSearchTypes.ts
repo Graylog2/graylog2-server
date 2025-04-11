@@ -27,7 +27,6 @@ import {
   selectSearchExecutionResult,
 } from 'views/logic/slices/searchExecutionSelectors';
 import { executeWithExecutionState } from 'views/logic/slices/searchExecutionSlice';
-import SearchResult from 'views/logic/SearchResult';
 
 const reexecuteSearchTypes =
   (searchTypes: SearchTypeOptions, effectiveTimerange?: TimeRange) =>
@@ -48,16 +47,15 @@ const reexecuteSearchTypes =
 
     const executionState = new SearchExecutionState(parameterBindings, newGlobalOverride);
 
-    const handleSearchResult = (searchExecutionResult: SearchExecutionResult): SearchExecutionResult => {
-      const { result: newPartialSearchResult } = searchExecutionResult;
+    const handleSearchResult = ({ result: newPartialSearchResult }: SearchExecutionResult): SearchExecutionResult => {
       const { result: existingSearchResult } = selectSearchExecutionResult(getState());
-      const updatedSearchTypes = newPartialSearchResult.getSearchTypesFromResponse(searchTypeIds);
-      const updatedSearchResult = new SearchResult({
-        ...existingSearchResult.result,
-        errors: newPartialSearchResult.result.errors,
-      });
 
-      return { result: updatedSearchResult.updateSearchTypes(updatedSearchTypes), widgetMapping: view.widgetMapping };
+      const updatedSearchTypes = newPartialSearchResult.getSearchTypesFromResponse(searchTypeIds);
+      const updatedSearchResult = existingSearchResult
+        .withErrors(newPartialSearchResult.result.errors)
+        .updateSearchTypes(updatedSearchTypes);
+
+      return { result: updatedSearchResult, widgetMapping: view.widgetMapping };
     };
 
     return dispatch(
