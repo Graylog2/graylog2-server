@@ -35,7 +35,7 @@ import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog.security.shares.EntitySharesService;
+import org.graylog.security.shares.EntitySharesServiceImpl;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -120,9 +120,9 @@ public class NotificationFacadeTest {
         stateService = mock(DBEventProcessorStateService.class);
         MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         eventDefinitionService = new DBEventDefinitionService(
-                mongoCollections, stateService, mock(EntityOwnershipService.class), null, new IgnoreSearchFilters(), mock(EntitySharesService.class));
+                mongoCollections, stateService, mock(EntityOwnershipService.class), null, new IgnoreSearchFilters(), mock(EntitySharesServiceImpl.class));
 
-        notificationService = new DBNotificationService(mongoCollections, mock(EntityOwnershipService.class), mock(EntitySharesService.class));
+        notificationService = new DBNotificationService(mongoCollections, mock(EntityOwnershipService.class), mock(EntitySharesServiceImpl.class));
         notificationResourceHandler = new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, Maps.newHashMap());
         facade = new NotificationFacade(objectMapper, notificationResourceHandler, notificationService, userService);
     }

@@ -508,7 +508,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user, Optional<EntityShareRequest> shareRequestOptional) throws ValidationException {
+    public String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user,
+                                            Optional<EntityShareRequest> shareRequestOptional) throws ValidationException {
         final String savedStreamId = super.save(stream);
         final Set<StreamRule> rules = streamRules.stream()
                 .map(rule -> streamRuleService.copy(savedStreamId, rule))

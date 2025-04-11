@@ -62,7 +62,7 @@ import static org.mockito.Mockito.when;
 @MongoDBFixtures("EntitySharesServiceTest.json")
 class EntitySharesServiceTest {
 
-    private EntitySharesService entitySharesService;
+    private EntitySharesServiceImpl entitySharesService;
 
     @Mock
     private EntityDependencyResolver entityDependencyResolver;
@@ -90,7 +90,7 @@ class EntitySharesServiceTest {
 
 
         final EventBus serverEventBus = mock(EventBus.class);
-        this.entitySharesService = new EntitySharesService(dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker, grnRegistry, granteeService, serverEventBus);
+        this.entitySharesService = new EntitySharesServiceImpl(dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker, grnRegistry, granteeService, serverEventBus);
 
         // TODO this is needed to initialize the CAPABILITIES field
         new BuiltinCapabilities();

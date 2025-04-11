@@ -49,7 +49,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDT
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog.security.shares.EntitySharesService;
+import org.graylog.security.shares.EntitySharesServiceImpl;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -113,7 +113,7 @@ public class ViewFacadeTest {
                                   MongoCollections mongoCollections) {
             super(clusterConfigService,
                     dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class),
-                    mock(ViewSummaryService.class), mongoCollections, mock(EntitySharesService.class));
+                    mock(ViewSummaryService.class), mongoCollections, mock(EntitySharesServiceImpl.class));
         }
     }
 

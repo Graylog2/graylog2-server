@@ -41,7 +41,8 @@ public interface StreamService extends PersistedService {
 
     String save(Stream stream) throws ValidationException;
 
-    String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user, Optional<EntityShareRequest> shareRequestOptional) throws ValidationException;
+    String saveWithRulesAndOwnership(Stream stream, Collection<StreamRule> streamRules, User user,
+                                     Optional<EntityShareRequest> shareRequestOptional) throws ValidationException;
 
     Stream load(String id) throws NotFoundException;
 
