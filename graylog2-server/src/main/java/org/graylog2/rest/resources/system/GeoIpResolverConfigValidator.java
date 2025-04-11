@@ -102,7 +102,7 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
                 throw new ConfigValidationException("Cannot use both S3 and GCS at the same time. Please choose at most one.");
             }
 
-            if (config.useS3() || config.useGcs()) {
+            if (geoIpFileService.isCloud()) {
                 //Throws ConfigValidationException if the config is invalid:
                 geoIpFileService.validateConfiguration(config);
 
