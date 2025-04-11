@@ -48,6 +48,9 @@
         <Logger name="org.apache.iceberg.IncrementalFileCleanup" level="warn"/>
         <Logger name="org.apache.iceberg.SnapshotProducer" level="warn"/>
         <Logger name="org.apache.iceberg.SnapshotScan" level="warn"/>
+        <Logger name="org.apache.iceberg.aws.s3.S3InputStream" level="warn">
+            <RegexFilter regex=".*(software.amazon.awssdk.core.exception.AbortedException: null).*" onMatch="DENY" onMismatch="ACCEPT"/>
+        </Logger>
         <Logger name="org.apache.iceberg.metrics.LoggingMetricsReporter" level="warn"/>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
