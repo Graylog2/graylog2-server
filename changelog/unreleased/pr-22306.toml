@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Add permission check if a user is allowed to save searches."
+
+issues = ["Graylog2/graylog-plugin-enterprise#10359"]
+pulls = ["22306"]
