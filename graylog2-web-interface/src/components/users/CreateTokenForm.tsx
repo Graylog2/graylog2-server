@@ -95,7 +95,9 @@ const CreateTokenForm = ({
         bsStyle="primary">
         {creatingToken ? <Spinner text="Creating..." /> : 'Create Token'}
       </Button>
-       <HelpBlock>TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes PT60M, for 24 hours: PT24H, for 30 days: PT30D</HelpBlock>
+      <HelpBlock>
+        TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes PT60M, for 24 hours: PT24H, for 30 days: PT30D
+      </HelpBlock>
     </StyledForm>
   );
 };
