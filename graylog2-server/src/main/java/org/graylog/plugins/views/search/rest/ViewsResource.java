@@ -225,14 +225,21 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     }
 
 
+    private void checkCreatePermission(final boolean allowed, final String message) {
+        if(!allowed) {
+            throw new ForbiddenException(message);
+        }
+    }
+
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
     public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") ViewDTO dto,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) throws ValidationException {
-        if (dto.type().equals(ViewDTO.Type.DASHBOARD) && !searchUser.canCreateDashboards()) {
-            throw new ForbiddenException("User is not allowed to create new dashboards.");
+        switch (dto.type()) {
+            case DASHBOARD -> checkCreatePermission(searchUser.canCreateDashboards(),"User is not allowed to create new dashboards.");
+            case SEARCH -> checkCreatePermission(searchUser.isPermitted(RestPermissions.SEARCHES_CREATE),"User is not allowed to save searches.");
         }
 
         validateIntegrity(dto, searchUser, true);

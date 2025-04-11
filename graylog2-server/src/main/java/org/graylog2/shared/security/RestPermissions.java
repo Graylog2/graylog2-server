@@ -65,6 +65,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String DASHBOARDS_CREATE = "dashboards:create";
     public static final String DASHBOARDS_EDIT = "dashboards:edit";
     public static final String DASHBOARDS_READ = "dashboards:read";
+    public static final String SEARCHES_CREATE = "searches:create";
     public static final String DECORATORS_CREATE = "decorators:create";
     public static final String DECORATORS_EDIT = "decorators:edit";
     public static final String DECORATORS_READ = "decorators:read";
@@ -215,6 +216,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DASHBOARDS_CREATE, ""))
             .add(create(DASHBOARDS_EDIT, ""))
             .add(create(DASHBOARDS_READ, ""))
+            .add(create(SEARCHES_CREATE, ""))
             .add(create(DATANODE_READ, ""))
             .add(create(DATANODE_REMOVE, ""))
             .add(create(DATANODE_RESET, ""))
@@ -358,6 +360,7 @@ public class RestPermissions implements PluginPermissions {
             METRICS_READ,
             SYSTEM_READ,
             THROUGHPUT_READ,
+            SEARCHES_CREATE,
             DATANODE_READ
     ).build();
 
