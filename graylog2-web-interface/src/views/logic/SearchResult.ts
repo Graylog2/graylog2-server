@@ -89,7 +89,7 @@ class SearchResult {
     return new SearchResult({ ...this.result, errors });
   }
 
-  updateSearchTypes(searchTypeResults) {
+  updateSearchTypes(searchTypeResults: SearchJobResult['results']) {
     const updatedResult = this.result;
 
     searchTypeResults.forEach((searchTypeResult: { id: string }) => {
