@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 
 import { indexSets } from 'fixtures/indexSets';
 import { stream } from 'fixtures/streams';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 import StreamModal from './StreamModal';
 
@@ -30,6 +31,8 @@ const exampleStream = {
   description: 'Stream Description',
   index_set_id: indexSets[0].id,
 };
+
+jest.mock('components/permissions/EntityCreateShareFormGroup', () => mockComponent('EntityCreateShareFormGroup'));
 
 const SUT = (props: Partial<React.ComponentProps<typeof StreamModal>>) => (
   <StreamModal
