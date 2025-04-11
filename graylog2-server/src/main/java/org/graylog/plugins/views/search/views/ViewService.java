@@ -24,11 +24,8 @@ import jakarta.inject.Inject;
 import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog.grn.GRN;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog.security.shares.EntityShareRequest;
-import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.indices.MongoDbIndexTools;
@@ -63,15 +60,13 @@ public class ViewService implements ViewUtils<ViewDTO> {
     private final MongoCollection<ViewDTO> collection;
     private final MongoPaginationHelper<ViewDTO> pagination;
     private final MongoUtils<ViewDTO> mongoUtils;
-    private final EntitySharesService entitySharesService;
 
     @Inject
     protected ViewService(ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
                           EntityOwnershipService entityOwnerShipService,
                           ViewSummaryService viewSummaryService,
-                          MongoCollections mongoCollections,
-                          EntitySharesService entitySharesService) {
+                          MongoCollections mongoCollections) {
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityOwnerShipService = entityOwnerShipService;
@@ -79,7 +74,6 @@ public class ViewService implements ViewUtils<ViewDTO> {
         this.collection = mongoCollections.collection(COLLECTION_NAME, ViewDTO.class);
         this.pagination = mongoCollections.paginationHelper(this.collection);
         this.mongoUtils = mongoCollections.utils(collection);
-        this.entitySharesService = entitySharesService;
 
         new MongoDbIndexTools<>(collection).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
     }
@@ -219,21 +213,12 @@ public class ViewService implements ViewUtils<ViewDTO> {
     }
 
     public ViewDTO saveWithOwner(ViewDTO viewDTO, User user) {
-        return saveWithOwner(viewDTO, user, Optional.empty());
-    }
-
-    public ViewDTO saveWithOwner(ViewDTO viewDTO, User user, Optional<EntityShareRequest> shareRequestOptional) {
         final ViewDTO savedObject = save(viewDTO);
-
-        GRN grn;
         if (viewDTO.type().equals(ViewDTO.Type.DASHBOARD)) {
-            grn = entityOwnerShipService.registerNewDashboard(savedObject.id(), user);
+            entityOwnerShipService.registerNewDashboard(savedObject.id(), user);
         } else {
-            grn = entityOwnerShipService.registerNewSearch(savedObject.id(), user);
+            entityOwnerShipService.registerNewSearch(savedObject.id(), user);
         }
-        shareRequestOptional.ifPresent(entityShareRequest ->
-                entitySharesService.updateEntityShares(grn, entityShareRequest, user));
-
         return savedObject;
     }
 

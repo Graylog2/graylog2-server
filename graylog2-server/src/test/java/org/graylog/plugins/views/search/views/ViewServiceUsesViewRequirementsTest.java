@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog.security.shares.EntitySharesServiceImpl;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -79,7 +78,7 @@ public class ViewServiceUsesViewRequirementsTest {
                 viewRequirementsFactory,
                 mock(EntityOwnershipService.class),
                 mock(ViewSummaryService.class),
-                mongoCollections, mock(EntitySharesServiceImpl.class));
+                mongoCollections);
         when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
         this.searchUser = TestSearchUser.builder().build();
     }

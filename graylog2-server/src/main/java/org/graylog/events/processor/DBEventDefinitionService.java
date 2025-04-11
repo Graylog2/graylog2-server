@@ -23,12 +23,9 @@ import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import org.bson.conversions.Bson;
 import org.graylog.events.notifications.EventNotificationConfig;
-import org.graylog.grn.GRN;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog.security.shares.EntityShareRequest;
-import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.EntityScopeService;
@@ -73,15 +70,11 @@ public class DBEventDefinitionService {
     private final DBEventProcessorStateService stateService;
     private final EntityOwnershipService entityOwnerShipService;
     private final SearchFiltersReFetcher searchFiltersRefetcher;
-    private final EntitySharesService entitySharesService;
 
     @Inject
     public DBEventDefinitionService(MongoCollections mongoCollections,
                                     DBEventProcessorStateService stateService,
-                                    EntityOwnershipService entityOwnerShipService,
-                                    EntityScopeService entityScopeService,
-                                    SearchFiltersReFetcher searchFiltersRefetcher,
-                                    EntitySharesService entitySharesService) {
+                                    EntityOwnershipService entityOwnerShipService, EntityScopeService entityScopeService, SearchFiltersReFetcher searchFiltersRefetcher) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, EventDefinitionDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
@@ -89,7 +82,6 @@ public class DBEventDefinitionService {
         this.stateService = stateService;
         this.entityOwnerShipService = entityOwnerShipService;
         this.searchFiltersRefetcher = searchFiltersRefetcher;
-        this.entitySharesService = entitySharesService;
     }
 
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
@@ -108,11 +100,9 @@ public class DBEventDefinitionService {
         );
     }
 
-    public EventDefinitionDto saveWithOwnership(EventDefinitionDto eventDefinitionDto, User user, Optional<EntityShareRequest> shareRequestOptional) {
+    public EventDefinitionDto saveWithOwnership(EventDefinitionDto eventDefinitionDto, User user) {
         final EventDefinitionDto dto = save(eventDefinitionDto);
-        GRN grn = entityOwnerShipService.registerNewEventDefinition(dto.id(), user);
-        shareRequestOptional.ifPresent(entityShareRequest ->
-                entitySharesService.updateEntityShares(grn, entityShareRequest, user));
+        entityOwnerShipService.registerNewEventDefinition(dto.id(), user);
         return dto;
     }
 

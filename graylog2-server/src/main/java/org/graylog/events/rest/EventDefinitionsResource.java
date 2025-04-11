@@ -66,7 +66,8 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.security.UserContext;
-import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -85,6 +86,7 @@ import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -93,7 +95,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -140,6 +141,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkScheduleExecutor;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkUnscheduleExecutor;
     private final EventResolver eventResolver;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -150,7 +152,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     AuditEventSender auditEventSender,
                                     ObjectMapper objectMapper,
                                     EventResolver eventResolver,
-                                    EventDefinitionConfiguration eventDefinitionConfiguration
+                                    EventDefinitionConfiguration eventDefinitionConfiguration,
+                                    EntitySharesService entitySharesService
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
@@ -163,8 +166,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
         this.bulkUnscheduleExecutor = new SequentialBulkExecutor<>(this::unschedule, auditEventSender, objectMapper);
         this.eventResolver = eventResolver;
+        this.entitySharesService = entitySharesService;
     }
-
 
     @GET
     @Timed
@@ -273,20 +276,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         return dbService.getByIds(request.eventDefinitionIds());
     }
 
-    public record CreateEventRequest(
-            @JsonProperty("event_definition_dto") EventDefinitionDto eventDefinitionDto,
-            @JsonProperty("entity_share_request") @Nullable EntityShareRequest entityShareRequest
-    ) {}
-
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create new event definition", response = EventDefinitionDto.class)
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response create(@ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
-                           @ApiParam(name = "JSON Body") CreateEventRequest createEventRequest,
-                           @Context UserContext userContext) {
-        final EventDefinitionDto dto = createEventRequest.eventDefinitionDto();
+                           @ApiParam(name = "JSON Body") EventDefinitionDto dto, @Context UserContext userContext) {
         checkEventDefinitionPermissions(dto, "create");
 
         final ValidationResult result = dto.validate(null, eventDefinitionConfiguration);
@@ -294,12 +290,28 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
         final EventDefinitionDto entity = schedule ?
-                eventDefinitionHandler.create(dto,
-                        Optional.of(userContext.getUser()), Optional.ofNullable(createEventRequest.entityShareRequest())) :
-                eventDefinitionHandler.createWithoutSchedule(dto.toBuilder().state(EventDefinition.State.DISABLED).build(),
-                        Optional.of(userContext.getUser()), Optional.ofNullable(createEventRequest.entityShareRequest()));
+                eventDefinitionHandler.create(dto, Optional.of(userContext.getUser())) :
+                eventDefinitionHandler.createWithoutSchedule(dto.toBuilder().state(EventDefinition.State.DISABLED).build(), Optional.of(userContext.getUser()));
         recentActivityService.create(entity.id(), GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(entity).build();
+    }
+
+    @POST
+    @Path("/with-request")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Create new event definition with sharing request", response = EventDefinitionDto.class)
+    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
+    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
+    public Response createWithRequest(@ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
+                                      @ApiParam @Valid @NotNull(message = "View request is mandatory") CreateEntityRequest<EventDefinitionDto> request,
+                           @Context UserContext userContext) {
+        final Response result = create(schedule, request.entity(), userContext);
+
+        if (request.shareRequest().isPresent() && result.getEntity() instanceof StreamCreatedResponse streamCreatedResponse) {
+            entitySharesService.updateEntityShares(GRNTypes.STREAM, streamCreatedResponse.streamId(), request.shareRequest().get(), userContext.getUser());
+        }
+
+        return result;
     }
 
     @PUT

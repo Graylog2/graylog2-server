@@ -162,8 +162,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 null,
                 streamEntity.matchingType().asString(parameters),
                 streamEntity.removeMatches().asBoolean(parameters),
-                indexSetService.getDefault().id(),
-                null);
+                indexSetService.getDefault().id());
         final Stream stream = streamService.create(createStreamRequest, user.getName());
         final List<StreamRule> streamRules = streamEntity.streamRules().stream()
                 .map(streamRuleEntity -> createStreamRuleRequest(streamRuleEntity, parameters))
@@ -171,7 +170,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .collect(Collectors.toList());
         final String savedStreamId;
         try {
-            savedStreamId = streamService.saveWithRulesAndOwnership(stream, streamRules, user, Optional.empty());
+            savedStreamId = streamService.saveWithRulesAndOwnership(stream, streamRules, user);
         } catch (ValidationException e) {
             throw new ContentPackException("Couldn't create entity " + entity.toEntityDescriptor(), e);
         }

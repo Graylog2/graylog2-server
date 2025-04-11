@@ -44,41 +44,35 @@ public class EntityOwnershipService {
         this.grnRegistry = grnRegistry;
     }
 
-    public GRN registerNewEventDefinition(String id, User user) {
+    public void registerNewEventDefinition(String id, User user) {
         final GRN grn = grnRegistry.newGRN(GRNTypes.EVENT_DEFINITION, id);
         registerNewEntity(grn, user);
-        return grn;
     }
 
-    public GRN registerNewEventNotification(String id, User user) {
+    public void registerNewEventNotification(String id, User user) {
         final GRN grn = grnRegistry.newGRN(GRNTypes.EVENT_NOTIFICATION, id);
         registerNewEntity(grn, user);
-        return grn;
     }
 
-    public GRN registerNewDashboard(String id, User user) {
+    public void registerNewDashboard(String id, User user) {
         final GRN grn = grnRegistry.newGRN(GRNTypes.DASHBOARD, id);
         registerNewEntity(grn, user);
-        return grn;
     }
 
-    public GRN registerNewSearch(String id, User user) {
+    public void registerNewSearch(String id, User user) {
         final GRN grn = grnRegistry.newGRN(GRNTypes.SEARCH, id);
         registerNewEntity(grn, user);
-        return grn;
     }
 
-    public GRN registerNewStream(String id, User user) {
+    public void registerNewStream(String id, User user) {
         final GRN grn = grnRegistry.newGRN(GRNTypes.STREAM, id);
         registerNewEntity(grn, user);
-        return grn;
     }
 
     //TODO: this method could replace all methods from registerNew... family, so that we don't have to add two methods and tests for each new GRN Type in the future
-    public GRN registerNewEntity(final String id, final User user, final GRNType grnType) {
+    public void registerNewEntity(final String id, final User user, final GRNType grnType) {
         final GRN grn = grnRegistry.newGRN(grnType, id);
         registerNewEntity(grn, user);
-        return grn;
     }
 
     //TODO: this method could replace all methods from unregister... family, so that we don't have to add two methods and tests for each new GRN Type in the future
