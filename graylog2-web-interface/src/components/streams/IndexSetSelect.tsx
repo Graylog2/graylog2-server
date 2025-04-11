@@ -25,10 +25,12 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 type Props = {
   indexSets: Array<IndexSet>;
   help?: React.ReactElement | string;
+  label?: React.ReactElement | string;
 };
 
 const IndexSetSelect = ({
   indexSets,
+  label = 'Index Set',
   help = 'Messages that match this stream will be written to the configured index set.',
 }: Props) => {
   const indexSetOptions = useMemo(
@@ -45,7 +47,7 @@ const IndexSetSelect = ({
   return (
     <Field name="index_set_id">
       {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-        <Input label="Index Set" help={help} id={name} error={error && touched ? error : undefined}>
+        <Input label={label} help={help} id={name} error={error && touched ? error : undefined}>
           <Select
             onBlur={onBlur}
             onChange={(newValue: number) =>

@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix missing dependency for Data Adapter when creating Content Pack for Search with Parameters."
+
+pulls = ["21563"]
