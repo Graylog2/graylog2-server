@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,7 +94,13 @@ public abstract class AbstractOpensearchCli {
 
         try {
             final DefaultExecuteResultHandler executeResultHandler = new DefaultExecuteResultHandler();
-            final Map<String, String> env = Collections.singletonMap("OPENSEARCH_PATH_CONF", configPath.toAbsolutePath().toString());
+
+            final Map<String, String> env = new LinkedHashMap<>();
+            env.put("OPENSEARCH_PATH_CONF", configPath.toAbsolutePath().toString());
+
+            final String javaHome = System.getProperty("java.home");
+            env.put("OPENSEARCH_JAVA_HOME", javaHome);
+
             executor.execute(cmd, env, executeResultHandler);
             executeResultHandler.waitFor();
             final int exitValue = executeResultHandler.getExitValue();
