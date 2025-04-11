@@ -610,6 +610,23 @@
                             </sha512>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>download-repository-gcs-plugin</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/plugins/repository-gcs/${opensearch.version}/repository-gcs-${opensearch.version}.zip
+                            </url>
+                            <outputFileName>repository-gcs-${opensearch.version}.zip</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
+                            <sha512>
+                                b6e6039d002dba0184adb0e1992d2d26d58d06a57d167871e8b40802bcc1cb7ed12132fb3956e43c0dd91eb60eab7dc3e0d830926cdeb7574c53398c8d253cf9
+                            </sha512>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -679,7 +696,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <executions>
                     <execution>
-                        <id>install-required-opensearch-plugins-x64</id>
+                        <id>install-opensearch-plugin-s3-x64</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>exec</goal>
@@ -698,7 +715,26 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>install-required-opensearch-plugins-aarch64</id>
+                        <id>install-opensearch-plugin-gcs-x64</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>bash</executable>
+                            <environmentVariables>
+                                <OPENSEARCH_JAVA_HOME>${java.home}</OPENSEARCH_JAVA_HOME><!-- no matter which architecture we configure, we need our own jdk to run the script -->
+                                <BIN>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/bin/opensearch-plugin</BIN>
+                                <FILE>file://${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</FILE>
+                            </environmentVariables>
+                            <arguments>
+                                <argument>-c</argument>
+                                <argument>$BIN list repository-gcs | grep -q repository-gcs || $BIN install --batch $FILE</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-opensearch-plugin-s3-aarch64</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>exec</goal>
@@ -713,6 +749,25 @@
                             <arguments>
                                 <argument>-c</argument>
                                 <argument>$BIN list repository-s3 | grep -q repository-s3 || $BIN install --batch $FILE</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-opensearch-plugin-gcs-aarch64</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>bash</executable>
+                            <environmentVariables>
+                                <OPENSEARCH_JAVA_HOME>${java.home}</OPENSEARCH_JAVA_HOME><!-- no matter which architecture we configure, we need our own jdk to run the script -->
+                                <BIN>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/bin/opensearch-plugin</BIN>
+                                <FILE>file://${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</FILE>
+                            </environmentVariables>
+                            <arguments>
+                                <argument>-c</argument>
+                                <argument>$BIN list repository-gcs | grep -q repository-gcs || $BIN install --batch $FILE</argument>
                             </arguments>
                         </configuration>
                     </execution>

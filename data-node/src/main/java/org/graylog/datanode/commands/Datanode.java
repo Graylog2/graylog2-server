@@ -33,6 +33,7 @@ import org.graylog.datanode.bindings.PeriodicalBindings;
 import org.graylog.datanode.bootstrap.DatanodeBootstrap;
 import org.graylog.datanode.bootstrap.Main;
 import org.graylog.datanode.configuration.DatanodeProvisioningBindings;
+import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
@@ -60,6 +61,7 @@ public class Datanode extends DatanodeBootstrap {
 
     private final S3RepositoryConfiguration s3RepositoryConfiguration = new S3RepositoryConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
+    private final GCSRepositoryConfiguration gcsRepositoryConfiguration = new GCSRepositoryConfiguration();
 
     public Datanode() {
         super("datanode", new Configuration());
@@ -82,7 +84,8 @@ public class Datanode extends DatanodeBootstrap {
     public @Nonnull List<Object> getNodeCommandConfigurationBeans() {
         return Arrays.asList(configuration,
                 tlsConfiguration,
-                s3RepositoryConfiguration);
+                s3RepositoryConfiguration,
+                gcsRepositoryConfiguration);
     }
 
     @Override

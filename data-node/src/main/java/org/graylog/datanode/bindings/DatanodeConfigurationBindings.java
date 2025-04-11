@@ -21,6 +21,8 @@ import com.google.inject.TypeLiteral;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeConfigurationProvider;
+import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.configuration.DatanodeDirectoriesProvider;
 import org.graylog.datanode.configuration.OpensearchDistributionProvider;
 import org.graylog.datanode.configuration.OpensearchKeystoreProvider;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
@@ -41,6 +43,7 @@ public class DatanodeConfigurationBindings extends AbstractModule {
         bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         bind(new TypeLiteral<Map<OpensearchKeystoreProvider.Store, KeyStoreDto>>() {}).toProvider(OpensearchKeystoreProvider.class);
         bind(DatanodeConfiguration.class).toProvider(DatanodeConfigurationProvider.class);
+        bind(DatanodeDirectories.class).toProvider(DatanodeDirectoriesProvider.class);
         bind(OpensearchDistribution.class).toProvider(OpensearchDistributionProvider.class);
         bind(StateFileParser.class).to(StateFileParserImpl.class);
         bind(ShardStatsParser.class).to(ShardStatsParserImpl.class);

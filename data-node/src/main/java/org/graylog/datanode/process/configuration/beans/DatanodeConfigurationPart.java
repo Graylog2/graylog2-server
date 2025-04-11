@@ -24,6 +24,7 @@ import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 
 import java.security.KeyStore;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ import java.util.Map;
 public abstract class DatanodeConfigurationPart {
     public abstract List<String> nodeRoles();
 
-    public abstract Map<String, String> keystoreItems();
+    public abstract Collection<OpensearchKeystoreItem> keystoreItems();
 
     public abstract Map<String, String> properties();
 
@@ -58,7 +59,7 @@ public abstract class DatanodeConfigurationPart {
     public static Builder builder() {
         return new AutoValue_DatanodeConfigurationPart.Builder()
                 .nodeRoles(Collections.emptyList())
-                .keystoreItems(Collections.emptyMap())
+                .keystoreItems(Collections.emptySet())
                 .properties(Collections.emptyMap())
                 .javaOpts(Collections.emptyList())
                 .configFiles(Collections.emptyList())
@@ -97,7 +98,7 @@ public abstract class DatanodeConfigurationPart {
             return this;
         }
 
-        public abstract Builder keystoreItems(Map<String, String> keystoreItems);
+        public abstract Builder keystoreItems(Collection<OpensearchKeystoreItem> keystoreItems);
 
         public abstract Builder properties(Map<String, String> properties);
 
