@@ -24,15 +24,20 @@ import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AutoValue
 @WithBeanGetter
@@ -99,7 +104,7 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
     @Nullable
     public abstract String contentPack();
 
-    @JsonProperty("is_default")
+    @JsonProperty(FIELD_DEFAULT_STREAM)
     @Nullable
     public abstract Boolean isDefault();
 
@@ -121,6 +126,23 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
 
     static Builder builder() {
         return Builder.create();
+    }
+
+    public static Map<String, Object> toMap(StreamDTO dto) {
+        final Map<String, Object> map = new HashMap<>();
+        if (dto.id() != null) {
+            map.put("id", dto.id());
+        }
+        map.put(FIELD_TITLE, dto.title().strip());
+        map.put(FIELD_CREATED_AT, Tools.getISO8601String(new DateTime(dto.createdAt(), DateTimeZone.UTC)));
+        map.put(FIELD_DESCRIPTION, dto.description());
+        map.put(FIELD_CREATOR_USER_ID, dto.creatorUserId());
+        map.put(FIELD_CONTENT_PACK, dto.contentPack());
+        map.put(FIELD_MATCHING_TYPE, dto.matchingType());
+        map.put(FIELD_DISABLED, dto.disabled());
+        map.put(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, dto.removeMatchesFromDefaultStream());
+        map.put(FIELD_INDEX_SET_ID, dto.indexSetId());
+        return map;
     }
 
     @AutoValue.Builder

@@ -28,7 +28,7 @@ public class StreamsModule extends Graylog2Module {
     @Override
     protected void configure() {
         bind(StreamRuleService.class).to(StreamRuleServiceImpl.class);
-        bind(StreamService.class).to(StreamServiceImpl.class);
+        bind(StreamService.class).to(DBStreamService.class);
 
         Multibinder<StreamRuleInputsProvider> uriBinder = Multibinder.newSetBinder(binder(), StreamRuleInputsProvider.class);
         uriBinder.addBinding().to(StreamRuleServerInputsProvider.class);

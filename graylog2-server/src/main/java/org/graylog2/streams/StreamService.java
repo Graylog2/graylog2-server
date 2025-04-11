@@ -18,7 +18,6 @@ package org.graylog2.streams;
 
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
@@ -32,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface StreamService extends PersistedService {
+public interface StreamService {
     Stream create(Map<String, Object> fields);
 
     Stream create(CreateStreamRequest request, String userId);
@@ -62,7 +61,7 @@ public interface StreamService extends PersistedService {
     Map<String, String> loadStreamTitles(Collection<String> streamIds);
 
     @Nullable
-    public String streamTitleFromCache(String streamId);
+    String streamTitleFromCache(String streamId);
 
     /**
      * @return the total number of streams
