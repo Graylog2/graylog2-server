@@ -50,6 +50,7 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.streams.events.StreamDeletedEvent;
 import org.graylog2.streams.events.StreamsChangedEvent;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -480,7 +481,18 @@ public class DBStreamService implements StreamService {
     }
 
     private StreamDTO toDTO(Stream stream) {
-        final Date createdAt = Date.from(Instant.parse((String) stream.getFields().get(FIELD_CREATED_AT)));
+        final Date createdAt;
+        // TODO: Clean this up, created_at comes in different forms from different places.
+        final Object createdDate = stream.getFields().get(FIELD_CREATED_AT);
+        if (createdDate instanceof String dateString) {
+            createdAt = Date.from(Instant.parse(dateString));
+        } else if (createdDate instanceof DateTime dateTime) {
+            createdAt = dateTime.toDate();
+        } else if (createdDate instanceof Date date) {
+            createdAt = date;
+        } else {
+            throw new IllegalArgumentException(f("Unexpected type of %s: %s", FIELD_CREATED_AT, createdDate));
+        }
         final String createdBy = (String) stream.getFields().get(FIELD_CREATOR_USER_ID);
         final StreamDTO.Builder dtoBuilder = StreamDTO.builder()
                 .id(stream.getId())
