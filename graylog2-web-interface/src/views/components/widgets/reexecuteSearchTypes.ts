@@ -47,12 +47,15 @@ const reexecuteSearchTypes =
 
     const executionState = new SearchExecutionState(parameterBindings, newGlobalOverride);
 
-    const handleSearchResult = (searchExecutionResult: SearchExecutionResult): SearchExecutionResult => {
-      const { result: searchResult } = searchExecutionResult;
-      const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
-      const { result } = selectSearchExecutionResult(getState());
+    const handleSearchResult = ({ result: newPartialSearchResult }: SearchExecutionResult): SearchExecutionResult => {
+      const { result: existingSearchResult } = selectSearchExecutionResult(getState());
 
-      return { result: result.updateSearchTypes(updatedSearchTypes), widgetMapping: view.widgetMapping };
+      const updatedSearchTypes = newPartialSearchResult.getSearchTypesFromResponse(searchTypeIds);
+      const updatedSearchResult = existingSearchResult
+        .withErrors(newPartialSearchResult.result.errors)
+        .updateSearchTypes(updatedSearchTypes);
+
+      return { result: updatedSearchResult, widgetMapping: view.widgetMapping };
     };
 
     return dispatch(
