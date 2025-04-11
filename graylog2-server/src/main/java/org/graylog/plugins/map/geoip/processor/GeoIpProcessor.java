@@ -19,8 +19,10 @@ package org.graylog.plugins.map.geoip.processor;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import org.graylog.plugins.map.config.GeoIpFileServiceFactory;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
-import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog.plugins.map.geoip.GeoIpDbFileChangedEvent;
 import org.graylog.plugins.map.geoip.GeoIpResolverEngine;
 import org.graylog.plugins.map.geoip.GeoIpVendorResolverService;
@@ -32,9 +34,6 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -60,7 +59,7 @@ public class GeoIpProcessor implements MessageProcessor {
     private final MetricRegistry metricRegistry;
     private final GeoIpVendorResolverService geoIpVendorResolverService;
     private final ServerStatus serverStatus;
-    private final S3GeoIpFileService s3GeoIpFileService;
+    private final GeoIpFileServiceFactory geoIpFileServiceFactory;
 
     private final AtomicReference<GeoIpResolverEngine> filterEngine = new AtomicReference<>(null);
 
@@ -71,13 +70,13 @@ public class GeoIpProcessor implements MessageProcessor {
                           MetricRegistry metricRegistry,
                           GeoIpVendorResolverService geoIpVendorResolverService,
                           ServerStatus serverStatus,
-                          S3GeoIpFileService s3GeoIpFileService) {
+                          GeoIpFileServiceFactory geoIpFileServiceFactory) {
         this.clusterConfigService = clusterConfigService;
         this.scheduler = scheduler;
         this.metricRegistry = metricRegistry;
         this.geoIpVendorResolverService = geoIpVendorResolverService;
         this.serverStatus = serverStatus;
-        this.s3GeoIpFileService = s3GeoIpFileService;
+        this.geoIpFileServiceFactory = geoIpFileServiceFactory;
 
         eventBus.register(this);
     }
@@ -116,7 +115,6 @@ public class GeoIpProcessor implements MessageProcessor {
     @Subscribe
     @SuppressWarnings("unused")
     public void onDatabaseFileChangedEvent(GeoIpDbFileChangedEvent event) {
-
         scheduler.schedule(this::reload, 0, TimeUnit.SECONDS);
     }
 
@@ -125,6 +123,6 @@ public class GeoIpProcessor implements MessageProcessor {
                 GeoIpResolverConfig.defaultConfig());
 
         LOG.debug("Updating GeoIP resolver engine - {}", newConfig);
-        filterEngine.set(new GeoIpResolverEngine(geoIpVendorResolverService, newConfig, s3GeoIpFileService, metricRegistry));
+        filterEngine.set(new GeoIpResolverEngine(geoIpVendorResolverService, newConfig, geoIpFileServiceFactory.create(newConfig), metricRegistry));
     }
 }

@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.map.config;
 
-public class S3DownloadException extends Exception {
-    public S3DownloadException(String message) {
+public class CloudDownloadException extends Exception {
+    public CloudDownloadException(String message) {
         super(message);
     }
 }
