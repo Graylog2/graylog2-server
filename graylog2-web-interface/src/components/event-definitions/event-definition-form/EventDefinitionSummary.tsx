@@ -27,6 +27,7 @@ import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
+import usePluginEntities from 'hooks/usePluginEntities';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
@@ -51,6 +52,7 @@ type Props = {
 
 const EventDefinitionSummary = ({ eventDefinition, notifications, validation = { errors: { title: '' } }, currentUser }: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
+  const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
   const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
 
   useEffect(() => {
@@ -62,6 +64,13 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation = {
 
     flipShowValidation();
   }, [showValidation, setShowValidation]);
+
+  const eventProcedureSummary = React.useMemo(
+    () => pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary }) => (
+      <PluggableEventProcedureSummary eventDefinitionEventProcedure={eventDefinition?.event_procedure} />
+    )),
+    [pluggableEventProcedureSummary, eventDefinition],
+  );
 
   const renderDetails = () => (
     <>
@@ -75,10 +84,24 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation = {
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
         {isEventProceduresEnabled ? (
           <>
-            <dt style={{ margin: '16px 0 0' }}>Event Procedure</dt>
-            <dd />
+            {(!!eventDefinition?.event_procedure) ? (
+              <>
+                <dt style={{ margin: '16px 0 0' }}>Event Procedure Summary</dt>
+                <dd>
+                  {
+                    eventProcedureSummary.map((summary) => (
+                      <div key="event-procedure-summary">{summary}</div>
+                    ))
+                  }
+                </dd>
+              </>
+            ) : (
+              <>
+                <dt style={{ margin: '16px 0 0' }}>Event Procedure Summary</dt>
+                <p>This Event does not have any Event Procedures.</p>
+              </>
+            )}
           </>
-
         ) : (
           <>
             <dt style={{ margin: '16px 0 0' }}>Remediation Steps</dt>

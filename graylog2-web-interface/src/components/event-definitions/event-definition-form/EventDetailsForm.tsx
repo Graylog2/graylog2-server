@@ -200,9 +200,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             readOnly={readOnly}
             rows={2}
           />
-
           {renderEventProcedure()}
-
         </fieldset>
       </Col>
     </Row>
