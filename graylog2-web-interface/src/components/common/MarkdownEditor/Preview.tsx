@@ -32,6 +32,7 @@ const Container = styled.div<{ $height?: number, $noBackground?: boolean, $noBor
 
   height: ${({ $height }) => ($height ? `${$height}px` : 'auto')};
   min-height: 100px;
+  width: 100%;
 `;
 
 const ExpandIcon = styled(Icon)`

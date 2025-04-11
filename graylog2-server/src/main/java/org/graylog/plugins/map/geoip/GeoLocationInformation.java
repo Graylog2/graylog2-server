@@ -28,8 +28,8 @@ import javax.annotation.Nullable;
 @AutoValue
 @JsonDeserialize(builder = GeoLocationInformation.Builder.class)
 public abstract class GeoLocationInformation {
-    private static final String FIELD_LATITUDE = "latitude";
-    private static final String FIELD_LONGITUDE = "longitude";
+    public static final String FIELD_LATITUDE = "latitude";
+    public static final String FIELD_LONGITUDE = "longitude";
     private static final String FIELD_COUNTRY_ISO_CODE = "country_iso_code";
     private static final String FIELD_COUNTRY_NAME = "country_name";
     private static final String FIELD_CITY_NAME = "city_name";
