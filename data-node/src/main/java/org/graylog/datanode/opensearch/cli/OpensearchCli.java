@@ -27,6 +27,7 @@ import java.nio.file.Path;
 public class OpensearchCli {
 
     private final OpensearchKeystoreCli keystore;
+    private final OpensearchPluginCli plugin;
 
     public OpensearchCli(OpensearchConfiguration config) {
         this(
@@ -37,10 +38,14 @@ public class OpensearchCli {
 
     public OpensearchCli(Path configDir, Path binDir) {
         this.keystore = new OpensearchKeystoreCli(configDir, binDir);
+        this.plugin = new OpensearchPluginCli(configDir, binDir);
     }
 
     public OpensearchKeystoreCli keystore() {
         return keystore;
     }
 
+    public OpensearchPluginCli plugin() {
+        return plugin;
+    }
 }

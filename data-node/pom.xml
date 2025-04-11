@@ -675,25 +675,20 @@
             </plugin>
 
             <plugin>
-                <artifactId>exec-maven-plugin</artifactId>
                 <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>install-required-opensearch-plugins-x64</id>
                         <phase>prepare-package</phase>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>java</goal>
                         </goals>
                         <configuration>
-                            <executable>bash</executable>
-                            <environmentVariables>
-                                <OPENSEARCH_JAVA_HOME>${java.home}</OPENSEARCH_JAVA_HOME><!-- no matter which architecture we configure, we need our own jdk to run the script -->
-                                <BIN>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/bin/opensearch-plugin</BIN>
-                                <FILE>file://${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</FILE>
-                            </environmentVariables>
+                            <mainClass>org.graylog.datanode.build.InstallOpensearchPlugins</mainClass>
                             <arguments>
-                                <argument>-c</argument>
-                                <argument>$BIN list repository-s3 | grep -q repository-s3 || $BIN install --batch $FILE</argument>
+                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -701,24 +696,18 @@
                         <id>install-required-opensearch-plugins-aarch64</id>
                         <phase>prepare-package</phase>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>java</goal>
                         </goals>
                         <configuration>
-                            <executable>bash</executable>
-                            <environmentVariables>
-                                <OPENSEARCH_JAVA_HOME>${java.home}</OPENSEARCH_JAVA_HOME><!-- no matter which architecture we configure, we need our own jdk to run the script -->
-                                <BIN>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/bin/opensearch-plugin</BIN>
-                                <FILE>file://${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</FILE>
-                            </environmentVariables>
+                            <mainClass>org.graylog.datanode.build.InstallOpensearchPlugins</mainClass>
                             <arguments>
-                                <argument>-c</argument>
-                                <argument>$BIN list repository-s3 | grep -q repository-s3 || $BIN install --batch $FILE</argument>
+                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
                             </arguments>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
