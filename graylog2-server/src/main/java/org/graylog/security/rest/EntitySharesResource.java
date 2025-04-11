@@ -19,29 +19,10 @@ package org.graylog.security.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.grn.GRN;
-import org.graylog.grn.GRNRegistry;
-import org.graylog.security.DBGrantService;
-import org.graylog.security.entities.EntityDescriptor;
-import org.graylog.security.shares.EntityShareRequest;
-import org.graylog.security.shares.EntityShareResponse;
-import org.graylog.security.shares.EntitySharesService;
-import org.graylog.security.shares.GranteeSharesService;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.database.users.User;
-import org.graylog2.rest.PaginationParameters;
-import org.graylog2.rest.models.PaginatedResponse;
-import org.graylog2.shared.users.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
@@ -55,8 +36,24 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
+import org.graylog.security.entities.EntityDescriptor;
+import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.EntityShareResponse;
+import org.graylog.security.shares.EntitySharesService;
+import org.graylog.security.shares.GranteeSharesService;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.PaginationParameters;
+import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.shared.users.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -71,19 +68,15 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     private static final Logger LOG = LoggerFactory.getLogger(EntitySharesResource.class);
 
     private final GRNRegistry grnRegistry;
-    private final DBGrantService grantService;
-    private final UserService userService;
     private final GranteeSharesService granteeSharesService;
     private final EntitySharesService entitySharesService;
 
     @Inject
     public EntitySharesResource(GRNRegistry grnRegistry,
-                                DBGrantService grantService,
                                 UserService userService,
                                 GranteeSharesService granteeSharesService,
                                 EntitySharesService entitySharesService) {
         this.grnRegistry = grnRegistry;
-        this.grantService = grantService;
         this.userService = userService;
         this.granteeSharesService = granteeSharesService;
         this.entitySharesService = entitySharesService;
@@ -124,7 +117,15 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
         // we can do a second request including the "grantees". Then we can do the dependency check to
         // fill out "missing_dependencies".
         // This should probably be a POST request with a JSON payload.
-        return entitySharesService.prepareShare(grn, request, getCurrentUser(), getSubject());
+        return entitySharesService.prepareShare(Optional.of(grn), request, getCurrentUser(), getSubject());
+    }
+
+    @POST
+    @ApiOperation(value = "Prepare shares independent of any specific entity or collection")
+    @Path("entities/prepare")
+    @NoAuditEvent("This does not change any data")
+    public EntityShareResponse prepareGenericShare(@ApiParam(name = "JSON Body", required = true) @NotNull @Valid EntityShareRequest request) {
+        return entitySharesService.prepareShare(Optional.empty(), request, getCurrentUser(), getSubject());
     }
 
     @POST

@@ -63,6 +63,8 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -116,6 +118,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final StartPageService startPageService;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<ViewDTO, SearchUser> bulkExecutor;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public ViewsResource(ViewService dbService,
@@ -126,7 +129,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
                          ReferencedSearchFiltersHelper referencedSearchFiltersHelper,
                          AuditEventSender auditEventSender,
-                         ObjectMapper objectMapper) {
+                         ObjectMapper objectMapper,
+                         EntitySharesService entitySharesService) {
         this.dbService = dbService;
         this.startPageService = startPageService;
         this.recentActivityService = recentActivityService;
@@ -137,8 +141,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         this.searchFilterVisibilityChecker = searchFilterVisibilityChecker;
         this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
         this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
-
-
+        this.entitySharesService = entitySharesService;
     }
 
     @GET
@@ -224,7 +227,6 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
     }
 
-
     @POST
     @ApiOperation("Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
@@ -241,6 +243,23 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
         recentActivityService.create(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
         return result;
+    }
+
+    @POST
+    @Path("/with-request")
+    @ApiOperation("Create a new view with sharing request")
+    @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
+    public ViewDTO createWithRequest(@ApiParam @Valid @NotNull(message = "View request is mandatory") CreateEntityRequest<ViewDTO> request,
+                                     @Context UserContext userContext,
+                                     @Context SearchUser searchUser) throws ValidationException {
+        final var dto = create(request.entity(), userContext, searchUser);
+
+        if (request.shareRequest().isPresent()) {
+            final var grnType = dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
+            entitySharesService.updateEntityShares(grnType, dto.id(), request.shareRequest().get(), searchUser.getUser());
+        }
+
+        return dto;
     }
 
     private void validateIntegrity(ViewDTO dto, SearchUser searchUser, boolean newCreation) {
