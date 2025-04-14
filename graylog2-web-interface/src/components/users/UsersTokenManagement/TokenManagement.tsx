@@ -21,23 +21,23 @@ import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER } from 'components
 import { Row, Col } from 'components/bootstrap';
 import { fetchTokens, keyFn } from 'components/users/UsersTokenManagement/hooks/useTokens';
 import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
-import { PaginatedEntityTable } from 'components/common';
+import { PaginatedEntityTable, QueryHelper } from 'components/common';
 import TokenActions from 'components/users/UsersTokenManagement/TokenManagementActions';
 
 import CustomColumnRenderers from './ColumnRenderers';
 
+const Container = styled.div`
+  .data-table {
+    overflow-x: visible;
+  }
+`;
+
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const TokenManagement = () => {
-  const Container = styled.div`
-    .data-table {
-      overflow-x: visible;
-    }
-  `;
-
-  const Header = styled.div`
-    display: flex;
-    align-items: center;
-  `;
-
   const tokenAction = useCallback(
     ({ user_id, id: tokenId, NAME: tokenName }: Token) => (
       <TokenActions userId={user_id} tokenId={tokenId} tokenName={tokenName} />
@@ -45,6 +45,30 @@ const TokenManagement = () => {
     [],
   );
   const columnRenderers = useMemo(() => CustomColumnRenderers(), []);
+  const fieldMap = {
+    username: 'The username of the token owner',
+    name: 'The name of the token',
+    created: 'The date of the token creation',
+    last_access: 'The last time the token was used',
+    external_user: 'Is the token owner a user from an external authentication backend',
+    auth_backend: 'The user authentication bakend. N/A for internal users',
+  };
+  const tokenExamples = (
+    <>
+      <p>
+        Find tokens created by a given user:
+        <br />
+        <code>username:givenName</code>
+        <br />
+      </p>
+      <p>
+        Find token by a given token name:
+        <br />
+        <code>name:tokenName</code>
+        <br />
+      </p>
+    </>
+  );
 
   return (
     <Container>
@@ -55,6 +79,9 @@ const TokenManagement = () => {
           </Header>
           <PaginatedEntityTable<Token>
             humanName="tokens"
+            queryHelpComponent={
+              <QueryHelper entityName="token" commonFields={[]} fieldMap={fieldMap} example={tokenExamples} />
+            }
             columnsOrder={COLUMNS_ORDER}
             additionalAttributes={ADDITIONAL_ATTRIBUTES}
             actionsCellWidth={320}

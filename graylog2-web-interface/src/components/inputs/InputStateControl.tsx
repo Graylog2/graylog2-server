@@ -80,7 +80,7 @@ const InputStateControl = ({ input, openWizard }: Props) => {
   if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
     return (
       <Button bsStyle="warning" onClick={setupInput}>
-        Setup Input
+        Set-up Input
       </Button>
     );
   }

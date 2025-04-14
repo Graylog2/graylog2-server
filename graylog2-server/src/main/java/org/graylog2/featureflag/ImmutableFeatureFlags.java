@@ -48,7 +48,6 @@ class ImmutableFeatureFlags implements FeatureFlags {
     public boolean isOn(String feature) {
         FeatureFlag flag = getFlag(feature);
         if (flag == null) {
-            LOG.warn("Feature flag '{}' is not set. Fall back to default value 'false'", feature);
             return false;
         }
         return flag.isOn();

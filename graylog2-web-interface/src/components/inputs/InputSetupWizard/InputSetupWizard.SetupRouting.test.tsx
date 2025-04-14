@@ -164,7 +164,7 @@ const getStreamCreateFormFields = async () => {
     hidden: true,
   });
 
-  const indexSetSelect = await screen.findByLabelText('Index Set');
+  const indexSetSelect = await screen.findByLabelText('Select Index Set');
 
   const removeMatchesCheckbox = await screen.findByRole('checkbox', {
     name: /Remove matches from/i,
@@ -219,7 +219,7 @@ describe('InputSetupWizard Setup Routing', () => {
     it('should show a warning if the input is already in use', async () => {
       renderWizard();
 
-      await screen.findByText('Input already in use');
+      await screen.findByText('Input already in use - Message Duplication Risk!');
       await screen.findByText('In use stream 1');
       await screen.findByText('In use stream 2');
       await screen.findByText('In use pipeline 1');
@@ -236,7 +236,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        await screen.findByLabelText(/All messages \(Default\)/i);
+        await screen.findByLabelText(/Default Stream/i);
       });
 
       it('should only show editable existing streams', async () => {
@@ -255,7 +255,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+        const streamSelect = await screen.findByLabelText(/Default Stream/i);
 
         await selectEvent.openMenu(streamSelect);
 
@@ -283,7 +283,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+        const streamSelect = await screen.findByLabelText(/Default Stream/i);
 
         await selectEvent.openMenu(streamSelect);
 
@@ -311,7 +311,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+        const streamSelect = await screen.findByLabelText(/Default Stream/i);
 
         await selectEvent.openMenu(streamSelect);
         await selectEvent.select(streamSelect, 'Aloho');
@@ -341,7 +341,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
         fireEvent.click(selectStreamButton);
 
-        const streamSelect = await screen.findByLabelText(/All messages \(Default\)/i);
+        const streamSelect = await screen.findByLabelText(/Default Stream/i);
 
         await selectEvent.openMenu(streamSelect);
 

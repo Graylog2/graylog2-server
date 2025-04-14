@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.searchtypes.DataLakeSearchType;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -52,6 +53,7 @@ public class TimeRangeValidator implements SearchValidator {
 
         final Stream<SearchError> searchTypeErrors = query.searchTypes()
                 .stream()
+                .filter(searchType -> !(searchType instanceof DataLakeSearchType)) //Data Lake search types are not limited by this configuration setting
                 .flatMap(searchType -> validateSearchType(query, searchType, config).map(Stream::of).orElseGet(Stream::empty));
         return Stream.concat(queryError.map(Stream::of).orElseGet(Stream::empty), searchTypeErrors);
     }

@@ -357,7 +357,8 @@ public class RestPermissions implements PluginPermissions {
             MESSAGES_READ,
             METRICS_READ,
             SYSTEM_READ,
-            THROUGHPUT_READ
+            THROUGHPUT_READ,
+            DATANODE_READ
     ).build();
 
     protected static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()
@@ -369,7 +370,7 @@ public class RestPermissions implements PluginPermissions {
                     RestPermissions.DASHBOARDS_CREATE
             )),
             BuiltinRole.create("Event Definition Creator", "Allows creation of Event Definitions (built-in)", ImmutableSet.of(
-                    RestPermissions.EVENT_DEFINITIONS_CREATE
+                    RestPermissions.EVENT_DEFINITIONS_CREATE, RestPermissions.LOOKUP_TABLES_READ
             )),
             BuiltinRole.create("Event Notification Creator", "Allows creation of Event Notifications (built-in)", ImmutableSet.of(
                     RestPermissions.EVENT_NOTIFICATIONS_CREATE

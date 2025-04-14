@@ -22,9 +22,9 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
+import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +40,7 @@ public interface AccessTokenService extends PersistedService {
     List<AccessToken> loadAll(String username);
 
     /**
-     * Please use {@link #create(String, String, Duration)} instead.
+     * Please use {@link #create(String, String, PeriodDuration)} instead.
      * Internally, the above-mentioned method is called with the currently configured default ttl.
      *
      * @deprecated
@@ -48,7 +48,7 @@ public interface AccessTokenService extends PersistedService {
     @Deprecated(since = "6.2.0")
     AccessToken create(String username, String name);
 
-    AccessToken create(String username, String name, Duration ttl);
+    AccessToken create(String username, String name, PeriodDuration ttl);
 
     DateTime touch(AccessToken accessToken) throws ValidationException;
 
@@ -86,7 +86,8 @@ public interface AccessTokenService extends PersistedService {
      * @param id        ID of the token.
      * @param tokenName Name of the token.
      * @param expiresAt Expiration date/time of the token.
-     * @param userId    ID of the owning user.
+     * @param userId    ID of the owning user. Can be null, in case the token belongs to a user which doesn't exist in the database.
+     * @param username  The username of the owner.
      */
-    record ExpiredToken(String id, String tokenName, DateTime expiresAt, String userId) {}
+    record ExpiredToken(String id, String tokenName, DateTime expiresAt, String userId, String username) {}
 }
