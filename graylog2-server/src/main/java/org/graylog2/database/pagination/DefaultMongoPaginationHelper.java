@@ -52,7 +52,7 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
     private final List<Bson> pipeline;
 
     public DefaultMongoPaginationHelper(MongoCollection<T> collection) {
-        this(collection, null, null, null, 0, false, null, null, null);
+        this(collection, null, null, null, 0, false, null, null, List.of());
     }
 
     private DefaultMongoPaginationHelper(MongoCollection<T> collection,
