@@ -45,7 +45,7 @@ public class PaginationResultES7 extends ChunkedQueryResultES7 {
 
     @Override
     @Nullable
-    protected SearchResponse nextSearchResult() throws IOException {
+    protected SearchResponse nextSearchResult() {
         final SearchSourceBuilder initialQuery = initialSearchRequest.source();
         final SearchHit[] hits = lastSearchResponse.getHits().getHits();
         if (hits == null || hits.length == 0) {
@@ -53,8 +53,7 @@ public class PaginationResultES7 extends ChunkedQueryResultES7 {
         }
         initialQuery.searchAfter(hits[hits.length - 1].getSortValues());
         initialSearchRequest.source(initialQuery);
-        return client.executeWithIOException((c, requestOptions) -> c.search(initialSearchRequest, requestOptions),
-                "Unable to retrieve next chunk from search: ");
+        return client.search(initialSearchRequest, "Unable to retrieve next chunk from search: ");
     }
 
     @Override
