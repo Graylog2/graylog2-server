@@ -54,9 +54,14 @@ public class OpensearchPluginCli extends AbstractOpensearchCli {
      * Remove plugin from existing installation.
      *
      * @param pluginName plain plugin name, e.g. repository-s3.
+     * @param purge should also configuration of the plugin be removed?
      * @return STDOUT of the removal process. In case of error, a RuntimeException will be thrown.
      */
-    public String removePlugin(String pluginName) {
-        return runBatch("remove", pluginName);
+    public String removePlugin(String pluginName, boolean purge) {
+        if (purge) {
+            return runBatch("remove", pluginName, "--purge");
+        } else {
+            return runBatch("remove", pluginName);
+        }
     }
 }

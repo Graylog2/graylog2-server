@@ -635,42 +635,6 @@
                             </target>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>remove-unused-opensearch-plugins</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <!-- Remove unused OpenSearch plugins -->
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-alerting"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-custom-codecs"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-geospatial"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-knn"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-neural-search"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-notifications"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-notifications-core"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-performance-analyzer"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-reports-scheduler"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-security-analytics"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-sql"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-observability"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-alerting"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-custom-codecs"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-geospatial"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-knn"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-neural-search"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-notifications"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-notifications-core"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-performance-analyzer"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-reports-scheduler"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-security-analytics"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-sql"/>
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins//opensearch-observability"/>
-                            </target>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
 
@@ -678,6 +642,60 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
+                    <execution>
+                        <id>remove-unused-opensearch-plugins-x64</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.graylog.datanode.build.RemoveOpensearchPlugins</mainClass>
+                            <arguments>
+                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64</argument>
+                                <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
+                                and need to be removed in correct order-->
+                                <argument>opensearch-alerting</argument>
+                                <argument>opensearch-custom-codecs</argument>
+                                <argument>opensearch-geospatial</argument>
+                                <argument>opensearch-neural-search</argument>
+                                <argument>opensearch-knn</argument>
+                                <argument>opensearch-notifications</argument>
+                                <argument>opensearch-notifications-core</argument>
+                                <argument>opensearch-performance-analyzer</argument>
+                                <argument>opensearch-reports-scheduler</argument>
+                                <argument>opensearch-security-analytics</argument>
+                                <argument>opensearch-sql</argument>
+                                <argument>opensearch-observability</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>remove-unused-opensearch-plugins-aarch64</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.graylog.datanode.build.RemoveOpensearchPlugins</mainClass>
+                            <arguments>
+                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64</argument>
+                                <!--caution, the plugin order is relevant. Plugins have dependencies on other plugins
+                                and need to be removed in correct order-->
+                                <argument>opensearch-alerting</argument>
+                                <argument>opensearch-custom-codecs</argument>
+                                <argument>opensearch-geospatial</argument>
+                                <argument>opensearch-neural-search</argument>
+                                <argument>opensearch-knn</argument>
+                                <argument>opensearch-notifications</argument>
+                                <argument>opensearch-notifications-core</argument>
+                                <argument>opensearch-performance-analyzer</argument>
+                                <argument>opensearch-reports-scheduler</argument>
+                                <argument>opensearch-security-analytics</argument>
+                                <argument>opensearch-sql</argument>
+                                <argument>opensearch-observability</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>install-required-opensearch-plugins-x64</id>
                         <phase>prepare-package</phase>
