@@ -22,7 +22,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.sun.management.OperatingSystemMXBean;
 import jakarta.inject.Inject;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
@@ -63,12 +62,13 @@ import org.graylog2.security.TrustManagerAggregator;
 import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import oshi.SystemInfo;
+import oshi.hardware.GlobalMemory;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.security.KeyStore;
 import java.util.List;
@@ -249,9 +249,10 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @SuppressForbidden("Deliberate use of com.sun package, handling exception if not available")
     long getFreeMemory() {
         try {
-            OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+            SystemInfo systemInfo = new SystemInfo();
+            GlobalMemory memory = systemInfo.getHardware().getMemory();
             long buffer = 2 * 1024 * 1024 * 1024L;
-            return osBean.getFreeMemorySize() - buffer;
+            return memory.getAvailable() - buffer;
         } catch (Exception e) {
             LOG.warn("Could not determine free memory of system");
             return 0;
