@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { Modal as MantineModal } from '@mantine/core';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
 
@@ -29,6 +29,12 @@ const ModalOverlay = styled(MantineModal.Overlay)`
 const ModalContent = styled(MantineModal.Content)`
   z-index: 1050;
 `;
+
+const ModalRoot = styled(MantineModal.Root)(
+  ({ theme }) => css`
+    --mantine-color-body: ${theme.colors.global.contentBackground};
+  `,
+);
 
 const sizeForMantine = (size: BsSize) => {
   switch (size) {
@@ -62,7 +68,7 @@ const Modal = ({
   backdrop = true,
   closable = true,
 }: Props) => (
-  <MantineModal.Root
+  <ModalRoot
     opened={show}
     onClose={onHide}
     size={sizeForMantine(bsSize)}
@@ -70,7 +76,7 @@ const Modal = ({
     closeOnEscape={closable}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
-  </MantineModal.Root>
+  </ModalRoot>
 );
 
 Modal.Header = ({ children, showCloseButton = true }: { children: React.ReactNode; showCloseButton?: boolean }) => (
