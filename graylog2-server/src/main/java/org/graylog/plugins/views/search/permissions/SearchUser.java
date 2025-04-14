@@ -85,8 +85,11 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
     }
 
     @Override
-    public boolean canCreateDashboards() {
-        return isPermitted(RestPermissions.DASHBOARDS_CREATE);
+    public boolean canCreateView(ViewDTO.Type type) {
+        return switch (type) {
+            case DASHBOARD -> isPermitted(RestPermissions.DASHBOARDS_CREATE);
+            case SEARCH -> isPermitted(ViewsRestPermissions.VIEW_CREATE) || isPermitted(RestPermissions.DASHBOARDS_CREATE);
+        };
     }
 
     @Override
