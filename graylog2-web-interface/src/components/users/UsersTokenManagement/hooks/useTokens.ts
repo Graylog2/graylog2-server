@@ -30,6 +30,7 @@ export type Token = {
   last_access: string;
   external_user: boolean;
   title: string;
+  user_deleted: boolean;
 };
 
 type PaginatedResponse = {
