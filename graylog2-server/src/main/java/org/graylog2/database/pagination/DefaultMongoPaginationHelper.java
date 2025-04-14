@@ -23,15 +23,14 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Collation;
-import jakarta.annotation.Nullable;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.graylog2.database.utils.MongoUtils.stream;
 
 /**
@@ -50,7 +49,7 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
     private final boolean includeGrandTotal;
     private final Bson grandTotalFilter;
     private final Collation collation;
-    private final Optional<List<Bson>> pipeline;
+    private final List<Bson> pipeline;
 
     public DefaultMongoPaginationHelper(MongoCollection<T> collection) {
         this(collection, null, null, null, 0, false, null, null, null);
@@ -64,7 +63,7 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
                                          boolean includeGrandTotal,
                                          Bson grandTotalFilter,
                                          Collation collation,
-                                         @Nullable List<Bson> pipeline) {
+                                         List<Bson> pipeline) {
         this.collection = collection;
         this.filter = filter;
         this.sort = sort;
@@ -73,53 +72,54 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
         this.includeGrandTotal = includeGrandTotal;
         this.grandTotalFilter = grandTotalFilter;
         this.collation = collation;
-        this.pipeline = Optional.ofNullable(pipeline);
+        this.pipeline = pipeline;
     }
 
     @Override
     public MongoPaginationHelper<T> filter(Bson filter) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline.orElse(null));
+                grandTotalFilter, collation, pipeline);
     }
 
     @Override
     public MongoPaginationHelper<T> sort(Bson sort) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline.orElse(null));
+                grandTotalFilter, collation, pipeline);
     }
 
     @Override
     public MongoPaginationHelper<T> projection(Bson projection) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline.orElse(null));
+                grandTotalFilter, collation, pipeline);
     }
 
     @Override
     public MongoPaginationHelper<T> perPage(int perPage) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline.orElse(null));
+                grandTotalFilter, collation, pipeline);
     }
 
     @Override
     public MongoPaginationHelper<T> includeGrandTotal(boolean includeGrandTotal) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline.orElse(null));
+                grandTotalFilter, collation, pipeline);
     }
 
     @Override
     public MongoPaginationHelper<T> grandTotalFilter(Bson grandTotalFilter) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline.orElse(null));
+                grandTotalFilter, collation, pipeline);
     }
 
     @Override
     public MongoPaginationHelper<T> collation(Collation collation) {
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
-                grandTotalFilter, collation, pipeline.orElse(null));
+                grandTotalFilter, collation, pipeline);
     }
 
     @Override
     public MongoPaginationHelper<T> pipeline(List<Bson> pipeline) {
+        checkArgument(pipeline != null && !pipeline.isEmpty(), "Pipeline must be non-null and not empty.");
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, projection, perPage, includeGrandTotal,
                 grandTotalFilter, collation, pipeline);
     }
@@ -160,32 +160,30 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
     private MongoIterable<T> getFindIterableBase(int pageNumber, int pageSize) {
         final var skip = pageSize * Math.max(0, pageNumber - 1);
 
-        return pipeline.map(p -> {
-                    final var finalPipeline = ImmutableList.<Bson>builder()
-                            .addAll(p);
-                    if (filter != null) {
-                        finalPipeline.add(Aggregates.match(filter));
-                    }
-                    if (sort != null) {
-                        finalPipeline.add(Aggregates.sort(sort));
-                    }
-                    if (projection != null) {
-                        finalPipeline.add(Aggregates.project(projection));
-                    }
-                    finalPipeline.add(Aggregates.skip(skip));
-                    finalPipeline.add(Aggregates.limit(pageSize));
-                    return (MongoIterable<T>) collection.aggregate(finalPipeline.build()).collation(collation);
-                })
-                .orElseGet(() -> {
-                    FindIterable<T> findIterable = collection.find()
-                            .filter(filter)
-                            .sort(sort)
-                            .collation(collation);
-                    if (projection != null) {
-                        findIterable = findIterable.projection(projection);
-                    }
-                    return findIterable.skip(skip).limit(pageSize);
-                });
+        if (pipeline.isEmpty()) {
+            FindIterable<T> findIterable = collection.find()
+                    .filter(filter)
+                    .sort(sort)
+                    .collation(collation);
+            if (projection != null) {
+                findIterable = findIterable.projection(projection);
+            }
+            return findIterable.skip(skip).limit(pageSize);
+        }
+        final var finalPipeline = ImmutableList.<Bson>builder()
+                .addAll(pipeline);
+        if (filter != null) {
+            finalPipeline.add(Aggregates.match(filter));
+        }
+        if (sort != null) {
+            finalPipeline.add(Aggregates.sort(sort));
+        }
+        if (projection != null) {
+            finalPipeline.add(Aggregates.project(projection));
+        }
+        finalPipeline.add(Aggregates.skip(skip));
+        finalPipeline.add(Aggregates.limit(pageSize));
+        return collection.aggregate(finalPipeline.build()).collation(collation);
     }
 
 }

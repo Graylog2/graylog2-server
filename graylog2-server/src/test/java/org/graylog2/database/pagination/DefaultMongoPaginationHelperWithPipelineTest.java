@@ -139,7 +139,7 @@ class DefaultMongoPaginationHelperWithPipelineTest {
                 Aggregates.lookup(
                         "test_runs",
                         List.of(new Variable<>("testId", new Document("$toString", "$_id"))),
-                        List.<Bson>of(new Document("$match", new Document("$expr", new Document("$eq", List.of("$test_id", "$$testId"))))),
+                        List.of(new Document("$match", new Document("$expr", new Document("$eq", List.of("$test_id", "$$testId"))))),
                         "runs"
                 ),
                 Aggregates.addFields(new Field<>(LAST_RUN, new Document("$max", "$runs.created_at"))),
