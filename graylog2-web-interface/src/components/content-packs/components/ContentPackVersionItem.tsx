@@ -78,6 +78,7 @@ const ContentPackVersionItem = ({
 
   return (
     <tr key={pack.id + pack.rev}>
+      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
       <td>
         <input type="radio" value={pack.rev} onChange={onChange} checked={selectedVersion === pack.rev} />
       </td>
