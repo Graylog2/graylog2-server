@@ -23,6 +23,7 @@ import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import TelemetryProvider from 'logic/telemetry/TelemetryProvider';
 import NodesProvider from 'contexts/NodesProvider';
 import InputsProvider from 'contexts/InputsProvider';
+import SuggestReloadIfVersionChanged from 'routing/SuggestReloadIfVersionChanged';
 
 const LoggedInPage = () => (
   <DefaultQueryClientProvider>
@@ -32,6 +33,7 @@ const LoggedInPage = () => (
           <NodesProvider>
             <InputsProvider>
               <AppRouter />
+              <SuggestReloadIfVersionChanged />
             </InputsProvider>
           </NodesProvider>
         </StreamsProvider>

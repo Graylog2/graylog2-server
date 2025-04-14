@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
+import ErrorPopover from 'components/lookup-tables/ErrorPopover';
 
 import type { Token } from '../hooks/useTokens';
 
@@ -25,6 +26,11 @@ type Props = {
   token: Token;
 };
 
-const UsernameCell = ({ token }: Props) => <Link to={Routes.SYSTEM.USERS.show(token.user_id)}>{token.username}</Link>;
+const UsernameCell = ({ token }: Props) => (
+  <>
+    {token.user_deleted && <ErrorPopover placement="right" errorText="User does not exist." title="Token user error" />}
+    <Link to={Routes.SYSTEM.USERS.show(token.user_id)}>{token.username}</Link>
+  </>
+);
 
 export default UsernameCell;

@@ -164,7 +164,7 @@ const getStreamCreateFormFields = async () => {
     hidden: true,
   });
 
-  const indexSetSelect = await screen.findByLabelText('Index Set');
+  const indexSetSelect = await screen.findByLabelText('Select Index Set');
 
   const removeMatchesCheckbox = await screen.findByRole('checkbox', {
     name: /Remove matches from/i,
