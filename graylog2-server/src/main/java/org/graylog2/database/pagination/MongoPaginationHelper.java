@@ -21,6 +21,7 @@ import org.bson.conversions.Bson;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -92,6 +93,8 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> collation(Collation collation);
+
+    MongoPaginationHelper<T> pipeline(List<Bson> pipeline);
 
     /**
      * Perform the MongoDB request and return the specified page.
