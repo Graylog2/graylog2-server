@@ -115,8 +115,9 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, enti
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
-      setFieldValue('entity_share_request', payload);
+      setFieldValue('share_request', payload);
       resetSelection();
+      setDisableSubmit(false);
 
       return response;
     })

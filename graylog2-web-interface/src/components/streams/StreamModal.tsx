@@ -24,17 +24,20 @@ import { FormikInput, ModalSubmit, InputOptionalInfo } from 'components/common';
 import { Modal } from 'components/bootstrap';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
 import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type FormValues = Partial<
-  Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream' | 'entity_share_request' >
->;
+  Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream' >
+> & {
+  share_request?: EntitySharePayload
+};
 
 const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => ({
   index_set_id: initialValues.index_set_id ?? indexSets?.find((indexSet) => indexSet.default)?.id,
   description: initialValues.description ?? undefined,
   title: initialValues.title ?? undefined,
   remove_matches_from_default_stream: initialValues.remove_matches_from_default_stream ?? undefined,
-  entity_share_request: initialValues.entity_share_request ?? undefined,
+  share_request: initialValues.share_request ?? undefined,
 });
 
 const validate = (values: FormValues) => {
@@ -57,7 +60,7 @@ type Props = {
   submitButtonText: string;
   submitLoadingText: string;
   onClose: () => void;
-  onSubmit: (values: FormValues) => Promise<void>;
+  onSubmit: (values: Partial<Stream>, shareRequest?: EntitySharePayload) => Promise<void>;
   indexSets: Array<IndexSet>;
 };
 
@@ -66,6 +69,7 @@ const StreamModal = ({
     title: '',
     description: '',
     remove_matches_from_default_stream: false,
+    share_request: null,
   },
   title: modalTitle,
   submitButtonText,
@@ -76,7 +80,7 @@ const StreamModal = ({
 }: Props) => {
   const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
 
-  const _onSubmit = useCallback((values: FormValues) => onSubmit(values).then(() => onClose()), [onClose, onSubmit]);
+  const _onSubmit = useCallback(({share_request, ...rest }: FormValues) => onSubmit(rest, share_request).then(() => onClose()), [onClose, onSubmit]);
 
   return (
     <Modal title={modalTitle} onHide={onClose} show>
