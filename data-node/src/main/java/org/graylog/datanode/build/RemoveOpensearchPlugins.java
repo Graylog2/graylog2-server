@@ -20,6 +20,7 @@ import org.graylog.datanode.opensearch.cli.OpensearchCli;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 /**
  * Utility for correct removal of opensearch plugins from a maven build. This makes sure that no dependencies are
@@ -29,7 +30,7 @@ public class RemoveOpensearchPlugins {
 
     public static void main(String[] args) throws IOException {
 
-        if (args.length != 2) {
+        if (args.length < 2) {
             System.err.println("Syntax: " + RemoveOpensearchPlugins.class.getSimpleName() + " <opendsearchDistDir> <pluginFile>");
             System.exit(1);
         }
@@ -42,8 +43,13 @@ public class RemoveOpensearchPlugins {
         );
 
         // TODO: implement batch removal of multiple plugins, if opensearch ever supports that (like ES does)
-        final String pluginName = args[1];
-        System.out.println("Removing unused opensearch plugin " + pluginName);
-        cli.plugin().removePlugin(pluginName, true);
+        Arrays.stream(args)
+                .skip(1)
+                .forEach(pluginName -> removePlugin(pluginName, cli));
+    }
+
+    private static void removePlugin(String plugin, OpensearchCli cli) {
+        System.out.println("Removing unused opensearch plugin " + plugin);
+        cli.plugin().removePlugin(plugin, true);
     }
 }
