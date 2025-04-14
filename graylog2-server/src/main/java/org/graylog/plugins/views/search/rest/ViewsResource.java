@@ -231,7 +231,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") ViewDTO dto,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) throws ValidationException {
-        if (!searchUser.canCreateView(dto.type())) {
+        if (!searchUser.canCreateView(dto)) {
             throw new ForbiddenException("User is not allowed to create view of type " + dto.type());
         }
 
