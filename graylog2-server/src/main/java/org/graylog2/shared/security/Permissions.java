@@ -21,12 +21,12 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ListMultimap;
+import jakarta.inject.Inject;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
+import org.graylog2.users.UserConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,8 +34,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class Permissions {
     private static final Logger LOG = LoggerFactory.getLogger(Permissions.class);
@@ -63,25 +61,20 @@ public class Permissions {
         return readerBasePermissions;
     }
 
-    public Set<String> readerPermissions(String username) {
-        final ImmutableSet.Builder<String> perms = ImmutableSet.<String>builder().addAll(readerBasePermissions);
-
-        if (isNullOrEmpty(username)) {
-            LOG.error("Username cannot be empty or null for creating reader permissions");
-            throw new IllegalArgumentException("Username was null or empty when getting reader permissions.");
-        }
-
-        perms.addAll(userSelfEditPermissions(username));
-
-        return perms.build();
+    public boolean isAllowedToCreateTokens(boolean isExternalUser, UserConfiguration config) {
+        final boolean externalAllowed = config.allowAccessTokenForExternalUsers() || !isExternalUser;
+        final boolean allUsers = !config.restrictAccessTokenToAdmins();
+        return externalAllowed && allUsers;
     }
 
-    public Set<String> userSelfEditPermissions(String username) {
+    public Set<String> userSelfEditPermissions(String username, boolean isAllowedToCreateToken) {
         ImmutableSet.Builder<String> perms = ImmutableSet.builder();
         perms.add(perInstance(RestPermissions.USERS_EDIT, username));
         perms.add(perInstance(RestPermissions.USERS_PASSWORDCHANGE, username));
         perms.add(perInstance(RestPermissions.USERS_TOKENLIST, username));
-        perms.add(perInstance(RestPermissions.USERS_TOKENCREATE, username));
+        if (isAllowedToCreateToken) {
+            perms.add(perInstance(RestPermissions.USERS_TOKENCREATE, username));
+        }
         perms.add(perInstance(RestPermissions.USERS_TOKENREMOVE, username));
         return perms.build();
     }

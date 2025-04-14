@@ -43,7 +43,11 @@ const normalizePresetTimeRange = (timeRange: TimeRange) => {
   return timeRange;
 };
 
-const TimeRangePresetRow = () => {
+type Props = {
+  limitDuration: number;
+};
+
+const TimeRangePresetRow = ({ limitDuration }: Props) => {
   const { showAddToQuickListButton } = useContext(TimeRangeInputSettingsContext);
   const { showPresetsButton } = useContext(TimeRangeInputSettingsContext);
   const { values, setValues } = useFormikContext<TimeRangePickerFormValues>();
@@ -70,7 +74,7 @@ const TimeRangePresetRow = () => {
           <SaveTimeRangeAsPresetButton />
         </IfPermitted>
       )}
-      {showPresetsButton && <TimeRangePresetDropdown onChange={onSetPreset} />}
+      {showPresetsButton && <TimeRangePresetDropdown limitDuration={limitDuration} onChange={onSetPreset} />}
     </Container>
   );
 };

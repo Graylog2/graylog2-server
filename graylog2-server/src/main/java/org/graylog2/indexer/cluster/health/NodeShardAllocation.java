@@ -14,14 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.searchtypes;
+package org.graylog2.indexer.cluster.health;
 
-import org.graylog.plugins.views.search.SearchType;
-
-/**
- * Marker interface for search types that are not search engine related, but Data Warehouse/Iceberg related
- */
-public interface DataWarehouseSearchType extends SearchType {
-
-    String PREFIX = "data_warehouse_";
+public record NodeShardAllocation(String node, int shards) {
 }

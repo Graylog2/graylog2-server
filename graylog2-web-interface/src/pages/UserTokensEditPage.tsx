@@ -72,12 +72,15 @@ const _createToken = (tokenName, userId, loadTokens, setCreatingToken, tokenTtl)
 
   setCreatingToken(true);
 
-  return promise.then((token) => {
-    loadTokens();
-    setCreatingToken(false);
+  return promise
+    .then((token) => {
+      loadTokens();
 
-    return token;
-  });
+      return token;
+    })
+    .finally(() => {
+      setCreatingToken(false);
+    });
 };
 
 const UserEditPage = ({ params }: Props) => {
@@ -116,10 +119,11 @@ const UserEditPage = ({ params }: Props) => {
       </PageHeader>
 
       <Row className="content">
-        <Col lg={8}>
+        <Col lg={12}>
           {loadedUser ? (
             <TokenList
               tokens={tokens}
+              user={loadedUser}
               onDelete={_handleTokenDelete}
               onCreate={_handleTokenCreate}
               creatingToken={creatingToken}

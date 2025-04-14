@@ -28,7 +28,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.graph.MutableGraph;
-import org.graylog.plugins.views.search.engine.validation.DataWarehouseSearchValidator;
+import org.graylog.plugins.views.search.engine.validation.DataLakeSearchValidator;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
@@ -134,7 +134,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
 
     public Search addStreamsToQueriesWithoutStreams(Supplier<Set<String>> defaultStreamsSupplier) {
-        if (!hasQueriesWithoutStreams() || DataWarehouseSearchValidator.containsDataWarehouseSearchElements(this)) {
+        if (!hasQueriesWithoutStreams() || DataLakeSearchValidator.containsDataLakeSearchElements(this)) {
             return this;
         }
         final Set<Query> withStreams = queries().stream().filter(Query::hasStreams).collect(toSet());
@@ -158,7 +158,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
     public Search addStreamsToQueriesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
                                                     StreamPermissions streamPermissions) {
-        if (!hasQueriesWithStreamCategories() || DataWarehouseSearchValidator.containsDataWarehouseSearchElements(this)) {
+        if (!hasQueriesWithStreamCategories() || DataLakeSearchValidator.containsDataLakeSearchElements(this)) {
             return this;
         }
         final Set<Query> withStreamCategories = queries().stream().filter(q -> !q.usedStreamCategories().isEmpty()).collect(toSet());
@@ -179,7 +179,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
 
     public Search addStreamsToSearchTypesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
                                                         StreamPermissions streamPermissions) {
-        if (!hasQuerySearchTypesWithStreamCategories() || DataWarehouseSearchValidator.containsDataWarehouseSearchElements(this)) {
+        if (!hasQuerySearchTypesWithStreamCategories() || DataLakeSearchValidator.containsDataLakeSearchElements(this)) {
             return this;
         }
         final Set<Query> withStreamCategories = queries().stream()
@@ -332,5 +332,6 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
     @Override
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
         queries().forEach(query -> query.resolveNativeEntity(entityDescriptor, mutableGraph));
+        parameters().forEach(parameter -> parameter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }
