@@ -85,4 +85,16 @@ public interface StreamService {
     List<String> streamTitlesForIndexSet(String indexSetId);
 
     void addToIndexSet(String indexSetId, Collection<String> streamIds);
+
+    java.util.stream.Stream<String> streamAllIds();
+
+    /**
+     * Returns only StreamDTOs. The DTO methods skip the full loading of StreamRules and Outputs and should be used when
+     * information stored solely on the StreamDTO itself is necessary.
+     *
+     * @return a stream of StreamDTO objects. This must be closed by the caller.
+     */
+    java.util.stream.Stream<StreamDTO> streamAllDTOs();
+
+    java.util.stream.Stream<StreamDTO> streamDTOByIds(Collection<String> streamIds);
 }

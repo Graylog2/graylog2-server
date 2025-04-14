@@ -73,7 +73,6 @@ import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -718,10 +717,10 @@ public class StreamResource extends RestResource {
             checkNotEditableStream(streamId, "The stream with id <" + streamId + "> cannot be edited.");
         });
 
-        final Set<String> existingStreams = streamService.loadByIds(streamIds)
-                .stream()
-                .map(Persisted::getId)
-                .collect(Collectors.toSet());
+        final Set<String> existingStreams;
+        try (var stream = streamService.streamDTOByIds(streamIds)) {
+            existingStreams = stream.map(StreamDTO::id).collect(Collectors.toSet());
+        }
 
         final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreams);
 

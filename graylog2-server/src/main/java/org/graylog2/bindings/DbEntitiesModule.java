@@ -31,7 +31,7 @@ import org.graylog2.plugin.PluginModule;
 import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.MongoDbSession;
 import org.graylog2.streams.OutputImpl;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.filters.StreamDestinationFilterRuleDTO;
 import org.graylog2.system.activities.SystemMessageImpl;
@@ -55,7 +55,7 @@ public class DbEntitiesModule extends PluginModule {
                 OutputImpl.class,
                 ServerNodeEntity.class,
                 StreamDestinationFilterRuleDTO.class,
-                StreamImpl.class,
+                StreamDTO.class,
                 StreamRuleImpl.class,
                 SystemMessageImpl.class,
                 UserImpl.class,

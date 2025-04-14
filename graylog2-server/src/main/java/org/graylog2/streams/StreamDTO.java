@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.database.DbEntity;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -39,10 +40,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
+
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDTO.Builder.class)
+@DbEntity(collection = "streams", readPermission = STREAMS_READ)
 public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Builder> {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";

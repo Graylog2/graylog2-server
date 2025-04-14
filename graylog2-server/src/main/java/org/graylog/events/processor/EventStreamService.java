@@ -17,11 +17,9 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.Sets;
-import org.graylog2.plugin.database.Persisted;
+import jakarta.inject.Inject;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
-
-import jakarta.inject.Inject;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,10 +42,11 @@ public class EventStreamService {
             // When the source streams field of an event is empty, every user can see it. That's why we need to add
             // streams to the field. We decided to use all currently existing streams (minus the non-message streams)
             // to make sure only users that have access to all message streams can see the event.
-            sourceStreams = streamService.loadAll().stream()
-                    .map(Persisted::getId)
-                    .filter(streamId -> !Stream.NON_MESSAGE_STREAM_IDS.contains(streamId))
-                    .collect(Collectors.toSet());
+            try (var stream = streamService.streamAllIds()) {
+                sourceStreams = stream
+                        .filter(streamId -> !Stream.NON_MESSAGE_STREAM_IDS.contains(streamId))
+                        .collect(Collectors.toSet());
+            }
         } else if (searchStreams.isEmpty()) {
             // If the search streams is empty, we search in all streams and so we include all source streams from the result.
             sourceStreams = resultSourceStreams;

@@ -17,39 +17,26 @@
 package org.graylog2.streams;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
-import org.graylog2.database.DbEntity;
-import org.graylog2.database.PersistedImpl;
-import org.graylog2.database.validators.DateValidator;
-import org.graylog2.database.validators.FilledStringValidator;
-import org.graylog2.database.validators.MapValidator;
-import org.graylog2.database.validators.OptionalStringValidator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 /**
  * Representing a single stream from the streams collection. Also provides method
  * to get all streams of this collection.
  */
-@DbEntity(collection = "streams",
-          readPermission = STREAMS_READ)
-public class StreamImpl extends PersistedImpl implements Stream {
+public class StreamImpl implements Stream {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -66,42 +53,49 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_CATEGORIES = "categories";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
 
+    private final String id;
+    private final Map<String, Object> fields;
     private final List<StreamRule> streamRules;
     private final Set<Output> outputs;
     private final IndexSet indexSet;
 
     public StreamImpl(Map<String, Object> fields) {
-        super(fields);
+        this.id = new ObjectId().toString();
+        this.fields = fields;
         this.streamRules = null;
         this.outputs = null;
         this.indexSet = null;
     }
 
     public StreamImpl(Map<String, Object> fields, IndexSet indexSet) {
-        super(fields);
+        this.id = new ObjectId().toString();
+        this.fields = fields;
         this.streamRules = null;
         this.outputs = null;
         this.indexSet = indexSet;
     }
 
-    protected StreamImpl(ObjectId id, Map<String, Object> fields) {
-        super(id, fields);
-        this.streamRules = null;
-        this.outputs = null;
-        this.indexSet = null;
-    }
-
     public StreamImpl(ObjectId id, Map<String, Object> fields, List<StreamRule> streamRules, Set<Output> outputs, @Nullable IndexSet indexSet) {
-        super(id, fields);
-
+        this.id = id.toString();
+        this.fields = fields;
         this.streamRules = streamRules;
         this.outputs = outputs;
         this.indexSet = indexSet;
     }
 
     @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public Map<String, Object> getFields() {
+        return fields;
+    }
+
+    @Override
     public String toString() {
-        return this.id.toString() + ": \"" + this.getTitle() + "\"";
+        return this.id + ": \"" + this.getTitle() + "\"";
     }
 
     @Override
@@ -187,7 +181,6 @@ public class StreamImpl extends PersistedImpl implements Stream {
     }
 
     @JsonValue
-    @Override
     public Map<String, Object> asMap() {
         // We work on the result a bit to allow correct JSON serializing.
         Map<String, Object> result = Maps.newHashMap(fields);
@@ -203,28 +196,6 @@ public class StreamImpl extends PersistedImpl implements Stream {
         result.put(FIELD_INDEX_SET_ID, getIndexSetId());
         result.put(FIELD_CATEGORIES, getCategories());
         return result;
-    }
-
-    @Override
-    public Map<String, Validator> getValidations() {
-        return ImmutableMap.<String, Validator>builder()
-                .put(FIELD_TITLE, new FilledStringValidator())
-                .put(FIELD_CREATOR_USER_ID, new FilledStringValidator())
-                .put(FIELD_CREATED_AT, new DateValidator())
-                .put(FIELD_CONTENT_PACK, new OptionalStringValidator())
-                .put(FIELD_INDEX_SET_ID, new FilledStringValidator())
-                .build();
-    }
-
-    @Override
-    public Map<String, Validator> getEmbeddedValidations(String key) {
-        if (EMBEDDED_ALERT_CONDITIONS.equals(key)) {
-            return ImmutableMap.of(
-                    "id", new FilledStringValidator(),
-                    "parameters", new MapValidator());
-        }
-
-        return Collections.emptyMap();
     }
 
     @Override
@@ -268,7 +239,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
         // The indexSet might be null because of backwards compatibility but it shouldn't be for regular streams.
         // Throw an exception if indexSet is not set to avoid losing messages!
         if (indexSet == null) {
-            throw new IllegalStateException("index set must not be null! (stream id=" + getId() + " title=\"" + getTitle() + "\")");
+            throw new IllegalStateException("index set must not be null! (stream id=" + id + " title=\"" + getTitle() + "\")");
         }
         return indexSet;
     }

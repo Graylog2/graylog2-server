@@ -220,8 +220,22 @@ public class DBStreamService implements StreamService {
 
     @Override
     public List<Stream> loadAll() {
-        // TODO: Return the stream, close it on the calling end.
         return loadAllByQuery(new Document());
+    }
+
+    @Override
+    public java.util.stream.Stream<String> streamAllIds() {
+        return stream(collection.find()).map(StreamDTO::id);
+    }
+
+    @Override
+    public java.util.stream.Stream<StreamDTO> streamAllDTOs() {
+        return stream(collection.find());
+    }
+
+    @Override
+    public java.util.stream.Stream<StreamDTO> streamDTOByIds(Collection<String> streamIds) {
+        return stream(collection.find(stringIdsIn(streamIds)));
     }
 
     private List<Stream> loadAllByQuery(Bson query) {
@@ -509,12 +523,11 @@ public class DBStreamService implements StreamService {
         if (stream.getOutputs() != null) {
             dtoBuilder.outputs(stream.getOutputs().stream().map(o -> new ObjectId(o.getId())).toList());
         }
-        if (stream.getStreamRules() != null) {
-            dtoBuilder.rules(stream.getStreamRules());
-        }
         if (stream.getCategories() != null) {
             dtoBuilder.categories(stream.getCategories());
         }
+        // Intentionally do not add any StreamRules to the DTO. These are not saved in the streams collection and are
+        // linked from the streamrules collection when queried.
         return dtoBuilder.build();
     }
 }
