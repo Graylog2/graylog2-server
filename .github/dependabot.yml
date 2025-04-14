@@ -14,12 +14,9 @@ updates:
       - dependency-name: "com.amazonaws:aws-java-sdk-bom"
         update-types: ["version-update:semver-patch"]
       # Lucene >=10 requires JDK 21
-      - dependency-name: "org.apache.lucene:lucene-queryparser"
+      - dependency-name: "org.apache.lucene:lucene-*"
         versions:
-          - "> 9"
-      - dependency-name: "org.apache.lucene:lucene-analysis-common"
-        versions:
-          - "> 9"
+          - ">= 10"
     open-pull-requests-limit: 25
     labels:
       - dependencies
