@@ -25,7 +25,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 @ContainerMatrixTestsConfiguration(mavenProjectDirProvider = MavenProjectDirProviderWithFrontend.class,
                                    searchVersions = {SearchServer.DATANODE_DEV},
                                    additionalConfigurationParameters = {
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_HTTP_PUBLISH_URI", value = "http://localhost:9000/graylog")
+                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_HTTP_EXTERNAL_URI", value = "http://localhost:9000/graylog")
                                    })
 public class WebInterfaceAssetsResourceWithPrefixIT extends WebInterfaceAssetsResourceBase {
     public WebInterfaceAssetsResourceWithPrefixIT(GraylogApis graylogApis) {

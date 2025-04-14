@@ -22,8 +22,19 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Resources;
+import org.glassfish.jersey.server.ContainerRequest;
+import org.graylog2.plugin.Plugin;
+import org.graylog2.shared.rest.resources.csp.CSP;
+import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
+import org.graylog2.web.IndexHtmlGenerator;
+import org.graylog2.web.PluginAssets;
+
+import javax.activation.MimetypesFileTypeMap;
+import javax.annotation.Nonnull;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
@@ -35,17 +46,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.plugin.Plugin;
-import org.graylog2.rest.RestTools;
-import org.graylog2.shared.rest.resources.csp.CSP;
-import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
-import org.graylog2.web.IndexHtmlGenerator;
-import org.graylog2.web.PluginAssets;
 
-import javax.activation.MimetypesFileTypeMap;
-import javax.annotation.Nonnull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -72,20 +73,15 @@ import static java.util.Objects.requireNonNull;
 @CSP(group = CSP.DEFAULT)
 public class WebInterfaceAssetsResource {
     private final MimetypesFileTypeMap mimeTypes;
-    private final HttpConfiguration httpConfiguration;
     private final IndexHtmlGenerator indexHtmlGenerator;
     private final Set<Plugin> plugins;
     private final LoadingCache<URI, FileSystem> fileSystemCache;
 
     @Inject
-    public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator,
-                                      Set<Plugin> plugins,
-                                      MimetypesFileTypeMap mimeTypes,
-                                      HttpConfiguration httpConfiguration) {
+    public WebInterfaceAssetsResource(IndexHtmlGenerator indexHtmlGenerator, Set<Plugin> plugins, MimetypesFileTypeMap mimeTypes) {
         this.indexHtmlGenerator = indexHtmlGenerator;
         this.plugins = plugins;
         this.mimeTypes = requireNonNull(mimeTypes);
-        this.httpConfiguration = httpConfiguration;
         this.fileSystemCache = CacheBuilder.newBuilder()
                 .maximumSize(1024)
                 .build(new CacheLoader<>() {
@@ -107,18 +103,16 @@ public class WebInterfaceAssetsResource {
     @Path("assets/plugin/{plugin}/{filename}")
     @GET
     public Response get(@Context Request request,
-                        @Context HttpHeaders headers,
                         @PathParam("plugin") String pluginName,
                         @PathParam("filename") String filename) {
         final Plugin plugin = getPluginForName(pluginName)
                 .orElseThrow(() -> new NotFoundException("Couldn't find plugin " + pluginName));
-        final var filenameWithoutSuffix = trimBasePath(filename, headers);
 
         try {
-            final URL resourceUrl = getResourceUri(true, filenameWithoutSuffix, plugin.metadata().getClass());
-            return getResponse(request, filenameWithoutSuffix, resourceUrl, true);
+            final URL resourceUrl = getResourceUri(true, filename, plugin.metadata().getClass());
+            return getResponse(request, filename, resourceUrl, true);
         } catch (URISyntaxException | IOException e) {
-            throw new NotFoundException("Couldn't find " + filenameWithoutSuffix + " in plugin " + pluginName, e);
+            throw new NotFoundException("Couldn't find " + filename + " in plugin " + pluginName, e);
         }
     }
 
@@ -131,33 +125,17 @@ public class WebInterfaceAssetsResource {
     public Response get(@Context ContainerRequest request,
                         @Context HttpHeaders headers,
                         @PathParam("filename") String filename) {
-        final var filenameWithoutSuffix = trimBasePath(filename, headers);
         try {
-            final URL resourceUrl = getResourceUri(false, filenameWithoutSuffix, this.getClass());
-            return getResponse(request, filenameWithoutSuffix, resourceUrl, false);
+            final URL resourceUrl = getResourceUri(false, filename, this.getClass());
+            return getResponse(request, filename, resourceUrl, false);
         } catch (IOException | URISyntaxException e) {
             return generateIndexHtml(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
         }
-
-    }
-
-    private String trimBasePath(String filename, HttpHeaders headers) {
-        final String baseUriPath = removeTrailingSlash(RestTools.buildRelativeExternalUri(headers.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).getPath());
-        return filename.startsWith(baseUriPath) ? filename.substring(baseUriPath.length()) : filename;
-    }
-
-    private String removeTrailingSlash(String basePath) {
-        if (basePath == null || !basePath.endsWith("/")) {
-            return basePath;
-        }
-
-        return basePath.substring(0, basePath.length() - 1);
     }
 
     @GET
     @Path("{filename:.*}")
-    public Response getIndex(@Context ContainerRequest request,
-                             @Context HttpHeaders headers) {
+    public Response getIndex(@Context ContainerRequest request, @Context HttpHeaders headers) {
         final URI originalLocation = request.getRequestUri();
         return get(request, headers, originalLocation.getPath());
     }
