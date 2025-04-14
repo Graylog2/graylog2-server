@@ -56,6 +56,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DATANODE_RESET = PREFIX + "data_node:reset";
     public static final String DATANODE_STOP = PREFIX + "data_node:stop";
     public static final String DATANODE_START = PREFIX + "data_node:start";
+    public static final String DATANODE_START_REPLICATION = PREFIX + "data_node:start_replication";
+    public static final String DATANODE_STOP_REPLICATION = PREFIX + "data_node:stop_replication";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
@@ -114,6 +116,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String MESSAGE_INPUT_DELETE = PREFIX + "message_input:delete";
     public static final String MESSAGE_INPUT_START = PREFIX + "message_input:start";
     public static final String MESSAGE_INPUT_STOP = PREFIX + "message_input:stop";
+    public static final String MESSAGE_INPUT_SETUP = PREFIX + "message_input:setup";
     public static final String MESSAGE_INPUT_UPDATE = PREFIX + "message_input:update";
     public static final String MESSAGE_OUTPUT_CREATE = PREFIX + "message_output:create";
     public static final String MESSAGE_OUTPUT_DELETE = PREFIX + "message_output:delete";
@@ -208,6 +211,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DATANODE_RESET)
             .add(DATANODE_STOP)
             .add(DATANODE_START)
+            .add(DATANODE_START_REPLICATION)
+            .add(DATANODE_STOP_REPLICATION)
             .add(DATANODE_API_REQUEST)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
@@ -266,6 +271,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(MESSAGE_INPUT_DELETE)
             .add(MESSAGE_INPUT_START)
             .add(MESSAGE_INPUT_STOP)
+            .add(MESSAGE_INPUT_SETUP)
             .add(MESSAGE_INPUT_UPDATE)
             .add(MESSAGE_OUTPUT_CREATE)
             .add(MESSAGE_OUTPUT_DELETE)

@@ -59,9 +59,11 @@ const InputListRow = styled(Row)`
 
 const _splitInputs = (state: StoreState<typeof InputsStore>, node: NodeInfo) => {
   const { inputs } = state ?? {};
-  const globalInputs = inputs?.filter((input) => input.global === true)
+  const globalInputs = inputs
+    ?.filter((input) => input.global === true)
     .sort((inputA, inputB) => naturalSortIgnoreCase(inputA.title, inputB.title));
-  let localInputs = inputs?.filter((input) => input.global === false)
+  let localInputs = inputs
+    ?.filter((input) => input.global === false)
     .sort((inputA, inputB) => naturalSortIgnoreCase(inputA.title, inputB.title));
 
   if (node?.node_id) {
@@ -78,21 +80,21 @@ const _onFilterInputs = (globalInputs: Array<Input>, localInputs: Array<Input>, 
   const regExp = RegExp(filter, 'i');
   const filterMethod = (input: Input) => regExp.test(input.title);
 
-  return ((!globalInputs || !localInputs) || (!filter || filter.length <= 0))
+  return !globalInputs || !localInputs || !filter || filter.length <= 0
     ? {
-      filteredGlobalInputs: globalInputs,
-      filteredLocalInputs: localInputs,
-    }
+        filteredGlobalInputs: globalInputs,
+        filteredLocalInputs: localInputs,
+      }
     : {
-      filteredGlobalInputs: globalInputs.filter(filterMethod),
-      filteredLocalInputs: localInputs.filter(filterMethod),
-    };
+        filteredGlobalInputs: globalInputs.filter(filterMethod),
+        filteredLocalInputs: localInputs.filter(filterMethod),
+      };
 };
 
 type Props = {
-  permissions: Array<string>,
-  node: NodeInfo,
-}
+  permissions: Array<string>;
+  node: NodeInfo;
+};
 
 const InputsList = ({ permissions, node }: Props) => {
   useEffect(() => {
@@ -107,7 +109,8 @@ const InputsList = ({ permissions, node }: Props) => {
   const resetFilter = useCallback(() => setFilter(undefined), []);
   const { filteredGlobalInputs, filteredLocalInputs } = useMemo(
     () => _onFilterInputs(globalInputs, localInputs, filter),
-    [filter, globalInputs, localInputs]);
+    [filter, globalInputs, localInputs],
+  );
 
   const nodeAffix = node ? ' on this node' : '';
 
@@ -118,48 +121,43 @@ const InputsList = ({ permissions, node }: Props) => {
   return (
     <div>
       {!node && (
-      <IfPermitted permissions="inputs:create">
-        <CreateInputControl />
-      </IfPermitted>
+        <IfPermitted permissions="inputs:create">
+          <CreateInputControl />
+        </IfPermitted>
       )}
 
       <InputListRow id="filter-input" className="content">
         <Col md={12}>
-          <SearchForm onSearch={setFilter}
-                      topMargin={0}
-                      onReset={resetFilter}
-                      placeholder="Filter by title" />
+          <SearchForm onSearch={setFilter} topMargin={0} onReset={resetFilter} placeholder="Filter by title" />
           <br />
           <h2>
-            Global inputs
-            &nbsp;
-            <small>{globalInputs.length} configured{nodeAffix}</small>
+            Global inputs &nbsp;
+            <small>
+              {globalInputs.length} configured{nodeAffix}
+            </small>
           </h2>
-          <EntityList bsNoItemsStyle="info"
-                      noItemsText={globalInputs.length <= 0 ? 'There are no global inputs.'
-                        : 'No global inputs match the filter'}
-                      items={filteredGlobalInputs.map((input) => (
-                        <InputListItem key={input.id}
-                                       input={input}
-                                       currentNode={currentNode}
-                                       permissions={permissions} />
-                      ))} />
+          <EntityList
+            bsNoItemsStyle="info"
+            noItemsText={globalInputs.length <= 0 ? 'There are no global inputs.' : 'No global inputs match the filter'}
+            items={filteredGlobalInputs.map((input) => (
+              <InputListItem key={input.id} input={input} currentNode={currentNode} permissions={permissions} />
+            ))}
+          />
           <br />
           <br />
           <h2>
-            Local inputs
-            &nbsp;
-            <small>{localInputs.length} configured{nodeAffix}</small>
+            Local inputs &nbsp;
+            <small>
+              {localInputs.length} configured{nodeAffix}
+            </small>
           </h2>
-          <EntityList bsNoItemsStyle="info"
-                      noItemsText={localInputs.length <= 0 ? 'There are no local inputs.'
-                        : 'No local inputs match the filter'}
-                      items={filteredLocalInputs.map((input) => (
-                        <InputListItem key={input.id}
-                                       input={input}
-                                       currentNode={currentNode}
-                                       permissions={permissions} />
-                      ))} />
+          <EntityList
+            bsNoItemsStyle="info"
+            noItemsText={localInputs.length <= 0 ? 'There are no local inputs.' : 'No local inputs match the filter'}
+            items={filteredLocalInputs.map((input) => (
+              <InputListItem key={input.id} input={input} currentNode={currentNode} permissions={permissions} />
+            ))}
+          />
         </Col>
       </InputListRow>
     </div>

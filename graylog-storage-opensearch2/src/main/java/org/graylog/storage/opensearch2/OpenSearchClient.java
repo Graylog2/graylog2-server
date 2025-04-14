@@ -42,6 +42,7 @@ import org.graylog.storage.errors.ResponseError;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
+import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,32 +184,34 @@ public class OpenSearchClient {
                 : RequestOptions.DEFAULT;
     }
 
-    private OpenSearchException exceptionFrom(Exception e, String errorMessage) {
-        if (e instanceof OpenSearchException) {
-            final OpenSearchException openSearchException = (OpenSearchException) e;
+    public static RuntimeException exceptionFrom(Exception e, String errorMessage) {
+        if (e instanceof OpenSearchException openSearchException) {
             if (isIndexNotFoundException(openSearchException)) {
-                throw IndexNotFoundException.create(errorMessage + openSearchException.getResourceId(), openSearchException.getIndex().getName());
+                return IndexNotFoundException.create(errorMessage + openSearchException.getResourceId(), openSearchException.getIndex().getName());
             }
             if (isMasterNotDiscoveredException(openSearchException)) {
-                throw new MasterNotDiscoveredException();
+                return new MasterNotDiscoveredException();
             }
             if (isInvalidWriteTargetException(openSearchException)) {
                 final Matcher matcher = invalidWriteTarget.matcher(openSearchException.getMessage());
                 if (matcher.find()) {
                     final String target = matcher.group("target");
-                    throw InvalidWriteTargetException.create(target);
+                    return InvalidWriteTargetException.create(target);
                 }
             }
             if (isBatchSizeTooLargeException(openSearchException)) {
-                throw new BatchSizeTooLargeException(openSearchException.getMessage());
+                return new BatchSizeTooLargeException(openSearchException.getMessage());
+            }
+            if (isMapperParsingExceptionException(openSearchException)) {
+                return new MapperParsingException(openSearchException.getMessage());
             }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
-            throw new BatchSizeTooLargeException(e.getMessage());
+            return new BatchSizeTooLargeException(e.getMessage());
         }
         return new OpenSearchException(errorMessage, e);
     }
 
-    private boolean isInvalidWriteTargetException(OpenSearchException openSearchException) {
+    private static boolean isInvalidWriteTargetException(OpenSearchException openSearchException) {
         try {
             final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
             return parsedException.reason().startsWith("no write index is defined for alias");
@@ -217,7 +220,7 @@ public class OpenSearchClient {
         }
     }
 
-    private boolean isMasterNotDiscoveredException(OpenSearchException openSearchException) {
+    private static boolean isMasterNotDiscoveredException(OpenSearchException openSearchException) {
         try {
             final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
             return parsedException.type().equals("master_not_discovered_exception")
@@ -227,11 +230,15 @@ public class OpenSearchClient {
         }
     }
 
-    private boolean isIndexNotFoundException(OpenSearchException openSearchException) {
+    private static boolean isIndexNotFoundException(OpenSearchException openSearchException) {
         return openSearchException.getMessage().contains("index_not_found_exception");
     }
 
-    private boolean isBatchSizeTooLargeException(OpenSearchException openSearchException) {
+    private static boolean isMapperParsingExceptionException(OpenSearchException openSearchException) {
+        return openSearchException.getMessage().contains("mapper_parsing_exception");
+    }
+
+    private static boolean isBatchSizeTooLargeException(OpenSearchException openSearchException) {
         if (openSearchException instanceof OpenSearchStatusException statusException) {
             if (statusException.getCause() instanceof ResponseException responseException) {
                 return (responseException.getResponse().getStatusLine().getStatusCode() == 429);

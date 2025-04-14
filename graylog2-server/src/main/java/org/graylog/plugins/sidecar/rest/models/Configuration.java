@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -30,7 +31,7 @@ import java.util.Set;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-public abstract class Configuration {
+public abstract class Configuration implements MongoEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_COLLECTOR_ID = "collector_id";
     public static final String FIELD_NAME = "name";

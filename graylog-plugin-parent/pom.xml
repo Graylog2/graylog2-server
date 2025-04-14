@@ -40,7 +40,7 @@
         <web.build-dir>${project.build.directory}/web/build</web.build-dir>
 
         <!-- Plugin versions -->
-        <jdeb.version>1.11</jdeb.version>
+        <jdeb.version>1.13</jdeb.version>
         <rpm-maven.version>2.2.0</rpm-maven.version>
     </properties>
 

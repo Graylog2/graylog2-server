@@ -23,24 +23,29 @@ import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import type { WidgetActionType } from 'views/components/widgets/Types';
 
 type Props = {
-  widget: Widget,
+  widget: Widget;
 };
 
 const ExtraMenuWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
 
-  const extraWidgetActions = useMemo<Array<WidgetActionType>>(() => pluginWidgetActions
-    .filter(({ isHidden = () => false, position }) => !isHidden(widget) && position === 'menu'),
-  [pluginWidgetActions, widget]);
+  const extraWidgetActions = useMemo<Array<WidgetActionType>>(
+    () =>
+      pluginWidgetActions.filter(({ isHidden = () => false, position }) => !isHidden(widget) && position === 'menu'),
+    [pluginWidgetActions, widget],
+  );
 
   return (
-    <>{extraWidgetActions.map(({ component: Component, type, disabled = () => false }) => (
-      <Component widget={widget}
-                 contexts={{ widgetFocusContext }}
-                 key={`${type}-${widget.id}`}
-                 disabled={disabled()} />
-    ))}
+    <>
+      {extraWidgetActions.map(({ component: Component, type, disabled = () => false }) => (
+        <Component
+          widget={widget}
+          contexts={{ widgetFocusContext }}
+          key={`${type}-${widget.id}`}
+          disabled={disabled()}
+        />
+      ))}
     </>
   );
 };

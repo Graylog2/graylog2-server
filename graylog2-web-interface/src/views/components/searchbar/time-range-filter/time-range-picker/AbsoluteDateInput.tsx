@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
@@ -25,63 +24,54 @@ import useUserDateTime from 'hooks/useUserDateTime';
 
 const Wrapper = styled.div`
   width: 100%;
-  
+
   .form-group {
     margin: 0;
   }
 `;
 
 type Props = {
-  name: string,
-  disabled?: boolean,
-  onChange: (newValue: string) => void,
-  value: string | undefined,
-  hasError?: boolean,
-  className?: string,
-}
+  name: string;
+  disabled?: boolean;
+  onChange?: (newValue: string) => void;
+  value?: string | undefined;
+  hasError?: boolean;
+  className?: string;
+};
 
-const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError, className }: Props) => {
+const AbsoluteDateInput = ({
+  name,
+  disabled = false,
+  onChange = () => {},
+  value = '',
+  hasError = false,
+  className,
+}: Props) => {
   const { formatTime } = useUserDateTime();
   const _onSetTimeToNow = () => onChange(formatTime(new Date(), 'complete'));
   const _onChange = (event) => onChange(event.target.value);
 
   return (
     <Wrapper className={className}>
-      <Input type="text"
-             id={`date-input-${name}`}
-             name={name}
-             autoComplete="off"
-             disabled={disabled}
-             onChange={_onChange}
-             placeholder={DATE_TIME_FORMATS.default}
-             value={value}
-             buttonAfter={(
-               <Button disabled={disabled}
-                       onClick={_onSetTimeToNow}
-                       title="Insert current date">
-                 <Icon name="calendar_clock" />
-               </Button>
-             )}
-             className="mousetrap"
-             bsStyle={hasError ? 'error' : null} />
+      <Input
+        type="text"
+        id={`date-input-${name}`}
+        name={name}
+        autoComplete="off"
+        disabled={disabled}
+        onChange={_onChange}
+        placeholder={DATE_TIME_FORMATS.default}
+        value={value}
+        buttonAfter={
+          <Button disabled={disabled} onClick={_onSetTimeToNow} title="Insert current date">
+            <Icon name="calendar_clock" />
+          </Button>
+        }
+        className="mousetrap"
+        bsStyle={hasError ? 'error' : null}
+      />
     </Wrapper>
   );
-};
-
-AbsoluteDateInput.propTypes = {
-  disabled: PropTypes.bool,
-  hasError: PropTypes.bool,
-  name: PropTypes.string.isRequired,
-  onChange: PropTypes.func,
-  value: PropTypes.string,
-};
-
-AbsoluteDateInput.defaultProps = {
-  className: undefined,
-  disabled: false,
-  hasError: false,
-  onChange: () => {},
-  value: '',
 };
 
 export default AbsoluteDateInput;

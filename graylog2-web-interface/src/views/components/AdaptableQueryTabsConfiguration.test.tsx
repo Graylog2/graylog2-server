@@ -24,6 +24,7 @@ import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabs
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
@@ -32,33 +33,24 @@ jest.mock('views/logic/slices/viewSlice', () => ({
 }));
 
 describe('AdaptableQueryTabsConfiguration', () => {
-  let oldConfirm;
-
-  beforeEach(() => {
-    oldConfirm = window.confirm;
-    window.confirm = jest.fn(() => true);
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-    window.confirm = oldConfirm;
-  });
-
+  useWindowConfirmMock();
   useViewsPlugin();
 
-  const renderConfiguration = () => render((
-    <TestStoreProvider>
-      <AdaptableQueryTabsConfiguration show
-                                       setShow={() => {}}
-                                       activeQueryId="queryId-1"
-                                       dashboardId="dashboard-id"
-                                       queriesList={OrderedSet(
-                                         [
-                                           { id: 'queryId-1', title: 'Query Title 1' },
-                                           { id: 'queryId-2', title: 'Query Title 2' },
-                                         ])} />
-    </TestStoreProvider>
-  ));
+  const renderConfiguration = () =>
+    render(
+      <TestStoreProvider>
+        <AdaptableQueryTabsConfiguration
+          show
+          setShow={() => {}}
+          activeQueryId="queryId-1"
+          dashboardId="dashboard-id"
+          queriesList={OrderedSet([
+            { id: 'queryId-1', title: 'Query Title 1' },
+            { id: 'queryId-2', title: 'Query Title 2' },
+          ])}
+        />
+      </TestStoreProvider>,
+    );
 
   it('should display modal window', async () => {
     renderConfiguration();

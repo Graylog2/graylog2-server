@@ -17,21 +17,20 @@
 package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoDBUpsertRetryer;
-import org.mongojack.DBQuery;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +41,8 @@ import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Indexes.ascending;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.include;
 import static org.graylog2.indexer.fieldtypes.FieldTypeDTO.FIELD_NAME;
@@ -58,32 +59,26 @@ import static org.graylog2.indexer.indexset.CustomFieldMappings.REVERSE_TYPES;
 public class IndexFieldTypesService {
     private static final String FIELDS_FIELD_NAMES = String.format(Locale.US, "%s.%s", FIELD_FIELDS, FIELD_NAME);
 
-    private final JacksonDBCollection<IndexFieldTypesDTO, ObjectId> db;
-    private final MongoCollection<Document> mongoCollection;
-
+    private final MongoCollection<IndexFieldTypesDTO> collection;
+    private final MongoUtils<IndexFieldTypesDTO> mongoUtils;
+    private final MongoCollection<Document> rawCollection;
 
     @Inject
-    public IndexFieldTypesService(final MongoConnection mongoConnection,
-                                  final MongoJackObjectMapperProvider objectMapperProvider) {
-        this.mongoCollection = mongoConnection.getMongoDatabase().getCollection("index_field_types");
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("index_field_types"),
-                IndexFieldTypesDTO.class,
-                ObjectId.class,
-                objectMapperProvider.get());
+    public IndexFieldTypesService(MongoCollections mongoCollections) {
+        collection = mongoCollections.collection("index_field_types", IndexFieldTypesDTO.class);
+        mongoUtils = mongoCollections.utils(collection);
+        rawCollection = collection.withDocumentClass(Document.class);
 
-        this.db.createIndex(new BasicDBObject(ImmutableMap.of(
-                FIELD_INDEX_NAME, 1,
-                FIELD_INDEX_SET_ID, 1
-        )), new BasicDBObject("unique", true));
-        this.db.createIndex(new BasicDBObject(FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
-        this.db.createIndex(new BasicDBObject(FIELDS_FIELD_NAMES, 1));
-        this.db.createIndex(new BasicDBObject(FIELD_INDEX_SET_ID, 1));
+        collection.createIndex(ascending(FIELD_INDEX_NAME, FIELD_INDEX_SET_ID), new IndexOptions().unique(true));
+        collection.createIndex(ascending(FIELD_INDEX_NAME), new IndexOptions().unique(true));
+        collection.createIndex(ascending(FIELDS_FIELD_NAMES));
+        collection.createIndex(ascending(FIELD_INDEX_SET_ID));
     }
 
     public List<String> fieldTypeHistory(final String indexSetId,
                                          final String fieldName,
                                          final boolean skipEntriesWithUnchangedType) {
-        final AggregateIterable<Document> aggregateResult = this.mongoCollection.aggregate(List.of(
+        final AggregateIterable<Document> aggregateResult = this.rawCollection.aggregate(List.of(
                         Aggregates.unwind("$" + FIELD_FIELDS),
                         Aggregates.match(and(
                                 eq(FIELD_INDEX_SET_ID, indexSetId),
@@ -119,83 +114,80 @@ public class IndexFieldTypesService {
 
     public Optional<IndexFieldTypesDTO> get(String idOrIndexName) {
         try {
-            return Optional.ofNullable(db.findOneById(new ObjectId(idOrIndexName)));
+            return mongoUtils.getById(new ObjectId(idOrIndexName));
         } catch (IllegalArgumentException e) {
             // Not an ObjectId, try again with index_name
-            return Optional.ofNullable(db.findOne(DBQuery.is(FIELD_INDEX_NAME, idOrIndexName)));
+            return Optional.ofNullable(collection.find(eq(FIELD_INDEX_NAME, idOrIndexName)).first());
         }
     }
 
     public IndexFieldTypesDTO save(IndexFieldTypesDTO dto) {
-        final WriteResult<IndexFieldTypesDTO, ObjectId> save = db.save(dto);
-        return save.getSavedObject();
+        return mongoUtils.save(dto);
     }
 
     public Optional<IndexFieldTypesDTO> upsert(IndexFieldTypesDTO dto) {
-        final WriteResult<IndexFieldTypesDTO, ObjectId> update = MongoDBUpsertRetryer.run(() -> db.update(
-                DBQuery.and(
-                        DBQuery.is(FIELD_INDEX_NAME, dto.indexName()),
-                        DBQuery.is(FIELD_INDEX_SET_ID, dto.indexSetId())
+        final UpdateResult updateResult = collection.replaceOne(
+                and(
+                        eq(FIELD_INDEX_NAME, dto.indexName()),
+                        eq(FIELD_INDEX_SET_ID, dto.indexSetId())
                 ),
                 dto,
-                true,
-                false
-        ));
+                new ReplaceOptions().upsert(true)
+        );
 
-        final Object upsertedId = update.getUpsertedId();
-        if (upsertedId instanceof ObjectId) {
-            return get(((ObjectId) upsertedId).toHexString());
-        } else if (upsertedId instanceof String) {
-            return get((String) upsertedId);
+        final var id = updateResult.getUpsertedId();
+        if (id != null) {
+            return Optional.of(dto.toBuilder()
+                    .id(id.asObjectId().getValue().toHexString())
+                    .build());
         }
+
         return Optional.empty();
     }
 
     public void delete(String idOrIndexName) {
         try {
-            db.removeById(new ObjectId(idOrIndexName));
+            mongoUtils.deleteById(new ObjectId(idOrIndexName));
         } catch (IllegalArgumentException e) {
             // Not an ObjectId, try again with index_name
-            db.remove(DBQuery.is(FIELD_INDEX_NAME, idOrIndexName));
+            collection.deleteOne(eq(FIELD_INDEX_NAME, idOrIndexName));
         }
     }
 
     public Collection<IndexFieldTypesDTO> findForIndexSet(String indexSetId) {
-        return findByQuery(DBQuery.is(FIELD_INDEX_SET_ID, indexSetId));
+        return findByQuery(eq(FIELD_INDEX_SET_ID, indexSetId));
     }
 
     public Collection<IndexFieldTypesDTO> findForIndexSets(Collection<String> indexSetIds) {
-        return findByQuery(
-                DBQuery.in(FIELD_INDEX_SET_ID, indexSetIds)
-        );
+        return findByQuery(in(FIELD_INDEX_SET_ID, indexSetIds));
     }
 
     public Collection<IndexFieldTypesDTO> findForFieldNames(Collection<String> fieldNames) {
-        return findByQuery(DBQuery.in(FIELDS_FIELD_NAMES, fieldNames));
+        return findByQuery(in(FIELDS_FIELD_NAMES, fieldNames));
     }
 
     public Collection<IndexFieldTypesDTO> findForFieldNamesAndIndices(Collection<String> fieldNames, Collection<String> indexNames) {
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.in(FIELD_INDEX_NAME, indexNames),
-                DBQuery.in(FIELDS_FIELD_NAMES, fieldNames)
+        final var query = and(
+                in(FIELD_INDEX_NAME, indexNames),
+                in(FIELDS_FIELD_NAMES, fieldNames)
         );
 
         return findByQuery(query);
     }
 
     public Collection<IndexFieldTypesDTO> findAll() {
-        return findByQuery(DBQuery.empty());
+        return findByQuery(Filters.empty());
     }
 
-    private Collection<IndexFieldTypesDTO> findByQuery(DBQuery.Query query) {
-        return ImmutableList.copyOf((Iterable<IndexFieldTypesDTO>) db.find(query));
+    private Collection<IndexFieldTypesDTO> findByQuery(Bson query) {
+        return ImmutableList.copyOf(collection.find(query));
     }
 
     public IndexFieldTypesDTO findOneByIndexName(final String indexName) {
-        return db.findOne(DBQuery.is(FIELD_INDEX_NAME, indexName));
+        return collection.find(eq(FIELD_INDEX_NAME, indexName)).first();
     }
 
     public List<IndexFieldTypesDTO> findByIndexNames(final Collection<String> indexNames) {
-        return db.find(DBQuery.in(FIELD_INDEX_NAME, indexNames)).toArray();
+        return collection.find(in(FIELD_INDEX_NAME, indexNames)).into(new ArrayList<>());
     }
 }

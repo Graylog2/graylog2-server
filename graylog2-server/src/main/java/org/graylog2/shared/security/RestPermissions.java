@@ -162,6 +162,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String THREADS_DUMP = "threads:dump";
     public static final String PROCESSBUFFER_DUMP = "processbuffer:dump";
     public static final String THROUGHPUT_READ = "throughput:read";
+    public static final String TOKEN_USAGE_READ = "tokenusage:read";
     public static final String TYPE_MAPPINGS_CREATE = "typemappings:create";
     public static final String TYPE_MAPPINGS_DELETE = "typemappings:delete";
     public static final String TYPE_MAPPINGS_EDIT = "typemappings:edit";
@@ -356,7 +357,8 @@ public class RestPermissions implements PluginPermissions {
             MESSAGES_READ,
             METRICS_READ,
             SYSTEM_READ,
-            THROUGHPUT_READ
+            THROUGHPUT_READ,
+            DATANODE_READ
     ).build();
 
     protected static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()
@@ -368,7 +370,7 @@ public class RestPermissions implements PluginPermissions {
                     RestPermissions.DASHBOARDS_CREATE
             )),
             BuiltinRole.create("Event Definition Creator", "Allows creation of Event Definitions (built-in)", ImmutableSet.of(
-                    RestPermissions.EVENT_DEFINITIONS_CREATE
+                    RestPermissions.EVENT_DEFINITIONS_CREATE, RestPermissions.LOOKUP_TABLES_READ
             )),
             BuiltinRole.create("Event Notification Creator", "Allows creation of Event Notifications (built-in)", ImmutableSet.of(
                     RestPermissions.EVENT_NOTIFICATIONS_CREATE

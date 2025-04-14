@@ -16,9 +16,9 @@
  */
 import React, { useEffect } from 'react';
 
+import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { InputsList } from 'components/inputs';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
@@ -41,19 +41,21 @@ const InputsPage = () => {
     <DocumentTitle title="Inputs">
       <div>
         <PageHeader title="Inputs">
-          {isCloud
-            ? (
-              <>
-                <p> Graylog cloud accepts data via inputs. There are many types of inputs to choose from, but only some
-                  can run directly in the cloud. You can launch and terminate them on this page.
-                </p>
-                <p>
-                  If you are missing an input type on this page&apos;s list of available inputs, you can start the input
-                  on a <Link to={Routes.pluginRoute('SYSTEM_FORWARDERS')}>Forwarder</Link>.
-                </p>
-              </>
-            )
-            : <span>Graylog nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>}
+          {isCloud ? (
+            <>
+              <p>
+                {' '}
+                Graylog cloud accepts data via inputs. There are many types of inputs to choose from, but only some can
+                run directly in the cloud. You can launch and terminate them on this page.
+              </p>
+              <p>
+                If you are missing an input type on this page&apos;s list of available inputs, you can start the input
+                on a <Link to={Routes.pluginRoute('SYSTEM_FORWARDERS')}>Forwarder</Link>.
+              </p>
+            </>
+          ) : (
+            <span>Graylog nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>
+          )}
         </PageHeader>
         <InputsList permissions={currentUser.permissions} />
       </div>

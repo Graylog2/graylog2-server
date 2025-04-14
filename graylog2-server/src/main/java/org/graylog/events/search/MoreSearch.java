@@ -26,18 +26,19 @@ import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -85,9 +86,9 @@ public class MoreSearch {
         checkArgument(forbiddenSourceStreams != null, "forbiddenSourceStreams cannot be null");
 
         final Sorting.Direction sortDirection = parameters.sortDirection() == EventsSearchParameters.SortDirection.ASC ? Sorting.Direction.ASC : Sorting.Direction.DESC;
-        final Sorting sorting = parameters.sortUnmappedType().isPresent() ?
-                new Sorting(parameters.sortBy(), sortDirection, parameters.sortUnmappedType().get())
-                : new Sorting(parameters.sortBy(), sortDirection);
+        final Sorting sorting = parameters.sortUnmappedType()
+                .map(unmappedType -> new Sorting(parameters.sortBy(), sortDirection, unmappedType))
+                .orElse(new Sorting(parameters.sortBy(), sortDirection));
         final String queryString = parameters.query().trim();
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
 
@@ -100,7 +101,35 @@ public class MoreSearch {
                     .executedQuery(queryString)
                     .build();
         }
-        return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(), parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams);
+        return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(),
+                parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams, parameters.filter().extraFilters());
+    }
+
+    /**
+     * Creates a histogram over events for the given parameters.
+     *
+     * @param parameters             event search parameters
+     * @param filterString           filter string
+     * @param eventStreams           event streams to search in
+     * @param forbiddenSourceStreams forbidden source streams
+     * @return the result
+     */
+    // TODO: We cannot use Searches#search() at the moment because that method cannot handle multiple streams. (because of Searches#extractStreamId())
+    //       We also cannot use the new search code at the moment because it doesn't do pagination.
+    Histogram histogram(EventsSearchParameters parameters, String filterString, Set<String> eventStreams, Set<String> forbiddenSourceStreams, ZoneId timeZone) {
+        checkArgument(parameters != null, "parameters cannot be null");
+        checkArgument(!eventStreams.isEmpty(), "eventStreams cannot be empty");
+        checkArgument(forbiddenSourceStreams != null, "forbiddenSourceStreams cannot be null");
+
+        final String queryString = parameters.query().trim();
+        final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
+
+        final var effectiveTimeRange = AbsoluteRange.create(parameters.timerange().getFrom(), parameters.timerange().getTo());
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Histogram.empty(effectiveTimeRange);
+        }
+        return moreSearchAdapter.eventHistogram(queryString, effectiveTimeRange, affectedIndices, eventStreams,
+                filterString, forbiddenSourceStreams, timeZone, parameters.filter().extraFilters());
     }
 
     private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
@@ -112,7 +141,7 @@ public class MoreSearch {
                     .map(IndexRange::indexName)
                     .collect(Collectors.toSet());
         } else {
-            final Set<Stream> streams = loadStreams(streamIds);
+            final Set<Stream> streams = streamService.loadByIds(streamIds);
             final IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams = new IndexRangeContainsOneOfStreams();
             return indexRanges.stream()
                     .filter(ir -> indexRangeContainsOneOfStreams.test(ir, streams))
@@ -155,21 +184,6 @@ public class MoreSearch {
         }
 
         moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, filters, batchSize, resultCallback::call);
-    }
-
-    public Set<Stream> loadStreams(Set<String> streamIds) {
-        // TODO: Use method from `StreamService` which loads a collection of ids (when implemented) to prevent n+1.
-        // Track https://github.com/Graylog2/graylog2-server/issues/4897 for progress.
-        Set<Stream> streams = new HashSet<>();
-        for (String streamId : streamIds) {
-            try {
-                Stream load = streamService.load(streamId);
-                streams.add(load);
-            } catch (NotFoundException e) {
-                LOG.debug("Failed to load stream <{}>", streamId);
-            }
-        }
-        return streams;
     }
 
     /**
@@ -248,4 +262,15 @@ public class MoreSearch {
             public abstract Result build();
         }
     }
+
+    public record Histogram(EventsBuckets buckets) {
+        public static Histogram empty(AbsoluteRange effectiveTimeRange) {
+            return new Histogram(new EventsBuckets(List.of(), List.of()));
+        }
+
+        public record EventsBuckets(List<Bucket> events, List<Bucket> alerts) {}
+
+        public record Bucket(ZonedDateTime startDate, Long count) {}
+    }
+
 }

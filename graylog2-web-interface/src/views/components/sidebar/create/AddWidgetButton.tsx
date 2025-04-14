@@ -24,8 +24,8 @@ import useLocation from 'routing/useLocation';
 import { Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import generateId from 'logic/generateId';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import type { GetState } from 'views/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -50,47 +50,47 @@ const CreateButton = styled(Button)`
 `;
 
 export type CreatorProps = {
-  view: View,
+  view: View;
 };
 type CreatorType = 'preset' | 'generic' | 'investigations' | 'events';
-type CreatorFunction = () => (dispatch: AppDispatch, getState: GetState) => unknown;
+type CreatorFunction = () => (dispatch: ViewsDispatch, getState: GetState) => unknown;
 
 type FunctionalCreator = {
-  func: CreatorFunction,
-  title: string,
-  type: CreatorType,
-  useCondition?: () => boolean,
+  func: CreatorFunction;
+  title: string;
+  type: CreatorType;
+  useCondition?: () => boolean;
 };
 
 type CreatorComponentProps = {
-  onClose: () => void,
+  onClose: () => void;
 };
 
 type ComponentCreator = {
-  component: React.ComponentType<CreatorComponentProps>,
-  useCondition?: () => boolean,
-  title: string,
-  type: CreatorType,
+  component: React.ComponentType<CreatorComponentProps>;
+  useCondition?: () => boolean;
+  title: string;
+  type: CreatorType;
 };
 
 export type Creator = ComponentCreator | FunctionalCreator;
 
-type OverflowingComponents = { [key: string]: React.ReactNode }
+type OverflowingComponents = { [key: string]: React.ReactNode };
 
-export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
+export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => 'func' in creator;
 
 const CreateMenuItem = ({
   creator,
   onClick,
   setOverflowingComponents,
 }: {
-  creator: Creator,
-  onClick: () => void,
-  setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>
+  creator: Creator;
+  onClick: () => void;
+  setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>;
 }) => {
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const disabled = creator.useCondition?.() === false;
 
   const createHandlerFor = () => {
@@ -144,9 +144,7 @@ const CreateMenuItem = ({
   };
 
   return (
-    <CreateButton key={creator.title}
-                  onClick={createHandlerFor()}
-                  disabled={disabled}>
+    <CreateButton key={creator.title} onClick={createHandlerFor()} disabled={disabled}>
       {creator.title}
     </CreateButton>
   );
@@ -157,24 +155,26 @@ const GroupCreateMenuItems = ({
   onClick,
   setOverflowingComponents,
 }: {
-  creators: Array<Creator>,
-  onClick: () => void,
-  setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>
+  creators: Array<Creator>;
+  onClick: () => void;
+  setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>;
 }) => (
   <>
     {sortBy(creators, 'title').map((creator) => (
-      <CreateMenuItem creator={creator}
-                      key={creator.title}
-                      onClick={onClick}
-                      setOverflowingComponents={setOverflowingComponents} />
+      <CreateMenuItem
+        creator={creator}
+        key={creator.title}
+        onClick={onClick}
+        setOverflowingComponents={setOverflowingComponents}
+      />
     ))}
   </>
 );
 
-const createGroup = (creators: Array<Creator>, type: CreatorType) => creators.filter((c) => (c.type === type));
+const createGroup = (creators: Array<Creator>, type: CreatorType) => creators.filter((c) => c.type === type);
 
 type Props = {
-  onClick: () => void,
+  onClick: () => void;
 };
 
 const AddWidgetButton = ({ onClick }: Props) => {
@@ -188,35 +188,44 @@ const AddWidgetButton = ({ onClick }: Props) => {
 
   return (
     <>
-      <SectionInfo>Use the following options to add an aggregation, log view (enterprise feature) or parameters
-        (enterprise feature) to your search.
+      <SectionInfo>
+        Use the following options to add an aggregation, log view (enterprise feature) or parameters (enterprise
+        feature) to your search.
       </SectionInfo>
       <Group>
         <SectionSubheadline>Generic</SectionSubheadline>
-        <GroupCreateMenuItems creators={generic}
-                              onClick={onClick}
-                              setOverflowingComponents={setOverflowingComponents} />
+        <GroupCreateMenuItems
+          creators={generic}
+          onClick={onClick}
+          setOverflowingComponents={setOverflowingComponents}
+        />
       </Group>
       <Group>
         <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
-        <GroupCreateMenuItems creators={presets}
-                              onClick={onClick}
-                              setOverflowingComponents={setOverflowingComponents} />
+        <GroupCreateMenuItems
+          creators={presets}
+          onClick={onClick}
+          setOverflowingComponents={setOverflowingComponents}
+        />
       </Group>
       {!!investigationsCreator?.length && (
         <Group>
           <SectionSubheadline>Investigations</SectionSubheadline>
-          <GroupCreateMenuItems creators={investigationsCreator}
-                                onClick={onClick}
-                                setOverflowingComponents={setOverflowingComponents} />
+          <GroupCreateMenuItems
+            creators={investigationsCreator}
+            onClick={onClick}
+            setOverflowingComponents={setOverflowingComponents}
+          />
         </Group>
       )}
       {!!eventsCreator?.length && (
         <Group>
           <SectionSubheadline>Events</SectionSubheadline>
-          <GroupCreateMenuItems creators={eventsCreator}
-                                onClick={onClick}
-                                setOverflowingComponents={setOverflowingComponents} />
+          <GroupCreateMenuItems
+            creators={eventsCreator}
+            onClick={onClick}
+            setOverflowingComponents={setOverflowingComponents}
+          />
         </Group>
       )}
       {components}

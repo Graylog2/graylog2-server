@@ -21,7 +21,7 @@ import scaleForGradient from 'views/components/sidebar/highlighting/Scale';
 export type HighlightingColorJson = StaticColorJson | GradientColorJson;
 
 abstract class HighlightingColor {
-  abstract get type (): 'static' | 'gradient';
+  abstract get type(): 'static' | 'gradient';
 
   static fromJSON(json: HighlightingColorJson) {
     switch (json.type) {
@@ -37,7 +37,7 @@ abstract class HighlightingColor {
     }
   }
 
-  abstract colorFor (value: any);
+  abstract colorFor(value: any);
 
   isStatic(): this is StaticColor {
     return this.type === 'static';
@@ -49,8 +49,8 @@ abstract class HighlightingColor {
 }
 
 type StaticColorJson = {
-  type: 'static',
-  color: string,
+  type: 'static';
+  color: string;
 };
 
 export class StaticColor extends HighlightingColor {
@@ -93,11 +93,11 @@ export class StaticColor extends HighlightingColor {
 }
 
 type GradientColorJson = {
-  type: 'gradient',
-  gradient: string,
-  lower: number,
-  upper: number,
-}
+  type: 'gradient';
+  gradient: string;
+  lower: number;
+  upper: number;
+};
 
 const parseValue = (value: any, defaultValue: number = 0): number => {
   if (typeof value === 'number') {
@@ -156,7 +156,7 @@ export class GradientColor extends HighlightingColor {
     const spread = this.upper - this.lower;
     const normalizedValue = Math.max(this.lower, Math.min(this.upper, parsedValue));
 
-    return this._scale((normalizedValue - this.lower) / spread);
+    return this._scale((normalizedValue - this.lower) / spread).hex();
   }
 
   static fromJSON({ gradient, lower, upper }: GradientColorJson) {

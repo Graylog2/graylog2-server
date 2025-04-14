@@ -21,44 +21,51 @@ import { Button, Text } from 'preflight/components/common';
 import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
 
-const StyledButton = styled(Button)(({ theme }) => css`
-  border-radius: 50px;
-  padding: 0 13px;
-  background-color: ${theme.colors.variant.lightest.default};
-`);
+const StyledButton = styled(Button)(
+  ({ theme }) => css`
+    border-radius: 50px;
+    padding: 0 13px;
+    background-color: ${theme.colors.variant.lightest.default};
+  `,
+);
 
 const HelpMenu = () => (
-  <Menu width={250}
-        position="bottom-end">
+  <Menu width={250} position="bottom-end">
     <Menu.Target>
       <StyledButton variant="default">
-        <Text fw={500} size="sm" mr={3}>Get Help</Text>
+        <Text fw={500} size="sm" mr={3}>
+          Get Help
+        </Text>
         <Icon name="keyboard_arrow_down" />
       </StyledButton>
     </Menu.Target>
     <Menu.Dropdown>
-      <Menu.Item component="a"
-                 rightSection={<Icon name="open_in_new" />}
-                 href="https://docs.graylog.org/docs"
-                 target="_blank">
+      <Menu.Item
+        component="a"
+        rightSection={<Icon name="open_in_new" />}
+        href="https://docs.graylog.org/docs"
+        target="_blank">
         Graylog Documentation
       </Menu.Item>
-      <Menu.Item component="a"
-                 rightSection={<Icon name="open_in_new" />}
-                 href="https://docs.graylog.org/docs/changelog"
-                 target="_blank">
+      <Menu.Item
+        component="a"
+        rightSection={<Icon name="open_in_new" />}
+        href="https://docs.graylog.org/docs/changelog"
+        target="_blank">
         Graylog changelogs
       </Menu.Item>
-      <Menu.Item component="a"
-                 rightSection={<Icon name="open_in_new" />}
-                 href="https://docs.graylog.org/docs/changelog-graylog"
-                 target="_blank">
+      <Menu.Item
+        component="a"
+        rightSection={<Icon name="open_in_new" />}
+        href="https://docs.graylog.org/docs/changelog-graylog"
+        target="_blank">
         Graylog Operations changelogs
       </Menu.Item>
-      <Menu.Item component="a"
-                 rightSection={<Icon name="open_in_new" />}
-                 href="https://support.graylog.org/portal"
-                 target="_blank">
+      <Menu.Item
+        component="a"
+        rightSection={<Icon name="open_in_new" />}
+        href="https://support.graylog.org/portal"
+        target="_blank">
         Support
       </Menu.Item>
     </Menu.Dropdown>

@@ -22,46 +22,45 @@ import type { DataNodesCA } from 'preflight/types';
 import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { onSettled } from 'util/conditional/onError';
 
 export const QUERY_KEY = ['data-nodes', 'ca-status'];
-const fetchDataNodesCA = (): Promise<DataNodesCA> => (
-  fetch('GET', qualifyUrl('/api/ca'), undefined, false)
-);
+const fetchDataNodesCA = (): Promise<DataNodesCA> => fetch('GET', qualifyUrl('/api/ca'), undefined, false);
 
 const useDataNodesCA = (): {
-  data: DataNodesCA,
-  isFetching: boolean,
-  error: FetchError,
-  isInitialLoading: boolean
+  data: DataNodesCA;
+  isFetching: boolean;
+  error: FetchError;
+  isInitialLoading: boolean;
 } => {
   const [metaData, setMetaData] = useState<{
-    error: FetchError | null,
-    isInitialLoading: boolean,
+    error: FetchError | null;
+    isInitialLoading: boolean;
   }>({
     error: null,
     isInitialLoading: false,
   });
-  const {
-    data,
-    isFetching,
-  } = useQuery<DataNodesCA, FetchError>({
+  const { data, isFetching } = useQuery<DataNodesCA, FetchError>({
     queryKey: QUERY_KEY,
-    queryFn: fetchDataNodesCA,
+    queryFn: () =>
+      onSettled(
+        fetchDataNodesCA(),
+        () => {
+          setMetaData({
+            error: null,
+            isInitialLoading: false,
+          });
+        },
+        (newError: FetchError) => {
+          setMetaData({
+            error: newError,
+            isInitialLoading: false,
+          });
+        },
+      ),
     initialData: undefined,
     refetchInterval: 3000,
     retry: false,
-    onError: (newError) => {
-      setMetaData({
-        error: newError,
-        isInitialLoading: false,
-      });
-    },
-    onSuccess: () => {
-      setMetaData({
-        error: null,
-        isInitialLoading: false,
-      });
-    },
   });
 
   return {

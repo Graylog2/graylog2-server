@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useMemo, useRef } from 'react';
 import $ from 'jquery';
 import isString from 'lodash/isString';
@@ -25,17 +24,17 @@ import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  backdrop: boolean | 'static' | undefined,
-  submitButtonDisabled: boolean,
-  formProps: object,
-  bsSize: 'lg' | 'large' | 'sm' | 'small',
-  show: boolean,
-  submitButtonText: string,
-  onSubmitForm: (event) => void,
-  onCancel: () => void,
-  title: string | React.ReactNode,
-  children: React.ReactNode,
-  modalTitle?: string | undefined,
+  backdrop?: boolean | 'static' | undefined;
+  submitButtonDisabled?: boolean;
+  formProps?: object;
+  bsSize?: 'lg' | 'large' | 'sm' | 'small';
+  show: boolean;
+  submitButtonText?: string;
+  onSubmitForm?: (event) => void;
+  onCancel: () => void;
+  title: string | React.ReactNode;
+  children: React.ReactNode;
+  modalTitle?: string | undefined;
 };
 
 /**
@@ -44,11 +43,11 @@ type Props = {
  */
 const BootstrapModalForm = ({
   backdrop,
-  submitButtonDisabled,
-  formProps,
+  submitButtonDisabled = false,
+  formProps = {},
   bsSize,
   show,
-  submitButtonText,
+  submitButtonText = 'Submit',
   onSubmitForm,
   onCancel,
   title,
@@ -62,8 +61,10 @@ const BootstrapModalForm = ({
     const formDOMNode = form.current;
     const $formDOMNode = $(formDOMNode) as any;
 
-    if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity())
-      || (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())) {
+    if (
+      (typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) ||
+      (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())
+    ) {
       event.preventDefault();
 
       return;
@@ -75,69 +76,29 @@ const BootstrapModalForm = ({
     }
   };
 
-  const body = (
-    <div className="container-fluid">
-      {children}
-    </div>
-  );
+  const body = <div className="container-fluid">{children}</div>;
 
   const _title = useMemo<string | undefined>(() => (isString(title) ? title : modalTitle), [modalTitle, title]);
 
   return (
-    <BootstrapModalWrapper bsSize={bsSize}
-                           showModal={show}
-                           backdrop={backdrop}
-                           onHide={onCancel}
-                           title={_title}
-                           {...restProps}>
+    <BootstrapModalWrapper
+      bsSize={bsSize}
+      showModal={show}
+      backdrop={backdrop}
+      onHide={onCancel}
+      title={_title}
+      {...restProps}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
-      <form ref={form}
-            onSubmit={submit}
-            {...formProps}
-            data-testid="modal-form">
-        <Modal.Body>
-          {body}
-        </Modal.Body>
+      <form ref={form} onSubmit={submit} {...formProps} data-testid="modal-form">
+        <Modal.Body>{body}</Modal.Body>
         <Modal.Footer>
-          <ModalSubmit disabledSubmit={submitButtonDisabled}
-                       onCancel={onCancel}
-                       submitButtonText={submitButtonText} />
+          <ModalSubmit disabledSubmit={submitButtonDisabled} onCancel={onCancel} submitButtonText={submitButtonText} />
         </Modal.Footer>
       </form>
     </BootstrapModalWrapper>
   );
-};
-
-BootstrapModalForm.propTypes = {
-  backdrop: PropTypes.oneOf([true, false, 'static']),
-  bsSize: PropTypes.oneOf(['lg', 'large', 'sm', 'small']),
-  /* Modal title */
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
-  /* Form contents, included in the modal body */
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
-  onSubmitForm: PropTypes.func,
-  onCancel: PropTypes.func.isRequired,
-  /* Object with additional props to pass to the form */
-  formProps: PropTypes.object,
-  /* Text to use in the submit button. "Submit" is the default */
-  submitButtonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-  submitButtonDisabled: PropTypes.bool,
-  show: PropTypes.bool.isRequired,
-};
-
-BootstrapModalForm.defaultProps = {
-  backdrop: undefined,
-  formProps: {},
-  submitButtonText: 'Submit',
-  submitButtonDisabled: false,
-  onSubmitForm: undefined,
-  bsSize: undefined,
-  modalTitle: undefined,
 };
 
 export default BootstrapModalForm;

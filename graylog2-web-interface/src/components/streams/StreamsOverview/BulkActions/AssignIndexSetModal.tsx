@@ -18,43 +18,45 @@
 import * as React from 'react';
 import { Formik, Form } from 'formik';
 
+import { Streams } from '@graylog/server-api';
+
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import type FetchError from 'logic/errors/FetchError';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
 import UserNotification from 'util/UserNotification';
-import { Streams } from '@graylog/server-api';
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import StringUtils from 'util/StringUtils';
 
 type ModalProps = {
-  descriptor: string,
-  indexSets: Array<IndexSet>,
-  refetchStreams: () => void,
-  toggleShowModal: () => void,
-}
+  descriptor: string;
+  indexSets: Array<IndexSet>;
+  refetchStreams: () => void;
+  toggleShowModal: () => void;
+};
 
 type AssignIndexSetFormValues = {
-  index_set_id: string | undefined,
-}
+  index_set_id: string | undefined;
+};
 
-const AssignIndexSetModal = ({
-  toggleShowModal,
-  indexSets,
-  refetchStreams,
-  descriptor,
-}: ModalProps) => {
+const AssignIndexSetModal = ({ toggleShowModal, indexSets, refetchStreams, descriptor }: ModalProps) => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const modalTitle = `Assign Index Set To ${selectedEntities.length} ${StringUtils.capitalizeFirstLetter(descriptor)}`;
-  const onSubmit = ({ index_set_id: indexSetId }: AssignIndexSetFormValues) => Streams.assignToIndexSet(indexSetId, selectedEntities).then(() => {
-    refetchStreams();
-    UserNotification.success(`Index set was assigned to ${selectedEntities.length} ${descriptor} successfully.`, 'Success');
-    setSelectedEntities([]);
-    toggleShowModal();
-  }).catch((error: FetchError) => {
-    UserNotification.error(`Assigning index set failed with status: ${error}`, 'Error');
-  });
+  const onSubmit = ({ index_set_id: indexSetId }: AssignIndexSetFormValues) =>
+    Streams.assignToIndexSet(indexSetId, selectedEntities)
+      .then(() => {
+        refetchStreams();
+        UserNotification.success(
+          `Index set was assigned to ${selectedEntities.length} ${descriptor} successfully.`,
+          'Success',
+        );
+        setSelectedEntities([]);
+        toggleShowModal();
+      })
+      .catch((error: FetchError) => {
+        UserNotification.error(`Assigning index set failed with status: ${error}`, 'Error');
+      });
 
   const validate = ({ index_set_id }: AssignIndexSetFormValues) => {
     let errors = {};
@@ -67,27 +69,27 @@ const AssignIndexSetModal = ({
   };
 
   return (
-    <Modal title={modalTitle}
-           onHide={toggleShowModal}
-           show>
-      <Formik initialValues={{ index_set_id: undefined }}
-              onSubmit={onSubmit}
-              validate={validate}>
+    <Modal title={modalTitle} onHide={toggleShowModal} show>
+      <Formik initialValues={{ index_set_id: undefined }} onSubmit={onSubmit} validate={validate}>
         {({ isSubmitting, isValidating }) => (
           <Form>
             <Modal.Header closeButton>
               <Modal.Title>{modalTitle}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <IndexSetSelect indexSets={indexSets}
-                              help="Messages that match the selected streams will be written to the configured index set." />
+              <IndexSetSelect
+                indexSets={indexSets}
+                help="Messages that match the selected streams will be written to the configured index set."
+              />
             </Modal.Body>
             <Modal.Footer>
-              <ModalSubmit submitButtonText="Assign index set"
-                           submitLoadingText="Assigning index set..."
-                           onCancel={toggleShowModal}
-                           disabledSubmit={isValidating}
-                           isSubmitting={isSubmitting} />
+              <ModalSubmit
+                submitButtonText="Assign index set"
+                submitLoadingText="Assigning index set..."
+                onCancel={toggleShowModal}
+                disabledSubmit={isValidating}
+                isSubmitting={isSubmitting}
+              />
             </Modal.Footer>
           </Form>
         )}

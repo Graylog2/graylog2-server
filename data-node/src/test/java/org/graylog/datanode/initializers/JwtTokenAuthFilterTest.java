@@ -22,6 +22,7 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
+import org.graylog2.security.JwtSecret;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -48,7 +49,7 @@ class JwtTokenAuthFilterTest {
     @Test
     void verifyValidToken() throws IOException {
         final String key = "gTVfiF6A0pB70A3UP1EahpoR6LId9DdNadIkYNygK5Z8lpeJIpw9vN0jZ6fdsfeuV9KIg9gVLkCHIPj6FHW5Q9AvpOoGZO3h";
-        final JwtTokenAuthFilter validator = new JwtTokenAuthFilter(key);
+        final JwtTokenAuthFilter validator = new JwtTokenAuthFilter(new JwtSecret(key));
         final ContainerRequest mockedRequest = mockRequest("Bearer " + generateToken(key));
         validator.filter(mockedRequest);
         Mockito.verify(mockedRequest, never()).abortWith(Mockito.any());
@@ -57,7 +58,7 @@ class JwtTokenAuthFilterTest {
     @Test
     void verifyNoHeaderProvided() throws IOException {
         final String key = "gTVfiF6A0pB70A3UP1EahpoR6LId9DdNadIkYNygK5Z8lpeJIpw9vN0jZ6fdsfeuV9KIg9gVLkCHIPj6FHW5Q9AvpOoGZO3h";
-        final JwtTokenAuthFilter validator = new JwtTokenAuthFilter(key);
+        final JwtTokenAuthFilter validator = new JwtTokenAuthFilter(new JwtSecret(key));
         final ContainerRequest mockedRequest = mockRequest(null);
         validator.filter(mockedRequest);
         Mockito.verify(mockedRequest, atLeastOnce()).abortWith(Mockito.any());
@@ -67,7 +68,7 @@ class JwtTokenAuthFilterTest {
     void verifyInvalidToken() throws IOException {
         final String generationKey = "gTVfiF6A0pB70A3UP1EahpoR6LId9DdNadIkYNygK5Z8lpeJIpw9vN0jZ6fdsfeuV9KIg9gVLkCHIPj6FHW5Q9AvpOoGZO3h";
         final String verificationKey = "n51wcO3jn8w3JNyGgKc7k1fTCr1FWvGg7ODfQOyBT2fizBrCVsRJg2GsbYGLNejfi3QsKaqJgo3zAWMuAZhJznuizHZpv92S";
-        final JwtTokenAuthFilter validator = new JwtTokenAuthFilter(verificationKey);
+        final JwtTokenAuthFilter validator = new JwtTokenAuthFilter(new JwtSecret(verificationKey));
 
         final ContainerRequest mockedRequest = mockRequest("Bearer " + generateToken(generationKey));
         validator.filter(mockedRequest);
@@ -77,7 +78,7 @@ class JwtTokenAuthFilterTest {
     @Test
     void testNoneAlgorithm() {
         final String key = "gTVfiF6A0pB70A3UP1EahpoR6LId9DdNadIkYNygK5Z8lpeJIpw9vN0jZ6fdsfeuV9KIg9gVLkCHIPj6FHW5Q9AvpOoGZO3h";
-        final JwtTokenAuthFilter validator = new JwtTokenAuthFilter(key);
+        final JwtTokenAuthFilter validator = new JwtTokenAuthFilter(new JwtSecret(key));
         Assertions.assertThatThrownBy(() -> validator.verifyToken(removeSignature(generateToken(key))))
                 .isInstanceOf(TokenVerificationException.class)
                 .hasMessageContaining("Token format/configuration is not supported");
@@ -93,6 +94,6 @@ class JwtTokenAuthFilterTest {
 
     @Nonnull
     private static String generateToken(String signingKey) {
-        return IndexerJwtAuthTokenProvider.createToken(signingKey.getBytes(StandardCharsets.UTF_8), Duration.seconds(180));
+        return IndexerJwtAuthTokenProvider.createToken(new JwtSecret(signingKey), Duration.seconds(180));
     }
 }

@@ -40,6 +40,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
@@ -63,6 +64,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
@@ -109,9 +111,9 @@ public class MessageResource extends RestResource {
 
             return resultMessage;
         } catch (DocumentNotFoundException e) {
-            final String msg = "Message " + messageId + " does not exist in index " + index;
-            LOG.error(msg, e);
-            throw new NotFoundException(msg, e);
+            throw new NotFoundException("Message " + messageId + " does not exist in index " + index, e);
+        } catch (IndexNotFoundException e) {
+            throw new NotFoundException("Index " + index + " does not exist.", e);
         }
     }
 
@@ -161,17 +163,14 @@ public class MessageResource extends RestResource {
     }
 
     private Message decodeMessage(Codec codec, ResolvableInetSocketAddress remoteAddress, RawMessage rawMessage) {
-        Message message;
+        Optional<Message> messageOpt;
         try {
-            message = codec.decode(rawMessage);
-
+            messageOpt = codec.decodeSafe(rawMessage);
         } catch (Exception e) {
             throw new BadRequestException("Could not decode message");
         }
 
-        if (message == null) {
-            throw new BadRequestException("Could not decode message");
-        }
+        Message message = messageOpt.orElseThrow(() -> new BadRequestException("Could not decode message"));
 
         // Ensure the decoded Message has a source, otherwise creating a ResultMessage will fail
         if (isNullOrEmpty(message.getSource())) {

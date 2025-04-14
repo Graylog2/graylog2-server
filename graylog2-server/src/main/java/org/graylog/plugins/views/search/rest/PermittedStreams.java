@@ -32,7 +32,6 @@ public class PermittedStreams {
     private final Supplier<Stream<String>> allStreamsProvider;
     private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
 
-
     public PermittedStreams(Supplier<Stream<String>> allStreamsProvider, Function<Collection<String>, Stream<String>> streamCategoryMapper) {
         this.allStreamsProvider = allStreamsProvider;
         this.streamCategoryMapper = streamCategoryMapper;

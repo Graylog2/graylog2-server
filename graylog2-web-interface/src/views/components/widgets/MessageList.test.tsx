@@ -28,7 +28,7 @@ import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { finishedLoading } from 'views/logic/slices/searchExecutionSlice';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import SearchResult from 'views/logic/SearchResult';
@@ -75,7 +75,7 @@ const dummySearchJobResults = {
 jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/components/widgets/useCurrentSearchTypesResults');
 jest.mock('views/components/widgets/reexecuteSearchTypes');
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 describe('MessageList', () => {
   const config = MessagesWidgetConfig.builder().fields([]).build();
@@ -104,6 +104,8 @@ describe('MessageList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
+      restartAutoRefresh: () => {},
+      animationId: 'animation-id',
     });
   });
 
@@ -127,40 +129,38 @@ describe('MessageList', () => {
     userEvent.click(nextPageButton);
   };
 
-  const SimpleMessageList = (props: Partial<React.ComponentProps<typeof MessageList>>) => (
+  const SimpleMessageList = ({
+    data: _data = data,
+    config: _config = config,
+    fields = Immutable.List([]),
+    ...props
+  }: Partial<React.ComponentProps<typeof MessageList>>) => (
     <TestStoreProvider>
-      <MessageList title="Message List"
-                   editing={false}
-                   filter=""
-                   type="messages"
-                   id="message-list"
-                   queryId="deadbeef"
-                   toggleEdit={() => {}}
-                   setLoadingState={() => {}}
-                   data={props.data}
-                   config={props.config}
-                   fields={props.fields}
-                   height={480}
-                   width={640}
-                   {...props} />
+      <MessageList
+        title="Message List"
+        editing={false}
+        filter=""
+        type="messages"
+        id="message-list"
+        queryId="deadbeef"
+        toggleEdit={() => {}}
+        setLoadingState={() => {}}
+        data={_data}
+        config={_config}
+        fields={fields}
+        height={480}
+        width={640}
+        {...props}
+      />
     </TestStoreProvider>
   );
-
-  SimpleMessageList.defaultProps = {
-    config: config,
-    data: data,
-    fields: Immutable.List([]),
-  };
 
   it('should render width widget fields', async () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
 
     const configWithFields = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
 
-    render(
-      <SimpleMessageList config={configWithFields}
-                         fields={Immutable.List(fields)} />,
-    );
+    render(<SimpleMessageList config={configWithFields} fields={Immutable.List(fields)} />);
 
     await screen.findByText('file_name');
     await screen.findByText(TIMESTAMP_FIELD);
@@ -170,10 +170,7 @@ describe('MessageList', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     const emptyConfig = MessagesWidgetConfig.builder().fields([]).build();
 
-    render(
-      <SimpleMessageList config={emptyConfig}
-                         fields={Immutable.List(fields)} />,
-    );
+    render(<SimpleMessageList config={emptyConfig} fields={Immutable.List(fields)} />);
 
     await findTable();
 
@@ -196,11 +193,12 @@ describe('MessageList', () => {
   });
 
   it('reexecute query for search type, when using pagination', async () => {
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult(dummySearchJobResults),
-      widgetMapping: Immutable.Map(),
-    }));
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult(dummySearchJobResults),
+      }),
+    );
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
     const secondPageSize = 10;
 
@@ -218,13 +216,16 @@ describe('MessageList', () => {
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh,
+      restartAutoRefresh: () => {},
+      animationId: 'animation-id',
     });
 
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult(dummySearchJobResults),
-      widgetMapping: Immutable.Map(),
-    }));
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult(dummySearchJobResults),
+      }),
+    );
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     const secondPageSize = 10;
 
     render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
@@ -235,16 +236,19 @@ describe('MessageList', () => {
   });
 
   it('displays error description, when using pagination throws an error', async () => {
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult({
-        ...dummySearchJobResults,
-        errors: [{
-          description: 'Error description',
-        } as SearchErrorResponse],
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult({
+          ...dummySearchJobResults,
+          errors: [
+            {
+              description: 'Error description',
+            } as SearchErrorResponse,
+          ],
+        }),
       }),
-      widgetMapping: Immutable.Map(),
-    }));
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    );
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     const secondPageSize = 10;
 

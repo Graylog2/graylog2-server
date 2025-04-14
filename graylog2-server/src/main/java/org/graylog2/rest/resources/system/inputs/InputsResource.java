@@ -17,40 +17,19 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.Configuration;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.inputs.Input;
-import org.graylog2.inputs.InputService;
-import org.graylog2.inputs.encryption.EncryptedInputConfigs;
-import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
-import org.graylog2.rest.models.system.inputs.responses.InputCreated;
-import org.graylog2.rest.models.system.inputs.responses.InputSummary;
-import org.graylog2.rest.models.system.inputs.responses.InputsList;
-import org.graylog2.shared.inputs.MessageInputFactory;
-import org.graylog2.shared.inputs.NoSuchInputTypeException;
-import org.graylog2.shared.security.RestPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -58,11 +37,44 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.Configuration;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.inputs.Input;
+import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.diagnosis.InputDiagnosticService;
+import org.graylog2.inputs.encryption.EncryptedInputConfigs;
+import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
+import org.graylog2.rest.models.system.inputs.responses.InputCreated;
+import org.graylog2.rest.models.system.inputs.responses.InputDiagnostics;
+import org.graylog2.rest.models.system.inputs.responses.InputSummary;
+import org.graylog2.rest.models.system.inputs.responses.InputsList;
+import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.inputs.NoSuchInputTypeException;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -81,15 +93,32 @@ public class InputsResource extends AbstractInputsResource {
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
 
     private final InputService inputService;
+    private final InputDiagnosticService inputDiagnosticService;
+    private final StreamService streamService;
+    private final StreamRuleService streamRuleService;
+    private final PipelineService pipelineService;
     private final MessageInputFactory messageInputFactory;
     private final Configuration config;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public InputsResource(InputService inputService, MessageInputFactory messageInputFactory, Configuration config) {
+    public InputsResource(InputService inputService,
+                          InputDiagnosticService inputDiagnosticService,
+                          StreamService streamService,
+                          StreamRuleService streamRuleService,
+                          PipelineService pipelineService,
+                          MessageInputFactory messageInputFactory,
+                          Configuration config,
+                          ClusterEventBus clusterEventBus) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
+        this.inputDiagnosticService = inputDiagnosticService;
+        this.streamService = streamService;
+        this.streamRuleService = streamRuleService;
+        this.pipelineService = pipelineService;
         this.messageInputFactory = messageInputFactory;
         this.config = config;
+        this.clusterEventBus = clusterEventBus;
     }
 
     @GET
@@ -106,6 +135,55 @@ public class InputsResource extends AbstractInputsResource {
         final Input input = inputService.find(inputId);
 
         return getInputSummary(input);
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Get diagnostic information of a single input")
+    @Path("/diagnostics/{inputId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input.")
+    })
+    public InputDiagnostics diagnostics(@ApiParam(name = "inputId", required = true)
+                                        @PathParam("inputId") String inputId,
+                                        @Context SearchUser searchUser) throws org.graylog2.database.NotFoundException {
+        checkPermission(RestPermissions.INPUTS_READ, inputId);
+        return inputDiagnosticService.getInputDiagnostics(inputService.find(inputId), searchUser);
+    }
+
+    public record InputReferences(
+            @JsonProperty("input_id") String inputId,
+            @JsonProperty("stream_refs") List<InputReference> streamRefs,
+            @JsonProperty("pipeline_refs") List<InputReference> pipelineRefs) {
+    }
+
+    public record InputReference(
+            @JsonProperty("id") String id,
+            @Nullable @JsonProperty("name") String name) {
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Returns any streams or pipeline that reference the given input")
+    @Path("/references/{inputId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input.")
+    })
+    public InputReferences getReferences(@ApiParam(name = "inputId", required = true)
+                                         @PathParam("inputId") String inputId) {
+        checkPermission(RestPermissions.INPUTS_READ, inputId);
+        checkPermission(RestPermissions.STREAMS_READ);
+        checkPermission(PipelineRestPermissions.PIPELINE_READ);
+
+        return new InputReferences(inputId,
+                streamRuleService.loadForInput(inputId).stream()
+                        .map(StreamRule::getStreamId)
+                        .distinct()
+                        .map(streamId -> new InputReference(streamId, streamService.streamTitleFromCache(streamId)))
+                        .toList(),
+                pipelineService.loadBySourcePattern(inputId).stream()
+                        .map(pipelineDao -> new InputReference(pipelineDao.id(), pipelineDao.title()))
+                        .toList());
     }
 
     @GET
@@ -133,12 +211,13 @@ public class InputsResource extends AbstractInputsResource {
     })
     @RequiresPermissions(RestPermissions.INPUTS_CREATE)
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true)
+    public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
+                           @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
         try {
             throwBadRequestIfNotGlobal(lr);
             // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
-            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
+            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node(), isSetupWizard);
             if (config.isCloud() && !messageInput.isCloudCompatible()) {
                 throw new BadRequestException(String.format(Locale.ENGLISH,
                         "The input type <%s> is not allowed in the cloud environment!", lr.type()));
@@ -173,7 +252,9 @@ public class InputsResource extends AbstractInputsResource {
     public void terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
         final Input input = inputService.find(inputId);
-        inputService.destroy(input);
+        if (0 < inputService.destroy(input)) {
+            clusterEventBus.post(new InputDeletedEvent(input.getId(), input.getTitle()));
+        }
     }
 
     @PUT
@@ -195,8 +276,7 @@ public class InputsResource extends AbstractInputsResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input input = inputService.find(inputId);
-
-        final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
+        final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node(), input.getDesiredState());
 
         messageInput.checkConfiguration();
 
@@ -210,6 +290,9 @@ public class InputsResource extends AbstractInputsResource {
 
         final Input newInput = inputService.create(input.getId(), mergedInput);
         inputService.update(newInput);
+        if (!input.getTitle().equals(newInput.getTitle())) {
+            clusterEventBus.post(new InputRenamedEvent(input.getId(), input.getTitle(), newInput.getTitle()));
+        }
 
         final URI inputUri = getUriBuilderToSelf().path(InputsResource.class)
                 .path("{inputId}")

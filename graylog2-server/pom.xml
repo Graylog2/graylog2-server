@@ -159,6 +159,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+            <artifactId>owasp-java-html-sanitizer</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
@@ -349,6 +354,10 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.threeten</groupId>
+            <artifactId>threeten-extra</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.graylog2.repackaged</groupId>
@@ -461,6 +470,12 @@
             <version>${testcontainers.opensearch.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>rabbitmq</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -754,6 +769,31 @@
             <groupId>com.github.stateless4j</groupId>
             <artifactId>stateless4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-alts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-services</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.proto</groupId>
+            <artifactId>opentelemetry-proto</artifactId>
+        </dependency>
+
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
             <groupId>junit</groupId>
@@ -932,7 +972,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -955,10 +995,9 @@
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <minimizeJar>false</minimizeJar>
                     <filters>
-                        <!-- Bouncycastle's JARs are signed. When building a shaded JAR, either remove the signatures, or
-                             add dependency to the main JAR's manifest. Otherwise running the application will fail. -->
+                        <!-- Exclude all signature files from the shaded JARs to avoid server startup failure. -->
                         <filter>
-                            <artifact>org.bouncycastle:*</artifact>
+                            <artifact>*</artifact>
                             <excludes>
                                 <exclude>META-INF/*.SF</exclude>
                                 <exclude>META-INF/*.DSA</exclude>
@@ -1108,6 +1147,24 @@
                     <verbose>true</verbose>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+                    <pluginId>grpc-java</pluginId>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
     <profiles>
@@ -1265,16 +1322,6 @@
                                 <phase>test</phase>
                                 <configuration>
                                     <arguments>test</arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>yarn test:integration</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                                <phase>test</phase>
-                                <configuration>
-                                    <arguments>test:integration</arguments>
                                 </configuration>
                             </execution>
                         </executions>

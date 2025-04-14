@@ -18,8 +18,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 type Props = {
-  children: React.ReactNode,
-  className?: string,
+  children: React.ReactNode;
+  className?: string;
 };
 
 const Container = styled.div`
@@ -45,9 +45,5 @@ const Container = styled.div`
 `;
 
 const SelectGroup = ({ children, className }: Props) => <Container className={className}>{children}</Container>;
-
-SelectGroup.defaultProps = {
-  className: undefined,
-};
 
 export default SelectGroup;

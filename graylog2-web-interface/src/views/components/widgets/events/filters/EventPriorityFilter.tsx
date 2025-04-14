@@ -22,9 +22,9 @@ import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import PriorityName from 'components/events/events/PriorityName';
 
 type Props = {
-  onSelect: (value: string) => void,
-  selectedValues: Array<string>
-}
+  onSelect: (value: string) => void;
+  selectedValues: Array<string>;
+};
 
 const EventTypeFilter = ({ onSelect, selectedValues }: Props) => (
   <ListGroup className="no-bm">
@@ -32,9 +32,7 @@ const EventTypeFilter = ({ onSelect, selectedValues }: Props) => (
       const disabledOption = selectedValues.includes(priority);
 
       return (
-        <ListGroupItem onClick={() => !disabledOption && onSelect(priority)}
-                       disabled={disabledOption}
-                       key={priority}>
+        <ListGroupItem onClick={() => !disabledOption && onSelect(priority)} disabled={disabledOption} key={priority}>
           <PriorityName priority={Number(priority)} />
         </ListGroupItem>
       );

@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch2;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
@@ -32,8 +33,8 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
-import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
+import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndicesAdapter;
@@ -88,6 +89,7 @@ public class OpenSearch2Module extends VersionAwareModule {
 
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
+        bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS2.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {

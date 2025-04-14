@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { Button, ControlLabel, FormControl, FormGroup, HelpBlock } from 'components/bootstrap';
+import { Spinner, ISODurationInput } from 'components/common';
 
 const StyledForm = styled.form`
   margin-top: 10px;
@@ -31,52 +30,74 @@ const StyledForm = styled.form`
       width: 300px;
     }
   }
+
+  .input-group {
+    width: 300px;
+  }
 `;
 
 type Props = {
-  creatingToken: boolean,
-  disableForm: boolean,
-  onCreate: (tokenName: string) => void,
+  creatingToken?: boolean;
+  disableForm?: boolean;
+  onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => void;
+  defaultTtl?: string;
+  disableTtl?: boolean;
 };
 
-const CreateTokenForm = ({ creatingToken, disableForm, onCreate }: Props) => {
+const CreateTokenForm = ({
+  creatingToken = false,
+  disableForm = false,
+  defaultTtl = 'P30D',
+  disableTtl = false,
+  onCreate,
+}: Props) => {
   const [tokenName, setTokenName] = useState('');
+  const [tokenTtl, setTokenTtl] = useState(defaultTtl);
 
   const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    onCreate(tokenName);
+    onCreate({ tokenName, tokenTtl });
     setTokenName('');
+    setTokenTtl(defaultTtl);
   };
+
+  const ttlValidator = (milliseconds: number) => milliseconds >= 60000;
 
   return (
     <StyledForm className="form-inline" onSubmit={createToken}>
       <FormGroup controlId="create-token-input">
         <ControlLabel>Token Name</ControlLabel>
-        <FormControl type="text"
-                     disabled={disableForm}
-                     placeholder="What is this token for?"
-                     value={tokenName}
-                     onChange={(event) => setTokenName((event.target as HTMLInputElement).value)} />
+        <FormControl
+          type="text"
+          disabled={disableForm}
+          placeholder="What is this token for?"
+          value={tokenName}
+          onChange={(event) => setTokenName((event.target as HTMLInputElement).value)}
+        />
       </FormGroup>
-      <Button id="create-token"
-              disabled={disableForm || tokenName === '' || creatingToken}
-              type="submit"
-              bsStyle="primary">
-        {(creatingToken ? <Spinner text="Creating..." /> : 'Create Token')}
+      {!disableTtl && (
+        <ISODurationInput
+          id="token_creation_ttl"
+          duration={tokenTtl}
+          update={(value) => setTokenTtl(value)}
+          label="Token TTL"
+          help=""
+          validator={ttlValidator}
+          errorText="invalid (min: 1 minute)"
+          disabled={disableForm}
+          required
+        />
+      )}
+      <Button
+        id="create-token"
+        disabled={disableForm || tokenName === '' || creatingToken}
+        type="submit"
+        bsStyle="primary">
+        {creatingToken ? <Spinner text="Creating..." /> : 'Create Token'}
       </Button>
+       <HelpBlock>TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes PT60M, for 24 hours: PT24H, for 30 days: PT30D</HelpBlock>
     </StyledForm>
   );
-};
-
-CreateTokenForm.propTypes = {
-  creatingToken: PropTypes.bool,
-  disableForm: PropTypes.bool,
-  onCreate: PropTypes.func.isRequired,
-};
-
-CreateTokenForm.defaultProps = {
-  creatingToken: false,
-  disableForm: false,
 };
 
 export default CreateTokenForm;

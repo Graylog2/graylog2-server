@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { Modal, Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
@@ -23,33 +22,27 @@ import type View from 'views/logic/views/View';
 import SavedSearchesOverview from './SavedSearchesOverview';
 
 type Props = {
-  toggleModal: () => void,
-  deleteSavedSearch: (view: View) => Promise<View>,
-  activeSavedSearchId: string,
+  toggleModal: () => void;
+  deleteSavedSearch: (view: View) => Promise<void>;
+  activeSavedSearchId: string;
 };
 
 const SavedSearchesModal = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }: Props) => (
-  <Modal show
-         title="Saved searches"
-         bsSize="large"
-         onHide={toggleModal}>
+  <Modal show title="Saved searches" bsSize="large" onHide={toggleModal}>
     <Modal.Header closeButton>
       <Modal.Title>Saved Searches</Modal.Title>
     </Modal.Header>
     <Modal.Body>
-      <SavedSearchesOverview deleteSavedSearch={deleteSavedSearch}
-                             activeSavedSearchId={activeSavedSearchId}
-                             onLoadSavedSearch={toggleModal} />
+      <SavedSearchesOverview
+        deleteSavedSearch={deleteSavedSearch}
+        activeSavedSearchId={activeSavedSearchId}
+        onLoadSavedSearch={toggleModal}
+      />
     </Modal.Body>
     <Modal.Footer>
       <Button onClick={toggleModal}>Cancel</Button>
     </Modal.Footer>
   </Modal>
 );
-
-SavedSearchesModal.propTypes = {
-  toggleModal: PropTypes.func.isRequired,
-  deleteSavedSearch: PropTypes.func.isRequired,
-};
 
 export default SavedSearchesModal;

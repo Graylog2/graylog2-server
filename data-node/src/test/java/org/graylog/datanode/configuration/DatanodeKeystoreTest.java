@@ -79,8 +79,41 @@ class DatanodeKeystoreTest {
         final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(ca.certificate()));
 
         datanodeKeystore.replaceCertificatesInKeystore(certChain);
+        Assertions.assertThat(datanodeKeystore.getSubjectAlternativeNames())
+                .hasSizeGreaterThanOrEqualTo(2)
+                .contains("my-hostname", "second-hostname");
 
         Assertions.assertThat(this.receivedEvents).hasSize(1);
+
+        Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isTrue();
+    }
+
+    @Test
+    void testIntermediateCA(@TempDir Path tempDir) throws Exception {
+
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), "foobar", this.eventBus);
+        datanodeKeystore.create(generateKeyPair());
+
+
+        final KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("root")
+                .isCA(true)
+                .validity(Duration.ofDays(365)));
+
+        final KeyPair intermediate = CertificateGenerator.generate(CertRequest.signed("intermediate", rootCa)
+                .isCA(true)
+                .validity(Duration.ofDays(365)));
+
+        final KeyPair server = CertificateGenerator.generate(CertRequest.signed("server", intermediate)
+                .isCA(true)
+                .validity(Duration.ofDays(365)));
+
+        final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest("my-hostname", List.of("second-hostname"));
+
+        final CsrSigner signer = new CsrSigner();
+        final X509Certificate datanodeCert = signer.sign(server.privateKey(), server.certificate(), csr, 30);
+        final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(server.certificate(), intermediate.certificate(), rootCa.certificate()));
+
+        datanodeKeystore.replaceCertificatesInKeystore(certChain);
 
         Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isTrue();
     }

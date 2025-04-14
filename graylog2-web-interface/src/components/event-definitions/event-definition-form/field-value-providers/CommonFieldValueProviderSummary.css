@@ -1,7 +1,7 @@
 :local(.field) {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 :local(.fixedTable) {
-    table-layout: fixed;
+  table-layout: fixed;
 }

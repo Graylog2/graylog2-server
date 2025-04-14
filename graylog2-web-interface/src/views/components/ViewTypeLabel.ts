@@ -21,7 +21,7 @@ import type { ViewType } from 'views/logic/views/View';
 type Props = {
   type: ViewType | undefined | null;
   capitalize?: boolean;
-}
+};
 
 const ViewTypeLabel = ({ type, capitalize = false }: Props) => {
   if (!type) {

@@ -26,6 +26,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.images.builder.Transferable;
 import org.testcontainers.images.builder.dockerfile.DockerfileBuilder;
 
 import java.io.IOException;
@@ -48,7 +49,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     private String rootUsername = "admin";
     private String passwordSecret;
-    private String rootPasswordSha2;
     private String mongoDbUri;
     private int restPort = 8999;
     private int openSearchHttpPort = 9200;
@@ -71,12 +71,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     @Override
     public org.graylog.testing.datanode.DatanodeDevContainerBuilder passwordSecret(final String passwordSecret) {
         this.passwordSecret = passwordSecret;
-        return this;
-    }
-
-    @Override
-    public org.graylog.testing.datanode.DatanodeDevContainerBuilder rootPasswordSha2(final String rootPasswordSha2) {
-        this.rootPasswordSha2 = rootPasswordSha2;
         return this;
     }
 
@@ -169,14 +163,18 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
                 .withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", rootUsername)
                 .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", passwordSecret)
-                .withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", rootPasswordSha2)
 
                 .withEnv("GRAYLOG_DATANODE_NODE_ID_FILE", "./node-id")
                 .withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0:" + restPort)
 
                 // disable disk threshold in tests, it causes problems in github builds where we don't have
                 // enough free space
-                .withEnv("opensearch.cluster.routing.allocation.disk.threshold_enabled", "false")
+                .withCopyToContainer(Transferable.of(
+                        """
+                                cluster.routing.allocation.disk.threshold_enabled=false
+                                """
+                ), IMAGE_WORKING_DIR + "/config/opensearch.overrides")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIGURATION_OVERRIDES_FILE", IMAGE_WORKING_DIR + "/config/opensearch.overrides")
 
                 .withNetworkAliases(nodeName)
                 .waitingFor(new LogMessageWaitStrategy()

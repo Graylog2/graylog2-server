@@ -42,6 +42,7 @@ import org.graylog.storage.errors.ResponseError;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
+import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,32 +184,34 @@ public class ElasticsearchClient {
                 : RequestOptions.DEFAULT;
     }
 
-    private ElasticsearchException exceptionFrom(Exception e, String errorMessage) {
-        if (e instanceof ElasticsearchException) {
-            final ElasticsearchException elasticsearchException = (ElasticsearchException) e;
+    public static RuntimeException exceptionFrom(Exception e, String errorMessage) {
+        if (e instanceof ElasticsearchException elasticsearchException) {
             if (isIndexNotFoundException(elasticsearchException)) {
-                throw IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
+                return IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }
             if (isMasterNotDiscoveredException(elasticsearchException)) {
-                throw new MasterNotDiscoveredException();
+                return new MasterNotDiscoveredException();
             }
             if (isInvalidWriteTargetException(elasticsearchException)) {
                 final Matcher matcher = invalidWriteTarget.matcher(elasticsearchException.getMessage());
                 if (matcher.find()) {
                     final String target = matcher.group("target");
-                    throw InvalidWriteTargetException.create(target);
+                    return InvalidWriteTargetException.create(target);
                 }
             }
             if (isBatchSizeTooLargeException(elasticsearchException)) {
-                throw new BatchSizeTooLargeException(elasticsearchException.getMessage());
+                return new BatchSizeTooLargeException(elasticsearchException.getMessage());
+            }
+            if (isMapperParsingExceptionException(elasticsearchException)) {
+                return new MapperParsingException(elasticsearchException.getMessage());
             }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
-            throw new BatchSizeTooLargeException(e.getMessage());
+            return new BatchSizeTooLargeException(e.getMessage());
         }
         return new ElasticsearchException(errorMessage, e);
     }
 
-    private boolean isInvalidWriteTargetException(ElasticsearchException elasticsearchException) {
+    private static boolean isInvalidWriteTargetException(ElasticsearchException elasticsearchException) {
         try {
             final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
             return parsedException.reason().startsWith("no write index is defined for alias");
@@ -217,7 +220,7 @@ public class ElasticsearchClient {
         }
     }
 
-    private boolean isMasterNotDiscoveredException(ElasticsearchException elasticsearchException) {
+    private static boolean isMasterNotDiscoveredException(ElasticsearchException elasticsearchException) {
         try {
             final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
             return parsedException.type().equals("master_not_discovered_exception")
@@ -227,11 +230,15 @@ public class ElasticsearchClient {
         }
     }
 
-    private boolean isIndexNotFoundException(ElasticsearchException elasticsearchException) {
+    private static boolean isIndexNotFoundException(ElasticsearchException elasticsearchException) {
         return elasticsearchException.getMessage().contains("index_not_found_exception");
     }
 
-    private boolean isBatchSizeTooLargeException(ElasticsearchException elasticsearchException) {
+    private static boolean isMapperParsingExceptionException(ElasticsearchException openSearchException) {
+        return openSearchException.getMessage().contains("mapper_parsing_exception");
+    }
+
+    private static boolean isBatchSizeTooLargeException(ElasticsearchException elasticsearchException) {
         if (elasticsearchException instanceof ElasticsearchStatusException statusException) {
             if (statusException.getCause() instanceof ResponseException responseException) {
                 return (responseException.getResponse().getStatusLine().getStatusCode() == 429);

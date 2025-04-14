@@ -17,6 +17,7 @@
 package org.graylog.security.certutil.csr;
 
 import com.google.common.collect.Sets;
+import jakarta.validation.constraints.NotNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -29,7 +30,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog2.plugin.certificates.RenewalPolicy;
+import org.graylog.security.certutil.keystore.storage.KeystoreUtils;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -79,10 +80,16 @@ public class CsrSigner {
         return name == dNSName;
     }
 
-    public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, RenewalPolicy renewalPolicy) throws Exception {
-        Instant validFrom = Instant.now(clock);
-        var validUntil = validFrom.plus(renewalPolicy.parsedCertificateLifetime());
+    public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, @NotNull Duration certificateLifetime) throws Exception {
 
+        final boolean keysMatching = KeystoreUtils.matchingKeys(caPrivateKey, caCertificate.getPublicKey());
+        if(!keysMatching) {
+            throw new IllegalArgumentException("Provided CA private key doesn't correspond to provided CA certificate!");
+        }
+
+
+        Instant validFrom = Instant.now(clock);
+        final Instant validUntil = validFrom.plus(certificateLifetime);
         return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
     }
 

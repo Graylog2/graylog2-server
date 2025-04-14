@@ -16,39 +16,40 @@
  */
 package org.graylog2.users;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DuplicateKeyException;
+import com.google.common.primitives.Ints;
+import com.mongodb.MongoException;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.FindOneAndReplaceOptions;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReturnDocument;
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.MongoDBUpsertRetryer;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.mongojack.DBQuery.and;
-import static org.mongojack.DBQuery.is;
+import static com.mongodb.client.model.Filters.eq;
 
 public class RoleServiceImpl implements RoleService {
     private static final Logger log = LoggerFactory.getLogger(RoleServiceImpl.class);
@@ -61,25 +62,20 @@ public class RoleServiceImpl implements RoleService {
     public static final String ADMIN_ROLENAME = "Admin";
     private static final String READER_ROLENAME = "Reader";
 
-    private final JacksonDBCollection<RoleImpl, ObjectId> dbCollection;
     private final Validator validator;
     private final String adminRoleObjectId;
     private final String readerRoleObjectId;
+    private final MongoCollection<RoleImpl> collection;
 
     @Inject
-    public RoleServiceImpl(MongoConnection mongoConnection,
-                           MongoJackObjectMapperProvider mapper,
+    public RoleServiceImpl(MongoCollections mongoCollections,
                            Permissions permissions,
                            Validator validator) {
         this.validator = validator;
 
-        dbCollection = JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(ROLES_COLLECTION_NAME),
-                RoleImpl.class,
-                ObjectId.class,
-                mapper.get());
+        collection = mongoCollections.nonEntityCollection(ROLES_COLLECTION_NAME, RoleImpl.class);
         // lower case role names are unique, this allows arbitrary naming, but still uses an index
-        dbCollection.createIndex(new BasicDBObject(NAME_LOWER, 1), new BasicDBObject("unique", true));
+        collection.createIndex(Indexes.ascending(NAME_LOWER), new IndexOptions().unique(true));
 
         // make sure the two built-in roles actually exist
         adminRoleObjectId = checkNotNull(ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
@@ -116,7 +112,13 @@ public class RoleServiceImpl implements RoleService {
             try {
                 final RoleImpl savedRole = save(fixedAdmin);
                 return savedRole.getId();
-            } catch (DuplicateKeyException | ValidationException e) {
+            } catch (MongoException e) {
+                if (MongoUtils.isDuplicateKeyError(e)) {
+                    log.error("Unable to save fixed " + roleName + " role, please restart Graylog to fix this.", e);
+                } else {
+                    throw e;
+                }
+            } catch (ValidationException e) {
                 log.error("Unable to save fixed " + roleName + " role, please restart Graylog to fix this.", e);
             }
         }
@@ -131,7 +133,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role loadById(String roleId) throws NotFoundException {
-        final Role role = dbCollection.findOneById(new ObjectId(roleId));
+        final Role role = collection.find(MongoUtils.idEq(roleId)).first();
         if (role == null) {
             throw new NotFoundException("No role found with id " + roleId);
         }
@@ -140,7 +142,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleImpl load(String roleName) throws NotFoundException {
-        final RoleImpl role = dbCollection.findOne(is(NAME_LOWER, roleName.toLowerCase(Locale.ENGLISH)));
+        final RoleImpl role = collection.find(eq(NAME_LOWER, roleName.toLowerCase(Locale.ENGLISH))).first();
 
         if (role == null) {
             throw new NotFoundException("No role found with name " + roleName);
@@ -150,45 +152,28 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public boolean exists(String roleName) {
-        return dbCollection.getCount(is(NAME_LOWER, roleName.toLowerCase(Locale.ENGLISH))) == 1;
+        return collection.countDocuments(eq(NAME_LOWER, roleName.toLowerCase(Locale.ENGLISH))) == 1;
     }
 
     @Override
     public Set<Role> loadAll() {
-        try (DBCursor<RoleImpl> rolesCursor = dbCollection.find()) {
-            return ImmutableSet.copyOf((Iterable<? extends Role>) rolesCursor);
-        }
+        return ImmutableSet.copyOf(collection.find());
     }
 
     @Override
-    public Map<String, Role> findIdMap(Set<String> roleIds) throws NotFoundException {
-        final DBQuery.Query query = DBQuery.in(ID, roleIds);
-        try (DBCursor<RoleImpl> rolesCursor = dbCollection.find(query)) {
-            ImmutableSet<Role> roles = ImmutableSet.copyOf((Iterable<? extends Role>) rolesCursor);
-            return Maps.uniqueIndex(roles, new Function<Role, String>() {
-                @Nullable
-                @Override
-                public String apply(Role input) {
-                    return input.getId();
-                }
-            });
-        }
+    public Map<String, Role> findIdMap(Set<String> roleIds) {
+        final var query = MongoUtils.stringIdsIn(roleIds);
+        final List<Role> roles = collection.find(query).into(new ArrayList<>());
+        return Maps.uniqueIndex(roles, Role::getId);
     }
 
     @Override
-    public Map<String, Role> loadAllIdMap() throws NotFoundException {
-        final Set<Role> roles = loadAll();
-        return Maps.uniqueIndex(roles, new Function<Role, String>() {
-            @Nullable
-            @Override
-            public String apply(Role input) {
-                return input.getId();
-            }
-        });
+    public Map<String, Role> loadAllIdMap() {
+        return Maps.uniqueIndex(loadAll(), Role::getId);
     }
 
     @Override
-    public Map<String, Role> loadAllLowercaseNameMap() throws NotFoundException {
+    public Map<String, Role> loadAllLowercaseNameMap() {
         final Set<Role> roles = loadAll();
         return Maps.uniqueIndex(roles, Roles.roleToNameFunction(true));
     }
@@ -196,16 +181,15 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleImpl save(Role role1) throws ValidationException {
         // sucky but necessary because of graylog2-shared not knowing about mongodb :(
-        if (!(role1 instanceof RoleImpl)) {
+        if (!(role1 instanceof final RoleImpl role)) {
             throw new IllegalArgumentException("invalid Role implementation class");
         }
-        RoleImpl role = (RoleImpl) role1;
         final Set<ConstraintViolation<Role>> violations = validate(role);
         if (!violations.isEmpty()) {
             throw new ValidationException("Validation failed.", violations.toString());
         }
-        return MongoDBUpsertRetryer.run(() ->
-                dbCollection.findAndModify(is(NAME_LOWER, role.nameLower()), null, null, false, role, true, true));
+        return collection.findOneAndReplace(eq(NAME_LOWER, role.nameLower()), role,
+                new FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER).upsert(true));
     }
 
     @Override
@@ -215,8 +199,10 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public int delete(String roleName) {
-        final DBQuery.Query nameMatchesAndNotReadonly = and(is(READ_ONLY, false), is(NAME_LOWER, roleName.toLowerCase(Locale.ENGLISH)));
-        return dbCollection.remove(nameMatchesAndNotReadonly).getN();
+        final var nameMatchesAndNotReadonly = Filters.and(
+                eq(READ_ONLY, false),
+                eq(NAME_LOWER, roleName.toLowerCase(Locale.ENGLISH)));
+        return Ints.saturatedCast(collection.deleteOne(nameMatchesAndNotReadonly).getDeletedCount());
     }
 
     @Override

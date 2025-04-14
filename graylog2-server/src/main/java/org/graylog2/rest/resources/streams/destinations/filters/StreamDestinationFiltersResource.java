@@ -81,7 +81,7 @@ public class StreamDestinationFiltersResource extends RestResource {
             @ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
             @ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParams
     ) {
-        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+        checkPermission(RestPermissions.STREAMS_READ, streamId);
         checkStream(streamId);
 
         final var paginatedList = filterService.findPaginatedForStream(
@@ -125,7 +125,7 @@ public class StreamDestinationFiltersResource extends RestResource {
     @ApiOperation("Get filter rule for given ID")
     public Response getFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
                               @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
-        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+        checkPermission(RestPermissions.STREAMS_READ, streamId);
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_READ, filterId);
         checkStream(streamId);
 

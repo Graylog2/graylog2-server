@@ -20,9 +20,13 @@ import styled from 'styled-components';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
-import type { ActionDefinition, ActionHandlerArguments, ActionComponents } from 'views/components/actions/ActionHandler';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type {
+  ActionDefinition,
+  ActionHandlerArguments,
+  ActionComponents,
+} from 'views/components/actions/ActionHandler';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { Spinner } from 'components/common';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
 
@@ -39,16 +43,21 @@ const StyledListItem = styled.li`
   list-style: none;
 `;
 
-const filterVisibleActions = (dispatch: AppDispatch, handlerArgs: Props['handlerArgs'], actions: Array<ActionDefinition> | undefined = []) => actions.filter((action: ActionDefinition) => {
-  const { isHidden = () => false } = action;
+const filterVisibleActions = (
+  dispatch: ViewsDispatch,
+  handlerArgs: Props['handlerArgs'],
+  actions: Array<ActionDefinition> | undefined = [],
+) =>
+  actions.filter((action: ActionDefinition) => {
+    const { isHidden = () => false } = action;
 
-  return dispatch((_dispatch, getState) => !isHidden(handlerArgs, getState));
-});
+    return dispatch((_dispatch, getState) => !isHidden(handlerArgs, getState));
+  });
 
 const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
   const valueActions = usePluginEntities('valueActions');
   const fieldActions = usePluginEntities('fieldActions');
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   if (type === 'value') {
     return filterVisibleActions(dispatch, handlerArgs, valueActions);
@@ -63,7 +72,7 @@ const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs
 
 const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
   const { isLoading, isError, externalValueActions } = useExternalValueActions();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   if (type !== 'value') {
     return { isLoading, isError, externalValueActions: [] };
@@ -75,12 +84,12 @@ const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs
 };
 
 type Props = {
-  children: React.ReactNode,
-  type: 'field' | 'value',
-  handlerArgs: ActionHandlerArguments,
-  setOverflowingComponents: (components: ActionComponents) => void,
-  overflowingComponents: ActionComponents,
-  onMenuToggle: () => void,
+  children: React.ReactNode;
+  type: 'field' | 'value';
+  handlerArgs: ActionHandlerArguments;
+  setOverflowingComponents: (components: ActionComponents) => void;
+  overflowingComponents: ActionComponents;
+  onMenuToggle: () => void;
 };
 
 const ActionDropdown = ({
@@ -97,34 +106,43 @@ const ActionDropdown = ({
   return (
     <>
       <StyledListItem>
-        <DropdownHeader>
-          {children}
-        </DropdownHeader>
+        <DropdownHeader>{children}</DropdownHeader>
       </StyledListItem>
 
       <MenuItem divider />
       <MenuItem header>Actions</MenuItem>
       {internalActions.map((action) => (
-        <ActionMenuItem action={action}
-                        key={`${type}-action-${action.type}`}
-                        handlerArgs={handlerArgs}
-                        setOverflowingComponents={setOverflowingComponents}
-                        overflowingComponents={overflowingComponents}
-                        type={type}
-                        onMenuToggle={onMenuToggle} />
+        <ActionMenuItem
+          action={action}
+          key={`${type}-action-${action.type}`}
+          handlerArgs={handlerArgs}
+          setOverflowingComponents={setOverflowingComponents}
+          overflowingComponents={overflowingComponents}
+          type={type}
+          onMenuToggle={onMenuToggle}
+        />
       ))}
-      {isLoading && (<><MenuItem divider /><MenuItem disabled><Spinner text="Loading" /></MenuItem></>)}
-      {(!isLoading && externalActions && externalActions.length !== 0) && (
+      {isLoading && (
+        <>
+          <MenuItem divider />
+          <MenuItem disabled>
+            <Spinner text="Loading" />
+          </MenuItem>
+        </>
+      )}
+      {!isLoading && externalActions && externalActions.length !== 0 && (
         <>
           <MenuItem divider />
           {externalActions.map((action) => (
-            <ActionMenuItem action={action}
-                            key={`${type}-action-${action.type}`}
-                            handlerArgs={handlerArgs}
-                            setOverflowingComponents={setOverflowingComponents}
-                            overflowingComponents={overflowingComponents}
-                            type={type}
-                            onMenuToggle={onMenuToggle} />
+            <ActionMenuItem
+              action={action}
+              key={`${type}-action-${action.type}`}
+              handlerArgs={handlerArgs}
+              setOverflowingComponents={setOverflowingComponents}
+              overflowingComponents={overflowingComponents}
+              type={type}
+              onMenuToggle={onMenuToggle}
+            />
           ))}
         </>
       )}

@@ -41,18 +41,21 @@ const renderChangeFieldTypeModal = ({
   showSelectionTable = undefined,
   initialFieldType = undefined,
   initialSelectedIndexSets = ['id-1', 'id-2'],
-}) => render(
-  <TestStoreProvider>
-    <ChangeFieldTypeModal onClose={onClose}
-                          initialData={{
-                            fieldName: field,
-                            type: initialFieldType,
-                          }}
-                          show={show}
-                          initialSelectedIndexSets={initialSelectedIndexSets}
-                          showSelectionTable={showSelectionTable} />
-  </TestStoreProvider>,
-);
+}) =>
+  render(
+    <TestStoreProvider>
+      <ChangeFieldTypeModal
+        onClose={onClose}
+        initialData={{
+          fieldName: field,
+          type: initialFieldType,
+        }}
+        show={show}
+        initialSelectedIndexSets={initialSelectedIndexSets}
+        showSelectionTable={showSelectionTable}
+      />
+    </TestStoreProvider>,
+  );
 const attributes: Attributes = [
   {
     id: 'index_set_id',
@@ -95,7 +98,7 @@ const fieldTypeUsages = [
     types: ['int'],
   },
 ];
-const paginatedFieldUsage = ({
+const paginatedFieldUsage = {
   data: {
     list: fieldTypeUsages,
     pagination: {
@@ -106,11 +109,10 @@ const paginatedFieldUsage = ({
     },
     attributes,
   },
-  refetch: () => {
-  },
+  refetch: () => {},
   isInitialLoading: false,
   isLoading: false,
-});
+};
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
@@ -125,12 +127,15 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
   IndexSetsActions: {
     list: jest.fn(),
   },
-  IndexSetsStore: MockStore(['getInitialState', () => ({
-    indexSets: [
-      { id: 'id-1', title: 'Index Title 1' },
-      { id: 'id-2', title: 'Index Title 2' },
-    ],
-  })]),
+  IndexSetsStore: MockStore([
+    'getInitialState',
+    () => ({
+      indexSets: [
+        { id: 'id-1', title: 'Index Title 1' },
+        { id: 'id-2', title: 'Index Title 2' },
+      ],
+    }),
+  ]),
 }));
 
 describe('ChangeFieldTypeModal', () => {
@@ -170,11 +175,10 @@ describe('ChangeFieldTypeModal', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['index_set_title',
-          'stream_titles',
-          'types'],
+        displayedAttributes: ['index_set_title', 'stream_titles', 'types'],
       },
       isInitialLoading: false,
+      refetch: () => {},
     });
   });
 
@@ -219,12 +223,14 @@ describe('ChangeFieldTypeModal', () => {
     fireEvent.click(rowCheckboxes[1]);
     fireEvent.click(submit);
 
-    await waitFor(() => expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
-      indexSetSelection: ['id-1'],
-      newFieldType: 'int',
-      rotated: true,
-      field: 'field',
-    }));
+    await waitFor(() =>
+      expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
+        indexSetSelection: ['id-1'],
+        newFieldType: 'int',
+        rotated: true,
+        field: 'field',
+      }),
+    );
   });
 
   it('run putFieldTypeMutationMock with selected type and indexes when showSelectionTable false', async () => {
@@ -238,15 +244,17 @@ describe('ChangeFieldTypeModal', () => {
 
     fireEvent.click(submit);
 
-    await waitFor(() => expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
-      indexSetSelection: ['id-2'],
-      newFieldType: 'int',
-      rotated: true,
-      field: 'field',
-    }));
+    await waitFor(() =>
+      expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
+        indexSetSelection: ['id-2'],
+        newFieldType: 'int',
+        rotated: true,
+        field: 'field',
+      }),
+    );
   });
 
-  it('Doesn\'t shows index sets data when showSelectionTable false', async () => {
+  it("Doesn't shows index sets data when showSelectionTable false", async () => {
     renderChangeFieldTypeModal({ showSelectionTable: false });
 
     expect(screen.queryByText('Stream Title 1')).not.toBeInTheDocument();

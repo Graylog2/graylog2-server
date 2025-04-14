@@ -32,6 +32,7 @@ import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
 import com.github.luben.zstd.util.Native;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -54,10 +55,10 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.graylog2.Configuration;
+import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
-import org.graylog2.configuration.PathConfiguration;
+import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.featureflag.FeatureFlagsFactory;
@@ -83,7 +84,6 @@ import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
@@ -102,10 +102,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
-public abstract class CmdLineTool implements CliCommand {
-
-    public static final String GRAYLOG_ENVIRONMENT_VAR_PREFIX = "GRAYLOG_";
-    public static final String GRAYLOG_SYSTEM_PROP_PREFIX = "graylog.";
+public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfiguration> implements CliCommand {
 
     static {
         // Set up JDK Logging adapter, https://logging.apache.org/log4j/2.x/log4j-jul/index.html
@@ -119,7 +116,7 @@ public abstract class CmdLineTool implements CliCommand {
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
-    protected final Configuration configuration;
+    protected final NodeConfiguration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog configuration and exit")
@@ -132,10 +129,10 @@ public abstract class CmdLineTool implements CliCommand {
     private boolean debug = false;
 
     @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog")
-    private String configFile = "/etc/graylog/server/server.conf";
+    protected String configFile = "/etc/graylog/server/server.conf";
 
     @Option(name = {"-ff", "--featureflagfile"}, description = "Configuration file for Graylog feature flags")
-    private String customFeatureFlagFile = "/etc/graylog/server/feature-flag.conf";
+    protected String customFeatureFlagFile = "/etc/graylog/server/feature-flag.conf";
 
     protected String commandName = "command";
 
@@ -144,14 +141,13 @@ public abstract class CmdLineTool implements CliCommand {
     protected FeatureFlags featureFlags;
     protected PluginLoader pluginLoader;
 
-    protected CmdLineTool(Configuration configuration) {
+    protected CmdLineTool(NodeConfiguration configuration) {
         this(null, configuration);
     }
 
-    protected CmdLineTool(String commandName, Configuration configuration) {
+    protected CmdLineTool(String commandName, NodeConfiguration configuration) {
         jadConfig = new JadConfig();
-        jadConfig.addConverterFactory(new GuavaConverterFactory());
-        jadConfig.addConverterFactory(new JodaTimeConverterFactory());
+        addConverters(jadConfig);
 
         if (commandName == null) {
             if (this.getClass().isAnnotationPresent(Command.class)) {
@@ -200,13 +196,14 @@ public abstract class CmdLineTool implements CliCommand {
      * Please note that this happens *before* the configuration file has been parsed.
      */
     protected void beforeStart() {
-    }
+        // This needs to run before the first SSLContext is instantiated,
+        // because it sets up the default SSLAlgorithmConstraints
+        applySecuritySettings(parseAndGetTLSConfiguration(configFile));
 
-    /**
-     * Things that have to run before the {@link #startCommand()} method is being called.
-     * Please note that this happens *before* the configuration file has been parsed.
-     */
-    protected void beforeStart(TLSProtocolsConfiguration configuration, PathConfiguration pathConfiguration) {
+        // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
+        if (configuration instanceof NativeLibPathConfiguration) {
+            setNettyNativeDefaults(parseAndGetNativeLibPathConfiguration(configFile));
+        }
     }
 
     /**
@@ -256,6 +253,22 @@ public abstract class CmdLineTool implements CliCommand {
         Security.addProvider(new BouncyCastleProvider());
     }
 
+
+    private void setNettyNativeDefaults(NativeLibPathConfiguration pathConfiguration) {
+        // Give netty a better spot than /tmp to unpack its tcnative libraries
+        if (System.getProperty("io.netty.native.workdir") == null) {
+            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
+        }
+        // The jna.tmpdir should reside in the native lib dir. (See: https://github.com/Graylog2/graylog2-server/issues/21223)
+        if (System.getProperty("jna.tmpdir") == null) {
+            System.setProperty("jna.tmpdir", pathConfiguration.getNativeLibDir().toAbsolutePath().resolve("jna").toString());
+        }
+        // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
+        if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
+            System.setProperty("io.netty.native.deleteLibAfterLoading", "false");
+        }
+    }
+
     private static void setSystemPropertyIfEmpty(String key, String value) {
         if (System.getProperty(key) == null) {
             System.setProperty(key, value);
@@ -275,34 +288,40 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     public void doRun(Level logLevel) {
-        final PluginLoaderConfig pluginLoaderConfig = getPluginLoaderConfig(configFile);
+        if (configuration instanceof NativeLibPathConfiguration) {
+            NativeLibPathConfiguration pathConfiguration = parseAndGetNativeLibPathConfiguration(configFile);
 
-        // Move the zstd temp folder from /tmp to our native lib dir to avoid issues with noexec-mounted /tmp directories.
-        // See: https://github.com/Graylog2/graylog2-server/issues/17837
-        // WARNING: This needs to be set before the first use of the zstd library. Our in-memory logger is using
-        //          zstd library, so we need to set it before the first usage of the Logger instance.
-        //          Setting it after the first library usage wouldn't have any effect.
-        if (Native.isLoaded()) {
-            LOG.warn("The zstd library is already loaded. Setting the ZstdTempFolder property doesn't have any effect!");
-        }
-        final Path nativeLibPath = pluginLoaderConfig.getNativeLibDir().toAbsolutePath();
-        try {
-            // We are very early in the startup process and the data_dir and native lib dir don't exist yet. Since the
-            // zstd library doesn't create its own temp directory, we have to do it to avoid errors on startup.
-            Files.createDirectories(nativeLibPath);
-            System.setProperty("ZstdTempFolder", nativeLibPath.toString());
-        } catch (IOException e) {
-            LOG.warn("Couldn't create native lib dir <{}>. Unable to set ZstdTempFolder system property.", nativeLibPath, e);
+            // Move the zstd temp folder from /tmp to our native lib dir to avoid issues with noexec-mounted /tmp directories.
+            // See: https://github.com/Graylog2/graylog2-server/issues/17837
+            // WARNING: This needs to be set before the first use of the zstd library. Our in-memory logger is using
+            //          zstd library, so we need to set it before the first usage of the Logger instance.
+            //          Setting it after the first library usage wouldn't have any effect.
+            if (Native.isLoaded()) {
+                LOG.warn("The zstd library is already loaded. Setting the ZstdTempFolder property doesn't have any effect!");
+            }
+            final Path nativeLibPath = pathConfiguration.getNativeLibDir().toAbsolutePath();
+            try {
+                // We are very early in the startup process and the data_dir and native lib dir don't exist yet. Since the
+                // zstd library doesn't create its own temp directory, we have to do it to avoid errors on startup.
+                Files.createDirectories(nativeLibPath);
+                System.setProperty("ZstdTempFolder", nativeLibPath.toString());
+            } catch (IOException e) {
+                LOG.warn("Couldn't create native lib dir <{}>. Unable to set ZstdTempFolder system property.", nativeLibPath, e);
+            }
         }
 
         // This is holding all our metrics.
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
         featureFlags = getFeatureFlags(metricRegistry);
 
-        pluginLoader = getPluginLoader(pluginLoaderConfig, chainingClassLoader);
+        if (configuration.withPlugins()) {
+            pluginLoader = getPluginLoader(getPluginLoaderConfig(configFile), chainingClassLoader);
+        }
 
         installCommandConfig();
-        installPluginBootstrapConfig(pluginLoader);
+        if (configuration.withPlugins()) {
+            installPluginBootstrapConfig(pluginLoader);
+        }
 
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
@@ -311,16 +330,17 @@ public abstract class CmdLineTool implements CliCommand {
         installConfigRepositories();
 
         beforeStart();
-        beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
 
         processConfiguration(jadConfig);
 
         bootstrapConfigInjector = setupBootstrapConfigInjector();
 
-        final Set<Plugin> plugins = loadPlugins();
-
-        installPluginConfig(plugins);
-        processConfiguration(jadConfig);
+        Set<Plugin> plugins = new HashSet<>();
+        if (configuration.withPlugins()) {
+            plugins = loadPlugins();
+            installPluginConfig(plugins);
+            processConfiguration(jadConfig);
+        }
 
         if (isDumpConfig()) {
             dumpCurrentConfigAndExit();
@@ -358,10 +378,6 @@ public abstract class CmdLineTool implements CliCommand {
         startCommand();
     }
 
-    protected PluginLoader getPluginLoader(File pluginDir, ChainingClassLoader classLoader) {
-        return new PluginLoader(pluginDir, classLoader);
-    }
-
     protected PluginLoader getPluginLoader(PluginLoaderConfig pluginLoaderConfig, ChainingClassLoader classLoader) {
         return new PluginLoader(pluginLoaderConfig.getPluginDir().toFile(), classLoader);
     }
@@ -372,7 +388,7 @@ public abstract class CmdLineTool implements CliCommand {
 
     // Parse only the TLSConfiguration bean
     // to avoid triggering anything that might initialize the default SSLContext
-    private TLSProtocolsConfiguration parseAndGetTLSConfiguration() {
+    protected TLSProtocolsConfiguration parseAndGetTLSConfiguration(String configFile) {
         final JadConfig jadConfig = new JadConfig();
         jadConfig.setRepositories(getConfigRepositories(configFile));
         final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
@@ -382,10 +398,24 @@ public abstract class CmdLineTool implements CliCommand {
         return tlsConfiguration;
     }
 
-    private PathConfiguration parseAndGetPathConfiguration(String configFile) {
-        final PathConfiguration pathConfiguration = new PathConfiguration();
-        processConfiguration(new JadConfig(getConfigRepositories(configFile), pathConfiguration));
+    protected NativeLibPathConfiguration parseAndGetNativeLibPathConfiguration(String configFile) {
+        final NativeLibPathConfiguration pathConfiguration = (NativeLibPathConfiguration) configuration;
+        final JadConfig config = new JadConfig(getConfigRepositories(configFile), pathConfiguration);
+        addConverters(config);
+        processConfiguration(config);
         return pathConfiguration;
+    }
+
+    /**
+     * The server configuration file contains config values that require these converters.
+     * For example `root_timezone = America/Chicago`.
+     * <p>
+     * The converters must be added to each instance of JadConfig before calling `JadConfig.process()` or else
+     * configuration value parsing might fail which could halt server startup.
+     */
+    private void addConverters(JadConfig config) {
+        config.addConverterFactory(new GuavaConverterFactory());
+        config.addConverterFactory(new JodaTimeConverterFactory());
     }
 
     private void installCommandConfig() {
@@ -451,7 +481,9 @@ public abstract class CmdLineTool implements CliCommand {
 
     private void dumpDefaultConfigAndExit() {
         bootstrapConfigInjector = setupBootstrapConfigInjector();
-        installPluginConfig(pluginLoader.loadPlugins(bootstrapConfigInjector));
+        if (configuration.withPlugins()) {
+            installPluginConfig(pluginLoader.loadPlugins(bootstrapConfigInjector));
+        }
         dumpCurrentConfigAndExit();
     }
 
@@ -463,7 +495,7 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     private FeatureFlags getFeatureFlags(MetricRegistry metricRegistry) {
-        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile, metricRegistry);
+        return new FeatureFlagsFactory().createImmutableFeatureFlags(customFeatureFlagFile, metricRegistry, configuration);
     }
 
     protected Set<Plugin> loadPlugins() {
@@ -472,7 +504,7 @@ public abstract class CmdLineTool implements CliCommand {
         for (Plugin plugin : pluginLoader.loadPlugins(bootstrapConfigInjector)) {
             final PluginMetaData metadata = plugin.metadata();
 
-            final Configuration config = bootstrapConfigInjector.getInstance(Configuration.class);
+            final GraylogNodeConfiguration config = bootstrapConfigInjector.getInstance(configuration.getClass());
             // TODO do we want this here? We are also considering removing the deprecated CollectorPlugin entirely
             if (config.isCloud()) {
                 if (metadata.getUniqueId().equals("org.graylog.plugins.collector.CollectorPlugin")) {
@@ -498,8 +530,8 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected Collection<Repository> getConfigRepositories(String configFile) {
         return Arrays.asList(
-                new EnvironmentRepository(GRAYLOG_ENVIRONMENT_VAR_PREFIX),
-                new SystemPropertiesRepository(GRAYLOG_SYSTEM_PROP_PREFIX),
+                new EnvironmentRepository(configuration.getEnvironmentVariablePrefix()),
+                new SystemPropertiesRepository(configuration.getSystemPropertyPrefix()),
                 // Legacy prefixes
                 new EnvironmentRepository("GRAYLOG2_"),
                 new SystemPropertiesRepository("graylog2."),
@@ -590,7 +622,7 @@ public abstract class CmdLineTool implements CliCommand {
         return bootstrapConfigInjector;
     }
 
-    private void featureFlagsBinding(Binder binder) {
+    protected void featureFlagsBinding(Binder binder) {
         binder.bind(FeatureFlags.class).toInstance(featureFlags);
     }
 
@@ -603,9 +635,9 @@ public abstract class CmdLineTool implements CliCommand {
         for (Message message : messages) {
             //noinspection ThrowableResultOfMethodCallIgnored
             final Throwable rootCause = ExceptionUtils.getRootCause(message.getCause());
-            if (rootCause instanceof NodeIdPersistenceException) {
+            if (configuration.withNodeIdFile() && rootCause instanceof NodeIdPersistenceException) {
                 LOG.error(UI.wallString(
-                        "Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
+                        "Unable to read or persist your NodeId file. This means your node id file is not readable or writable by the current user. The following exception might give more information: " + message));
                 System.exit(-1);
             } else if (rootCause instanceof AccessDeniedException) {
                 LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));
@@ -630,5 +662,10 @@ public abstract class CmdLineTool implements CliCommand {
 
     protected Set<ServerStatus.Capability> capabilities() {
         return Collections.emptySet();
+    }
+
+    @VisibleForTesting
+    protected void setConfigFile(String configFile) {
+        this.configFile = configFile;
     }
 }

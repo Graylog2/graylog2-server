@@ -29,6 +29,7 @@ import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.Permissions;
@@ -54,10 +55,10 @@ import java.util.Set;
 public class TestUserService extends PersistedServiceImpl implements UserService {
     final UserImpl.Factory userFactory;
 
-    public TestUserService(MongoConnection mongoConnection) {
+    public TestUserService(MongoConnection mongoConnection, ClusterConfigService configService) {
         super(mongoConnection);
         final Permissions permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
-        userFactory = new UserServiceImplTest.UserImplFactory(new Configuration(), permissions);
+        userFactory = new UserServiceImplTest.UserImplFactory(new Configuration(), permissions, configService);
     }
 
     @Override

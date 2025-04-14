@@ -16,22 +16,21 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input } from 'components/bootstrap';
 import type { BooleanField as BooleanFieldType } from 'components/configurationforms/types';
 
 type Props = {
-  autoFocus?: boolean,
-  field: BooleanFieldType,
-  onChange: (title: string, value: boolean, dirty?: boolean) => void,
-  title: string,
-  typeName: string,
-  value?: boolean,
+  autoFocus?: boolean;
+  field: BooleanFieldType;
+  onChange: (title: string, value: boolean, dirty?: boolean) => void;
+  title: string;
+  typeName: string;
+  value?: boolean;
 };
 
-const BooleanField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
+const BooleanField = ({ autoFocus = false, field, onChange, title, typeName, value = false }: Props) => {
   const handleChange = (event) => {
     const nextValue = getValueFromInput(event.target);
 
@@ -39,29 +38,17 @@ const BooleanField = ({ autoFocus, field, onChange, title, typeName, value }: Pr
   };
 
   return (
-    <Input id={`${typeName}-${title}`}
-           name={`configuration[${title}]`}
-           type="checkbox"
-           label={field.human_name}
-           checked={value}
-           help={field.description}
-           onChange={handleChange}
-           autoFocus={autoFocus} />
+    <Input
+      id={`${typeName}-${title}`}
+      name={`configuration[${title}]`}
+      type="checkbox"
+      label={field.human_name}
+      checked={value}
+      help={field.description}
+      onChange={handleChange}
+      autoFocus={autoFocus}
+    />
   );
-};
-
-BooleanField.propTypes = {
-  autoFocus: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.bool,
-};
-
-BooleanField.defaultProps = {
-  autoFocus: false,
-  value: false,
 };
 
 export default BooleanField;

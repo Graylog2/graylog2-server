@@ -16,26 +16,27 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import PropTypes from 'prop-types';
 
 import IconButton from 'components/common/IconButton';
 
 import type { DescriptiveItem } from './PaginatedItemOverview';
 
 type Props = {
-  item: DescriptiveItem,
-  onDeleteItem?: (descriptiveItem: DescriptiveItem) => void,
+  item: DescriptiveItem;
+  onDeleteItem?: (descriptiveItem: DescriptiveItem) => void;
 };
 
-const Container = styled.span(({ theme }) => css`
-  display: flex;
-  padding: 10px;
-  background-color: ${theme.colors.table.row.background};
+const Container = styled.span(
+  ({ theme }) => css`
+    display: flex;
+    padding: 10px;
+    background-color: ${theme.colors.table.row.background};
 
-  &:nth-of-type(even) {
-    background-color: ${theme.colors.table.row.backgroundStriped};
-  }
-`);
+    &:nth-of-type(even) {
+      background-color: ${theme.colors.table.row.backgroundStriped};
+    }
+  `,
+);
 
 const Header = styled.div`
   flex: 1;
@@ -51,9 +52,10 @@ const StyledDeleteButton = styled(IconButton)`
 `;
 
 const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Props) => {
-  const deleteButton = typeof onDeleteItem === 'function'
-    ? <StyledDeleteButton onClick={() => onDeleteItem(item)} name="close" title={`Remove ${name}`} />
-    : null;
+  const deleteButton =
+    typeof onDeleteItem === 'function' ? (
+      <StyledDeleteButton onClick={() => onDeleteItem(item)} name="close" title={`Remove ${name}`} />
+    ) : null;
 
   return (
     <Container>
@@ -62,14 +64,6 @@ const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Prop
       {deleteButton}
     </Container>
   );
-};
-
-PaginatedItem.defaultProps = {
-  onDeleteItem: undefined,
-};
-
-PaginatedItem.propTypes = {
-  onDeleteItem: PropTypes.func,
 };
 
 export default PaginatedItem;

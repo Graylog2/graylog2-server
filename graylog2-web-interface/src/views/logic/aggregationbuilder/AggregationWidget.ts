@@ -18,15 +18,25 @@ import { Map } from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import type { FiltersType } from 'views/types';
+import type { QueryString } from 'views/logic/queries/types';
 
 import AggregationWidgetConfig from './AggregationWidgetConfig';
 
-import Widget from '../widgets/Widget';
+import Widget, { widgetAttributesForComparison } from '../widgets/Widget';
 
 export default class AggregationWidget extends Widget {
-  constructor(id: string, config: AggregationWidgetConfig, filter?: string, timerange?: TimeRange, query?: QueryString, streams?: Array<string>, streamCategories?: Array<string>, filters?: FiltersType) {
+  constructor(
+    id: string,
+    config: AggregationWidgetConfig,
+    filter?: string,
+    timerange?: TimeRange,
+    query?: QueryString,
+    streams?: Array<string>,
+    streamCategories?: Array<string>,
+    filters?: FiltersType,
+  ) {
     super(id, AggregationWidget.type, config, filter, timerange, query, streams, streamCategories, filters);
   }
 
@@ -37,7 +47,16 @@ export default class AggregationWidget extends Widget {
   static fromJSON(value) {
     const { id, config, filter, timerange, query, streams, stream_categories, filters } = value;
 
-    return new AggregationWidget(id, AggregationWidgetConfig.fromJSON(config), filter, timerange, query, streams, stream_categories, filters);
+    return new AggregationWidget(
+      id,
+      AggregationWidgetConfig.fromJSON(config),
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+    );
   }
 
   toBuilder() {
@@ -54,7 +73,7 @@ export default class AggregationWidget extends Widget {
 
   equals(other: any) {
     if (other instanceof AggregationWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) => isDeepEqual(this[key], other[key]));
+      return widgetAttributesForComparison.every((key) => isDeepEqual(this[key], other[key]));
     }
 
     return false;
@@ -62,7 +81,7 @@ export default class AggregationWidget extends Widget {
 
   equalsForSearch(other: any) {
     if (other instanceof AggregationWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) => isEqualForSearch(this[key], other[key]));
+      return widgetAttributesForComparison.every((key) => isEqualForSearch(this[key], other[key]));
     }
 
     return false;

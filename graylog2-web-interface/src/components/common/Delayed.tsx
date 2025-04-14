@@ -16,11 +16,10 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 
 type Props = {
-  children: Array<React.ReactElement | string> | React.ReactElement,
-  delay: number,
+  children: Array<React.ReactElement | string> | React.ReactElement;
+  delay: number;
 };
 
 const Delayed = ({ children, delay }: Props) => {
@@ -37,11 +36,6 @@ const Delayed = ({ children, delay }: Props) => {
   }, []);
 
   return delayFinished ? <>{children}</> : null;
-};
-
-Delayed.propTypes = {
-  children: PropTypes.node.isRequired,
-  delay: PropTypes.number.isRequired,
 };
 
 export default Delayed;

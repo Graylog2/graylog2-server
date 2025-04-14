@@ -19,6 +19,7 @@ import { screen, renderPreflight } from 'wrappedTestingLibrary';
 
 import fetch from 'logic/rest/FetchProvider';
 import { asMock } from 'helpers/mocking';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import App from './App';
 
@@ -28,23 +29,29 @@ jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: () => 'https://example.org/',
 }));
 
-jest.mock('preflight/hooks/useServerAvailability', () => jest.fn(() => ({
-  data: false,
-})));
+jest.mock('preflight/hooks/useServerAvailability', () =>
+  jest.fn(() => ({
+    data: false,
+  })),
+);
 
-jest.mock('preflight/hooks/useDataNodes', () => jest.fn(() => ({
-  data: [],
-  isFetching: false,
-  isInitialLoading: false,
-  error: undefined,
-})));
+jest.mock('preflight/hooks/useDataNodes', () =>
+  jest.fn(() => ({
+    data: [],
+    isFetching: false,
+    isInitialLoading: false,
+    error: undefined,
+  })),
+);
 
-jest.mock('preflight/hooks/useDataNodesCA', () => jest.fn(() => ({
-  data: undefined,
-  isInitialLoading: false,
-  isFetching: false,
-  error: undefined,
-})));
+jest.mock('preflight/hooks/useDataNodesCA', () =>
+  jest.fn(() => ({
+    data: undefined,
+    isInitialLoading: false,
+    isFetching: false,
+    error: undefined,
+  })),
+);
 
 jest.mock('preflight/util/UserNotification', () => ({
   error: jest.fn(),
@@ -52,13 +59,11 @@ jest.mock('preflight/util/UserNotification', () => ({
 }));
 
 describe('App', () => {
-  let windowConfirm;
   let windowLocation;
 
-  beforeAll(() => {
-    windowConfirm = window.confirm;
-    window.confirm = jest.fn(() => true);
+  useWindowConfirmMock();
 
+  beforeAll(() => {
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: { reload: jest.fn() },
@@ -70,13 +75,14 @@ describe('App', () => {
   });
 
   afterAll(() => {
-    window.confirm = windowConfirm;
     Object.defineProperty(window, 'location', { configurable: true, value: windowLocation });
   });
 
   it('should render', async () => {
     renderPreflight(<App />);
 
-    await screen.findByText(/It looks like you are starting Graylog for the first time and have not configured a data node./);
+    await screen.findByText(
+      /It looks like you are starting Graylog for the first time and have not configured a data node./,
+    );
   });
 });

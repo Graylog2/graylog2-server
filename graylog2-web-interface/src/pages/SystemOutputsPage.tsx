@@ -29,8 +29,13 @@ const SystemOutputsPage = () => {
         <PageHeader title="Outputs in Cluster">
           <span>
             Graylog nodes can forward messages via outputs. Launch or terminate as many outputs as you want here{' '}
-            <strong>and then assign them to streams to forward all messages of a stream in real-time.</strong><br />
-            You can find output plugins in <a href="https://marketplace.graylog.org/" target="_blank" rel="noreferrer">the Graylog Marketplace</a>.
+            <strong>and then assign them to streams to forward all messages of a stream in real-time.</strong>
+            <br />
+            You can find output plugins in{' '}
+            <a href="https://marketplace.graylog.org/" target="_blank" rel="noreferrer">
+              the Graylog Marketplace
+            </a>
+            .
           </span>
         </PageHeader>
 

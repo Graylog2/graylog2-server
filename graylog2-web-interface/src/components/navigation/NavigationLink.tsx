@@ -15,45 +15,42 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
 import { LinkContainer } from 'components/common/router';
 import { NavItem } from 'components/bootstrap';
 
-const DropdownOption = styled(Menu.Item)(({ theme }) => css`
-  font-family: ${theme.fonts.family.navigation};
-  font-size: ${theme.fonts.size.navigation};
+const DropdownOption = styled(Menu.Item)(
+  ({ theme }) => css`
+    font-family: ${theme.fonts.family.navigation};
+    font-size: ${theme.fonts.size.navigation};
 
-  &:hover, &:focus {
-    color: inherit;
-    text-decoration: none;
-  }
-`);
+    &:hover,
+    &:focus {
+      color: inherit;
+      text-decoration: none;
+    }
+  `,
+);
 
 // We render a NavItem if topLevel is set to avoid errors when the NavigationLink is place in the navigation
 // bar instead of a navigation drop-down menu.
 type Props = {
-  description: React.ReactNode,
-  path: string,
-  topLevel?: boolean,
-}
-
-const NavigationLink = ({ description, path, topLevel, ...rest }: Props) => (
-  <LinkContainer key={path} to={path} relativeActive {...rest}>
-    {topLevel ? <NavItem>{description}</NavItem> : <DropdownOption component="a">{description}</DropdownOption>}
-  </LinkContainer>
-);
-
-NavigationLink.propTypes = {
-  description: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-  path: PropTypes.string.isRequired,
-  topLevel: PropTypes.bool,
+  description: React.ReactNode;
+  path: string;
+  topLevel?: boolean;
+  Badge?: React.ComponentType<{ text: React.ReactNode }>;
 };
 
-NavigationLink.defaultProps = {
-  topLevel: false,
+const NavigationLink = ({ Badge = undefined, description, path, topLevel = false, ...rest }: Props) => {
+  const title = Badge ? <Badge text={description} /> : description;
+
+  return (
+    <LinkContainer key={path} to={path} relativeActive {...rest}>
+      {topLevel ? <NavItem>{title}</NavItem> : <DropdownOption component="a">{title}</DropdownOption>}
+    </LinkContainer>
+  );
 };
 
 export default NavigationLink;

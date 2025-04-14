@@ -1,0 +1,5 @@
+type="f"
+message="Add needed Lookup Table Read permission to Event Creator Role."
+
+issues=["Graylog2/graylog-plugin-enterprise#9736"]
+pulls=["22188"]

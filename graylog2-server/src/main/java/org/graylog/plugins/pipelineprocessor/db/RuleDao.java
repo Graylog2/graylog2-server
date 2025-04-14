@@ -20,7 +20,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
-import org.graylog2.database.MongoEntity;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ScopedEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -28,7 +29,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 
 @AutoValue
-public abstract class RuleDao implements MongoEntity {
+public abstract class RuleDao extends ScopedEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -70,8 +71,20 @@ public abstract class RuleDao implements MongoEntity {
 
     public abstract Builder toBuilder();
 
+    public static RuleDao create(@Id @ObjectId @JsonProperty(FIELD_ID) @Nullable String id,
+                                 @JsonProperty(FIELD_TITLE) String title,
+                                 @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
+                                 @JsonProperty(FIELD_SOURCE) String source,
+                                 @JsonProperty(FIELD_CREATED_AT) @Nullable DateTime createdAt,
+                                 @JsonProperty(FIELD_MODFIED_AT) @Nullable DateTime modifiedAt,
+                                 @JsonProperty(FIELD_RULEBUILDER) @Nullable RuleBuilder ruleBuilder,
+                                 @JsonProperty(FIELD_SIMULATOR_MESSAGE) @Nullable String simulatorMessage) {
+        return create(id, null, title, description, source, createdAt, modifiedAt, ruleBuilder, simulatorMessage);
+    }
+
     @JsonCreator
     public static RuleDao create(@Id @ObjectId @JsonProperty(FIELD_ID) @Nullable String id,
+                                 @JsonProperty(FIELD_SCOPE) @Nullable String scope,
                                  @JsonProperty(FIELD_TITLE) String title,
                                  @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
                                  @JsonProperty(FIELD_SOURCE) String source,
@@ -81,6 +94,7 @@ public abstract class RuleDao implements MongoEntity {
                                  @JsonProperty(FIELD_SIMULATOR_MESSAGE) @Nullable String simulatorMessage) {
         return builder()
                 .id(id)
+                .scope(scope == null ? DefaultEntityScope.NAME : scope)
                 .source(source)
                 .title(title)
                 .description(description)
@@ -92,7 +106,7 @@ public abstract class RuleDao implements MongoEntity {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
         public abstract RuleDao build();
 
         public abstract Builder id(String id);

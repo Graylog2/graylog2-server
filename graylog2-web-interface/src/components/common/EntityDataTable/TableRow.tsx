@@ -38,19 +38,19 @@ const ActionsRef = styled.div`
 `;
 
 type Props<Entity extends EntityBase> = {
-  actionsRef: React.RefObject<HTMLDivElement>
-  columns: Array<Column>,
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
-  displaySelect: boolean,
-  displayActions: boolean,
-  entity: Entity,
-  index: number,
-  actions?: (entity: Entity) => React.ReactNode,
-  entityAttributesAreCamelCase: boolean,
-  isEntitySelectable: (entity: Entity) => boolean,
+  actionsRef: React.RefObject<HTMLDivElement>;
+  columns: Array<Column>;
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
+  displaySelect: boolean;
+  displayActions: boolean;
+  entity: Entity;
+  index: number;
+  actions?: (entity: Entity) => React.ReactNode;
+  entityAttributesAreCamelCase: boolean;
+  isEntitySelectable: (entity: Entity) => boolean;
 };
 
-const TableRow = <Entity extends EntityBase>({
+const TableRow = <Entity extends EntityBase, Meta>({
   columns,
   columnRenderersByAttribute,
   displaySelect,
@@ -65,29 +65,36 @@ const TableRow = <Entity extends EntityBase>({
   const { toggleEntitySelect, selectedEntities } = useSelectedEntities();
   const isSelected = !!selectedEntities?.includes(entity.id);
   const actionButtons = displayActions ? <ButtonToolbar>{actions(entity)}</ButtonToolbar> : null;
-  const isSelectDisabled = useMemo(() => !(displaySelect && isEntitySelectable(entity)), [displaySelect, entity, isEntitySelectable]);
+  const isSelectDisabled = useMemo(
+    () => !(displaySelect && isEntitySelectable(entity)),
+    [displaySelect, entity, isEntitySelectable],
+  );
   const title = `${isSelected ? 'Deselect' : 'Select'} entity`;
 
   return (
     <tr>
       {displaySelect && (
         <td aria-label="Select cell">
-          <RowCheckbox onChange={() => toggleEntitySelect(entity.id)}
-                       title={title}
-                       checked={isSelected}
-                       disabled={isSelectDisabled}
-                       aria-label={title} />
+          <RowCheckbox
+            onChange={() => toggleEntitySelect(entity.id)}
+            title={title}
+            checked={isSelected}
+            disabled={isSelectDisabled}
+            aria-label={title}
+          />
         </td>
       )}
       {columns.map((column) => {
         const columnRenderer = columnRenderersByAttribute[column.id];
 
         return (
-          <TableCell columnRenderer={columnRenderer}
-                     entityAttributesAreCamelCase={entityAttributesAreCamelCase}
-                     entity={entity}
-                     column={column}
-                     key={`${entity.id}-${column.id}`} />
+          <TableCell<Entity, Meta>
+            columnRenderer={columnRenderer}
+            entityAttributesAreCamelCase={entityAttributesAreCamelCase}
+            entity={entity}
+            column={column}
+            key={`${entity.id}-${column.id}`}
+          />
         );
       })}
       {displayActions ? (
@@ -99,8 +106,4 @@ const TableRow = <Entity extends EntityBase>({
   );
 };
 
-TableRow.defaultProps = {
-  actions: undefined,
-};
-
-export default React.memo(TableRow);
+export default React.memo(TableRow) as typeof TableRow;

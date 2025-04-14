@@ -18,10 +18,11 @@ import { OrderedMap } from 'immutable';
 import { v4 as uuidv4 } from 'uuid';
 
 import { DEFAULT_TIMERANGE } from 'views/Constants';
-import type { TimeRange, ElasticsearchQueryString, QueryId, FilterType } from 'views/logic/queries/Query';
+import type { TimeRange, QueryId, FilterType } from 'views/logic/queries/Query';
 import Query, { createElasticsearchQueryString, newFiltersForQuery } from 'views/logic/queries/Query';
 import generateId from 'logic/generateId';
 import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
+import type { QueryString } from 'views/logic/queries/types';
 
 export default (
   streamId?: string | string[],
@@ -29,15 +30,11 @@ export default (
   // eslint-disable-next-line default-param-last
   id: QueryId | undefined = generateId(),
   timeRange?: TimeRange,
-  queryString?: ElasticsearchQueryString,
+  queryString?: QueryString,
   searchFilters?: SearchFilter[],
 ): Query => {
   // eslint-disable-next-line no-nested-ternary
-  const streamIds = streamId
-    ? streamId instanceof Array
-      ? streamId
-      : [streamId]
-    : null;
+  const streamIds = streamId ? (streamId instanceof Array ? streamId : [streamId]) : null;
   // eslint-disable-next-line no-nested-ternary
   const streamCategories = streamCategory
     ? streamCategory instanceof Array

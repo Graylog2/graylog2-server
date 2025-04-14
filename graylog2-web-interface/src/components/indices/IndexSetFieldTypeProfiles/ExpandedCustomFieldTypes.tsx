@@ -21,16 +21,15 @@ import CustomFieldTypesList from 'components/indices/IndexSetFieldTypeProfiles/C
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 
 type Props = {
-  customFieldMappings: IndexSetFieldTypeProfile['customFieldMappings'],
-}
+  customFieldMappings: IndexSetFieldTypeProfile['customFieldMappings'];
+};
 
 const ExpandedCustomFieldTypes = ({ customFieldMappings }: Props) => {
-  const { data: { fieldTypes } } = useFieldTypesForMappings();
+  const {
+    data: { fieldTypes },
+  } = useFieldTypesForMappings();
 
-  return (
-    <CustomFieldTypesList list={customFieldMappings}
-                          fieldTypes={fieldTypes} />
-  );
+  return <CustomFieldTypesList list={customFieldMappings} fieldTypes={fieldTypes} />;
 };
 
 export default ExpandedCustomFieldTypes;

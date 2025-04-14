@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -45,6 +46,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.security.html.HTMLSanitizerConverter;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -63,6 +65,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_REMEDIATION_STEPS = "remediation_steps";
+    public static final String FIELD_EVENT_PROCEDURE = "event_procedure";
     public static final String FIELD_NOTIFICATIONS = "notifications";
     public static final String FIELD_STATE = "state";
     public static final String FIELD_UPDATED_AT = "updated_at";
@@ -95,6 +98,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @Nullable
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(FIELD_REMEDIATION_STEPS)
+    @JsonSerialize(converter = HTMLSanitizerConverter.class)
     public abstract String remediationSteps();
 
     @Override
@@ -146,6 +150,12 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
     @JsonProperty(FIELD_STATE)
     public abstract EventDefinition.State state();
+
+    @Override
+    @Nullable
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(FIELD_EVENT_PROCEDURE)
+    public abstract String eventProcedureId();
 
     public static Builder builder() {
         return Builder.create();
@@ -249,6 +259,9 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
         public abstract Builder schedulerCtx(EventDefinitionContextService.SchedulerCtx schedulerCtx);
 
+        @JsonProperty(FIELD_EVENT_PROCEDURE)
+        public abstract Builder eventProcedureId(String eventProcedureId);
+
         abstract EventDefinitionDto autoBuild();
 
         public EventDefinitionDto build() {
@@ -286,6 +299,11 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
                         .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
                         .collect(Collectors.toList()));
 
+        String procedureDescriptorId = null;
+        if (eventProcedureId() != null) {
+            procedureDescriptorId = entityDescriptorIds.get(eventProcedureId(), ModelTypes.EVENT_PROCEDURE_V1).orElse(null);
+        }
+
         return EventDefinitionEntity.builder()
                 .scope(ValueReference.of(scope()))
                 .updatedAt(updatedAt())
@@ -301,6 +319,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
                 .fieldSpec(fieldSpec())
                 .keySpec(keySpec())
                 .storage(storage())
+                .eventProcedureId(ValueReference.ofNullable(procedureDescriptorId))
                 .build();
     }
 
@@ -314,6 +333,13 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
                             .build();
                     mutableGraph.putEdge(entityDescriptor, depNotification);
                 });
+        if (eventProcedureId() != null && !eventProcedureId().isEmpty()) {
+            final EntityDescriptor depProcedure = EntityDescriptor.builder()
+                    .id(ModelId.of(eventProcedureId()))
+                    .type(ModelTypes.EVENT_PROCEDURE_V1)
+                    .build();
+            mutableGraph.putEdge(entityDescriptor, depProcedure);
+        }
         config().resolveNativeEntity(entityDescriptor, mutableGraph);
     }
 }

@@ -18,54 +18,60 @@ import type MessageSortConfig from 'views/logic/searchtypes/messages/MessageSort
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
 import type { SearchFilter } from 'views/types';
+import type { QueryString } from 'views/logic/queries/types';
 
-import type { ElasticsearchQueryString, TimeRange } from './Query';
+import type { TimeRange } from './Query';
 
 type AutoInterval = {
-  type: 'auto',
-  scaling?: number,
+  type: 'auto';
+  scaling?: number;
 };
 
 type TimeUnitInterval = {
-  type: 'timeunit',
-  value: number,
-  unit: string,
+  type: 'timeunit';
+  value: number;
+  unit: string;
 };
 
 type Interval = AutoInterval | TimeUnitInterval;
 
 type SearchTypePivot = {
-  type: string,
-  field: string,
-  limit?: number,
-  interval?: Interval,
+  type: string;
+  fields: Array<string>;
+  limit?: number;
+  interval?: Interval;
 };
 
-type SearchTypeBase = {
-  filter: string | undefined | null,
-  filters: Array<SearchFilter> | undefined,
-  id: string,
-  name: string | undefined | null,
-  query: ElasticsearchQueryString | undefined | null,
-  timerange: TimeRange | undefined | null,
-  type: string,
-  streams: Array<string>,
-  stream_categories: Array<string>,
+export type SearchTypeBase = {
+  filter: string | undefined | null;
+  filters: Array<SearchFilter> | undefined;
+  id: string;
+  name: string | undefined | null;
+  query: QueryString | undefined | null;
+  timerange: TimeRange | undefined | null;
+  type: string;
+  streams: Array<string>;
+  stream_categories: Array<string>;
 };
 
 export type AggregationSearchType = SearchTypeBase & {
-  sort: Array<SortConfig>,
-  series: Array<{ id: string, type: string, field: string }>,
-  column_groups: Array<SearchTypePivot>,
-  row_groups: Array<SearchTypePivot>,
-  rollup: boolean,
+  sort: Array<SortConfig>;
+  series: Array<{ id: string; type: string; field: string }>;
+  column_groups: Array<SearchTypePivot>;
+  row_groups: Array<SearchTypePivot>;
+  rollup: boolean;
 };
 
 export type MessagesSearchType = SearchTypeBase & {
-  sort: Array<MessageSortConfig>,
-  decorators: Array<Decorator>,
-  limit: number,
-  offset: number,
+  sort: Array<MessageSortConfig>;
+  decorators: Array<Decorator>;
+  limit: number;
+  offset: number;
 };
 
-export type SearchType = AggregationSearchType | MessagesSearchType;
+export interface PluggableSearchType {
+  'aggregation': AggregationSearchType;
+  'messages': MessagesSearchType;
+}
+
+export type SearchType = PluggableSearchType[keyof PluggableSearchType];

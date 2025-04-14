@@ -14,35 +14,38 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import Input from 'components/bootstrap/Input';
 import { getValueFromInput } from 'util/FormsUtils';
-import { optionalMarker } from 'components/configurationforms/FieldHelpers';
+import { optionableLabel } from 'components/configurationforms/FieldHelpers';
 
 import type { NumberField as NumberFieldType } from './types';
 
 type Props = {
-  autoFocus?: boolean,
-  field: NumberFieldType,
-  onChange: (title: string, value: number, dirty?: boolean) => void,
-  title: string,
-  typeName: string,
-  value: number,
+  autoFocus?: boolean;
+  field: NumberFieldType;
+  onChange: (title: string, value: number, dirty?: boolean) => void;
+  title: string;
+  typeName: string;
+  value?: number;
 };
 
-const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
+const NumberField = ({ autoFocus = false, field, onChange, title, typeName, value = 0 }: Props) => {
   const _getDefaultValidationSpecs = () => ({ min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER });
 
   const _mapValidationAttribute = (attribute) => {
     const { min, max } = _getDefaultValidationSpecs();
 
     switch (attribute.toUpperCase()) {
-      case 'ONLY_NEGATIVE': return { min: min, max: -1 };
-      case 'ONLY_POSITIVE': return { min: 0, max: max };
-      case 'IS_PORT_NUMBER': return { min: 0, max: 65535 };
-      default: return { min, max };
+      case 'ONLY_NEGATIVE':
+        return { min: min, max: -1 };
+      case 'ONLY_POSITIVE':
+        return { min: 0, max: max };
+      case 'IS_PORT_NUMBER':
+        return { min: 0, max: 65535 };
+      default:
+        return { min, max };
     }
   };
 
@@ -67,34 +70,20 @@ const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Pro
   const isRequired = !field.is_optional;
   const validationSpecs = validationSpec();
 
-  const label = <>{field.human_name} {optionalMarker(field)}</>;
-
   return (
-    <Input id={`${typeName}-${title}`}
-           label={label}
-           type="number"
-           name={`configuration[${title}]`}
-           required={isRequired}
-           onChange={handleChange}
-           value={value || 0}
-           help={field.description}
-           {...validationSpecs}
-           autoFocus={autoFocus} />
+    <Input
+      id={`${typeName}-${title}`}
+      label={optionableLabel(field)}
+      type="number"
+      name={`configuration[${title}]`}
+      required={isRequired}
+      onChange={handleChange}
+      value={value || 0}
+      help={field.description}
+      {...validationSpecs}
+      autoFocus={autoFocus}
+    />
   );
-};
-
-NumberField.propTypes = {
-  autoFocus: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.number,
-};
-
-NumberField.defaultProps = {
-  autoFocus: false,
-  value: 0,
 };
 
 export default NumberField;

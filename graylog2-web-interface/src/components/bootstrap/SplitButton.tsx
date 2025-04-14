@@ -23,36 +23,29 @@ import { ButtonGroup } from 'components/bootstrap/index';
 import Icon from '../common/Icon';
 
 type Props = {
-  disabled?: boolean,
-  title: React.ComponentProps<typeof Button>['children'],
-  open?: boolean,
-  onMenuChange?: (newState: boolean) => void,
-  width?: number,
+  disabled?: boolean;
+  title: React.ComponentProps<typeof Button>['children'];
+  open?: boolean;
+  onMenuChange?: (newState: boolean) => void;
+  width?: number;
 } & Pick<React.ComponentProps<typeof Button>, 'bsStyle' | 'bsSize' | 'children' | 'id' | 'onClick'>;
 const SplitButton = React.forwardRef<HTMLButtonElement, Props>(
-  ({ children, disabled, title, open, onMenuChange, width, onClick, ...props }, ref) => (
+  ({ children, disabled = false, title, open, onMenuChange, width, onClick, ...props }, ref) => (
     <Menu opened={open} onChange={onMenuChange} width={width}>
       <ButtonGroup>
         <Button {...props} disabled={disabled} onClick={onClick}>
           {title}
         </Button>
         <Menu.Target>
-          <Button ref={ref} aria-label="More Actions" {...props}><Icon name="arrow_drop_down" /></Button>
+          <Button ref={ref} aria-label="More Actions" {...props}>
+            <Icon name="arrow_drop_down" />
+          </Button>
         </Menu.Target>
-        <Menu.Dropdown>
-          {children}
-        </Menu.Dropdown>
+        <Menu.Dropdown>{children}</Menu.Dropdown>
       </ButtonGroup>
     </Menu>
   ),
 );
-
-SplitButton.defaultProps = {
-  disabled: false,
-  open: undefined,
-  onMenuChange: undefined,
-  width: undefined,
-};
 
 /** @component */
 export default SplitButton;

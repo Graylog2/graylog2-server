@@ -32,7 +32,6 @@ import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { loadDashboard } from 'views/logic/views/Actions';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -41,6 +40,8 @@ import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions'
 import useViewType from 'views/hooks/useViewType';
 import fetchSearch from 'views/logic/views/fetchSearch';
 import useWidgetResults from 'views/components/useWidgetResults';
+import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -69,16 +70,13 @@ const openActionDropdown = async () => {
   await screen.findByRole('heading', { name: 'Actions' });
 };
 
-const waitForDropdownToClose = () => waitFor(() => {
-  expect(screen.queryByRole('heading', { name: 'Actions' })).not.toBeInTheDocument();
-});
+const waitForDropdownToClose = () =>
+  waitFor(() => {
+    expect(screen.queryByRole('heading', { name: 'Actions' })).not.toBeInTheDocument();
+  });
 
 describe('<WidgetActionsMenu />', () => {
-  const widget = WidgetModel.builder().newId()
-    .type('dummy')
-    .id('widget-id')
-    .config({})
-    .build();
+  const widget = WidgetModel.builder().newId().type('dummy').id('widget-id').config({}).build();
 
   const viewState = ViewState.builder()
     .widgets(Immutable.List([widget]))
@@ -95,24 +93,21 @@ describe('<WidgetActionsMenu />', () => {
     .build();
 
   const searchDB1 = Search.builder().id('search-1').build();
-  const dashboard1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
-    .search(searchDB1)
-    .build();
-  const dashboard2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
-    .build();
+  const dashboard1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1').search(searchDB1).build();
+  const dashboard2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2').build();
   const dashboardList = [dashboard1, dashboard2];
 
   type DummyWidgetProps = {
-    view?: View,
-    widget?: WidgetModel,
-    focusedWidget?: WidgetFocusContextType['focusedWidget'],
-    setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
-    setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
-    unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'],
-    unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'],
-    title?: string
-    isFocused?: boolean,
-  }
+    view?: View;
+    widget?: WidgetModel;
+    focusedWidget?: WidgetFocusContextType['focusedWidget'];
+    setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'];
+    setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'];
+    unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'];
+    unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'];
+    title?: string;
+    isFocused?: boolean;
+  };
 
   const DummyWidget = ({
     view = search,
@@ -125,24 +120,27 @@ describe('<WidgetActionsMenu />', () => {
     ...props
   }: DummyWidgetProps) => (
     <TestStoreProvider view={view} initialQuery="query-id">
-      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
-        <WidgetFocusContext.Provider value={{
-          setWidgetFocusing,
-          setWidgetEditing,
-          unsetWidgetFocusing,
-          unsetWidgetEditing,
-          focusedWidget,
-        }}>
+      <TestFieldTypesContextProvider>
+        <WidgetFocusContext.Provider
+          value={{
+            setWidgetFocusing,
+            setWidgetEditing,
+            unsetWidgetFocusing,
+            unsetWidgetEditing,
+            focusedWidget,
+          }}>
           <WidgetContext.Provider value={propsWidget}>
-            <WidgetActionsMenu isFocused={false}
-                               toggleEdit={() => {}}
-                               title="Widget Title"
-                               position={new WidgetPosition(1, 1, 1, 1)}
-                               onPositionsChange={() => {}}
-                               {...props} />
+            <WidgetActionsMenu
+              isFocused={false}
+              toggleEdit={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              onPositionsChange={() => {}}
+              {...props}
+            />
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
-      </FieldTypesContext.Provider>
+      </TestFieldTypesContextProvider>
     </TestStoreProvider>
   );
 
@@ -189,11 +187,7 @@ describe('<WidgetActionsMenu />', () => {
   });
 
   it('does not display export action if widget is not a message table', async () => {
-    const dummyWidget = WidgetModel.builder()
-      .id('widgetId')
-      .type('dummy')
-      .config({})
-      .build();
+    const dummyWidget = WidgetModel.builder().id('widgetId').type('dummy').config({}).build();
     render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
 
     await openActionDropdown();
@@ -204,10 +198,7 @@ describe('<WidgetActionsMenu />', () => {
   });
 
   it('allows export for message tables', async () => {
-    const messagesWidget = MessagesWidget.builder()
-      .id('widgetId')
-      .config({})
-      .build();
+    const messagesWidget = MessagesWidget.builder().id('widgetId').config({}).build();
 
     render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
 
@@ -243,14 +234,13 @@ describe('<WidgetActionsMenu />', () => {
         refetch: () => {},
       });
 
-      ViewManagementActions.get = mockAction(jest.fn((async () => Promise.resolve(dashboard1.toJSON()))));
+      ViewManagementActions.get = mockAction(jest.fn(async () => Promise.resolve(dashboard1.toJSON())));
       ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
       asMock(fetchSearch).mockResolvedValue(searchDB1.toJSON());
 
-      asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()
-        .search(Search.builder().id('search-id').build())
-        .id('new-id').type(View.Type.Dashboard)
-        .build());
+      asMock(CopyWidgetToDashboard).mockImplementation(() =>
+        View.builder().search(Search.builder().id('search-id').build()).id('new-id').type(View.Type.Dashboard).build(),
+      );
 
       asMock(useViewType).mockReturnValue(View.Type.Search);
     });
@@ -291,8 +281,7 @@ describe('<WidgetActionsMenu />', () => {
       await renderAndClick();
       await waitFor(() => expect(createSearch).toHaveBeenCalledTimes(1));
 
-      expect(createSearch).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([])
-        .build());
+      expect(createSearch).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([]).build());
     });
 
     it('should update dashboard with new search and widget', async () => {
@@ -300,10 +289,7 @@ describe('<WidgetActionsMenu />', () => {
       await waitFor(() => expect(ViewManagementActions.update).toHaveBeenCalledTimes(1));
 
       expect(ViewManagementActions.update).toHaveBeenCalledWith(
-        View.builder()
-          .search(Search.builder().id('search-id').build())
-          .id('new-id').type(View.Type.Dashboard)
-          .build(),
+        View.builder().search(Search.builder().id('search-id').build()).id('new-id').type(View.Type.Dashboard).build(),
       );
     });
 
@@ -316,16 +302,7 @@ describe('<WidgetActionsMenu />', () => {
   });
 
   describe('delete action', () => {
-    let oldWindowConfirm;
-
-    beforeEach(() => {
-      oldWindowConfirm = window.confirm;
-      window.confirm = jest.fn();
-    });
-
-    afterEach(() => {
-      window.confirm = oldWindowConfirm;
-    });
+    useWindowConfirmMock();
 
     it('should delete widget when no deletion hook is installed and prompt is confirmed', async () => {
       asMock(window.confirm).mockReturnValue(true);

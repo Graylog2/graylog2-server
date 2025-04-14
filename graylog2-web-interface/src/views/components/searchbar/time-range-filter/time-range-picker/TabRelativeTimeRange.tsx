@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
@@ -32,8 +31,8 @@ import type { TimeRangePickerFormValues } from './TimeRangePicker';
 import RelativeRangeSelect from './RelativeRangeSelect';
 
 type Props = {
-  disabled: boolean,
-  limitDuration: number,
+  disabled?: boolean;
+  limitDuration?: number;
 };
 
 const RelativeWrapper = styled.div`
@@ -47,46 +46,46 @@ const StyledIcon = styled(Icon)`
   flex: 0.75;
 `;
 
-const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
-  const { values: { timeRangeTabs }, setFieldValue } = useFormikContext<TimeRangePickerFormValues>();
+const TabRelativeTimeRange = ({ disabled = false, limitDuration = 0 }: Props) => {
+  const {
+    values: { timeRangeTabs },
+    setFieldValue,
+  } = useFormikContext<TimeRangePickerFormValues>();
   const activeTabTimeRange = timeRangeTabs.relative;
-  const disableUntil = disabled || (isTypeRelativeWithEnd(activeTabTimeRange) && activeTabTimeRange.from === RELATIVE_ALL_TIME);
+  const disableUntil =
+    disabled || (isTypeRelativeWithEnd(activeTabTimeRange) && activeTabTimeRange.from === RELATIVE_ALL_TIME);
 
   return (
     <div>
       <RelativeWrapper>
         <>
-          <RelativeRangeSelect defaultRange={classifyFromRange(DEFAULT_RELATIVE_FROM)}
-                               disableUnsetRange={limitDuration !== 0}
-                               disabled={disabled}
-                               fieldName="from"
-                               limitDuration={limitDuration}
-                               onUnsetRange={() => { setFieldValue('timeRangeTabs.relative.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE); }}
-                               title="From:"
-                               unsetRangeLabel="All Time" />
+          <RelativeRangeSelect
+            defaultRange={classifyFromRange(DEFAULT_RELATIVE_FROM)}
+            disableUnsetRange={limitDuration !== 0}
+            disabled={disabled}
+            fieldName="from"
+            limitDuration={limitDuration}
+            onUnsetRange={() => {
+              setFieldValue('timeRangeTabs.relative.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE);
+            }}
+            title="From:"
+            unsetRangeLabel="All Time"
+          />
           <StyledIcon name="arrow_right_alt" />
 
-          <RelativeRangeSelect defaultRange={classifyToRange(DEFAULT_RELATIVE_TO)}
-                               disableUnsetRange={disableUntil}
-                               disabled={disableUntil}
-                               fieldName="to"
-                               limitDuration={limitDuration}
-                               title="Until:"
-                               unsetRangeLabel="Now" />
+          <RelativeRangeSelect
+            defaultRange={classifyToRange(DEFAULT_RELATIVE_TO)}
+            disableUnsetRange={disableUntil}
+            disabled={disableUntil}
+            fieldName="to"
+            limitDuration={limitDuration}
+            title="Until:"
+            unsetRangeLabel="Now"
+          />
         </>
       </RelativeWrapper>
     </div>
   );
-};
-
-TabRelativeTimeRange.propTypes = {
-  limitDuration: PropTypes.number,
-  disabled: PropTypes.bool,
-};
-
-TabRelativeTimeRange.defaultProps = {
-  disabled: false,
-  limitDuration: 0,
 };
 
 export default TabRelativeTimeRange;

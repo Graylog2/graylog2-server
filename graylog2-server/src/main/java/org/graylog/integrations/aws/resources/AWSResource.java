@@ -20,8 +20,18 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
@@ -29,9 +39,7 @@ import org.graylog.integrations.aws.AWSPermissions;
 import org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
 import org.graylog.integrations.aws.resources.requests.KinesisHealthCheckRequest;
-import org.graylog.integrations.aws.resources.responses.AvailableServiceResponse;
 import org.graylog.integrations.aws.resources.responses.KinesisHealthCheckResponse;
-import org.graylog.integrations.aws.resources.responses.KinesisPermissionsResponse;
 import org.graylog.integrations.aws.resources.responses.LogGroupsResponse;
 import org.graylog.integrations.aws.resources.responses.RegionsResponse;
 import org.graylog.integrations.aws.resources.responses.StreamsResponse;
@@ -46,26 +54,9 @@ import org.graylog2.rest.resources.system.inputs.AbstractInputsResource;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-/**
- * Web endpoints for the AWS integration.
- * Full base URL for requests in this class: http://api/plugins/org.graylog.integrations/aws/
- */
 @Api(value = "AWS", description = "AWS integrations")
 @Path("/aws")
 @RequiresAuthentication
@@ -93,30 +84,6 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @RequiresPermissions(AWSPermissions.AWS_READ)
     public RegionsResponse getAwsRegions() {
         return awsService.getAvailableRegions();
-    }
-
-    @GET
-    @Timed
-    @Path("/available_services")
-    @ApiResponses(value = {
-            @ApiResponse(code = 500, message = AWSService.POLICY_ENCODING_ERROR),
-    })
-    @ApiOperation(value = "Get all available AWS services")
-    @RequiresPermissions(AWSPermissions.AWS_READ)
-    public AvailableServiceResponse getAvailableServices() {
-        return awsService.getAvailableServices();
-    }
-
-    @GET
-    @Timed
-    @Path("/permissions")
-    @ApiResponses(value = {
-            @ApiResponse(code = 500, message = AWSService.POLICY_ENCODING_ERROR),
-    })
-    @ApiOperation(value = "Get the permissions required for the AWS Kinesis setup and for the Kinesis auto-setup.")
-    @RequiresPermissions(AWSPermissions.AWS_READ)
-    public KinesisPermissionsResponse getPermissions() {
-        return awsService.getPermissions();
     }
 
     @POST
@@ -160,10 +127,11 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @ApiOperation(value = "Create a new AWS input.")
     @RequiresPermissions(RestPermissions.INPUTS_CREATE)
     @AuditEvent(type = IntegrationsAuditEventTypes.KINESIS_INPUT_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true)
+    public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
+                           @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull AWSInputCreateRequest saveRequest) throws Exception {
 
-        Input input = awsService.saveInput(saveRequest, getCurrentUser());
+        Input input = awsService.saveInput(saveRequest, getCurrentUser(), isSetupWizard);
         return Response.ok().entity(getInputSummary(input)).build();
     }
 }

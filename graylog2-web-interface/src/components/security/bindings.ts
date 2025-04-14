@@ -16,15 +16,17 @@
  */
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import Routes, { SECURITY_PATH, SECURITY_ROUTE_DESCRIPTION } from 'routing/Routes';
+import Routes, { SECURITY_PATH } from 'routing/Routes';
 import SecurityPageEntry from 'components/security/SecurityPageEntry';
+import DEFAULT_ENTERPRISE_NAV_ITEM from 'components/navigation/DefaultEnterpriseNavItem';
 
 const routes = [
   { path: `${SECURITY_PATH}/*`, component: SecurityPageEntry, parentComponent: ({ children }) => children },
 ];
 
-export const navigation = {
-  description: SECURITY_ROUTE_DESCRIPTION,
+export const DEFAULT_SECURITY_NAV_ITEM = {
+  description: 'Security',
+  position: { after: DEFAULT_ENTERPRISE_NAV_ITEM.description },
   children: [
     { path: Routes.SECURITY.OVERVIEW, description: 'Overview' },
     { path: Routes.SECURITY.USER_ACTIVITY, description: 'User Activity' },
