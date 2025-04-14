@@ -17,7 +17,6 @@
 package org.graylog.testing.completebackend.apis.inputs;
 
 import com.google.common.collect.ImmutableMap;
-import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.GraylogRestApi;
@@ -67,18 +66,12 @@ public final class GelfInputApi implements GraylogRestApi {
                     ImmutableMap.of("bind_address", "0.0.0.0", "port", gelfHttpPort),
                     null);
 
-            Response response = given()
+            given()
                     .spec(api.requestSpecification())
                     .body(request)
                     .expect().response().statusCode(201)
                     .when()
                     .post("/system/inputs");
-
-            given()
-                    .spec(api.requestSpecification())
-                    .expect().response().statusCode(200)
-                    .when()
-                    .put("/system/inputstates/" + response.getBody().jsonPath().get("id"));
         }
 
         waitForGelfInputOnPort(mappedPort);

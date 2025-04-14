@@ -40,7 +40,7 @@ export const COLUMNS_ORDER = [
   'user_id',
   'NAME',
   'created_at',
-  'last_access',    
+  'last_access',
   'expires_at',
   'external_user',
   'title',

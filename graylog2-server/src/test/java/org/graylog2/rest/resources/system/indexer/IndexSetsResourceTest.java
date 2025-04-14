@@ -57,7 +57,9 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -104,7 +106,7 @@ public class IndexSetsResourceTest {
     @Before
     public void setUp() throws Exception {
         this.permitted = true;
-        this.indexSetsResource = new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted);
+        this.indexSetsResource = createIndexSetsResource(Set.of());
     }
 
     private void notPermitted() {
@@ -116,7 +118,7 @@ public class IndexSetsResourceTest {
         final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false);
+        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -127,13 +129,35 @@ public class IndexSetsResourceTest {
     }
 
     @Test
+    public void listWithOnlyOpenFilters() {
+        final IndexSetConfig indexA = createTestConfig("a", "title");
+        final IndexSetConfig indexB = createTestConfig("b", "title");
+        final IndexSetConfig indexC = createTestConfig("c", "title");
+        when(indexSetService.findAll()).thenReturn(List.of(indexA, indexB, indexC));
+
+        indexSetsResource = createIndexSetsResource(Set.of(
+                () -> indexSetConfig -> !Objects.equals(indexSetConfig.id(), indexB.id()),
+                () -> indexSetConfig -> !Objects.equals(indexSetConfig.id(), indexC.id())
+        ));
+        final IndexSetResponse filteredList = indexSetsResource.list(0, 0, false, true);
+        final IndexSetResponse unfilteredList = indexSetsResource.list(0, 0, false, false);
+
+        assertThat(filteredList.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexA, false));
+        assertThat(unfilteredList.indexSets()).containsExactly(
+                IndexSetSummary.fromIndexSetConfig(indexA, false),
+                IndexSetSummary.fromIndexSetConfig(indexB, false),
+                IndexSetSummary.fromIndexSetConfig(indexC, false)
+        );
+    }
+
+    @Test
     public void listDenied() {
         notPermitted();
 
         final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false);
+        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -147,7 +171,7 @@ public class IndexSetsResourceTest {
     public void list0() {
         when(indexSetService.findAll()).thenReturn(Collections.emptyList());
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false);
+        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -618,11 +642,23 @@ public class IndexSetsResourceTest {
         );
     }
 
+    private TestResource createIndexSetsResource(Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
+        return new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
+                indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, openIndexSetFilterFactories);
+    }
+
     private static class TestResource extends IndexSetsResource {
+
         private final Provider<Boolean> permitted;
 
-        TestResource(Indices indices, IndexSetService indexSetService, IndexSetRegistry indexSetRegistry, IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory, IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService, SystemJobManager systemJobManager, Provider<Boolean> permitted) {
-            super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class));
+        TestResource(Indices indices, IndexSetService indexSetService, IndexSetRegistry indexSetRegistry,
+                     IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
+                     IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService,
+                     SystemJobManager systemJobManager, Provider<Boolean> permitted,
+                     Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
+            super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
+                    indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),
+                    openIndexSetFilterFactories);
             this.permitted = permitted;
         }
 
