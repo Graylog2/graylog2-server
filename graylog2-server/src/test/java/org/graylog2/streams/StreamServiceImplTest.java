@@ -21,12 +21,15 @@ import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -64,7 +67,8 @@ public class StreamServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        this.streamService = new StreamServiceImpl(mongodb.mongoConnection(), streamRuleService,
+        final MongoCollections mc = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongodb.mongoConnection());
+        this.streamService = new DBStreamService(mc, streamRuleService,
                 outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus(), Set.of());
     }
 
