@@ -357,7 +357,8 @@ public class RestPermissions implements PluginPermissions {
             MESSAGES_READ,
             METRICS_READ,
             SYSTEM_READ,
-            THROUGHPUT_READ
+            THROUGHPUT_READ,
+            DATANODE_READ
     ).build();
 
     protected static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()

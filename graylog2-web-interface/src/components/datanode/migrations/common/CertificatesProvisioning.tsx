@@ -25,7 +25,7 @@ import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatan
 import { Alert } from 'components/bootstrap';
 
 const CertificatesProvisioning = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
-  const { currentStep: step, isLoading } = useMigrationState(3000);
+  const { currentStep: step, isLoading } = useMigrationState({ refetchInterval: 3000 });
 
   if (isLoading) {
     return <Spinner text="Loading migration state." />;
