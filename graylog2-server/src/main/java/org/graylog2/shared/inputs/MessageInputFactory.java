@@ -49,6 +49,10 @@ public class MessageInputFactory {
     }
 
     public MessageInput create(InputCreateRequest lr, String user, String nodeId) throws NoSuchInputTypeException {
+        return create(lr, user, nodeId, false);
+    }
+
+    public MessageInput create(InputCreateRequest lr, String user, String nodeId, boolean isSetupWizard) throws NoSuchInputTypeException {
         final MessageInput input = create(lr.type(), new Configuration(lr.configuration()));
         input.setTitle(lr.title());
         input.setGlobal(lr.global());
@@ -58,7 +62,7 @@ public class MessageInputFactory {
             input.setNodeId(nodeId);
         }
 
-        if (featureFlags.isOn("SETUP_MODE") && input.supportsSetupMode()) {
+        if (featureFlags.isOn("SETUP_MODE") && input.supportsSetupMode() && isSetupWizard) {
             input.setDesiredState(IOState.Type.SETUP);
         }
 
