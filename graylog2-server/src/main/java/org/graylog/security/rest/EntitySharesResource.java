@@ -53,7 +53,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -117,7 +116,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
         // we can do a second request including the "grantees". Then we can do the dependency check to
         // fill out "missing_dependencies".
         // This should probably be a POST request with a JSON payload.
-        return entitySharesService.prepareShare(Optional.of(grn), request, getCurrentUser(), getSubject());
+        return entitySharesService.prepareShare(grn, request, getCurrentUser(), getSubject());
     }
 
     @POST
@@ -125,7 +124,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     @Path("entities/prepare")
     @NoAuditEvent("This does not change any data")
     public EntityShareResponse prepareGenericShare(@ApiParam(name = "JSON Body", required = true) @NotNull @Valid EntityShareRequest request) {
-        return entitySharesService.prepareShare(Optional.empty(), request, getCurrentUser(), getSubject());
+        return entitySharesService.prepareShare(request, getCurrentUser(), getSubject());
     }
 
     @POST
