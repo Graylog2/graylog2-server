@@ -16,7 +16,6 @@
  */
 package org.graylog2.streams;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
@@ -43,16 +42,13 @@ import java.util.stream.Collectors;
 
 public class StreamRuleServiceImpl extends PersistedServiceImpl implements StreamRuleService {
     private final ClusterEventBus clusterEventBus;
-    private final StreamService streamService;
 
     @Inject
     public StreamRuleServiceImpl(MongoConnection mongoConnection,
-                                 ClusterEventBus clusterEventBus,
-                                 StreamService streamService) {
+                                 ClusterEventBus clusterEventBus) {
         super(mongoConnection);
         collection(StreamRuleImpl.class).createIndex(StreamRuleImpl.FIELD_STREAM_ID);
         this.clusterEventBus = clusterEventBus;
-        this.streamService = streamService;
     }
 
     @Override
@@ -183,18 +179,6 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
 
     private long streamRuleCount(ObjectId streamId) {
         return count(StreamRuleImpl.class, new BasicDBObject(StreamRuleImpl.FIELD_STREAM_ID, streamId));
-    }
-
-    @Override
-    public Map<String, Long> streamRuleCountByStream() {
-        final ImmutableMap.Builder<String, Long> streamRules = ImmutableMap.builder();
-        try (var streamIds = streamService.streamAllIds()) {
-            streamIds.forEach(streamId -> {
-                streamRules.put(streamId, streamRuleCount(streamId));
-            });
-        }
-
-        return streamRules.build();
     }
 
     @SuppressWarnings("unchecked")

@@ -97,4 +97,9 @@ public interface StreamService {
     java.util.stream.Stream<StreamDTO> streamAllDTOs();
 
     java.util.stream.Stream<StreamDTO> streamDTOByIds(Collection<String> streamIds);
+
+    /**
+     * @return map of stream IDs to number of rules attached to the stream with that ID
+     */
+    Map<String, Long> streamRuleCountByStream();
 }
