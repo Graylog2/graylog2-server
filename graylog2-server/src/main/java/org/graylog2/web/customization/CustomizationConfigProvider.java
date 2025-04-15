@@ -23,6 +23,7 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @Singleton
@@ -37,7 +38,7 @@ public class CustomizationConfigProvider implements Provider<Config> {
     }
 
     private Config retrieve() {
-        return clusterConfigService.get(Config.class);
+        return Optional.ofNullable(clusterConfigService.get(Config.class)).orElse(Config.empty());
     }
 
     @Override
