@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Display migration error message in Remote Reindex Running step"
+
+issues = ["20461"]
+pulls = ["20527"]

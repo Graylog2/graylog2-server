@@ -50,6 +50,7 @@ const docsHelper = {
     PIPELINES: 'making_sense_of_your_log_data/pipelines.html',
     REPORTING: 'interacting_with_your_log_data/reporting.html',
     ROLLING_ES_UPGRADE: 'setting_up_graylog/opensearch.htm#UpgradingtoOpenSearch',
+    SEARCH_FILTERS: 'making_sense_of_your_log_data/search_filters.htm',
     SEARCH_QUERY_ERRORS: 'making_sense_of_your_log_data/writing_search_queries.html#ErrorTypes',
     SEARCH_QUERY_LANGUAGE: 'making_sense_of_your_log_data/writing_search_queries.html',
     STREAMS: 'making_sense_of_your_log_data/streams.html',

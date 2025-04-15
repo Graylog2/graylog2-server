@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>6.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -114,7 +114,7 @@
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <commons-net.version>3.11.1</commons-net.version>
         <commons-validator.version>1.9.0</commons-validator.version>
-        <commons-io.version>2.18.0</commons-io.version>
+        <commons-io.version>2.19.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.37.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
@@ -123,7 +123,7 @@
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.71.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>33.4.7-jre</guava.version>
+        <guava.version>33.4.8-jre</guava.version>
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
@@ -197,7 +197,7 @@
         <equalsverifier.version>3.19.3</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
-        <junit-jupiter.version>5.12.1</junit-jupiter.version>
+        <junit-jupiter.version>5.12.2</junit-jupiter.version>
         <mockito.version>5.17.0</mockito.version>
         <restassured.version>5.5.1</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
