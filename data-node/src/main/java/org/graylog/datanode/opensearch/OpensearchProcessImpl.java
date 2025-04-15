@@ -233,7 +233,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         Size heap = Size.parse(configuration.getOpensearchHeap());
         long heapBytes = heap.toBytes();
         long freeMemory = getFreeMemory();
-        long memoryRatio = freeMemory / heapBytes;
+        float memoryRatio = (float) freeMemory / heapBytes;
         if (memoryRatio > MEMORY_RATIO_THRESHOLD) {
             LOG.warn("There appears to be about {} times more available memory than the heap size configured for this data node.", memoryRatio);
             clusterEventBus.post(new DataNodeNotficationEvent(nodeId.getNodeId(), Notification.Type.DATA_NODE_HEAP_WARNING,
