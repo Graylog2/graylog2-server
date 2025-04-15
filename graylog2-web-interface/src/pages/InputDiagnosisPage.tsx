@@ -327,7 +327,7 @@ const InputDiagnosisPage = () => {
                   </li>
                   <li>
                     An input configured to use a specified port will fail if that port is privileged (and {productName}{' '}
-                    is not running as Root), or already in use by another Input or application.
+                    is not running as root), or already in use by another Input or application.
                   </li>
                   <li>An input will fail if it is unable to route to the specified IP.</li>
                   <li>
