@@ -139,6 +139,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     }
 
     @Override
+    public void dropCollection(String collectionName) {
+        services.getMongoDBInstance().dropCollection(collectionName);
+    }
+
+    @Override
     public String uri() {
         return node.uri();
     }
