@@ -457,8 +457,8 @@ const InputDiagnosisPage = () => {
             headerLeftSection={<HelpPopoverButton helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />}
             actions={<ShowReceivedMessagesButton input={input} />}>
             <StyledP>
-              Messages successfully ingested into {productName} from this Input in the last 15 minutes. Click on the
-              Stream to inspect the messages.
+              Messages successfully ingested from this Input in the last 15 minutes. Click on the Stream to inspect the
+              messages.
             </StyledP>
             {inputMetrics.stream_message_count?.length ? (
               <StyledListGroup>
