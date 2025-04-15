@@ -245,7 +245,7 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response createWithRequest(@ApiParam @Valid @NotNull(message = "View request is mandatory") CreateEntityRequest<CreateStreamRequest> request,
+    public Response createWithRequest(@ApiParam @Valid @NotNull(message = "Stream request is mandatory") CreateEntityRequest<CreateStreamRequest> request,
                                       @Context UserContext userContext) throws ValidationException {
         final Response result = create(request.entity(), userContext);
 
