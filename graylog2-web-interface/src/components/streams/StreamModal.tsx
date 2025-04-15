@@ -85,7 +85,7 @@ const StreamModal = ({
   return (
     <Modal title={modalTitle} onHide={onClose} show>
       <Formik<FormValues> initialValues={_initialValues} onSubmit={_onSubmit} validate={validate}>
-        {({ isSubmitting, isValidating }) => (
+        {({ isSubmitting, isValidating, setFieldValue }) => (
           <Form>
             <Modal.Header closeButton>
               <Modal.Title>{modalTitle}</Modal.Title>
@@ -108,6 +108,7 @@ const StreamModal = ({
                 description='Search for a User or Team to add as collaborator on this stream.'
                 entityType='stream'
                 entityTitle=''
+                onSetEntityShare={(payload) => setFieldValue('share_request', payload)}
               />
               <FormikInput
                 label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}

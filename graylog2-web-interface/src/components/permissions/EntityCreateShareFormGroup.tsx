@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
-import { useFormikContext } from 'formik';
 import type { EntitySharePayload } from 'src/actions/permissions/EntityShareActions';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
@@ -43,6 +42,7 @@ type Props = {
   entityType: $PropertyType<SharedEntity, 'type'>;
   entityTitle: $PropertyType<SharedEntity, 'title'>;
   entityTypeTitle?: string | null | undefined;
+  onSetEntityShare: (payload: EntitySharePayload) => void;
 };
 
 const Section = styled.div`
@@ -91,12 +91,11 @@ const _granteesOptions = (grantees: GranteesListType) =>
 const getAvailableGrantee = (grantees: GranteesListType, selected:  SelectedGranteeCapabilities) =>
   grantees?.filter((g) => !selected.has(g.id))?.toList();
 
-const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, entityTypeTitle='' }: Props) => {
+const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSetEntityShare, entityTypeTitle='' }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const defaultShareSelection = { granteeId: null, capabilityId: 'view' };
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
-  const { setFieldValue } = useFormikContext();
 
   useEffect(() => {
     EntityShareDomain.prepare(entityType, entityTitle, null);
@@ -117,7 +116,7 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, enti
     };
 
     return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
-      setFieldValue('share_request', payload);
+      onSetEntityShare(payload);
       resetSelection();
       setDisableSubmit(false);
 
