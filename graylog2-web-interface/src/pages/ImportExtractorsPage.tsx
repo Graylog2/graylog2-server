@@ -23,10 +23,12 @@ import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import type { Input } from 'components/messageloaders/Types';
+import useProductName from 'customization/useProductName';
 
 type Props = ParamsContext;
 
 const ImportExtractorsPage = ({ params }: Props) => {
+  const productName = useProductName();
   const [input, setInput] = useState<Input>();
 
   useEffect(() => {
@@ -50,7 +52,7 @@ const ImportExtractorsPage = ({ params }: Props) => {
           }>
           <span>
             Exported extractors can be imported to an input. All you need is the JSON export of extractors from any
-            other Graylog setup or from{' '}
+            other {productName} setup or from{' '}
             <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">
               the Graylog Marketplace
             </a>
