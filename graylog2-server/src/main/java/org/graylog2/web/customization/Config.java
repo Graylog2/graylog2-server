@@ -48,4 +48,9 @@ public record Config(
     }
 
     public record Footer(Optional<Boolean> enabled) {}
+
+    public static Config empty() {
+        return new Config(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    }
 }
