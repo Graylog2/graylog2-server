@@ -26,7 +26,7 @@ import { useStore } from 'stores/connect';
 import EntityShareStore from 'stores/permissions/EntityShareStore';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import type { GRN } from 'logic/permissions/types';
-import type { CapabilitiesList, GranteesList as GranteesListType } from 'logic/permissions/EntityShareState';
+import type { CapabilitiesList, GranteesList as GranteesListType, SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
 import type Grantee from 'logic/permissions/Grantee';
 
 import ValidationError from './ValidationError';
@@ -88,6 +88,8 @@ const _capabilitiesOptions = (capabilities: CapabilitiesList) =>
   capabilities.map((capability) => ({ label: capability.title, value: capability.id })).toJS();
 const _granteesOptions = (grantees: GranteesListType) =>
   grantees.map((grantee) => ({ label: grantee.title, value: grantee.id, granteeType: grantee.type })).toJS();
+const getAvailableGrantee = (grantees: GranteesListType, selected:  SelectedGranteeCapabilities) =>
+  grantees?.filter((g) => !selected.has(g.id))?.toList();
 
 const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, entityTypeTitle='' }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
@@ -132,7 +134,11 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, enti
       selected_grantee_capabilities: newSelectedGranteeCapabilities,
     };
 
-    return EntityShareDomain.prepare(entityType, entityTitle, null, payload);
+    return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
+      setDisableSubmit(false);
+
+      return response;
+    });
   };
   
   const handleAddCollaborator = () => {
@@ -150,7 +156,7 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, enti
                  <GranteesSelect
                    onChange={(granteeId) => setShareSelection({...shareSelection, granteeId})}
                    optionRenderer={_renderGranteesSelectOption}
-                   options={_granteesOptions(entityShareState.availableGrantees)}
+                  options={_granteesOptions(getAvailableGrantee(entityShareState.availableGrantees,entityShareState.selectedGranteeCapabilities))}
                    placeholder="Search for users and teams"
                    value={shareSelection.granteeId}
                  />
