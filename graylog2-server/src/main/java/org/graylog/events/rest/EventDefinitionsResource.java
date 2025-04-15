@@ -303,7 +303,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response createWithRequest(@ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
-                                      @ApiParam @Valid @NotNull(message = "View request is mandatory") CreateEntityRequest<EventDefinitionDto> request,
+                                      @ApiParam @Valid @NotNull(message = "Eventdef request is mandatory") CreateEntityRequest<EventDefinitionDto> request,
                            @Context UserContext userContext) {
         final Response result = create(schedule, request.entity(), userContext);
 

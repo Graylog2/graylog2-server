@@ -203,7 +203,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @ApiOperation("Create new notification definition with sharing request")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
-    public Response createWithRequest(@ApiParam @Valid @NotNull(message = "View request is mandatory") CreateEntityRequest<NotificationDto> request,
+    public Response createWithRequest(@ApiParam @Valid @NotNull(message = "Notification request is mandatory") CreateEntityRequest<NotificationDto> request,
                                       @Context UserContext userContext) {
         final Response result = create(request.entity(), userContext);
 

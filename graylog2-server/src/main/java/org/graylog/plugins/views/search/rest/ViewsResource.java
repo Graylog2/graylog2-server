@@ -71,7 +71,6 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.bulk.AuditParams;
@@ -232,7 +231,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
     public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") ViewDTO dto,
                           @Context UserContext userContext,
-                          @Context SearchUser searchUser) throws ValidationException {
+                          @Context SearchUser searchUser) {
         if (dto.type().equals(ViewDTO.Type.DASHBOARD) && !searchUser.canCreateDashboards()) {
             throw new ForbiddenException("User is not allowed to create new dashboards.");
         }
@@ -251,7 +250,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
     public ViewDTO createWithRequest(@ApiParam @Valid @NotNull(message = "View request is mandatory") CreateEntityRequest<ViewDTO> request,
                                      @Context UserContext userContext,
-                                     @Context SearchUser searchUser) throws ValidationException {
+                                     @Context SearchUser searchUser) {
         final var dto = create(request.entity(), userContext, searchUser);
 
         if (request.shareRequest().isPresent()) {
@@ -267,7 +266,6 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 .orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " not available"));
 
         validateSearchProperties(dto, search);
-
 
         if (!newCreation) {
             final ViewDTO originalView = dbService.get(dto.id()).orElseThrow(() -> new BadRequestException("Cannot update a view that does not exist : id = " + dto.id()));
@@ -366,15 +364,39 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                           @ApiParam @Valid ViewDTO dto,
                           @Context SearchUser searchUser) {
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
-        if (!searchUser.canUpdateView(updatedDTO)) {
-            throw new ForbiddenException("Not allowed to edit " + summarize(updatedDTO) + ".");
-        }
-
-        validateIntegrity(updatedDTO, searchUser, false);
+        validateDto(updatedDTO, searchUser);
 
         var result = dbService.update(updatedDTO);
         recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
         return result;
+    }
+
+    @PUT
+    @Path("{id}/with-request")
+    @ApiOperation("Update view, including sharing request")
+    @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ViewDTO updateWithRequest(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
+                                     @ApiParam @Valid @NotNull(message = "Share request is mandatory") CreateEntityRequest<ViewDTO> request,
+                                     @Context SearchUser searchUser) {
+        final ViewDTO updatedDTO = request.entity().toBuilder().id(id).build();
+        validateDto(updatedDTO, searchUser);
+
+        if (request.shareRequest().isPresent()) {
+            final var grnType = updatedDTO.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
+            entitySharesService.updateEntityShares(grnType, updatedDTO.id(), request.shareRequest().get(), searchUser.getUser());
+        }
+
+        var result = dbService.update(updatedDTO);
+        recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        return result;
+    }
+
+    private void validateDto(ViewDTO dto, SearchUser searchUser) {
+        if (!searchUser.canUpdateView(dto)) {
+            throw new ForbiddenException("Not allowed to edit " + summarize(dto) + ".");
+        }
+        validateIntegrity(dto, searchUser, false);
     }
 
     @PUT
