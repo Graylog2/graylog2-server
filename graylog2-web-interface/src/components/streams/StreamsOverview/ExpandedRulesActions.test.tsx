@@ -33,7 +33,6 @@ describe('ExpandedRulesActions', () => {
 
     await screen.findByRole('heading', {
       name: /new stream rule/i,
-      hidden: true,
     });
   });
 });

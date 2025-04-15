@@ -38,12 +38,11 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -54,22 +53,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-public class AccessTokenEntityServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class TokenUsageServiceImplTest {
     private static final int PAGE = 1;
     private static final int PER_PAGE = 10;
     private static final String SORT = AccessTokenEntity.FIELD_NAME;
     private static final SortOrder SORT_ORDER = SortOrder.ASCENDING;
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private AccessTokenService accessTokenService;
@@ -82,23 +80,23 @@ public class AccessTokenEntityServiceImplTest {
     private UserFactory userFactory;
     private Object[] allMocks;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         testee = new TokenUsageServiceImpl(accessTokenService, userService, dbAuthServiceBackendService);
-        userFactory = new AccessTokenEntityServiceImplTest.UserFactory(
+        userFactory = new TokenUsageServiceImplTest.UserFactory(
                 new Permissions(ImmutableSet.of(new RestPermissions())));
         allMocks = new Object[]{accessTokenService, userService, dbAuthServiceBackendService};
     }
 
     @Test
-    public void noAvailableTokensReturnEmptyResponse() {
+    void noAvailableTokensReturnEmptyResponse() {
         when(accessTokenService.findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER)))
                 .thenReturn(PaginatedList.emptyList(PAGE, PER_PAGE));
         when(dbAuthServiceBackendService.streamByIds(Collections.emptySet())).thenReturn(Stream.empty());
         final PaginatedList<TokenUsageDTO> expected = new PaginatedList<>(Collections.emptyList(), 0, PAGE, PER_PAGE);
 
         final PaginatedList<TokenUsageDTO> actual = testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER);
-        assertEquals(expected, actual);
+        assertThat(actual).isEqualTo(expected);
 
         verify(accessTokenService).findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER));
         verify(dbAuthServiceBackendService).streamByIds(Collections.emptySet());
@@ -106,7 +104,7 @@ public class AccessTokenEntityServiceImplTest {
     }
 
     @Test
-    public void onlyLocalUsersDoesntHitTheAuthBackendService() {
+    void onlyLocalUsersDoesntHitTheAuthBackendService() {
         final AccessTokenEntity token1 = mkToken(1, Tools.nowUTC());
         final AccessTokenEntity token2 = mkToken(2, Tools.nowUTC());
         final User user1 = mkUser(1, false);
@@ -116,10 +114,10 @@ public class AccessTokenEntityServiceImplTest {
         when(userService.load("userName1")).thenReturn(user1);
         when(userService.load("userName2")).thenReturn(user2);
         when(dbAuthServiceBackendService.streamByIds(Collections.emptySet())).thenReturn(Stream.empty());
-        final PaginatedList<TokenUsageDTO> expected = new PaginatedList<>(List.of(mkTokenUsage(token1, user1, null), mkTokenUsage(token2, user2, null)), 2, PAGE, PER_PAGE);
+        final PaginatedList<TokenUsageDTO> expected = new PaginatedList<>(List.of(mkTokenUsage(token1, user1, null, false), mkTokenUsage(token2, user2, null, false)), 2, PAGE, PER_PAGE);
 
         final PaginatedList<TokenUsageDTO> actual = testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER);
-        assertEquals(expected, actual);
+        assertThat(actual).isEqualTo(expected);
 
         verify(accessTokenService).findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER));
         verify(userService).load("userName1");
@@ -129,7 +127,7 @@ public class AccessTokenEntityServiceImplTest {
     }
 
     @Test
-    public void tokensFromExternalUsersShowAuthBackends() {
+    void tokensFromExternalUsersShowAuthBackends() {
         final AccessTokenEntity token1 = mkToken(1, Tools.nowUTC());
         final AccessTokenEntity token2 = mkToken(2, Tools.dateTimeFromDouble(0));
         final User user1 = mkUser(1, true);
@@ -140,10 +138,10 @@ public class AccessTokenEntityServiceImplTest {
         when(userService.load("userName1")).thenReturn(user1);
         when(userService.load("userName2")).thenReturn(user2);
         when(dbAuthServiceBackendService.streamByIds(Set.of("auth-backend-id1", "auth-backend-id2"))).thenReturn(Stream.of(mkAuthService()));
-        final PaginatedList<TokenUsageDTO> expected = new PaginatedList<>(List.of(mkTokenUsage(token1, user1, authService1.title()), mkTokenUsage(token2, user2, "<auth-backend-id2> (DELETED)")), 2, PAGE, PER_PAGE);
+        final PaginatedList<TokenUsageDTO> expected = new PaginatedList<>(List.of(mkTokenUsage(token1, user1, authService1.title(), false), mkTokenUsage(token2, user2, "<auth-backend-id2> (DELETED)", false)), 2, PAGE, PER_PAGE);
 
         final PaginatedList<TokenUsageDTO> actual = testee.loadTokenUsage(PAGE, PER_PAGE, new SearchQuery(""), SORT, SORT_ORDER);
-        assertEquals(expected, actual);
+        assertThat(actual).isEqualTo(expected);
 
         verify(accessTokenService).findPaginated(any(SearchQuery.class), eq(PAGE), eq(PER_PAGE), eq(SORT), eq(SORT_ORDER));
         verify(userService).load("userName1");
@@ -172,6 +170,33 @@ public class AccessTokenEntityServiceImplTest {
                 .doesNotThrowAnyException();
     }
 
+    @Test
+    void loadListWithDeletedUser() {
+        final AccessTokenEntity token1 = mkToken(1, Tools.nowUTC());
+        final AccessTokenEntity token2 = mkToken(2, Tools.nowUTC());
+        final User user1 = mkUser(1, true);
+        final User user2 = mkUser(2, true);
+        final AuthServiceBackendDTO authService1 = mkAuthService();
+        final SearchQuery query = new SearchQuery("");
+
+        when(accessTokenService.findPaginated(any(), anyInt(), anyInt(), any(), any()))
+                .thenReturn(new PaginatedList<>(List.of(token1, token2), 2, PAGE, PER_PAGE));
+        when(userService.load("userName1")).thenReturn(user1);
+        when(userService.load("userName2")).thenReturn(null);
+        when(dbAuthServiceBackendService.streamByIds(Set.of("auth-backend-id1"))).thenReturn(Stream.of(authService1));
+        final PaginatedList<TokenUsageDTO> expected = new PaginatedList<>(List.of(mkTokenUsage(token1, user1, authService1.title(), false), mkTokenUsage(token2, user2, null, true)), 2, PAGE, PER_PAGE);
+
+        final PaginatedList<TokenUsageDTO> actual = testee.loadTokenUsage(PAGE, PER_PAGE, query, AccessTokenEntity.FIELD_NAME, SortOrder.ASCENDING);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual).isEqualTo(expected);
+
+        verify(accessTokenService).findPaginated(query, PAGE, PER_PAGE, AccessTokenEntity.FIELD_NAME, SortOrder.ASCENDING);
+        verify(userService).load(user1.getName());
+        verify(userService).load(user2.getName());
+        verify(dbAuthServiceBackendService).streamByIds(Set.of(authService1.id()));
+        verifyNoMoreInteractions(allMocks);
+    }
 
     //Just some helper methods
 
@@ -207,7 +232,7 @@ public class AccessTokenEntityServiceImplTest {
                 .build();
     }
 
-    private TokenUsageDTO mkTokenUsage(AccessTokenEntity dto, User user, @Nullable String authBackendName) {
+    private TokenUsageDTO mkTokenUsage(AccessTokenEntity dto, User user, @Nullable String authBackendName, boolean isUserDeleted) {
         final String username = dto.userName();
         final boolean isExternal = user.isExternalUser();
         final String authBackend;
@@ -219,7 +244,17 @@ public class AccessTokenEntityServiceImplTest {
             authBackend = "Internal";
         }
 
-        return TokenUsageDTO.create(dto.id(), username, user.getId(), dto.name(), dto.createdAt(), dto.lastAccess().getMillis() == 0 ? null : dto.lastAccess(), dto.expiresAt(), isExternal, authBackend);
+        return TokenUsageDTO.create(
+                dto.id(),
+                username,
+                isUserDeleted ? null : user.getId(),
+                dto.name(),
+                dto.createdAt(),
+                dto.lastAccess().getMillis() == 0 ? null : dto.lastAccess(), dto.expiresAt(),
+                isUserDeleted ? false : isExternal,
+                isUserDeleted ? "UNKNOWN" : authBackend,
+                isUserDeleted
+        );
     }
 
     public static class UserFactory implements UserImpl.Factory {

@@ -78,10 +78,9 @@ jest.mock('./startDownload');
 describe('ExportModal', () => {
   // Prepare expected payload
 
-  const triggerFormSubmit = () => {
-    const submitButton = screen.getByRole('button', {
+  const triggerFormSubmit = async () => {
+    const submitButton = await screen.findByRole('button', {
       name: /start download/i,
-      hidden: true,
     });
 
     fireEvent.click(submitButton);
@@ -143,7 +142,7 @@ describe('ExportModal', () => {
     };
     render(<SimpleExportModal />);
 
-    triggerFormSubmit();
+    await triggerFormSubmit();
 
     await waitFor(() =>
       expect(exportSearchMessages).toHaveBeenCalledWith(
@@ -161,7 +160,7 @@ describe('ExportModal', () => {
 
     expect(getAllByText('Start Download')).toHaveLength(2);
 
-    triggerFormSubmit();
+    await triggerFormSubmit();
 
     await findByText('Downloading...');
   });
@@ -170,7 +169,7 @@ describe('ExportModal', () => {
     const closeModalStub = jest.fn();
     render(<SimpleExportModal closeModal={closeModalStub} />);
 
-    triggerFormSubmit();
+    await triggerFormSubmit();
 
     await waitFor(() => expect(closeModalStub).toHaveBeenCalledTimes(1));
   });
@@ -187,7 +186,7 @@ describe('ExportModal', () => {
     const view = viewWithoutWidget(View.Type.Search).toBuilder().state(viewStateMap).build();
     render(<SimpleExportModal view={view} />);
 
-    triggerFormSubmit();
+    await triggerFormSubmit();
 
     await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
@@ -226,7 +225,7 @@ describe('ExportModal', () => {
     const view = viewWithoutWidget(View.Type.Search).toBuilder().state(viewStateMap).build();
     render(<SimpleExportModal view={view} />);
 
-    triggerFormSubmit();
+    await triggerFormSubmit();
 
     await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
@@ -261,7 +260,7 @@ describe('ExportModal', () => {
     it('should export all messages with default fields when no widget exists', async () => {
       render(<SearchExportModal />);
 
-      triggerFormSubmit();
+      await triggerFormSubmit();
 
       await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledTimes(1));
 
@@ -290,7 +289,7 @@ describe('ExportModal', () => {
     it('should export messages related to preselected widget', async () => {
       render(<SearchExportModal view={viewWithOneWidget(View.Type.Search)} />);
 
-      triggerFormSubmit();
+      await triggerFormSubmit();
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(
@@ -333,7 +332,7 @@ describe('ExportModal', () => {
     it('should export widget messages on direct export', async () => {
       render(<SearchExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />);
 
-      triggerFormSubmit();
+      await triggerFormSubmit();
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(
@@ -424,7 +423,7 @@ describe('ExportModal', () => {
         <DashboardExportModal view={viewWithMultipleWidgets(View.Type.Search)} directExportWidgetId="widget-id-1" />,
       );
 
-      triggerFormSubmit();
+      await triggerFormSubmit();
       await waitFor(() => expect(exportSearchTypeMessages).toHaveBeenCalledTimes(1));
 
       expect(exportSearchTypeMessages).toHaveBeenCalledWith(
