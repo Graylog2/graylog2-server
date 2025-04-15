@@ -54,7 +54,7 @@ public class CookieFactory {
         return makeCookie(token.getAuthenticationToken(), token.validUntil(), requestContext);
     }
 
-    NewCookie deleteAuthenticationCookie(ContainerRequestContext requestContext) {
+    public NewCookie deleteAuthenticationCookie(ContainerRequestContext requestContext) {
         return makeCookie("", new Date(), requestContext);
     }
 
