@@ -18,6 +18,11 @@ package org.graylog.testing.completebackend;
 
 public class MavenProjectDirProviderWithFrontend extends DefaultMavenProjectDirProvider {
     @Override
+    public String getUniqueId() {
+        return "with_frontend";
+    }
+
+    @Override
     public boolean includeFrontend() {
         return true;
     }
