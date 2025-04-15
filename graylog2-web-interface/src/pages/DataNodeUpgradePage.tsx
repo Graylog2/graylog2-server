@@ -340,7 +340,7 @@ const DataNodeUpgradePage = () => {
           )}
           {openUpgradeConfirmDialog && nodeInProgress && (
             <Modal show backdrop={false} onHide={() => setOpenUpgradeConfirmDialog(false)}>
-              <Modal.Header closeButton>
+              <Modal.Header>
                 <Modal.Title>Data Node Manual Upgrade</Modal.Title>
               </Modal.Header>
 
