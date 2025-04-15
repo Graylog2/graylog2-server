@@ -96,18 +96,17 @@ public class StreamListFingerprintTest {
                 null);
     }
 
-    // TODO: fix this. the implementation has changed.
-//    @Test
-//    public void testGetFingerprint() throws Exception {
-//        final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.newArrayList(stream1, stream2));
-//
-//        // The fingerprint depends on the hashCode of each stream and stream rule and might change if the underlying
-//        // implementation changed.
-//        assertEquals("d669c1037a49c956ef8f25033abc065c2fb259d4", fingerprint.getFingerprint());
-//    }
+    @Test
+    public void testGetFingerprint() {
+        final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.newArrayList(stream1, stream2));
+
+        // The fingerprint depends on the hashCode of each stream and stream rule and might change if the underlying
+        // implementation changed.
+        assertEquals("5bfe7793c7775538b22185cfb2e3dbbc199824c9", fingerprint.getFingerprint());
+    }
 
     @Test
-    public void testIdenticalStreams() throws Exception {
+    public void testIdenticalStreams() {
         final StreamListFingerprint fingerprint1 = new StreamListFingerprint(Lists.newArrayList(stream1));
         final StreamListFingerprint fingerprint2 = new StreamListFingerprint(Lists.newArrayList(stream1));
         final StreamListFingerprint fingerprint3 = new StreamListFingerprint(Lists.newArrayList(stream2));
@@ -117,7 +116,7 @@ public class StreamListFingerprintTest {
     }
 
     @Test
-    public void testWithEmptyStreamList() throws Exception {
+    public void testWithEmptyStreamList() {
         final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.<Stream>newArrayList());
 
         assertEquals(expectedEmptyFingerprint, fingerprint.getFingerprint());

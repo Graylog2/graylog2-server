@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -252,5 +253,19 @@ public class StreamImpl implements Stream {
     @Override
     public void setIndexSetId(String indexSetId) {
         fields.put(FIELD_INDEX_SET_ID, indexSetId);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof final Stream other)) {
+            return false;
+        }
+
+        return Objects.equals(fields, other.getFields()) && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getFields());
     }
 }
