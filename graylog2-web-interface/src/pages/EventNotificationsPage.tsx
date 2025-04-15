@@ -23,6 +23,7 @@ import EventNotificationsContainer from 'components/event-notifications/event-no
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import PageDescription from 'components/event-notifications/PageDescription';
 
 const EventNotificationsPage = () => (
   <DocumentTitle title="Notifications">
@@ -40,11 +41,7 @@ const EventNotificationsPage = () => (
         title: 'Alerts documentation',
         path: DocsHelper.PAGES.ALERTS,
       }}>
-      <span>
-        Notifications alert you of any configured Event when they occur. Notifications can be send directly to you or to
-        other systems you use for that purpose. Remember to assign Notifications while creating or editing an Event
-        Definition.
-      </span>
+      <PageDescription />
     </PageHeader>
 
     <Row className="content">

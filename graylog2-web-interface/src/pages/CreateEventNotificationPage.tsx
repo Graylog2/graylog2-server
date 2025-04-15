@@ -25,6 +25,7 @@ import EventNotificationFormContainer from 'components/event-notifications/event
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useHistory from 'routing/useHistory';
+import PageDescription from 'components/event-notifications/PageDescription';
 
 const CreateEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
@@ -43,10 +44,7 @@ const CreateEventDefinitionPage = () => {
           title: 'Alerts documentation',
           path: DocsHelper.PAGES.ALERTS,
         }}>
-        <span>
-          Notifications alert you of any configured Event when they occur. Notifications can be send directly to you or
-          to other systems you use for that purpose.
-        </span>
+        <PageDescription />
       </PageHeader>
 
       <Row className="content">
