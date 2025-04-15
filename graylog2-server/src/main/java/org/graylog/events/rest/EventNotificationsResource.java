@@ -208,7 +208,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         final Response result = create(request.entity(), userContext);
 
         if (request.shareRequest().isPresent() && result.getEntity() instanceof NotificationDto dto) {
-            entitySharesService.updateEntityShares(GRNTypes.STREAM, dto.id(), request.shareRequest().get(), userContext.getUser());
+            entitySharesService.updateEntityShares(GRNTypes.EVENT_NOTIFICATION, dto.id(), request.shareRequest().get(), userContext.getUser());
         }
 
         return result;
