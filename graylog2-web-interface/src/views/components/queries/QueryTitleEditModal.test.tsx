@@ -72,7 +72,7 @@ describe('QueryTitleEditModal', () => {
   it('updates query title and closes', async () => {
     let modalRef;
     const onTitleChangeFn = jest.fn();
-    const { getByRole, queryByText } = render(
+    render(
       <QueryTitleEditModal
         ref={(ref) => {
           modalRef = ref;
@@ -86,7 +86,7 @@ describe('QueryTitleEditModal', () => {
 
     expect(titleInput).toHaveValue('CurrentTitle');
 
-    const saveButton = getByRole('button', { name: /update title/i, hidden: true });
+    const saveButton = await screen.findByRole('button', { name: /update title/i });
 
     fireEvent.change(titleInput, { target: { value: 'NewTitle' } });
     fireEvent.click(saveButton);
@@ -96,7 +96,7 @@ describe('QueryTitleEditModal', () => {
 
     // Modal should not be visible anymore
     await waitFor(() => {
-      expect(queryByText(modalHeadline)).toBeNull();
+      expect(screen.queryByText(modalHeadline)).toBeNull();
     });
   });
 
