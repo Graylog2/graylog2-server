@@ -35,14 +35,14 @@ describe('BootstrapModalForm', () => {
   it('does not show modal form when show property is false', async () => {
     render(renderModalForm(false));
 
-    expect(screen.queryByTitle('Sample Form')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Sample Form/i })).not.toBeInTheDocument();
     expect(screen.queryByText('42')).not.toBeInTheDocument();
   });
 
   it('shows modal form when show property is true', async () => {
     render(renderModalForm(true));
 
-    await screen.findByTitle('Sample Form');
+    await screen.findByRole('heading', { name: /Sample Form/i });
     await screen.findByText('42');
   });
 

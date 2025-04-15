@@ -26,7 +26,7 @@ const StyledModal = styled(Modal)`
 
 type Props = {
   show?: boolean;
-  onConfirm: (event) => void;
+  onConfirm: () => void;
   onCancel?: () => void;
   title: string | React.ReactNode;
   children: React.ReactNode;
@@ -53,7 +53,7 @@ const ConfirmDialog = ({
 
   return (
     <StyledModal show={show} onHide={onHide}>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
 
