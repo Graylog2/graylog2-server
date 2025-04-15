@@ -327,6 +327,7 @@ type EventProcedureFormProps = {
 
 type EventProcedureSummaryProps = {
   eventDefinitionEventProcedure: string | undefined;
+  eventId?: string;
 };
 
 type SearchAction = {

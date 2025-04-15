@@ -186,7 +186,17 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
     get(eventDefinitionId) {
       const promise = fetch('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId, 'with-context'] }));
 
-      promise.catch((error) => {
+      promise
+        .then((response) => {
+          console.log(response)
+
+          return {
+            eventDefinition: response.event_definition,
+            context: response.context,
+            is_mutable: response.is_mutable,
+          }
+        })
+        .catch((error) => {
         if (error.status === 404) {
           UserNotification.error(
             `Unable to find Event Definition with id <${eventDefinitionId}>, please ensure it wasn't deleted.`,
@@ -196,6 +206,8 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
       });
 
       EventDefinitionsActions.get.promise(promise);
+
+      return promise;
     },
 
     setAlertFlag(eventDefinition) {
