@@ -77,7 +77,7 @@ describe('EntityShareModal', () => {
     />
   );
 
-  const getModalSubmitButton = () => screen.queryByRole('button', { name: /update sharing/i, hidden: true });
+  const getModalSubmitButton = () => screen.queryByRole('button', { name: /update sharing/i });
 
   it('fetches entity share state initially', async () => {
     render(<SimpleEntityShareModal />);
@@ -90,7 +90,7 @@ describe('EntityShareModal', () => {
   it('updates entity share state on submit', async () => {
     render(<SimpleEntityShareModal />);
 
-    fireEvent.click(await screen.findByRole('button', { name: /update sharing/i, hidden: true }));
+    fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
 
     await waitFor(() => expect(EntityShareActions.update).toHaveBeenCalledTimes(1));
 
@@ -105,7 +105,6 @@ describe('EntityShareModal', () => {
 
     const cancelButton = await screen.findByRole('button', {
       name: /cancel/i,
-      hidden: true,
     });
 
     fireEvent.click(cancelButton);
@@ -187,7 +186,6 @@ describe('EntityShareModal', () => {
         // Submit form
         const submitButton = await screen.findByRole('button', {
           name: /add collaborator/i,
-          hidden: true,
         });
 
         fireEvent.click(submitButton);
@@ -225,7 +223,7 @@ describe('EntityShareModal', () => {
 
       await selectEvent.select(granteesSelect, john.title);
 
-      fireEvent.click(await screen.findByRole('button', { name: /update sharing/i, hidden: true }));
+      fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
 
       await waitFor(() => {
         expect(window.confirm).toHaveBeenCalledWith(
