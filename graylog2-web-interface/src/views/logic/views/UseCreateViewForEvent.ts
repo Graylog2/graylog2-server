@@ -82,8 +82,8 @@ const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
   return new WidgetPosition(col, row, AGGREGATION_WIDGET_HEIGHT, 6);
 };
 
-const createViewWidget = ({ field, groupBy, fnSeries, expr }) => {
-  const uniqPivotFields = uniq([field, ...groupBy].filter((v) => !!v));
+const createViewWidget = ({ groupBy, fnSeries, expr }) => {
+  const uniqPivotFields = uniq(groupBy.filter((v) => !!v));
   const rowPivots = uniqPivotFields.length ? [pivotForField(uniqPivotFields, new FieldType('value', [], []))] : [];
   const fnSeriesForFunc = Series.forFunction(fnSeries);
   const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
@@ -139,8 +139,8 @@ export const WidgetsGenerator = async ({ streams, streamCategories, aggregations
   const needsSummaryAggregations = aggregations.length > 1;
   const SUMMARY_ROW_DELTA = needsSummaryAggregations ? AGGREGATION_WIDGET_HEIGHT : 0;
   const { aggregationWidgets, aggregationTitles, aggregationPositions } = aggregations.reduce(
-    (res, { field, value, expr, fnSeries }, index) => {
-      const widget = createViewWidget({ fnSeries, field, groupBy, expr });
+    (res, { value, expr, fnSeries }, index) => {
+      const widget = createViewWidget({ fnSeries, groupBy, expr });
       res.aggregationWidgets.push(widget);
       res.aggregationTitles[widget.id] = `${fnSeries} ${expr} ${value}`;
       res.aggregationPositions[widget.id] = createViewPosition({ index, SUMMARY_ROW_DELTA });
