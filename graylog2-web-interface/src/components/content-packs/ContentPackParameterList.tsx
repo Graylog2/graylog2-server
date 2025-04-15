@@ -162,7 +162,7 @@ class ContentPackParameterList extends React.Component<
 
     const modal = (
       <BootstrapModalWrapper showModal={showModal} onHide={closeModal} bsSize="large">
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>
         <Modal.Body>
