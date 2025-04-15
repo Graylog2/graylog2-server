@@ -59,12 +59,11 @@ const ElasticsearchUnavailableInformation = () => {
             }>
             <p>
               We could not get the indices overview information. This usually means there was a problem connecting to
-              Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from {productName}</strong>
-              .
+              the indexer, and <strong>you should ensure the indexer is up and reachable from {productName}</strong>.
             </p>
             <p>
-              Messages will continue to be stored in the journal, but searching on them will not be possible until
-              Elasticsearch is reachable again.
+              Messages will continue to be stored in the journal, but searching on them will not be possible until the
+              indexer is reachable again.
             </p>
           </Panel>
         </div>
