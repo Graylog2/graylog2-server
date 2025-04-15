@@ -68,10 +68,10 @@ describe('ViewHeader', () => {
     fireEvent.click(editButton);
     await screen.findByText('Editing saved dashboard', { exact: false });
 
-    const titleInput = await screen.findByRole('textbox', { name: /title/i, hidden: true });
+    const titleInput = await screen.findByRole('textbox', { name: /title/i });
     await userEvent.type(titleInput, ' updated');
 
-    const saveButton = await screen.findByRole('button', { name: /save dashboard/i, hidden: true });
+    const saveButton = await screen.findByRole('button', { name: /save dashboard/i });
     await userEvent.click(saveButton);
 
     expect(onSaveView).toHaveBeenCalledWith(expect.objectContaining({ title: 'Some view updated' }));
