@@ -53,7 +53,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props)
 
   return (
     <BootstrapModalWrapper showModal={show} onHide={onHide} bsSize="large">
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>{rule.title || '<no title>'}</Modal.Title>
       </Modal.Header>
       <Modal.Body>

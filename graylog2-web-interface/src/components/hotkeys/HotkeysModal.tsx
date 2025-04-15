@@ -94,8 +94,8 @@ const HotkeysModal = ({ onToggle }: Props) => {
   const enabledCollection = useEnabledCollections();
 
   return (
-    <Modal onHide={onToggle} show title="Keyboard shortcuts" bsSize="large">
-      <Modal.Header closeButton>
+    <Modal onHide={onToggle} show bsSize="large">
+      <Modal.Header>
         <Modal.Title>Keyboard shortcuts</Modal.Title>
       </Modal.Header>
 
