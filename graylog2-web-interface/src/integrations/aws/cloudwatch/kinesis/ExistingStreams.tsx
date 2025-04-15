@@ -32,18 +32,33 @@ import Spinner from 'components/common/Spinner';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
 
+const AutoSetupContent = styled.div`
+  margin-bottom: 9px;
+`;
+
+const LoadingContent = styled(Modal.Body)`
+  text-align: center;
+`;
+
+const StyledSpinner = styled(Spinner)`
+  font-size: 48px;
+  color: #702785;
+`;
+
+const LoadingMessage = styled.p`
+  font-size: 16px;
+  font-weight: bold;
+  padding-top: 15px;
+  color: #a6afbd;
+`;
+
 type KinesisStreamsProps = {
   onSubmit: (...args: any[]) => void;
   onChange: (...args: any[]) => void;
   toggleSetup?: (...args: any[]) => void;
 };
 
-const KinesisStreams = ({
-  onChange,
-  onSubmit,
-
-  toggleSetup = () => {},
-}: KinesisStreamsProps) => {
+const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisStreamsProps) => {
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState(null);
   const { availableStreams, setLogData } = useContext(ApiContext);
@@ -87,20 +102,20 @@ const KinesisStreams = ({
         </Button>
       </Panel>,
     );
-  }, []);
+  }, [clearSidebar, setSidebar, toggleSetup]);
 
-   useEffect(() => {
-      if (logDataStatus.error) {
-        setLogDataUrl(null);
+  useEffect(() => {
+    if (logDataStatus.error) {
+      setLogDataUrl(null);
 
-        setFormError({
-          full_message: logDataStatus.error,
-          nice_message: (
-            <span>We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.</span>
-          ),
-        });
-      }
-    }, [logDataStatus.error]);
+      setFormError({
+        full_message: logDataStatus.error,
+        nice_message: (
+          <span>We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.</span>
+        ),
+      });
+    }
+  }, [logDataStatus.error, setLogDataUrl]);
 
   const handleSubmit = () => {
     setLogDataUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS.HEALTH_CHECK);
@@ -108,12 +123,12 @@ const KinesisStreams = ({
 
   return (
     <>
-      <LoadingModal show={logDataStatus.loading} backdrop="static" keyboard={false} onHide={() => {}} bsSize="small">
+      <Modal show={logDataStatus.loading} bsSize="small" onHide={() => {}} closable={false}>
         <LoadingContent>
           <StyledSpinner />
           <LoadingMessage>This request may take a few moments.</LoadingMessage>
         </LoadingContent>
-      </LoadingModal>
+      </Modal>
 
       <FormWrap
         onSubmit={handleSubmit}
@@ -151,32 +166,5 @@ const KinesisStreams = ({
   );
 };
 
-const AutoSetupContent = styled.div`
-  margin-bottom: 9px;
-`;
-
-const LoadingModal = styled(Modal)`
-  > .modal-dialog {
-    width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-`;
-
-const LoadingContent = styled(Modal.Body)`
-  text-align: center;
-`;
-
-const StyledSpinner = styled(Spinner)`
-  font-size: 48px;
-  color: #702785;
-`;
-
-const LoadingMessage = styled.p`
-  font-size: 16px;
-  font-weight: bold;
-  padding-top: 15px;
-  color: #a6afbd;
-`;
-
 export default KinesisStreams;
+
