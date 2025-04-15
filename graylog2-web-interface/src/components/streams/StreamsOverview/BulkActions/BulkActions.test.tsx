@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, within, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import selectEvent from 'react-select-event';
 
@@ -63,10 +63,7 @@ describe('StreamsOverview BulkActionsRow', () => {
   const assignIndexSet = async () => {
     userEvent.click(await screen.findByRole('menuitem', { name: /assign index set/i }));
 
-    await screen.findByRole('heading', {
-      name: /assign index set to 2 streams/i,
-      hidden: true,
-    });
+    await screen.findByRole('heading', { name: /assign index set to 2 streams/i });
 
     const indexSetSelect = await screen.findByLabelText('Index Set');
 
@@ -76,12 +73,7 @@ describe('StreamsOverview BulkActionsRow', () => {
 
     await selectEvent.select(indexSetSelect, 'Example Index Set');
 
-    const document = screen.getByRole('document', { hidden: true });
-
-    const submitButton = within(document).getByRole('button', {
-      name: /assign index set/i,
-      hidden: true,
-    });
+    const submitButton = await screen.findByRole('button', { name: /assign index set/i });
 
     await waitFor(() => expect(submitButton).toBeEnabled());
 

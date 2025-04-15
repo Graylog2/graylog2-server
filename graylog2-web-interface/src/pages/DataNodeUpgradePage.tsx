@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Row, Col, Button, Table, Label, SegmentedControl, Alert, Modal } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner, Icon, Switch } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import useDataNodeUpgradeStatus, {
   getNodeToUpgrade,
@@ -29,7 +29,7 @@ import useDataNodeUpgradeStatus, {
 import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import DocumentationLink from 'components/support/DocumentationLink';
-import DataNodeUpgradeHelp from 'components/datanode/DataNodeUpgrade/DataNodeUpgradeHelp';
+import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
 const StyledHorizontalDl = styled.dl(
   ({ theme }) => css`
@@ -55,6 +55,7 @@ const StyledHorizontalDl = styled.dl(
 const ShardReplicationContainer = styled.div`
   display: flex;
   height: 20px;
+  align-items: center;
 `;
 
 type DataNodeUpgradeMethodType = 'cluster-restart' | 'rolling-upgrade';
@@ -187,28 +188,63 @@ const DataNodeUpgradePage = () => {
               <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} bsSize="xs">
                 {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
               </Label>
-              <DataNodeUpgradeHelp />
+              &nbsp;
+              <HelpPopoverButton
+                helpText={
+                  <>
+                    <p>How does my cluster change state during the rolling upgrade?</p>
+                    <p>
+                      RED - if you are using indices with no replication and upgrade the node hosting the shards of
+                      these indices, the cluster will go to a red state and no data will be ingested into or searchable
+                      from these indices.
+                    </p>
+                    <p>
+                      YELLOW - after starting the upgrade of a node, shard allocation will be set to no replication to
+                      allow OpenSearch to use only the available shards.
+                    </p>
+                    <p>
+                      After a node has been upgraded and you click on <em>Confirm Upgrade</em>, shard replication will
+                      be re-enabled and all shards that were unavailable due to the node being upgraded will be
+                      re-allocated and the cluster will return to a GREEN state.
+                    </p>
+                  </>
+                }
+              />
             </h3>
             <StyledHorizontalDl>
-              <dt>Shard Replication:</dt>
-              <dd>
-                <ShardReplicationContainer>
-                  {data?.shard_replication_enabled ? (
-                    <Label bsStyle="success" bsSize="xs">
-                      Enabled
-                    </Label>
-                  ) : (
-                    <Label bsStyle="warning" bsSize="xs">
-                      Disabled
-                    </Label>
-                  )}
-                  &nbsp;
-                  <Switch
-                    checked={!!data?.shard_replication_enabled}
-                    onChange={data?.shard_replication_enabled ? stopShardReplication : startShardReplication}
-                  />
-                </ShardReplicationContainer>
-              </dd>
+              {(upgradeMethod === 'rolling-upgrade') && (
+                <>
+                  <dt>Shard Replication:</dt>
+                  <dd>
+                    <ShardReplicationContainer>
+                      {data?.shard_replication_enabled ? (
+                        <Label bsStyle="success" bsSize="xs">
+                          Enabled
+                        </Label>
+                      ) : (
+                        <Label bsStyle="warning" bsSize="xs">
+                          Disabled
+                        </Label>
+                      )}
+                      &nbsp;
+                      <HelpPopoverButton helpText={
+                        <>
+                          <p>
+                            After you click on <em><b>Start Upgrade Process</b></em> of a node, shard allocation will be set to no replication to allow OpenSearch to use only the available shards.
+                          </p>
+                          <p>
+                            After a node has been upgraded and you click on <em><b>Confirm Upgrade</b></em>, shard replication will be re-enabled and all shards that were unavailable due to the node being upgraded will be re-allocated.
+                          </p>
+                          <br />
+                          <Button onClick={data?.shard_replication_enabled ? stopShardReplication : startShardReplication} bsStyle="warning" bsSize="xsmall">
+                            Force {data?.shard_replication_enabled ? 'Disabled' : 'Enabled'}
+                          </Button>
+                        </>
+                      } />
+                    </ShardReplicationContainer>
+                  </dd>
+                </>
+              )}
               <dt>Cluster Manager:</dt>
               <dd>{data?.cluster_state?.manager_node?.name}</dd>
               <dt>Number of Nodes:</dt>
@@ -323,7 +359,7 @@ const DataNodeUpgradePage = () => {
           )}
           {openUpgradeConfirmDialog && nodeInProgress && (
             <Modal show backdrop={false} onHide={() => setOpenUpgradeConfirmDialog(false)}>
-              <Modal.Header closeButton>
+              <Modal.Header>
                 <Modal.Title>Data Node Manual Upgrade</Modal.Title>
               </Modal.Header>
 

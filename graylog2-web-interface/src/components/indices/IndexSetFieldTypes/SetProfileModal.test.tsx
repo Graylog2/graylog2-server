@@ -77,7 +77,7 @@ describe('IndexSetFieldTypesList', () => {
     renderModal();
     const select = await screen.findByLabelText(/Select profile/i);
     await selectItem(select, 'Profile-2');
-    const submit = await screen.findByRole('button', { name: /Set Profile/i, hidden: true });
+    const submit = await screen.findByRole('button', { name: /Set Profile/i });
     fireEvent.click(submit);
 
     expect(setIndexSetFieldTypeProfileMock).toHaveBeenCalledWith({
@@ -91,10 +91,9 @@ describe('IndexSetFieldTypesList', () => {
     renderModal();
     const select = await screen.findByLabelText(/Select profile/i);
     await selectItem(select, 'Profile-2');
-    const submit = await screen.findByRole('button', { name: /Set Profile/i, hidden: true });
+    const submit = await screen.findByRole('button', { name: /Set Profile/i });
     const checkBox = await screen.findByRole('checkbox', {
       name: /rotate affected indices after change/i,
-      hidden: true,
     });
     fireEvent.click(checkBox);
     fireEvent.click(submit);
@@ -108,10 +107,9 @@ describe('IndexSetFieldTypesList', () => {
 
   it('run removeProfileFromIndex on submit without rotation', async () => {
     renderModal();
-    const removeButton = await screen.findByRole('button', { name: /Remove profile/i, hidden: true });
+    const removeButton = await screen.findByRole('button', { name: /Remove profile/i });
     const checkBox = await screen.findByRole('checkbox', {
       name: /rotate affected indices after change/i,
-      hidden: true,
     });
     fireEvent.click(checkBox);
     fireEvent.click(removeButton);
@@ -124,7 +122,7 @@ describe('IndexSetFieldTypesList', () => {
 
   it('run removeProfileFromIndex on submit with rotation', async () => {
     renderModal();
-    const removeButton = await screen.findByRole('button', { name: /Remove profile/i, hidden: true });
+    const removeButton = await screen.findByRole('button', { name: /Remove profile/i });
     fireEvent.click(removeButton);
 
     expect(removeProfileFromIndexMock).toHaveBeenCalledWith({
@@ -135,7 +133,7 @@ describe('IndexSetFieldTypesList', () => {
 
   it('render modal without removal button when profile is not set', async () => {
     renderModal(null);
-    const removeButton = screen.queryByRole('button', { name: /Remove profile/i, hidden: true });
+    const removeButton = screen.queryByRole('button', { name: /Remove profile/i });
 
     expect(removeButton).not.toBeInTheDocument();
   });
