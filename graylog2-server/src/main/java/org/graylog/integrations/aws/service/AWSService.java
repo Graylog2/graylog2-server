@@ -140,6 +140,7 @@ public class AWSService {
         configuration.put(AWSInput.CK_DYNAMODB_ENDPOINT, request.dynamodbEndpoint());
         configuration.put(AWSInput.CK_IAM_ENDPOINT, request.iamEndpoint());
         configuration.put(AWSInput.CK_KINESIS_ENDPOINT, request.kinesisEndpoint());
+        configuration.put(AWSInput.CK_OVERRIDE_SOURCE, request.overrideSource());
 
         AWSMessageType inputType = AWSMessageType.valueOf(request.awsMessageType());
         if (inputType.isKinesis()) {

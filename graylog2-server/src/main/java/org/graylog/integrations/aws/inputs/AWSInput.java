@@ -55,6 +55,8 @@ public class AWSInput extends MessageInput {
     public static final String CK_IAM_ENDPOINT = "iam_endpoint";
     public static final String CK_KINESIS_ENDPOINT = "kinesis_endpoint";
 
+    public static final String CK_OVERRIDE_SOURCE = "override_source";
+
     @Inject
     public AWSInput(@Assisted Configuration configuration,
                     MetricRegistry metricRegistry,
@@ -190,7 +192,18 @@ public class AWSInput extends MessageInput {
                     ConfigurationField.Optional.OPTIONAL,
                     NumberField.Attribute.ONLY_POSITIVE));
 
+            request.addField(getOverrideSourceFieldDefinition());
+
             return request;
         }
+    }
+
+    static TextField getOverrideSourceFieldDefinition() {
+        return new TextField(
+                CK_OVERRIDE_SOURCE,
+                "Override Source (optional)",
+                "",
+                "The source is set to the Kinesis message by default. Set this if you want to override it with a custom value.",
+                ConfigurationField.Optional.OPTIONAL);
     }
 }

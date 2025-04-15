@@ -89,18 +89,18 @@ const KinesisStreams = ({
     );
   }, []);
 
-  useEffect(() => {
-    if (logDataStatus.error) {
-      setLogDataUrl(null);
+   useEffect(() => {
+      if (logDataStatus.error) {
+        setLogDataUrl(null);
 
-      setFormError({
-        full_message: logDataStatus.error,
-        nice_message: (
-          <span>We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.</span>
-        ),
-      });
-    }
-  }, [logDataStatus.error]);
+        setFormError({
+          full_message: logDataStatus.error,
+          nice_message: (
+            <span>We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.</span>
+          ),
+        });
+      }
+    }, [logDataStatus.error]);
 
   const handleSubmit = () => {
     setLogDataUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS.HEALTH_CHECK);

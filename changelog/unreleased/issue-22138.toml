@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixes the user to create input even if stream does not contain any messages."
+
+issues = ["22138"]

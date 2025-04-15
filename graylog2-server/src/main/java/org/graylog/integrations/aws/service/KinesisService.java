@@ -51,12 +51,19 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
+import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeSubscriptionFiltersRequest;
+import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeSubscriptionFiltersResponse;
+import software.amazon.awssdk.services.cloudwatchlogs.model.SubscriptionFilter;
 import software.amazon.awssdk.services.iam.IamClient;
 import software.amazon.awssdk.services.iam.IamClientBuilder;
 import software.amazon.awssdk.services.kinesis.KinesisClient;
 import software.amazon.awssdk.services.kinesis.KinesisClientBuilder;
 import software.amazon.awssdk.services.kinesis.model.CreateStreamRequest;
 import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsRequest;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsResponse;
 import software.amazon.awssdk.services.kinesis.model.GetShardIteratorRequest;
@@ -74,6 +81,8 @@ import software.amazon.awssdk.services.kinesis.model.StreamStatus;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -81,6 +90,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -153,8 +163,14 @@ public class KinesisService {
         KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, request);
 
         final List<Record> records = retrieveRecords(request.streamName(), kinesisClient);
-        if (records.size() == 0) {
-            throw new BadRequestException(String.format(Locale.ROOT, "The Kinesis stream [%s] does not contain any messages.", request.streamName()));
+
+        if (records.isEmpty()) {
+            LOG.warn("The Kinesis stream [{}] is empty. Proceeding with setup at the user's own risk.", request.streamName());
+            return KinesisHealthCheckResponse.create(
+                    AWSMessageType.NONE,
+                    String.format(Locale.ROOT, "The Kinesis stream [%s] does not contain any messages.", request.streamName()),
+                    new HashMap<>()
+            );
         }
 
         Record record = selectRandomRecord(records);
@@ -165,7 +181,7 @@ public class KinesisService {
         }
 
         DateTime timestamp = new DateTime(record.approximateArrivalTimestamp().toEpochMilli(), DateTimeZone.UTC);
-        return detectAndParseMessage(new String(payloadBytes, StandardCharsets.UTF_8), timestamp, request.streamName(), "", "", compressed);
+        return detectAndParseMessage(new String(payloadBytes, StandardCharsets.UTF_8), timestamp, request.streamName(), "test-graylog", "", compressed, request);
     }
 
     public StreamsResponse getKinesisStreamNames(AWSRequest request) throws ExecutionException {
@@ -238,7 +254,7 @@ public class KinesisService {
         CloudWatchLogEvent logEntry = logEntryOptional.get();
         DateTime timestamp = new DateTime(logEntry.timestamp(), DateTimeZone.UTC);
         return detectAndParseMessage(logEntry.message(), timestamp,
-                request.streamName(), data.logGroup(), data.logStream(), true);
+                request.streamName(), data.logGroup(), data.logStream(), true, request);
     }
 
     /**
@@ -327,7 +343,7 @@ public class KinesisService {
      * @return A {@code KinesisHealthCheckResponse} with the fully parsed message and type.
      */
     private KinesisHealthCheckResponse detectAndParseMessage(String logMessage, DateTime timestamp, String kinesisStreamName,
-                                                             String logGroupName, String logStreamName, boolean compressed) {
+                                                             String logGroupName, String logStreamName, boolean compressed, KinesisHealthCheckRequest request) {
 
         LOG.debug("Attempting to detect the type of log message. message [{}] stream [{}] log group [{}].",
                 logMessage, kinesisStreamName, logGroupName);
@@ -337,10 +353,13 @@ public class KinesisService {
 
         LOG.debug("The message is type [{}]", awsMessageType);
 
+        // Retrieve Kinesis Data Stream ARN
+        String streamArn = getKinesisStreamArn(kinesisStreamName, request);
+
         final String responseMessage = String.format(Locale.ROOT, "Success. The message is a %s message.", awsMessageType.getLabel());
 
         final KinesisLogEntry logEvent = KinesisLogEntry.create(kinesisStreamName, logGroupName, logStreamName,
-                timestamp, logMessage);
+                timestamp, logMessage, "", streamArn, awsMessageType.getLabel(), getSubscriptionFilters(request.region(), logGroupName));
 
         final Codec.Factory<? extends Codec> codecFactory = this.availableCodecs.get(awsMessageType.getCodecName());
         if (codecFactory == null) {
@@ -360,10 +379,54 @@ public class KinesisService {
         final Message fullyParsedMessage = codec.decodeSafe(new RawMessage(payload)).orElseThrow(() ->
                 new BadRequestException(String.format(Locale.ROOT, "Message decoding failed. More information might be " +
                         "available by enabling Debug logging. message [%s]", logMessage)));
+        fullyParsedMessage.setSource(streamArn);
+      //  fullyParsedMessage.addField("streamArn", streamArn);
+       // fullyParsedMessage.addField("messageType", awsMessageType.getLabel());
+        // fullyParsedMessage.addField("subscriptionFilters", getSubscriptionFilters(request.region(), logGroupName));
 
         LOG.debug("Successfully parsed message type [{}] with codec [{}].", awsMessageType, awsMessageType.getCodecName());
 
         return KinesisHealthCheckResponse.create(awsMessageType, responseMessage, fullyParsedMessage.getFields());
+    }
+
+    private String getKinesisStreamArn(String streamName, KinesisHealthCheckRequest request) {
+        KinesisClient kinesisClient = awsClientBuilderUtil.buildClient(kinesisClientBuilder, request);
+
+        DescribeStreamRequest describeStreamRequest = DescribeStreamRequest.builder()
+                .streamName(streamName)
+                .build();
+
+        DescribeStreamResponse response = kinesisClient.describeStream(describeStreamRequest);
+        return response.streamDescription().streamARN();
+    }
+
+    /**
+     * Retrieves subscription filters for the specified log group in the given AWS region.
+     *
+     * @param region       AWS region where the log group is located.
+     * @param logGroupName Name of the CloudWatch Logs log group.
+     */
+    public static List<String> getSubscriptionFilters(String region, String logGroupName) {
+        // Initialize the CloudWatchLogsClient with the specified region
+        try (CloudWatchLogsClient logsClient = CloudWatchLogsClient.builder()
+                .region(Region.of(region))
+                .credentialsProvider(ProfileCredentialsProvider.create())
+                .build()) {
+
+            // Create a request to describe subscription filters
+            DescribeSubscriptionFiltersRequest request = DescribeSubscriptionFiltersRequest.builder()
+                    .logGroupName(logGroupName)
+                    .build();
+
+            // Retrieve the subscription filters
+            DescribeSubscriptionFiltersResponse response = logsClient.describeSubscriptionFilters(request);
+            LOG.info("Subscription filters:[{}]",response.subscriptionFilters());
+            return response.subscriptionFilters().stream().map(SubscriptionFilter::filterName).collect(Collectors.toList());
+
+        } catch (Exception e) {
+            LOG.error("Error retrieving subscription filters: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     Record selectRandomRecord(List<Record> recordsList) {
