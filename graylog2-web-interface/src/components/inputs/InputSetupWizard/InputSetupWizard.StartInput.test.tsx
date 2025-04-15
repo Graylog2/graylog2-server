@@ -177,13 +177,13 @@ const newPipelineConfig = {
 };
 
 const goToStartInputStep = async () => {
-  const nextButton = await screen.findByRole('button', { name: /Next/i, hidden: true });
+  const nextButton = await screen.findByRole('button', { name: /Next/i });
 
   fireEvent.click(nextButton);
 };
 
 const startInput = async () => {
-  const startInputButton = await screen.findByRole('button', { name: /Start Input/i, hidden: true });
+  const startInputButton = await screen.findByRole('button', { name: /Start Input/i });
 
   fireEvent.click(startInputButton);
 };
@@ -191,36 +191,30 @@ const startInput = async () => {
 const createStream = async (newPipeline = false, removeFromDefault = true) => {
   const createStreamButton = await screen.findByRole('button', {
     name: /Create Stream/i,
-    hidden: true,
   });
 
   fireEvent.click(createStreamButton);
 
-  await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+  await screen.findByRole('heading', { name: /Create new stream/i });
 
   const titleInput = await screen.findByRole('textbox', {
     name: /Title/i,
-    hidden: true,
   });
 
   const descriptionInput = await screen.findByRole('textbox', {
     name: /Description/i,
-    hidden: true,
   });
 
   const newPipelineCheckbox = await screen.findByRole('checkbox', {
     name: /Create a new pipeline for this stream/i,
-    hidden: true,
   });
 
   const removeFromDefaultCheckbox = await screen.findByRole('checkbox', {
     name: /remove matches from ‘default stream’/i,
-    hidden: true,
   });
 
   const submitButton = await screen.findByRole('button', {
     name: 'Next',
-    hidden: true,
   });
 
   fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
@@ -262,7 +256,7 @@ describe('InputSetupWizard Start Input', () => {
 
       await waitFor(() => expect(InputStatesStore.start).toHaveBeenCalledWith(input));
 
-      expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
+      expect(await screen.findByRole('heading', { name: /Setting up Input.../i })).toBeInTheDocument();
       expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();
     });
 
@@ -271,7 +265,6 @@ describe('InputSetupWizard Start Input', () => {
 
       const selectStreamButton = await screen.findByRole('button', {
         name: /Select Stream/i,
-        hidden: true,
       });
 
       fireEvent.click(selectStreamButton);
@@ -295,7 +288,7 @@ describe('InputSetupWizard Start Input', () => {
         }),
       );
 
-      expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
+      expect(await screen.findByRole('heading', { name: /Setting up Input.../i })).toBeInTheDocument();
       expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
       expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();
     });
@@ -305,7 +298,6 @@ describe('InputSetupWizard Start Input', () => {
 
       const selectStreamButton = await screen.findByRole('button', {
         name: /Select Stream/i,
-        hidden: true,
       });
 
       fireEvent.click(selectStreamButton);
@@ -318,7 +310,6 @@ describe('InputSetupWizard Start Input', () => {
 
       const removeFromDefaultCheckbox = await screen.findByRole('checkbox', {
         name: /remove matches from ‘default stream’/i,
-        hidden: true,
       });
 
       fireEvent.click(removeFromDefaultCheckbox);
@@ -335,7 +326,7 @@ describe('InputSetupWizard Start Input', () => {
         }),
       );
 
-      expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
+      expect(await screen.findByRole('heading', { name: /Setting up Input.../i })).toBeInTheDocument();
       expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
       expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();
     });
@@ -352,7 +343,7 @@ describe('InputSetupWizard Start Input', () => {
       goToStartInputStep();
       startInput();
 
-      expect(await screen.findByRole('heading', { name: /Setting up Input.../i, hidden: true })).toBeInTheDocument();
+      expect(await screen.findByRole('heading', { name: /Setting up Input.../i })).toBeInTheDocument();
       expect(await screen.findByText(/Stream "Wingardium" created!/i)).toBeInTheDocument();
       expect(await screen.findByText(/Routing set up!/i)).toBeInTheDocument();
       expect(await screen.findByText(/Input started successfully!/i)).toBeInTheDocument();

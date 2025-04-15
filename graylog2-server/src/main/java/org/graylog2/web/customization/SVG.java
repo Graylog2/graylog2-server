@@ -14,28 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web;
+package org.graylog2.web.customization;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-import java.net.URI;
-
-@AutoValue
-@WithBeanGetter
-@JsonAutoDetect
-public abstract class AppConfig {
-    @JsonProperty("gl2ServerUrl")
-    public abstract URI serverUri();
-
-    @JsonProperty("gl2AppPathPrefix")
-    public abstract String appPathPrefix();
+public class SVG {
+    private final String data;
 
     @JsonCreator
-    public static AppConfig create(URI serverUri) {
-        return new AutoValue_AppConfig(serverUri, "");
+    public SVG(String data) {
+        if (!data.startsWith("<svg") && !data.startsWith("<?xml")) {
+            throw new IllegalArgumentException("Invalid SVG data supplied: " + data);
+        }
+
+        this.data = data;
+    }
+
+    @JsonValue
+    public String data() {
+        return data;
     }
 }
