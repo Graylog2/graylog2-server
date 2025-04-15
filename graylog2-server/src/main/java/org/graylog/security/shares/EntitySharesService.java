@@ -61,20 +61,23 @@ public class EntitySharesService {
     private final GRNRegistry grnRegistry;
     private final GranteeService granteeService;
     private final EventBus serverEventBus;
+    private final AdditionalGrantsResolver additionalGrantsResolver;
 
     @Inject
     public EntitySharesService(DBGrantService grantService,
-                                   EntityDependencyResolver entityDependencyResolver,
-                                   EntityDependencyPermissionChecker entityDependencyPermissionChecker,
-                                   GRNRegistry grnRegistry,
-                                   GranteeService granteeService,
-                                   EventBus serverEventBus) {
+                               EntityDependencyResolver entityDependencyResolver,
+                               EntityDependencyPermissionChecker entityDependencyPermissionChecker,
+                               GRNRegistry grnRegistry,
+                               GranteeService granteeService,
+                               EventBus serverEventBus,
+                               AdditionalGrantsResolver additionalGrantsResolver) {
         this.grantService = grantService;
         this.entityDependencyResolver = entityDependencyResolver;
         this.entityDependencyPermissionChecker = entityDependencyPermissionChecker;
         this.grnRegistry = grnRegistry;
         this.granteeService = granteeService;
         this.serverEventBus = serverEventBus;
+        this.additionalGrantsResolver = additionalGrantsResolver;
     }
 
     /**
