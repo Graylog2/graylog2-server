@@ -292,7 +292,6 @@ describe('AdaptableQueryTabs', () => {
 
     await screen.findByRole('button', {
       name: /copy page/i,
-      hidden: true,
     });
   });
 });

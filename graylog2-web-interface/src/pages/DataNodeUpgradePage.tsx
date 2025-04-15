@@ -186,25 +186,29 @@ const DataNodeUpgradePage = () => {
             <h3>
               <Label bsStyle={getClusterHealthStyle(data?.cluster_state?.status)} bsSize="xs">
                 {data?.cluster_state?.cluster_name}: {data?.cluster_state?.status}
-              </Label>&nbsp;
-              <HelpPopoverButton helpText={
-                <>
-                  <p>How does my cluster change state during the rolling upgrade?</p>
-                  <p>
-                    RED - if you are using indices with no replication and upgrade the node hosting the shards of these indices,
-                    the cluster will go to a red state and no data will be ingested into or searchable from these indices.
-                  </p>
-                  <p>
-                    YELLOW - after starting the upgrade of a node, shard allocation will be set to no replication to allow
-                    OpenSearch to use only the available shards.
-                  </p>
-                  <p>
-                    After a node has been upgraded and you click on <em>Confirm Upgrade</em>, shard replication will be re-enabled
-                    and all shards that were unavailable due to the node being upgraded will be re-allocated and the cluster will
-                    return to a GREEN state.
-                  </p>
-                </>
-              } />
+              </Label>
+              &nbsp;
+              <HelpPopoverButton
+                helpText={
+                  <>
+                    <p>How does my cluster change state during the rolling upgrade?</p>
+                    <p>
+                      RED - if you are using indices with no replication and upgrade the node hosting the shards of
+                      these indices, the cluster will go to a red state and no data will be ingested into or searchable
+                      from these indices.
+                    </p>
+                    <p>
+                      YELLOW - after starting the upgrade of a node, shard allocation will be set to no replication to
+                      allow OpenSearch to use only the available shards.
+                    </p>
+                    <p>
+                      After a node has been upgraded and you click on <em>Confirm Upgrade</em>, shard replication will
+                      be re-enabled and all shards that were unavailable due to the node being upgraded will be
+                      re-allocated and the cluster will return to a GREEN state.
+                    </p>
+                  </>
+                }
+              />
             </h3>
             <StyledHorizontalDl>
               <dt>Shard Replication:</dt>
