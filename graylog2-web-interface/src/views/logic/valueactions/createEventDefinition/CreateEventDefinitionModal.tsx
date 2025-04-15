@@ -125,7 +125,7 @@ const CreateEventDefinitionModal = ({
 
   return (
     <Modal onHide={onClose} show={show}>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Configure new event definition</Modal.Title>
       </Modal.Header>
       <Modal.Body>
