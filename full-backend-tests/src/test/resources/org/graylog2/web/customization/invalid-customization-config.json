@@ -1,0 +1,14 @@
+{
+  "cluster_config": [
+    {
+      "_id": {
+        "$oid": "61977043c1f17d26b45c8a0b"
+      },
+      "type" : "org.graylog2.web.customization.Config",
+      "payload": {
+        "invalidkey": "value"
+      },
+      "last_updated" : { "$date": "2025-04-07T12:52:01.051+0000" },
+      "last_updated_by" : "<MANUAL>"
+    }]
+}

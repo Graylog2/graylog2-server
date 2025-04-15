@@ -14,22 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog2.web.customization;
 
-import Modal from './Modal';
+import jakarta.inject.Inject;
 
-type Props = {
-  backdrop?: boolean;
-  bsSize?: 'lg' | 'large' | 'sm' | 'small';
-  showModal: boolean;
-  onHide: () => void;
-  children: React.ReactNode;
-};
+public class CustomizationConfig {
+    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
+    private final Config config;
 
-const BootstrapModalWrapper = ({ showModal, children, onHide, bsSize = undefined, backdrop = undefined }: Props) => (
-  <Modal show={showModal} onHide={onHide} bsSize={bsSize} backdrop={backdrop}>
-    {children}
-  </Modal>
-);
+    @Inject
+    public CustomizationConfig(Config config) {
+        this.config = config;
+    }
 
-export default BootstrapModalWrapper;
+    public String productName() {
+        return config.productName().orElse(DEFAULT_PRODUCT_NAME);
+    }
+}
