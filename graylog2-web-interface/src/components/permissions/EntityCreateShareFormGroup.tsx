@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -22,7 +23,7 @@ import type { EntitySharePayload } from 'src/actions/permissions/EntityShareActi
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { useStore } from 'stores/connect';
-import EntityShareStore from 'stores/permissions/EntityShareStore';
+import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import type { GRN } from 'logic/permissions/types';
 import type { CapabilitiesList, GranteesList as GranteesListType, SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';

@@ -115,7 +115,7 @@ describe('StreamModal', () => {
         index_set_id: 'index-set-id-2',
         remove_matches_from_default_stream: false,
         title: 'Stream Title and further title',
-      }),
+      }, undefined),
     );
   });
 });
