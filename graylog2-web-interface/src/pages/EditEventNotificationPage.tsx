@@ -31,6 +31,7 @@ import { EventNotificationsActions } from 'stores/event-notifications/EventNotif
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import type { HistoryContext } from 'routing/withHistory';
 import withHistory from 'routing/withHistory';
+import PageDescription from 'components/event-notifications/PageDescription';
 
 type EditEventDefinitionPageProps = ParamsContext &
   HistoryContext & {
@@ -97,10 +98,7 @@ class EditEventDefinitionPage extends React.Component<
             title: 'Alerts documentation',
             path: DocsHelper.PAGES.ALERTS,
           }}>
-          <span>
-            Notifications alert you of any configured Event when they occur. Notifications can be send directly to you
-            or to other systems you use for that purpose.
-          </span>
+          <PageDescription />
         </PageHeader>
 
         <Row className="content">
