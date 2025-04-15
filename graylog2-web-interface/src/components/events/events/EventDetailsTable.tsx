@@ -50,8 +50,6 @@ const EventDetailsTable = <E extends EntityBase = Event>({
         const renderCell = attributesRenderers[attribute.id]?.renderCell ?? typeRenderer ?? defaultTypeRenderer;
         const value = event[attribute.id];
 
-        console.log(meta);
-
         return (
           <tr key={attribute.id}>
             {attribute.title && (

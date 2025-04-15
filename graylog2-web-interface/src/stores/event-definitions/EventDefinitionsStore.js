@@ -187,15 +187,11 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
       const promise = fetch('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId, 'with-context'] }));
 
       promise
-        .then((response) => {
-          console.log(response)
-
-          return {
-            eventDefinition: response.event_definition,
-            context: response.context,
-            is_mutable: response.is_mutable,
-          }
-        })
+        .then((response) => ({
+          eventDefinition: response.event_definition,
+          context: response.context,
+          is_mutable: response.is_mutable,
+        }))
         .catch((error) => {
         if (error.status === 404) {
           UserNotification.error(

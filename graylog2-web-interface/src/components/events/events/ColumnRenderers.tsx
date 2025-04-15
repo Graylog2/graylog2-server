@@ -94,7 +94,7 @@ const EventProcedureRenderer = ({
     () => pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary }) => (
       <PluggableEventProcedureSummary eventId={eventId} eventDefinitionEventProcedure={eventProcedureId} />
     )),
-    [pluggableEventProcedureSummary],
+    [pluggableEventProcedureSummary, eventId, eventProcedureId],
   );
 
   return (
