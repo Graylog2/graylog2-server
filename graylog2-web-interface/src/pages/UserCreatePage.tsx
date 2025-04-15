@@ -23,7 +23,6 @@ import { Button } from 'components/bootstrap';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UserCreate from 'components/users/UserCreate';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
-import useProductName from 'customization/useProductName';
 
 const UserCreatePage = () => (
   <DocumentTitle title="Create New User">
