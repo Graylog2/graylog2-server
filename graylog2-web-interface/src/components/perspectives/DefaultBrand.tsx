@@ -16,10 +16,9 @@
  */
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
-import DOMPurify from 'dompurify';
 
 import { NAV_LOGO_HEIGHT } from 'theme/constants';
-import AppConfig from 'util/AppConfig';
+import useCustomLogo from 'customization/useCustomLogo';
 
 export const Logo = ({ color }: { color: string }) => (
   <svg
@@ -83,11 +82,10 @@ const StyledSvgContainer = styled.div`
 `;
 export const BrandNavLogo = () => {
   const theme = useTheme();
-  const { mode } = theme;
-  const customLogo = AppConfig.branding()?.logo?.[mode];
+  const customLogo = useCustomLogo(theme.mode);
 
   // eslint-disable-next-line react/no-danger
-  if (customLogo) return <StyledSvgContainer dangerouslySetInnerHTML={{ __html: DOMPurify().sanitize(customLogo) }} />;
+  if (customLogo) return <StyledSvgContainer dangerouslySetInnerHTML={{ __html: customLogo }} />;
 
   return <Logo color={theme.colors.brand.logo} />;
 };
