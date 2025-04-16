@@ -53,7 +53,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +63,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -101,14 +99,12 @@ public class SlackEventNotificationTest {
         final ImmutableList<MessageSummary> messageSummaries = generateMessageSummaries(50);
         when(notificationCallbackService.getBacklogForEvent(eventNotificationContext)).thenReturn(messageSummaries);
 
-        final var httpConfiguration = mock(HttpConfiguration.class);
-        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://graylog.example.org"));
         slackEventNotification = new SlackEventNotification(notificationCallbackService,
                 Engine.createEngine(),
                 mockNotificationService,
                 nodeId,
                 mockSlackClient,
-                new TemplateModelProvider(new CustomizationConfig(Config.empty()), new ObjectMapperProvider(), httpConfiguration));
+                new TemplateModelProvider(new CustomizationConfig(Config.empty()), new ObjectMapperProvider(), new HttpConfiguration()));
 
     }
 
