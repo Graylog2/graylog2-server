@@ -18,6 +18,7 @@ package org.graylog2.web.customization;
 
 import jakarta.inject.Inject;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class CustomizationConfig {
@@ -25,7 +26,7 @@ public class CustomizationConfig {
     private final Config config;
 
     @Inject
-    public CustomizationConfig(Config config) {
+    public CustomizationConfig(@Nullable Config config) {
         this.config = Optional.ofNullable(config).orElse(Config.empty());
     }
 
