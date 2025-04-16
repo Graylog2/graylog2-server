@@ -203,7 +203,7 @@
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.20.6</testcontainers.version>
         <testcontainers.opensearch.version>2.1.3</testcontainers.opensearch.version>
-        <graalvm.version>24.2.0</graalvm.version>
+        <graalvm.version>24.2.1</graalvm.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v20.17.0</nodejs.version>
