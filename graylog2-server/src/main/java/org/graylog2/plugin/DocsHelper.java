@@ -19,8 +19,8 @@ package org.graylog2.plugin;
 public enum DocsHelper {
     PAGE_SENDING_JSONPATH("getting_in_log_data/json_path_from_http_api_input.html"),
     PAGE_SENDING_IPFIXPATH("getting_in_log_data/ipfix_input.html"),
-    PAGE_ES_CONFIGURATION("https://go2docs.graylog.org/current/setting_up_graylog/server.conf.html#OpenSearch"),
-    PAGE_ES_VERSIONS("downloading_and_installing_graylog/installing_graylog.html#CompatibilityMatrix"),
+    PAGE_ES_CONFIGURATION("setting_up_graylog/server_configuration_settings_reference.htm#SearchBackendConfigurationProperties"),
+    PAGE_ES_VERSIONS("downloading_and_installing_graylog/compatibility_matrix.htm"),
     REPORTING_HELP("interacting_with_your_log_data/reporting.html");
 
     private static final String SERVER = "https://go2docs.graylog.org/current";
