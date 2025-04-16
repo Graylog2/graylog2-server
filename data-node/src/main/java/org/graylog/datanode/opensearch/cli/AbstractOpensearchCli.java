@@ -31,27 +31,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public abstract class AbstractOpensearchCli {
 
-    private final Path configPath;
+    private final CliEnv env;
     private final Path binPath;
 
     /**
-     * @param configPath Opensearch CLI tools adapt configuration stored under OPENSEARCH_PATH_CONF env property.
-     *                   This is why wealways want to set this configPath for each CLI tool.
-     * @param bin        location of the actual executable binary that this wrapper handles
+     * @param bin location of the actual executable binary that this wrapper handles
      */
-    private AbstractOpensearchCli(Path configPath, Path bin) {
-        this.configPath = configPath;
-        this.binPath = bin;
-    }
-
-    protected AbstractOpensearchCli(Path configDir, Path binDir, String binName) {
-        this(configDir, checkExecutable(binDir.resolve(binName)));
+    protected AbstractOpensearchCli(Path bin, CliEnv env) {
+        this.env = env;
+        this.binPath = checkExecutable(bin);
     }
 
     private static Path checkExecutable(Path path) {
@@ -94,14 +86,7 @@ public abstract class AbstractOpensearchCli {
 
         try {
             final DefaultExecuteResultHandler executeResultHandler = new DefaultExecuteResultHandler();
-
-            final Map<String, String> env = new LinkedHashMap<>();
-            env.put("OPENSEARCH_PATH_CONF", configPath.toAbsolutePath().toString());
-
-            final String javaHome = System.getProperty("java.home");
-            env.put("OPENSEARCH_JAVA_HOME", javaHome);
-
-            executor.execute(cmd, env, executeResultHandler);
+            executor.execute(cmd, env.getEnv(), executeResultHandler);
             executeResultHandler.waitFor();
             final int exitValue = executeResultHandler.getExitValue();
             if (exitValue != 0) {

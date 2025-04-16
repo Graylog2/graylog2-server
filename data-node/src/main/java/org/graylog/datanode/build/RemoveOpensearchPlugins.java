@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.build;
 
+import org.graylog.datanode.opensearch.cli.CliEnv;
 import org.graylog.datanode.opensearch.cli.OpensearchCli;
 
 import java.io.IOException;
@@ -36,11 +37,11 @@ public class RemoveOpensearchPlugins {
         }
 
         final Path opensearchDist = Path.of(args[0]);
+        final Path binDir = opensearchDist.resolve("bin");
+        final Path configDir = opensearchDist.resolve("config");
 
-        final OpensearchCli cli = new OpensearchCli(
-                opensearchDist.resolve("config"),
-                opensearchDist.resolve("bin")
-        );
+        final CliEnv env = new CliEnv(configDir).javaHome(System.getProperty("java.home"));
+        final OpensearchCli cli = new OpensearchCli(env, binDir);
 
         // TODO: implement batch removal of multiple plugins, if opensearch ever supports that (like ES does)
         Arrays.stream(args)

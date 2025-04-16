@@ -23,8 +23,10 @@ import java.util.List;
 
 public class OpensearchKeystoreCli extends AbstractOpensearchCli {
 
-    public OpensearchKeystoreCli(Path configDir, Path binDir) {
-        super(configDir, binDir, "opensearch-keystore");
+    public static final String KEYSTORE_BIN_NAME = "opensearch-keystore";
+
+    public OpensearchKeystoreCli(Path binDir, CliEnv env) {
+        super(binDir.resolve(KEYSTORE_BIN_NAME), env);
     }
 
     /**

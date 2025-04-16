@@ -25,8 +25,10 @@ import java.util.List;
  */
 public class OpensearchPluginCli extends AbstractOpensearchCli {
 
-    protected OpensearchPluginCli(Path configDir, Path binDir) {
-        super(configDir, binDir, "opensearch-plugin");
+    public static final String PLUGIN_BIN_NAME = "opensearch-plugin";
+
+    protected OpensearchPluginCli(Path binDir, CliEnv env) {
+        super(binDir.resolve(PLUGIN_BIN_NAME), env);
     }
 
     /**
