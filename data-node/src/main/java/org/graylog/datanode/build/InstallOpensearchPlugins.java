@@ -37,7 +37,7 @@ public class InstallOpensearchPlugins {
     public static void main(String[] args) throws IOException {
 
         if (args.length < 2) {
-            System.err.println("Syntax: " + InstallOpensearchPlugins.class.getSimpleName() + " <opendsearchDistDir> <pluginFile1> ... <pluginFileN>");
+            System.err.println("Syntax: " + InstallOpensearchPlugins.class.getSimpleName() + " <opensearchDistDir> <pluginFile1> ... <pluginFileN>");
             System.exit(1);
         }
 

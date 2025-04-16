@@ -17,6 +17,7 @@
 package org.graylog.datanode.opensearch.cli;
 
 import io.jsonwebtoken.lang.Collections;
+import org.graylog2.shared.utilities.StringUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,7 +60,7 @@ public class CliEnv {
 
     private Path checkDir(Path dir) {
         if (!Files.isDirectory(dir)) {
-            throw new IllegalArgumentException(String.format("%s is not a directory", dir));
+            throw new IllegalArgumentException(StringUtils.f("%s is not a directory", dir));
         }
         return dir;
     }

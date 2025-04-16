@@ -32,7 +32,7 @@ public class RemoveOpensearchPlugins {
     public static void main(String[] args) throws IOException {
 
         if (args.length < 2) {
-            System.err.println("Syntax: " + RemoveOpensearchPlugins.class.getSimpleName() + " <opendsearchDistDir> <pluginFile>");
+            System.err.println("Syntax: " + RemoveOpensearchPlugins.class.getSimpleName() + " <opensearchDistDir> <pluginFile>");
             System.exit(1);
         }
 
