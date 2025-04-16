@@ -142,9 +142,9 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
   );
 };
 
-const plugContextValue = { sendTelemetry: () => {} };
+const noopContextValue = { sendTelemetry: () => {} };
 const NoopTelemetryProvider = ({ children }) => (
-  <TelemetryContext.Provider value={plugContextValue}>{children}</TelemetryContext.Provider>
+  <TelemetryContext.Provider value={noopContextValue}>{children}</TelemetryContext.Provider>
 );
 const isTelemetryEnabled = AppConfig?.telemetry()?.enabled;
 const TelemetryProvider = ({ children }) => {
