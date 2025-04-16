@@ -130,7 +130,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
       <br />
       <RemoteReindexTasksProgress migrationStatus={migrationStatus} />
       <MigrationError errorMessage={currentStep.error_message} />
-      {(indicesWithErrors.length > 0) && (
+      {indicesWithErrors.length > 0 && (
         <Alert title="Migration failed" bsStyle="danger">
           <IndicesContainer>
             {indicesWithErrors.map((index) => (
