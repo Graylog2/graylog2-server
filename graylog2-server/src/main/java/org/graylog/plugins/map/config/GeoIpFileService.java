@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.map.config;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog2.plugin.validate.ConfigValidationException;
 import org.slf4j.Logger;
 
@@ -31,10 +32,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class GeoIpFileService {
-    private static final String ACTIVE_ASN_FILE = "asn-from-cloud.mmdb";
-    private static final String ACTIVE_CITY_FILE = "standard_location-from-cloud.mmdb";
-    private static final String TEMP_ASN_FILE = "temp-" + ACTIVE_ASN_FILE;
-    private static final String TEMP_CITY_FILE = "temp-" + ACTIVE_CITY_FILE;
+    @VisibleForTesting
+    static final String ACTIVE_ASN_FILE = "asn-from-cloud.mmdb";
+    @VisibleForTesting
+    static final String ACTIVE_CITY_FILE = "standard_location-from-cloud.mmdb";
+    @VisibleForTesting
+    static final String TEMP_ASN_FILE = "temp-" + ACTIVE_ASN_FILE;
+    @VisibleForTesting
+    static final String TEMP_CITY_FILE = "temp-" + ACTIVE_CITY_FILE;
 
     private static final String BUCKET_GROUP = "bucket";
     private static final String OBJECT_GROUP = "object";
@@ -45,10 +50,10 @@ public abstract class GeoIpFileService {
     private final Path tempAsnPath;
     private final Path tempCityPath;
 
-    private Instant asnFileLastModified = Instant.EPOCH;
-    private Instant cityFileLastModified = Instant.EPOCH;
-    private Instant tempAsnFileLastModified = null;
-    private Instant tempCityFileLastModified = null;
+    protected Instant asnFileLastModified = Instant.EPOCH;
+    protected Instant cityFileLastModified = Instant.EPOCH;
+    protected Instant tempAsnFileLastModified = null;
+    protected Instant tempCityFileLastModified = null;
 
     private final AtomicReference<Pattern> pathPattern = new AtomicReference<>();
 
@@ -72,7 +77,7 @@ public abstract class GeoIpFileService {
 
     public abstract boolean isCloud();
 
-    protected Pattern getPathPattern() {
+    private Pattern getPathPattern() {
         if (pathPattern.get() == null) {
             pathPattern.set(Pattern.compile("^" + Pattern.quote(getPathPrefix()) + "(?<" + BUCKET_GROUP + ">[-\\w]+)\\/(?<" + OBJECT_GROUP + ">[-\\w\\/\\.]+)$"));
         }
