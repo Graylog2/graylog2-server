@@ -38,7 +38,7 @@ type Props = {
   };
 };
 
-const ServerUnavailablePage = ({ server }: Props) => {
+const ServerUnavailablePage = ({ server = undefined }: Props) => {
   const productName = useProductName();
   const [showDetails, setShowDetails] = useState(false);
 

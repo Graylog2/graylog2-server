@@ -94,10 +94,6 @@ class IndexSetPage extends React.Component<Props, State> {
     indexerOverview: undefined,
     indexerOverviewError: undefined,
     indexSet: undefined,
-    indexDetails: {
-      indices: undefined,
-      closedIndices: undefined,
-    },
   };
 
   constructor(props) {

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -33,7 +33,7 @@ const ImportExtractorsPage = ({ params }: Props) => {
 
   useEffect(() => {
     InputsActions.get(params.inputId).then((_input) => setInput(_input));
-  }, []);
+  }, [params.inputId]);
 
   const _isLoading = !input;
 
