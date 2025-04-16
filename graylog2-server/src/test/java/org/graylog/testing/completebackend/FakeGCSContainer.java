@@ -66,4 +66,12 @@ public class FakeGCSContainer extends GenericContainer<FakeGCSContainer> {
     public String getProjectId() {
         return projectId;
     }
+
+    @Override
+    public void close() {
+        super.close();
+        if (network != null) {
+            network.close();
+        }
+    }
 }
