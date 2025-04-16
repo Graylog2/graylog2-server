@@ -14,23 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web.customization;
+package org.graylog2.storage.providers;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import org.graylog2.indexer.client.IndexerHostsAdapter;
+import org.graylog2.storage.DetectedSearchVersion;
+import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.VersionAwareProvider;
 
-import javax.annotation.Nullable;
-import java.util.Optional;
+import java.util.Map;
 
-public class CustomizationConfig {
-    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
-    private final Config config;
-
+public class IndexerHostsAdapterProvider extends VersionAwareProvider<IndexerHostsAdapter> {
     @Inject
-    public CustomizationConfig(@Nullable Config config) {
-        this.config = Optional.ofNullable(config).orElse(Config.empty());
-    }
-
-    public String productName() {
-        return config.productName().orElse(DEFAULT_PRODUCT_NAME);
+    public IndexerHostsAdapterProvider(@DetectedSearchVersion SearchVersion indexerVersion, Map<SearchVersion, Provider<IndexerHostsAdapter>> pluginBindings) {
+        super(indexerVersion, pluginBindings);
     }
 }
