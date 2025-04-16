@@ -76,10 +76,14 @@ public class GcsGeoIpFileService extends GeoIpFileService {
 
     @Override
     public void validateConfiguration(GeoIpResolverConfig config) throws ConfigValidationException {
-        boolean asnFileExists = !config.asnDbPath().isBlank();
-        if (!config.cityDbPath().startsWith(GCS_BUCKET_PREFIX) ||
-                (asnFileExists && !config.asnDbPath().startsWith(GCS_BUCKET_PREFIX))) {
-            throw new ConfigValidationException("Database file paths must be valid google cloud storage object paths when using it. Expecting a prefix \"" + GCS_BUCKET_PREFIX + "\".");
+        if (extractDetails(config.cityDbPath()).isEmpty()) {
+            throw new ConfigValidationException("City database path is not a valid GCS URL. It must be in the format <gs://bucket-name/object-name>.");
+        }
+        if (!config.asnDbPath().isBlank() && extractDetails(config.asnDbPath()).isEmpty()) {
+            throw new ConfigValidationException("ASN database path is not a valid GCS URL. It must be in the format <gs://bucket-name/object-name>.");
+        }
+        if (config.gcsProjectId() == null || config.gcsProjectId().isBlank()) {
+            throw new ConfigValidationException("GCS project ID is not set. It is required to connect to Google Cloud Storage.");
         }
     }
 
