@@ -14,23 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web.customization;
+package org.graylog2.configuration;
 
-import jakarta.inject.Inject;
+import java.net.URI;
+import java.util.List;
 
-import javax.annotation.Nullable;
-import java.util.Optional;
+public record SearchIndexerHosts(List<URI> configuredHosts, List<URI> initialHosts, List<URI> activeHosts) {
 
-public class CustomizationConfig {
-    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
-    private final Config config;
-
-    @Inject
-    public CustomizationConfig(@Nullable Config config) {
-        this.config = Optional.ofNullable(config).orElse(Config.empty());
-    }
-
-    public String productName() {
-        return config.productName().orElse(DEFAULT_PRODUCT_NAME);
-    }
 }
