@@ -41,6 +41,9 @@ public class IndexerDiscoveryModule extends AbstractModule {
         registerIndexerDiscoveryListener(IndexerDiscoverySecurityAutoconfig.class);
 
         bind(new TypeLiteral<List<URI>>() {}).annotatedWith(IndexerHosts.class).toProvider(IndexerDiscoveryProvider.class).asEagerSingleton();
+
+        bind(SearchIndexerHostsService.class).to(SearchIndexerHostsServiceImpl.class).asEagerSingleton();
+
         bind(Boolean.class).annotatedWith(RunsWithDataNode.class).toProvider(RunsWithDataNodeDiscoveryProvider.class).asEagerSingleton();
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
