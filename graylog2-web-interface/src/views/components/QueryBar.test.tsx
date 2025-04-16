@@ -118,7 +118,7 @@ describe('QueryBar', () => {
 
     fireEvent.click(dropdown);
 
-    const closeButton = await screen.findByRole('menuitem', { name: /delete/i, hidden: true });
+    const closeButton = await screen.findByRole('menuitem', { name: /delete/i });
 
     fireEvent.click(closeButton);
 

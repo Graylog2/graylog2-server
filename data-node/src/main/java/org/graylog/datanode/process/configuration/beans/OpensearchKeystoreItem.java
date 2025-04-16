@@ -14,16 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.datanode.process.configuration.beans;
 
-public class MavenProjectDirProviderWithFrontend extends DefaultMavenProjectDirProvider {
-    @Override
-    public String getUniqueId() {
-        return "with_frontend";
-    }
+import org.graylog.datanode.opensearch.cli.OpensearchKeystoreCli;
 
-    @Override
-    public boolean includeFrontend() {
-        return true;
-    }
+public interface OpensearchKeystoreItem {
+    String key();
+    void persist(OpensearchKeystoreCli cli);
 }

@@ -25,7 +25,7 @@ import Popover from 'components/common/Popover';
 import type { BsSize } from 'components/bootstrap/types';
 
 type Props = PropsWithChildren<{
-  helpText: string|React.ReactNode;
+  helpText: string | React.ReactNode;
   bsStyle?: ColorVariant;
   bsSize?: BsSize;
 }>;
@@ -44,7 +44,7 @@ const StyledIcon = styled(Icon)<{ $bsStyle: ColorVariant }>(
   `,
 );
 
-const HelpPopoverButton = ({ helpText, bsStyle = "info", bsSize = "medium" }: Props) => {
+const HelpPopoverButton = ({ helpText, bsStyle = 'info', bsSize = 'medium' }: Props) => {
   const [showHelp, setShowHelp] = useState(false);
   const toggleHelp = () => setShowHelp((cur) => !cur);
 

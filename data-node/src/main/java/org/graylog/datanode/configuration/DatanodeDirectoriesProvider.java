@@ -14,16 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.datanode.configuration;
 
-public class MavenProjectDirProviderWithFrontend extends DefaultMavenProjectDirProvider {
-    @Override
-    public String getUniqueId() {
-        return "with_frontend";
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
+public class DatanodeDirectoriesProvider implements Provider<DatanodeDirectories> {
+
+    private final DatanodeDirectories directories;
+
+    @Inject
+    public DatanodeDirectoriesProvider(DatanodeConfiguration datanodeConfiguration) {
+        this.directories = datanodeConfiguration.datanodeDirectories();
     }
 
     @Override
-    public boolean includeFrontend() {
-        return true;
+    public DatanodeDirectories get() {
+        return directories;
     }
 }
