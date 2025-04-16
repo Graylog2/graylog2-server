@@ -57,7 +57,7 @@ const getGlobalProps = (telemetryData: TelemetryDataType) => {
   };
 };
 
-const GLTelemetryProvider = ({ children }: { children: React.ReactElement }) => {
+const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   const posthog = usePostHog();
   const theme = useTheme();
 
@@ -143,13 +143,13 @@ const GLTelemetryProvider = ({ children }: { children: React.ReactElement }) => 
 };
 
 const plugContextValue = { sendTelemetry: () => {} };
-const TelemetryProviderPlug = ({ children }) => (
+const NoopTelemetryProvider = ({ children }) => (
   <TelemetryContext.Provider value={plugContextValue}>{children}</TelemetryContext.Provider>
 );
 const isTelemetryEnabled = AppConfig?.telemetry()?.enabled;
 const TelemetryProvider = ({ children }) => {
-  if (!isTelemetryEnabled) return <TelemetryProviderPlug>{children}</TelemetryProviderPlug>;
+  if (!isTelemetryEnabled) return <NoopTelemetryProvider>{children}</NoopTelemetryProvider>;
 
-  return <GLTelemetryProvider>{children}</GLTelemetryProvider>;
+  return <PostHogTelemetryProvider>{children}</PostHogTelemetryProvider>;
 };
 export default TelemetryProvider;
