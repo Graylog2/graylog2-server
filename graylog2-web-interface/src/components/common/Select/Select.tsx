@@ -132,7 +132,7 @@ const menu = (base) => ({
 
 const menuPortal = (base) => ({
   ...base,
-  zIndex: 'auto',
+  zIndex: 1052,
 });
 
 const singleValueAndPlaceholder =
@@ -241,7 +241,6 @@ export type Props<OptionValue> = {
   multi?: boolean;
   maxMenuHeight?: number;
   menuPlacement?: 'bottom' | 'auto' | 'top';
-  menuPortalTarget?: HTMLElement;
   menuIsOpen?: boolean;
   name?: string;
   openMenuOnFocus?: boolean;
@@ -340,7 +339,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     total: 0,
     onInputChange: undefined,
     loadOptions: undefined,
-    menuPortalTarget: undefined,
     forwardedRef: undefined,
   };
 
@@ -524,7 +522,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       getOptionValue: (option) => option[valueKey],
       filterOption: customFilter,
       components: mergedComponents,
-      menuPortalTarget: menuPortalTarget,
+      menuPortalTarget: document.body,
       isOptionDisabled: (option: { disabled?: boolean }) => !!option.disabled,
       styles: _styles({ size, theme }),
       theme: this._selectTheme,
