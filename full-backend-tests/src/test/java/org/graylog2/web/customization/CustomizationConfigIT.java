@@ -26,7 +26,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+// @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class CustomizationConfigIT {
     private final GraylogApis apis;
 
