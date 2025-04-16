@@ -23,25 +23,26 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
-import java.util.Optional;
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 @Singleton
-public class CustomizationConfigProvider implements Provider<Config> {
+public class ConfigProvider implements Provider<Config> {
     private final ClusterConfigService clusterConfigService;
     private final Supplier<Config> configSupplier;
 
     @Inject
-    public CustomizationConfigProvider(ClusterConfigService clusterConfigService, @Named("isDevelopmentServer") boolean isDevelopment) {
+    public ConfigProvider(ClusterConfigService clusterConfigService, @Named("isDevelopmentServer") boolean isDevelopment) {
         this.clusterConfigService = clusterConfigService;
         this.configSupplier = isDevelopment ? this::retrieve : Suppliers.memoize(this::retrieve);
     }
 
     private Config retrieve() {
-        return Optional.ofNullable(clusterConfigService.get(Config.class)).orElse(Config.empty());
+        return clusterConfigService.get(Config.class);
     }
 
     @Override
+    @Nullable
     public Config get() {
         return configSupplier.get();
     }

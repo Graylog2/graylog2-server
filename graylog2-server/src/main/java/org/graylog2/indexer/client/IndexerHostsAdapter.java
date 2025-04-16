@@ -14,23 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web.customization;
+package org.graylog2.indexer.client;
 
-import jakarta.inject.Inject;
+import java.net.URI;
+import java.util.List;
 
-import javax.annotation.Nullable;
-import java.util.Optional;
-
-public class CustomizationConfig {
-    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
-    private final Config config;
-
-    @Inject
-    public CustomizationConfig(@Nullable Config config) {
-        this.config = Optional.ofNullable(config).orElse(Config.empty());
-    }
-
-    public String productName() {
-        return config.productName().orElse(DEFAULT_PRODUCT_NAME);
-    }
+public interface IndexerHostsAdapter {
+    /**
+     * @return List of up-to-date nodes as the elastic/opensearch client sees them and uses them. This includes all
+     * changes caused by sniffers and dynamic infrastructure changes. Unlike the fixed "elasticsearch_hosts" configuration
+     * property, this may change during every call and gives real-time information.
+     */
+    List<URI> getActiveHosts();
 }
