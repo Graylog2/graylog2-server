@@ -31,6 +31,7 @@ import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.integrations.notifications.types.util.RequestClient;
 import org.graylog2.bindings.providers.JsonSafeEngineProvider;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageFactory;
@@ -39,6 +40,9 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.web.customization.Config;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -47,6 +51,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -187,12 +192,14 @@ public class TeamsEventNotificationV2Test {
         final ImmutableList<MessageSummary> messageSummaries = generateMessageSummaries(50);
         when(notificationCallbackService.getBacklogForEvent(eventNotificationContext)).thenReturn(messageSummaries);
 
+        final var httpConfiguration = mock(HttpConfiguration.class);
+        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://graylog.example.org"));
         teamsEventNotification = new TeamsEventNotificationV2(notificationCallbackService,
                 new JsonSafeEngineProvider().get(),
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                mock(TemplateModelProvider.class));
+                new TemplateModelProvider(new CustomizationConfig(Config.empty()), new ObjectMapperProvider(), httpConfiguration));
     }
 
     @Test

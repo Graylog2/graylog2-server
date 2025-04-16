@@ -32,6 +32,7 @@ import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.integrations.notifications.types.util.RequestClient;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageFactory;
@@ -41,6 +42,8 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.web.customization.Config;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
@@ -50,6 +53,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +85,7 @@ public class TeamsEventNotificationTest {
 
     private TeamsEventNotificationConfig teamsEventNotificationConfig;
     private EventNotificationContext eventNotificationContext;
-    private MessageFactory messageFactory = new TestMessageFactory();
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     private final String expectedColor = "#FF2052";
     private final String expectedImage = "iconUrl";
@@ -94,13 +98,15 @@ public class TeamsEventNotificationTest {
         final ImmutableList<MessageSummary> messageSummaries = generateMessageSummaries(50);
         when(notificationCallbackService.getBacklogForEvent(eventNotificationContext)).thenReturn(messageSummaries);
 
+        final var httpConfiguration = mock(HttpConfiguration.class);
+        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://graylog.example.org"));
         teamsEventNotification = new TeamsEventNotification(notificationCallbackService,
                 new ObjectMapperProvider(),
                 Engine.createEngine(),
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                mock(TemplateModelProvider.class));
+                new TemplateModelProvider(new CustomizationConfig(Config.empty()), new ObjectMapperProvider(), httpConfiguration));
     }
 
     private void getDummyTeamsNotificationConfig() {
@@ -170,13 +176,15 @@ public class TeamsEventNotificationTest {
         List<MessageSummary> messageSummaries = generateMessageSummaries(50);
         Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, teamsEventNotificationConfig.type(), messageSummaries, DateTimeZone.UTC);
         //there are 9 keys and two asserts needs to be implemented (backlog,event)
-        assertThat(customMessageModel).isNotNull();
-        assertThat(customMessageModel.get("event_definition_description")).isEqualTo("Event Definition Test Description");
-        assertThat(customMessageModel.get("event_definition_title")).isEqualTo("Event Definition Test Title");
-        assertThat(customMessageModel.get("event_definition_type")).isEqualTo("test-dummy-v1");
-        assertThat(customMessageModel.get("type")).isEqualTo("teams-notification-v1");
-        assertThat(customMessageModel.get("job_definition_id")).isEqualTo("<unknown>");
-        assertThat(customMessageModel.get("job_trigger_id")).isEqualTo("<unknown>");
+        assertThat(customMessageModel).isNotNull()
+                .containsAllEntriesOf(Map.of(
+                        "event_definition_description", "Event Definition Test Description",
+                        "event_definition_title", "Event Definition Test Title",
+                        "event_definition_type", "test-dummy-v1",
+                        "type", "teams-notification-v1",
+                        "job_definition_id", "<unknown>",
+                        "job_trigger_id", "<unknown>"
+                ));
     }
 
 
