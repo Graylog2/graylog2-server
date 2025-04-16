@@ -21,8 +21,8 @@ import { Section } from 'components/common';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
+import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
-import DiagnosisHelp from './DiagnosisHelp';
 import { DIAGNOSIS_HELP } from './Constants';
 
 type Props = {
@@ -83,7 +83,7 @@ const DiagnosisMessageErrors = ({ messageErrors, inputId }: Props) => {
     <Section
       preHeaderSection={<StatusColorIndicator radius="50%" bsStyle={hasError ? 'danger' : 'gray'} />}
       headerLeftSection={
-        <DiagnosisHelp
+        <HelpPopoverButton
           helpText={`Message Error at Input:
             ${DIAGNOSIS_HELP.MESSAGE_ERROR_AT_INPUT}
 
