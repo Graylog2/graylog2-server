@@ -18,7 +18,8 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { mount } from 'wrappedEnzyme';
 import SelectComponent, { components as Components } from 'react-select';
-import selectEvent from 'react-select-event';
+
+import selectEvent from 'helpers/selectEvent';
 
 import Select from './index';
 

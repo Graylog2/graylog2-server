@@ -521,6 +521,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       getOptionValue: (option) => option[valueKey],
       filterOption: customFilter,
       components: mergedComponents,
+      menuPortalTarget: document.body,
       isOptionDisabled: (option: { disabled?: boolean }) => !!option.disabled,
       styles: _styles({ size, theme }),
       theme: this._selectTheme,
