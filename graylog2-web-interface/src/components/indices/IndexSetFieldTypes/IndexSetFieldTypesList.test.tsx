@@ -452,7 +452,7 @@ describe('IndexSetFieldTypesList', () => {
       const button = await screen.findByTitle('Set field type profile');
       fireEvent.click(button);
       const modal = await screen.findByRole('dialog');
-      await within(modal).findByRole('button', { name: /Set Profile/i, hidden: true });
+      await within(modal).findByRole('button', { name: /Set Profile/i });
     });
   });
 });

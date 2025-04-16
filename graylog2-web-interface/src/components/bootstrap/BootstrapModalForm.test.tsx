@@ -52,7 +52,7 @@ describe('BootstrapModalForm', () => {
 
     render(renderModalForm(true, onSubmit, onCancel));
 
-    (await screen.findByRole('button', { name: 'Submit', hidden: true })).click();
+    (await screen.findByRole('button', { name: 'Submit' })).click();
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalled();
@@ -67,7 +67,7 @@ describe('BootstrapModalForm', () => {
 
     render(renderModalForm(true, onSubmit, onCancel));
 
-    (await screen.findByRole('button', { name: 'Cancel', hidden: true })).click();
+    (await screen.findByRole('button', { name: 'Cancel' })).click();
 
     await waitFor(() => {
       expect(onCancel).toHaveBeenCalled();

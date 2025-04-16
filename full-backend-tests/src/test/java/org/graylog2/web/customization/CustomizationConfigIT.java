@@ -16,18 +16,21 @@
  */
 package org.graylog2.web.customization;
 
-import io.restassured.response.ValidatableResponse;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.HostAccess;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(searchVersions = SearchServer.DATANODE_DEV)
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class CustomizationConfigIT {
+    private static final Logger LOG = LoggerFactory.getLogger(CustomizationConfigIT.class);
     private final GraylogApis apis;
 
     public CustomizationConfigIT(GraylogApis graylogApis) {
@@ -36,37 +39,49 @@ public class CustomizationConfigIT {
 
     @ContainerMatrixTest
     void worksWithoutCustomizationConfig() {
-        getConfigJs()
-                .body("branding", nullValue());
+        assertThat(getFromConfigJs("branding")).isEqualTo(null);
     }
 
     @ContainerMatrixTest
     void invalidCustomizationConfigDoesNotBreakEndpoint() {
         importFixture("invalid-customization-config.json");
 
-        getConfigJs()
-                .body("branding", nullValue());
+        assertThat(getFromConfigJs("branding")).isEqualTo(null);
     }
 
     @ContainerMatrixTest
     void returnsCustomizationConfig() {
         importFixture("valid-customization-config.json");
 
-        getConfigJs()
-                .body("branding.product_name", equalTo("AwesomeLog"));
+        assertThat(getFromConfigJs("branding.product_name")).isEqualTo("AwesomeLog");
     }
 
-    private ValidatableResponse getConfigJs() {
-        return given()
+    private String getFromConfigJs(String attribute) {
+        final var response = given()
                 .baseUri(apis.backend().uri())
                 .port(apis.backend().apiPort())
                 .get("/config.js")
                 .then()
                 .assertThat()
-                .statusCode(200);
+                .statusCode(200)
+                .extract().body().asString();
+
+        try (final var jsContext = Context.newBuilder()
+                .allowExperimentalOptions(true)
+                .allowHostAccess(HostAccess.NONE)
+                .option("engine.WarnInterpreterOnly", "false")
+                .build()) {
+            final var value = jsContext.eval("js", """
+                        const window = {};
+                        %1$s
+                        window.appConfig.%2$s;
+                    """.formatted(response, attribute));
+            return value.asString();
+        }
     }
 
     void importFixture(String name) {
+        apis.backend().dropCollection("cluster_config");
         apis.backend().importMongoDBFixture(name, CustomizationConfigIT.class);
     }
 }
