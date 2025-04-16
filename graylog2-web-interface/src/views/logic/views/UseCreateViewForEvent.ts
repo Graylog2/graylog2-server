@@ -82,8 +82,8 @@ const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
   return new WidgetPosition(col, row, AGGREGATION_WIDGET_HEIGHT, 6);
 };
 
-const createViewWidget = ({ groupBy, fnSeries, expr }) => {
-  const uniqPivotFields = uniq(groupBy.filter((v) => !!v)) as Array<string>;
+const createViewWidget = ({ groupBy, fnSeries, expr }: { groupBy: Array<string> }) => {
+  const uniqPivotFields = uniq(groupBy.filter((v) => !!v));
   const rowPivots = uniqPivotFields.length ? [pivotForField(uniqPivotFields, new FieldType('value', [], []))] : [];
   const fnSeriesForFunc = Series.forFunction(fnSeries);
   const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
