@@ -156,29 +156,24 @@ const useIndexSetsListResult = {
 const getStreamCreateFormFields = async () => {
   const titleInput = await screen.findByRole('textbox', {
     name: /Title/i,
-    hidden: true,
   });
 
   const descriptionInput = await screen.findByRole('textbox', {
     name: /Description/i,
-    hidden: true,
   });
 
   const indexSetSelect = await screen.findByLabelText('Select Index Set');
 
   const removeMatchesCheckbox = await screen.findByRole('checkbox', {
     name: /Remove matches from/i,
-    hidden: true,
   });
 
   const newPipelineCheckbox = await screen.findByRole('checkbox', {
     name: /Create a new pipeline for this stream/i,
-    hidden: true,
   });
 
   const submitButton = await screen.findByRole('button', {
     name: 'Next',
-    hidden: true,
   });
 
   return {
@@ -231,7 +226,6 @@ describe('InputSetupWizard Setup Routing', () => {
         renderWizard();
         const selectStreamButton = await screen.findByRole('button', {
           name: /Select Stream/i,
-          hidden: true,
         });
 
         fireEvent.click(selectStreamButton);
@@ -250,7 +244,6 @@ describe('InputSetupWizard Setup Routing', () => {
         renderWizard();
         const selectStreamButton = await screen.findByRole('button', {
           name: /Select Stream/i,
-          hidden: true,
         });
 
         fireEvent.click(selectStreamButton);
@@ -278,7 +271,6 @@ describe('InputSetupWizard Setup Routing', () => {
 
         const selectStreamButton = await screen.findByRole('button', {
           name: /Select Stream/i,
-          hidden: true,
         });
 
         fireEvent.click(selectStreamButton);
@@ -306,7 +298,6 @@ describe('InputSetupWizard Setup Routing', () => {
 
         const selectStreamButton = await screen.findByRole('button', {
           name: /Select Stream/i,
-          hidden: true,
         });
 
         fireEvent.click(selectStreamButton);
@@ -336,7 +327,6 @@ describe('InputSetupWizard Setup Routing', () => {
 
         const selectStreamButton = await screen.findByRole('button', {
           name: /Select Stream/i,
-          hidden: true,
         });
 
         fireEvent.click(selectStreamButton);
@@ -376,12 +366,11 @@ describe('InputSetupWizard Setup Routing', () => {
 
       const createStreamButton = await screen.findByRole('button', {
         name: /Create Stream/i,
-        hidden: true,
       });
 
       fireEvent.click(createStreamButton);
 
-      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+      await screen.findByRole('heading', { name: /Create new stream/i });
 
       const { titleInput, descriptionInput, indexSetSelect, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
         await getStreamCreateFormFields();
@@ -404,12 +393,11 @@ describe('InputSetupWizard Setup Routing', () => {
 
       const createStreamButton = await screen.findByRole('button', {
         name: /Create Stream/i,
-        hidden: true,
       });
 
       fireEvent.click(createStreamButton);
 
-      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+      await screen.findByRole('heading', { name: /Create new stream/i });
 
       const { titleInput, descriptionInput, indexSetSelect } = await getStreamCreateFormFields();
 
@@ -426,12 +414,11 @@ describe('InputSetupWizard Setup Routing', () => {
 
       const createStreamButton = await screen.findByRole('button', {
         name: /Create Stream/i,
-        hidden: true,
       });
 
       fireEvent.click(createStreamButton);
 
-      await screen.findByRole('heading', { name: /Create new stream/i, hidden: true });
+      await screen.findByRole('heading', { name: /Create new stream/i });
 
       const { titleInput, descriptionInput, indexSetSelect } = await getStreamCreateFormFields();
 
