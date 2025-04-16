@@ -142,7 +142,7 @@ const GLTelemetryProvider = ({ children }: { children: React.ReactElement }) => 
   );
 };
 
-const plugContextValue = { sendTelemetryPlug: () => {} };
+const plugContextValue = { sendTelemetry: () => {} };
 const TelemetryProviderPlug = ({ children }) => (
   <TelemetryContext.Provider value={plugContextValue}>{children}</TelemetryContext.Provider>
 );
