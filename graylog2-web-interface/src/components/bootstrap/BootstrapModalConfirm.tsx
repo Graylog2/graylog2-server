@@ -18,6 +18,7 @@ import React from 'react';
 
 import ModalSubmit from 'components/common/ModalSubmit';
 
+import type { ModalSize } from './Modal';
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
@@ -29,6 +30,7 @@ type Props = {
   confirmButtonDisabled?: boolean;
   onConfirm: (e: React.BaseSyntheticEvent) => void;
   onCancel: () => void;
+  size?: ModalSize;
   children: React.ReactNode;
 };
 
@@ -47,8 +49,8 @@ const BootstrapModalConfirm = ({
   onConfirm,
   ...restProps
 }: Props) => (
-  <BootstrapModalWrapper showModal={showModal} onHide={onCancel} role="alertdialog" {...restProps}>
-    <Modal.Header closeButton>
+  <BootstrapModalWrapper showModal={showModal} onHide={onCancel} {...restProps}>
+    <Modal.Header>
       <Modal.Title>{title}</Modal.Title>
     </Modal.Header>
 

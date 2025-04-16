@@ -25,6 +25,7 @@ import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdField
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch2.client.IndexerHostsAdapterOS2;
 import org.graylog.storage.opensearch2.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch2.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch2.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
@@ -36,6 +37,7 @@ import org.graylog.storage.opensearch2.sniffer.impl.NodeLoggingFilter;
 import org.graylog.storage.opensearch2.sniffer.impl.OpensearchClusterSniffer;
 import org.graylog.storage.opensearch2.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2;
 import org.graylog2.indexer.IndexToolsAdapter;
+import org.graylog2.indexer.client.IndexerHostsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
@@ -105,6 +107,8 @@ public class OpenSearch2Module extends VersionAwareModule {
         Multibinder<SnifferFilter> snifferFilters = Multibinder.newSetBinder(binder(), SnifferFilter.class);
         snifferFilters.addBinding().to(NodeAttributesFilter.class);
         snifferFilters.addBinding().to(NodeLoggingFilter.class);
+
+        bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterOS2.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
