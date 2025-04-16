@@ -28,7 +28,7 @@ import ToggleActionButton from 'components/content-stream/ToggleActionButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { CarouselProvider } from 'components/common/Carousel';
-import AppConfig from 'util/AppConfig';
+import useWelcomeCustomization from 'customization/useWelcomeCustomization';
 
 const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(
   ({ $enabled, theme }) => css`
@@ -48,10 +48,8 @@ const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boole
   `,
 );
 
-const isNewsSectionEnabled = AppConfig?.branding()?.welcome?.news?.enabled === true;
-const isReleaseSectionEnabled = AppConfig?.branding()?.welcome?.releases?.enabled === true;
-
 const ContentStreamSection = () => {
+  const { isReleaseSectionEnabledForBrand, isNewsSectionEnabledForBrand } = useWelcomeCustomization();
   const { username } = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
   const { contentStreamSettings, isLoadingContentStreamSettings, onSaveContentStreamSetting, refetchContentStream } =
@@ -114,7 +112,7 @@ const ContentStreamSection = () => {
 
   return (
     <SectionGrid $columns="2fr 1fr">
-      {isNewsSectionEnabled && (
+      {isNewsSectionEnabledForBrand && (
         <StyledNewsSectionComponent
           title="News"
           $enabled={contentStreamEnabled}
@@ -127,7 +125,7 @@ const ContentStreamSection = () => {
           )}
         </StyledNewsSectionComponent>
       )}
-      {isReleaseSectionEnabled && (
+      {isReleaseSectionEnabledForBrand && (
         <StyledReleaseSectionComponent
           title="Releases"
           $enabled={releasesSectionEnabled}
