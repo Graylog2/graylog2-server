@@ -484,7 +484,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       optionRenderer, // Do not pass down prop
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueRenderer, // Do not pass down prop
-      menuPortalTarget,
       async,
       total,
       onInputChange,
@@ -522,7 +521,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       getOptionValue: (option) => option[valueKey],
       filterOption: customFilter,
       components: mergedComponents,
-      menuPortalTarget: document.body,
       isOptionDisabled: (option: { disabled?: boolean }) => !!option.disabled,
       styles: _styles({ size, theme }),
       theme: this._selectTheme,

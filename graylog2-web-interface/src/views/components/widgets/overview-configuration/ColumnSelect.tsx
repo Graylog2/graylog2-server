@@ -30,7 +30,6 @@ type Props = {
   columns: Array<string>;
   excludedColumns?: Array<string>;
   id: string;
-  menuPortalTarget?: HTMLElement;
   name: string;
   onChange: (columnName: string) => void;
   onMenuClose?: () => void;
@@ -52,7 +51,6 @@ const ColumnSelect = ({
   columnTitle,
   id,
   excludedColumns = [],
-  menuPortalTarget,
   name,
   onChange,
   onMenuClose,
@@ -91,7 +89,6 @@ const ColumnSelect = ({
       value={value}
       aria-label={ariaLabel}
       autoFocus={autoFocus}
-      menuPortalTarget={menuPortalTarget}
       onChange={onChange}
     />
   );

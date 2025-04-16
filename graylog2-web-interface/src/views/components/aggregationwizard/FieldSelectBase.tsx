@@ -49,7 +49,6 @@ type Props = {
   excludedFields?: Array<string>;
   id: string;
   isFieldQualified?: (field: FieldTypeMapping) => boolean;
-  menuPortalTarget?: HTMLElement;
   name: string;
   onChange: (fieldName: string) => void;
   onMenuClose?: () => void;
@@ -105,7 +104,6 @@ const FieldSelect = ({
   excludedFields = [],
   id,
   isFieldQualified = () => true,
-  menuPortalTarget,
   name,
   onChange,
   onMenuClose,
@@ -163,7 +161,6 @@ const FieldSelect = ({
         optionRenderer={OptionRenderer}
         size={size}
         autoFocus={autoFocus}
-        menuPortalTarget={menuPortalTarget}
         onChange={onChange}
       />
       {(_showSelectAllRest || _showDeSelectAll) && (
