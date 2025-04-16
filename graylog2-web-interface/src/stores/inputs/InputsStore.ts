@@ -115,7 +115,7 @@ export const InputsStore = singletonStore('core.Inputs', () =>
     },
 
     create(input) {
-      const promise = fetch('POST', URLUtils.qualifyUrl(this.sourceUrl), input);
+      const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}?setup_wizard=true`), input);
 
       promise.then(
         () => {

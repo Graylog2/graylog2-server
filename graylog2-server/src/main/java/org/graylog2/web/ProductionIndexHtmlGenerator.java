@@ -19,12 +19,11 @@ package org.graylog2.web;
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.core.MultivaluedMap;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.io.IOException;
 import java.net.URI;
@@ -46,36 +45,41 @@ public class ProductionIndexHtmlGenerator implements IndexHtmlGenerator {
     private final List<String> sortedJsFiles;
     private final Engine templateEngine;
     private final HttpConfiguration httpConfiguration;
+    private final CustomizationConfig customizationConfig;
 
     @Inject
     public ProductionIndexHtmlGenerator(final PluginAssets pluginAssets,
                                         final Engine templateEngine,
-                                        final HttpConfiguration httpConfiguration) throws IOException {
+                                        final HttpConfiguration httpConfiguration,
+                                        final CustomizationConfig customizationConfig) throws IOException {
         this(
                 Resources.toString(Resources.getResource("web-interface/index.html.template"), StandardCharsets.UTF_8),
                 pluginAssets.cssFiles(),
                 pluginAssets.sortedJsFiles(),
                 templateEngine,
-                httpConfiguration);
+                httpConfiguration,
+                customizationConfig);
     }
 
     private ProductionIndexHtmlGenerator(final String template,
                                          final List<String> cssFiles,
                                          final List<String> sortedJsFiles,
                                          final Engine templateEngine,
-                                         final HttpConfiguration httpConfiguration) throws IOException {
+                                         final HttpConfiguration httpConfiguration,
+                                         final CustomizationConfig customizationConfig) {
         this.template = requireNonNull(template, "template");
         this.cssFiles = requireNonNull(cssFiles, "cssFiles");
         this.sortedJsFiles = requireNonNull(sortedJsFiles, "sortedJsFiles");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
         this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
+        this.customizationConfig = customizationConfig;
     }
 
     @Override
     public String get(MultivaluedMap<String, String> headers, String nonce) {
         final URI relativePath = RestTools.buildRelativeExternalUri(headers, httpConfiguration.getHttpExternalUri());
         final Map<String, Object> model = ImmutableMap.<String, Object>builder()
-                .put("title", "Graylog Web Interface")
+                .put("title", customizationConfig.productName() + " Web Interface")
                 .put("cssFiles", cssFiles)
                 .put("jsFiles", sortedJsFiles)
                 .put("appPrefix", relativePath)

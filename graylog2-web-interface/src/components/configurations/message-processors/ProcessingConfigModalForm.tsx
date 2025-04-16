@@ -93,7 +93,7 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
       <Formik onSubmit={saveConfig} initialValues={formConfig}>
         {({ isSubmitting, values, setFieldValue, isValid }) => (
           <Form>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <Modal.Title id="dialog_label">Update Message Processors Configuration</Modal.Title>
             </Modal.Header>
 

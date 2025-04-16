@@ -260,7 +260,6 @@ describe('CreateEventDefinitionModal', () => {
 
     const linkButton = await screen.findByRole<HTMLAnchorElement>('link', {
       name: /continue configuration/i,
-      hidden: true,
     });
 
     expect(linkButton.href).toContain('/alerts/definitions/new?step=condition&session-id=cedfv-session-id');

@@ -1,0 +1,5 @@
+type = "added"
+message = "Added support for Google Cloud Storage repository configuration in data node"
+
+issues = []
+pulls = ["22282"]

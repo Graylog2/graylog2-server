@@ -207,7 +207,7 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
 
   return (
     <BootstrapModalForm
-      title={<span>Remove Field Type Overrides</span>}
+      title="Remove Field Type Overrides"
       submitButtonText="Remove field type overrides"
       onSubmitForm={onSubmit}
       onCancel={onCancel}

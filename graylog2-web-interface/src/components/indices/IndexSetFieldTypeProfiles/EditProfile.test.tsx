@@ -80,7 +80,6 @@ describe('EditProfile', () => {
 
     const name = await screen.findByRole('textbox', {
       name: /name/i,
-      hidden: true,
     });
 
     const fieldFirst = await screen.findByLabelText(/select customFieldMappings.0.field/i);

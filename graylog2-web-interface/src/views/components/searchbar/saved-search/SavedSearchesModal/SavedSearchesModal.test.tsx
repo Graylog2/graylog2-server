@@ -218,14 +218,12 @@ describe('SavedSearchesModal', () => {
 
       const pageSizeDropdown = await screen.findByRole('button', {
         name: /configure page size/i,
-        hidden: true,
       });
 
       userEvent.click(pageSizeDropdown);
 
       const pageSizeOption = await screen.findByRole('menuitem', {
         name: /100/i,
-        hidden: true,
       });
 
       userEvent.click(pageSizeOption);

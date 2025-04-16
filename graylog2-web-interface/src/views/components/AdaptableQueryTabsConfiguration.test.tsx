@@ -82,7 +82,6 @@ describe('AdaptableQueryTabsConfiguration', () => {
     renderConfiguration();
     const deleteButton = await screen.findByRole('button', {
       name: /remove page query title 2/i,
-      hidden: true,
     });
 
     // eslint-disable-next-line testing-library/no-unnecessary-act

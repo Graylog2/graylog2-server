@@ -16,23 +16,31 @@
  */
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -54,23 +62,29 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
 
     static final String SEARCH_NODE_ROLE = "search";
     private final Configuration localConfiguration;
+    private final DatanodeDirectories datanodeDirectories;
     private final S3RepositoryConfiguration s3RepositoryConfiguration;
+    private final GCSRepositoryConfiguration gcsRepositoryConfiguration;
     private final Provider<OpensearchUsableSpace> usableSpaceProvider;
 
     @Inject
-    public SearchableSnapshotsConfigurationBean(Configuration localConfiguration, S3RepositoryConfiguration s3RepositoryConfiguration, Provider<OpensearchUsableSpace> usableSpaceProvider) {
+    public SearchableSnapshotsConfigurationBean(Configuration localConfiguration, DatanodeDirectories datanodeDirectories, S3RepositoryConfiguration s3RepositoryConfiguration, GCSRepositoryConfiguration gcsRepositoryConfiguration, Provider<OpensearchUsableSpace> usableSpaceProvider) {
         this.localConfiguration = localConfiguration;
+        this.datanodeDirectories = datanodeDirectories;
         this.s3RepositoryConfiguration = s3RepositoryConfiguration;
+        this.gcsRepositoryConfiguration = gcsRepositoryConfiguration;
         this.usableSpaceProvider = usableSpaceProvider;
     }
 
     @Override
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
-        if (snapshotsAreEnabled()) {
+        if (snapshotsAreConfigured()) {
+            LOG.info("Searchable snapshots are configured, adding opensearch configuration");
             final DatanodeConfigurationPart.Builder builder = DatanodeConfigurationPart.builder();
 
             final boolean searchRoleEnabled = searchRoleEnabled();
-            if(searchRoleEnabled) {
+            if (searchRoleEnabled) {
+                LOG.info("Search role enabled, validating usable space and adding search role to opensearch configuration");
                 validateUsableSpace();
                 builder.addNodeRole(SEARCH_NODE_ROLE);
             }
@@ -78,7 +92,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
                     .properties(properties(searchRoleEnabled))
                     .keystoreItems(keystoreItems())
                     .build();
-        } else if (searchRoleExplicitlyConfigured() && !snapshotsAreEnabled()) {
+        } else if (searchRoleExplicitlyConfigured() && !snapshotsAreConfigured()) {
             throw new OpensearchConfigurationException("Your configuration contains the search node role in node_roles but there is no" +
                     "snapshots repository configured. Please remove the role or provide path_repo or S3 repository credentials.");
         } else {
@@ -149,7 +163,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     private Map<String, String> properties(boolean searchRoleEnabled) {
         final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
 
-        if(searchRoleEnabled) { // configure cache only if we also have the search role
+        if (searchRoleEnabled) { // configure cache only if we also have the search role
             builder.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
         }
 
@@ -166,17 +180,25 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
         return builder.build();
     }
 
-    private Map<String, String> keystoreItems() {
-        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    private Collection<OpensearchKeystoreItem> keystoreItems() {
+        final ImmutableList.Builder<OpensearchKeystoreItem> builder = ImmutableList.builder();
         if (s3RepositoryConfiguration.isRepositoryEnabled()) {
-            builder.put("s3.client.default.access_key", s3RepositoryConfiguration.getS3ClientDefaultAccessKey());
-            builder.put("s3.client.default.secret_key", s3RepositoryConfiguration.getS3ClientDefaultSecretKey());
+            LOG.info("S3 repository configured, adding access and secret key to opensearch keystore");
+            builder.add(new OpensearchKeystoreStringItem("s3.client.default.access_key", s3RepositoryConfiguration.getS3ClientDefaultAccessKey()));
+            builder.add(new OpensearchKeystoreStringItem("s3.client.default.secret_key", s3RepositoryConfiguration.getS3ClientDefaultSecretKey()));
+        }
+
+        if (gcsRepositoryConfiguration.isRepositoryEnabled()) {
+            LOG.info("Google Cloud Storage repository configured, adding credentials file to opensearch keystore");
+            final Path credentialsFile = datanodeDirectories.resolveConfigurationSourceFile(gcsRepositoryConfiguration.getGcsCredentialsFile())
+                    .orElseThrow(() -> new IllegalArgumentException("Failed to resolve Google Cloud Storage credentials file. File not found: " + gcsRepositoryConfiguration.getGcsCredentialsFile()));
+            builder.add(new OpensearchKeystoreFileItem("gcs.client.default.credentials_file", credentialsFile));
         }
         return builder.build();
     }
 
-    private boolean snapshotsAreEnabled() {
-        return s3RepositoryConfiguration.isRepositoryEnabled() || isSharedFileSystemRepo();
+    private boolean snapshotsAreConfigured() {
+        return s3RepositoryConfiguration.isRepositoryEnabled() || isSharedFileSystemRepo() || gcsRepositoryConfiguration.isRepositoryEnabled();
     }
 
     private boolean isSharedFileSystemRepo() {

@@ -117,7 +117,7 @@ const SetProfileModal = ({ show, onClose, currentProfile }: Props) => {
   return (
     <Modal onHide={onCancel} show={show} data-testid="modal-form">
       <form onSubmit={onSubmit}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>
             <span>Set Profile</span>
           </Modal.Title>

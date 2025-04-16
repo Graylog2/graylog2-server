@@ -86,7 +86,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
 
   return (
     <Modal show onHide={onClose} backdrop={false}>
-      <Modal.Header closeButton>Input Setup Wizard</Modal.Header>
+      <Modal.Header>Input Setup Wizard</Modal.Header>
       <Modal.Body>
         <InputSetupWizardStepsProvider>
           {EnterpriseWizard ? (

@@ -50,6 +50,7 @@ import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.configuration.IndexerDiscoveryModule;
 import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.configuration.PathConfiguration;
+import org.graylog2.indexer.client.IndexerHostsAdapter;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationType;
 import org.graylog2.plugin.MessageBindings;
@@ -286,6 +287,7 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         return Guice.createInjector(
+                binder -> binder.bind(IndexerHostsAdapter.class).toInstance(List::of),
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ServerStatusBindings(capabilities()),
