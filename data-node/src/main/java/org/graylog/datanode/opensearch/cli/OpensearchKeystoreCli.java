@@ -47,6 +47,14 @@ public class OpensearchKeystoreCli extends AbstractOpensearchCli {
         runWithStdin(List.of(secretValue), "add", "-x", key); // -x allows input from stdin, bypassing the prompt
     }
 
+    /**
+     * Add secrets to the store. The command is interactive, it will ask for the secret value (to avoid recording the value
+     * in the command line history). So we have to work around that and provide the value in STDIN.
+     */
+    public void addFile(String key, Path file) {
+        runWithStdin(List.of(), "add-file", key, file.toAbsolutePath().toString()); // -x allows input from stdin, bypassing the prompt
+    }
+
     public List<String> list() {
         final String rawResponse = runWithStdin(Collections.emptyList(), "list");
         final String[] items = rawResponse.split("\n");

@@ -193,9 +193,9 @@
             <classifier>linux-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-epoll</artifactId>
-          <classifier>linux-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-epoll</artifactId>
+            <classifier>linux-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -203,9 +203,9 @@
             <classifier>osx-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-kqueue</artifactId>
-          <classifier>osx-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-kqueue</artifactId>
+            <classifier>osx-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -213,9 +213,9 @@
             <classifier>osx-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-tcnative-boringssl-static</artifactId>
-          <classifier>osx-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-tcnative-boringssl-static</artifactId>
+            <classifier>osx-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -223,9 +223,9 @@
             <classifier>linux-x86_64</classifier>
         </dependency>
         <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-tcnative-boringssl-static</artifactId>
-          <classifier>linux-aarch_64</classifier>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-tcnative-boringssl-static</artifactId>
+            <classifier>linux-aarch_64</classifier>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -610,6 +610,23 @@
                             </sha512>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>download-repository-gcs-plugin</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/plugins/repository-gcs/${opensearch.version}/repository-gcs-${opensearch.version}.zip
+                            </url>
+                            <outputFileName>repository-gcs-${opensearch.version}.zip</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
+                            <sha512>
+                                b6e6039d002dba0184adb0e1992d2d26d58d06a57d167871e8b40802bcc1cb7ed12132fb3956e43c0dd91eb60eab7dc3e0d830926cdeb7574c53398c8d253cf9
+                            </sha512>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -707,6 +724,7 @@
                             <arguments>
                                 <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -721,6 +739,7 @@
                             <arguments>
                                 <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</argument>
                             </arguments>
                         </configuration>
                     </execution>

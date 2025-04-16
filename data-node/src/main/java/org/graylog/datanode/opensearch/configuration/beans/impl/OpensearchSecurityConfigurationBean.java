@@ -28,6 +28,8 @@ import org.graylog.datanode.configuration.variants.OpensearchCertificatesProvide
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
 import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
 import org.graylog.datanode.process.configuration.files.OpensearchSecurityConfigurationFile;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
@@ -43,6 +45,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -217,12 +220,12 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
         return config.build();
     }
 
-    private Map<String, String> keystoreItems(String truststorePassword, Optional<KeystoreInformation> httpCert, Optional<KeystoreInformation> transportCert) {
-        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
-        config.put("plugins.security.ssl.transport.truststore_password_secure", new String(truststorePassword));
-        config.put("plugins.security.ssl.http.truststore_password_secure", new String(truststorePassword));
-        httpCert.ifPresent(c -> config.put("plugins.security.ssl.http.keystore_password_secure", new String(c.password())));
-        transportCert.ifPresent(c -> config.put("plugins.security.ssl.transport.keystore_password_secure", new String(c.password())));
+    private Collection<OpensearchKeystoreItem> keystoreItems(String truststorePassword, Optional<KeystoreInformation> httpCert, Optional<KeystoreInformation> transportCert) {
+        final ImmutableList.Builder<OpensearchKeystoreItem> config = ImmutableList.builder();
+        config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.transport.truststore_password_secure", new String(truststorePassword)));
+        config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.http.truststore_password_secure", new String(truststorePassword)));
+        httpCert.ifPresent(c -> config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.http.keystore_password_secure", new String(c.password()))));
+        transportCert.ifPresent(c -> config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.transport.keystore_password_secure", new String(c.password()))));
         return config.build();
     }
 
