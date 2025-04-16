@@ -1,0 +1,5 @@
+type="a"
+message="Geo-IP fiels can now be downloaded from google-cloud-storage."
+
+pulls = ["22305"]
+issues = ["22191"]
