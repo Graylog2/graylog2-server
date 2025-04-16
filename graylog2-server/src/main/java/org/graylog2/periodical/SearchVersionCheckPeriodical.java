@@ -19,8 +19,8 @@ package org.graylog2.periodical;
 import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.configuration.SearchIndexerHostsService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -33,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
 public class SearchVersionCheckPeriodical extends Periodical {
@@ -43,7 +41,7 @@ public class SearchVersionCheckPeriodical extends Periodical {
     private final Optional<SearchVersion> versionOverride;
     private final VersionProbeFactory versionProbeFactory;
     private final NotificationService notificationService;
-    private final List<URI> indexerHosts;
+    private final SearchIndexerHostsService indexerHosts;
     private final boolean useJwtAuthentication;
 
     @Inject
@@ -51,7 +49,7 @@ public class SearchVersionCheckPeriodical extends Periodical {
                                         @Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
                                         VersionProbeFactory versionProbeFactory,
                                         NotificationService notificationService,
-                                        @IndexerHosts List<URI> indexerHosts,
+                                        SearchIndexerHostsService searchIndexerHostsService,
                                         @Named("indexer_use_jwt_authentication") boolean useJwtAuthentication,
                                         @RunsWithDataNode Boolean runsWithDataNode
                                     ) {
@@ -59,7 +57,7 @@ public class SearchVersionCheckPeriodical extends Periodical {
         this.versionOverride = Optional.ofNullable(versionOverride);
         this.versionProbeFactory = versionProbeFactory;
         this.notificationService = notificationService;
-        this.indexerHosts = indexerHosts;
+        this.indexerHosts = searchIndexerHostsService;
         this.useJwtAuthentication = runsWithDataNode || useJwtAuthentication;
     }
 
@@ -112,7 +110,7 @@ public class SearchVersionCheckPeriodical extends Periodical {
 
         final VersionProbe limitedProbe = this.versionProbeFactory.create(1, Duration.seconds(1), useJwtAuthentication, VersionProbeLogger.INSTANCE);
 
-        limitedProbe.probe(indexerHosts).ifPresent(version -> {
+        limitedProbe.probe(indexerHosts.getHosts().activeHosts()).ifPresent(version -> {
             if (compatible(this.initialSearchVersion, version)) {
                 notificationService.fixed(Notification.Type.ES_VERSION_MISMATCH);
             } else {

@@ -17,6 +17,7 @@
 package org.graylog2.periodical;
 
 import com.github.joschi.jadconfig.util.Duration;
+import org.graylog2.configuration.SearchIndexerHosts;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
@@ -121,7 +122,7 @@ class SearchVersionCheckPeriodicalTest {
                 versionOverride,
                 versionProbe,
                 notificationService,
-                Collections.emptyList(),
+                ()  -> new SearchIndexerHosts(Collections.emptyList(), Collections.emptyList(), Collections.emptyList()),
                 false,
                 false);
     }
