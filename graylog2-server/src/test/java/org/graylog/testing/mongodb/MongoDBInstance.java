@@ -129,6 +129,10 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         service.dropDatabase();
     }
 
+    public void dropCollection(String collection) {
+        service.mongoDatabase().getCollection(collection).drop();
+    }
+
     public void start() {
         service.start();
         if (fixtureImporter != null) {

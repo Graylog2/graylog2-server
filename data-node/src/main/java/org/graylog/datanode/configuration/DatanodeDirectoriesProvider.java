@@ -14,23 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web.customization;
+package org.graylog.datanode.configuration;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
-import javax.annotation.Nullable;
-import java.util.Optional;
+public class DatanodeDirectoriesProvider implements Provider<DatanodeDirectories> {
 
-public class CustomizationConfig {
-    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
-    private final Config config;
+    private final DatanodeDirectories directories;
 
     @Inject
-    public CustomizationConfig(@Nullable Config config) {
-        this.config = Optional.ofNullable(config).orElse(Config.empty());
+    public DatanodeDirectoriesProvider(DatanodeConfiguration datanodeConfiguration) {
+        this.directories = datanodeConfiguration.datanodeDirectories();
     }
 
-    public String productName() {
-        return config.productName().orElse(DEFAULT_PRODUCT_NAME);
+    @Override
+    public DatanodeDirectories get() {
+        return directories;
     }
 }

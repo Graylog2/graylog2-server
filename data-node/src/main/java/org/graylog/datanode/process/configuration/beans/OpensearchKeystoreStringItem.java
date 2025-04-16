@@ -14,23 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web.customization;
+package org.graylog.datanode.process.configuration.beans;
 
-import jakarta.inject.Inject;
+import org.graylog.datanode.opensearch.cli.OpensearchKeystoreCli;
 
-import javax.annotation.Nullable;
-import java.util.Optional;
+public class OpensearchKeystoreStringItem implements OpensearchKeystoreItem {
 
-public class CustomizationConfig {
-    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
-    private final Config config;
+    private final String key;
+    private final String secret;
 
-    @Inject
-    public CustomizationConfig(@Nullable Config config) {
-        this.config = Optional.ofNullable(config).orElse(Config.empty());
+    public OpensearchKeystoreStringItem(final String key, final String secret) {
+        this.key = key;
+        this.secret = secret;
     }
 
-    public String productName() {
-        return config.productName().orElse(DEFAULT_PRODUCT_NAME);
+    @Override
+    public String key() {
+        return key;
+    }
+
+    @Override
+    public void persist(OpensearchKeystoreCli cli) {
+        cli.add(key, secret);
     }
 }

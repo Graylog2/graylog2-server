@@ -14,23 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web.customization;
+package org.graylog.datanode.configuration;
 
-import jakarta.inject.Inject;
+import com.github.joschi.jadconfig.Parameter;
+import org.graylog2.configuration.Documentation;
 
-import javax.annotation.Nullable;
-import java.util.Optional;
+import java.nio.file.Path;
 
-public class CustomizationConfig {
-    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
-    private final Config config;
+public class GCSRepositoryConfiguration {
+    @Documentation("Path to Google Cloud Storage credentials file in JSON format. May be absolute or relative to config_location directory.")
+    @Parameter(value = "gcs_credentials_file")
+    private Path gcsCredentialsFile;
 
-    @Inject
-    public CustomizationConfig(@Nullable Config config) {
-        this.config = Optional.ofNullable(config).orElse(Config.empty());
+    public Path getGcsCredentialsFile() {
+        return gcsCredentialsFile;
     }
 
-    public String productName() {
-        return config.productName().orElse(DEFAULT_PRODUCT_NAME);
+    public boolean isRepositoryEnabled() {
+        return gcsCredentialsFile != null;
     }
 }
