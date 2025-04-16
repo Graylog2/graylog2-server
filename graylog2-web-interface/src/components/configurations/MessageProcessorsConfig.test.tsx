@@ -101,7 +101,6 @@ describe('MessageProcessorsConfig', () => {
 
     await screen.findByRole('heading', {
       name: /update message processors configuration/i,
-      hidden: true,
     });
   });
 });

@@ -6,5 +6,6 @@ window.appConfig = {
   isCloud: ${isCloud},
   featureFlags: ${featureFlags},
   telemetry: ${telemetry},
-  contentStream: ${contentStream}
+  contentStream: ${contentStream},
+  branding: ${branding}
 };
