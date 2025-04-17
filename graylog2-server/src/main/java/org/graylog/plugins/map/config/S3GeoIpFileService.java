@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.map.config;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog2.plugin.validate.ConfigValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,14 +78,12 @@ public class S3GeoIpFileService extends GeoIpFileService {
 
     @Override
     public void validateConfiguration(GeoIpResolverConfig config) throws ConfigValidationException {
-        if (!isConnected()) {
-            throw new ConfigValidationException("Unable to use S3 for file refresh without AWS credentials. See documentation for steps to properly configure AWS credentials.");
-        }
         // Make sure the paths are valid S3 object paths
-        boolean asnFileExists = !config.asnDbPath().isBlank();
-        if (!config.cityDbPath().startsWith(S3_BUCKET_PREFIX) ||
-                (asnFileExists && !config.asnDbPath().startsWith(S3_BUCKET_PREFIX))) {
-            throw new ConfigValidationException("Database file paths must be valid S3 object paths when using S3.");
+        if (extractDetails(config.cityDbPath()).isEmpty()) {
+            throw new ConfigValidationException("City database path is not a valid S3 URL. It must be in the format <s3://bucket-name/key-name>.");
+        }
+        if (!config.asnDbPath().isBlank() && extractDetails(config.asnDbPath()).isEmpty()) {
+            throw new ConfigValidationException("ASN database path is not a valid S3 URL. It must be in the format <s3://bucket-name/key-name>.");
         }
     }
 
@@ -127,7 +126,8 @@ public class S3GeoIpFileService extends GeoIpFileService {
 
     private Optional<Instant> genericServerTimestamp(String dbPath) {
         return extractDetails(dbPath)
-                .map(d -> getS3Object(d.bucket(), d.object()).lastModified());
+                .flatMap(d -> Optional.ofNullable(getS3Object(d.bucket(), d.object())))
+                .map(S3Object::lastModified);
     }
 
     @Override
@@ -161,5 +161,10 @@ public class S3GeoIpFileService extends GeoIpFileService {
             }
         }
         return s3Client;
+    }
+
+    @VisibleForTesting
+    void setS3Client(S3Client s3Client) {
+        this.s3Client = s3Client;
     }
 }
