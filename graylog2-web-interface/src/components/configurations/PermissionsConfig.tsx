@@ -114,12 +114,12 @@ const PermissionsConfig = () => {
             </p>
           </IfPermitted>
 
-          <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+          <Modal show={showModal} onHide={resetConfig}>
             <Formik onSubmit={saveConfig} initialValues={config}>
               {({ isSubmitting }) => (
                 <Form>
                   <Modal.Header>
-                    <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+                    <Modal.Title>{modalTitle}</Modal.Title>
                   </Modal.Header>
 
                   <Modal.Body>

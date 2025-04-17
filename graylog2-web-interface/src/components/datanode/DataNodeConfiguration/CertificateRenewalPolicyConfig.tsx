@@ -226,12 +226,12 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
         </>
       )}
 
-      <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+      <Modal show={showModal} onHide={resetConfig}>
         <Formik<FormConfig> onSubmit={saveConfig} initialValues={formConfig}>
           {({ values, setFieldValue, isSubmitting, isValid, isValidating }) => (
             <Form>
               <Modal.Header>
-                <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+                <Modal.Title>{modalTitle}</Modal.Title>
               </Modal.Header>
 
               <Modal.Body>
