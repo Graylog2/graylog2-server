@@ -16,112 +16,118 @@
  */
 package org.graylog2.jersey;
 
-import com.google.common.collect.ImmutableMap;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.model.Resource;
-import org.glassfish.jersey.server.model.ResourceModel;
-import org.graylog2.Configuration;
-import org.graylog2.shared.rest.HideOnCloud;
-import org.junit.Test;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.model.Resource;
+import org.glassfish.jersey.server.model.ResourceModel;
+import org.graylog2.shared.rest.NonApiResource;
+import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Locale;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class PrefixAddingModelProcessorTest {
-    private static final String PACKAGE_NAME = "org.graylog2.jersey";
-    final Configuration configuration = mock(Configuration.class);
-
     @Test
-    public void processResourceModelAddsPrefixToResourceClassInCorrectPackage() throws Exception {
-        final ImmutableMap<String, String> packagePrefixes = ImmutableMap.of(PACKAGE_NAME, "/test/prefix");
-        when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes);
-        final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
-                .addResource(Resource.from(TestResource.class))
-                .addResource(Resource.from(HiddenTestResource.class)).build();
-
-        final ResourceModel resourceModel = modelProcessor.processResourceModel(originalResourceModel, new ResourceConfig());
-
-        assertThat(resourceModel.getResources()).hasSize(2);
-
-        final Resource resource = resourceModel.getResources().get(0);
-        assertThat(resource.getPath()).isEqualTo("/test/prefix/foobar/{test}");
-        final Resource resource2 = resourceModel.getResources().get(1);
-        assertThat(resource2.getPath()).isEqualTo("/test/prefix/hide-cloud/{test}");
-    }
-
-    @Test
-    public void processResourceModelAddsPrefixToResourceClassInCorrectSubPackage() throws Exception {
-        final ImmutableMap<String, String> packagePrefixes = ImmutableMap.of(
-                "org", "/generic",
-                "org.graylog2", "/test/prefix",
-                "org.graylog2.wrong", "/wrong"
+    public void processResourceModelAddsPrefixToResourceClasses() {
+        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor();
+        final ResourceModel originalResourceModel = createResourceModel(
+                TestResourceWithCustomPrefix.class,
+                TestResourceWithDefaultPrefix.class,
+                APITestResource.class
         );
-        when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes);
-        final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
-                .addResource(Resource.from(TestResource.class)).build();
 
         final ResourceModel resourceModel = modelProcessor.processResourceModel(originalResourceModel, new ResourceConfig());
 
-        assertThat(resourceModel.getResources()).hasSize(1);
+        assertThat(resourceModel.getResources()).hasSize(3);
 
-        final Resource resource = resourceModel.getResources().get(0);
-        assertThat(resource.getPath()).isEqualTo("/test/prefix/foobar/{test}");
+        final Resource resource1 = resourceModel.getResources().get(0);
+        assertThat(resource1.getPath()).isEqualTo("/custom/prefix/foobar/{test}");
+
+        final Resource resource2 = resourceModel.getResources().get(1);
+        assertThat(resource2.getPath()).isEqualTo("/default/{test}");
+
+        final Resource resource3 = resourceModel.getResources().get(2);
+        assertThat(resource3.getPath()).isEqualTo("api/an-api-resource/{test}");
     }
 
     @Test
-    public void processResourceModelDoesNotAddPrefixToResourceClassInOtherPackage() throws Exception {
-        final ImmutableMap<String, String> packagePrefixes = ImmutableMap.of("org.example", "/test/prefix");
-        when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes);
-        final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
-                .addResource(Resource.from(TestResource.class)).build();
+    public void processResourceModelWithEmptyOrBlankPrefixFails() {
+        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor();
+        final ResourceModel modelWithEmptyPrefix = createResourceModel(TestResourceWithEmptyPrefix.class);
+        final ResourceModel modelWithBlankPrefix = createResourceModel(TestResourceWithBlankPrefix.class);
 
-        final ResourceModel resourceModel = modelProcessor.processResourceModel(originalResourceModel, new ResourceConfig());
+        assertThatThrownBy(() -> modelProcessor.processResourceModel(modelWithEmptyPrefix, new ResourceConfig()))
+                .isInstanceOf(IllegalArgumentException.class);
 
-        assertThat(resourceModel.getResources()).hasSize(1);
-
-        final Resource resource = resourceModel.getResources().get(0);
-        assertThat(resource.getPath()).isEqualTo("/foobar/{test}");
+        assertThatThrownBy(() -> modelProcessor.processResourceModel(modelWithBlankPrefix, new ResourceConfig()))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    public void processSubResourceDoesNothing() throws Exception {
-        final Map<String, String> packagePrefixes = ImmutableMap.of(PACKAGE_NAME, "/test/prefix");
-        when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes);
-        final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
-                .addResource(Resource.from(TestResource.class)).build();
+    public void processSubResourceDoesNothing() {
+        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor();
+        final ResourceModel originalResourceModel = createResourceModel(TestResourceWithCustomPrefix.class);
 
         final ResourceModel resourceModel = modelProcessor.processSubResource(originalResourceModel, new ResourceConfig());
 
         assertThat(originalResourceModel).isSameAs(resourceModel);
     }
 
+    private ResourceModel createResourceModel(Class<?>... resourceClasses) {
+        final ResourceModel.Builder builder = new ResourceModel.Builder(false);
+
+        Arrays.stream(resourceClasses).forEach(rc -> builder.addResource(Resource.from(rc)));
+
+        return builder.build();
+    }
+
 
     @Path("/foobar/{test}")
-    private static class TestResource {
+    @NonApiResource(prefix = "/custom/prefix")
+    private static class TestResourceWithCustomPrefix {
         @GET
         public String helloWorld(@PathParam("test") String s) {
             return String.format(Locale.ENGLISH, "Hello, %s!", s);
         }
     }
 
-    @Path("/hide-cloud/{test}")
-    @HideOnCloud
-    private static class HiddenTestResource {
+    @Path("/default/{test}")
+    @NonApiResource
+    private static class TestResourceWithDefaultPrefix {
         @GET
         public String helloWorld(@PathParam("test") String s) {
             return String.format(Locale.ENGLISH, "Hello, %s!", s);
+        }
+    }
+
+    @Path("/an-api-resource/{test}")
+    private static class APITestResource {
+        @GET
+        public String helloWorld(@PathParam("test") String s) {
+            return String.format(Locale.ENGLISH, "Hello, %s!", s);
+        }
+    }
+
+    @Path("/empty")
+    @NonApiResource(prefix = "")
+    private static class TestResourceWithEmptyPrefix {
+        @GET
+        public String helloWorld() {
+            return "hello";
+        }
+    }
+
+    @Path("/blank")
+    @NonApiResource(prefix = "  ")
+    private static class TestResourceWithBlankPrefix {
+        @GET
+        public String helloWorld() {
+            return "hello";
         }
     }
 }
