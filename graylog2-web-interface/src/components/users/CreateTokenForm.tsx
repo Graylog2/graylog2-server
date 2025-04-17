@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
+import { Button, ControlLabel, FormControl, FormGroup, HelpBlock } from 'components/bootstrap';
 import { Spinner, ISODurationInput } from 'components/common';
 
 const StyledForm = styled.form`
@@ -30,6 +30,7 @@ const StyledForm = styled.form`
       width: 300px;
     }
   }
+
   .input-group {
     width: 300px;
   }
@@ -39,11 +40,17 @@ type Props = {
   creatingToken?: boolean;
   disableForm?: boolean;
   onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => void;
-  defaultTtl?: string,
-  disableTtl?: boolean,
+  defaultTtl?: string;
+  disableTtl?: boolean;
 };
 
-const CreateTokenForm = ({ creatingToken = false, disableForm = false, defaultTtl = 'P30D', disableTtl = false, onCreate }: Props) => {
+const CreateTokenForm = ({
+  creatingToken = false,
+  disableForm = false,
+  defaultTtl = 'P30D',
+  disableTtl = false,
+  onCreate,
+}: Props) => {
   const [tokenName, setTokenName] = useState('');
   const [tokenTtl, setTokenTtl] = useState(defaultTtl);
 
@@ -88,6 +95,9 @@ const CreateTokenForm = ({ creatingToken = false, disableForm = false, defaultTt
         bsStyle="primary">
         {creatingToken ? <Spinner text="Creating..." /> : 'Create Token'}
       </Button>
+      <HelpBlock>
+        TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes PT60M, for 24 hours: PT24H, for 30 days: PT30D
+      </HelpBlock>
     </StyledForm>
   );
 };

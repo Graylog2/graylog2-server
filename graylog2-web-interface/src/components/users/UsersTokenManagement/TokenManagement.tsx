@@ -51,20 +51,20 @@ const TokenManagement = () => {
     created: 'The date of the token creation',
     last_access: 'The last time the token was used',
     external_user: 'Is the token owner a user from an external authentication backend',
-    auth_backend: 'The user authentication bakend. N/A for internal users'
+    auth_backend: 'The user authentication bakend. N/A for internal users',
   };
   const tokenExamples = (
     <>
       <p>
         Find tokens created by a given user:
         <br />
-        <code>username: givenName</code>
+        <code>username:givenName</code>
         <br />
       </p>
       <p>
         Find token by a given token name:
         <br />
-        <code>name: tokenName</code>
+        <code>name:tokenName</code>
         <br />
       </p>
     </>
@@ -78,8 +78,10 @@ const TokenManagement = () => {
             <h2>Tokens</h2>
           </Header>
           <PaginatedEntityTable<Token>
-            humanName="tokens"      
-            queryHelpComponent={<QueryHelper entityName="token"  commonFields={[]} fieldMap={fieldMap} example={tokenExamples} />}
+            humanName="tokens"
+            queryHelpComponent={
+              <QueryHelper entityName="token" commonFields={[]} fieldMap={fieldMap} example={tokenExamples} />
+            }
             columnsOrder={COLUMNS_ORDER}
             additionalAttributes={ADDITIONAL_ATTRIBUTES}
             actionsCellWidth={320}

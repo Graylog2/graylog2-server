@@ -68,7 +68,7 @@ const DEFAULT_PROPS = {
   dashboardId: 'dashboard-id',
 };
 
-const AdaptableQueryTabs = (props: React.ComponentProps<typeof OriginalAdaptableQueryTabs>) => (
+const AdaptableQueryTabs = ({ ...props }: React.ComponentProps<typeof OriginalAdaptableQueryTabs>) => (
   <TestStoreProvider>
     <OriginalAdaptableQueryTabs {...props} />
   </TestStoreProvider>
@@ -292,7 +292,6 @@ describe('AdaptableQueryTabs', () => {
 
     await screen.findByRole('button', {
       name: /copy page/i,
-      hidden: true,
     });
   });
 });

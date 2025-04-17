@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, {useMemo, useState} from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import {
@@ -27,11 +27,12 @@ import {
   NoEntitiesExist,
   RelativeTime,
 } from 'components/common';
-import {Button, ButtonToolbar, Panel, Table} from 'components/bootstrap';
-import type {Token, TokenSummary} from 'stores/users/UsersStore';
-import {sortByDate} from 'util/SortUtils';
-import {Headline} from 'components/common/Section/SectionComponent';
+import { Button, ButtonToolbar, Panel, Table } from 'components/bootstrap';
+import type { Token, TokenSummary } from 'stores/users/UsersStore';
+import { sortByDate } from 'util/SortUtils';
+import { Headline } from 'components/common/Section/SectionComponent';
 import useCurrentUser from 'hooks/useCurrentUser';
+import type User from 'logic/users/User';
 
 import CreateTokenForm from './CreateTokenForm';
 
@@ -61,9 +62,10 @@ type Props = {
   onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => Promise<Token>;
   onDelete: (tokenId: string, tokenName: string) => void;
   tokens?: TokenSummary[];
+  user: User;
 };
 
-const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDelete, tokens = [] }: Props) => {
+const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDelete, user, tokens = [] }: Props) => {
   const currentUser = useCurrentUser();
   const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
@@ -96,7 +98,11 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
     <>
       <IfPermitted permissions={['users:tokencreate', `users:tokencreate:${currentUser.username}`]} anyPermissions>
         <Headline>Create And Edit Tokens</Headline>
-        <CreateTokenForm onCreate={handleTokenCreation} creatingToken={creatingToken} />
+        <CreateTokenForm
+          onCreate={handleTokenCreation}
+          creatingToken={creatingToken}
+          defaultTtl={user.serviceAccount ? 'P100Y' : 'P30D'}
+        />
       </IfPermitted>
       {createdToken && (
         <StyledTokenPanel bsStyle="success">
@@ -118,43 +124,50 @@ const TokenList = ({ creatingToken = false, deletingToken = null, onCreate, onDe
         </StyledTokenPanel>
       )}
       <hr />
-      
+
       <Headline>Tokens</Headline>
       <StyledSearchForm onSearch={updateQuery} onReset={updateQuery} label="Filter" useLoadingState={false} />
       {effectiveTokens.length === 0 ? (
         <NoEntitiesExist>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</NoEntitiesExist>
-      ): (
+      ) : (
         <Table striped bordered condensed>
           <thead>
             <tr>
               <th>Token Name</th>
               <th>Created</th>
               <th>Last Access</th>
+              <th>Expires At</th>
               <th className="text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {effectiveTokens.map((token) => {
-              const tokenNeverUsed = Date.parse(token.last_access) === 0;
+              const tokenNeverUsed = !token.last_access || Date.parse(token.last_access) === 0;
 
               return (
-              <tr key={token.id}>
-                <td>{token.name}</td>
-                <td><Timestamp dateTime={token.created_at} /></td>
-                <td>{tokenNeverUsed ? 'Never used' : <RelativeTime dateTime={token.last_access} />}</td>
-                <td>
-                  <ButtonToolbar className="pull-right">
-                    <Button
-                      bsSize="xsmall"
-                      disabled={deletingToken === token.id}
-                      bsStyle="danger"
-                      onClick={deleteToken(token)}>
-                      {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
-                    </Button>
-                  </ButtonToolbar>
-                </td>
-              </tr>
-            )})}
+                <tr key={token.id}>
+                  <td>{token.name}</td>
+                  <td>
+                    <Timestamp dateTime={token.created_at} />
+                  </td>
+                  <td>{tokenNeverUsed ? 'Never used' : <RelativeTime dateTime={token.last_access} />}</td>
+                  <td>
+                    <Timestamp dateTime={token.expires_at} />
+                  </td>
+                  <td>
+                    <ButtonToolbar className="pull-right">
+                      <Button
+                        bsSize="xsmall"
+                        disabled={deletingToken === token.id}
+                        bsStyle="danger"
+                        onClick={deleteToken(token)}>
+                        {deletingToken === token.id ? <Spinner text="Deleting..." /> : 'Delete'}
+                      </Button>
+                    </ButtonToolbar>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       )}

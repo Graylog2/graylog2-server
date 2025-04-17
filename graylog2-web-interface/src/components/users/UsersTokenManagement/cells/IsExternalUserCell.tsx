@@ -37,7 +37,7 @@ const IsExternalUserCell = ({ token }: Props) => {
 
   return (
     <Wrapper $enabled={isExternal}>
-      <Label bsStyle={isExternal ? 'success' : 'default'} >{isExternal? 'Yes': 'No'}</Label>
+      <Label bsStyle={isExternal ? 'success' : 'default'}>{isExternal ? 'Yes' : 'No'}</Label>
     </Wrapper>
   );
 };

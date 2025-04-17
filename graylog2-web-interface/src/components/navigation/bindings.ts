@@ -55,7 +55,7 @@ const navigationBindings: PluginExports = {
               description: 'Configurations',
               permissions: ['clusterconfigentry:read'],
             },
-            { path: Routes.SYSTEM.CLUSTER.NODES, description: 'Cluster Configuration' },
+            { path: Routes.SYSTEM.CLUSTER.NODES, description: 'Cluster Configuration', permissions: ['datanode:read'] },
             { path: Routes.SYSTEM.INPUTS, description: 'Inputs', permissions: ['inputs:read'] },
             { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },
             { path: Routes.SYSTEM.INDICES.LIST, description: 'Indices', permissions: ['indices:read'] },

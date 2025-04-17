@@ -32,11 +32,12 @@ import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.DatanodeDirectories;
-import org.graylog2.CommonNodeConfiguration;
 import org.graylog.datanode.docs.DocumentationConstants;
+import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.Configuration.SafeClassesValidator;
 import org.graylog2.configuration.Documentation;
 import org.graylog2.configuration.DocumentationSection;
+import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
@@ -61,8 +62,7 @@ import java.util.Set;
  */
 @SuppressWarnings("FieldMayBeFinal")
 @DocumentationSection(heading = "GRAYLOG DATANODE CONFIGURATION FILE", description = DocumentationConstants.DATANODE_DOCUMENTATION_DESCRIPTION)
-public class Configuration  implements CommonNodeConfiguration {
-
+public class Configuration implements CommonNodeConfiguration, NativeLibPathConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
     public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
     public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";
