@@ -1,86 +1,126 @@
 package org.graylog.plugins.map.config;
 
-import com.google.cloud.NoCredentials;
-import com.google.cloud.WriteChannel;
-import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.BucketInfo;
 import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
-import org.junit.jupiter.api.BeforeAll;
+import org.graylog.testing.completebackend.FakeGCSContainer;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.GenericContainer;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @Testcontainers
+@ExtendWith(MockitoExtension.class)
 class GcsGeoIpFileServiceIT {
     @Container
-    static final GenericContainer<?> fakeGcs = new GenericContainer<>("fsouza/fake-gcs-server")
-            .withExposedPorts(4443)
-            .withFileSystemBind("fake-gcs-data", "/data")
-            .withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint(
-                    "/bin/fake-gcs-server",
-                    "-scheme", "http"
-            ));
-    private static Storage storageClient;
+    final FakeGCSContainer fakeGcs = new FakeGCSContainer();
+    @Mock
+    private GeoIpProcessorConfig processorConfig;
+    private Storage storageClient;
 
-    @BeforeAll
-    static void setUpFakeGcs() throws Exception {
-        String fakeGcsExternalUrl = "http://" + fakeGcs.getHost() + ":" + fakeGcs.getFirstMappedPort();
+    private GcsGeoIpFileService service;
+    private Path tempDir;
 
-        updateExternalUrlWithContainerUrl(fakeGcsExternalUrl);
+    @BeforeEach
+    void setUp() throws Exception {
+        //Set up fake-gcs:
+        fakeGcs.updateExternalUrlWithContainerUrl(fakeGcs.getEndpointUri().toString());
+        storageClient = fakeGcs.getStorage();
 
-        storageClient = StorageOptions.newBuilder()
-                .setHost(fakeGcsExternalUrl)
-                .setProjectId("test-project")
-                .setCredentials(NoCredentials.getInstance())
-                .build()
-                .getService();
-    }
-
-    private static void updateExternalUrlWithContainerUrl(String fakeGcsExternalUrl) throws Exception {
-        String modifyExternalUrlRequestUri = fakeGcsExternalUrl + "/_internal/config";
-        String updateExternalUrlJson = "{"
-                + "\"externalUrl\": \"" + fakeGcsExternalUrl + "\""
-                + "}";
-
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(modifyExternalUrlRequestUri))
-                .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(updateExternalUrlJson))
-                .build();
-        HttpResponse<Void> response = HttpClient.newBuilder().build()
-                .send(req, HttpResponse.BodyHandlers.discarding());
-
-        if (response.statusCode() != 200) {
-            throw new RuntimeException(
-                    "error updating fake-gcs-server with external url, response status code " + response.statusCode() + " != 200");
-        }
+        //And now to the service itself:
+        tempDir = Files.createTempDirectory("test");
+        when(processorConfig.getS3DownloadLocation()).thenReturn(tempDir);
+        service = new GcsGeoIpFileService(processorConfig);
+        service.setStorage(storageClient);
     }
 
     @Test
-    void shouldUploadFileByWriterChannel() throws IOException {
+    void testServerTimestampWithValidConfig() throws IOException {
+        final String bucket = "geoip-bucket";
+        final String cityFile = "fake_GeoLite2-City.mmdb";
+        final String asnFile = "fake_GeoLite2-ASN.mmdb";
+        fakeGcs.createBucket(bucket);
+        storageClient.createFrom(BlobInfo.newBuilder(bucket, cityFile).build(), getClass().getResourceAsStream(cityFile));
+        //Explicitly NOT uploading the ASN-file to test a non-existing timestamp.
 
-        storageClient.create(BucketInfo.newBuilder("sample-bucket2").build());
+        final GeoIpResolverConfig config = mkConfig(bucket, cityFile, asnFile);
+        final Optional<Instant> cityFileServerTimestamp = service.getCityFileServerTimestamp(config);
+        assertThat(cityFileServerTimestamp).isPresent();
+        final Optional<Instant> asnFileServerTimestamp = service.getAsnFileServerTimestamp(config);
+        assertThat(asnFileServerTimestamp).isEmpty();
+    }
 
-        WriteChannel channel = storageClient.writer(BlobInfo.newBuilder("sample-bucket2", "some_file2.txt").build());
-        channel.write(ByteBuffer.wrap("line1\n".getBytes(UTF_8)));
-        channel.write(ByteBuffer.wrap("line2\n".getBytes(UTF_8)));
-        channel.close();
+    @Test
+    void testServerTimestampWthInvalidConfig() {
+        //No need to upload anything, the server should not be hit.
+        final GeoIpResolverConfig config = mkConfig("", "", "").toBuilder()
+                .asnDbPath("invalid_asn-path")
+                .cityDbPath("gs://another_invalid_city-path")
+                .build();
+        assertThat(service.getCityFileServerTimestamp(config)).isEmpty();
+        assertThat(service.getAsnFileServerTimestamp(config)).isEmpty();
+    }
 
-        Blob someFile2 = storageClient.get("sample-bucket2", "some_file2.txt");
-        String fileContent = new String(someFile2.getContent(), UTF_8);
-        assertEquals("line1\nline2\n", fileContent);
+    @Test
+    void testFileDownloadWithValidConfig() throws IOException {
+        final String bucket = "geoip-bucket";
+        final String cityFile = "fake_GeoLite2-City.mmdb";
+        final String asnFile = "fake_GeoLite2-ASN.mmdb";
+        fakeGcs.createBucket(bucket);
+        storageClient.createFrom(BlobInfo.newBuilder(bucket, cityFile).build(), getClass().getResourceAsStream(cityFile));
+        //Explicitly NOT uploading file to test a non-existing file-download.
+
+        final GeoIpResolverConfig config = mkConfig(bucket, cityFile, asnFile);
+
+        final Path downloadTarget = tempDir.resolve("temp-" + cityFile);
+        final Optional<Instant> lastModified = service.downloadCityFile(config, downloadTarget);
+        assertThat(lastModified).isPresent().matches(instantO -> instantO.map(i -> i.isBefore(Instant.now())).orElse(false));
+        assertThat(downloadTarget).exists();
+
+        final IOException thrownException = assertThrows(IOException.class, () -> service.downloadAsnFile(config, downloadTarget));
+        assertThat(thrownException.getMessage()).contains("Failed to download file from GCS");
+    }
+
+    @Test
+    void testFileDownloadWithInvalidConfig() throws IOException {
+        //No need to upload anything, the server should not be hit.
+        final GeoIpResolverConfig config = mkConfig("", "", "").toBuilder()
+                .asnDbPath("invalid_asn-path")
+                .cityDbPath("gs://another_invalid_city-path")
+                .build();
+
+        assertThat(service.downloadCityFile(config, tempDir.resolve("temp-city.mmdb"))).isEmpty();
+        assertThat(service.downloadAsnFile(config, tempDir.resolve("temp-asn.mmdb"))).isEmpty();
+    }
+
+    //===========================
+    // Helper code
+    //===========================
+    private GeoIpResolverConfig mkConfig(final String bucket, final String cityFile, final String asnFile) {
+        return GeoIpResolverConfig.builder()
+                .enabled(true)
+                .enforceGraylogSchema(true)
+                .databaseVendorType(DatabaseVendorType.MAXMIND)
+                .refreshInterval(10L)
+                .refreshIntervalUnit(TimeUnit.MINUTES)
+                .cityDbPath("gs://" + bucket + "/" + cityFile)
+                .asnDbPath("gs://" + bucket + "/" + asnFile)
+                .useS3(false)
+                .useGcs(true)
+                .gcsProjectId(fakeGcs.getProjectId())
+                .build();
     }
 }

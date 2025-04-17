@@ -20,6 +20,7 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog2.plugin.validate.ConfigValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,32 +93,20 @@ public class GcsGeoIpFileService extends GeoIpFileService {
         return LOG;
     }
 
-    private void getOrSetProjectId(GeoIpResolverConfig config) {
+    private void getOrSetProjectId(String gcsProjectId) {
         if (projectId == null) {
-            projectId = config.gcsProjectId();
+            projectId = gcsProjectId;
         }
     }
 
     @Override
     protected Optional<Instant> downloadCityFile(GeoIpResolverConfig config, Path tempCityPath) throws IOException {
-        getOrSetProjectId(config);
-        final Optional<BucketAndObject> cityDetails = extractDetails(config.cityDbPath());
-        if (cityDetails.isPresent()) {
-            return Optional.of(downloadSingleFile(getGcsStorage(), cityDetails.get(), tempCityPath));
-        } else {
-            return Optional.empty();
-        }
+        return genericDownload(config.gcsProjectId(), config.cityDbPath(), tempCityPath);
     }
 
     @Override
     protected Optional<Instant> downloadAsnFile(GeoIpResolverConfig config, Path asnCityPath) throws IOException {
-        getOrSetProjectId(config);
-        final Optional<BucketAndObject> asnDetails = extractDetails(config.asnDbPath());
-        if (asnDetails.isPresent()) {
-            return Optional.of(downloadSingleFile(getGcsStorage(), asnDetails.get(), asnCityPath));
-        } else {
-            return Optional.empty();
-        }
+        return genericDownload(config.gcsProjectId(), config.asnDbPath(), asnCityPath);
     }
 
     @Override
@@ -128,6 +117,16 @@ public class GcsGeoIpFileService extends GeoIpFileService {
             return false;
         }
         return true;
+    }
+
+    private Optional<Instant> genericDownload(String gcsProjectId, String dbPath, Path tempPath) throws IOException {
+        getOrSetProjectId(gcsProjectId);
+        final Optional<BucketAndObject> details = extractDetails(dbPath);
+        if (details.isPresent()) {
+            return Optional.of(downloadSingleFile(getGcsStorage(), details.get(), tempPath));
+        } else {
+            return Optional.empty();
+        }
     }
 
     private Instant downloadSingleFile(Storage storage, BucketAndObject details, Path destFilePath) throws IOException {
@@ -141,16 +140,17 @@ public class GcsGeoIpFileService extends GeoIpFileService {
 
     @Override
     protected Optional<Instant> getCityFileServerTimestamp(GeoIpResolverConfig config) {
-        getOrSetProjectId(config);
-        final Optional<BucketAndObject> cityDetails = extractDetails(config.cityDbPath());
-        return cityDetails.flatMap(details -> updateTimestampForGcsObject(getGcsStorage(), details));
+        return genericServerTimestamp(config.gcsProjectId(), config.cityDbPath());
     }
 
     @Override
     protected Optional<Instant> getAsnFileServerTimestamp(GeoIpResolverConfig config) {
-        getOrSetProjectId(config);
-        final Optional<BucketAndObject> asnDetails = extractDetails(config.asnDbPath());
-        return asnDetails.flatMap(details -> updateTimestampForGcsObject(getGcsStorage(), details));
+        return genericServerTimestamp(config.gcsProjectId(), config.asnDbPath());
+    }
+
+    private Optional<Instant> genericServerTimestamp(String gcsProjectId, String dbPath) {
+        getOrSetProjectId(gcsProjectId);
+        return extractDetails(dbPath).flatMap(details -> updateTimestampForGcsObject(getGcsStorage(), details));
     }
 
     private Optional<Instant> updateTimestampForGcsObject(Storage storage, BucketAndObject details) {
@@ -167,6 +167,11 @@ public class GcsGeoIpFileService extends GeoIpFileService {
             }
         }
         return storage;
+    }
+
+    @VisibleForTesting
+    void setStorage(Storage storage) {
+        this.storage = storage;
     }
 
 }

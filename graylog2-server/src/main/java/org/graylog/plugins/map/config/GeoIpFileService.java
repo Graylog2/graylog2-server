@@ -79,7 +79,7 @@ public abstract class GeoIpFileService {
 
     private Pattern getPathPattern() {
         if (pathPattern.get() == null) {
-            pathPattern.set(Pattern.compile("^" + Pattern.quote(getPathPrefix()) + "(?<" + BUCKET_GROUP + ">[-\\w]+)\\/(?<" + OBJECT_GROUP + ">[-\\w\\/\\.]+)$"));
+            pathPattern.set(Pattern.compile("^" + Pattern.quote(getPathPrefix()) + "(?<" + BUCKET_GROUP + ">[-\\w]+)/(?<" + OBJECT_GROUP + ">[-\\w/.]+)$"));
         }
         return pathPattern.get();
     }

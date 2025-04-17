@@ -1,6 +1,8 @@
 package org.graylog.plugins.map.config;
 
+import org.apache.commons.io.FileUtils;
 import org.graylog2.plugin.validate.ConfigValidationException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,12 +24,18 @@ class GcsGeoIpFileServiceTest {
     @Mock
     private GeoIpProcessorConfig processorConfig;
     private GcsGeoIpFileService service;
+    private Path tempDir;
 
     @BeforeEach
     void setUp() throws IOException {
-        final Path tempDir = Files.createTempDirectory("test");
+        tempDir = Files.createTempDirectory("test");
         when(processorConfig.getS3DownloadLocation()).thenReturn(tempDir);
         service = new GcsGeoIpFileService(processorConfig);
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        FileUtils.deleteDirectory(tempDir.toFile());
     }
 
     @Test
@@ -45,8 +53,25 @@ class GcsGeoIpFileServiceTest {
     }
 
     @Test
+    void validateConfigBlankAsnDbPathIsValid() {
+        final GeoIpResolverConfig config = mkConfig().toBuilder().gcsProjectId("my-project").asnDbPath(" ").build();
+        try {
+            service.validateConfiguration(config);
+        } catch (ConfigValidationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     void validateConfigMissingProjectId() {
         final GeoIpResolverConfig config = mkConfig();
+        final ConfigValidationException exception = assertThrows(ConfigValidationException.class, () -> service.validateConfiguration(config));
+        assertThat(exception.getMessage()).contains("GCS project ID");
+    }
+
+    @Test
+    void validateConfigBlankProjectId() {
+        final GeoIpResolverConfig config = mkConfig().toBuilder().gcsProjectId(" ").build();
         final ConfigValidationException exception = assertThrows(ConfigValidationException.class, () -> service.validateConfiguration(config));
         assertThat(exception.getMessage()).contains("GCS project ID");
     }

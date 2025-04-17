@@ -67,13 +67,6 @@ class GeoIpFileServiceTest {
     private final BiFunction<GeoIpResolverConfig, Optional<Instant>, Optional<Instant>> anyTimestamp =
             (config, returnValue) -> returnValue;
 
-    private final BiFunction<GeoIpResolverConfig, Optional<Instant>, Optional<Instant>> successfulTimestamp =
-            (config, returnValue) -> returnValue;
-
-    private final BiFunction<GeoIpResolverConfig, Optional<Instant>, Optional<Instant>> failedTimestamp =
-            (config, returnValue) -> {
-                throw new IllegalStateException("Boooom!");
-            };
 
     @BeforeEach
     void setUp() throws IOException {
@@ -107,7 +100,7 @@ class GeoIpFileServiceTest {
     }
 
     @Test
-    void downloadFilesToTempLocationFails() throws CloudDownloadException {
+    void downloadFilesToTempLocationFails() {
         service = new TestGeoIpFileService(processorConfig, failedDownload, failedDownload, anyTimestamp, anyTimestamp);
         final Path tempCityFilePath = tempDir.resolve(GeoIpFileService.TEMP_CITY_FILE);
         final Path tempAsnFilePath = tempDir.resolve(GeoIpFileService.ACTIVE_ASN_FILE);
@@ -262,12 +255,12 @@ class GeoIpFileServiceTest {
         }
 
         @Override
-        protected Optional<Instant> downloadCityFile(GeoIpResolverConfig config, Path tempCityPath) throws IOException {
+        protected Optional<Instant> downloadCityFile(GeoIpResolverConfig config, Path tempCityPath) {
             return cityDownloadF.apply(tempCityPath, config, cityFileInstant);
         }
 
         @Override
-        protected Optional<Instant> downloadAsnFile(GeoIpResolverConfig config, Path tempAsnPath) throws IOException {
+        protected Optional<Instant> downloadAsnFile(GeoIpResolverConfig config, Path tempAsnPath) {
             return asnDownloadF.apply(tempAsnPath, config, asnFileInstant);
         }
 
