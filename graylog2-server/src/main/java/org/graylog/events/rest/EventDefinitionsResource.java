@@ -308,7 +308,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         final Response result = create(schedule, request.entity(), userContext);
 
         if (request.shareRequest().isPresent() && result.getEntity() instanceof StreamCreatedResponse streamCreatedResponse) {
-            entitySharesService.updateEntityShares(GRNTypes.STREAM, streamCreatedResponse.streamId(), request.shareRequest().get(), userContext.getUser());
+            entitySharesService.updateEntityShares(GRNTypes.EVENT_DEFINITION, streamCreatedResponse.streamId(), request.shareRequest().get(), userContext.getUser());
         }
 
         return result;
