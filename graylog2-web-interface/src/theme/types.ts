@@ -14,26 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ColorScheme } from '@graylog/sawmill';
+import type { ColorScheme, ColorVariant, CustomColors } from '@graylog/sawmill';
 
 import type { LegacyColorScheme } from 'theme/constants';
-import type { Colors, ColorVariants, ThemeColorModes } from 'theme/colors';
-
-import type { ThemesColors } from './theme-types';
+import type { CustomThemesColors } from 'theme/theme-types';
 
 interface CustomizationHooks {
   useThemeCustomizer: () => {
-    currentColors: ThemeColorModes;
-    customThemeColors: {};
+    currentColors: {};
     isDefaultColors: boolean;
     isSaved: boolean;
     isLoadingCustomColors: boolean;
     onChangeTheme: ({ mode, key, type, hex }: { mode: ColorScheme; key: string; type: string; hex: string }) => void;
-    onResetTheme: () => Promise;
-    onRevertTheme: () => Promise;
-    onSaveTheme: () => Promise;
+    onResetTheme: () => Promise<unknown>;
+    onRevertTheme: () => Promise<unknown>;
+    onSaveTheme: () => Promise<unknown>;
   };
-  useCustomThemeColors: (isInitialLoad?: boolean) => { data: ThemesColors; isInitialLoading: boolean };
+  useCustomThemeColors: (isInitialLoad?: boolean) => { data: CustomThemesColors; isInitialLoading: boolean };
 }
 
 interface CustomizationActions {
@@ -42,10 +39,10 @@ interface CustomizationActions {
     mode,
     initialLoad,
   }: {
-    graylogColors: Colors;
+    graylogColors: CustomColors;
     mode: LegacyColorScheme;
     initialLoad: boolean;
-  }) => Promise;
+  }) => Promise<unknown>;
 }
 
 interface CustomizationType {
@@ -61,7 +58,7 @@ export interface Notification {
   isDismissible: boolean;
   atLogin: boolean;
   isGlobal: boolean;
-  variant: ColorVariants;
+  variant: ColorVariant;
   hiddenTitle: boolean;
 }
 type NotificationId = string;
@@ -71,7 +68,7 @@ export interface PublicNotificationsHooks {
   usePublicNotifications: () => {
     notifications: Notifications;
     dismissedNotifications: Set<NotificationId>;
-    onDismissPublicNotification: (NotificationId) => void;
+    onDismissPublicNotification: (id: NotificationId) => void;
   };
 }
 
