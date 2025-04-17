@@ -33,6 +33,24 @@ type StepHealthCheckProps = {
   onChange: (...args: any[]) => void;
 };
 
+const Notice = styled.span`
+  display: flex;
+  align-items: center;
+
+  > span {
+    margin-left: 6px;
+  }
+`;
+
+const CheckAgain = styled.p`
+  display: flex;
+  align-items: center;
+
+  > strong {
+    margin-right: 9px;
+  }
+`;
+
 const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const { logData, setLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
@@ -60,14 +78,14 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
     if (!logData) {
       checkForLogs();
     }
-  }, []);
+  }, [logData, checkForLogs]);
 
   useEffect(() => {
     if (!logDataProgress.loading && !logDataProgress.data) {
       setPauseCountdown(false);
       setLogDataUrl(null);
     }
-  }, [logDataProgress.loading]);
+  }, [logDataProgress.loading, logDataProgress.data, setLogDataUrl]);
 
   if (!logData) {
     return (
@@ -113,7 +131,14 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const acknowledgment = knownLog ? 'Awesome!' : 'Drats!';
   const bsStyle = knownLog ? 'success' : 'warning';
   const logTypeLabel = KINESIS_LOG_TYPES.find((type) => type.value === logData.type).label;
-  const logType = knownLog ? `a ${logTypeLabel}` : logTypeLabel === 'None' ? logData.additional : 'an unknown message type.';
+
+  const getLogType = () => {
+    if (knownLog) return `a ${logTypeLabel}`;
+    if (logTypeLabel === 'None') return logData.additional;
+    return 'an unknown message type.';
+  };
+
+  const logType = getLogType();
 
   const handleSubmit = () => {
     onSubmit();
@@ -158,23 +183,5 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
     </FormWrap>
   );
 };
-
-const Notice = styled.span`
-  display: flex;
-  align-items: center;
-
-  > span {
-    margin-left: 6px;
-  }
-`;
-
-const CheckAgain = styled.p`
-  display: flex;
-  align-items: center;
-
-  > strong {
-    margin-right: 9px;
-  }
-`;
 
 export default StepHealthCheck;
