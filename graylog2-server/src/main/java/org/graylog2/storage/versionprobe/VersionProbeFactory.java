@@ -16,17 +16,16 @@
  */
 package org.graylog2.storage.versionprobe;
 
-import org.graylog2.storage.SearchVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.joschi.jadconfig.util.Duration;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Optional;
+public interface VersionProbeFactory {
+    /**
+     * Create a VersionProbe instance with all defaults from the graylog server configuration
+     */
+    VersionProbe createDefault();
 
-public interface VersionProbe {
-
-    Logger LOG = LoggerFactory.getLogger(VersionProbe.class); // keep the original implementation class name for compat reasons
-
-    Optional<SearchVersion> probe(final Collection<URI> hosts);
+    /**
+     * Create instance with specific connection details and custom listener
+     */
+    VersionProbe create(int probeAttempts, Duration probeDelay, boolean useJwtAuthentication, VersionProbeListener versionProbeListener);
 }
