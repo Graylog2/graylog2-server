@@ -1,8 +1,12 @@
 package org.graylog.security.shares;
 
+import org.apache.commons.lang.NotImplementedException;
+import org.graylog.grn.GRN;
+
+import java.util.Collection;
+
 public interface AdditionalGrantsResolver {
-    default void test() {
-        // This is a placeholder method to ensure that the interface is not empty.
-        // In a real implementation, this method would contain logic to resolve additional grants.
+    default Collection<GRN> dependentEntities(GRN ownedEntity) {
+        throw new NotImplementedException();
     }
 }

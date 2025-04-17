@@ -167,6 +167,12 @@ public class EntitySharesService {
         return updateEntityShares(grnRegistry.newGRN(grnType, id), request, sharingUser);
     }
 
+    public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
+        final EntityShareResponse result = updateOnlyEntityShares(ownedEntity, request, sharingUser);
+        resolveImplicitGrants(ownedEntity, request, sharingUser);
+        return result;
+    }
+
     /**
      * Share / unshare an entity with one or more grantees.
      * The grants in the request are created or, if they already exist, updated.
@@ -175,7 +181,7 @@ public class EntitySharesService {
      * @param request     the request containing grantees and their capabilities
      * @param sharingUser the user executing the request
      */
-    public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
+    private EntityShareResponse updateOnlyEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         requireNonNull(ownedEntity, "ownedEntity cannot be null");
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
@@ -214,7 +220,7 @@ public class EntitySharesService {
         }
 
         // Update capabilities of existing grants (for a grantee)
-        existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach((g -> {
+        existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach(g -> {
             final Capability newCapability = selectedGranteeCapabilities.get(g.grantee());
             if (!g.capability().equals(newCapability)) {
                 grantService.save(g.toBuilder()
@@ -224,7 +230,7 @@ public class EntitySharesService {
                         .build());
                 updateEventBuilder.addUpdates(g.grantee(), newCapability, g.capability());
             }
-        }));
+        });
 
         // Create newly added grants
         // TODO Create multiple entries with one db query
@@ -256,6 +262,13 @@ public class EntitySharesService {
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
                 .build();
+    }
+
+    private void resolveImplicitGrants(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
+        Collection<GRN> dependentEntities = additionalGrantsResolver.dependentEntities(ownedEntity);
+        dependentEntities.forEach(grant -> {
+            updateOnlyEntityShares(grant, request, sharingUser);
+        });
     }
 
     private void postUpdateEvent(EntitySharesUpdateEvent updateEvent) {
