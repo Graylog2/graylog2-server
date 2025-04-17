@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.plugins.map.config;
+
+import jakarta.inject.Inject;
+
+import java.util.concurrent.atomic.AtomicReference;
+
+public class GeoIpFileServiceFactory {
+    private final GeoIpProcessorConfig processorConfig;
+    private final AtomicReference<GeoIpFileService> actualS3FileService = new AtomicReference<>();
+    private final AtomicReference<GeoIpFileService> actualGcsFileService = new AtomicReference<>();
+
+    @Inject
+    public GeoIpFileServiceFactory(GeoIpProcessorConfig processorConfig) {
+        this.processorConfig = processorConfig;
+    }
+
+    /**
+     * Creates a new instance of {@link GeoIpFileService} if it doesn't already exist.
+     * This method is thread-safe and ensures that only one instance is created.
+     *
+     * @return a new instance of {@link GeoIpFileService}
+     */
+    public GeoIpFileService create(GeoIpResolverConfig config) {
+        if (config.useS3()) {
+            if (actualS3FileService.get() == null) {
+                actualS3FileService.set(new S3GeoIpFileService(processorConfig));
+            }
+            return actualS3FileService.get();
+        } else if (config.useGcs()) {
+            if (actualGcsFileService.get() == null) {
+                actualGcsFileService.set(new GcsGeoIpFileService(processorConfig));
+            }
+            return actualGcsFileService.get();
+        } else {
+            return new LocalGeoIpFileService(processorConfig);
+        }
+    }
+}
