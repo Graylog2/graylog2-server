@@ -25,7 +25,7 @@ import useDataNodes from './useDataNodes';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
-jest.mock('preflight/util/UserNotification', () => ({
+jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
 }));
 

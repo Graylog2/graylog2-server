@@ -20,14 +20,14 @@ import userEvent from '@testing-library/user-event';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import fetch from 'logic/rest/FetchProvider';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import { asMock } from 'helpers/mocking';
 
 import CACreateForm from './CACreateForm';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
-jest.mock('preflight/util/UserNotification', () => ({
+jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
