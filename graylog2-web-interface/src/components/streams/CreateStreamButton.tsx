@@ -67,6 +67,7 @@ const CreateStreamButton = ({
           indexSets={indexSets}
           onSubmit={onCreate}
           onClose={toggleCreateModal}
+          isNew
         />
       )}
     </>

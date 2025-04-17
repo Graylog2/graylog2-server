@@ -62,6 +62,7 @@ type Props = {
   onClose: () => void;
   onSubmit: (values: Partial<Stream>, shareRequest?: EntitySharePayload) => Promise<void>;
   indexSets: Array<IndexSet>;
+  isNew?: boolean,
 };
 
 const StreamModal = ({
@@ -77,6 +78,7 @@ const StreamModal = ({
   onClose,
   onSubmit,
   indexSets,
+  isNew = false,
 }: Props) => {
   const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
 
@@ -104,12 +106,14 @@ const StreamModal = ({
               />
 
               <IndexSetSelect indexSets={indexSets} />
-              <EntityCreateShareFormGroup
-                description='Search for a User or Team to add as collaborator on this stream.'
-                entityType='stream'
-                entityTitle=''
-                onSetEntityShare={(payload) => setFieldValue('share_request', payload)}
-              />
+              {isNew && (
+                <EntityCreateShareFormGroup
+                  description='Search for a User or Team to add as collaborator on this stream.'
+                  entityType='stream'
+                  entityTitle=''
+                  onSetEntityShare={(payload) => setFieldValue('share_request', payload)}
+                />
+              )}
               <FormikInput
                 label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
                 help={
