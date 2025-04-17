@@ -94,10 +94,9 @@ const createViewWidget = ({ groupBy, fnSeries, expr }: { groupBy: Array<string>;
 
 const getSummaryAggregation = ({ aggregations, groupBy }) => {
   const { summaryFnSeries, summaryRowPivots, summaryTitle } = aggregations.reduce(
-    (res, { field, value, expr, fnSeries }) => {
+    (res, { value, expr, fnSeries }) => {
       const concatTitle = `${fnSeries} ${expr} ${value}`;
       res.summaryFnSeries.push(fnSeries);
-      if (field) res.summaryRowPivots.push(field);
       res.summaryTitle = `${res.summaryTitle} ${concatTitle}`;
 
       return res;
