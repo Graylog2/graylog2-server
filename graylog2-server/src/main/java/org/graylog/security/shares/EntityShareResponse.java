@@ -27,6 +27,7 @@ import org.graylog.security.Capability;
 import org.graylog.security.entities.EntityDescriptor;
 import org.graylog2.plugin.rest.ValidationResult;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -36,6 +37,7 @@ import java.util.Set;
 @JsonDeserialize(builder = EntityShareResponse.Builder.class)
 public abstract class EntityShareResponse {
     @JsonProperty("entity")
+    @Nullable
     public abstract String entity();
 
     @JsonProperty("sharing_user")
@@ -75,6 +77,7 @@ public abstract class EntityShareResponse {
         }
 
         @JsonProperty("entity")
+        @Nullable
         public abstract Builder entity(String entity);
 
         @JsonProperty("sharing_user")
