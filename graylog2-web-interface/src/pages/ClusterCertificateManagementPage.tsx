@@ -22,11 +22,11 @@ import DocsHelper from 'util/DocsHelper';
 import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
-const DataNodesClusterConfigurationPage = () => (
-  <DocumentTitle title="Data Node Certificate Management">
+const ClusterCertificateManagementPage = () => (
+  <DocumentTitle title="Certificate Management">
     <ClusterConfigurationPageNavigation />
     <PageHeader
-      title="Data Node Certificate Management"
+      title="Certificate Management"
       documentationLink={{
         title: 'Data Nodes documentation',
         path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
@@ -44,4 +44,4 @@ const DataNodesClusterConfigurationPage = () => (
   </DocumentTitle>
 );
 
-export default DataNodesClusterConfigurationPage;
+export default ClusterCertificateManagementPage;

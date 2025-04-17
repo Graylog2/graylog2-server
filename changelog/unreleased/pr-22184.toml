@@ -1,0 +1,5 @@
+type = "added"
+message = "Added datanode sniffer to opensearch clients where applicable"
+
+issues = []
+pulls = ["22155"]

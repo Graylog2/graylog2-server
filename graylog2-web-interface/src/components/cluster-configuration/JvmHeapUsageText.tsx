@@ -67,9 +67,7 @@ const JvmHeapUsageText = ({ nodeId }: Props) => {
   }, [metrics, nodeId]);
 
   const { usedPercentage, committedPercentage, usedMemory, committedMemory, maxMemory } = extractedMetrics;
-  let detail = (
-    <span>Loading heap usage information...</span>
-  );
+  let detail = <span>Loading heap usage information...</span>;
 
   if (usedPercentage || committedPercentage) {
     if (Object.keys(extractedMetrics).length === 0) {

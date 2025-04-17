@@ -37,7 +37,7 @@ const SecondaryText = styled.div`
 `;
 
 const NodeInfoTH = styled.th`
-  width: 51%
+  width: 51%;
 `;
 
 type Props = {

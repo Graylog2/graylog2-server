@@ -33,4 +33,8 @@ public class CustomizationConfig {
     public String productName() {
         return config.productName().orElse(DEFAULT_PRODUCT_NAME);
     }
+
+    public static CustomizationConfig empty() {
+        return new CustomizationConfig(Config.empty());
+    }
 }
