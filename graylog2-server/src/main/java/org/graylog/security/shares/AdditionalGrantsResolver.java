@@ -16,10 +16,10 @@
  */
 package org.graylog.security.shares;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.graylog.grn.GRN;
 
 import java.util.Collection;
+import java.util.Collections;
 
 public interface AdditionalGrantsResolver {
     /**
@@ -29,6 +29,6 @@ public interface AdditionalGrantsResolver {
      * @return A collection of dependent entities
      */
     default Collection<GRN> dependentEntities(GRN primaryEntity) {
-        throw new NotImplementedException();
+        return Collections.emptyList();
     }
 }
