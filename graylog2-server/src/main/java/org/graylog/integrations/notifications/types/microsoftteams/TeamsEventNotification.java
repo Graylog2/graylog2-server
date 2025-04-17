@@ -33,6 +33,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,7 @@ public class TeamsEventNotification implements EventNotification {
     private final NodeId nodeId;
     private final RequestClient requestClient;
     private final TemplateModelProvider templateModelProvider;
+    private final CustomizationConfig customizationConfig;
 
     @Inject
     public TeamsEventNotification(EventNotificationService notificationCallbackService,
@@ -64,7 +66,8 @@ public class TeamsEventNotification implements EventNotification {
                                   Engine templateEngine,
                                   NotificationService notificationService,
                                   NodeId nodeId, RequestClient requestClient,
-                                  TemplateModelProvider templateModelProvider) {
+                                  TemplateModelProvider templateModelProvider,
+                                  CustomizationConfig customizationConfig) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapperProvider = requireNonNull(objectMapperProvider);
         this.templateEngine = requireNonNull(templateEngine);
@@ -72,6 +75,7 @@ public class TeamsEventNotification implements EventNotification {
         this.nodeId = requireNonNull(nodeId);
         this.requestClient = requireNonNull(requestClient);
         this.templateModelProvider = templateModelProvider;
+        this.customizationConfig = customizationConfig;
     }
 
     /**
@@ -117,7 +121,7 @@ public class TeamsEventNotification implements EventNotification {
         String description = buildMessageDescription(ctx);
         String customMessage = null;
         String template = config.customMessage();
-        String summary = ctx.eventDefinition().map(EventDefinitionDto::title).orElse("Graylog Event");
+        String summary = ctx.eventDefinition().map(EventDefinitionDto::title).orElse(customizationConfig.productName() + " Event");
         if (!isNullOrEmpty(template)) {
             customMessage = buildCustomMessage(ctx, config, template);
         }

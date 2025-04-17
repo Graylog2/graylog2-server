@@ -41,7 +41,6 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.web.customization.Config;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -195,7 +194,7 @@ public class TeamsEventNotificationV2Test {
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                new TemplateModelProvider(new CustomizationConfig(Config.empty()), new ObjectMapperProvider(), new HttpConfiguration()));
+                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()));
     }
 
     @Test

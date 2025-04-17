@@ -56,6 +56,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -95,6 +96,7 @@ public class TeamsEventNotificationTest {
         eventNotificationContext = NotificationTestData.getDummyContext(getHttpNotification(), "ayirp").toBuilder().notificationConfig(teamsEventNotificationConfig).build();
         final ImmutableList<MessageSummary> messageSummaries = generateMessageSummaries(50);
         when(notificationCallbackService.getBacklogForEvent(eventNotificationContext)).thenReturn(messageSummaries);
+        final var customizationConfig = CustomizationConfig.empty();
 
         teamsEventNotification = new TeamsEventNotification(notificationCallbackService,
                 new ObjectMapperProvider(),
@@ -102,7 +104,8 @@ public class TeamsEventNotificationTest {
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                new TemplateModelProvider(new CustomizationConfig(Config.empty()), new ObjectMapperProvider(), new HttpConfiguration()));
+                new TemplateModelProvider(customizationConfig, new ObjectMapperProvider(), new HttpConfiguration()),
+                customizationConfig);
     }
 
     private void getDummyTeamsNotificationConfig() {
@@ -319,6 +322,36 @@ public class TeamsEventNotificationTest {
         TeamsEventNotificationConfig.Builder builder = TeamsEventNotificationConfig.builder();
         builder.customMessage("Title");
         return builder.build();
+    }
+
+    @Test
+    public void testDefaultProductNameInDefaultMessage() throws EventNotificationException {
+        TeamsMessage actual = teamsEventNotification.createTeamsMessage(eventNotificationContext, TeamsEventNotificationConfig.builder().iconUrl(expectedImage).build());
+        assertThat(actual.sections())
+                .hasSize(1)
+                .allMatch(section -> section.text().contains("Graylog Teams Notification"));
+    }
+
+    @Test
+    public void testProductNameInDefaultMessage() throws EventNotificationException {
+        final var productName = "SuperDuperLog";
+        final var config = new Config(Optional.of(productName), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+        final var customizationConfig = new CustomizationConfig(config);
+
+        final var teamsEventNotification = new TeamsEventNotification(notificationCallbackService,
+                new ObjectMapperProvider(),
+                Engine.createEngine(),
+                mockNotificationService,
+                nodeId,
+                mockrequestClient,
+                new TemplateModelProvider(customizationConfig, new ObjectMapperProvider(), new HttpConfiguration()),
+                customizationConfig);
+
+        TeamsMessage actual = teamsEventNotification.createTeamsMessage(eventNotificationContext, TeamsEventNotificationConfig.builder().iconUrl(expectedImage).build());
+        assertThat(actual.sections())
+                .hasSize(1)
+                .allMatch(section -> section.text().contains("SuperDuperLog Teams Notification"));
     }
 }
 
