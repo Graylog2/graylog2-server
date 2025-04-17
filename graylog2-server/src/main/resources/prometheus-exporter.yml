@@ -1295,6 +1295,16 @@ metric_mappings:
     wildcard_extract_labels:
       - "write"
 
+  - metric_name: "data_warehouse_iceberg_file_io_gcs_read"
+    match_pattern: "org.graylog.iceberg.file.io.gcs.read.*"
+    wildcard_extract_labels:
+      - "read"
+
+  - metric_name: "data_warehouse_iceberg_file_io_gcs_write"
+    match_pattern: "org.graylog.iceberg.file.io.gcs.write.*"
+    wildcard_extract_labels:
+      - "write"
+
   - metric_name: "data_warehouse_iceberg_file_io_local_write"
     match_pattern: "org.graylog.iceberg.file.io.local.write"
 
