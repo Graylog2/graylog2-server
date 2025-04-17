@@ -95,14 +95,17 @@ public class S3GeoIpFileService extends GeoIpFileService {
 
     @Override
     protected Optional<Instant> downloadCityFile(GeoIpResolverConfig config, Path tempCityPath) {
-        final Optional<BucketAndObject> cityDetails = extractDetails(config.cityDbPath());
-        return cityDetails.map(details -> download(details, tempCityPath));
+        return genericDownload(config.cityDbPath(), tempCityPath);
     }
 
     @Override
     protected Optional<Instant> downloadAsnFile(GeoIpResolverConfig config, Path tempAsnPath) {
-        final Optional<BucketAndObject> asnDetails = extractDetails(config.asnDbPath());
-        return asnDetails.map(details -> download(details, tempAsnPath));
+        return genericDownload(config.asnDbPath(), tempAsnPath);
+    }
+
+    private Optional<Instant> genericDownload(String dbPath, Path tempPath) {
+        return extractDetails(dbPath)
+                .map(details -> download(details, tempPath));
     }
 
     private Instant download(BucketAndObject details, Path destFilePath) {
@@ -114,14 +117,17 @@ public class S3GeoIpFileService extends GeoIpFileService {
 
     @Override
     protected Optional<Instant> getCityFileServerTimestamp(GeoIpResolverConfig config) {
-        final Optional<BucketAndObject> cityDetails = extractDetails(config.cityDbPath());
-        return cityDetails.map(details -> getS3Object(details.bucket(), details.object())).map(S3Object::lastModified);
+        return genericServerTimestamp(config.cityDbPath());
     }
 
     @Override
     protected Optional<Instant> getAsnFileServerTimestamp(GeoIpResolverConfig config) {
-        final Optional<BucketAndObject> asnDetails = extractDetails(config.asnDbPath());
-        return asnDetails.map(details -> getS3Object(details.bucket(), details.object())).map(S3Object::lastModified);
+        return genericServerTimestamp(config.asnDbPath());
+    }
+
+    private Optional<Instant> genericServerTimestamp(String dbPath) {
+        return extractDetails(dbPath)
+                .map(d -> getS3Object(d.bucket(), d.object()).lastModified());
     }
 
     @Override

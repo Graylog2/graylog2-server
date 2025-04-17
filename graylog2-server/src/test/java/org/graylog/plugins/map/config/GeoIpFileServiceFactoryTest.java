@@ -1,5 +1,7 @@
 package org.graylog.plugins.map.config;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,10 +26,17 @@ class GeoIpFileServiceFactoryTest {
     @InjectMocks
     private GeoIpFileServiceFactory factory;
 
+    private Path tempDir;
+
     @BeforeEach
     void setUp() throws IOException {
-        final Path tempDir = Files.createTempDirectory("test");
+        tempDir = Files.createTempDirectory("test");
         when(processorConfig.getS3DownloadLocation()).thenReturn(tempDir);
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        FileUtils.deleteDirectory(tempDir.toFile());
     }
 
     @Test
