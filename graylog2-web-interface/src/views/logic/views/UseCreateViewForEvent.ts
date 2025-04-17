@@ -82,7 +82,7 @@ const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
   return new WidgetPosition(col, row, AGGREGATION_WIDGET_HEIGHT, 6);
 };
 
-const createViewWidget = ({ groupBy, fnSeries, expr }: { groupBy: Array<string>; fnSeries; expr }) => {
+const createViewWidget = ({ groupBy, fnSeries, expr }: { groupBy: Array<string>; fnSeries: string; expr: string }) => {
   const uniqPivotFields = uniq(groupBy.filter((v) => !!v));
   const rowPivots = uniqPivotFields.length ? [pivotForField(uniqPivotFields, new FieldType('value', [], []))] : [];
   const fnSeriesForFunc = Series.forFunction(fnSeries);
