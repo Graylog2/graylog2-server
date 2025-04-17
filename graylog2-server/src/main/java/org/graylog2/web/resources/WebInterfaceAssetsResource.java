@@ -21,6 +21,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
+import com.google.common.io.Resources;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.GET;
@@ -43,10 +44,10 @@ import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.PluginAssets;
 import org.graylog2.web.customization.CustomizationConfig;
+import org.jooq.lambda.tuple.Tuple2;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Nonnull;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -57,6 +58,7 @@ import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.Date;
@@ -115,7 +117,7 @@ public class WebInterfaceAssetsResource {
         final var fileContents = customizationConfig.favicon()
                 .or(() -> {
                     try {
-                        return Optional.of(Files.readAllBytes(readFile(false, FAVICON, this.getClass()).toPath()));
+                        return Optional.of(readFile(false, FAVICON, this.getClass()).v2());
                     } catch (URISyntaxException | IOException e) {
                         return Optional.empty();
                     }
@@ -149,7 +151,7 @@ public class WebInterfaceAssetsResource {
         final var filenameWithoutSuffix = trimBasePath(filename, headers);
 
         try {
-            final File resource = readFile(true, filenameWithoutSuffix, plugin.metadata().getClass());
+            final var resource = readFile(true, filenameWithoutSuffix, plugin.metadata().getClass());
             return getResponse(request, filenameWithoutSuffix, resource);
         } catch (URISyntaxException | IOException e) {
             throw new NotFoundException("Couldn't find " + filenameWithoutSuffix + " in plugin " + pluginName, e);
@@ -196,10 +198,10 @@ public class WebInterfaceAssetsResource {
         return get(request, headers, originalLocation.getPath());
     }
 
-    private Response getResponse(Request request, String filename, File resource) throws IOException, URISyntaxException {
-        final byte[] fileContents = Files.readAllBytes(resource.toPath());
+    private Response getResponse(Request request, String filename, Tuple2<java.nio.file.Path, byte[]> resource) throws IOException, URISyntaxException {
+        final byte[] fileContents = resource.v2();
 
-        final FileTime lastModifiedTime = Files.getLastModifiedTime(resource.toPath());
+        final FileTime lastModifiedTime = Files.getLastModifiedTime(resource.v1());
         final Date lastModified = Date.from(lastModifiedTime.toInstant());
         final HashCode hashCode = Hashing.sha256().hashBytes(fileContents);
         final EntityTag entityTag = new EntityTag(hashCode.toString());
@@ -223,7 +225,7 @@ public class WebInterfaceAssetsResource {
                 .build();
     }
 
-    private File readFile(boolean fromPlugin, String filename, Class<?> aClass) throws URISyntaxException, IOException {
+    private Tuple2<java.nio.file.Path, byte[]> readFile(boolean fromPlugin, String filename, Class<?> aClass) throws URISyntaxException, IOException {
         final URL resourceUrl = aClass.getResource(pluginPrefixFilename(fromPlugin, filename));
         if (resourceUrl == null) {
             throw new FileNotFoundException("Resource file " + filename + " not found.");
@@ -232,12 +234,13 @@ public class WebInterfaceAssetsResource {
 
         switch (resourceUrl.getProtocol()) {
             case "file": {
-                return new File(uri);
+                final var path = Paths.get(uri);
+                return new Tuple2<>(path, Files.readAllBytes(path));
             }
             case "jar": {
                 final FileSystem fileSystem = fileSystemCache.getUnchecked(uri);
                 final java.nio.file.Path path = fileSystem.getPath(pluginPrefixFilename(fromPlugin, filename));
-                return path.toFile();
+                return new Tuple2<>(path, Resources.toByteArray(resourceUrl));
             }
             default:
                 throw new IllegalArgumentException("Not a JAR or local file: " + resourceUrl);
