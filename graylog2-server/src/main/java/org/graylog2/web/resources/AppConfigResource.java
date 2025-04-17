@@ -21,6 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ContentStreamConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
@@ -28,16 +34,9 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.NonApiResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.web.PluginUISettingsProvider;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 
 import java.io.IOException;
 import java.net.URI;
@@ -50,6 +49,7 @@ import static java.util.Objects.requireNonNull;
 
 @Path("/config.js")
 @CSP(group = CSP.DEFAULT)
+@NonApiResource
 public class AppConfigResource {
     private final Configuration configuration;
     private final HttpConfiguration httpConfiguration;

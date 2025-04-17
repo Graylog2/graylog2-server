@@ -39,6 +39,7 @@ import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.NonApiResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.web.IndexHtmlGenerator;
@@ -70,6 +71,7 @@ import static java.util.Objects.requireNonNull;
 @Singleton
 @Path("")
 @CSP(group = CSP.DEFAULT)
+@NonApiResource
 public class WebInterfaceAssetsResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;
