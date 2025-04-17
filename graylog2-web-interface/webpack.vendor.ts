@@ -108,7 +108,7 @@ if (TARGET === 'start') {
         disableDotRule: true,
       },
       proxy: [{
-        context: ['/api', '/config.js'],
+        context: ['/api', '/config.js', '/sso'],
         target: apiUrl,
       }],
     },
