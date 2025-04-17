@@ -37,7 +37,7 @@ const StyledH2 = styled.h2(
   `,
 );
 
-const Header = () => <StyledH2>Graylog cluster</StyledH2>;
+const Header = () => <StyledH2>Cluster</StyledH2>;
 
 const ClusterInfo = () => {
   const nodes = useStore(NodesStore);

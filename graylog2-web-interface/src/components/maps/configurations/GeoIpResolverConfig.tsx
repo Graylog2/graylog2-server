@@ -52,8 +52,8 @@ const defaultConfig: GeoIpConfigType = {
   enabled: false,
   enforce_graylog_schema: true,
   db_vendor_type: 'MAXMIND',
-  city_db_path: '/etc/graylog/server/GeoLite2-City.mmdb',
-  asn_db_path: '/etc/graylog/server/GeoLite2-ASN.mmdb',
+  city_db_path: '/etc/server/GeoLite2-City.mmdb',
+  asn_db_path: '/etc/server/GeoLite2-ASN.mmdb',
   refresh_interval_unit: 'MINUTES',
   refresh_interval: 10,
   use_s3: false,
@@ -103,7 +103,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       <p>
         The Geo-Location Processor plugin scans all messages for fields containing <strong>exclusively</strong> an IP
         address, and puts their geo-location information (coordinates, ISO country code, and city name) into different
-        fields. Read more in the <DocumentationLink page="geolocation" text="Graylog documentation" />.
+        fields. Read more in the <DocumentationLink page="geolocation" text="documentation" />.
       </p>
 
       <dl className="deflist">
@@ -111,7 +111,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
         <dd>{config.enabled === true ? 'Yes' : 'No'}</dd>
         {config.enabled && (
           <>
-            <dt>Enforce default Graylog schema:</dt>
+            <dt>Enforce default schema:</dt>
             <dd>{config.enforce_graylog_schema === true ? 'Yes' : 'No'}</dd>
             <dt>Database vendor type:</dt>
             <dd>{activeVendorType(config.db_vendor_type)}</dd>
@@ -156,7 +156,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                       id="enforce_graylog_schema"
                       type="checkbox"
                       disabled={!values.enabled}
-                      label="Enforce default Graylog schema"
+                      label="Enforce default schema"
                       name="enforce_graylog_schema"
                     />
                   </Col>

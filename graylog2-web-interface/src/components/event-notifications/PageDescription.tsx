@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
-import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
-
-const IndexExpandedSection = ({ type }: ExpandedSectionProps) => (
-  <p>
-    Field type <i>{type}</i> comes from the search engine index mapping. It could have been created dynamically, set by
-    the system or come from historical profiles and/or custom mappings.
-  </p>
+const PageDescription = () => (
+  <span>
+    Notifications alert you of any configured Event when they occur. Notifications can be sent directly to you or to
+    other systems you use for that purpose. Remember to assign Notifications while creating or editing an Event
+    Definition.
+  </span>
 );
 
-export default IndexExpandedSection;
+export default PageDescription;

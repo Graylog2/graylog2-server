@@ -19,6 +19,7 @@ import * as React from 'react';
 import type UserOverview from 'logic/users/UserOverview';
 import { DataTable } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
+import useProductName from 'customization/useProductName';
 
 type Props = {
   adminUser: UserOverview;
@@ -27,23 +28,29 @@ type Props = {
   headers: Array<string>;
 };
 
-const SystemAdministratorOverview = ({ adminUser, dataRowFormatter, headers, headerCellFormatter }: Props) => (
-  <Row className="content">
-    <Col xs={12}>
-      <h2>System Administrator</h2>
-      <p className="description">The system administrator can only be edited in the Graylog configuration file.</p>
-      <DataTable
-        id="users-overview"
-        className="table-hover"
-        headers={headers}
-        headerCellFormatter={headerCellFormatter}
-        sortByKey="fullName"
-        rows={[adminUser]}
-        dataRowFormatter={dataRowFormatter}
-        filterKeys={[]}
-      />
-    </Col>
-  </Row>
-);
+const SystemAdministratorOverview = ({ adminUser, dataRowFormatter, headers, headerCellFormatter }: Props) => {
+  const productName = useProductName();
+
+  return (
+    <Row className="content">
+      <Col xs={12}>
+        <h2>System Administrator</h2>
+        <p className="description">
+          The system administrator can only be edited in the {productName} configuration file.
+        </p>
+        <DataTable
+          id="users-overview"
+          className="table-hover"
+          headers={headers}
+          headerCellFormatter={headerCellFormatter}
+          sortByKey="fullName"
+          rows={[adminUser]}
+          dataRowFormatter={dataRowFormatter}
+          filterKeys={[]}
+        />
+      </Col>
+    </Row>
+  );
+};
 
 export default SystemAdministratorOverview;

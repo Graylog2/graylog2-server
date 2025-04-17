@@ -113,7 +113,7 @@ const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExample
         <Col md={12}>
           <p className={RuleHelperStyle.marginQuickReferenceText}>
             Read the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES} text="full documentation" /> to gain a
-            better understanding of how Graylog pipeline rules work.
+            better understanding of how pipeline rules work.
           </p>
         </Col>
       </Row>

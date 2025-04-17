@@ -16,20 +16,24 @@
  */
 import * as React from 'react';
 
-// import DocsHelper from 'util/DocsHelper';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import TokenManagement from 'components/users/UsersTokenManagement/TokenManagement';
+import useProductName from 'customization/useProductName';
 
-const TokenManagementPage = () => (
-  <DocumentTitle title="Token Management">
-    <UsersPageNavigation />
-    <PageHeader title="Token Management">
-      <span>Overview of Graylog&apos;s access tokens.</span>
-    </PageHeader>
+const TokenManagementPage = () => {
+  const productName = useProductName();
 
-    <TokenManagement />
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title="Token Management">
+      <UsersPageNavigation />
+      <PageHeader title="Token Management">
+        <span>Access tokens overview configured for {productName}.</span>
+      </PageHeader>
+
+      <TokenManagement />
+    </DocumentTitle>
+  );
+};
 
 export default TokenManagementPage;

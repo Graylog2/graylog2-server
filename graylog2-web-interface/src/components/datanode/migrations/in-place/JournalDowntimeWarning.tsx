@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import { Alert } from 'components/bootstrap';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
+import useProductName from 'customization/useProductName';
 
 import useJournalDowntimeSize from '../../hooks/useJournalDowntimeSize';
 import MigrationError from '../common/MigrationError';
@@ -30,13 +31,14 @@ const DownsizeWarning = styled(Alert)`
 `;
 
 const JournalDowntimeWarning = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const productName = useProductName();
   const { data, error, isError } = useJournalDowntimeSize();
 
   return (
     <>
       <h3>Journal downtime size warning</h3>
       <p>
-        Please note that during migration data processing will stop on your Graylog node, this will result in the
+        Please note that during migration data processing will stop on your {productName} node, this will result in the
         journal growing in size.
       </p>
       <p>Therefore you might need to increase your journal volume size.</p>
@@ -45,7 +47,7 @@ const JournalDowntimeWarning = ({ currentStep, onTriggerStep, hideActions }: Mig
         <b>{data.KBs_per_minute} KB/min</b>
       </p>
       <p>
-        Your current maximum downtime for reconfiguring Graylog to point to the data node is:{' '}
+        Your current maximum downtime for reconfiguring {productName} to point to the data node is:{' '}
         <b>{data.max_downtime_duration}</b>
       </p>
       {isError && (

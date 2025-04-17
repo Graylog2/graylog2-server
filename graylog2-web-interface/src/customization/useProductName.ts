@@ -14,15 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 
-import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
+import AppConfig from 'util/AppConfig';
 
-const IndexExpandedSection = ({ type }: ExpandedSectionProps) => (
-  <p>
-    Field type <i>{type}</i> comes from the search engine index mapping. It could have been created dynamically, set by
-    the system or come from historical profiles and/or custom mappings.
-  </p>
-);
+const useProductName = () => AppConfig.branding()?.product_name ?? 'Graylog';
 
-export default IndexExpandedSection;
+export default useProductName;
