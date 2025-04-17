@@ -20,19 +20,22 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
 
-import java.util.Collections;
 import java.util.Set;
 
 import static org.graylog2.plugin.security.Permission.create;
 
 public class ViewsRestPermissions implements PluginPermissions {
 
+    public static final String VIEW_CREATE = "view:create";
     public static final String VIEW_READ = "view:read";
     public static final String VIEW_EDIT = "view:edit";
     public static final String VIEW_DELETE = "view:delete";
     public static final String DEFAULT_VIEW_SET = "default-view:set";
 
+    private final Permission createPermission = create(VIEW_CREATE, "Create view");
+
     private final ImmutableSet<Permission> permissions = ImmutableSet.of(
+            createPermission,
             create(VIEW_READ, "Read available views"),
             create(VIEW_EDIT, "Edit view"),
             create(VIEW_DELETE, "Delete view"),
@@ -46,6 +49,6 @@ public class ViewsRestPermissions implements PluginPermissions {
 
     @Override
     public Set<Permission> readerBasePermissions() {
-        return Collections.emptySet();
+        return Set.of(createPermission);
     }
 }
