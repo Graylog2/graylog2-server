@@ -41,8 +41,6 @@ import javax.activation.MimetypesFileTypeMap;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.attribute.FileTime;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
@@ -170,8 +168,7 @@ public class WebInterfaceAssetsResource {
     private Response getResponse(Request request, String filename, ResourceFileReader.ResourceFile resource) throws IOException, URISyntaxException {
         final byte[] fileContents = resource.contents().get();
 
-        final FileTime lastModifiedTime = Files.getLastModifiedTime(resource.path());
-        final Date lastModified = Date.from(lastModifiedTime.toInstant());
+        final var lastModified = resource.lastModified().orElseGet(Date::new);
         final var entityTag = resource.entityTag().get();
 
         final Response.ResponseBuilder response = request.evaluatePreconditions(lastModified, entityTag);

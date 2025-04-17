@@ -23,7 +23,10 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @Singleton
@@ -58,6 +61,18 @@ public class ResourceFileReader {
                 final var hashCode = Hashing.sha256().hashBytes(fileContents);
                 return new EntityTag(hashCode.toString());
             }));
+        }
+
+        public Optional<Date> lastModified() {
+            return Optional.ofNullable(path())
+                    .flatMap(path -> {
+                        try {
+                            final FileTime lastModifiedTime = Files.getLastModifiedTime(path);
+                            return Optional.of(Date.from(lastModifiedTime.toInstant()));
+                        } catch (IOException e) {
+                            return Optional.empty();
+                        }
+                    });
         }
     }
 
