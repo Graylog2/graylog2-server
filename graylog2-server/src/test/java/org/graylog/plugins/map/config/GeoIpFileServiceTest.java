@@ -16,12 +16,11 @@
  */
 package org.graylog.plugins.map.config;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.function.TriFunction;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
@@ -85,14 +84,9 @@ class GeoIpFileServiceTest {
 
 
     @BeforeEach
-    void setUp() throws IOException {
-        tempDir = Files.createTempDirectory("test");
-        when(processorConfig.getS3DownloadLocation()).thenReturn(tempDir);
-    }
-
-    @AfterEach
-    void tearDown() throws IOException {
-        FileUtils.deleteDirectory(tempDir.toFile());
+    void setUp(@TempDir Path junitTempDir) {
+        this.tempDir = junitTempDir;
+        when(processorConfig.getS3DownloadLocation()).thenReturn(junitTempDir);
     }
 
     @Test
