@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
@@ -206,7 +207,7 @@ class ViewSharingToGrantsMigrationTest {
                                EntityOwnershipService entityOwnerShipService, MongoCollections mongoCollections) {
             super(clusterConfigService,
                     view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService,
-                    mock(ViewSummaryService.class), mongoCollections);
+                    mock(ViewSummaryService.class), mongoCollections, new IgnoreSearchFilters());
         }
     }
 }
