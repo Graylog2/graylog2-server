@@ -16,13 +16,16 @@
  */
 package org.graylog2.periodical;
 
-import com.github.zafarkhaja.semver.Version;
+import com.github.joschi.jadconfig.util.Duration;
+import org.graylog2.configuration.SearchIndexerHosts;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.VersionProbe;
+import org.graylog2.storage.versionprobe.VersionProbeFactory;
+import org.graylog2.storage.versionprobe.VersionProbeListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -32,20 +35,18 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-class ESVersionCheckPeriodicalTest {
-    private VersionProbe versionProbe;
+class SearchVersionCheckPeriodicalTest {
+
     private NotificationService notificationService;
 
     @BeforeEach
     void setUp() {
-        this.versionProbe = mock(VersionProbe.class);
         this.notificationService = mock(NotificationServiceImpl.class);
         when(this.notificationService.build()).thenCallRealMethod();
         when(this.notificationService.buildNow()).thenCallRealMethod();
@@ -53,41 +54,46 @@ class ESVersionCheckPeriodicalTest {
 
     @Test
     void doesNotRunIfVersionOverrideIsSet() {
-        createPeriodical(SearchVersion.elasticsearch(8, 0, 0), SearchVersion.elasticsearch(7, 0, 0)).doRun();
+        final SearchVersion initialVersion = SearchVersion.elasticsearch(8, 0, 0);
+        final SearchVersion overrideVersion = SearchVersion.elasticsearch(7, 0, 0);
+        createPeriodical(
+                initialVersion,
+                overrideVersion,
+                mockVersionProbeFactory(initialVersion)).doRun();
 
         verifyNoInteractions(notificationService);
     }
 
     @Test
     void doesNotDoAnythingIfVersionWasNotProbed() {
-        returnProbedVersion(null);
-        createPeriodical(SearchVersion.elasticsearch(8, 0, 0)).doRun();
+        final SearchVersion initialVersion = SearchVersion.elasticsearch(8, 0, 0);
+        createPeriodical(initialVersion, mockVersionProbeFactory(null)).doRun();
         verifyNoInteractions(notificationService);
     }
 
     @Test
     void createsNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
-        returnProbedVersion(Version.of(9, 2, 3));
-
-        createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
+        final SearchVersion initialVersion = SearchVersion.elasticsearch(8, 1, 2);
+        final VersionProbeFactory versionProbe = mockVersionProbeFactory(SearchVersion.elasticsearch(9, 2, 3));
+        createPeriodical(initialVersion, versionProbe).doRun();
 
         assertNotificationWasRaised();
     }
 
     @Test
     void createsNotificationIfCurrentVersionIncompatiblyOlderThanInitialOne() {
-        returnProbedVersion(Version.of(6, 8, 1));
-
-        createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
+        final SearchVersion initialVersion = SearchVersion.elasticsearch(8, 1, 2);
+        final VersionProbeFactory versionProbe = mockVersionProbeFactory(SearchVersion.elasticsearch(6, 8, 1));
+        createPeriodical(initialVersion, versionProbe).doRun();
 
         assertNotificationWasRaised();
     }
 
     @Test
     void fixesNotificationIfCurrentVersionIsIncompatibleWithInitialOne() {
-        returnProbedVersion(Version.of(8, 2, 3));
-
-        createPeriodical(SearchVersion.elasticsearch(8, 1, 2)).doRun();
+        final SearchVersion initialVersion = SearchVersion.elasticsearch(8, 1, 2);
+        VersionProbeFactory versionProbe = mockVersionProbeFactory(SearchVersion.elasticsearch(8, 2, 3));
+        createPeriodical(initialVersion, versionProbe).doRun();
 
         assertNotificationWasFixed();
     }
@@ -106,15 +112,32 @@ class ESVersionCheckPeriodicalTest {
         assertThat(captor.getValue().getType()).isEqualTo(Notification.Type.ES_VERSION_MISMATCH);
     }
 
-    private void returnProbedVersion(@Nullable com.github.zafarkhaja.semver.Version probedVersion) {
-        when(versionProbe.probe(anyCollection())).thenReturn(Optional.ofNullable(probedVersion).map(SearchVersion::elasticsearch));
+    private Periodical createPeriodical(SearchVersion initialVersion, VersionProbeFactory versionProbeFactory) {
+        return createPeriodical(initialVersion, null, versionProbeFactory);
     }
 
-    private Periodical createPeriodical(SearchVersion initialVersion) {
-        return new ESVersionCheckPeriodical(initialVersion, null, Collections.emptyList(), versionProbe, notificationService);
+    private Periodical createPeriodical(SearchVersion initialVersion, @Nullable SearchVersion versionOverride, VersionProbeFactory versionProbe) {
+        return new SearchVersionCheckPeriodical(
+                initialVersion,
+                versionOverride,
+                versionProbe,
+                notificationService,
+                ()  -> new SearchIndexerHosts(Collections.emptyList(), Collections.emptyList(), Collections.emptyList()),
+                false,
+                false);
     }
 
-    private Periodical createPeriodical(SearchVersion initialVersion, @Nullable SearchVersion versionOverride) {
-        return new ESVersionCheckPeriodical(initialVersion, versionOverride, Collections.emptyList(), versionProbe, notificationService);
+    private VersionProbeFactory mockVersionProbeFactory(SearchVersion expectedResult) {
+        return new VersionProbeFactory() {
+            @Override
+            public VersionProbe createDefault() {
+                return (hosts) -> Optional.ofNullable(expectedResult);
+            }
+
+            @Override
+            public VersionProbe create(int probeAttempts, Duration probeDelay, boolean useJwtAuthentication, VersionProbeListener versionProbeListener) {
+                return createDefault();
+            }
+        };
     }
 }
