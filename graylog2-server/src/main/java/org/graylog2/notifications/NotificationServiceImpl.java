@@ -19,6 +19,9 @@ package org.graylog2.notifications;
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
@@ -32,11 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -47,7 +47,7 @@ import static org.graylog2.audit.AuditEventTypes.SYSTEM_NOTIFICATION_CREATE;
 import static org.graylog2.audit.AuditEventTypes.SYSTEM_NOTIFICATION_DELETE;
 
 @Singleton
-public class NotificationServiceImpl extends PersistedServiceImpl implements NotificationService {
+public class NotificationServiceImpl extends PersistedServiceImpl implements NotificationService, NotificationPersistenceService {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     private final NodeId nodeId;
@@ -197,4 +197,14 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         return query;
     }
 
+    @Nonnull
+    @Override
+    public Iterator<Notification> iterator() {
+        return all().iterator();
+    }
+
+    @Override
+    public int destroy(Notification notification) {
+        return super.destroy(notification);
+    }
 }
