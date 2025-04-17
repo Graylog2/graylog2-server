@@ -30,6 +30,7 @@ import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
@@ -63,12 +64,12 @@ class S3GeoIpFileServiceIT {
     }
 
     @Test
-    void testServerTimestampWithValidConfig() {
+    void testServerTimestampWithValidConfig() throws URISyntaxException {
         final String bucket = "geoip-bucket";
         final String cityFile = "fake_GeoLite2-City.mmdb";
         final String asnFile = "fake_GeoLite2-ASN.mmdb";
         s3Client.createBucket(CreateBucketRequest.builder().bucket(bucket).build());
-        final Path cityFilePath = Path.of(getClass().getResource(cityFile).getFile());
+        final Path cityFilePath = Path.of(getClass().getResource(cityFile).toURI());
         s3Client.putObject(PutObjectRequest.builder().bucket(bucket).key(cityFile).build(), RequestBody.fromFile(cityFilePath));
         //Explicitly NOT uploading the ASN-file to test a non-existing timestamp.
 
@@ -91,12 +92,12 @@ class S3GeoIpFileServiceIT {
     }
 
     @Test
-    void testFileDownloadWithValidConfig() {
+    void testFileDownloadWithValidConfig() throws URISyntaxException {
         final String bucket = "geoip-bucket";
         final String cityFile = "fake_GeoLite2-City.mmdb";
         final String asnFile = "fake_GeoLite2-ASN.mmdb";
         s3Client.createBucket(CreateBucketRequest.builder().bucket(bucket).build());
-        final Path cityFilePath = Path.of(getClass().getResource(cityFile).getFile());
+        final Path cityFilePath = Path.of(getClass().getResource(cityFile).toURI());
         s3Client.putObject(PutObjectRequest.builder().bucket(bucket).key(cityFile).build(), RequestBody.fromFile(cityFilePath));
         //Explicitly NOT uploading file to test a non-existing file-download.
 
