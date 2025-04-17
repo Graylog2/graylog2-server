@@ -28,8 +28,10 @@ import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 import useHistory from 'routing/useHistory';
 import { useStore } from 'stores/connect';
+import useProductName from 'customization/useProductName';
 
 const CreateContentPackPage = () => {
+  const productName = useProductName();
   const history = useHistory();
   const { entityIndex } = useStore(CatalogStore);
   const [contentPackState, setContentPackState] = useState({
@@ -67,7 +69,7 @@ const CreateContentPackPage = () => {
       (response) => {
         const message =
           'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
-          'Graylog logs for more information.';
+          `${productName} server logs for more information.`;
         const title = 'Could not import content pack';
         let smallMessage = '';
 

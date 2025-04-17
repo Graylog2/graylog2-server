@@ -37,6 +37,8 @@ class SidecarStatusPage extends React.Component<
     [key: string]: any;
   }
 > {
+  private interval: NodeJS.Timeout;
+
   constructor(props) {
     super(props);
 
@@ -44,8 +46,6 @@ class SidecarStatusPage extends React.Component<
       sidecar: undefined,
     };
   }
-
-  private interval: NodeJS.Timeout;
 
   componentDidMount() {
     const reloadSidecar = () => this.reloadSidecar(this.props.history);
@@ -101,7 +101,7 @@ class SidecarStatusPage extends React.Component<
             title: 'Sidecars documentation',
             path: DocsHelper.PAGES.COLLECTOR_STATUS,
           }}>
-          <span>A status overview of the Graylog Sidecar.</span>
+          <span>A status overview of the Sidecar.</span>
         </PageHeader>
 
         <SidecarStatus sidecar={sidecar} collectors={collectors} />
