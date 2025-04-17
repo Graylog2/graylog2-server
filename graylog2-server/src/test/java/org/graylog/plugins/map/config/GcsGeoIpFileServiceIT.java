@@ -22,13 +22,13 @@ import org.graylog.testing.completebackend.FakeGCSContainer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
@@ -51,13 +51,13 @@ class GcsGeoIpFileServiceIT {
     private Path tempDir;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp(@TempDir Path junitTempDir) throws Exception {
         //Set up fake-gcs:
         fakeGcs.updateExternalUrlWithContainerUrl(fakeGcs.getEndpointUri().toString());
         storageClient = fakeGcs.getStorage();
 
         //And now to the service itself:
-        tempDir = Files.createTempDirectory("test");
+        this.tempDir = junitTempDir;
         when(processorConfig.getS3DownloadLocation()).thenReturn(tempDir);
         service = new GcsGeoIpFileService(processorConfig);
         service.setStorage(storageClient);
