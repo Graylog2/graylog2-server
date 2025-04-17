@@ -14,19 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage.versionprobe;
-
-import org.graylog2.storage.SearchVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.graylog2.configuration;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.List;
 
-public interface VersionProbe {
+public record SearchIndexerHosts(List<URI> configuredHosts, List<URI> initialHosts, List<URI> activeHosts) {
 
-    Logger LOG = LoggerFactory.getLogger(VersionProbe.class); // keep the original implementation class name for compat reasons
-
-    Optional<SearchVersion> probe(final Collection<URI> hosts);
 }

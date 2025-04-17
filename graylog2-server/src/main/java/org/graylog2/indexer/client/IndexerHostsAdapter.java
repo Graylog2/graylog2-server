@@ -14,19 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage.versionprobe;
-
-import org.graylog2.storage.SearchVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.graylog2.indexer.client;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.List;
 
-public interface VersionProbe {
-
-    Logger LOG = LoggerFactory.getLogger(VersionProbe.class); // keep the original implementation class name for compat reasons
-
-    Optional<SearchVersion> probe(final Collection<URI> hosts);
+public interface IndexerHostsAdapter {
+    /**
+     * @return List of up-to-date nodes as the elastic/opensearch client sees them and uses them. This includes all
+     * changes caused by sniffers and dynamic infrastructure changes. Unlike the fixed "elasticsearch_hosts" configuration
+     * property, this may change during every call and gives real-time information.
+     */
+    List<URI> getActiveHosts();
 }

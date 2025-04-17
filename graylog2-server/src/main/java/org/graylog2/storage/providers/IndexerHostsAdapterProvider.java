@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage.versionprobe;
+package org.graylog2.storage.providers;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import org.graylog2.indexer.client.IndexerHostsAdapter;
+import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.storage.VersionAwareProvider;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.Map;
 
-public interface VersionProbe {
-
-    Logger LOG = LoggerFactory.getLogger(VersionProbe.class); // keep the original implementation class name for compat reasons
-
-    Optional<SearchVersion> probe(final Collection<URI> hosts);
+public class IndexerHostsAdapterProvider extends VersionAwareProvider<IndexerHostsAdapter> {
+    @Inject
+    public IndexerHostsAdapterProvider(@DetectedSearchVersion SearchVersion indexerVersion, Map<SearchVersion, Provider<IndexerHostsAdapter>> pluginBindings) {
+        super(indexerVersion, pluginBindings);
+    }
 }

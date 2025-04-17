@@ -14,19 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.storage.versionprobe;
+package org.graylog2.configuration;
 
-import org.graylog2.storage.SearchVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.Optional;
-
-public interface VersionProbe {
-
-    Logger LOG = LoggerFactory.getLogger(VersionProbe.class); // keep the original implementation class name for compat reasons
-
-    Optional<SearchVersion> probe(final Collection<URI> hosts);
+/**
+ * This service provides unified access to configured, initial and current list of hosts used in elastic/opensearch
+ * clients to access the indexers. The client is the single source of truth when we need to know which all hosts
+ * are available. It adds new hosts through sniffers and removes those unavailable.
+ */
+public interface SearchIndexerHostsService {
+    SearchIndexerHosts getHosts();
 }

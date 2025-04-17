@@ -22,12 +22,15 @@ import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class CustomizationConfigIT {
+    private static final Logger LOG = LoggerFactory.getLogger(CustomizationConfigIT.class);
     private final GraylogApis apis;
 
     public CustomizationConfigIT(GraylogApis graylogApis) {
@@ -66,6 +69,7 @@ public class CustomizationConfigIT {
         try (final var jsContext = Context.newBuilder()
                 .allowExperimentalOptions(true)
                 .allowHostAccess(HostAccess.NONE)
+                .option("engine.WarnInterpreterOnly", "false")
                 .build()) {
             final var value = jsContext.eval("js", """
                         const window = {};
