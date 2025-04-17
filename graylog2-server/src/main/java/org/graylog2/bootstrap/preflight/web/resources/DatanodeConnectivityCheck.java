@@ -16,18 +16,15 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import okhttp3.OkHttpClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
+import org.graylog2.storage.versionprobe.VersionProbeFactory;
 import org.graylog2.storage.versionprobe.VersionProbe;
 import org.graylog2.storage.versionprobe.VersionProbeLogger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Collections;
@@ -36,27 +33,21 @@ import java.util.List;
 @Singleton
 public class DatanodeConnectivityCheck {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodeConnectivityCheck.class);
-
-    private final VersionProbe versionProbe;
+    private final VersionProbeFactory versionProbeFactory;
+    private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
 
     @Inject
-    public DatanodeConnectivityCheck(
-            ObjectMapper objectMapper,
-            OkHttpClient okHttpClient,
-            IndexerJwtAuthTokenProvider jwtTokenProvider
-    ) {
-        // always force usage of JWT tokens. Elsewhere, we autodetect if jwt auth is enabled, but this works only
-        // after preflight, where we can reliably detect if we are running against datanodes.
-        // Here we know it without detection anyway.
-        final IndexerJwtAuthToken indexerJwtAuthToken = jwtTokenProvider.alwaysEnabled().get();
-        this.versionProbe = new VersionProbe(objectMapper, okHttpClient, 1, Duration.seconds(1), indexerJwtAuthToken);
+    public DatanodeConnectivityCheck(VersionProbeFactory versionProbeFactory, IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
+        this.versionProbeFactory = versionProbeFactory;
+        this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
     }
 
     public ConnectionCheckResult probe(DataNodeDto node) {
+        final VersionProbeMessageCollector messageCollector = new VersionProbeMessageCollector(VersionProbeLogger.INSTANCE);
+        final IndexerJwtAuthToken jwtToken = indexerJwtAuthTokenProvider.alwaysEnabled().get();
+        final VersionProbe versionProbe = versionProbeFactory.create(jwtToken, 1, Duration.seconds(1), messageCollector);
         final List<URI> hosts = Collections.singletonList(URI.create(node.getTransportAddress()));
-        final VersionProbeMessageCollector messageCollector = new VersionProbeMessageCollector(new VersionProbeLogger(LOG));
-        return versionProbe.probe(hosts, messageCollector)
+        return versionProbe.probe(hosts)
                 .map(ConnectionCheckResult::success)
                 .orElse(ConnectionCheckResult.failure(messageCollector.joinedMessages()));
     }
