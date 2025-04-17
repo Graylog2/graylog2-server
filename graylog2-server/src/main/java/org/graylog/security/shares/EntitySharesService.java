@@ -248,7 +248,7 @@ public class EntitySharesService {
 
         // remove grants that are not present anymore
         // TODO delete multiple entries with one db query
-        existingGrants.forEach((g) -> {
+        existingGrants.forEach(g -> {
             if (!selectedGranteeCapabilities.containsKey(g.grantee())) {
                 grantService.delete(g.id());
                 updateEventBuilder.addDeletes(g.grantee(), g.capability());
@@ -264,11 +264,15 @@ public class EntitySharesService {
                 .build();
     }
 
+    /**
+     * Applies the share request to dependent entities, that we want to keep in sync.
+     *
+     * @param ownedEntity the parent entity
+     * @param request     sharing request
+     * @param sharingUser the sharing user
+     */
     private void resolveImplicitGrants(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
-        Collection<GRN> dependentEntities = additionalGrantsResolver.dependentEntities(ownedEntity);
-        dependentEntities.forEach(grant -> {
-            updateOnlyEntityShares(grant, request, sharingUser);
-        });
+        additionalGrantsResolver.dependentEntities(ownedEntity).forEach(grn -> updateOnlyEntityShares(grn, request, sharingUser));
     }
 
     private void postUpdateEvent(EntitySharesUpdateEvent updateEvent) {
@@ -299,7 +303,7 @@ public class EntitySharesService {
 
         // Iterate over all existing owner grants and find modifications
         ArrayList<GRN> removedOwners = new ArrayList<>();
-        existingGrants.stream().filter(g -> g.capability().equals(Capability.OWN)).forEach((g) -> {
+        existingGrants.stream().filter(g -> g.capability().equals(Capability.OWN)).forEach(g -> {
             // owner got removed
             if (!selectedGranteeCapabilities.containsKey(g.grantee())) {
                 // Ignore owners that were invisible to the requesting user
