@@ -14,13 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.storage.opensearch2.sniffer;
 
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
 
-import java.io.IOException;
-import java.util.List;
+public interface SnifferBuilder {
+    /**
+     * @return true if the configuration of this node allows that type of sniffer
+     */
+    boolean enabled();
 
-public interface NodesSniffer {
-    List<Node> sniff(List<Node> nodes) throws IOException;
+    /**
+     * @return Always a new instance of a sniffer.
+     */
+    NodesSniffer create(RestClient restClient);
 }
