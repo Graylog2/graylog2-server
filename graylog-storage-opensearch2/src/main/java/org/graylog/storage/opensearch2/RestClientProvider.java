@@ -122,10 +122,11 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
                             .setMaxConnTotal(configuration.elasticsearchMaxTotalConnections())
                             .setMaxConnPerRoute(configuration.elasticsearchMaxTotalConnectionsPerRoute());
 
-                    indexerJwtAuthToken.headerValue().ifPresentOrElse(
-                            authHeader -> httpClientConfig.addInterceptorLast((HttpRequestInterceptor) (request, context) -> request.addHeader("Authorization", authHeader)),
-                            () -> httpClientConfig.setDefaultCredentialsProvider(credentialsProvider)
-                    );
+                    if (indexerJwtAuthToken.isJwtAuthEnabled()) {
+                        httpClientConfig.addInterceptorLast(jwtAuthInterceptor());
+                    } else {
+                        httpClientConfig.setDefaultCredentialsProvider(credentialsProvider);
+                    }
 
                     if (configuration.muteDeprecationWarnings()) {
                         httpClientConfig.addInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
@@ -139,5 +140,11 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
                 .setChunkedEnabled(configuration.compressionEnabled());
 
         return new RestHighLevelClient(restClientBuilder);
+    }
+
+    @Nonnull
+    private HttpRequestInterceptor jwtAuthInterceptor() {
+        return (request, context) ->
+                indexerJwtAuthToken.headerValue().ifPresent(value -> request.addHeader("Authorization", value));
     }
 }
