@@ -76,6 +76,7 @@ import org.graylog2.shared.security.SecurityBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.shared.system.stats.SystemStatsModule;
+import org.graylog2.storage.versionprobe.VersionProbeModule;
 import org.jsoftbiz.utils.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -287,6 +288,7 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         return Guice.createInjector(
+                new VersionProbeModule(),
                 binder -> binder.bind(IndexerHostsAdapter.class).toInstance(List::of),
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
