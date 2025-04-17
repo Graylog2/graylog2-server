@@ -33,7 +33,7 @@ type Branding = {
     background?: string;
   };
   welcome?: {
-    news?: { enabled: boolean; feed: string };
+    news?: { enabled: boolean; feed?: string };
     releases?: { enabled: boolean };
   };
   navigation?: {
