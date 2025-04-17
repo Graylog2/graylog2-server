@@ -89,7 +89,9 @@ class EntitySharesServiceTest {
 
 
         final EventBus serverEventBus = mock(EventBus.class);
-        this.entitySharesService = new EntitySharesService(dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker, grnRegistry, granteeService, serverEventBus);
+        this.entitySharesService = new EntitySharesService(
+                dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker,
+                grnRegistry, granteeService, serverEventBus, mock(AdditionalGrantsResolver.class));
 
         // TODO this is needed to initialize the CAPABILITIES field
         new BuiltinCapabilities();

@@ -61,20 +61,23 @@ public class EntitySharesService {
     private final GRNRegistry grnRegistry;
     private final GranteeService granteeService;
     private final EventBus serverEventBus;
+    private final AdditionalGrantsResolver additionalGrantsResolver;
 
     @Inject
     public EntitySharesService(DBGrantService grantService,
-                                   EntityDependencyResolver entityDependencyResolver,
-                                   EntityDependencyPermissionChecker entityDependencyPermissionChecker,
-                                   GRNRegistry grnRegistry,
-                                   GranteeService granteeService,
-                                   EventBus serverEventBus) {
+                               EntityDependencyResolver entityDependencyResolver,
+                               EntityDependencyPermissionChecker entityDependencyPermissionChecker,
+                               GRNRegistry grnRegistry,
+                               GranteeService granteeService,
+                               EventBus serverEventBus,
+                               AdditionalGrantsResolver additionalGrantsResolver) {
         this.grantService = grantService;
         this.entityDependencyResolver = entityDependencyResolver;
         this.entityDependencyPermissionChecker = entityDependencyPermissionChecker;
         this.grnRegistry = grnRegistry;
         this.granteeService = granteeService;
         this.serverEventBus = serverEventBus;
+        this.additionalGrantsResolver = additionalGrantsResolver;
     }
 
     /**
@@ -164,6 +167,12 @@ public class EntitySharesService {
         return updateEntityShares(grnRegistry.newGRN(grnType, id), request, sharingUser);
     }
 
+    public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
+        final EntityShareResponse result = updateOnlyEntityShares(ownedEntity, request, sharingUser);
+        resolveImplicitGrants(ownedEntity, request, sharingUser);
+        return result;
+    }
+
     /**
      * Share / unshare an entity with one or more grantees.
      * The grants in the request are created or, if they already exist, updated.
@@ -172,7 +181,7 @@ public class EntitySharesService {
      * @param request     the request containing grantees and their capabilities
      * @param sharingUser the user executing the request
      */
-    public EntityShareResponse updateEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
+    private EntityShareResponse updateOnlyEntityShares(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
         requireNonNull(ownedEntity, "ownedEntity cannot be null");
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
@@ -211,7 +220,7 @@ public class EntitySharesService {
         }
 
         // Update capabilities of existing grants (for a grantee)
-        existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach((g -> {
+        existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach(g -> {
             final Capability newCapability = selectedGranteeCapabilities.get(g.grantee());
             if (!g.capability().equals(newCapability)) {
                 grantService.save(g.toBuilder()
@@ -221,7 +230,7 @@ public class EntitySharesService {
                         .build());
                 updateEventBuilder.addUpdates(g.grantee(), newCapability, g.capability());
             }
-        }));
+        });
 
         // Create newly added grants
         // TODO Create multiple entries with one db query
@@ -239,7 +248,7 @@ public class EntitySharesService {
 
         // remove grants that are not present anymore
         // TODO delete multiple entries with one db query
-        existingGrants.forEach((g) -> {
+        existingGrants.forEach(g -> {
             if (!selectedGranteeCapabilities.containsKey(g.grantee())) {
                 grantService.delete(g.id());
                 updateEventBuilder.addDeletes(g.grantee(), g.capability());
@@ -253,6 +262,17 @@ public class EntitySharesService {
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
                 .build();
+    }
+
+    /**
+     * Applies the share request to dependent entities, that we want to keep in sync.
+     *
+     * @param ownedEntity the parent entity
+     * @param request     sharing request
+     * @param sharingUser the sharing user
+     */
+    private void resolveImplicitGrants(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
+        additionalGrantsResolver.dependentEntities(ownedEntity).forEach(grn -> updateOnlyEntityShares(grn, request, sharingUser));
     }
 
     private void postUpdateEvent(EntitySharesUpdateEvent updateEvent) {
@@ -283,7 +303,7 @@ public class EntitySharesService {
 
         // Iterate over all existing owner grants and find modifications
         ArrayList<GRN> removedOwners = new ArrayList<>();
-        existingGrants.stream().filter(g -> g.capability().equals(Capability.OWN)).forEach((g) -> {
+        existingGrants.stream().filter(g -> g.capability().equals(Capability.OWN)).forEach(g -> {
             // owner got removed
             if (!selectedGranteeCapabilities.containsKey(g.grantee())) {
                 // Ignore owners that were invisible to the requesting user

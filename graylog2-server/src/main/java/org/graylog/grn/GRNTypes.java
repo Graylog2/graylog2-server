@@ -34,6 +34,7 @@ public class GRNTypes {
     public static final GRNType FAVORITE = GRNType.create("favorite", "favorites:");
     public static final GRNType LAST_OPENED = GRNType.create("last_opened", "last_opened:");
     public static final GRNType REPORT = GRNType.create("report", "report:");
+    public static final GRNType SIGMA_RULE = GRNType.create("sigma_rule", "sigma_rule:");
 
     // TODO This is essentially the same as org.graylog2.contentpacks.model.ModelTypes
     // TODO find a way to unify these
@@ -53,6 +54,7 @@ public class GRNTypes {
             .add(FAVORITE)
             .add(LAST_OPENED)
             .add(REPORT)
+            .add(SIGMA_RULE)
             .build();
 
     /**
