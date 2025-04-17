@@ -77,11 +77,11 @@ const StreamModal = ({
   const _onSubmit = useCallback((values: FormValues) => onSubmit(values).then(() => onClose()), [onClose, onSubmit]);
 
   return (
-    <Modal title={modalTitle} onHide={onClose} show>
+    <Modal onHide={onClose} show>
       <Formik<FormValues> initialValues={_initialValues} onSubmit={_onSubmit} validate={validate}>
         {({ isSubmitting, isValidating }) => (
           <Form>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <Modal.Title>{modalTitle}</Modal.Title>
             </Modal.Header>
             <Modal.Body>

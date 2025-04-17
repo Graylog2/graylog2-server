@@ -29,7 +29,7 @@ const noop = () => {};
 const EventsRefreshProvider = ({ children = undefined }: React.PropsWithChildren<{}>) => {
   const defaultInterval = useDefaultInterval();
   const defaultRefreshConfig: RefreshConfig = useMemo(
-    () => ({ enabled: true, interval: durationToMS(defaultInterval) }),
+    () => ({ enabled: false, interval: durationToMS(defaultInterval) }),
     [defaultInterval],
   );
 

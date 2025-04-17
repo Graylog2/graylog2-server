@@ -24,10 +24,12 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -125,10 +127,11 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @ApiOperation(value = "Create a new AWS input.")
     @RequiresPermissions(RestPermissions.INPUTS_CREATE)
     @AuditEvent(type = IntegrationsAuditEventTypes.KINESIS_INPUT_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true)
+    public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
+                           @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull AWSInputCreateRequest saveRequest) throws Exception {
 
-        Input input = awsService.saveInput(saveRequest, getCurrentUser());
+        Input input = awsService.saveInput(saveRequest, getCurrentUser(), isSetupWizard);
         return Response.ok().entity(getInputSummary(input)).build();
     }
 }

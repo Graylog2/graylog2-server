@@ -30,7 +30,7 @@ const DebugOverlay = ({ show, onClose }: Props) => {
 
   return (
     <BootstrapModalWrapper showModal={show} onHide={onClose}>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Debug information</Modal.Title>
       </Modal.Header>
       <Modal.Body>

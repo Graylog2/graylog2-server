@@ -69,6 +69,11 @@ public class RunningGraylogBackend implements GraylogBackend {
     }
 
     @Override
+    public void dropCollection(String collectionName) {
+        throw new UnsupportedOperationException("Feature needs implementation...");
+    }
+
+    @Override
     public void importElasticsearchFixture(String resourcePath, Class<?> testClass) {
         this.searchServerInstance.importFixtureResource(resourcePath, testClass);
     }

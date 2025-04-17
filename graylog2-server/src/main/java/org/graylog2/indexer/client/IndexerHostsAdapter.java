@@ -14,28 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+package org.graylog2.indexer.client;
 
 import java.net.URI;
+import java.util.List;
 
-@AutoValue
-@WithBeanGetter
-@JsonAutoDetect
-public abstract class AppConfig {
-    @JsonProperty("gl2ServerUrl")
-    public abstract URI serverUri();
-
-    @JsonProperty("gl2AppPathPrefix")
-    public abstract String appPathPrefix();
-
-    @JsonCreator
-    public static AppConfig create(URI serverUri) {
-        return new AutoValue_AppConfig(serverUri, "");
-    }
+public interface IndexerHostsAdapter {
+    /**
+     * @return List of up-to-date nodes as the elastic/opensearch client sees them and uses them. This includes all
+     * changes caused by sniffers and dynamic infrastructure changes. Unlike the fixed "elasticsearch_hosts" configuration
+     * property, this may change during every call and gives real-time information.
+     */
+    List<URI> getActiveHosts();
 }

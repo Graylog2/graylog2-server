@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
+import type { MantineRadius } from '@mantine/core';
 
 import Indicator from 'components/bootstrap/Indicator';
 
@@ -24,6 +25,7 @@ type Props = React.PropsWithChildren<{
   bsStyle?: ColorVariant;
   'data-testid'?: string;
   className?: string;
+  radius?: MantineRadius;
 }>;
 
 const StyledIndicator = styled(Indicator)<{ color: ColorVariant }>(
@@ -42,8 +44,14 @@ const StatusColorIndicator = ({
   'data-testid': dataTestid,
   className = '',
   children = undefined,
+  radius = 0,
 }: Props) => (
-  <StyledIndicator color={bsStyle} radius={0} size={8} className={`${bsStyle} ${className}`} data-testid={dataTestid}>
+  <StyledIndicator
+    color={bsStyle}
+    radius={radius}
+    size={8}
+    className={`${bsStyle} ${className}`}
+    data-testid={dataTestid}>
     {children}
   </StyledIndicator>
 );

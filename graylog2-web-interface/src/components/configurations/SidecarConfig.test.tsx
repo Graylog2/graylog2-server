@@ -63,14 +63,12 @@ describe('SidecarConfig', () => {
     fireEvent.click(
       await screen.findByRole('checkbox', {
         name: /override sidecar configuration/i,
-        hidden: true,
       }),
     );
 
     fireEvent.click(
       await screen.findByRole('button', {
         name: /update configuration/i,
-        hidden: true,
       }),
     );
 

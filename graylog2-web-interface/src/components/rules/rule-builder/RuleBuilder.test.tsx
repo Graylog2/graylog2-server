@@ -125,7 +125,7 @@ describe('RuleBuilder', () => {
     });
   });
 
-  it('should be able to convert Rule Builder to Source Code', () => {
+  it('should be able to convert Rule Builder to Source Code', async () => {
     const title = 'title';
     const description = 'description';
     const rule_builder = { actions: [], conditions: [], operator: 'AND' };
@@ -134,7 +134,7 @@ describe('RuleBuilder', () => {
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByRole } = render(
+    render(
       <PipelineRulesContext.Provider
         value={{
           simulateRule: () => {},
@@ -145,11 +145,11 @@ describe('RuleBuilder', () => {
       </PipelineRulesContext.Provider>,
     );
 
-    const convertButton = getByRole('button', { name: 'Convert Rule Builder to Source Code', hidden: true });
+    const convertButton = await screen.findByRole('button', { name: 'Convert Rule Builder to Source Code' });
     userEvent.click(convertButton);
 
-    const createRuleFromCodeButton = getByRole('button', { name: 'Create new Rule from Code', hidden: true });
-    const copyCloseButton = getByRole('button', { name: 'Copy & Close', hidden: true });
+    const createRuleFromCodeButton = await screen.findByRole('button', { name: 'Create new Rule from Code' });
+    const copyCloseButton = await screen.findByRole('button', { name: 'Copy & Close' });
 
     expect(createRuleFromCodeButton).toBeInTheDocument();
     expect(copyCloseButton).toBeInTheDocument();

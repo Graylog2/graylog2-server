@@ -83,7 +83,6 @@ describe('IndexSetFieldTypesList', () => {
 
       const submit = await screen.findByRole('button', {
         name: /remove field type overrides/i,
-        hidden: true,
       });
       fireEvent.click(submit);
 
@@ -100,7 +99,6 @@ describe('IndexSetFieldTypesList', () => {
       const checkbox = await screen.findByText(/rotate affected indices after change/i);
       const submit = await screen.findByRole('button', {
         name: /remove field type overrides/i,
-        hidden: true,
       });
       fireEvent.click(checkbox);
       fireEvent.click(submit);
