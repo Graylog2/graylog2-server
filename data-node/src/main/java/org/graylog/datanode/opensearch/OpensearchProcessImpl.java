@@ -17,7 +17,10 @@
 package org.graylog.datanode.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Size;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -50,11 +53,17 @@ import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.graylog2.datanode.DataNodeNotficationEvent;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.TrustManagerAggregator;
+import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import oshi.SystemInfo;
+import oshi.hardware.GlobalMemory;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.TrustManager;
@@ -64,6 +73,7 @@ import java.net.URI;
 import java.security.KeyStore;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
@@ -74,7 +84,7 @@ import java.util.concurrent.TimeUnit;
 public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
-
+    private static final long MEMORY_RATIO_THRESHOLD = 2;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
@@ -96,6 +106,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     private final String nodeName;
     private final NodeId nodeId;
     private final EventBus eventBus;
+    private final ClusterEventBus clusterEventBus;
 
 
     static final String CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING = "cluster.routing.allocation.exclude._name";
@@ -105,7 +116,8 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @Inject
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager,
                           final Configuration configuration,
-                          ObjectMapper objectMapper, OpensearchStateMachine processState, NodeId nodeId, EventBus eventBus) {
+                          ObjectMapper objectMapper, OpensearchStateMachine processState, NodeId nodeId, EventBus eventBus,
+                          ClusterEventBus clusterEventBus) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = processState;
         this.stdout = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
@@ -116,6 +128,8 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         this.nodeName = configuration.getDatanodeNodeName();
         this.nodeId = nodeId;
         this.eventBus = eventBus;
+        this.clusterEventBus = clusterEventBus;
+        eventBus.register(this);
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
@@ -214,6 +228,42 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         );
     }
 
+    @VisibleForTesting
+    void checkConfiguredHeap() {
+        Size heap = Size.parse(configuration.getOpensearchHeap());
+        long heapBytes = heap.toBytes();
+        long freeMemory = getFreeMemory();
+        float memoryRatio = (float) freeMemory / heapBytes;
+        if (memoryRatio > MEMORY_RATIO_THRESHOLD) {
+            LOG.warn("There appears to be about {} times more available memory than the heap size configured for this data node.", memoryRatio);
+            clusterEventBus.post(new DataNodeNotficationEvent(nodeId.getNodeId(), Notification.Type.DATA_NODE_HEAP_WARNING,
+                    Map.of("hostname", configuration.getHostname(), "memoryRatio", memoryRatio)));
+        }
+    }
+
+    /**
+     * Tries to determine the free memory available on the machine at the given time minus a buffer of 2 GB.
+     *
+     * @return free memory minus buffer of 2 GB
+     */
+    @SuppressForbidden("Deliberate use of com.sun package, handling exception if not available")
+    long getFreeMemory() {
+        try {
+            SystemInfo systemInfo = new SystemInfo();
+            GlobalMemory memory = systemInfo.getHardware().getMemory();
+            long buffer = 2 * 1024 * 1024 * 1024L;
+            return memory.getAvailable() - buffer;
+        } catch (Exception e) {
+            LOG.warn("Could not determine free memory of system");
+            return 0;
+        }
+    }
+
+    @Subscribe
+    public void onNotificationEvent(DataNodeNotficationEvent event) {
+        // we need a subscriber in the data node, otherwise this event will be ignored due to it having no subscribers
+    }
+
     @Override
     public synchronized void start() {
         opensearchConfiguration.ifPresentOrElse(
@@ -228,9 +278,11 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
                     restClient = Optional.of(createRestClient(config));
                     openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
-                }),
-                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
-        );
+                    checkConfiguredHeap();
+
+                    }),
+                    () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
+            );
     }
 
     /**
