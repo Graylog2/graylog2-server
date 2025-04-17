@@ -41,4 +41,8 @@ public class CustomizationConfig {
     public Optional<byte[]> favicon() {
         return config.favicon().map(base64Decoder::decode);
     }
+
+    public static CustomizationConfig empty() {
+        return new CustomizationConfig(Config.empty());
+    }
 }
