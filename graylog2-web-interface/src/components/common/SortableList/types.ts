@@ -39,7 +39,7 @@ export type CustomListItemRender<ItemType extends ListItemType> = ({
   draggableProps: DraggableProps;
   dragHandleProps: DragHandleProps;
   index: number;
-  item: ItemType;
+  item: ItemType | any;
   ref: React.Ref<any>;
 }) => React.ReactNode;
 
