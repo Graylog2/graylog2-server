@@ -198,7 +198,7 @@ public class AWSInput extends MessageInput {
         }
     }
 
-    static TextField getOverrideSourceFieldDefinition() {
+    public static TextField getOverrideSourceFieldDefinition() {
         return new TextField(
                 CK_OVERRIDE_SOURCE,
                 "Override Source (optional)",

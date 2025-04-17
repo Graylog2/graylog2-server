@@ -37,16 +37,18 @@ public class KinesisPayloadDecoderTest {
     private KinesisPayloadDecoder flowLogDecoder;
     private KinesisPayloadDecoder rawDecoder;
 
+    public static final String TEST_REGION = "ap-northeast-1";
+
     @Before
     public void setUp() {
 
         flowLogDecoder = new KinesisPayloadDecoder(new ObjectMapperProvider().get(),
-                                                   AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS,
-                                                   "a-stream");
+                AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS,
+                "graylog2", TEST_REGION);
 
         rawDecoder = new KinesisPayloadDecoder(new ObjectMapperProvider().get(),
-                                               AWSMessageType.KINESIS_RAW,
-                                               "a-stream");
+                AWSMessageType.KINESIS_RAW,
+                "a-stream", TEST_REGION);
     }
 
     @Test
@@ -54,7 +56,7 @@ public class KinesisPayloadDecoderTest {
 
         final List<KinesisLogEntry> logEntries =
                 flowLogDecoder.processMessages(AWSTestingUtils.cloudWatchFlowLogPayload(),
-                                               Instant.ofEpochMilli(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP.getMillis()));
+                        Instant.ofEpochMilli(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP.getMillis()));
 
         Assert.assertEquals(2, logEntries.size());
 
@@ -66,8 +68,8 @@ public class KinesisPayloadDecoderTest {
 
         // Verify that both messages have to correct timestamp.
         Assert.assertEquals(2, logEntries.stream()
-                                         .filter(logEntry -> logEntry.timestamp().equals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP))
-                                         .count());
+                .filter(logEntry -> logEntry.timestamp().equals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP))
+                .count());
     }
 
     @Test
@@ -85,8 +87,8 @@ public class KinesisPayloadDecoderTest {
 
         // Verify that both messages have to correct timestamp.
         Assert.assertEquals(2, logEntries.stream()
-                                         .filter(logEntry -> logEntry.timestamp().equals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP))
-                                         .count());
+                .filter(logEntry -> logEntry.timestamp().equals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP))
+                .count());
     }
 
     @Test
@@ -106,4 +108,5 @@ public class KinesisPayloadDecoderTest {
         Assert.assertEquals(textLogMessage, resultLogEntry.message());
         Assert.assertEquals(new DateTime(now.toEpochMilli(), DateTimeZone.UTC), resultLogEntry.timestamp());
     }
+
 }

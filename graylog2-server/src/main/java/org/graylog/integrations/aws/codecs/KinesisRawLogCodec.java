@@ -19,7 +19,6 @@ package org.graylog.integrations.aws.codecs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import org.apache.commons.lang3.StringUtils;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
@@ -32,11 +31,8 @@ import org.graylog2.plugin.inputs.codecs.Codec;
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
-import static org.graylog.integrations.aws.inputs.AWSInput.CK_OVERRIDE_SOURCE;
-
 public class KinesisRawLogCodec extends AbstractKinesisCodec {
     public static final String NAME = "CloudWatchRawLog";
-    static final String SOURCE = "aws-kinesis-raw-logs";
     public static final String SUBSCRIPTION_FILTERS = "subscription_filters";
     public static final String STREAM_ARN = "stream_arn";
 
@@ -51,7 +47,7 @@ public class KinesisRawLogCodec extends AbstractKinesisCodec {
     @Override
     public Optional<Message> decodeLogData(@Nonnull final KinesisLogEntry logEvent) {
         try {
-            final String source = configuration.getString(KinesisCloudWatchFlowLogCodec.Config.CK_OVERRIDE_SOURCE, SOURCE);
+            final String source = configuration.getString(KinesisCloudWatchFlowLogCodec.Config.CK_OVERRIDE_SOURCE, logEvent.owner());
             Message result = messageFactory.createMessage(
                     logEvent.message(),
                     source,
@@ -62,11 +58,6 @@ public class KinesisRawLogCodec extends AbstractKinesisCodec {
             result.addField(FIELD_LOG_STREAM, logEvent.logStream());
             result.addField(SUBSCRIPTION_FILTERS, logEvent.subscriptionFilters());
             result.addField(STREAM_ARN, logEvent.streamArn());
-
-            final String overrideSource = configuration.getString(CK_OVERRIDE_SOURCE);
-            if (StringUtils.isNotBlank(overrideSource)) {
-                result.setSource(overrideSource);
-            }
 
             return Optional.of(result);
         } catch (Exception e) {

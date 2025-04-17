@@ -28,6 +28,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 public class CloudWatchFlowLogCodecTest {
 
     private KinesisCloudWatchFlowLogCodec codec;
@@ -49,7 +51,7 @@ public class CloudWatchFlowLogCodecTest {
         final String flowLogMessage = "2 423432432432 eni-3244234 172.1.1.2 172.1.1.2 80 2264 6 1 52 1559738144 1559738204 ACCEPT OK";
         final DateTime timestamp = DateTime.now(DateTimeZone.UTC);
         final KinesisLogEntry logEvent = KinesisLogEntry.create("a-stream", "log-group", "log-stream",
-                                                                timestamp, flowLogMessage);
+                timestamp, flowLogMessage, "123456789", "TEST_STREAM_ARN", "Kinesis Raw", new ArrayList<>());
         final Message message = codec.decodeLogData(logEvent).get();
         Assert.assertEquals("log-group", message.getField(AbstractKinesisCodec.FIELD_LOG_GROUP));
         Assert.assertEquals("log-stream", message.getField(AbstractKinesisCodec.FIELD_LOG_STREAM));
