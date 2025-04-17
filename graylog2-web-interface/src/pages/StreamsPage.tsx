@@ -29,15 +29,22 @@ import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore'
 import { useStore } from 'stores/connect';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import useStreamWithShareMutation from 'hooks/useStreamWithShareMutation';
 
 const StreamsPage = () => {
   const { indexSets } = useStore(IndexSetsStore);
   const sendTelemetry = useSendTelemetry();
+  const { createStreamWithShare } = useStreamWithShareMutation();
 
-  const onSave = (stream: Stream) => {
+  const onSave = (stream: Stream, entityShare?: EntitySharePayload) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.NEW_STREAM_CREATED, {
       app_pathname: 'streams',
     });
+
+    if (entityShare) {
+      return createStreamWithShare({stream, shareRequest: entityShare}).then((response) => response);
+    }
 
     return StreamsStore.save(stream, () => {
       UserNotification.success('Stream has been successfully created.', 'Success');

@@ -42,6 +42,8 @@ import mockHistory from 'helpers/mocking/mockHistory';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
+import { createEntityShareState }  from 'fixtures/entityShareState';
+import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
@@ -50,6 +52,18 @@ jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
 jest.mock('views/logic/views/OnSaveViewAction', () => jest.fn(() => () => {}));
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-search-id'));
+jest.mock('stores/permissions/EntityShareStore', () => ({
+  __esModule: true,
+  EntityShareActions: {
+    prepare: jest.fn(() => Promise.resolve()),
+    update: jest.fn(() => Promise.resolve()),
+  },
+  EntityShareStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(),
+  },
+}));
+
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
@@ -116,6 +130,7 @@ describe('SearchActionsMenu', () => {
     asMock(useView).mockReturnValue(defaultView);
     asMock(useIsDirty).mockReturnValue(false);
     asMock(useIsNew).mockReturnValue(false);
+    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
   });
 
   useViewsPlugin();
@@ -227,7 +242,7 @@ describe('SearchActionsMenu', () => {
 
       const updatedView = defaultView.toBuilder().title('title and further title').id('new-search-id').build();
 
-      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
+      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null));
     });
 
     it('should extend a saved search with plugin data on duplication', async () => {
@@ -257,7 +272,7 @@ describe('SearchActionsMenu', () => {
         .id('new-search-id')
         .build();
 
-      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView));
+      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null));
       await waitForElementToBeRemoved(screen.queryByText('Pluggable component!'));
     });
 

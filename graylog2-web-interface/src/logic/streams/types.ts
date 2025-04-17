@@ -35,11 +35,6 @@ export type Stream = {
   is_default: boolean;
   is_editable: boolean;
   categories: string[];
-  entity_share_request?: {
-    selected_grantee_capabilities: {
-      [_key: string]: 'view' | 'manage' | 'own';
-    }
-  };
 };
 
 export type StreamRule = {
