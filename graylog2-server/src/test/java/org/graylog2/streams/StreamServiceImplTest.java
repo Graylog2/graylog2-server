@@ -68,7 +68,7 @@ public class StreamServiceImplTest {
     @Before
     public void setUp() throws Exception {
         final MongoCollections mc = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongodb.mongoConnection());
-        this.streamService = new DBStreamService(mc, streamRuleService,
+        this.streamService = new StreamServiceImpl(mc, streamRuleService,
                 outputService, indexSetService, factory, entityOwnershipService, new ClusterEventBus(), Set.of());
     }
 

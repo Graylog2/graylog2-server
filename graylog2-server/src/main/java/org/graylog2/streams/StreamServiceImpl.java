@@ -95,8 +95,8 @@ import static org.graylog2.streams.StreamDTO.FIELD_OUTPUTS;
 import static org.graylog2.streams.StreamDTO.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM;
 import static org.graylog2.streams.StreamDTO.FIELD_TITLE;
 
-public class DBStreamService implements StreamService {
-    private static final Logger LOG = LoggerFactory.getLogger(DBStreamService.class);
+public class StreamServiceImpl implements StreamService {
+    private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
     private static final String COLLECTION_NAME = "streams";
     private final MongoCollection<StreamDTO> collection;
     private final MongoUtils<StreamDTO> mongoUtils;
@@ -110,14 +110,14 @@ public class DBStreamService implements StreamService {
     private final LoadingCache<String, String> streamTitleCache;
 
     @Inject
-    public DBStreamService(MongoCollections mongoCollections,
-                           StreamRuleService streamRuleService,
-                           OutputService outputService,
-                           IndexSetService indexSetService,
-                           MongoIndexSet.Factory indexSetFactory,
-                           EntityOwnershipService entityOwnershipService,
-                           ClusterEventBus clusterEventBus,
-                           Set<StreamDeletionGuard> streamDeletionGuards) {
+    public StreamServiceImpl(MongoCollections mongoCollections,
+                             StreamRuleService streamRuleService,
+                             OutputService outputService,
+                             IndexSetService indexSetService,
+                             MongoIndexSet.Factory indexSetFactory,
+                             EntityOwnershipService entityOwnershipService,
+                             ClusterEventBus clusterEventBus,
+                             Set<StreamDeletionGuard> streamDeletionGuards) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.streamRuleService = streamRuleService;
@@ -278,7 +278,7 @@ public class DBStreamService implements StreamService {
                             final Output output = outputsById.get(outputId);
                             if (output == null) {
                                 final String streamTitle = Strings.nullToEmpty(dto.title());
-                                LOG.warn("Stream \"" + streamTitle + "\" <" + id + "> references missing output <" + outputId + "> - ignoring output.");
+                                LOG.warn("Stream \"{}\" <{}> references missing output <{}> - ignoring output.", streamTitle, id, outputId);
                             }
                             return output;
                         })

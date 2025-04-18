@@ -47,7 +47,6 @@ import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.streams.DBStreamService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamDTO;
@@ -56,6 +55,7 @@ import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.StreamServiceImpl;
 import org.graylog2.streams.matchers.StreamRuleMock;
 import org.junit.Before;
 import org.junit.Rule;
@@ -103,7 +103,7 @@ public class StreamCatalogTest {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         final StreamRuleService streamRuleService = new StreamRuleServiceImpl(mongoConnection, clusterEventBus);
         final MongoCollections mc = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongoConnection);
-        final StreamService streamService = new DBStreamService(
+        final StreamService streamService = new StreamServiceImpl(
                 mc,
                 streamRuleService,
                 outputService,

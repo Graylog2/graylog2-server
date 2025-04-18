@@ -220,4 +220,6 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
             return autoBuild();
         }
     }
+
+
 }
