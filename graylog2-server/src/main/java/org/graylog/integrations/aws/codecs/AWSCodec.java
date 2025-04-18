@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.graylog.integrations.aws.inputs.AWSInput.getOverrideSourceFieldDefinition;
+
 public class AWSCodec extends AbstractCodec {
 
     public static final String NAME = "AWSCodec";
@@ -115,6 +117,8 @@ public class AWSCodec extends AbstractCodec {
                     FLOW_LOG_PREFIX_DEFAULT,
                     "Add field with the Flow Log prefix e. g. \"src_addr\" -> \"flow_log_src_addr\"."
             ));
+
+            request.addField(getOverrideSourceFieldDefinition());
 
             return request;
         }

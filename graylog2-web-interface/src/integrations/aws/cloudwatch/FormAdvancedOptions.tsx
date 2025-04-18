@@ -26,11 +26,15 @@ type FormAdvancedOptionsProps = {
   onChange: (...args: any[]) => void;
 };
 
+const StyledAdditionalFields = styled(AdditionalFields)`
+  margin: 0 0 35px;
+`;
+
 const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
-  const { awsCloudWatchBatchSize, awsCloudWatchThrottleEnabled, awsCloudWatchAddFlowLogPrefix } = formData;
+  const { awsCloudWatchBatchSize, overrideSource, awsCloudWatchThrottleEnabled, awsCloudWatchAddFlowLogPrefix } = formData;
 
   const handleToggle = (visible) => {
     setAdvancedOptionsVisibility(visible);
@@ -59,6 +63,15 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
       />
 
       <Input
+        id="overrideSource"
+        type="text"
+        value={overrideSource?.value}
+        onChange={onChange}
+        label="Override Source (optional)"
+        help="The source is set to the Kinesis message by default. Set this if you want to override it with a custom value."
+      />
+
+      <Input
         id="awsCloudWatchBatchSize"
         type="number"
         value={awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue}
@@ -69,9 +82,5 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
     </StyledAdditionalFields>
   );
 };
-
-const StyledAdditionalFields = styled(AdditionalFields)`
-  margin: 0 0 35px;
-`;
 
 export default FormAdvancedOptions;

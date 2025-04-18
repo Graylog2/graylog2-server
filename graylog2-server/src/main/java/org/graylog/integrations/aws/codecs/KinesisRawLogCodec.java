@@ -33,7 +33,9 @@ import java.util.Optional;
 
 public class KinesisRawLogCodec extends AbstractKinesisCodec {
     public static final String NAME = "CloudWatchRawLog";
-    static final String SOURCE = "aws-kinesis-raw-logs";
+    public static final String SUBSCRIPTION_FILTERS = "subscription_filters";
+    public static final String STREAM_ARN = "stream_arn";
+
     private final MessageFactory messageFactory;
 
     @Inject
@@ -45,7 +47,7 @@ public class KinesisRawLogCodec extends AbstractKinesisCodec {
     @Override
     public Optional<Message> decodeLogData(@Nonnull final KinesisLogEntry logEvent) {
         try {
-            final String source = configuration.getString(KinesisCloudWatchFlowLogCodec.Config.CK_OVERRIDE_SOURCE, SOURCE);
+            final String source = configuration.getString(KinesisCloudWatchFlowLogCodec.Config.CK_OVERRIDE_SOURCE, logEvent.owner());
             Message result = messageFactory.createMessage(
                     logEvent.message(),
                     source,
@@ -54,6 +56,8 @@ public class KinesisRawLogCodec extends AbstractKinesisCodec {
             result.addField(FIELD_KINESIS_STREAM, logEvent.kinesisStream());
             result.addField(FIELD_LOG_GROUP, logEvent.logGroup());
             result.addField(FIELD_LOG_STREAM, logEvent.logStream());
+            result.addField(SUBSCRIPTION_FILTERS, logEvent.subscriptionFilters());
+            result.addField(STREAM_ARN, logEvent.streamArn());
 
             return Optional.of(result);
         } catch (Exception e) {

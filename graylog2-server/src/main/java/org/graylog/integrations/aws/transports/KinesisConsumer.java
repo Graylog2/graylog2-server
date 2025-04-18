@@ -130,7 +130,7 @@ public class KinesisConsumer implements Runnable {
         LOG.debug("Using Kinesis applicationName [{}].", applicationName);
 
         // The KinesisShardProcessorFactory contains the message processing logic.
-        final KinesisShardProcessorFactory kinesisShardProcessorFactory = new KinesisShardProcessorFactory(objectMapper, transport, handleMessageCallback, kinesisStreamName, awsMessageType);
+        final KinesisShardProcessorFactory kinesisShardProcessorFactory = new KinesisShardProcessorFactory(objectMapper, transport, handleMessageCallback, kinesisStreamName, awsMessageType, request.region());
 
         ConfigsBuilder configsBuilder = new ConfigsBuilder(kinesisStreamName, applicationName,
                 kinesisAsyncClient, dynamoClient, cloudWatchClient,
