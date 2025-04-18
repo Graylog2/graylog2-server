@@ -140,7 +140,14 @@ public class KinesisPayloadDecoder {
         return logSubscriptionData;
     }
 
-    public static String getStreamArn(String streamName, String regionName) {
+    public String getStreamArn(String streamName, String regionName) {
+
+         /* For testing purpose,In order to prevent calling original
+             AWS SDK methods this condition is used.*/
+        if (streamName.isEmpty()) {
+            return "arn:aws:kinesis:" + regionName + ":000000000000:stream/";
+        }
+
         Region region = Region.of(regionName);
         try (KinesisClient kinesisClient = KinesisClient.builder()
                 .region(region)

@@ -44,7 +44,7 @@ public class KinesisPayloadDecoderTest {
 
         flowLogDecoder = new KinesisPayloadDecoder(new ObjectMapperProvider().get(),
                 AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS,
-                "graylog2", TEST_REGION);
+                "", TEST_REGION);
 
         rawDecoder = new KinesisPayloadDecoder(new ObjectMapperProvider().get(),
                 AWSMessageType.KINESIS_RAW,
