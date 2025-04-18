@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { Button, Panel, Input } from 'components/bootstrap';
@@ -69,10 +69,10 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
     },
   );
 
-  const checkForLogs = () => {
+  const checkForLogs = useCallback(() => {
     setPauseCountdown(true);
     setLogDataUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS.HEALTH_CHECK);
-  };
+  }, [setPauseCountdown, setLogDataUrl]);
 
   useEffect(() => {
     if (!logData) {

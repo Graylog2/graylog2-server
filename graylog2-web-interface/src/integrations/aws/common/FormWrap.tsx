@@ -40,49 +40,6 @@ type FormWrapProps = {
   className?: string;
 };
 
-const FormWrap = ({
-  buttonContent = 'Submit',
-  children,
-  className,
-  disabled = false,
-  description = null,
-  error = null,
-  loading = false,
-  onSubmit = () => { },
-  title = null,
-}: FormWrapProps) => {
-  const formRef = useRef();
-  const [disabledButton, setDisabledButton] = useState(disabled);
-
-  const prevent = (event) => {
-    event.preventDefault();
-
-    return false;
-  };
-
-
-  useEffect(() => {
-    setDisabledButton(loading || disabled);
-  }, [loading, disabled]);
-
-  return (
-    <form onSubmit={prevent} autoComplete="off" noValidate className={className} ref={formRef}>
-      {title && (typeof title === 'string' ? <h2>{title}</h2> : title)}
-      {description && (typeof description === 'string' ? <p>{description}</p> : description)}
-
-      {error && error.full_message && (
-        <ErrorMessage fullMessage={error.full_message} niceMessage={error.nice_message} />
-      )}
-
-      {children}
-
-      <Button type="button" onClick={disabledButton ? null : onSubmit} bsStyle="primary" disabled={disabledButton}>
-        {loading ? 'Loading...' : buttonContent}
-      </Button>
-    </form>
-  );
-};
-
 const ErrorOutputStyle = createGlobalStyle`
   /* NOTE: This is to remove Bootstrap styles from the anchor element I can't override in Panel.Header */
   form {
@@ -147,6 +104,49 @@ export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessagePr
       <strong>Additional Information: </strong>
       {fullMessage}
     </Panel>
+  );
+};
+
+const FormWrap = ({
+  buttonContent = 'Submit',
+  children,
+  className = '',
+  disabled = false,
+  description = null,
+  error = null,
+  loading = false,
+  onSubmit = () => { },
+  title = null,
+}: FormWrapProps) => {
+  const formRef = useRef();
+  const [disabledButton, setDisabledButton] = useState(disabled);
+
+  const prevent = (event) => {
+    event.preventDefault();
+
+    return false;
+  };
+
+
+  useEffect(() => {
+    setDisabledButton(loading || disabled);
+  }, [loading, disabled]);
+
+  return (
+    <form onSubmit={prevent} autoComplete="off" noValidate className={className} ref={formRef}>
+      {title && (typeof title === 'string' ? <h2>{title}</h2> : title)}
+      {description && (typeof description === 'string' ? <p>{description}</p> : description)}
+
+      {error && error.full_message && (
+        <ErrorMessage fullMessage={error.full_message} niceMessage={error.nice_message} />
+      )}
+
+      {children}
+
+      <Button type="button" onClick={disabledButton ? null : onSubmit} bsStyle="primary" disabled={disabledButton}>
+        {loading ? 'Loading...' : buttonContent}
+      </Button>
+    </form>
   );
 };
 
