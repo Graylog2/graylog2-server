@@ -22,6 +22,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.VersionProbe;
 import org.graylog2.storage.versionprobe.VersionProbeFactory;
@@ -121,10 +122,10 @@ class SearchVersionCheckPeriodicalTest {
                 initialVersion,
                 versionOverride,
                 versionProbe,
+                IndexerJwtAuthToken.disabled(),
                 notificationService,
-                ()  -> new SearchIndexerHosts(Collections.emptyList(), Collections.emptyList(), Collections.emptyList()),
-                false,
-                false);
+                ()  -> new SearchIndexerHosts(Collections.emptyList(), Collections.emptyList(), Collections.emptyList())
+        );
     }
 
     private VersionProbeFactory mockVersionProbeFactory(SearchVersion expectedResult) {
@@ -135,7 +136,7 @@ class SearchVersionCheckPeriodicalTest {
             }
 
             @Override
-            public VersionProbe create(int probeAttempts, Duration probeDelay, boolean useJwtAuthentication, VersionProbeListener versionProbeListener) {
+            public VersionProbe create(IndexerJwtAuthToken jwtAuthToken, int probeAttempts, Duration probeDelay, VersionProbeListener versionProbeListener) {
                 return createDefault();
             }
         };

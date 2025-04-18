@@ -20,6 +20,8 @@ import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.graylog2.storage.versionprobe.VersionProbeFactory;
 import org.graylog2.storage.versionprobe.VersionProbe;
 import org.graylog2.storage.versionprobe.VersionProbeLogger;
@@ -32,15 +34,18 @@ import java.util.List;
 public class DatanodeConnectivityCheck {
 
     private final VersionProbeFactory versionProbeFactory;
+    private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
 
     @Inject
-    public DatanodeConnectivityCheck(VersionProbeFactory versionProbeFactory) {
+    public DatanodeConnectivityCheck(VersionProbeFactory versionProbeFactory, IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
         this.versionProbeFactory = versionProbeFactory;
+        this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
     }
 
     public ConnectionCheckResult probe(DataNodeDto node) {
         final VersionProbeMessageCollector messageCollector = new VersionProbeMessageCollector(VersionProbeLogger.INSTANCE);
-        final VersionProbe versionProbe = versionProbeFactory.create(1, Duration.seconds(1), true, messageCollector);
+        final IndexerJwtAuthToken jwtToken = indexerJwtAuthTokenProvider.alwaysEnabled().get();
+        final VersionProbe versionProbe = versionProbeFactory.create(jwtToken, 1, Duration.seconds(1), messageCollector);
         final List<URI> hosts = Collections.singletonList(URI.create(node.getTransportAddress()));
         return versionProbe.probe(hosts)
                 .map(ConnectionCheckResult::success)

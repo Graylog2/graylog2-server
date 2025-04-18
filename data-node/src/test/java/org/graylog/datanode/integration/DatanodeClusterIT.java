@@ -163,7 +163,7 @@ public class DatanodeClusterIT {
         OpensearchTestIndexCreation osIndexClient = new OpensearchTestIndexCreation(RestOperationParameters.builder()
                 .port(nodeA.getOpensearchRestPort())
                 .truststore(trustStore)
-                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
+                .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
                 .build());
 
         // create index and get primary and replica shard node
@@ -181,7 +181,7 @@ public class DatanodeClusterIT {
         final RestOperationParameters datanodeRestParameters = RestOperationParameters.builder()
                 .port(primary.get().getDatanodeRestPort())
                 .truststore(trustStore)
-                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
+                .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
                 .build();
         new DatanodeRestApiWait(datanodeRestParameters)
                 .waitForAvailableStatus();
@@ -194,7 +194,7 @@ public class DatanodeClusterIT {
         osIndexClient = new OpensearchTestIndexCreation(RestOperationParameters.builder()
                 .port(replica.get().getOpensearchRestPort())
                 .truststore(trustStore)
-                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
+                .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
                 .build());
         List<String> newShardNodes = osIndexClient.getShardNodes();
         Assertions.assertEquals(newShardNodes.size(), 2);
@@ -251,7 +251,7 @@ public class DatanodeClusterIT {
             new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(node.getOpensearchRestPort())
                     .truststore(trustStore)
-                    .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
+                    .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
                     .build())
                     .waitForNodesCount(countOfNodes);
 
