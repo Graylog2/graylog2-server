@@ -135,6 +135,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const getLogType = () => {
     if (knownLog) return `a ${logTypeLabel}`;
     if (logTypeLabel === 'None') return logData.additional;
+    
     return 'an unknown message type.';
   };
 
@@ -176,7 +177,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
         id="awsCloudWatchLog"
         type="textarea"
         label="Formatted Log Message"
-        value={logTypeLabel == 'None' ? 'No Messages' : logData.message}
+        value={logTypeLabel === 'None' ? 'No Messages' : logData.message}
         rows={10}
         disabled
       />
