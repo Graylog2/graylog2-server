@@ -46,7 +46,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     public static final String TYPE_NAME = "email-notification-v1";
 
     private static final String DEFAULT_SENDER = "graylog@example.org";
-    static final String DEFAULT_SUBJECT = "Graylog event notification: ${event_definition_title}";
+    static final String DEFAULT_SUBJECT = "${product_name} event notification: ${event_definition_title}";
     static final String DEFAULT_BODY_TEMPLATE = "--- [Event Definition] ---------------------------\n" +
             "Title:       ${event_definition_title}\n" +
             "Description: ${event_definition_description}\n" +
