@@ -69,7 +69,6 @@ describe('StreamRuleModal', () => {
 
     await screen.findByRole('textbox', {
       name: /field/i,
-      hidden: true,
     });
   });
 
@@ -78,12 +77,10 @@ describe('StreamRuleModal', () => {
 
     const fieldInput = await screen.findByRole('textbox', {
       name: /field/i,
-      hidden: true,
     });
 
     const valueInput = await screen.findByRole('textbox', {
       name: /value/i,
-      hidden: true,
     });
 
     expect(fieldInput).toHaveValue('field_1');
@@ -97,7 +94,6 @@ describe('StreamRuleModal', () => {
 
     const submitBtn = await screen.findByRole('button', {
       name: /update rule/i,
-      hidden: true,
     });
 
     const ruleTypeSelect = await screen.findByLabelText('Type');

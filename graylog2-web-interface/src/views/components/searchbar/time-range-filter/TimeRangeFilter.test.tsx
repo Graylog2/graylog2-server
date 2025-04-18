@@ -54,7 +54,6 @@ describe('TimeRangeFilter', () => {
 
     const button = await screen.findByRole('button', {
       name: /open time range selector/i,
-      hidden: true,
     });
 
     fireEvent.click(button);
