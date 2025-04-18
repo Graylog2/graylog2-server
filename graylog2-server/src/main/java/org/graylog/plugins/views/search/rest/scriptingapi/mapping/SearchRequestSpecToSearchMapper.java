@@ -50,7 +50,7 @@ public class SearchRequestSpecToSearchMapper {
                                            StreamService streamService) {
         this.pivotCreator = pivotCreator;
         this.messageListCreator = messageListCreator;
-        this.streamCategoryMapper = (categories) -> streamService.mapCategoriesToIds(categories).stream();
+        this.streamCategoryMapper = streamService::mapCategoriesToIds;
     }
 
     public Search mapToSearch(MessagesRequestSpec messagesRequestSpec, SearchUser searchUser) {

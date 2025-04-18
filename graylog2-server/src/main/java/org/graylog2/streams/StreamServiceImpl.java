@@ -312,10 +312,8 @@ public class StreamServiceImpl implements StreamService {
     }
 
     @Override
-    public Set<String> mapCategoriesToIds(Collection<String> categories) {
-        try (var stream = stream(collection.find(in(FIELD_CATEGORIES, categories)))) {
-            return stream.map(StreamDTO::id).collect(Collectors.toSet());
-        }
+    public java.util.stream.Stream<String> mapCategoriesToIds(Collection<String> categories) {
+        return stream(collection.find(in(FIELD_CATEGORIES, categories))).map(StreamDTO::id);
     }
 
     @Override

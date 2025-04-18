@@ -48,7 +48,7 @@ public interface StreamService {
 
     Set<Stream> loadByIds(Collection<String> streamIds);
 
-    Set<String> mapCategoriesToIds(Collection<String> streamCategories);
+    java.util.stream.Stream<String> mapCategoriesToIds(Collection<String> streamCategories);
 
     Set<String> indexSetIdsByIds(Collection<String> streamIds);
 

@@ -146,6 +146,7 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
         map.put(FIELD_DISABLED, dto.disabled());
         map.put(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, dto.removeMatchesFromDefaultStream());
         map.put(FIELD_INDEX_SET_ID, dto.indexSetId());
+        map.put(FIELD_CATEGORIES, dto.categories());
         return map;
     }
 
