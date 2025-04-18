@@ -18,7 +18,6 @@ package org.graylog2.streams;
 
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
@@ -32,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface StreamService extends PersistedService {
+public interface StreamService {
     Stream create(Map<String, Object> fields);
 
     Stream create(CreateStreamRequest request, String userId);
@@ -49,7 +48,7 @@ public interface StreamService extends PersistedService {
 
     Set<Stream> loadByIds(Collection<String> streamIds);
 
-    Set<String> mapCategoriesToIds(Collection<String> streamCategories);
+    java.util.stream.Stream<String> mapCategoriesToIds(Collection<String> streamCategories);
 
     Set<String> indexSetIdsByIds(Collection<String> streamIds);
 
@@ -62,7 +61,7 @@ public interface StreamService extends PersistedService {
     Map<String, String> loadStreamTitles(Collection<String> streamIds);
 
     @Nullable
-    public String streamTitleFromCache(String streamId);
+    String streamTitleFromCache(String streamId);
 
     /**
      * @return the total number of streams
@@ -86,4 +85,21 @@ public interface StreamService extends PersistedService {
     List<String> streamTitlesForIndexSet(String indexSetId);
 
     void addToIndexSet(String indexSetId, Collection<String> streamIds);
+
+    java.util.stream.Stream<String> streamAllIds();
+
+    /**
+     * Returns only StreamDTOs. The DTO methods skip the full loading of StreamRules and Outputs and should be used when
+     * information stored solely on the StreamDTO itself is necessary.
+     *
+     * @return a stream of StreamDTO objects. This must be closed by the caller.
+     */
+    java.util.stream.Stream<StreamDTO> streamAllDTOs();
+
+    java.util.stream.Stream<StreamDTO> streamDTOByIds(Collection<String> streamIds);
+
+    /**
+     * @return map of stream IDs to number of rules attached to the stream with that ID
+     */
+    Map<String, Long> streamRuleCountByStream();
 }

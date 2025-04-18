@@ -42,7 +42,6 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -101,14 +100,14 @@ public class AggregationEventProcessorTest {
 
     @Before
     public void setUp() throws Exception {
-        when(streamService.loadAll()).thenReturn(ImmutableList.of(
-                new StreamMock(Collections.singletonMap("_id", "stream-1"), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", "stream-2"), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", "stream-3"), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_STREAM_ID), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_EVENTS_STREAM_ID), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.FAILURES_STREAM_ID), emptyList())
+        when(streamService.streamAllIds()).thenAnswer(inv -> java.util.stream.Stream.of(
+                "stream-1",
+                "stream-2",
+                "stream-3",
+                StreamImpl.DEFAULT_STREAM_ID,
+                StreamImpl.DEFAULT_EVENTS_STREAM_ID,
+                StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
+                StreamImpl.FAILURES_STREAM_ID
         ));
 
         eventStreamService = new EventStreamService(streamService);

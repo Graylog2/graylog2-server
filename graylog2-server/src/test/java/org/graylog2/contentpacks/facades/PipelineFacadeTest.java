@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.graph.Graph;
-import org.bson.types.ObjectId;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
@@ -229,8 +228,8 @@ public class PipelineFacadeTest {
 
         final FakeStream fakeDefaultStream = new FakeStream("All message Fake") {
             @Override
-            protected ObjectId getObjectId() {
-                return new ObjectId(Stream.DEFAULT_STREAM_ID);
+            public String getId() {
+                return Stream.DEFAULT_STREAM_ID;
             }
         };
         when(streamService.load(Stream.DEFAULT_STREAM_ID)).thenReturn(fakeDefaultStream);

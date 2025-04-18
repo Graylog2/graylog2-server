@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
+import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.outputs.events.OutputChangedEvent;
 import org.graylog2.plugin.configuration.Configuration;
@@ -195,6 +196,6 @@ public class OutputRegistryTest {
     }
 
     private Stream stream(Output... outputs) {
-        return new StreamImpl(null, null, null, ImmutableSet.copyOf(outputs), null);
+        return new StreamImpl(new ObjectId(), null, null, ImmutableSet.copyOf(outputs), null);
     }
 }

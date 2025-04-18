@@ -26,7 +26,6 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
-import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -98,21 +97,6 @@ public class StreamMock implements Stream {
 
     @Override
     public Map<String, Object> getFields() {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public Map<String, Validator> getValidations() {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public Map<String, Object> asMap() {
         return Collections.emptyMap();
     }
 

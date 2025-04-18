@@ -97,7 +97,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
             ExportJobService exportJobService,
             QueryValidationService queryValidationService,
             StreamService streamService) {
-        this(exporter, commandFactory, searchDomain, executionGuard, eventBus, exportJobService, queryValidationService, categories -> streamService.mapCategoriesToIds(categories).stream());
+        this(exporter, commandFactory, searchDomain, executionGuard, eventBus, exportJobService, queryValidationService, streamService::mapCategoriesToIds);
     }
 
     MessagesResource(MessagesExporter exporter,

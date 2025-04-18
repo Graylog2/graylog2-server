@@ -16,6 +16,8 @@
  */
 package org.graylog2.system.stats;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.plugins.views.search.views.DashboardService;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.inputs.InputService;
@@ -26,9 +28,6 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.graylog2.system.stats.mongo.MongoProbe;
 import org.graylog2.system.stats.mongo.MongoStats;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 @Singleton
 public class ClusterStatsService {
@@ -66,7 +65,7 @@ public class ClusterStatsService {
                 mongoStats(),
                 streamService.count(),
                 streamRuleService.totalStreamRuleCount(),
-                streamRuleService.streamRuleCountByStream(),
+                streamService.streamRuleCountByStream(),
                 userService.count(),
                 outputService.count(),
                 outputService.countByType(),
