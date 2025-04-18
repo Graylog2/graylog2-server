@@ -56,6 +56,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -119,7 +120,9 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 new BasicCredentialsProvider(),
                 null,
                 false,
-                null)
+                null,
+                Collections.emptySet(),
+                Collections.emptySet())
                 .get();
     }
 
