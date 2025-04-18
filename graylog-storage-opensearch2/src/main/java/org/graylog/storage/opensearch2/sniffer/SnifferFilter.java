@@ -14,27 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.web.customization;
+package org.graylog.storage.opensearch2.sniffer;
 
-import jakarta.inject.Inject;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
 
-import javax.annotation.Nullable;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.List;
 
-public class CustomizationConfig {
-    private static final String DEFAULT_PRODUCT_NAME = "Graylog";
-    private final Config config;
-
-    @Inject
-    public CustomizationConfig(@Nullable Config config) {
-        this.config = Optional.ofNullable(config).orElse(Config.empty());
-    }
-
-    public String productName() {
-        return config.productName().orElse(DEFAULT_PRODUCT_NAME);
-    }
-
-    public static CustomizationConfig empty() {
-        return new CustomizationConfig(Config.empty());
-    }
+public interface SnifferFilter {
+    boolean enabled();
+    List<Node> filterNodes(List<Node> nodes) throws IOException;
 }
