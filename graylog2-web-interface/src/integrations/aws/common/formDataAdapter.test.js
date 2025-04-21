@@ -108,7 +108,7 @@ describe('formDataAdapter', () => {
   };
 
   it('adapts formData into an AWS request with key & secret', () => {
-    testAWSRequest({
+    const request = testAWSRequest({
       awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
       awsCloudWatchAssumeARN: { value: '' },
       awsCloudWatchAwsKey: { value: 'mykey' },
@@ -119,10 +119,12 @@ describe('formDataAdapter', () => {
       awsCloudWatchAwsSecret: { value: 'mysecret' },
       overrideSource: { value: '' },
     });
+
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an AWS request with automatic auth', () => {
-    testAWSRequest({
+    const request = testAWSRequest({
       awsAuthenticationType: { value: AWS_AUTH_TYPES.automatic },
       awsCloudWatchAssumeARN: { value: '' },
       key: 'mykey',
@@ -133,6 +135,8 @@ describe('formDataAdapter', () => {
       overrideSource: { value: '' },
       secret: 'mysecret',
     });
+
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an AWS request with additional options', () => {
@@ -160,10 +164,14 @@ describe('formDataAdapter', () => {
   });
 
   it('adapts formData into an InputCreateRequest with key & secret', () => {
-    testGenericInputCreateRequest(exampleFormDataWithKeySecretAuth);
+    const request = testGenericInputCreateRequest(exampleFormDataWithKeySecretAuth);
+    
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an InputCreateRequest with automatic auth', () => {
-    testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
+    const request = testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
+    
+    expect(request).toBeDefined();
   });
 });
