@@ -14,13 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.datanode.configuration;
 
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
-import java.io.IOException;
-import java.util.List;
+public class DatanodeDirectoriesProvider implements Provider<DatanodeDirectories> {
 
-public interface NodesSniffer {
-    List<Node> sniff(List<Node> nodes) throws IOException;
+    private final DatanodeDirectories directories;
+
+    @Inject
+    public DatanodeDirectoriesProvider(DatanodeConfiguration datanodeConfiguration) {
+        this.directories = datanodeConfiguration.datanodeDirectories();
+    }
+
+    @Override
+    public DatanodeDirectories get() {
+        return directories;
+    }
 }

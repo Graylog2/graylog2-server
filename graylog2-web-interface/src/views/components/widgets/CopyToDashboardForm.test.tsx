@@ -67,8 +67,8 @@ describe('CopyToDashboardForm', () => {
     />
   );
 
-  const submitModal = () => {
-    const submitButton = screen.getByRole('button', { name: /submit/i, hidden: true });
+  const submitModal = async () => {
+    const submitButton = await screen.findByRole('button', { name: /submit/i });
     fireEvent.click(submitButton);
   };
 
@@ -123,7 +123,7 @@ describe('CopyToDashboardForm', () => {
 
     render(<SUT />);
 
-    const submitButton = await screen.findByRole('button', { name: /submit/i, hidden: true });
+    const submitButton = await screen.findByRole('button', { name: /submit/i });
 
     await waitFor(() => {
       expect(submitButton).toBeDisabled();
@@ -138,9 +138,9 @@ describe('CopyToDashboardForm', () => {
     const firstView = getByText('view 1');
 
     fireEvent.click(firstView);
-    submitModal();
+    await submitModal();
 
-    await screen.findByRole('button', { name: /submit/i, hidden: true });
+    await screen.findByRole('button', { name: /submit/i });
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith('view-1');
@@ -153,9 +153,9 @@ describe('CopyToDashboardForm', () => {
     const checkBox = await findByLabelText(/create a new dashboard/i);
 
     fireEvent.click(checkBox);
-    submitModal();
+    await submitModal();
 
-    await screen.findByRole('button', { name: /submit/i, hidden: true });
+    await screen.findByRole('button', { name: /submit/i });
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith();
