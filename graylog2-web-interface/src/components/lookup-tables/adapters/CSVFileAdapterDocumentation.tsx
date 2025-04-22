@@ -17,23 +17,26 @@
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 
+import useProductName from 'customization/useProductName';
 import { Alert } from 'components/bootstrap';
 
-const CSVFileAdapterDocumentation = () => {
-  const csvFile1 = `"ipaddr","hostname"
+const csvFile1 = `"ipaddr","hostname"
 "127.0.0.1","localhost"
 "10.0.0.1","server1"
 "10.0.0.2","server2"`;
 
-  const csvFile2 = `'ipaddr';'lladdr';'hostname'
+const csvFile2 = `'ipaddr';'lladdr';'hostname'
 '127.0.0.1';'e4:b2:11:d1:38:14';'localhost'
 '10.0.0.1';'e4:b2:12:d1:48:28';'server1'
 '10.0.0.2';'e4:b2:11:d1:58:34';'server2'`;
 
-  const csvFile3 = `"cidr","subnet"
+const csvFile3 = `"cidr","subnet"
 "192.168.100.0/24","Finance Department subnet"
 "192.168.101.0/24","IT Department subnet"
 "192.168.102.0/24","HR Department subnet"`;
+
+const CSVFileAdapterDocumentation = () => {
+  const productName = useProductName();
 
   return (
     <div>
@@ -47,7 +50,7 @@ const CSVFileAdapterDocumentation = () => {
             The file uses <strong>utf-8</strong> encoding
           </li>
           <li>
-            The file is readable by <strong>every</strong> Graylog server node
+            The file is readable by <strong>every</strong> {productName} server node
           </li>
         </ul>
       </Alert>

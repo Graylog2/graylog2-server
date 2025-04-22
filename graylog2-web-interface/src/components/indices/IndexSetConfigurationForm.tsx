@@ -47,6 +47,7 @@ import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConf
 import useFeature from 'hooks/useFeature';
 import useIndexSet from 'components/indices/hooks/useIndexSet';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
+import useProductName from 'customization/useProductName';
 
 type Props = {
   cancelLink: string;
@@ -133,7 +134,7 @@ const RotationStrategies = ({
     <IndexMaintenanceStrategiesConfiguration
       title="Index Rotation Configuration"
       name="rotation"
-      description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
+      description="Multiple indices are used to store documents, and you can configure the strategy to determine when to rotate the currently active write index."
       selectPlaceholder="Select rotation strategy"
       label="Rotation strategy"
       pluginExports={PluginStore.exports('indexRotationConfig')}
@@ -159,7 +160,7 @@ const RetentionConfig = ({
     <IndexMaintenanceStrategiesConfiguration
       title="Index Retention Configuration"
       name="retention"
-      description="Graylog uses a retention strategy to clean up old indices."
+      description="A retention strategy is used to clean up old indices"
       selectPlaceholder="Select retention strategy"
       label="Retention strategy"
       pluginExports={PluginStore.exports('indexRetentionConfig')}
@@ -217,6 +218,7 @@ const IndexSetConfigurationForm = ({
   submitLoadingText,
 }: Props) => {
   const history = useHistory();
+  const productName = useProductName();
 
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
@@ -401,7 +403,7 @@ const IndexSetConfigurationForm = ({
                                 <em>Advanced Option.</em> How often the Field Type Information for the active write
                                 Index will be updated. Setting this value higher can marginally reduce search cluster
                                 overhead and improve performance, but will result in new data messages longer to be
-                                searchable in Graylog.
+                                searchable in {productName}.
                               </>
                             }
                             value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}

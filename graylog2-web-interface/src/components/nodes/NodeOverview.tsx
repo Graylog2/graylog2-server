@@ -123,9 +123,9 @@ const NodeOverview = ({
           <h2>Disk Journal</h2>
           <p className="description">
             Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure.
-            The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message
-            rate or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of
-            those messages in main memory and avoids overly long garbage collection pauses that way.
+            The journal also helps maintain functionality if any of the outputs is too slow to keep up with the message
+            rate or whenever there is a peak in incoming messages. It makes sure that memory is not overloaded and
+            avoids overly long garbage collection pauses that way.
           </p>
           <JournalDetails nodeId={node.node_id} />
         </Col>

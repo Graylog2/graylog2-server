@@ -41,6 +41,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
 import { Link } from 'components/common/router';
 import { Headline } from 'components/common/Section/SectionComponent';
+import useProductName from 'customization/useProductName';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -158,9 +159,10 @@ const EmailGroup = () => {
 };
 
 const UserCreate = () => {
+  const productName = useProductName();
   const initialRole = {
     name: 'Reader',
-    description: 'Grants basic permissions for every Graylog user (built-in)',
+    description: `Grants basic permissions for every ${productName} user (built-in)`,
     id: '',
   };
   const [user, setUser] = useState(

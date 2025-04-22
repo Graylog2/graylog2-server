@@ -25,6 +25,7 @@ import backgroundImage from 'images/auth/login-bg.svg';
 import { Logo } from 'components/perspectives/DefaultBrand';
 import AppConfig from 'util/AppConfig';
 import useThemes from 'theme/hooks/useThemes';
+import useProductName from 'customization/useProductName';
 
 const LogoContainer = styled.div`
   display: block;
@@ -153,12 +154,13 @@ const useLoginBackground = () =>
   );
 
 const LoginChrome = ({ children }: Props) => {
+  const productName = useProductName();
   const loginBackground = useLoginBackground();
 
   return (
     <LoginContainer>
       <LoginBox>
-        <WelcomeMessage>Welcome to Graylog</WelcomeMessage>
+        <WelcomeMessage>Welcome to {productName}</WelcomeMessage>
         {children}
       </LoginBox>
       <Background>
