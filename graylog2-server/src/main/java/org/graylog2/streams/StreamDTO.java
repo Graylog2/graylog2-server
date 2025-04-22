@@ -108,7 +108,7 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
     @Nullable
     public abstract String contentPack();
 
-    @JsonProperty(FIELD_DEFAULT_STREAM)
+    @JsonProperty("is_default")
     @Nullable
     public abstract Boolean isDefault();
 
@@ -147,6 +147,7 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
         map.put(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, dto.removeMatchesFromDefaultStream());
         map.put(FIELD_INDEX_SET_ID, dto.indexSetId());
         map.put(FIELD_CATEGORIES, dto.categories());
+        map.put(FIELD_DEFAULT_STREAM, dto.isDefault());
         return map;
     }
 
