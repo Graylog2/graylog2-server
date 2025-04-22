@@ -47,6 +47,7 @@ import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
 import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import useHotkey from 'hooks/useHotkey';
 
 import SavedSearchForm from './SavedSearchForm';
@@ -137,14 +138,13 @@ const SearchActionsMenu = () => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableSearchAction(loaded, view);
 
   const saveSearch = useCallback(
-    async (newTitle: string) => {
+    async (newTitle: string,  entityShare?: EntitySharePayload) => {
       if (!view.id) {
         return;
       }
-
       const newView = view.toBuilder().title(newTitle).type(View.Type.Search).build();
 
-      await dispatch(onSaveView(newView));
+      await dispatch(onSaveView(newView, entityShare));
       closeFormModal();
       await dispatch(loadView(newView));
     },
@@ -152,11 +152,10 @@ const SearchActionsMenu = () => {
   );
 
   const saveAsSearch = useCallback(
-    async (newTitle: string) => {
+    async (newTitle: string,  entityShare?: EntitySharePayload) => {
       if (!newTitle || newTitle === '') {
         return;
       }
-
       const viewWithPluginData = await executePluggableDuplicationHandler(
         view,
         currentUser.permissions,
@@ -165,7 +164,7 @@ const SearchActionsMenu = () => {
 
       const newView = viewWithPluginData.toBuilder().newId().title(newTitle).type(View.Type.Search).build();
 
-      ViewManagementActions.create(newView)
+      ViewManagementActions.create(newView, entityShare)
         .then((createdView) => {
           toggleFormModal();
 

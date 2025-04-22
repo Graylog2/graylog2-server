@@ -20,10 +20,12 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 import OriginalSavedSearchForm from './SavedSearchForm';
 
 jest.mock('views/hooks/useSaveViewFormControls');
+jest.mock('components/permissions/EntityCreateShareFormGroup', () => mockComponent('EntityCreateShareFormGroup'));
 
 const SavedSearchForm = (props: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
   <OriginalSavedSearchForm {...props}>
@@ -102,7 +104,7 @@ describe('SavedSearchForm', () => {
       const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
       userEvent.click(saveAsButton);
 
-      expect(onSaveAs).toHaveBeenCalledWith('new Title and further title');
+      expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
 
     it('should not handle saveAsSearch if disabled', async () => {
@@ -125,7 +127,7 @@ describe('SavedSearchForm', () => {
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
       userEvent.click(createNewButton);
 
-      expect(onSaveAs).toHaveBeenCalledWith('new Title and further title');
+      expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
   });
 

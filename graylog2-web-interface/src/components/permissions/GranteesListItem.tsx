@@ -19,7 +19,6 @@ import type { $PropertyType } from 'utility-types';
 import { useState } from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
-import { Formik, Form } from 'formik';
 
 import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
 import type EntityShareState from 'logic/permissions/EntityShareState';
@@ -111,28 +110,25 @@ const GranteesListItem = ({
   };
 
   return (
-    <Formik initialValues={{ capabilityId }} onSubmit={() => {}}>
-      <Form>
-        <Container $currentState={currentGranteeState}>
-          <GranteeInfo title={title}>
-            <StyledGranteeIcon type={type} />
-            <Title>{title}</Title>
-          </GranteeInfo>
-          <StyledCapabilitySelect
-            onChange={(newCapabilityId) => onCapabilityChange({ granteeId: id, capabilityId: newCapabilityId })}
-            capabilities={availableCapabilities}
-            title={`Change the capability for ${title}`}
-          />
-          <Actions>
-            {isDeleting ? (
-              <Spinner text="" />
-            ) : (
-              <IconButton name="delete" onClick={handleDelete} title={`Remove sharing for ${title}`} />
-            )}
-          </Actions>
-        </Container>
-      </Form>
-    </Formik>
+    <Container $currentState={currentGranteeState}>
+      <GranteeInfo title={title}>
+        <StyledGranteeIcon type={type} />
+        <Title>{title}</Title>
+      </GranteeInfo>
+      <StyledCapabilitySelect
+        defaultValue={capabilityId}
+        onChange={(newCapabilityId) => onCapabilityChange({ granteeId: id, capabilityId: newCapabilityId })}
+        capabilities={availableCapabilities}
+        title={`Change the capability for ${title}`}
+      />
+      <Actions>
+        {isDeleting ? (
+          <Spinner text="" />
+        ) : (
+          <IconButton name="delete" onClick={handleDelete} title={`Remove sharing for ${title}`} />
+        )}
+      </Actions>
+    </Container>
   );
 };
 
