@@ -14,18 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+import * as React from 'react';
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog2.storage.SearchVersion;
+const PageDescription = () => (
+  <span>
+    Notifications alert you of any configured Event when they occur. Notifications can be sent directly to you or to
+    other systems you use for that purpose. Remember to assign Notifications while creating or editing an Event
+    Definition.
+  </span>
+);
 
-public class DatanodeDevInstanceBuilder extends SearchServerBuilder<DatanodeDevInstance> {
-    public DatanodeDevInstanceBuilder(SearchVersion version) {
-        super(version);
-    }
-
-    @Override
-    protected DatanodeDevInstance instantiate() {
-        return new DatanodeDevInstance(getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getHeapSize(), getFeatureFlags(), getEnv(), getDatanodePluginJarsProvider()).init();
-    }
-}
+export default PageDescription;

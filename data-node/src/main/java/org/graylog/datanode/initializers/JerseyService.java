@@ -21,6 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jakarta.rs.base.JsonMappingExceptionMapper;
 import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -50,6 +51,7 @@ import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.security.JwtSecretProvider;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
@@ -60,11 +62,13 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.SSLContext;
 import java.net.URI;
 import java.security.KeyStore;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -72,11 +76,13 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
 public class JerseyService extends AbstractIdleService {
+    public static final String PLUGIN_PREFIX = "/plugins";
     private static final Logger LOG = LoggerFactory.getLogger(JerseyService.class);
     private static final String RESOURCE_PACKAGE_WEB = "org.graylog2.web.resources";
 
     private final Configuration configuration;
     private final Set<Class<?>> systemRestResources;
+    private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
 
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
     private final Set<Class<? extends ExceptionMapper>> exceptionMappers;
@@ -94,6 +100,7 @@ public class JerseyService extends AbstractIdleService {
                          Set<Class<? extends DynamicFeature>> dynamicFeatures,
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,
                          @Named(Graylog2Module.SYSTEM_REST_RESOURCES) final Set<Class<?>> systemRestResources,
+                         final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
                          ObjectMapper objectMapper,
                          MetricRegistry metricRegistry,
                          TLSProtocolsConfiguration tlsConfiguration, EventBus eventBus, JwtSecretProvider jwtSecretProvider) {
@@ -101,6 +108,7 @@ public class JerseyService extends AbstractIdleService {
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.exceptionMappers = requireNonNull(exceptionMappers, "exceptionMappers");
         this.systemRestResources = systemRestResources;
+        this.pluginRestResources = requireNonNull(pluginRestResources, "pluginResources");
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
@@ -156,6 +164,8 @@ public class JerseyService extends AbstractIdleService {
     }
 
     private void startUpApi(SSLEngineConfigurator sslEngineConfigurator) throws Exception {
+        final Set<Resource> pluginResources = prefixPluginResources(PLUGIN_PREFIX, pluginRestResources);
+
         final String contextPath = configuration.getHttpPublishUri().getPath();
         final URI listenUri = new URI(
                 configuration.getUriScheme(),
@@ -173,11 +183,36 @@ public class JerseyService extends AbstractIdleService {
                 configuration.getHttpSelectorRunnersCount(),
                 configuration.getHttpMaxHeaderSize(),
                 configuration.isHttpEnableGzip(),
-                Set.of());
+                pluginResources);
 
         apiHttpServer.start();
 
         LOG.info("Started REST API at <{}:{}>", configuration.getBindAddress(), configuration.getDatanodeHttpPort());
+    }
+
+    private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<Class<? extends PluginRestResource>>> pluginResourceMap) {
+        return pluginResourceMap.entrySet().stream()
+                .map(entry -> prefixResources(pluginPrefix + "/" + entry.getKey(), entry.getValue()))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+    }
+
+    private <T> Set<Resource> prefixResources(String prefix, Set<Class<? extends T>> resources) {
+        final String pathPrefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length() - 1) : prefix;
+
+        return resources
+                .stream()
+                .map(resource -> {
+                    final jakarta.ws.rs.Path pathAnnotation = Resource.getPath(resource);
+                    final String resourcePathSuffix = Strings.nullToEmpty(pathAnnotation.value());
+                    final String resourcePath = resourcePathSuffix.startsWith("/") ? pathPrefix + resourcePathSuffix : pathPrefix + "/" + resourcePathSuffix;
+
+                    return Resource
+                            .builder(resource)
+                            .path(resourcePath)
+                            .build();
+                })
+                .collect(Collectors.toSet());
     }
 
     private ResourceConfig buildResourceConfig(final Set<Resource> additionalResources) {
