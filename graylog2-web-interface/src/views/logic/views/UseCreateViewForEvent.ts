@@ -83,8 +83,7 @@ const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
 };
 
 const createViewWidget = ({ groupBy, fnSeries, expr }: { groupBy: Array<string>; fnSeries: string; expr: string }) => {
-  const uniqPivotFields = uniq(groupBy.filter((v) => !!v));
-  const rowPivots = uniqPivotFields.length ? [pivotForField(uniqPivotFields, new FieldType('value', [], []))] : [];
+  const rowPivots = groupBy.length ? [pivotForField(groupBy, new FieldType('value', [], []))] : [];
   const fnSeriesForFunc = Series.forFunction(fnSeries);
   const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
   const sort = [new SortConfig(SortConfig.SERIES_TYPE, fnSeries, direction)];
@@ -93,7 +92,7 @@ const createViewWidget = ({ groupBy, fnSeries, expr }: { groupBy: Array<string>;
 };
 
 const getSummaryAggregation = ({ aggregations, groupBy }) => {
-  const { summaryFnSeries, summaryRowPivots, summaryTitle } = aggregations.reduce(
+  const { summaryFnSeries, summaryTitle } = aggregations.reduce(
     (res, { value, expr, fnSeries }) => {
       const concatTitle = `${fnSeries} ${expr} ${value}`;
       res.summaryFnSeries.push(fnSeries);
@@ -103,13 +102,12 @@ const getSummaryAggregation = ({ aggregations, groupBy }) => {
     },
     {
       summaryFnSeries: [],
-      summaryRowPivots: [],
       summaryTitle: 'Summary: ',
     },
   );
 
   const summaryWidget = getAggregationWidget({
-    rowPivots: [pivotForField(uniq([...summaryRowPivots, ...groupBy]), new FieldType('value', [], []))],
+    rowPivots: [pivotForField(groupBy, new FieldType('value', [], []))],
     fnSeries: summaryFnSeries.map((s) => Series.forFunction(s)),
   });
 
