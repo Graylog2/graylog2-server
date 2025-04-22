@@ -19,6 +19,7 @@ package org.graylog.searchbackend.datanode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import io.restassured.response.ValidatableResponse;
+import jakarta.annotation.Nonnull;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
@@ -27,12 +28,14 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.RestOperationParameters;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.JwtSecret;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.hamcrest.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Clock;
 import java.util.concurrent.ExecutionException;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV,
@@ -68,7 +71,7 @@ public class DatanodeSelfsignedStartupIT {
             final ValidatableResponse response = new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(getOpensearchPort())
                     .relaxedHTTPSValidation(true)
-                    .jwtTokenProvider(new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60)))
+                    .jwtAuthToken(createJwtAuthToken())
                     .build())
                     .waitForNodesCount(1);
 
@@ -77,5 +80,11 @@ public class DatanodeSelfsignedStartupIT {
             log.error("Could not connect to Opensearch\n" + apis.backend().getSearchLogs());
             throw e;
         }
+    }
+
+    @Nonnull
+    private static IndexerJwtAuthToken createJwtAuthToken() {
+        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60), true, Clock.systemDefaultZone());
+        return provider.get();
     }
 }
