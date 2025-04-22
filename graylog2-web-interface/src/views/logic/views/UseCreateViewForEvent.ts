@@ -16,7 +16,6 @@
  */
 import { useMemo } from 'react';
 import * as Immutable from 'immutable';
-import uniq from 'lodash/uniq';
 
 import View from 'views/logic/views/View';
 import type { AbsoluteTimeRange, RelativeTimeRangeStartOnly, TimeRange } from 'views/logic/queries/Query';
