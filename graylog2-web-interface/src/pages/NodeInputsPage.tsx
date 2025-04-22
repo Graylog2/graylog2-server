@@ -25,10 +25,12 @@ import withParams from 'routing/withParams';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
+import useProductName from 'customization/useProductName';
 
 import useCurrentUser from '../hooks/useCurrentUser';
 
 const NodeInputsPage = () => {
+  const productName = useProductName();
   const { nodeId } = useParams();
 
   const currentUser = useCurrentUser();
@@ -58,8 +60,8 @@ const NodeInputsPage = () => {
       <div>
         <PageHeader title={title}>
           <span>
-            Graylog nodes accept data via inputs. On this page you can see which inputs are running on this specific
-            node.
+            {productName} nodes accept data via inputs. On this page you can see which inputs are running on this
+            specific node.
             <br />
             You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
           </span>

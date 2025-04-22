@@ -257,7 +257,7 @@ const field2Widget = AggregationWidget.builder()
   .config(
     AggregationWidgetConfig.builder()
       .columnPivots([])
-      .rowPivots([Pivot.createValues(['field2', 'field1'])])
+      .rowPivots([Pivot.createValues(['field1', 'field2'])])
       .series([Series.forFunction('count(field2)')])
       .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field2)', Direction.Ascending)])
       .visualization('table')
