@@ -123,11 +123,11 @@ const PageHeader = ({
   children = [],
   subpage = false,
   title,
-  actions,
-  topActions,
-  lifecycle,
-  lifecycleMessage,
-  documentationLink,
+  actions = undefined,
+  topActions = undefined,
+  lifecycle = undefined,
+  lifecycleMessage = undefined,
+  documentationLink = undefined,
 }: Props) => {
   const topLevelClassNames = subpage ? '' : 'content';
 

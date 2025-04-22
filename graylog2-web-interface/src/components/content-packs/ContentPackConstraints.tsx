@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Set } from 'immutable';
 
 import { DataTable, Icon } from 'components/common';
@@ -13,6 +13,8 @@ type ContentPackConstraintsProps = {
 const ContentPackConstraints = ({ constraints = Set(), isFulfilled = false }: ContentPackConstraintsProps) => {
   const productName = useProductName();
   const headers = useMemo(() => ['Name', 'Type', 'Version', 'Fulfilled'], []);
+
+  const renderHeader = useCallback((header: React.ReactNode) => <th>{header}</th>, []);
 
   const formattedConstraints = useMemo(() => {
     let updatedConstraints = constraints.map((constraint) => {
@@ -56,7 +58,7 @@ const ContentPackConstraints = ({ constraints = Set(), isFulfilled = false }: Co
       <DataTable
         id="content-packs-constraints"
         headers={headers}
-        headerCellFormatter={(header) => <th>{header}</th>}
+        headerCellFormatter={renderHeader}
         sortBy={(row) => (row.constraint ? row.constraint.type : row.type)}
         dataRowFormatter={rowFormatter}
         rows={formattedConstraints}

@@ -67,7 +67,7 @@ export const PAGE_SIZES = [10, 50, 100];
 
 const EventDefinitions = ({
   eventDefinitions,
-  context,
+  context = undefined,
   pagination,
   query,
   onPageChange,

@@ -32,7 +32,7 @@ type SystemJobsComponentProps = {
   >;
 };
 
-const SystemJobsComponent = ({ jobs }: SystemJobsComponentProps) => {
+const SystemJobsComponent = ({ jobs = undefined }: SystemJobsComponentProps) => {
   const productName = useProductName();
 
   useEffect(() => {

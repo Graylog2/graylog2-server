@@ -75,7 +75,7 @@ type Props = {
   newEntryId?: string;
 };
 
-const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId }: Props) => {
+const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId = undefined }: Props) => {
   const productName = useProductName();
   const literal = 'literal';
   const regex = 'regex';

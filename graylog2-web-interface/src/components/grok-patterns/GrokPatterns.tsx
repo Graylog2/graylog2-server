@@ -75,6 +75,8 @@ class GrokPatterns extends React.Component<
     sendTelemetry: () => {},
   };
 
+  private loadPromise: CancellablePromise<unknown>;
+
   constructor(props) {
     super(props);
 
@@ -87,8 +89,6 @@ class GrokPatterns extends React.Component<
       },
     };
   }
-
-  private loadPromise: CancellablePromise<unknown>;
 
   componentDidMount() {
     this.loadData();

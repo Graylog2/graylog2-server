@@ -32,6 +32,16 @@ type ProcessorSimulatorProps = {
   streams: any[];
 };
 
+const getFormattedStreams = (streams) => {
+  if (!streams) {
+    return [];
+  }
+
+  return streams
+    .map((stream) => ({ value: stream.id, label: stream.title }))
+    .sort((s1, s2) => naturalSort(s1.label, s2.label));
+};
+
 class ProcessorSimulator extends React.Component<
   ProcessorSimulatorProps,
   {
@@ -65,16 +75,6 @@ class ProcessorSimulator extends React.Component<
         this.setState({ loading: false, error: error });
       },
     );
-  };
-
-  _getFormattedStreams = (streams) => {
-    if (!streams) {
-      return [];
-    }
-
-    return streams
-      .map((stream) => ({ value: stream.id, label: stream.title }))
-      .sort((s1, s2) => naturalSort(s1.label, s2.label));
   };
 
   _onStreamSelect = (selectedStream) => {
@@ -123,7 +123,7 @@ class ProcessorSimulator extends React.Component<
                 <FormGroup id="streamSelectorSimulation">
                   <ControlLabel>Stream</ControlLabel>
                   <Select
-                    options={this._getFormattedStreams(this.props.streams)}
+                    options={getFormattedStreams(this.props.streams)}
                     onChange={this._onStreamSelect}
                     value={this.state.stream.id}
                     required
