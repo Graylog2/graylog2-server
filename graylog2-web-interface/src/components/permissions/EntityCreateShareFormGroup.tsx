@@ -17,7 +17,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 import type { EntitySharePayload } from 'src/actions/permissions/EntityShareActions';
 
@@ -26,17 +25,15 @@ import { useStore } from 'stores/connect';
 import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import type { GRN } from 'logic/permissions/types';
-import type { CapabilitiesList, GranteesList as GranteesListType, SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
+import type { GranteesList as GranteesListType, SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
 import type Grantee from 'logic/permissions/Grantee';
+import { Spinner } from 'components/common';
 
-import ValidationError from './ValidationError';
-import DependenciesWarning from './DependenciesWarning';
 import type { SelectionRequest } from './GranteesSelector';
-import GranteeIcon from './GranteeIcon';
 import GranteesList from './GranteesList';
-
-import { Button } from '../bootstrap';
-import { Select, Spinner } from '../common';
+import EntityCreateCapabilitySelect from './EntityCreateCapabilitySelect';
+import { GranteesSelect, GranteesSelectOption, GranteesSelectorHeadline, ShareFormElements, ShareFormSection, ShareSubmitButton, StyledGranteeIcon } from './CommonStyledComponents';
+import EntityShareValidationsDependencies from './EntityShareValidationsDependencies';
 
 type Props = {
   description: string;
@@ -45,33 +42,6 @@ type Props = {
   entityTypeTitle?: string | null | undefined;
   onSetEntityShare: (payload: EntitySharePayload) => void;
 };
-
-const Section = styled.div`
-  margin-bottom: 25px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-const GranteesSelectorHeadline = styled.h5`
-  margin-bottom: 10px;
-`;
-const FormElements = styled.div`
-  display: flex;
-`;
-const SubmitButton = styled(Button)`
-  margin-left: 15px;
-`;
-const GranteesSelect = styled(Select)`
-  flex: 1;
-`;
-const GranteesSelectOption = styled.div`
-  display: flex;
-  align-items: center;
-`;
-const StyledGranteeIcon = styled(GranteeIcon)`
-  margin-right: 5px;
-`;
 
 const _renderGranteesSelectOption = ({
   label,
@@ -85,8 +55,6 @@ const _renderGranteesSelectOption = ({
     {label}
   </GranteesSelectOption>
 );
-const _capabilitiesOptions = (capabilities: CapabilitiesList) =>
-  capabilities.map((capability) => ({ label: capability.title, value: capability.id })).toJS();
 const _granteesOptions = (grantees: GranteesListType) =>
   grantees.map((grantee) => ({ label: grantee.title, value: grantee.id, granteeType: grantee.type })).toJS();
 const getAvailableGrantee = (grantees: GranteesListType, selected:  SelectedGranteeCapabilities) =>
@@ -107,7 +75,7 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSe
     setShareSelection(defaultShareSelection);
   };
 
-  const _handleSelection = ({ granteeId, capabilityId }: SelectionRequest) => {
+  const handleSelection = ({ granteeId, capabilityId }: SelectionRequest) => {
     const newSelectedCapabilities = entityShareState?.selectedGranteeCapabilities.merge({ [granteeId]: capabilityId });
 
     setDisableSubmit(true);
@@ -125,7 +93,7 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSe
     })
   };
 
-  const _handleDeletion = (granteeId: GRN) => {
+  const handleDeletion = (granteeId: GRN) => {
     const newSelectedGranteeCapabilities = entityShareState?.selectedGranteeCapabilities.remove(granteeId);
 
     setDisableSubmit(true);
@@ -140,65 +108,58 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSe
       return response;
     });
   };
-  
+
   const handleAddCollaborator = () => {
-    _handleSelection(shareSelection)
+    handleSelection(shareSelection)
   };
 
   return (
     <>
       {entityShareState ? (
         <>
-          <Section>
+          <ShareFormSection>
             <GranteesSelectorHeadline>Add Collaborator</GranteesSelectorHeadline>
             <p>{description}</p>
-               <FormElements>
-                 <GranteesSelect
-                   onChange={(granteeId) => setShareSelection({...shareSelection, granteeId})}
-                   optionRenderer={_renderGranteesSelectOption}
-                  options={_granteesOptions(getAvailableGrantee(entityShareState.availableGrantees,entityShareState.selectedGranteeCapabilities))}
-                   placeholder="Search for users and teams"
-                   value={shareSelection.granteeId}
-                 />
-                 <Select
-                   clearable={false}
-                   onChange={(capabilityId) => setShareSelection({...shareSelection, capabilityId})}
-                   options={_capabilitiesOptions(entityShareState?.availableCapabilities)}
-                   placeholder="View"
-                   value={shareSelection.capabilityId}
-                 />
-                 <SubmitButton
-                   bsStyle="success"
-                   title="Add Collaborator"
-                   onClick={handleAddCollaborator}
-                   disabled={disableSubmit}
-                 >
-                    Add Collaborator
-                 </SubmitButton>
-               </FormElements>
-          </Section>
-          <Section>
+            <ShareFormElements>
+              <GranteesSelect
+                onChange={(granteeId) => setShareSelection({...shareSelection, granteeId})}
+                optionRenderer={_renderGranteesSelectOption}
+                options={_granteesOptions(getAvailableGrantee(entityShareState.availableGrantees,entityShareState.selectedGranteeCapabilities))}
+                placeholder="Search for users and teams"
+                value={shareSelection.granteeId}
+              />
+              <EntityCreateCapabilitySelect
+                onChange={(capabilityId) => setShareSelection({...shareSelection, capabilityId})}
+                capabilities={entityShareState?.availableCapabilities}
+                value={shareSelection.capabilityId}
+              />
+              <ShareSubmitButton
+                bsStyle="success"
+                title="Add Collaborator"
+                onClick={handleAddCollaborator}
+                disabled={disableSubmit}
+              >
+                 Add Collaborator
+              </ShareSubmitButton>
+            </ShareFormElements>
+          </ShareFormSection>
+          <ShareFormSection>
             <GranteesList
               activeShares={entityShareState?.activeShares}
               availableCapabilities={entityShareState?.availableCapabilities}
               entityType={entityType}
               entityTypeTitle={entityTypeTitle}
-              onDelete={_handleDeletion}
-              onCapabilityChange={_handleSelection}
+              onDelete={handleDeletion}
+              onCapabilityChange={handleSelection}
               selectedGrantees={entityShareState?.selectedGrantees}
               title="Collaborators"
             />
-          </Section>
-          {entityShareState?.validationResults?.failed && (
-            <Section>
-              <ValidationError validationResult={entityShareState?.validationResults} availableGrantees={entityShareState?.availableGrantees} />
-            </Section>
-          )}
-          {entityShareState?.missingDependencies?.size > 0 && (
-            <Section>
-              <DependenciesWarning missingDependencies={entityShareState?.missingDependencies} availableGrantees={entityShareState?.availableGrantees} />
-            </Section>
-          )}
+          </ShareFormSection>
+          <EntityShareValidationsDependencies
+            missingDependencies={entityShareState.missingDependencies}
+            validationResults={entityShareState.validationResults}
+            availableGrantees={entityShareState.availableGrantees}
+           />
         </>
       ): (
         <Spinner />
