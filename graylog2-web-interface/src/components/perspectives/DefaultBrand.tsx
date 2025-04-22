@@ -18,7 +18,7 @@ import React from 'react';
 import styled, { useTheme } from 'styled-components';
 
 import { NAV_LOGO_HEIGHT } from 'theme/constants';
-import useCustomLogo from 'customization/useCustomLogo';
+import useCustomLogo from 'brand-customization/useCustomLogo';
 
 export const Logo = ({ color }: { color: string }) => (
   <svg
