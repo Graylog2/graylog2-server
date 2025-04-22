@@ -28,7 +28,7 @@ import ToggleActionButton from 'components/content-stream/ToggleActionButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { CarouselProvider } from 'components/common/Carousel';
-import useWelcomeCustomization from 'customization/useWelcomeCustomization';
+import useWelcomeCustomization from 'brand-customization/useWelcomeCustomization';
 
 const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(
   ({ $enabled, theme }) => css`
