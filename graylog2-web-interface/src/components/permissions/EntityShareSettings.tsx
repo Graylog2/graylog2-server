@@ -79,7 +79,7 @@ const EntityShareSettings = ({
   setDisableSubmit,
   granteesSelectFormRef,
   showShareableEntityURL = true,
-  entityTypeTitle,
+  entityTypeTitle = null,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 

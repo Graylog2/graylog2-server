@@ -17,7 +17,7 @@
 import * as React from 'react';
 import type { $PropertyType } from 'utility-types';
 import { useCallback } from 'react';
-import { Field, Form, Formik } from 'formik';
+import { Field } from 'formik';
 
 import { Select } from 'components/common';
 import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
@@ -30,10 +30,9 @@ type Props = {
   onChange?: (id: $PropertyType<CapabilityType, 'id'>) => void;
   capabilities: CapabilitiesList;
   title?: string;
-  defaultValue?:  $PropertyType<CapabilityType, 'id'>,
 };
 
-const CapabilitySelect = ({ capabilities, onChange, defaultValue = 'view', title = 'Select a capability', ...rest }: Props) => {
+const CapabilitySelect = ({ capabilities, onChange = null, title = 'Select a capability', ...rest }: Props) => {
   const capabilitiesOptions = _capabilitiesOptions(capabilities);
 
   const handleChange = useCallback(
@@ -48,22 +47,18 @@ const CapabilitySelect = ({ capabilities, onChange, defaultValue = 'view', title
   );
 
   return (
-    <Formik initialValues={{ capabilityId: defaultValue }} onSubmit={() => {}}>
-      <Form>
-        <Field name="capabilityId">
-          {({ field: { name, value, onChange: onFieldChange } }) => (
-            <Select
-              {...rest}
-              clearable={false}
-              onChange={(capabilityId) => handleChange(name, capabilityId, onFieldChange)}
-              options={capabilitiesOptions}
-              placeholder={title}
-              value={value}
-            />
-          )}
-        </Field>
-      </Form>
-    </Formik>
+    <Field name="capabilityId">
+      {({ field: { name, value, onChange: onFieldChange } }) => (
+        <Select
+          {...rest}
+          clearable={false}
+          onChange={(capabilityId) => handleChange(name, capabilityId, onFieldChange)}
+          options={capabilitiesOptions}
+          placeholder={title}
+          value={value}
+        />
+      )}
+    </Field>
   );
 };
 
