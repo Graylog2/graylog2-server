@@ -27,7 +27,7 @@ import OriginalSavedSearchForm from './SavedSearchForm';
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('components/permissions/EntityCreateShareFormGroup', () => mockComponent('EntityCreateShareFormGroup'));
 
-const SavedSearchForm = (props: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
+const SavedSearchForm = ({...props}: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
   <OriginalSavedSearchForm {...props}>
     <button type="button">Submit</button>
   </OriginalSavedSearchForm>

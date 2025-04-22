@@ -76,7 +76,7 @@ const _initialCapabilityId = (capabilities: CapabilitiesList) => {
   return capabilities.find((capability) => capability.title === initialCapabilityTitle)?.id;
 };
 
-const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit, formRef }: Props) => {
+const GranteesSelector = ({ availableGrantees, availableCapabilities, className = null, onSubmit, formRef = null }: Props) => {
   const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
   const _handelSubmit = (data, resetForm) => {

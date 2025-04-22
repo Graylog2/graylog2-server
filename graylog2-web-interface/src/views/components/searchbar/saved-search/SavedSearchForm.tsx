@@ -39,7 +39,7 @@ const stopEvent = (e) => {
   e.stopPropagation();
 };
 
-const SavedSearchForm = ({ children, show, isCreateNew, saveSearch, saveAsSearch, toggleModal, value }: Props) => {
+const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, saveAsSearch, toggleModal, value }: Props) => {
   const [title, setTitle] = useState(value);
   const [sharePayload, setSharePayload] = useState(null);
   const onChangeTitle = useCallback(
