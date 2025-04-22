@@ -26,6 +26,7 @@ const docsHelper = {
     ALERTS: 'interacting_with_your_log_data/alerts.html',
     AUDIT_LOG: 'interacting_with_your_log_data/audit_log.html',
     AUTHENTICATORS: 'setting_up_graylog/user_authentication.htm',
+    AWS_KINESIS_CLOUDWATCH_INPUT: 'getting_in_log_data/aws_kinesis_cloudwatch_input.html',
     CHANGELOG: 'changelogs/changelog.html',
     CLUSTER_STATUS_EXPLAINED: 'setting_up_graylog/opensearch.htm#ClusterStatusExplained',
     COLLECTOR: 'getting_in_log_data/graylog_sidecar.html',
