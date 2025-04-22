@@ -44,7 +44,7 @@ export type OptionType = {
 };
 
 type Props = {
-  config: GeoIpConfigType;
+  config?: GeoIpConfigType;
   updateConfig: (config: GeoIpConfigType) => Promise<GeoIpConfigType>;
 };
 
