@@ -24,6 +24,7 @@ import org.graylog2.configuration.SearchIndexerHostsService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.versionprobe.VersionProbeFactory;
@@ -40,25 +41,24 @@ public class SearchVersionCheckPeriodical extends Periodical {
     private final SearchVersion initialSearchVersion;
     private final Optional<SearchVersion> versionOverride;
     private final VersionProbeFactory versionProbeFactory;
+    private final IndexerJwtAuthToken indexerJwtAuthToken;
     private final NotificationService notificationService;
     private final SearchIndexerHostsService indexerHosts;
-    private final boolean useJwtAuthentication;
 
     @Inject
     public SearchVersionCheckPeriodical(@DetectedSearchVersion SearchVersion elasticsearchVersion,
                                         @Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
                                         VersionProbeFactory versionProbeFactory,
+                                        IndexerJwtAuthToken indexerJwtAuthToken,
                                         NotificationService notificationService,
-                                        SearchIndexerHostsService searchIndexerHostsService,
-                                        @Named("indexer_use_jwt_authentication") boolean useJwtAuthentication,
-                                        @RunsWithDataNode Boolean runsWithDataNode
-                                    ) {
+                                        SearchIndexerHostsService searchIndexerHostsService
+    ) {
         this.initialSearchVersion = elasticsearchVersion;
         this.versionOverride = Optional.ofNullable(versionOverride);
         this.versionProbeFactory = versionProbeFactory;
+        this.indexerJwtAuthToken = indexerJwtAuthToken;
         this.notificationService = notificationService;
         this.indexerHosts = searchIndexerHostsService;
-        this.useJwtAuthentication = runsWithDataNode || useJwtAuthentication;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class SearchVersionCheckPeriodical extends Periodical {
             return;
         }
 
-        final VersionProbe limitedProbe = this.versionProbeFactory.create(1, Duration.seconds(1), useJwtAuthentication, VersionProbeLogger.INSTANCE);
+        final VersionProbe limitedProbe = this.versionProbeFactory.create(indexerJwtAuthToken, 1, Duration.seconds(1), VersionProbeLogger.INSTANCE);
 
         limitedProbe.probe(indexerHosts.getHosts().activeHosts()).ifPresent(version -> {
             if (compatible(this.initialSearchVersion, version)) {
