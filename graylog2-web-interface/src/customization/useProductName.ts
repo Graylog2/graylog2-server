@@ -14,23 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 
-import { DocumentTitle, PageHeader } from 'components/common';
-import { Col, Row } from 'components/bootstrap';
-import KeyboardShortcutsList from 'components/hotkeys/KeyboardShortcutsList';
+import AppConfig from 'util/AppConfig';
 
-const KeyboardShortcutsPage = () => (
-  <DocumentTitle title="Keyboard Shortcuts">
-    <PageHeader title="Keyboard Shortcuts">
-      <span>A list of all available shortcuts</span>
-    </PageHeader>
-    <Row className="content">
-      <Col md={12}>
-        <KeyboardShortcutsList />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+const useProductName = () => AppConfig.branding()?.product_name ?? 'Graylog';
 
-export default KeyboardShortcutsPage;
+export default useProductName;

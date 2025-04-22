@@ -14,23 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
-import { DocumentTitle, PageHeader } from 'components/common';
-import { Col, Row } from 'components/bootstrap';
-import KeyboardShortcutsList from 'components/hotkeys/KeyboardShortcutsList';
-
-const KeyboardShortcutsPage = () => (
-  <DocumentTitle title="Keyboard Shortcuts">
-    <PageHeader title="Keyboard Shortcuts">
-      <span>A list of all available shortcuts</span>
-    </PageHeader>
-    <Row className="content">
-      <Col md={12}>
-        <KeyboardShortcutsList />
-      </Col>
-    </Row>
-  </DocumentTitle>
+const PageDescription = () => (
+  <span>
+    Notifications alert you of any configured Event when they occur. Notifications can be sent directly to you or to
+    other systems you use for that purpose. Remember to assign Notifications while creating or editing an Event
+    Definition.
+  </span>
 );
 
-export default KeyboardShortcutsPage;
+export default PageDescription;
