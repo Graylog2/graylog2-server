@@ -54,12 +54,10 @@ describe('StreamModal', () => {
 
     await screen.findByRole('textbox', {
       name: /title/i,
-      hidden: true,
     });
 
     await screen.findByRole('textbox', {
       name: /description/i,
-      hidden: true,
     });
   });
 
@@ -69,12 +67,10 @@ describe('StreamModal', () => {
 
     const title = await screen.findByRole('textbox', {
       name: /title/i,
-      hidden: true,
     });
 
     const description = await screen.findByRole('textbox', {
       name: /description/i,
-      hidden: true,
     });
 
     const indexSetSelect = await screen.findByLabelText('Index Set');
@@ -97,7 +93,6 @@ describe('StreamModal', () => {
 
     const submitButton = await screen.findByRole('button', {
       name: /submit/i,
-      hidden: true,
     });
 
     await waitFor(() => {
