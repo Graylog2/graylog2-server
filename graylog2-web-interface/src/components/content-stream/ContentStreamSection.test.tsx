@@ -22,6 +22,7 @@ import ContentStreamSection from 'components/content-stream/ContentStreamSection
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useContentStreamSettings from 'components/content-stream/hook/useContentStreamSettings';
+import AppConfig from 'util/AppConfig';
 
 const mockContentStreamSettings = {
   contentStreamSettings: {
@@ -57,6 +58,11 @@ jest.mock('components/content-stream/ContentStreamReleasesSection', () => () => 
 ));
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('util/AppConfig', () => ({
+  gl2AppPathPrefix: jest.fn(() => ''),
+  gl2ServerUrl: jest.fn(() => undefined),
+  branding: jest.fn(() => undefined),
+}));
 
 describe('<ContentStreamSection>', () => {
   beforeEach(() => {
@@ -86,5 +92,38 @@ describe('<ContentStreamSection>', () => {
 
     expect(screen.queryByText('ContentStreamNews')).not.toBeInTheDocument();
     expect(screen.queryByText('ContentStreamNews')).not.toBeInTheDocument();
+  });
+
+  it('Show News and Releases sections by default', async () => {
+    render(<ContentStreamSection />);
+
+    await screen.findByRole('heading', { name: /news/i });
+    await screen.findByRole('heading', { name: /releases/i });
+  });
+
+  it('Show News and Releases sections when enabled in branding', async () => {
+    asMock(AppConfig.branding).mockReturnValue({
+      welcome: {
+        news: { enabled: true },
+        releases: { enabled: true },
+      },
+    });
+    render(<ContentStreamSection />);
+
+    await screen.findByRole('heading', { name: /news/i });
+    await screen.findByRole('heading', { name: /releases/i });
+  });
+
+  it('Hide News and Releases sections when disabled in branding', async () => {
+    asMock(AppConfig.branding).mockReturnValue({
+      welcome: {
+        news: { enabled: false },
+        releases: { enabled: false },
+      },
+    });
+    render(<ContentStreamSection />);
+
+    expect(screen.queryByRole('heading', { name: /news/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /releases/i })).not.toBeInTheDocument();
   });
 });
