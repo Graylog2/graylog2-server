@@ -78,11 +78,9 @@ describe('CreateProfile', () => {
 
     const name = await screen.findByRole('textbox', {
       name: /name/i,
-      hidden: true,
     });
     const description = await screen.findByRole('textbox', {
       name: /description/i,
-      hidden: true,
     });
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 

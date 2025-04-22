@@ -18,16 +18,23 @@ package org.graylog2.web.customization;
 
 import jakarta.inject.Inject;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
 public class CustomizationConfig {
     private static final String DEFAULT_PRODUCT_NAME = "Graylog";
     private final Config config;
 
     @Inject
-    public CustomizationConfig(Config config) {
-        this.config = config;
+    public CustomizationConfig(@Nullable Config config) {
+        this.config = Optional.ofNullable(config).orElse(Config.empty());
     }
 
     public String productName() {
         return config.productName().orElse(DEFAULT_PRODUCT_NAME);
+    }
+
+    public static CustomizationConfig empty() {
+        return new CustomizationConfig(Config.empty());
     }
 }

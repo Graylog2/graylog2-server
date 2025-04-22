@@ -14,13 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog2.indexer.client;
 
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
-
-import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
-public interface NodesSniffer {
-    List<Node> sniff(List<Node> nodes) throws IOException;
+public interface IndexerHostsAdapter {
+    /**
+     * @return List of up-to-date nodes as the elastic/opensearch client sees them and uses them. This includes all
+     * changes caused by sniffers and dynamic infrastructure changes. Unlike the fixed "elasticsearch_hosts" configuration
+     * property, this may change during every call and gives real-time information.
+     */
+    List<URI> getActiveHosts();
 }

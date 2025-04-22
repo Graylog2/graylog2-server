@@ -107,6 +107,7 @@ import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.storage.VersionAwareStorageModule;
+import org.graylog2.storage.versionprobe.VersionProbeModule;
 import org.graylog2.streams.StreamsModule;
 import org.graylog2.system.processing.ProcessingStatusConfig;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -169,6 +170,7 @@ public class Server extends ServerBootstrap {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
                 new VersionAwareStorageModule(configuration),
+                new VersionProbeModule(),
                 new ConfigurationModule(configuration),
                 new DbEntitiesModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
