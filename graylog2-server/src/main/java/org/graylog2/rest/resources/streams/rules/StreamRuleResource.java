@@ -22,29 +22,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.plugin.streams.StreamRuleType;
-import org.graylog2.rest.resources.streams.responses.SingleStreamRuleSummaryResponse;
-import org.graylog2.rest.resources.streams.responses.StreamRuleListResponse;
-import org.graylog2.rest.resources.streams.responses.StreamRuleTypeResponse;
-import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamRuleService;
-import org.graylog2.streams.StreamService;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -56,6 +37,24 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.rest.resources.streams.responses.SingleStreamRuleSummaryResponse;
+import org.graylog2.rest.resources.streams.responses.StreamRuleListResponse;
+import org.graylog2.rest.resources.streams.responses.StreamRuleTypeResponse;
+import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamDTO;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamService;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -69,12 +68,15 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class StreamRuleResource extends RestResource {
     private final StreamRuleService streamRuleService;
     private final StreamService streamService;
+    private final EntityScopeService scopeService;
 
     @Inject
     public StreamRuleResource(StreamRuleService streamRuleService,
-                              StreamService streamService) {
+                              StreamService streamService,
+                              EntityScopeService scopeService) {
         this.streamRuleService = streamRuleService;
         this.streamService = streamService;
+        this.scopeService = scopeService;
     }
 
     @POST
@@ -88,10 +90,10 @@ public class StreamRuleResource extends RestResource {
                            @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
-        checkNotEditable(streamId, "Cannot add stream rules to non-editable streams.");
 
-        // Check if stream exists
-        streamService.load(streamId);
+        // Check if stream exists and can be edited
+        final StreamDTO dto = streamService.getDTO(streamId);
+        checkNotEditable(dto, "Cannot add stream rules to non-editable streams.");
 
         final StreamRule streamRule = streamRuleService.create(streamId, cr);
         final String id = streamRuleService.save(streamRule);
@@ -123,7 +125,10 @@ public class StreamRuleResource extends RestResource {
                                                   @ApiParam(name = "JSON body", required = true)
                                                   @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
-        checkNotEditable(streamid, "Cannot update stream rules on non-editable streams.");
+
+        // Check if stream exists and can be edited
+        final StreamDTO dto = streamService.getDTO(streamid);
+        checkNotEditable(dto, "Cannot update stream rules on non-editable streams.");
 
         final StreamRule streamRule;
         streamRule = streamRuleService.load(streamRuleId);
@@ -159,7 +164,9 @@ public class StreamRuleResource extends RestResource {
     public SingleStreamRuleSummaryResponse updateDeprecated(@PathParam("streamid") String streamid,
                                                             @PathParam("streamRuleId") String streamRuleId,
                                                             @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
-        checkNotEditable(streamid, "Cannot remove stream rule on non-editable streams.");
+        // Check if stream exists and can be edited
+        final StreamDTO dto = streamService.getDTO(streamid);
+        checkNotEditable(dto, "Cannot remove stream rule on non-editable streams.");
         return update(streamid, streamRuleId, cr);
     }
 
@@ -203,7 +210,10 @@ public class StreamRuleResource extends RestResource {
                        @ApiParam(name = "streamRuleId", required = true)
                        @PathParam("streamRuleId") @NotEmpty String streamRuleId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
-        checkNotEditable(streamid, "Cannot delete stream rule on non-editable streams.");
+
+        // Check if stream exists and can be edited
+        final StreamDTO dto = streamService.getDTO(streamid);
+        checkNotEditable(dto, "Cannot delete stream rule on non-editable streams.");
 
         final StreamRule streamRule = streamRuleService.load(streamRuleId);
         if (streamRule.getStreamId().equals(streamid)) {
@@ -229,8 +239,8 @@ public class StreamRuleResource extends RestResource {
         return result;
     }
 
-    private void checkNotEditable(String streamId, String message) {
-        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || !Stream.streamIsEditable(streamId)) {
+    private void checkNotEditable(StreamDTO dto, String message) {
+        if (Stream.DEFAULT_STREAM_ID.equals(dto.id()) || !scopeService.isMutable(dto)) {
             throw new BadRequestException(message);
         }
     }

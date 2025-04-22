@@ -54,6 +54,8 @@ public interface StreamService {
 
     List<Stream> loadAllEnabled();
 
+    List<Stream> loadSystemStreams(boolean includeDefaultStream);
+
     default List<Stream> loadAllByTitle(String title) {
         return loadAll().stream().filter(s -> title.equals(s.getTitle())).toList();
     }
@@ -102,4 +104,8 @@ public interface StreamService {
      * @return map of stream IDs to number of rules attached to the stream with that ID
      */
     Map<String, Long> streamRuleCountByStream();
+
+    StreamDTO getDTO(String id) throws NotFoundException;
+
+    boolean isEditable(String id);
 }

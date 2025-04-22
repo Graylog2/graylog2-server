@@ -23,8 +23,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.DbEntity;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -47,7 +48,7 @@ import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDTO.Builder.class)
 @DbEntity(collection = "streams", readPermission = STREAMS_READ)
-public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Builder> {
+public abstract class StreamDTO extends ScopedEntity {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -126,17 +127,23 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
     @Nullable
     public abstract List<String> categories();
 
+    @Override
+    public String toString() {
+        return id() + ": \"" + title() + "\"";
+    }
+
     public abstract Builder toBuilder();
 
     static Builder builder() {
         return Builder.create();
     }
 
-    public static Map<String, Object> toMap(StreamDTO dto) {
+    public static Map<String, Object> toMap(StreamDTO dto, boolean isEditable) {
         final Map<String, Object> map = new HashMap<>();
         if (dto.id() != null) {
             map.put("id", dto.id());
         }
+        map.put(FIELD_SCOPE, dto.scope());
         map.put(FIELD_TITLE, dto.title().strip());
         map.put(FIELD_CREATED_AT, Tools.getISO8601String(new DateTime(dto.createdAt(), DateTimeZone.UTC)));
         map.put(FIELD_DESCRIPTION, dto.description());
@@ -148,14 +155,16 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
         map.put(FIELD_INDEX_SET_ID, dto.indexSetId());
         map.put(FIELD_CATEGORIES, dto.categories());
         map.put(FIELD_DEFAULT_STREAM, dto.isDefault());
+        map.put(FIELD_IS_EDITABLE, isEditable);
         return map;
     }
 
     @AutoValue.Builder
-    public abstract static class Builder implements BuildableMongoEntity.Builder<StreamDTO, Builder> {
+    public abstract static class Builder extends AbstractBuilder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamDTO.Builder()
+                    .scope(DefaultEntityScope.NAME)
                     .matchingType(DEFAULT_MATCHING_TYPE.toString())
                     .isDefault(false)
                     .isEditable(false)
@@ -213,15 +222,6 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
         @JsonProperty(FIELD_CATEGORIES)
         public abstract Builder categories(List<String> categories);
 
-        public abstract String id();
-
-        public abstract StreamDTO autoBuild();
-
-        public StreamDTO build() {
-            isEditable(Stream.streamIsEditable(id()));
-            return autoBuild();
-        }
+        public abstract StreamDTO build();
     }
-
-
 }

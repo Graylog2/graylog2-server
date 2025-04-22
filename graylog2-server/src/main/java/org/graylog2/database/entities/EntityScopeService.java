@@ -43,6 +43,14 @@ public final class EntityScopeService {
         return Collections.unmodifiableList(new ArrayList<>(entityScopes.values()));
     }
 
+    public boolean isMutable(String scopeString) {
+        final EntityScope scope = entityScopes.get(scopeString.toUpperCase(Locale.ROOT));
+        if (scope == null) {
+            throw new IllegalArgumentException("Entity Scope does not exist: " + scope);
+        }
+        return scope.isMutable();
+    }
+
     public boolean isMutable(ScopedEntity scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
         String scope = scopedEntity.scope();

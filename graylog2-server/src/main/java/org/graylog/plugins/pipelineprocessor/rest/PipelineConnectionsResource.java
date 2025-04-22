@@ -41,7 +41,6 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -200,7 +199,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     }
 
     private void checkNotEditable(String streamId, String message) {
-        if (!Stream.streamIsEditable(streamId)) {
+        if (!streamService.isEditable(streamId)) {
             throw new BadRequestException(message);
         }
     }

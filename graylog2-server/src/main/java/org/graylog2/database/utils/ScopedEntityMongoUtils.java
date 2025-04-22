@@ -17,6 +17,7 @@
 package org.graylog2.database.utils;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.ReplaceOptions;
 import org.bson.types.ObjectId;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;
@@ -44,10 +45,21 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
      * @return the newly updated entity
      */
     public T update(T entity) {
+        return update(entity, false);
+    }
+
+    /**
+     * Performs a valid scope and mutability check before updating an entity.
+     *
+     * @param entity ScopedEntity to be updated
+     * @param upsert to create a new document if one does not currently exist or not
+     * @return the newly updated entity
+     */
+    public T update(T entity, boolean upsert) {
         Objects.requireNonNull(entity.id());
         ensureValidScope(entity);
         ensureMutability(entity);
-        collection.replaceOne(idEq(Objects.requireNonNull(entity.id())), entity);
+        collection.replaceOne(idEq(Objects.requireNonNull(entity.id())), entity, new ReplaceOptions().upsert(upsert));
         return entity;
     }
 

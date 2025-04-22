@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
@@ -98,6 +97,7 @@ public abstract class StreamResponse {
                                         @JsonProperty("is_default") @Nullable Boolean isDefault,
                                         @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream,
                                         @JsonProperty("index_set_id") String indexSetId,
+                                        @JsonProperty("is_editable") boolean isEditable,
                                         @JsonProperty("categories") @Nullable List<String> categories) {
         return new AutoValue_StreamResponse(
                 id,
@@ -113,7 +113,7 @@ public abstract class StreamResponse {
                 firstNonNull(isDefault, false),
                 firstNonNull(removeMatchesFromDefaultStream, false),
                 indexSetId,
-                Stream.streamIsEditable(id),
+                isEditable,
                 categories);
     }
 }

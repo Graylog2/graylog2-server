@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Output;
@@ -32,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 
 /**
  * Representing a single stream from the streams collection. Also provides method
@@ -52,6 +55,7 @@ public class StreamImpl implements Stream {
     public static final String FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM = "remove_matches_from_default_stream";
     public static final String FIELD_INDEX_SET_ID = "index_set_id";
     public static final String FIELD_CATEGORIES = "categories";
+    public static final String FIELD_IS_EDITABLE = "is_editable";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
 
     private final String id;
@@ -253,6 +257,18 @@ public class StreamImpl implements Stream {
     @Override
     public void setIndexSetId(String indexSetId) {
         fields.put(FIELD_INDEX_SET_ID, indexSetId);
+    }
+
+    public boolean isEditable() {
+        return (Boolean) fields.getOrDefault(FIELD_IS_EDITABLE, true);
+    }
+
+    public String getScope() {
+        return (String) fields.getOrDefault(FIELD_SCOPE, DefaultEntityScope.NAME);
+    }
+
+    public void setScope(String scope) {
+        fields.put(FIELD_SCOPE, scope);
     }
 
     @Override
