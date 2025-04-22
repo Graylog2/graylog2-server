@@ -63,11 +63,12 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                                          final boolean preImportLicense,
                                                                          final boolean withMailServerEnabled,
                                                                          final boolean webhookServerEnabled,
-                                                                         Map<String, String> env) {
+                                                                         Map<String, String> env,
+                                                                         PluginJarsProvider datanodePluginJarsProvider) {
 
         final Stopwatch sw = Stopwatch.createStarted();
         LOG.debug("Creating Backend services {} {} {} flags <{}>", version, mongodbVersion, withMailServerEnabled ? "mail" : "", enabledFeatureFlags);
-        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, env);
+        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, env, datanodePluginJarsProvider);
         LOG.debug(" creating backend services took " + sw.elapsed());
 
         final Stopwatch backendSw = Stopwatch.createStarted();
@@ -135,6 +136,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     @Override
     public void importMongoDBFixture(String resourcePath, Class<?> testClass) {
         services.getMongoDBInstance().importFixture(resourcePath, testClass);
+    }
+
+    @Override
+    public void dropCollection(String collectionName) {
+        services.getMongoDBInstance().dropCollection(collectionName);
     }
 
     @Override

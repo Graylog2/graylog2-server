@@ -30,6 +30,7 @@ import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerBut
 import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
 import { MIGRATION_ACTIONS } from '../../Constants';
 import RemoteReindexTasksProgress from '../common/RemoteReindexProgressBar';
+import MigrationError from '../common/MigrationError';
 
 const IndicesContainer = styled.div`
   max-height: 100px;
@@ -128,6 +129,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep, hideActions }: Migra
       <br />
       <br />
       <RemoteReindexTasksProgress migrationStatus={migrationStatus} />
+      <MigrationError errorMessage={currentStep.error_message} />
       {indicesWithErrors.length > 0 && (
         <Alert title="Migration failed" bsStyle="danger">
           <IndicesContainer>

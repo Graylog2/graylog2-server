@@ -14,19 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.statemachine.tracer;
+package org.graylog2.indexer.client;
 
-import com.github.oxo42.stateless4j.delegates.Trace;
-import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
-import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
+import java.net.URI;
+import java.util.List;
 
-/**
- * The tracer allows to observe triggered event (before) and transitions (after) of the {@link OpensearchStateMachine}
- */
-public interface StateMachineTracer extends Trace<OpensearchState, OpensearchEvent> {
-
-    default void setStateMachine(OpensearchStateMachine stateMachine) {
-    }
-
+public interface IndexerHostsAdapter {
+    /**
+     * @return List of up-to-date nodes as the elastic/opensearch client sees them and uses them. This includes all
+     * changes caused by sniffers and dynamic infrastructure changes. Unlike the fixed "elasticsearch_hosts" configuration
+     * property, this may change during every call and gives real-time information.
+     */
+    List<URI> getActiveHosts();
 }

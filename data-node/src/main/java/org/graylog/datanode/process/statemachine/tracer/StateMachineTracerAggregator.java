@@ -14,34 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.statemachine.tracer;
-
-import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
-import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
+package org.graylog.datanode.process.statemachine.tracer;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class StateMachineTracerAggregator implements StateMachineTracer {
+public class StateMachineTracerAggregator<STATE, EVENT> implements StateMachineTracer<STATE, EVENT> {
 
-    private final List<StateMachineTracer> delegates = new LinkedList<>();
+    private final List<StateMachineTracer<STATE, EVENT>> delegates = new LinkedList<>();
 
-    public void addTracer(StateMachineTracer tracer) {
+    public void addTracer(StateMachineTracer<STATE, EVENT> tracer) {
         delegates.add(tracer);
     }
 
-    public void removeTracer(StateMachineTracer tracer) {
+    public void removeTracer(StateMachineTracer<STATE, EVENT> tracer) {
         delegates.remove(tracer);
     }
 
     @Override
-    public void trigger(OpensearchEvent processEvent) {
+    public void trigger(EVENT processEvent) {
         delegates.forEach(d -> d.trigger(processEvent));
     }
 
     @Override
-    public void transition(OpensearchEvent processEvent, OpensearchState s1, OpensearchState s2) {
+    public void transition(EVENT processEvent, STATE s1, STATE s2) {
         delegates.forEach(d -> d.transition(processEvent, s1, s2));
     }
 

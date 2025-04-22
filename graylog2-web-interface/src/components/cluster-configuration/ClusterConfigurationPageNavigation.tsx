@@ -28,11 +28,11 @@ const ClusterConfigurationPageNavigation = () => {
 
   const NAV_ITEMS = [
     { title: 'Cluster Configuration', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
-    isDatanodeConfiguredAndUsed && { title: 'Data Node Dashboard', path: Routes.SYSTEM.CLUSTER.DATANODE_DASHBOARD },
     isDatanodeConfiguredAndUsed && {
-      title: 'Data Node Certificate Management',
-      path: Routes.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
+      title: 'Certificate Management',
+      path: Routes.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
     },
+    isDatanodeConfiguredAndUsed && { title: 'Data Node Dashboard', path: Routes.SYSTEM.CLUSTER.DATANODE_DASHBOARD },
     isDatanodeConfiguredAndUsed && { title: 'Data Node Upgrade', path: Routes.SYSTEM.CLUSTER.DATANODE_UPGRADE },
     showDatanodeMigration &&
       enableDataNodeMigration && { title: 'Data Node Migration', path: Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION },

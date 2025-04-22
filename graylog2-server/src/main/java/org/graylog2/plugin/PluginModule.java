@@ -88,11 +88,6 @@ public abstract class PluginModule extends Graylog2Module {
         return Collections.emptySet();
     }
 
-    @Override
-    protected Set<Object> getConfigurationBeans() {
-        return Collections.singleton(getConfigBeans());
-    }
-
     protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
         installInput(inputsMapBinder(), messageInputClass);
     }
