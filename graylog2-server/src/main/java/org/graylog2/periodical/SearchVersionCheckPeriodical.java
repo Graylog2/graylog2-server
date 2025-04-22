@@ -16,42 +16,49 @@
  */
 package org.graylog2.periodical;
 
+import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.graylog2.configuration.IndexerHosts;
+import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.configuration.SearchIndexerHostsService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.versionprobe.VersionProbeFactory;
 import org.graylog2.storage.versionprobe.VersionProbe;
+import org.graylog2.storage.versionprobe.VersionProbeLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
-public class ESVersionCheckPeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(ESVersionCheckPeriodical.class);
-    private final SearchVersion initialElasticsearchVersion;
+public class SearchVersionCheckPeriodical extends Periodical {
+    private static final Logger LOG = LoggerFactory.getLogger(SearchVersionCheckPeriodical.class);
+    private final SearchVersion initialSearchVersion;
     private final Optional<SearchVersion> versionOverride;
-    private final List<URI> elasticsearchHosts;
-    private final VersionProbe versionProbe;
+    private final VersionProbeFactory versionProbeFactory;
+    private final IndexerJwtAuthToken indexerJwtAuthToken;
     private final NotificationService notificationService;
+    private final SearchIndexerHostsService indexerHosts;
 
     @Inject
-    public ESVersionCheckPeriodical(@DetectedSearchVersion SearchVersion elasticsearchVersion,
-                                    @Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
-                                    @IndexerHosts List<URI> elasticsearchHosts,
-                                    VersionProbe versionProbe,
-                                    NotificationService notificationService) {
-        this.initialElasticsearchVersion = elasticsearchVersion;
+    public SearchVersionCheckPeriodical(@DetectedSearchVersion SearchVersion elasticsearchVersion,
+                                        @Named("elasticsearch_version") @Nullable SearchVersion versionOverride,
+                                        VersionProbeFactory versionProbeFactory,
+                                        IndexerJwtAuthToken indexerJwtAuthToken,
+                                        NotificationService notificationService,
+                                        SearchIndexerHostsService searchIndexerHostsService
+    ) {
+        this.initialSearchVersion = elasticsearchVersion;
         this.versionOverride = Optional.ofNullable(versionOverride);
-        this.elasticsearchHosts = elasticsearchHosts;
-        this.versionProbe = versionProbe;
+        this.versionProbeFactory = versionProbeFactory;
+        this.indexerJwtAuthToken = indexerJwtAuthToken;
         this.notificationService = notificationService;
+        this.indexerHosts = searchIndexerHostsService;
     }
 
     @Override
@@ -97,29 +104,29 @@ public class ESVersionCheckPeriodical extends Periodical {
     @Override
     public void doRun() {
         if (versionOverride.isPresent()) {
-            LOG.debug("Elasticsearch version is set manually. Not running check.");
+            LOG.debug("Search indexer version is set manually. Not running check.");
             return;
         }
 
-        final Optional<SearchVersion> probedVersion = this.versionProbe.probe(this.elasticsearchHosts);
+        final VersionProbe limitedProbe = this.versionProbeFactory.create(indexerJwtAuthToken, 1, Duration.seconds(1), VersionProbeLogger.INSTANCE);
 
-        probedVersion.ifPresent(version -> {
-            if (compatible(this.initialElasticsearchVersion, version)) {
+        limitedProbe.probe(indexerHosts.getHosts().activeHosts()).ifPresent(version -> {
+            if (compatible(this.initialSearchVersion, version)) {
                 notificationService.fixed(Notification.Type.ES_VERSION_MISMATCH);
             } else {
-                LOG.warn("Elasticsearch version currently running ({}) is incompatible with the one Graylog was started " +
-                        "with ({}) - a restart is required!", version, initialElasticsearchVersion);
+                LOG.warn("Search indexer version currently running ({}) is incompatible with the one Graylog was started " +
+                        "with ({}) - a restart is required!", version, initialSearchVersion);
                 final Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.ES_VERSION_MISMATCH)
                         .addSeverity(Notification.Severity.URGENT)
-                        .addDetail("initial_version", initialElasticsearchVersion.toString())
+                        .addDetail("initial_version", initialSearchVersion.toString())
                         .addDetail("current_version", version.toString());
                 notificationService.publishIfFirst(notification);
             }
         });
     }
 
-    private boolean compatible(SearchVersion initialElasticsearchMajorVersion, SearchVersion version) {
-        return initialElasticsearchMajorVersion.version().majorVersion() == version.version().majorVersion();
+    private boolean compatible(SearchVersion initialSearchMajorVersion, SearchVersion version) {
+        return initialSearchMajorVersion.version().majorVersion() == version.version().majorVersion();
     }
 }

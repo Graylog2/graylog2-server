@@ -714,4 +714,12 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     public String getDatanodeHttpCertificateAlias() {
         return datanodeHttpCertificateAlias;
     }
+
+    public Duration getIndexerJwtAuthTokenCachingDuration() {
+        return indexerJwtAuthTokenCachingDuration;
+    }
+
+    public Duration getIndexerJwtAuthTokenExpirationDuration() {
+        return indexerJwtAuthTokenExpirationDuration;
+    }
 }
