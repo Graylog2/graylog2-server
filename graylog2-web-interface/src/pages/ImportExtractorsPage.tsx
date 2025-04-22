@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -23,15 +23,17 @@ import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import type { Input } from 'components/messageloaders/Types';
+import useProductName from 'customization/useProductName';
 
 type Props = ParamsContext;
 
 const ImportExtractorsPage = ({ params }: Props) => {
+  const productName = useProductName();
   const [input, setInput] = useState<Input>();
 
   useEffect(() => {
     InputsActions.get(params.inputId).then((_input) => setInput(_input));
-  }, []);
+  }, [params.inputId]);
 
   const _isLoading = !input;
 
@@ -50,7 +52,7 @@ const ImportExtractorsPage = ({ params }: Props) => {
           }>
           <span>
             Exported extractors can be imported to an input. All you need is the JSON export of extractors from any
-            other Graylog setup or from{' '}
+            other {productName} setup or from{' '}
             <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">
               the Graylog Marketplace
             </a>

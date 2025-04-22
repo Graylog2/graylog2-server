@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { ClusterNodeMetrics } from '@graylog/server-api';
 
+import useProductName from 'customization/useProductName';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
 import type { Metric } from 'stores/metrics/MetricsStore';
@@ -51,6 +52,7 @@ const useNodeId = (nodes: NodesStoreState['nodes']) => {
 };
 
 const ShowMetricsPage = () => {
+  const productName = useProductName();
   const nodes = useStore(NodesStore, (state) => state.nodes);
   const nodeId = useNodeId(nodes);
   const { data: names, isLoading } = useQuery(
@@ -77,8 +79,8 @@ const ShowMetricsPage = () => {
       <span>
         <PageHeader title={title}>
           <span>
-            All Graylog nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you
-            can access all metrics via JMX, too.
+            All {productName} nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that
+            you can access all metrics via JMX, too.
             <br />
             This node is reporting a total of {(names || []).length} metrics.
           </span>

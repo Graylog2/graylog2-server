@@ -14,18 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog2.storage.SearchVersion;
+import AppConfig from 'util/AppConfig';
 
-public class DatanodeDevInstanceBuilder extends SearchServerBuilder<DatanodeDevInstance> {
-    public DatanodeDevInstanceBuilder(SearchVersion version) {
-        super(version);
-    }
+const useProductName = () => AppConfig.branding()?.product_name ?? 'Graylog';
 
-    @Override
-    protected DatanodeDevInstance instantiate() {
-        return new DatanodeDevInstance(getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getHeapSize(), getFeatureFlags(), getEnv(), getDatanodePluginJarsProvider()).init();
-    }
-}
+export default useProductName;
