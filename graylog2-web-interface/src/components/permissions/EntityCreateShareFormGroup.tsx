@@ -137,7 +137,7 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSe
                 bsStyle="success"
                 title="Add Collaborator"
                 onClick={handleAddCollaborator}
-                disabled={disableSubmit}
+                disabled={disableSubmit || !shareSelection.granteeId}
               >
                  Add Collaborator
               </ShareSubmitButton>
