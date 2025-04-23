@@ -32,8 +32,9 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.JwtSecret;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.AfterEach;
@@ -43,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Clock;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -83,7 +85,7 @@ class VersionProbeImplTest {
     void testSuccessfulVersionProbe() throws URISyntaxException {
         server.enqueue(new MockResponse().setBody(OPENSEARCH_RESPONSE));
         final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
-        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 100, Duration.milliseconds(10), false, versionProbeListener);
+        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret(), true), 100, Duration.milliseconds(10), versionProbeListener);
         final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.url("/").url().toURI()));
         Assertions.assertThat(probedVersion)
                 .isPresent()
@@ -100,7 +102,7 @@ class VersionProbeImplTest {
         server.setDispatcher(alwaysUnauthorized());
 
         final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
-        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 3, Duration.milliseconds(10), false, versionProbeListener);
+        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret(), true), 3, Duration.milliseconds(10), versionProbeListener);
         final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.url("/").uri()));
         Assertions.assertThat(probedVersion)
                 .isEmpty();
@@ -134,7 +136,7 @@ class VersionProbeImplTest {
 
         final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
 
-        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(secret), 3, Duration.milliseconds(10), true, versionProbeListener);
+        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(secret, true), 3, Duration.milliseconds(10), versionProbeListener);
         final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.url("/").uri()));
         Assertions.assertThat(probedVersion)
                 .isPresent()
@@ -144,7 +146,7 @@ class VersionProbeImplTest {
         Assertions.assertThat(versionProbeListener.getRetries()).isEmpty();
 
         final CollectingVersionProbeListener versionProbeListenerWithWrongSecret = new CollectingVersionProbeListener();
-        final VersionProbe versionProbeWithWrongSecret = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 3, Duration.milliseconds(10), true, versionProbeListenerWithWrongSecret);
+        final VersionProbe versionProbeWithWrongSecret = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret(), true), 3, Duration.milliseconds(10), versionProbeListenerWithWrongSecret);
         final Optional<SearchVersion> probedVersionWithWrongSecret = versionProbeWithWrongSecret.probe(Collections.singleton(server.url("/").uri()));
         Assertions.assertThat(probedVersionWithWrongSecret)
                 .isEmpty();
@@ -163,7 +165,7 @@ class VersionProbeImplTest {
         server.setDispatcher(basicAuthDispatcher(Credentials.basic(username, password)));
 
         final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
-        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret()), 3, Duration.milliseconds(10), false, versionProbeListener);
+        final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), disabledJwtAuth(randomSecret()), 3, Duration.milliseconds(10), versionProbeListener);
 
         final URI uri = server.url("/").newBuilder().username(username).password(password).build().uri();
         final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(uri));
@@ -240,12 +242,19 @@ class VersionProbeImplTest {
 
 
     @Nonnull
-    private static IndexerJwtAuthTokenProvider jwtTokenProvider(JwtSecret secret) {
+    private static IndexerJwtAuthToken jwtTokenProvider(JwtSecret secret, boolean useJwtAuthentication) {
         return new IndexerJwtAuthTokenProvider(
                 secret,
                 Duration.seconds(60),
-                Duration.seconds(30)
-        );
+                Duration.seconds(30),
+                useJwtAuthentication,
+                Clock.systemDefaultZone()
+        ).get();
+    }
+
+    @Nonnull
+    private static IndexerJwtAuthToken disabledJwtAuth(JwtSecret secret) {
+        return jwtTokenProvider(secret, false);
     }
 
     @Nonnull

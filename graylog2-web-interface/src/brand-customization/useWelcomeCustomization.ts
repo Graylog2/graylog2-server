@@ -14,19 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.statemachine.tracer;
 
-import com.github.oxo42.stateless4j.delegates.Trace;
-import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
-import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
+import AppConfig from 'util/AppConfig';
 
-/**
- * The tracer allows to observe triggered event (before) and transitions (after) of the {@link OpensearchStateMachine}
- */
-public interface StateMachineTracer extends Trace<OpensearchState, OpensearchEvent> {
+const useWelcomeCustomization = () => ({
+  isNewsSectionEnabledForBrand: AppConfig?.branding()?.welcome?.news?.enabled !== false,
+  isReleaseSectionEnabledForBrand: AppConfig?.branding()?.welcome?.releases?.enabled !== false,
+});
 
-    default void setStateMachine(OpensearchStateMachine stateMachine) {
-    }
-
-}
+export default useWelcomeCustomization;

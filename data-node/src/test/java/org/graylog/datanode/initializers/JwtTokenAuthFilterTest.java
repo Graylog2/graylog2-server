@@ -21,13 +21,14 @@ import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.JwtSecret;
+import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Optional;
@@ -94,6 +95,7 @@ class JwtTokenAuthFilterTest {
 
     @Nonnull
     private static String generateToken(String signingKey) {
-        return IndexerJwtAuthTokenProvider.createToken(new JwtSecret(signingKey), Duration.seconds(180));
+        final IndexerJwtAuthTokenProvider tokenProvider = new IndexerJwtAuthTokenProvider(new JwtSecret(signingKey), Duration.seconds(180), Duration.seconds(90), true, Clock.systemDefaultZone());
+        return tokenProvider.get().rawTokenValue().get();
     }
 }

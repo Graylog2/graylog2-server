@@ -32,10 +32,12 @@ import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/Con
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 import { useStore } from 'stores/connect';
+import useProductName from 'brand-customization/useProductName';
 
 const EditContentPackPage = () => {
+  useStore(ContentPacksStore);
+  const productName = useProductName();
   const { entityIndex } = useStore(CatalogStore);
-  const {} = useStore(ContentPacksStore);
   const { contentPackId, contentPackRev } = useParams<{ contentPackId: string; contentPackRev: string }>();
   const history = useHistory();
   const [selectedEntities, setSelectedEntities] = useState({});
@@ -47,15 +49,14 @@ const EditContentPackPage = () => {
   useEffect(() => {
     ContentPacksActions.get(contentPackId).then((result) => {
       const { contentPackRevisions } = result;
-      const originContentPackRev = contentPackRev;
-      const newContentPack = contentPackRevisions.createNewVersionFromRev(originContentPackRev);
+      const newContentPack = contentPackRevisions.createNewVersionFromRev(contentPackRev);
 
       setContentPack(newContentPack);
       setContentPackEntities(cloneDeep(newContentPack.entities));
 
       CatalogActions.showEntityIndex();
     });
-  }, []);
+  }, [contentPackId, contentPackRev]);
 
   const entityCatalog = useMemo(() => {
     if (!contentPack || !entityIndex) {
@@ -63,14 +64,13 @@ const EditContentPackPage = () => {
     }
 
     const groupedContentPackEntities = groupBy(contentPackEntities, 'type.name');
-    const newEntityCatalog = Object.keys(entityIndex).reduce((result, entityType) => {
+
+    return Object.keys(entityIndex).reduce((result, entityType) => {
       /* eslint-disable-next-line no-param-reassign */
       result[entityType] = entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []);
 
       return result;
     }, {});
-
-    return newEntityCatalog;
   }, [contentPack, entityIndex, contentPackEntities]);
 
   useEffect(() => {
@@ -95,7 +95,7 @@ const EditContentPackPage = () => {
     }, {});
 
     setSelectedEntities(newSelectedEntities);
-  }, [contentPack, entityIndex]);
+  }, [contentPack, entityCatalog, entityIndex]);
 
   useEffect(() => {
     if (!contentPack) {
@@ -136,7 +136,7 @@ const EditContentPackPage = () => {
       (response) => {
         const message =
           'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
-          'Graylog logs for more information.';
+          `${productName} server logs for more information.`;
         const title = 'Could not import content pack';
         let smallMessage = '';
 
@@ -149,13 +149,13 @@ const EditContentPackPage = () => {
     );
   };
 
-  const _getEntities = (selectedEntities) => {
-    CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
-      const contentPackEntities = Object.keys(selectedEntities)
-        .reduce((acc, entityType) => acc.concat(selectedEntities[entityType]), [])
+  const _getEntities = (newSelectedEntities) => {
+    CatalogActions.getSelectedEntities(newSelectedEntities).then((result) => {
+      const selectedContentPackEntities = Object.keys(newSelectedEntities)
+        .reduce((acc, entityType) => acc.concat(newSelectedEntities[entityType]), [])
         .filter((e) => e instanceof Entity);
       /* Mark entities from server */
-      const entities = contentPackEntities.concat(result.entities.map((e) => Entity.fromJSON(e, true)));
+      const entities = selectedContentPackEntities.concat(result.entities.map((e) => Entity.fromJSON(e, true)));
       const builtContentPack = contentPack.toBuilder().entities(entities).build();
 
       setContentPack(builtContentPack);

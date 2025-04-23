@@ -44,9 +44,9 @@ const IndicesPage = () => (
         path: DocsHelper.PAGES.INDEX_MODEL,
       }}>
       <span>
-        A Graylog stream write messages to an index set, which is a configuration for retention, sharding, and
-        replication of the stored data. By configuring index sets, you could, for example, have different retention
-        times for certain streams.
+        A stream writes messages to an index set, which is a configuration for retention, sharding, and replication of
+        the stored data. By configuring index sets, you could, for example, have different retention times for certain
+        streams.
       </span>
     </PageHeader>
 
