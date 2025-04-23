@@ -18,8 +18,7 @@
 import AppConfig from 'util/AppConfig';
 
 const defaultDocsUrl = 'https://go2docs.graylog.org/current';
-const docsUrl =
-  typeof AppConfig?.branding === 'function' ? (AppConfig.branding()?.help_url ?? defaultDocsUrl) : defaultDocsUrl;
+const docsUrl = AppConfig.branding?.()?.help_url ?? defaultDocsUrl;
 
 const docsHelper = {
   PAGES: {
