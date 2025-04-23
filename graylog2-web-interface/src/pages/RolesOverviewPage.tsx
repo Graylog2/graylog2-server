@@ -23,7 +23,7 @@ import DocsHelper from 'util/DocsHelper';
 import { Button, Row, Col, Alert } from 'components/bootstrap';
 import { PageHeader, DocumentTitle, Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const RolesOverviewPage = () => {
   const productName = useProductName();

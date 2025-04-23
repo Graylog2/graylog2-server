@@ -23,7 +23,7 @@ import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import type { Input } from 'components/messageloaders/Types';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = ParamsContext;
 
