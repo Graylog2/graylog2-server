@@ -44,7 +44,7 @@ const ContentPackUploadControls = () => {
     reader.onload = (evt) => {
       const request = evt.target.result;
 
-      ContentPacksActions.create.triggerPromise(request).then(
+      ContentPacksActions.create.triggerPromise(request as string).then(
         () => {
           UserNotification.success('Content pack imported successfully', 'Success!');
           ContentPacksActions.list();
