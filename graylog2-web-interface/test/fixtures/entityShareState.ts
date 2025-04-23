@@ -97,11 +97,11 @@ const entityShareState = EntityShareState.builder()
   .selectedGranteeCapabilities(janeIsSelected)
   .build();
 export const createEntityShareState = EntityShareState.builder()
-  .entity('grn::::dashboard:dashboard-id')
+  .entity('grn::::stream:stream-id')
   .availableGrantees(availableGrantees)
   .availableCapabilities(availableCapabilities)
   .activeShares(Immutable.List([]))
   .missingDependencies(missingDependencies)
-  .selectedGranteeCapabilities( Immutable.Map({}))
+  .selectedGranteeCapabilities(Immutable.Map({}))
   .build();
 export default entityShareState;

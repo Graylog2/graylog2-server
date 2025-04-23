@@ -153,6 +153,7 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSe
               onCapabilityChange={handleSelection}
               selectedGrantees={entityShareState?.selectedGrantees}
               title="Collaborators"
+              isCreating
             />
           </ShareFormSection>
           <EntityShareValidationsDependencies
