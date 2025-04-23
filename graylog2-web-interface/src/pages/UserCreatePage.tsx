@@ -38,10 +38,7 @@ const UserCreatePage = () => (
         title: 'Permissions documentation',
         path: DocsHelper.PAGES.USERS_ROLES,
       }}>
-      <span>
-        Use this page to create new Graylog users. The users and their permissions created here are not limited to the
-        web interface but valid and required for the REST APIs of your Graylog server nodes, too.
-      </span>
+      <span>Use this page to create new users for the web interface or the REST API.</span>
     </PageHeader>
 
     <UserCreate />

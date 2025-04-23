@@ -24,24 +24,25 @@ import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class NodeLoggingFilter implements SnifferFilter {
     private static final Logger LOG = LoggerFactory.getLogger(NodeLoggingFilter.class);
-    private static final Set<String> savedNodes = ConcurrentHashMap.newKeySet();
-    private final ElasticsearchClientConfiguration configuration;
+    private final Set<String> savedNodes = new LinkedHashSet<>();
+
+    private final boolean enabled;
 
     @Inject
     public NodeLoggingFilter(ElasticsearchClientConfiguration configuration) {
-        this.configuration = configuration;
+        this.enabled = configuration.isNodeActivityLogger();
     }
 
     @Override
     public boolean enabled() {
-        return configuration.isNodeActivityLogger();
+        return enabled;
     }
 
     @Override
@@ -51,13 +52,13 @@ public class NodeLoggingFilter implements SnifferFilter {
         final Set<String> nodesAdded = Sets.difference(currentNodes, savedNodes);
         final Set<String> nodesDropped = Sets.difference(savedNodes, currentNodes);
 
-        if(!nodesAdded.isEmpty()) {
+        if (!nodesAdded.isEmpty()) {
             LOG.info("Added node(s): {}", nodesAdded);
         }
-        if(!nodesDropped.isEmpty()) {
+        if (!nodesDropped.isEmpty()) {
             LOG.info("Dropped node(s): {}", nodesDropped);
         }
-        if(!nodesAdded.isEmpty() || !nodesDropped.isEmpty()) {
+        if (!nodesAdded.isEmpty() || !nodesDropped.isEmpty()) {
             LOG.info("Current node list: {}", currentNodes);
         }
 
