@@ -108,7 +108,7 @@ public abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, Strea
     @Nullable
     public abstract String contentPack();
 
-    @JsonProperty("is_default")
+    @JsonProperty(FIELD_DEFAULT_STREAM)
     @Nullable
     public abstract Boolean isDefault();
 
