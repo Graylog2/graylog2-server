@@ -203,7 +203,7 @@ const IndexSetsComponent = () => {
     let { description } = indexSet;
 
     if (indexSet.default) {
-      description += `${description.endsWith('.') ? '' : '.'} Graylog will use this index set by default.`;
+      description += `${description.endsWith('.') ? '' : '.'} This index set will be used by default.`;
     }
 
     let statsString;

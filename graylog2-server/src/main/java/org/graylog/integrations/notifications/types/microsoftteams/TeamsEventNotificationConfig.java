@@ -48,7 +48,7 @@ public abstract class TeamsEventNotificationConfig implements EventNotificationC
 
     private static final Pattern TEAMS_PATTERN = Pattern.compile("https://.*.webhook.office.com/");
     private static final String DEFAULT_HEX_COLOR = "#ff0500";
-    private static final String DEFAULT_CUSTOM_MESSAGE = "Graylog Teams Notification";
+    private static final String DEFAULT_CUSTOM_MESSAGE = "${product_name} Teams Notification";
     private static final long DEFAULT_BACKLOG_SIZE = 0;
     private static final DateTimeZone DEFAULT_TIME_ZONE = DateTimeZone.UTC;
 
