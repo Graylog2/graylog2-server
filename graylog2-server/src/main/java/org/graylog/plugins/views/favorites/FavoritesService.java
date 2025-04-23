@@ -73,12 +73,12 @@ public class FavoritesService {
                 )
                 .flatMap(Optional::stream)
                 .toList();
-        var pageToShow = items.stream()
+        var itemsToShow = items.stream()
                 .skip(perPage * Math.max(0L, page - 1))
                 .limit(perPage)
                 .toList();
 
-        return PaginatedResponse.create("favorites", new PaginatedList<>(pageToShow, items.size(), page, perPage));
+        return PaginatedResponse.create("favorites", new PaginatedList<>(itemsToShow, items.size(), page, perPage));
     }
 
     public void save(FavoritesForUserDTO favorite) {
