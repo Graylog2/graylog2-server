@@ -24,7 +24,7 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 import type { ContentPackMetadata, ContentPackInstallation } from 'components/content-packs/Types';
 
 type Actions = {
-  create: (pack: string) => Promise<unknown>;
+  create: (pack: string | ArrayBuffer) => Promise<unknown>;
   list: () => Promise<unknown>;
   get: (id: string) => Promise<{ contentPackRevisions: ContentPackRevisions }>;
   getRev: () => Promise<unknown>;
