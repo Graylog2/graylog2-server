@@ -16,11 +16,13 @@
  */
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
+import com.github.oxo42.stateless4j.StateMachine;
 import jakarta.inject.Inject;
 import org.graylog.datanode.opensearch.statemachine.FailuresCounter;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * This process watchdog follows transitions of the state machine and will try to restart the process in case of termination.
  * If the process is actually stopped, it won't restart it and will automatically deactivate itself.
  */
-public class OpensearchWatchdog implements StateMachineTracer {
+public class OpensearchWatchdog implements StateMachineTracer<OpensearchState, OpensearchEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchWatchdog.class);
 
@@ -97,7 +99,7 @@ public class OpensearchWatchdog implements StateMachineTracer {
     }
 
     @Override
-    public void setStateMachine(OpensearchStateMachine stateMachine) {
-        this.stateMachine = stateMachine;
+    public void setStateMachine(StateMachine<OpensearchState, OpensearchEvent> stateMachine) {
+        this.stateMachine = (OpensearchStateMachine) stateMachine;
     }
 }
