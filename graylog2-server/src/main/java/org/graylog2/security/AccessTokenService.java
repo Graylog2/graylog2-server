@@ -72,6 +72,14 @@ public interface AccessTokenService extends PersistedService {
     List<ExpiredToken> findExpiredTokens(DateTime expiredBefore);
 
     /**
+     * Returns all tokens not having a valid user.
+     * The items contain all information required to delete them via the {@link org.graylog2.periodical.OrphanedTokenCleaner}.
+     *
+     * @return List of orphaned tokens.
+     */
+    List<ExpiredToken> findOrphanedTokens();
+
+    /**
      * Deletes a token by its ID.
      *
      * @param id The ID of the token to delete.
