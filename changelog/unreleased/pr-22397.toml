@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed error in number of items calculation needed for paging favorites on the welcome page."
+
+issues = ["22394"]
+pulls = ["22397"]
