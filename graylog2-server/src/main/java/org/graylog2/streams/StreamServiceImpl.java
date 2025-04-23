@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -36,7 +35,9 @@ import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
@@ -75,13 +76,16 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Filters.or;
 import static com.mongodb.client.model.Updates.addEachToSet;
 import static com.mongodb.client.model.Updates.pull;
 import static com.mongodb.client.model.Updates.set;
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.idsIn;
 import static org.graylog2.database.utils.MongoUtils.stream;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.streams.StreamDTO.FIELD_CATEGORIES;
 import static org.graylog2.streams.StreamDTO.FIELD_CONTENT_PACK;
@@ -96,10 +100,11 @@ import static org.graylog2.streams.StreamDTO.FIELD_REMOVE_MATCHES_FROM_DEFAULT_S
 import static org.graylog2.streams.StreamDTO.FIELD_TITLE;
 
 public class StreamServiceImpl implements StreamService {
+    public static final String COLLECTION_NAME = "streams";
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
-    private static final String COLLECTION_NAME = "streams";
     private final MongoCollection<StreamDTO> collection;
     private final MongoUtils<StreamDTO> mongoUtils;
+    private final ScopedEntityMongoUtils<StreamDTO> scopedEntityUtils;
     private final StreamRuleService streamRuleService;
     private final OutputService outputService;
     private final IndexSetService indexSetService;
@@ -108,6 +113,7 @@ public class StreamServiceImpl implements StreamService {
     private final ClusterEventBus clusterEventBus;
     private final Set<StreamDeletionGuard> streamDeletionGuards;
     private final LoadingCache<String, String> streamTitleCache;
+    private final EntityScopeService scopeService;
 
     @Inject
     public StreamServiceImpl(MongoCollections mongoCollections,
@@ -117,9 +123,11 @@ public class StreamServiceImpl implements StreamService {
                              MongoIndexSet.Factory indexSetFactory,
                              EntityOwnershipService entityOwnershipService,
                              ClusterEventBus clusterEventBus,
-                             Set<StreamDeletionGuard> streamDeletionGuards) {
+                             Set<StreamDeletionGuard> streamDeletionGuards,
+                             EntityScopeService scopeService) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
         this.mongoUtils = mongoCollections.utils(collection);
+        this.scopedEntityUtils = mongoCollections.scopedEntityUtils(collection, scopeService);
         this.streamRuleService = streamRuleService;
         this.outputService = outputService;
         this.indexSetService = indexSetService;
@@ -127,6 +135,7 @@ public class StreamServiceImpl implements StreamService {
         this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
         this.streamDeletionGuards = streamDeletionGuards;
+        this.scopeService = scopeService;
 
         final CacheLoader<String, String> streamTitleLoader = new CacheLoader<>() {
             @Nonnull
@@ -190,12 +199,24 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     public List<Stream> loadAllEnabled() {
-        return loadAllByQuery(eq(FIELD_DISABLED, false));
+        return loadByQuery(eq(FIELD_DISABLED, false));
+    }
+
+    @Override
+    public List<Stream> loadSystemStreams(boolean includeDefaultStream) {
+        Bson filter = eq(FIELD_SCOPE, SystemStreamScope.NAME);
+        if (includeDefaultStream) {
+            filter = or(
+                    filter,
+                    idEq(DEFAULT_STREAM_ID)
+            );
+        }
+        return loadByQuery(filter);
     }
 
     @Override
     public List<Stream> loadAllByTitle(String title) {
-        return loadAllByQuery(eq(FIELD_TITLE, title));
+        return loadByQuery(eq(FIELD_TITLE, title));
     }
 
     @Override
@@ -221,7 +242,7 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     public List<Stream> loadAll() {
-        return loadAllByQuery(new Document());
+        return loadByQuery(new Document());
     }
 
     @Override
@@ -239,7 +260,7 @@ public class StreamServiceImpl implements StreamService {
         return stream(collection.find(stringIdsIn(streamIds)));
     }
 
-    private List<Stream> loadAllByQuery(Bson query) {
+    private List<Stream> loadByQuery(Bson query) {
         final List<StreamDTO> results;
         try (var stream = stream(collection.find(query))) {
             results = stream.toList();
@@ -286,7 +307,7 @@ public class StreamServiceImpl implements StreamService {
                         .collect(Collectors.toSet()));
             }
 
-            streams.add(new StreamImpl(new ObjectId(id), StreamDTO.toMap(dto), streamRules, outputs, indexSets.get(dto.indexSetId())));
+            streams.add(new StreamImpl(new ObjectId(id), StreamDTO.toMap(dto, scopeService.isMutable(dto)), streamRules, outputs, indexSets.get(dto.indexSetId())));
         }
 
         return streams.build();
@@ -308,7 +329,7 @@ public class StreamServiceImpl implements StreamService {
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
 
-        return ImmutableSet.copyOf(loadAllByQuery(idsIn(objectIds)));
+        return ImmutableSet.copyOf(loadByQuery(idsIn(objectIds)));
     }
 
     @Override
@@ -440,7 +461,7 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     public List<Stream> loadAllWithIndexSet(String indexSetId) {
-        return loadAllByQuery(eq(FIELD_INDEX_SET_ID, indexSetId));
+        return loadByQuery(eq(FIELD_INDEX_SET_ID, indexSetId));
     }
 
     @Override
@@ -456,8 +477,7 @@ public class StreamServiceImpl implements StreamService {
     public String save(Stream stream) throws ValidationException {
         final String id = stream.getId();
         final StreamDTO dto = toDTO(stream);
-        collection.replaceOne(idEq(id), dto, new ReplaceOptions().upsert(true));
-
+        scopedEntityUtils.update(dto, true);
         return id;
     }
 
@@ -496,12 +516,28 @@ public class StreamServiceImpl implements StreamService {
         return streamRules.build();
     }
 
+    @Override
+    public StreamDTO getDTO(String id) throws NotFoundException {
+        return mongoUtils.getById(id).orElseThrow(() -> new NotFoundException("Stream <" + id + "> not found!"));
+    }
+
+    @Override
+    public boolean isEditable(String id) {
+        final StreamDTO dto = mongoUtils.getById(id).orElse(null);
+        if (dto == null) {
+            // If it doesn't exist you can probably edit it.
+            return true;
+        }
+
+        return scopeService.isMutable(dto);
+    }
+
     private Stream fromDTO(StreamDTO dto) {
         final List<StreamRule> streamRules = streamRuleService.loadForStreamId(dto.id());
         final Set<Output> outputs = loadOutputsForRawStream(dto);
         final IndexSet indexSet = getIndexSet(dto.indexSetId());
 
-        final Map<String, Object> fields = StreamDTO.toMap(dto);
+        final Map<String, Object> fields = StreamDTO.toMap(dto, scopeService.isMutable(dto));
         return new StreamImpl(new ObjectId(dto.id()), fields, streamRules, outputs, indexSet);
     }
 
@@ -521,6 +557,7 @@ public class StreamServiceImpl implements StreamService {
         final String createdBy = (String) stream.getFields().get(FIELD_CREATOR_USER_ID);
         final StreamDTO.Builder dtoBuilder = StreamDTO.builder()
                 .id(stream.getId())
+                .scope(stream.getScope())
                 .creatorUserId(createdBy)
                 .matchingType(stream.getMatchingType().toString())
                 .description(stream.getDescription())

@@ -75,5 +75,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20250206105400_TokenManagementConfiguration.class);
         addMigration(V20250219134200_DefaultTTLForNewTokens.class);
         addMigration(V20250327120900_RenameDefaultPipeline.class);
+        addMigration(V20250421184900_MigrateSystemStreams.class);
     }
 }
