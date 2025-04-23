@@ -27,7 +27,7 @@ module.exports = {
         'graylog/prefer-hook': 'warn',
         'graylog/use-arrow-function-for-event-handlers-in-classes': 'error',
         // eslint-disable-next-line graylog/without-forbidden-words
-        'graylog/without-forbidden-words': ['error', { words: ['Gragylog2344'] }],
+        'graylog/without-forbidden-words': ['error', { words: ['graylog'] }],
       },
     },
   },

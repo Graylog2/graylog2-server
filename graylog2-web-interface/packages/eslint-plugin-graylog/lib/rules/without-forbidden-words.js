@@ -34,7 +34,7 @@ module.exports = {
       },
     ],
     messages: {
-      bannedWord: "The word '{{word}}' is not allowed.",
+      bannedWord: "The word '{{word}}' is not allowed. Remove it from {{value}}",
     },
   },
 
@@ -49,7 +49,7 @@ module.exports = {
           context.report({
             node,
             messageId: 'bannedWord',
-            data: { word },
+            data: { word, value },
           });
         }
       }
@@ -57,9 +57,21 @@ module.exports = {
 
     return {
       Literal(node) {
-        if (typeof node.value === 'string') {
-          check(node.value, node);
+        if (typeof node.value !== 'string') return;
+
+        // Skip import/export statements
+        if (
+          node.parent &&
+          (node.parent.type === 'ImportDeclaration' ||
+            node.parent.type === 'ExportAllDeclaration' ||
+            node.parent.type === 'ExportNamedDeclaration' ||
+            (node.parent.type === 'CallExpression' && node.parent.callee.name === 'require') ||
+            node.parent.type === 'TSModuleDeclaration')
+        ) {
+          return; // 🚫 skip banned-word check for import paths
         }
+
+        check(node.value, node);
       },
       TemplateElement(node) {
         check(node.value.raw, node);
