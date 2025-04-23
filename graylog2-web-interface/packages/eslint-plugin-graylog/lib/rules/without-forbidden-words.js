@@ -74,6 +74,17 @@ module.exports = {
         check(node.value, node);
       },
       TemplateElement(node) {
+        const { parent } = node;
+        // Check if this is a styled-components or emotion block
+        if (
+          parent &&
+          parent.type === 'TaggedTemplateExpression' &&
+          (parent.tag.name === 'css' || // css`...`
+            (parent.tag.type === 'MemberExpression' && parent.tag.object.name === 'styled')) // styled.div`...`
+        ) {
+          return;
+        }
+
         check(node.value.raw, node);
       },
       JSXText(node) {

@@ -48,12 +48,23 @@ module.exports = {
       files: ['*.js', '*.jsx'],
     },
     {
-      files: ['*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx', '*.it.js', '*.it.jsx', '*.it.ts', '*.it.tsx'],
+      files: [
+        '*.test.js',
+        '*.test.jsx',
+        '*.test.ts',
+        '*.test.tsx',
+        '*.it.js',
+        '*.it.jsx',
+        '*.it.ts',
+        '*.it.tsx',
+        '**/__tests__/**',
+      ],
       plugins: ['jest', 'testing-library'],
       extends: [
         'plugin:jest/recommended',
         'plugin:testing-library/react',
         'plugin:@tanstack/eslint-plugin-query/recommended',
+        'plugin:eslint-plugin-graylog/recommended',
       ],
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
@@ -62,12 +73,6 @@ module.exports = {
         'testing-library/no-debugging-utils': 'warn',
         'testing-library/prefer-screen-queries': 'off',
         'testing-library/render-result-naming-convention': 'off',
-      },
-    },
-    {
-      extends: ['plugin:eslint-plugin-graylog/recommended'],
-      files: ['**/*.test.ts', '**/*.test.tsx', '**/__tests__/**'],
-      rules: {
         'graylog/without-forbidden-words': 'off',
       },
     },
