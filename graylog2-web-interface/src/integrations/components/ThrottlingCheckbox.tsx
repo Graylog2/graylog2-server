@@ -1,6 +1,6 @@
 import * as React from 'react';
+import useProductName from 'brand-customization/useProductName';
 
-import useProductName from 'customization/useProductName';
 import { Input } from 'components/bootstrap';
 
 type Props = {

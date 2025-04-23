@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import useProductName from 'brand-customization/useProductName';
 
 import Button from 'components/bootstrap/Button';
 import Modal from 'components/bootstrap/Modal';
@@ -25,7 +26,6 @@ import DocumentTitle from 'components/common/DocumentTitle';
 import { qualifyUrl } from 'util/URLUtils';
 import LoginChrome from 'components/login/LoginChrome';
 import type { ServerError } from 'stores/sessions/ServerAvailabilityStore';
-import useProductName from 'customization/useProductName';
 
 const StyledIcon = styled(Icon)`
   margin-left: 6px;

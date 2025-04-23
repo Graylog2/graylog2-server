@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import useProductName from 'brand-customization/useProductName';
 
 import {
   updateHighlightingRules,
@@ -26,7 +27,6 @@ import HighlightingRules from 'views/components/sidebar/highlighting/Highlightin
 import type { Value, Condition, Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
-import useProductName from 'customization/useProductName';
 
 const ViewsHighlightingRules = () => {
   const dispatch = useViewsDispatch();

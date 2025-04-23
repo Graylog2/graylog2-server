@@ -16,6 +16,7 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import useProductName from 'brand-customization/useProductName';
 
 import { Button, Modal, Panel } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -29,7 +30,6 @@ import { ApiRoutes, DocsRoutes } from 'integrations/aws/common/Routes';
 import { renderOptions } from 'integrations/aws/common/Options';
 import formValidation from 'integrations/aws/utils/formValidation';
 import Spinner from 'components/common/Spinner';
-import useProductName from 'customization/useProductName';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
 

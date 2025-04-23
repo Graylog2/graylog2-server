@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
+import useProductName from 'brand-customization/useProductName';
 
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -23,7 +24,6 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import useProductName from 'customization/useProductName';
 
 const isCloud = AppConfig.isCloud();
 

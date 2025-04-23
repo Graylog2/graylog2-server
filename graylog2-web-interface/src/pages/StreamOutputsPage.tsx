@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import useProductName from 'brand-customization/useProductName';
 
 import { Link } from 'components/common/router';
 import { Col } from 'components/bootstrap';
@@ -24,7 +25,6 @@ import OutputsComponent from 'components/outputs/OutputsComponent';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useStream from 'components/streams/hooks/useStream';
-import useProductName from 'customization/useProductName';
 
 const StreamOutputsPage = () => {
   const productName = useProductName();

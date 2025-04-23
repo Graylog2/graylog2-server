@@ -16,6 +16,7 @@
  */
 import React, { useContext } from 'react';
 import styled from 'styled-components';
+import useProductName from 'brand-customization/useProductName';
 
 import { ExternalLink } from 'components/common';
 import { FormDataContext } from 'integrations/aws/context/FormData';
@@ -23,7 +24,6 @@ import { AdvancedOptionsContext } from 'integrations/aws/context/AdvancedOptions
 import AdditionalFields from 'integrations/aws/common/AdditionalFields';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
 import { SectionTitle, SectionNote } from 'integrations/aws/common/sharedStyles';
-import useProductName from 'customization/useProductName';
 
 const INPUT_PATTERN = 'https://(.*)';
 const INPUT_MESSAGE = "Domain should begin with 'https://'";

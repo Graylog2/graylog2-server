@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import useProductName from 'brand-customization/useProductName';
 
 import { ClusterNodeMetrics } from '@graylog/server-api';
 
-import useProductName from 'customization/useProductName';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
 import type { Metric } from 'stores/metrics/MetricsStore';

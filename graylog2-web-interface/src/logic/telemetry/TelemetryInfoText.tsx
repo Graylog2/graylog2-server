@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import useProductName from 'brand-customization/useProductName';
 
 import { ExternalLink } from 'components/common';
 import { Alert } from 'components/bootstrap';
-import useProductName from 'customization/useProductName';
 
 type Props = {
   showProfile?: boolean;

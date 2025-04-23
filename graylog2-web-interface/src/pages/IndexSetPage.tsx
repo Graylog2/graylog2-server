@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import numeral from 'numeral';
+import useProductName from 'brand-customization/useProductName';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/common/router';
@@ -39,7 +40,6 @@ import type { Indices } from 'stores/indices/IndicesStore';
 import { IndexerOverviewActions, IndexerOverviewStore } from 'stores/indexers/IndexerOverviewStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { IndicesActions, IndicesStore } from 'stores/indices/IndicesStore';
-import useProductName from 'customization/useProductName';
 
 const REFRESH_INTERVAL = 2000;
 

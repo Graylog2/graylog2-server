@@ -18,10 +18,10 @@ import * as React from 'react';
 import { Dialog } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import useProductName from 'brand-customization/useProductName';
 
 import Button from 'components/bootstrap/Button';
 import useServerVersion from 'routing/useServerVersion';
-import useProductName from 'customization/useProductName';
 
 type Props = {
   reload?: () => void;

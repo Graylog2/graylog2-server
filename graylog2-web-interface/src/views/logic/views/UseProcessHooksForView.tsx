@@ -16,11 +16,11 @@
  */
 import { useEffect, useState } from 'react';
 import * as React from 'react';
+import useProductName from 'brand-customization/useProductName';
 
 import ErrorPage from 'components/errors/ErrorPage';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import useProductName from 'customization/useProductName';
 
 import type View from './View';
 import processHooks from './processHooks';

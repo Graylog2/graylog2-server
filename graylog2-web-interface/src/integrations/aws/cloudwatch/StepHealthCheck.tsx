@@ -16,6 +16,7 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import useProductName from 'brand-customization/useProductName';
 
 import { Button, Panel, Input } from 'components/bootstrap';
 import FormWrap from 'integrations/aws/common/FormWrap';
@@ -27,7 +28,6 @@ import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/co
 import { ApiContext } from 'integrations/aws/context/Api';
 import { FormDataContext } from 'integrations/aws/context/FormData';
 import Icon from 'components/common/Icon';
-import useProductName from 'customization/useProductName';
 
 type StepHealthCheckProps = {
   onSubmit: (...args: any[]) => void;

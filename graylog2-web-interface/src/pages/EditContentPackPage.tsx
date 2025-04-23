@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
+import useProductName from 'brand-customization/useProductName';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -32,7 +33,6 @@ import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/Con
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 import { useStore } from 'stores/connect';
-import useProductName from 'customization/useProductName';
 
 const EditContentPackPage = () => {
   useStore(ContentPacksStore);

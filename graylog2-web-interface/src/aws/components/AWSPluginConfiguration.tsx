@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import omit from 'lodash/omit';
+import useProductName from 'brand-customization/useProductName';
 
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -23,7 +24,6 @@ import { BootstrapModalForm, Button, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { getValueFromInput } from 'util/FormsUtils';
-import useProductName from 'customization/useProductName';
 
 import { PLUGIN_API_ENDPOINT, PLUGIN_CONFIG_CLASS_NAME } from '../Constants';
 import UserNotification from '../../util/UserNotification';

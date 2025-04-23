@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import useProductName from 'brand-customization/useProductName';
 
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -26,7 +27,6 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
 import usePluginList from 'hooks/usePluginList';
-import useProductName from 'customization/useProductName';
 
 const ShowNodePage = () => {
   const productName = useProductName();

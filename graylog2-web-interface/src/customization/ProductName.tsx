@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const ProductName = () => useProductName();
 

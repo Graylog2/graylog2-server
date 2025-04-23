@@ -18,6 +18,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
 import { useNavigate } from 'react-router-dom';
+import useProductName from 'brand-customization/useProductName';
 
 import { Icon, LinkToNode, Section } from 'components/common';
 import useParams from 'routing/useParams';
@@ -37,7 +38,6 @@ import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
 import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
-import useProductName from 'customization/useProductName';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
 const LeftCol = styled.div(

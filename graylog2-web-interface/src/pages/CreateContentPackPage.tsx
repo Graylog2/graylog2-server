@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
+import useProductName from 'brand-customization/useProductName';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -28,7 +29,6 @@ import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 import useHistory from 'routing/useHistory';
 import { useStore } from 'stores/connect';
-import useProductName from 'customization/useProductName';
 
 const CreateContentPackPage = () => {
   const productName = useProductName();
