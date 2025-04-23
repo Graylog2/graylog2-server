@@ -174,19 +174,15 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => {
-        const isEventProceduresEnabled = useFeature('show_event_procedures');
-
-        return (
-          <>
-            {isEventProceduresEnabled ? (
-              <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
-            ) : (
-              <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
-            )}
-          </>
-        );
-      },
+      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => (
+        <>
+          {useFeature('show_event_procedures') ? (
+            <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
+          ) : (
+            <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+          )}
+        </>
+      ),
       width: 0.3,
     },
     timerange_start: {
