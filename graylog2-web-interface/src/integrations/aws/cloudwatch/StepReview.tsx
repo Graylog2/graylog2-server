@@ -112,6 +112,8 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
 
   const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
   const addPrefix = !!awsCloudWatchAddFlowLogPrefix.value;
+  const overrideSource = formData.overrideSource?.value ?? '';
+
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
     null,
@@ -127,6 +129,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
+      override_source: overrideSource,
     },
   );
 
