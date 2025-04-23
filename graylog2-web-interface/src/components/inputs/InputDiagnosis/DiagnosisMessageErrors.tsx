@@ -16,12 +16,12 @@
  */
 import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import useProductName from 'brand-customization/useProductName';
 
 import { Section } from 'components/common';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
+import useProductName from 'brand-customization/useProductName';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
 import { DIAGNOSIS_HELP } from './Constants';
