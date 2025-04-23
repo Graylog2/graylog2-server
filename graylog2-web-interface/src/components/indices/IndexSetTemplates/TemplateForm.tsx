@@ -40,7 +40,7 @@ import {
   prepareDataTieringInitialValues,
   DataTieringConfiguration,
 } from 'components/indices/data-tiering';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   initialValues?: IndexSetTemplate;

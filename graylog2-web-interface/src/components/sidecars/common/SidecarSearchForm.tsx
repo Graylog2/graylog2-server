@@ -18,7 +18,7 @@ import React from 'react';
 
 import { SearchForm } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const queryExamples = (
   <>

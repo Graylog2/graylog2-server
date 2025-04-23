@@ -21,7 +21,7 @@ import type { Subtract } from 'utility-types';
 
 import { Messages } from '@graylog/server-api';
 
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 import { getValueFromInput } from 'util/FormsUtils';
 import { Select, FormSubmit } from 'components/common';
 import { Col, Row, Input } from 'components/bootstrap';

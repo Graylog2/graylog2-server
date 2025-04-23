@@ -23,7 +23,7 @@ import { Spinner, Timestamp, BrowserTime } from 'components/common';
 import { SystemStore } from 'stores/system/SystemStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { useStore } from 'stores/connect';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const TimesList = () => {
   const productName = useProductName();

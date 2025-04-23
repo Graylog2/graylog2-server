@@ -3,7 +3,7 @@ import { Set } from 'immutable';
 
 import { DataTable, Icon } from 'components/common';
 import { Badge } from 'components/bootstrap';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type ContentPackConstraintsProps = {
   constraints?: any | any[];

@@ -16,7 +16,7 @@
  */
 import { useState } from 'react';
 
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 

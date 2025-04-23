@@ -47,7 +47,7 @@ import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConf
 import useFeature from 'hooks/useFeature';
 import useIndexSet from 'components/indices/hooks/useIndexSet';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   cancelLink: string;

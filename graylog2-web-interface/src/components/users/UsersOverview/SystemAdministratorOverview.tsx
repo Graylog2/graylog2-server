@@ -19,7 +19,7 @@ import * as React from 'react';
 import type UserOverview from 'logic/users/UserOverview';
 import { DataTable } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   adminUser: UserOverview;

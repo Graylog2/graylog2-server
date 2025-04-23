@@ -30,7 +30,7 @@ import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsS
 import ToolsStore from 'stores/tools/ToolsStore';
 import { isValidURL } from 'util/URLUtils';
 import generateId from 'logic/generateId';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type ValidationResult = {
   title: { valid: boolean };

@@ -25,7 +25,7 @@ import hasOverride from 'components/indices/helpers/hasOverride';
 import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   fieldType: IndexSetFieldType;
