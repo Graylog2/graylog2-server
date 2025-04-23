@@ -41,7 +41,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
 import { Link } from 'components/common/router';
 import { Headline } from 'components/common/Section/SectionComponent';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';

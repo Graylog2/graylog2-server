@@ -20,8 +20,7 @@ import { Col, Row } from 'components/bootstrap';
 import { Pagination, Spinner } from 'components/common';
 import { SystemMessagesList } from 'components/systemmessages';
 import { SystemMessagesStore } from 'stores/systemmessages/SystemMessagesStore';
-
-import ProductName from '../../customization/ProductName';
+import ProductName from 'brand-customization/ProductName';
 
 class SystemMessagesComponent extends React.Component {
   PER_PAGE = 30;

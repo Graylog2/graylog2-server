@@ -20,7 +20,7 @@ import { getFullVersion } from 'util/Version';
 import connect from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
 import { SystemStore } from 'stores/system/SystemStore';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type SystemStoreState = {
   system: {

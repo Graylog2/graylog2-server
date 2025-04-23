@@ -18,7 +18,7 @@
 import React from 'react';
 
 import { Alert } from 'components/bootstrap';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const CaffeineCacheDocumentation = () => {
   const productName = useProductName();

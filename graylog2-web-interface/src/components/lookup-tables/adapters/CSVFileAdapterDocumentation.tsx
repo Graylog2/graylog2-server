@@ -17,7 +17,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 import { Alert } from 'components/bootstrap';
 
 const csvFile1 = `"ipaddr","hostname"

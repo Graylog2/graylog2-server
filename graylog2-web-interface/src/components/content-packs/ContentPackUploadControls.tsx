@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import UserNotification from 'util/UserNotification';
 import { BootstrapModalForm, Input, Button } from 'components/bootstrap';
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 import style from './ContentPackUploadControls.css';
 

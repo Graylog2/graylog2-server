@@ -26,7 +26,7 @@ import { FormikInput, ModalSubmit, SortableList } from 'components/common';
 import * as ISODurationUtils from 'util/ISODurationUtils';
 import type { FormConfig, Processor } from 'components/configurations/message-processors/Types';
 import MessageProcessorStatusFormGroup from 'components/configurations/message-processors/MessageProcessorStatusFormGroup';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   closeModal: () => void;

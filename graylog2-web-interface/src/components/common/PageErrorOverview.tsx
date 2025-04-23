@@ -17,7 +17,7 @@
 import React from 'react';
 
 import ErrorPage from 'components/errors/ErrorPage';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type PageErrorOverviewProps = {
   /** Array of errors that prevented the original page to load. */

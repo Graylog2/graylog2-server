@@ -31,7 +31,7 @@ import RuntimeErrorPage from 'pages/RuntimeErrorPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import UnauthorizedErrorPage from 'pages/UnauthorizedErrorPage';
 import StreamPermissionErrorPage from 'pages/StreamPermissionErrorPage';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const FallbackErrorPage = ({ reportedError }: { reportedError: ReportedError }) => {
   const productName = useProductName();

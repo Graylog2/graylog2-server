@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { Alert } from 'components/bootstrap';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const csvFile1 = `"127.0.0.1","localhost"
 "10.0.0.1","server1"

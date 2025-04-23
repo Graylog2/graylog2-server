@@ -25,7 +25,7 @@ import backgroundImage from 'images/auth/login-bg.svg';
 import { Logo } from 'components/perspectives/DefaultBrand';
 import AppConfig from 'util/AppConfig';
 import useThemes from 'theme/hooks/useThemes';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const LogoContainer = styled.div`
   display: block;

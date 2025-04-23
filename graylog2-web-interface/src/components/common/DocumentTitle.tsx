@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   title: React.ReactNode;

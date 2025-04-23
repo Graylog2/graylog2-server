@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { Alert } from 'components/bootstrap';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 import useJournalDowntimeSize from '../../hooks/useJournalDowntimeSize';
 import MigrationError from '../common/MigrationError';

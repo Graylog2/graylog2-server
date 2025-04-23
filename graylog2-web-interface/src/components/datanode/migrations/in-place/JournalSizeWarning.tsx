@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { Icon } from 'components/common';
 import { Panel } from 'components/bootstrap';
 import { StyledPanel } from 'components/datanode/migrations/MigrationWelcomeStep';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
