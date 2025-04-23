@@ -19,7 +19,7 @@ import React from 'react';
 import { DocumentTitle, PageHeader } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import useCurrentUser from 'hooks/useCurrentUser';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const SystemOutputsPage = () => {
   const currentUser = useCurrentUser();

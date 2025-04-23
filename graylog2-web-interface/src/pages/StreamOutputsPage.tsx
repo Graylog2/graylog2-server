@@ -24,7 +24,7 @@ import OutputsComponent from 'components/outputs/OutputsComponent';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useStream from 'components/streams/hooks/useStream';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const StreamOutputsPage = () => {
   const productName = useProductName();

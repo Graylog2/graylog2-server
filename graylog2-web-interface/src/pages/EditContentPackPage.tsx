@@ -32,7 +32,7 @@ import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/Con
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 import { useStore } from 'stores/connect';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const EditContentPackPage = () => {
   useStore(ContentPacksStore);
