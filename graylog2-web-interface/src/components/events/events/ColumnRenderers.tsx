@@ -24,7 +24,7 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import PriorityName from 'components/events/events/PriorityName';
-import useFeature from 'hooks/useFeature';
+import AppConfig from 'util/AppConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
@@ -174,15 +174,19 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => (
-        <>
-          {useFeature('show_event_procedures') ? (
-            <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
-          ) : (
-            <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
-          )}
-        </>
-      ),
+      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => {
+        const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
+
+        return (
+          <>
+            {isEventProceduresEnabled ? (
+              <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
+            ) : (
+              <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+            )}
+          </>
+        );
+      },
       width: 0.3,
     },
     timerange_start: {
