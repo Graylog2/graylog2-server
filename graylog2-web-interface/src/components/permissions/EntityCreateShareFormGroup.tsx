@@ -18,7 +18,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import type { $PropertyType } from 'utility-types';
-import type { EntitySharePayload } from 'src/actions/permissions/EntityShareActions';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { useStore } from 'stores/connect';
@@ -27,6 +26,7 @@ import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import type { GRN } from 'logic/permissions/types';
 import type { GranteesList as GranteesListType, SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
 import type Grantee from 'logic/permissions/Grantee';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { Spinner } from 'components/common';
 
 import type { SelectionRequest } from './GranteesSelector';
