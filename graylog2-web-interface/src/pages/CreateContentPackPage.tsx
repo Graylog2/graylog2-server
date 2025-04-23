@@ -28,7 +28,7 @@ import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore'
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 import useHistory from 'routing/useHistory';
 import { useStore } from 'stores/connect';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const CreateContentPackPage = () => {
   const productName = useProductName();

@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 import LoginChrome from 'components/login/LoginChrome';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Alert from 'components/bootstrap/Alert';
