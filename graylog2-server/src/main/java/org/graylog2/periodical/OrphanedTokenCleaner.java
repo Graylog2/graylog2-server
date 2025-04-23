@@ -59,10 +59,10 @@ public class OrphanedTokenCleaner extends Periodical {
             ctxBuilder.put(AccessTokenImpl.NAME, token.tokenName()).put("userId", "null").put("username", token.username());
             try {
                 this.tokenService.deleteById(token.id());
-                LOG.info("Successfully removed orphaned token \"{}\" (id: {}) for user <{}>).", token.tokenName(), token.id(), token.username());
+                LOG.info("Successfully removed orphaned token \"{}\" (id: {}) for user <{}>.", token.tokenName(), token.id(), token.username());
                 this.auditEventSender.success(AuditActor.system(nodeId), USER_ACCESS_TOKEN_DELETE, ctxBuilder.build());
             } catch (Exception e) {
-                LOG.warn("Failed to remove orphaned token \"{}\" (id: {}) for user <{}>).", token.tokenName(), token.id(), token.username(), e);
+                LOG.warn("Failed to remove orphaned token \"{}\" (id: {}) for user <{}>.", token.tokenName(), token.id(), token.username(), e);
                 ctxBuilder.put("Failure", e.getMessage());
                 this.auditEventSender.failure(AuditActor.system(nodeId), USER_ACCESS_TOKEN_DELETE, ctxBuilder.build());
             }
