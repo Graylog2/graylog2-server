@@ -40,15 +40,12 @@ module.exports = {
 
   create(context) {
     const options = context.options[0] || {};
-    const bannedWords = new Set(options.words || []);
-    // eslint-disable-next-line
-    console.log('🚫 Current banned words:', Array.from(bannedWords));
-    // eslint-disable-next-line
-    console.log('Running custom ESLint rule');
+    const bannedWords = new Set((options.words || []).map((word) => word.toLowerCase()));
     function check(value, node) {
+      const lowerValue = value.toLowerCase();
       // eslint-disable-next-line no-restricted-syntax
       for (const word of bannedWords) {
-        if (value.includes(word)) {
+        if (lowerValue.includes(word)) {
           context.report({
             node,
             messageId: 'bannedWord',
@@ -57,21 +54,44 @@ module.exports = {
         }
       }
     }
-    // eslint-disable-next-line
-    console.log('Running custom ESLint rule');
 
     return {
       Literal(node) {
-        // eslint-disable-next-line
-        console.log('Running custom ESLint rule');
         if (typeof node.value === 'string') {
           check(node.value, node);
         }
       },
       TemplateElement(node) {
-        // eslint-disable-next-line
-        console.log('Running custom ESLint rule');
         check(node.value.raw, node);
+      },
+      JSXText(node) {
+        check(node.value, node);
+      },
+      JSXExpressionContainer(node) {
+        if (node.expression && node.expression.type === 'Literal' && typeof node.expression.value === 'string') {
+          check(node.expression.value, node);
+        }
+      },
+      JSXAttribute(node) {
+        if (
+          node.name.name === 'dangerouslySetInnerHTML' &&
+          node.value &&
+          node.value.expression &&
+          node.value.expression.type === 'ObjectExpression'
+        ) {
+          const htmlProp = node.value.expression.properties.find(
+            (prop) =>
+              prop.type === 'Property' &&
+              prop.key.type === 'Identifier' &&
+              prop.key.name === '__html' &&
+              prop.value.type === 'Literal' &&
+              typeof prop.value.value === 'string',
+          );
+
+          if (htmlProp) {
+            check(htmlProp.value.value, node);
+          }
+        }
       },
     };
   },

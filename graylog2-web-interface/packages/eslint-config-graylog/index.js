@@ -30,10 +30,7 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       parser: '@typescript-eslint/parser',
-      plugins: [
-        '@typescript-eslint/eslint-plugin',
-        '@tanstack/query',
-      ],
+      plugins: ['@typescript-eslint/eslint-plugin', '@tanstack/query'],
       rules: {
         'no-undef': 'off',
         'no-use-before-define': 'off',
@@ -51,14 +48,8 @@ module.exports = {
       files: ['*.js', '*.jsx'],
     },
     {
-      files: [
-        '*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx',
-        '*.it.js', '*.it.jsx', '*.it.ts', '*.it.tsx',
-      ],
-      plugins: [
-        'jest',
-        'testing-library',
-      ],
+      files: ['*.test.js', '*.test.jsx', '*.test.ts', '*.test.tsx', '*.it.js', '*.it.jsx', '*.it.ts', '*.it.tsx'],
+      plugins: ['jest', 'testing-library'],
       extends: [
         'plugin:jest/recommended',
         'plugin:testing-library/react',
@@ -73,6 +64,13 @@ module.exports = {
         'testing-library/render-result-naming-convention': 'off',
       },
     },
+    {
+      extends: ['plugin:eslint-plugin-graylog/recommended'],
+      files: ['**/*.test.ts', '**/*.test.tsx', '**/__tests__/**'],
+      rules: {
+        'graylog/without-forbidden-words': 'off',
+      },
+    },
   ],
   extends: [
     'eslint:recommended',
@@ -85,28 +83,28 @@ module.exports = {
     'plugin:graylog/recommended',
     'prettier',
   ],
-  plugins: [
-    'import',
-    'react-hooks',
-    'jest-formatting',
-    'graylog',
-  ],
+  plugins: ['import', 'react-hooks', 'jest-formatting', 'graylog'],
   rules: {
     'arrow-body-style': ['error', 'as-needed'],
     camelcase: 'off',
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'off',
-    'import/order': ['error', {
-      groups: ['builtin', 'external', 'internal', ['sibling', 'index'], 'parent'],
-      pathGroups: [{
-        pattern: '@graylog/*-api',
-        group: 'external',
-        position: 'after',
-      }],
-      'newlines-between': 'always',
-      pathGroupsExcludedImportTypes: ['builtin'],
-    }],
+    'import/order': [
+      'error',
+      {
+        groups: ['builtin', 'external', 'internal', ['sibling', 'index'], 'parent'],
+        pathGroups: [
+          {
+            pattern: '@graylog/*-api',
+            group: 'external',
+            position: 'after',
+          },
+        ],
+        'newlines-between': 'always',
+        pathGroupsExcludedImportTypes: ['builtin'],
+      },
+    ],
     'sort-imports': 'off', // disabled in favor of 'import/order'
     'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
     'max-classes-per-file': 'off',
@@ -115,21 +113,29 @@ module.exports = {
     'no-else-return': 'warn',
     'no-unused-vars': ['error', noUnusedVarsOptions],
     'no-nested-ternary': 'warn',
-    'no-restricted-imports': ['error', {
-      paths: [{
-        name: 'react-bootstrap',
-        message: 'Please use `components/bootstrap` instead.',
-      }, {
-        name: 'create-react-class',
-        message: 'Please use an ES6 or functional component instead.',
-      }, {
-        name: 'jest-each',
-        message: 'Please use `it.each` instead.',
-      }, {
-        name: 'lodash',
-        message: 'Please use `lodash/<function>` instead for reduced bundle sizes.',
-      }],
-    }],
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: 'react-bootstrap',
+            message: 'Please use `components/bootstrap` instead.',
+          },
+          {
+            name: 'create-react-class',
+            message: 'Please use an ES6 or functional component instead.',
+          },
+          {
+            name: 'jest-each',
+            message: 'Please use `it.each` instead.',
+          },
+          {
+            name: 'lodash',
+            message: 'Please use `lodash/<function>` instead for reduced bundle sizes.',
+          },
+        ],
+      },
+    ],
     'no-underscore-dangle': 'off',
     'object-shorthand': ['error', 'methods'],
     'react/destructuring-assignment': 'off',
@@ -182,11 +188,8 @@ module.exports = {
         config: './webpack.config.js',
       },
     },
-    'import/internal-regex': '^(actions|components|contexts|domainActions|fixtures|helpers|hooks|logic|routing|stores|util|theme|views)/',
-    polyfills: [
-      'fetch',
-      'IntersectionObserver',
-      'Promise',
-    ],
+    'import/internal-regex':
+      '^(actions|components|contexts|domainActions|fixtures|helpers|hooks|logic|routing|stores|util|theme|views)/',
+    polyfills: ['fetch', 'IntersectionObserver', 'Promise'],
   },
 };
