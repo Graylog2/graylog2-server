@@ -21,10 +21,7 @@ import AppConfig from 'util/AppConfig';
 
 const useCustomLogo = (theme: 'dark' | 'light') =>
   useMemo(
-    () =>
-      typeof AppConfig.branding === 'function' && AppConfig.branding()?.logo?.[theme]
-        ? DOMPurify.sanitize(AppConfig.branding().logo[theme])
-        : undefined,
+    () => (AppConfig?.branding?.()?.logo?.[theme] ? DOMPurify.sanitize(AppConfig.branding().logo[theme]) : undefined),
     [theme],
   );
 
