@@ -53,5 +53,6 @@ const DocumentationLink = ({ page, title = '', text, displayIcon = false }: Prop
     {displayIcon && <StyledIcon name="lightbulb_circle" type="regular" size="lg" />}
   </Container>
 );
-
+const Graylog = 'Gragylog2344';
+console.log({ Graylog });
 export default DocumentationLink;
