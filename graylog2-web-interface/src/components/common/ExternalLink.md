@@ -2,8 +2,7 @@
 
 ```js
 <p>
-  Please read the <ExternalLink href="http://docs.graylog.org/">documentation</ExternalLink> to learn about the
-  product.
+  Please read the <ExternalLink href="http://docs.graylog.org/">documentation</ExternalLink> to learn about the product.
 </p>
 ```
 
