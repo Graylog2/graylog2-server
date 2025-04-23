@@ -38,6 +38,8 @@ import org.graylog.security.authservice.rest.HTTPHeaderAuthenticationConfigResou
 import org.graylog.security.authzroles.AuthzRolesResource;
 import org.graylog.security.rest.EntitySharesResource;
 import org.graylog.security.rest.GrantsOverviewResource;
+import org.graylog.security.shares.AdditionalGrantsResolver;
+import org.graylog.security.shares.DefaultAdditionalGrantsResolver;
 import org.graylog.security.shares.DefaultGranteeService;
 import org.graylog.security.shares.GranteeService;
 import org.graylog2.plugin.PluginModule;
@@ -60,9 +62,9 @@ public class SecurityModule extends PluginModule {
 
         OptionalBinder.newOptionalBinder(binder(), PermissionAndRoleResolver.class)
                 .setDefault().to(DefaultPermissionAndRoleResolver.class);
-
         OptionalBinder.newOptionalBinder(binder(), GranteeService.class)
                 .setDefault().to(DefaultGranteeService.class);
+        OptionalBinder.newOptionalBinder(binder(), AdditionalGrantsResolver.class).setDefault().to(DefaultAdditionalGrantsResolver.class);
 
         bind(AuthServiceBackend.class).annotatedWith(InternalAuthServiceBackend.class).to(MongoDBAuthServiceBackend.class);
 

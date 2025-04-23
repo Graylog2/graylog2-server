@@ -19,13 +19,11 @@ package org.graylog.security.shares;
 import org.graylog.grn.GRN;
 
 import java.util.Collection;
+import java.util.Collections;
 
-public interface AdditionalGrantsResolver {
-    /**
-     * Return dependent entities that need to kept in sync with the primary entity.
-     *
-     * @param primaryEntity The primary entity
-     * @return A collection of dependent entities
-     */
-    Collection<GRN> dependentEntities(GRN primaryEntity);
+public class DefaultAdditionalGrantsResolver implements AdditionalGrantsResolver {
+    @Override
+    public Collection<GRN> dependentEntities(GRN primaryEntity) {
+        return Collections.emptyList();
+    }
 }
