@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { Field, Form, Formik } from 'formik';
 
-import { IfPermitted, Select, TimeUnitInput, ModalSubmit } from 'components/common';
+import { IfPermitted, Select, TimeUnitInput, ModalSubmit, InputOptionalInfo } from 'components/common';
 import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
 import FormikInput from 'components/common/FormikInput';
 import { DocumentationLink } from 'components/support';
@@ -27,6 +27,11 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 export type GeoVendorType = 'MAXMIND' | 'IPINFO';
 export type TimeUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
 
+const CLOUD_STORAGE_OPTION = {
+  GCS: 'gcs',
+  S3: 's3',
+} as const;
+
 export type GeoIpConfigType = {
   enabled: boolean;
   enforce_graylog_schema: boolean;
@@ -35,7 +40,8 @@ export type GeoIpConfigType = {
   asn_db_path: string;
   refresh_interval_unit: TimeUnit;
   refresh_interval: number;
-  use_s3: boolean;
+  pull_from_cloud?: (typeof CLOUD_STORAGE_OPTION)[keyof typeof CLOUD_STORAGE_OPTION];
+  gcs_project_id?: string;
 };
 
 export type OptionType = {
@@ -56,10 +62,11 @@ const defaultConfig: GeoIpConfigType = {
   asn_db_path: '/etc/server/GeoLite2-ASN.mmdb',
   refresh_interval_unit: 'MINUTES',
   refresh_interval: 10,
-  use_s3: false,
+  pull_from_cloud: undefined,
+  gcs_project_id: undefined,
 };
 
-const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
+const GeoIpResolverConfig = ({ config, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState(false);
   const [curConfig, setCurConfig] = useState(config);
 
@@ -90,6 +97,11 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
   const availableVendorTypes = (): OptionType[] => [
     { value: 'MAXMIND', label: 'MaxMind GeoIP' },
     { value: 'IPINFO', label: 'IPInfo Standard Location' },
+  ];
+
+  const cloudStorageOptions: OptionType[] = [
+    { value: CLOUD_STORAGE_OPTION.S3, label: 'S3' },
+    { value: CLOUD_STORAGE_OPTION.GCS, label: 'Google Cloud Storage' },
   ];
 
   const activeVendorType = (type: GeoVendorType) => availableVendorTypes().filter((t) => t.value === type)[0].label;
@@ -123,8 +135,12 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
             <dd>
               {config.refresh_interval} {config.refresh_interval_unit}
             </dd>
-            <dt>Pull files from S3 bucket:</dt>
-            <dd>{config.use_s3 === true ? 'Yes' : 'No'}</dd>
+            <dt>Pull files from cloud storage bucket:</dt>
+            <dd>
+              {config.pull_from_cloud
+                ? cloudStorageOptions.find((option) => option.value === config.pull_from_cloud)?.label
+                : 'No'}
+            </dd>
           </>
         )}
       </dl>
@@ -211,17 +227,49 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                   units={['SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
                 />
 
-                <Row>
-                  <Col sm={6}>
-                    <FormikInput
-                      id="use_s3"
-                      type="checkbox"
-                      disabled={!values.enabled}
-                      label="Pull files from S3 bucket"
-                      name="use_s3"
-                    />
-                  </Col>
-                </Row>
+                <Field id="pull_from_cloud_select" name="pull_from_cloud_field">
+                  {() => (
+                    <Input
+                      id="pull_from_cloud_input"
+                      label={
+                        <>
+                          Pull files from cloud storage bucket <InputOptionalInfo />
+                        </>
+                      }>
+                      <Select
+                        id="pull_from_cloud"
+                        name="pull_from_cloud"
+                        placeholder="Select cloud storage"
+                        required
+                        disabled={!values.enabled}
+                        options={cloudStorageOptions}
+                        matchProp="label"
+                        value={values.pull_from_cloud}
+                        onChange={(option) => {
+                          setFieldValue('pull_from_cloud', option);
+
+                          if (option !== CLOUD_STORAGE_OPTION.GCS) {
+                            setFieldValue('gcs_project_id', undefined);
+                          }
+                        }}
+                      />
+                    </Input>
+                  )}
+                </Field>
+
+                {values.pull_from_cloud === CLOUD_STORAGE_OPTION.GCS && (
+                  <FormikInput
+                    id="gcs_project_id"
+                    type="text"
+                    disabled={!values.enabled}
+                    label={
+                      <>
+                        Googe Cloud Storage Project ID <InputOptionalInfo />
+                      </>
+                    }
+                    name="gcs_project_id"
+                  />
+                )}
               </Modal.Body>
               <Modal.Footer>
                 <ModalSubmit
