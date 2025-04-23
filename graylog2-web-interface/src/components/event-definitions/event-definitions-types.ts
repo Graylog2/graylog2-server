@@ -100,6 +100,7 @@ export type EventDefinition = {
   };
   notifications: Array<Notification>;
   remediation_steps?: string;
+  event_procedure?: string;
   storage: Array<{
     type: string;
     streams: number[] | string[];
