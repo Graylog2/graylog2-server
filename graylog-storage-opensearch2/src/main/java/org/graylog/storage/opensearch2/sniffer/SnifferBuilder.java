@@ -14,19 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.statemachine.tracer;
+package org.graylog.storage.opensearch2.sniffer;
 
-import com.github.oxo42.stateless4j.delegates.Trace;
-import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
-import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
 
-/**
- * The tracer allows to observe triggered event (before) and transitions (after) of the {@link OpensearchStateMachine}
- */
-public interface StateMachineTracer extends Trace<OpensearchState, OpensearchEvent> {
+public interface SnifferBuilder {
+    /**
+     * @return true if the configuration of this node allows that type of sniffer
+     */
+    boolean enabled();
 
-    default void setStateMachine(OpensearchStateMachine stateMachine) {
-    }
-
+    /**
+     * @return Always a new instance of a sniffer.
+     */
+    NodesSniffer create(RestClient restClient);
 }

@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import AppConfig from 'util/AppConfig';
 
-import java.io.IOException;
-import java.util.List;
+const useWelcomeCustomization = () => ({
+  isNewsSectionEnabledForBrand: AppConfig?.branding()?.welcome?.news?.enabled !== false,
+  isReleaseSectionEnabledForBrand: AppConfig?.branding()?.welcome?.releases?.enabled !== false,
+});
 
-public interface NodesSniffer {
-    List<Node> sniff(List<Node> nodes) throws IOException;
-}
+export default useWelcomeCustomization;

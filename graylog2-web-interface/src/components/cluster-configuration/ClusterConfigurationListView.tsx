@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { Table, Label } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -22,10 +23,22 @@ import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusC
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
+import JournalState from 'components/nodes/JournalState';
 
 import type { ClusterNodes } from './useClusterNodes';
 import ClusterStatusLabel from './ClusterStatusLabel';
 import ClusterActions from './ClusterActions';
+import JvmHeapUsageText from './JvmHeapUsageText';
+
+const SecondaryText = styled.div`
+  span {
+    font-size: small;
+  }
+`;
+
+const NodeInfoTH = styled.th`
+  width: 51%;
+`;
 
 type Props = {
   clusterNodes: ClusterNodes;
@@ -42,7 +55,7 @@ const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
   <Table>
     <thead>
       <tr>
-        <th>Node</th>
+        <NodeInfoTH>Node</NodeInfoTH>
         <th>Type</th>
         <th>Role</th>
         <th>State</th>
@@ -53,7 +66,15 @@ const ClusterConfigurationListView = ({ clusterNodes }: Props) => (
       {clusterNodes.graylogNodes.map((graylogNode) => (
         <tr key={graylogNode.nodeName}>
           <td>
-            <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(graylogNode.nodeInfo.node_id)}>{graylogNode.nodeName}</Link>
+            <div>
+              <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(graylogNode.nodeInfo.node_id)}>{graylogNode.nodeName}</Link>
+            </div>
+            <SecondaryText>
+              <JournalState nodeId={graylogNode.nodeInfo.node_id} />
+            </SecondaryText>
+            <SecondaryText>
+              <JvmHeapUsageText nodeId={graylogNode.nodeInfo.node_id} />
+            </SecondaryText>
           </td>
           <td>{graylogNode.type}</td>
           <td>{getRoleLabels(graylogNode.role)}</td>
