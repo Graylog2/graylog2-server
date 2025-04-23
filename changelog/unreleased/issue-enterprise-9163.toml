@@ -1,5 +1,5 @@
 type="a"
 message="Added support in Event Definitions for new Event Procedures."
 
-issues=["9163"]
+issues=["Graylog2/graylog-plugin-enterprise#9163"]
 pulls=["22297"]

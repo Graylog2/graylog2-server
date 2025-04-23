@@ -27,7 +27,7 @@ import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'com
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import usePluginEntities from 'hooks/usePluginEntities';
 import * as FormsUtils from 'util/FormsUtils';
-import AppConfig from 'util/AppConfig';
+import useFeature from 'hooks/useFeature';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -59,20 +59,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const sendTelemetry = useSendTelemetry();
   const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState(false);
   const pluggableEventProcedureForm = usePluginEntities('views.components.eventProcedureForm');
-  const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
-
-  const eventProcedureForm = React.useMemo(
-    () => pluggableEventProcedureForm.map(({ component: PluggableEventProcedureForm }) => (
-      <PluggableEventProcedureForm
-        eventDefinition={eventDefinition}
-        eventDefinitionEventProcedure={eventDefinitionEventProcedure}
-        onClose={() => setShowAddEventProcedureForm(false)}
-        onSave={(eventProcedureId) => onChange('event_procedure', eventProcedureId)}
-        canEdit={canEdit}
-      />
-    )),
-    [pluggableEventProcedureForm, eventDefinition, eventDefinitionEventProcedure, canEdit, onChange],
-  );
+  const isEventProceduresEnabled = useFeature('show_event_procedures');
 
   const handleChange = (event) => {
     const { name } = event.target;
@@ -100,11 +87,15 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
         <>
           {(hasEventProcedure || showAddEventProcedureForm) ? (
             <>
-              {
-                eventProcedureForm.map((form) => (
-                  <div key="event-procedure-form">{form}</div>
-                ))
-              }
+              {pluggableEventProcedureForm.map(({ component: PluggableEventProcedureForm }) => (
+                <PluggableEventProcedureForm
+                  eventDefinition={eventDefinition}
+                  eventProcedureID={eventDefinitionEventProcedure}
+                  onClose={() => setShowAddEventProcedureForm(false)}
+                  onSave={(eventProcedureId) => onChange('event_procedure', eventProcedureId)}
+                  canEdit={canEdit}
+                />
+              ))}
             </>
           ) : (
             <>

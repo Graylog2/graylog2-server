@@ -126,10 +126,7 @@ const EventDefinitionForm = ({
     [canEdit, eventDefinition._scope],
   );
 
-  const eventProcedureId = React.useMemo(
-    () => eventDefinition?.event_procedure || undefined,
-    [eventDefinition]
-  );
+  const eventProcedureId = eventDefinition?.event_procedure || undefined;
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
 

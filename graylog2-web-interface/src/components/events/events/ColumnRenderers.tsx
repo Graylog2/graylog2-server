@@ -24,7 +24,7 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import PriorityName from 'components/events/events/PriorityName';
-import AppConfig from 'util/AppConfig';
+import useFeature from 'hooks/useFeature';
 import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
@@ -90,20 +90,11 @@ const EventProcedureRenderer = ({
 }) => {
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
 
-  const eventProcedureSummary = React.useMemo(
-    () => pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary }) => (
-      <PluggableEventProcedureSummary eventId={eventId} eventDefinitionEventProcedure={eventProcedureId} />
-    )),
-    [pluggableEventProcedureSummary, eventId, eventProcedureId],
-  );
-
   return (
     <>
-      {
-        eventProcedureSummary.map((summary) => (
-          <div key="event-procedure-summary">{summary}</div>
-        ))
-      }
+      {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary }) => (
+        <PluggableEventProcedureSummary eventId={eventId} eventDefinitionEventProcedure={eventProcedureId} />
+      ))}
     </>
   );
 };
@@ -184,7 +175,7 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
     },
     remediation_steps: {
       renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => {
-        const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
+        const isEventProceduresEnabled = useFeature('show_event_procedures');
 
         return (
           <>

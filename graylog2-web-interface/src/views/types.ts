@@ -65,7 +65,6 @@ import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
-
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
   : never;
@@ -319,7 +318,7 @@ type AssetInformationComponentProps = {
 
 type EventProcedureFormProps = {
   eventDefinition: EventDefinition;
-  eventDefinitionEventProcedure: string | undefined;
+  eventProcedureID: string | undefined;
   onClose: () => void;
   onSave: (eventProcedureId: string) => void;
   canEdit: boolean;
