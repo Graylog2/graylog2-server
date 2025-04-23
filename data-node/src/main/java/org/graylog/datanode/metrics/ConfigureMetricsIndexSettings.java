@@ -25,8 +25,8 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.periodicals.MetricsCollector;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
 import org.graylog.storage.opensearch2.ism.IsmApi;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ConfigureMetricsIndexSettings implements StateMachineTracer {
+public class ConfigureMetricsIndexSettings implements StateMachineTracer<OpensearchState, OpensearchEvent> {
 
     private final Logger log = LoggerFactory.getLogger(ConfigureMetricsIndexSettings.class);
 

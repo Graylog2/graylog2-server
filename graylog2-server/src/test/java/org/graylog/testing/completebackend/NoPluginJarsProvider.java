@@ -14,18 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog.testing.completebackend;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog2.storage.SearchVersion;
+import com.google.common.collect.ImmutableList;
 
-public class DatanodeDevInstanceBuilder extends SearchServerBuilder<DatanodeDevInstance> {
-    public DatanodeDevInstanceBuilder(SearchVersion version) {
-        super(version);
+import java.nio.file.Path;
+import java.util.List;
+
+public class NoPluginJarsProvider implements PluginJarsProvider {
+
+    @Override
+    public List<Path> getJars() {
+        return ImmutableList.of();
     }
 
     @Override
-    protected DatanodeDevInstance instantiate() {
-        return new DatanodeDevInstance(getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getHeapSize(), getFeatureFlags(), getEnv(), getDatanodePluginJarsProvider()).init();
+    public String getUniqueId() {
+        return "no-plugin";
     }
+
 }
