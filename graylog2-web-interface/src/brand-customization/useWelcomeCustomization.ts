@@ -15,8 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import useProductName from 'customization/useProductName';
+import AppConfig from 'util/AppConfig';
 
-const ProductName = () => useProductName();
+const useWelcomeCustomization = () => ({
+  isNewsSectionEnabledForBrand: AppConfig?.branding()?.welcome?.news?.enabled !== false,
+  isReleaseSectionEnabledForBrand: AppConfig?.branding()?.welcome?.releases?.enabled !== false,
+});
 
-export default ProductName;
+export default useWelcomeCustomization;

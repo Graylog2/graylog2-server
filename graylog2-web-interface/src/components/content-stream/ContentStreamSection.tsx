@@ -28,6 +28,7 @@ import ToggleActionButton from 'components/content-stream/ToggleActionButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { CarouselProvider } from 'components/common/Carousel';
+import useWelcomeCustomization from 'brand-customization/useWelcomeCustomization';
 
 const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(
   ({ $enabled, theme }) => css`
@@ -48,6 +49,7 @@ const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boole
 );
 
 const ContentStreamSection = () => {
+  const { isReleaseSectionEnabledForBrand, isNewsSectionEnabledForBrand } = useWelcomeCustomization();
   const { username } = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
   const { contentStreamSettings, isLoadingContentStreamSettings, onSaveContentStreamSetting, refetchContentStream } =
@@ -110,23 +112,27 @@ const ContentStreamSection = () => {
 
   return (
     <SectionGrid $columns="2fr 1fr">
-      <StyledNewsSectionComponent
-        title="News"
-        $enabled={contentStreamEnabled}
-        headerActions={<ToggleActionButton onClick={toggleNews} isOpen={contentStreamEnabled} />}>
-        {contentStreamEnabled && (
-          <CarouselProvider carouselId={CAROUSEL_ID}>
-            <ContentStreamNews />
-            <ContentStreamNewsFooter />
-          </CarouselProvider>
-        )}
-      </StyledNewsSectionComponent>
-      <StyledReleaseSectionComponent
-        title="Releases"
-        $enabled={releasesSectionEnabled}
-        headerActions={<ToggleActionButton onClick={toggleRelease} isOpen={releasesSectionEnabled} />}>
-        {releasesSectionEnabled && <ContentStreamReleasesSection />}
-      </StyledReleaseSectionComponent>
+      {isNewsSectionEnabledForBrand && (
+        <StyledNewsSectionComponent
+          title="News"
+          $enabled={contentStreamEnabled}
+          headerActions={<ToggleActionButton onClick={toggleNews} isOpen={contentStreamEnabled} />}>
+          {contentStreamEnabled && (
+            <CarouselProvider carouselId={CAROUSEL_ID}>
+              <ContentStreamNews />
+              <ContentStreamNewsFooter />
+            </CarouselProvider>
+          )}
+        </StyledNewsSectionComponent>
+      )}
+      {isReleaseSectionEnabledForBrand && (
+        <StyledReleaseSectionComponent
+          title="Releases"
+          $enabled={releasesSectionEnabled}
+          headerActions={<ToggleActionButton onClick={toggleRelease} isOpen={releasesSectionEnabled} />}>
+          {releasesSectionEnabled && <ContentStreamReleasesSection />}
+        </StyledReleaseSectionComponent>
+      )}
     </SectionGrid>
   );
 };

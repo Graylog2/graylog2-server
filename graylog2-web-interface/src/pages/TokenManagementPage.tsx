@@ -19,7 +19,7 @@ import * as React from 'react';
 import { PageHeader, DocumentTitle } from 'components/common';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import TokenManagement from 'components/users/UsersTokenManagement/TokenManagement';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 const TokenManagementPage = () => {
   const productName = useProductName();

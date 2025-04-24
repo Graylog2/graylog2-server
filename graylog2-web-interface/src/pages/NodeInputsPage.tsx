@@ -25,7 +25,7 @@ import withParams from 'routing/withParams';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
-import useProductName from 'customization/useProductName';
+import useProductName from 'brand-customization/useProductName';
 
 import useCurrentUser from '../hooks/useCurrentUser';
 
