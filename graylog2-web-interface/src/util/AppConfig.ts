@@ -30,7 +30,7 @@ export type BrandingResourceKey =
   | 'contact_support'
   | 'contact_us';
 
-export type BrandingResources = { [key: BrandingResourceKey]: BrandingResource };
+export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
 
 type Branding = {
   product_name?: string;

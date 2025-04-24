@@ -16,19 +16,30 @@
  */
 import { useMemo } from 'react';
 
-import type { BrandingResources, BrandingResource } from 'util/AppConfig';
+import type { BrandingResource, BrandingResourceKey } from 'util/AppConfig';
 import AppConfig from 'util/AppConfig';
 
-const useResourcesCustomization = () =>
-  useMemo<BrandingResources>(() => {
+const defaultResourcesFeeds: Record<BrandingResourceKey, string> = {
+  stream_rule_matcher_code: '',
+  contact_sales: '',
+  contact_support: '',
+  contact_us: '',
+  enterprise_product: '',
+};
+
+const useResourcesCustomization = (brandingKey: BrandingResourceKey): BrandingResource => {
+  const resources = useMemo(() => {
     const customResources = AppConfig?.branding?.()?.resources ?? {};
 
-    return Object.fromEntries<BrandingResource>(
-      Object.entries(customResources).map(([key, resource]) => [
+    return Object.fromEntries(
+      Object.entries(customResources).map(([key, resource]: [BrandingResourceKey, BrandingResource]) => [
         key,
-        { enabled: resource.enabled !== false, feed: resource.feed },
+        { enabled: resource.enabled !== false, feed: resource.feed ?? defaultResourcesFeeds[key] },
       ]),
     );
   }, []);
+
+  return resources[brandingKey];
+};
 
 export default useResourcesCustomization;
