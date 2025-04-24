@@ -37,6 +37,7 @@ import useIndexSetStats from 'hooks/useIndexSetStats';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import useIndexerOverview from 'hooks/useIndexerOverview';
 import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
+import useProductName from 'brand-customization/useProductName';
 
 import IndexSetOldestMessageCell from './IndexSetOldestMessageCell';
 
@@ -51,6 +52,7 @@ const ActionButtonsWrap = styled.span(
 );
 
 const DestinationIndexSetSection = ({ stream }: Props) => {
+  const productName = useProductName();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { data: indexSet, isInitialLoading: isLoadingIndexSet } = useSingleIndexSet(stream.index_set_id);
   const archivingEnabled =
@@ -104,9 +106,9 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
         />
       }>
       <Alert bsStyle="default">
-        Messages routed to the <b>Search Cluster</b> will be searchable and count towards the License usage. These
-        messages will be stored in the defined Index Set until the retention policy criteria is met. Note: Messages not
-        routed to the <b>Search Cluster</b> will not be searchable.
+        Messages routed to the <b>Search Cluster</b> will be searchable and count towards the {productName} License
+        usage. These messages will be stored in the defined Index Set until the retention policy criteria is met. Note:
+        Messages not routed to the <b>Search Cluster</b> will not be searchable.
       </Alert>
       <Table>
         <thead>
