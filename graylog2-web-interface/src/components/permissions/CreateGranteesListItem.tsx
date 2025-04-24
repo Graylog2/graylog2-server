@@ -17,7 +17,6 @@
 import * as React from 'react';
 import type { $PropertyType } from 'utility-types';
 import { useState } from 'react';
-import styled from 'styled-components';
 
 import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
 import type EntityShareState from 'logic/permissions/EntityShareState';
@@ -27,12 +26,14 @@ import type Capability from 'logic/permissions/Capability';
 import type { CurrentState as CurrentGranteeState } from 'logic/permissions/SelectedGrantee';
 import type SelectedGrantee from 'logic/permissions/SelectedGrantee';
 
-import EntityCreateCapabilitySelect from './EntityCreateCapabilitySelect';
-import { GranteeInfo, GranteeListItemActions, GranteeListItemContainer, GranteeListItemTitle, StyledGranteeIcon } from './CommonStyledComponents';
-
-const StyledCapabilitySelect = styled(EntityCreateCapabilitySelect)`
-  flex: 0.5;
-`;
+import {
+  GranteeInfo,
+  GranteeListItemActions,
+  GranteeListItemContainer,
+  GranteeListItemTitle,
+  StyledEntityCreateCapabilitySelect,
+  StyledGranteeIcon
+} from './CommonStyledComponents';
 
 type Props = {
   availableCapabilities: CapabilitiesList;
@@ -66,7 +67,7 @@ const CreateGranteesListItem = ({
         <StyledGranteeIcon type={type} />
         <GranteeListItemTitle>{title}</GranteeListItemTitle>
       </GranteeInfo>
-      <StyledCapabilitySelect
+      <StyledEntityCreateCapabilitySelect
         onChange={(newCapabilityId) => onCapabilityChange({ granteeId: id, capabilityId: newCapabilityId })}
         capabilities={availableCapabilities}
         title={`Change the capability for ${title}`}
@@ -74,7 +75,7 @@ const CreateGranteesListItem = ({
       />
       <GranteeListItemActions>
         {isDeleting ? (
-          <Spinner text="" />
+          <Spinner />
         ) : (
           <IconButton name="delete" onClick={handleDelete} title={`Remove sharing for ${title}`} />
         )}
