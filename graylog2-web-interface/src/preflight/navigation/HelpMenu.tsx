@@ -21,6 +21,7 @@ import { Button, Text } from 'preflight/components/common';
 import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
 import DocsHelper from 'util/DocsHelper';
+import useResourceCustomization from 'brand-customization/useResourceCustomization';
 
 const StyledButton = styled(Button)(
   ({ theme }) => css`
@@ -30,47 +31,49 @@ const StyledButton = styled(Button)(
   `,
 );
 
-const HelpMenu = () => (
-  <Menu width={250} position="bottom-end">
-    <Menu.Target>
-      <StyledButton variant="default">
-        <Text fw={500} size="sm" mr={3}>
-          Get Help
-        </Text>
-        <Icon name="keyboard_arrow_down" />
-      </StyledButton>
-    </Menu.Target>
-    <Menu.Dropdown>
-      <Menu.Item
-        component="a"
-        rightSection={<Icon name="open_in_new" />}
-        href={DocsHelper.versionedDocsHomePage()}
-        target="_blank">
-        Documentation
-      </Menu.Item>
-      <Menu.Item
-        component="a"
-        rightSection={<Icon name="open_in_new" />}
-        href={DocsHelper.toString(DocsHelper.PAGES.CHANGELOG)}
-        target="_blank">
-        Graylog changelogs
-      </Menu.Item>
-      <Menu.Item
-        component="a"
-        rightSection={<Icon name="open_in_new" />}
-        href={DocsHelper.toString(DocsHelper.PAGES.OPERATIONS_CHANGELOG)}
-        target="_blank">
-        Operations changelogs
-      </Menu.Item>
-      <Menu.Item
-        component="a"
-        rightSection={<Icon name="open_in_new" />}
-        href="https://support.graylog.org/portal"
-        target="_blank">
-        Support
-      </Menu.Item>
-    </Menu.Dropdown>
-  </Menu>
-);
+const HelpMenu = () => {
+  const { enabled, feed } = useResourceCustomization('contact_support');
+
+  return (
+    <Menu width={250} position="bottom-end">
+      <Menu.Target>
+        <StyledButton variant="default">
+          <Text fw={500} size="sm" mr={3}>
+            Get Help
+          </Text>
+          <Icon name="keyboard_arrow_down" />
+        </StyledButton>
+      </Menu.Target>
+      <Menu.Dropdown>
+        <Menu.Item
+          component="a"
+          rightSection={<Icon name="open_in_new" />}
+          href={DocsHelper.versionedDocsHomePage()}
+          target="_blank">
+          Documentation
+        </Menu.Item>
+        <Menu.Item
+          component="a"
+          rightSection={<Icon name="open_in_new" />}
+          href={DocsHelper.toString(DocsHelper.PAGES.CHANGELOG)}
+          target="_blank">
+          Graylog changelogs
+        </Menu.Item>
+        <Menu.Item
+          component="a"
+          rightSection={<Icon name="open_in_new" />}
+          href={DocsHelper.toString(DocsHelper.PAGES.OPERATIONS_CHANGELOG)}
+          target="_blank">
+          Operations changelogs
+        </Menu.Item>
+        {enabled && (
+          <Menu.Item component="a" rightSection={<Icon name="open_in_new" />} href={feed} target="_blank">
+            Support
+          </Menu.Item>
+        )}
+      </Menu.Dropdown>
+    </Menu>
+  );
+};
 
 export default HelpMenu;
