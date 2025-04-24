@@ -24,6 +24,8 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
 import useWidgets from 'views/hooks/useWidgets';
+import useResourceCustomization from 'brand-customization/useResourceCustomization';
+import useProductName from 'brand-customization/useProductName';
 
 const StyledJumbotron = styled(Jumbotron)(
   ({ theme }) => css`
@@ -36,53 +38,64 @@ const StyledJumbotron = styled(Jumbotron)(
   `,
 );
 
-const NoWidgetsInfo = () => (
-  <StyledJumbotron>
-    <h2>
-      <IfDashboard>This dashboard has no widgets yet</IfDashboard>
-      <IfSearch>There are no widgets defined to visualize the search result</IfSearch>
-    </h2>
-    <br />
-    <p>
-      Create a new widget by selecting a widget type in the left sidebar section &quot;Create&quot;.
+const NoWidgetsInfo = () => {
+  const { enabled, feed } = useResourceCustomization('enterprise_product');
+  const productName = useProductName();
+
+  return (
+    <StyledJumbotron>
+      <h2>
+        <IfDashboard>This dashboard has no widgets yet</IfDashboard>
+        <IfSearch>There are no widgets defined to visualize the search result</IfSearch>
+      </h2>
       <br />
-    </p>
-    <p>A few tips for creating searches and dashboards</p>
-    <ul>
-      <li>
-        <p>
-          1. Start with a <b>question</b> you want to answer. Define the problem you want to solve.
-        </p>
-      </li>
-      <li>
-        <p>
-          2. <b>Limit</b> the data to only the data points you want to see.
-        </p>
-      </li>
-      <li>
-        <p>
-          3. <b>Visualize</b> the data. Does it answer your question?
-        </p>
-      </li>
-      <IfDashboard>
+      <p>
+        Create a new widget by selecting a widget type in the left sidebar section &quot;Create&quot;.
+        <br />
+      </p>
+      <p>A few tips for creating searches and dashboards</p>
+      <ul>
         <li>
           <p>
-            4. <b>Share</b> the dashboard with your colleagues. Prepare it for <b>reuse</b> by using parameters
-            (contained in{' '}
-            <a href="https://www.graylog.org/graylog-enterprise-edition" target="_blank" rel="noopener noreferrer">
-              Graylog Enterprise
-            </a>
-            ).
+            1. Start with a <b>question</b> you want to answer. Define the problem you want to solve.
           </p>
         </li>
-      </IfDashboard>
-    </ul>
-    <p>
-      You can also have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />, to
-      learn more about the widget creation.
-    </p>
-  </StyledJumbotron>
-);
+        <li>
+          <p>
+            2. <b>Limit</b> the data to only the data points you want to see.
+          </p>
+        </li>
+        <li>
+          <p>
+            3. <b>Visualize</b> the data. Does it answer your question?
+          </p>
+        </li>
+        <IfDashboard>
+          <li>
+            <p>
+              4. <b>Share</b> the dashboard with your colleagues. Prepare it for <b>reuse</b> by using parameters
+              {enabled && (
+                <>
+                  {' '}
+                  (contained in{' '}
+                  <a href={feed} target="_blank" rel="noopener noreferrer">
+                    {productName} Enterprise
+                  </a>
+                  )
+                </>
+              )}
+              .
+            </p>
+          </li>
+        </IfDashboard>
+      </ul>
+      <p>
+        You can also have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />,
+        to learn more about the widget creation.
+      </p>
+    </StyledJumbotron>
+  );
+};
 
 const useHasWidgets = () => {
   const widgets = useWidgets();

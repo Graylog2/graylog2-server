@@ -25,7 +25,7 @@ const defaultResourcesFeeds: Record<BrandingResourceKey, string> = {
   contact_sales: '',
   contact_support: '',
   contact_us: 'https://www.graylog.org/community-support/',
-  enterprise_product: '',
+  enterprise_product: 'https://www.graylog.org/graylog-enterprise-edition',
 };
 
 const useResourceCustomization = (brandingKey: BrandingResourceKey): BrandingResource => {
