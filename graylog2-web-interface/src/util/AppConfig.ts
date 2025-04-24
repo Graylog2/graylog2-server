@@ -44,6 +44,13 @@ type Branding = {
   };
   help_url?: string;
   footer?: { enabled: boolean };
+  resources?: {
+    stream_rule_matcher_code?: { enabled: boolean; feed?: string };
+    enterprise_product?: { enabled: boolean; feed?: string };
+    contact_sales?: { enabled: boolean; feed?: string };
+    contact_support?: { enabled: boolean; feed?: string };
+    contact_us?: { enabled: boolean; feed?: string };
+  };
 };
 
 export type AppConfigs = {
