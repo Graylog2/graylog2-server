@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -61,7 +62,7 @@ public class EntitySharesService {
     private final GRNRegistry grnRegistry;
     private final GranteeService granteeService;
     private final EventBus serverEventBus;
-    private final AdditionalGrantsResolver additionalGrantsResolver;
+    private final Set<AdditionalGrantsResolver> additionalGrantsResolvers;
 
     @Inject
     public EntitySharesService(DBGrantService grantService,
@@ -70,14 +71,14 @@ public class EntitySharesService {
                                GRNRegistry grnRegistry,
                                GranteeService granteeService,
                                EventBus serverEventBus,
-                               AdditionalGrantsResolver additionalGrantsResolver) {
+                               Set<AdditionalGrantsResolver> additionalGrantsResolvers) {
         this.grantService = grantService;
         this.entityDependencyResolver = entityDependencyResolver;
         this.entityDependencyPermissionChecker = entityDependencyPermissionChecker;
         this.grnRegistry = grnRegistry;
         this.granteeService = granteeService;
         this.serverEventBus = serverEventBus;
-        this.additionalGrantsResolver = additionalGrantsResolver;
+        this.additionalGrantsResolvers = additionalGrantsResolvers;
     }
 
     /**
@@ -272,7 +273,14 @@ public class EntitySharesService {
      * @param sharingUser the sharing user
      */
     private void resolveImplicitGrants(GRN ownedEntity, EntityShareRequest request, User sharingUser) {
-        additionalGrantsResolver.dependentEntities(ownedEntity).forEach(grn -> updateOnlyEntityShares(grn, request, sharingUser));
+        List<GrantDTO> grantDtos = new ArrayList<>();
+        additionalGrantsResolvers.stream()
+                .map(resolver -> resolver.additionalGrants(ownedEntity))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(grantDtos::addAll);
+        grantDtos.forEach(dto ->
+                updateOnlyEntityShares(dto.target(), EntityShareRequest.create(Map.of(dto.grantee(), dto.capability())), sharingUser));
     }
 
     private void postUpdateEvent(EntitySharesUpdateEvent updateEvent) {

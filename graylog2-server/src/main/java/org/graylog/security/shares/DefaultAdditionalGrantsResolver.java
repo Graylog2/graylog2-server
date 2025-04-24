@@ -17,13 +17,14 @@
 package org.graylog.security.shares;
 
 import org.graylog.grn.GRN;
+import org.graylog.security.GrantDTO;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Optional;
 
 public class DefaultAdditionalGrantsResolver implements AdditionalGrantsResolver {
     @Override
-    public Collection<GRN> dependentEntities(GRN primaryEntity) {
-        return Collections.emptyList();
+    public Optional<Collection<GrantDTO>> additionalGrants(GRN primaryEntity) {
+        return Optional.empty();
     }
 }

@@ -20,6 +20,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.InternalAuthServiceBackend;
@@ -64,7 +65,8 @@ public class SecurityModule extends PluginModule {
                 .setDefault().to(DefaultPermissionAndRoleResolver.class);
         OptionalBinder.newOptionalBinder(binder(), GranteeService.class)
                 .setDefault().to(DefaultGranteeService.class);
-        OptionalBinder.newOptionalBinder(binder(), AdditionalGrantsResolver.class).setDefault().to(DefaultAdditionalGrantsResolver.class);
+
+        Multibinder.newSetBinder(binder(), AdditionalGrantsResolver.class).addBinding().to(DefaultAdditionalGrantsResolver.class);
 
         bind(AuthServiceBackend.class).annotatedWith(InternalAuthServiceBackend.class).to(MongoDBAuthServiceBackend.class);
 

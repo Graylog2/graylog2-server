@@ -17,15 +17,17 @@
 package org.graylog.security.shares;
 
 import org.graylog.grn.GRN;
+import org.graylog.security.GrantDTO;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface AdditionalGrantsResolver {
     /**
-     * Return dependent entities that need to kept in sync with the primary entity.
+     * Return additional grants based on the specified primary entity.
      *
      * @param primaryEntity The primary entity
-     * @return A collection of dependent entities
+     * @return A collection of related grants
      */
-    Collection<GRN> dependentEntities(GRN primaryEntity);
+    Optional<Collection<GrantDTO>> additionalGrants(GRN primaryEntity);
 }
