@@ -73,6 +73,7 @@ public class ConfigurationDocsGenerator {
 
     private DocsPrinter createWriter(DocumentationFormat format) throws IOException {
         final FileWriter fileWriter = new FileWriter(format.outputFile(), StandardCharsets.UTF_8);
+        // TODO: if the format list expands, introduce DI and factories for printers
         return switch (format.format()) {
             case "csv" -> new CsvDocsPrinter(fileWriter);
             case "conf" -> new ConfigFileDocsPrinter(fileWriter);
