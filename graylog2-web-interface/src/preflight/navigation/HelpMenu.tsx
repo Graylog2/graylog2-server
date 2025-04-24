@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import { Button, Text } from 'preflight/components/common';
 import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
+import DocsHelper from 'util/DocsHelper';
 
 const StyledButton = styled(Button)(
   ({ theme }) => css`
@@ -43,23 +44,23 @@ const HelpMenu = () => (
       <Menu.Item
         component="a"
         rightSection={<Icon name="open_in_new" />}
-        href="https://docs.graylog.org/docs"
+        href={DocsHelper.versionedDocsHomePage()}
         target="_blank">
-        Graylog Documentation
+        Documentation
       </Menu.Item>
       <Menu.Item
         component="a"
         rightSection={<Icon name="open_in_new" />}
-        href="https://docs.graylog.org/docs/changelog"
+        href={DocsHelper.toString(DocsHelper.PAGES.CHANGELOG)}
         target="_blank">
         Graylog changelogs
       </Menu.Item>
       <Menu.Item
         component="a"
         rightSection={<Icon name="open_in_new" />}
-        href="https://docs.graylog.org/docs/changelog-graylog"
+        href={DocsHelper.toString(DocsHelper.PAGES.OPERATIONS_CHANGELOG)}
         target="_blank">
-        Graylog Operations changelogs
+        Operations changelogs
       </Menu.Item>
       <Menu.Item
         component="a"

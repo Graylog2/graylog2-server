@@ -14,18 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.configuration;
+import { useMemo } from 'react';
+import DOMPurify from 'dompurify';
 
-import com.github.joschi.jadconfig.Parameter;
+import AppConfig from 'util/AppConfig';
 
-public class EventBusConfiguration {
+const useCustomLogo = (theme: 'dark' | 'light') =>
+  useMemo(
+    () => (AppConfig?.branding?.()?.logo?.[theme] ? DOMPurify.sanitize(AppConfig.branding().logo[theme]) : undefined),
+    [theme],
+  );
 
-    @Documentation("Number of threads used exclusively for dispatching internal events. Default is 2.")
-    @Parameter(value = "async_eventbus_processors")
-    private final int asyncEventbusProcessors = 2;
-
-    public int getAsyncEventbusProcessors() {
-        return asyncEventbusProcessors;
-    }
-
-}
+export default useCustomLogo;

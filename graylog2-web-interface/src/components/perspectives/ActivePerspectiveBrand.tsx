@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import type { PropsWithChildren } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Link } from 'components/common/router';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
@@ -27,13 +27,25 @@ const BrandContainer = styled.div`
   align-items: center;
 `;
 
-const BrandLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  min-height: ${NAV_ITEM_HEIGHT};
-`;
+const BrandLink = styled(Link)(
+  ({ theme }) => css`
+    display: inline-flex;
+    align-items: center;
+    min-height: ${NAV_ITEM_HEIGHT};
+    color: ${theme.colors.global.textDefault};
+    &:hover,
+    &:active,
+    &:focus {
+      text-decoration: none;
+      color: ${theme.colors.global.textDefault};
+    }
+  `,
+);
 
-const ActivePerspectiveBrand = ({ children, className = '' }: PropsWithChildren<{ className?: string }>) => {
+const ActivePerspectiveBrand = ({
+  children = undefined,
+  className = '',
+}: PropsWithChildren<{ className?: string }>) => {
   const { activePerspective } = useActivePerspective();
   const ActiveBrandComponent = activePerspective?.brandComponent;
 
