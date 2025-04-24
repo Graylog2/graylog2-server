@@ -30,7 +30,8 @@ public record Config(
         Optional<Login> login,
         Optional<Welcome> welcome,
         Optional<Navigation> navigation,
-        Optional<Footer> footer
+        Optional<Footer> footer,
+        Optional<Resources> resources
 ) {
     public record Logo(SVG light, SVG dark) {}
     public record Login(Optional<SVG> background) {}
@@ -38,6 +39,15 @@ public record Config(
     public record Welcome(Optional<WelcomeItem> news,
                           Optional<WelcomeItem> releases) {
         public record WelcomeItem(Optional<Boolean> enabled, Optional<String> feed) {}
+    }
+
+    public record Resources(Optional<ResourceItem> stream_rule_matcher_code,
+                            Optional<ResourceItem> enterprise_product,
+                            Optional<ResourceItem> contact_sales,
+                            Optional<ResourceItem> contact_support,
+                            Optional<ResourceItem> contact_us
+                            ) {
+        public record ResourceItem(Optional<Boolean> enabled, Optional<String> feed) {}
     }
 
     public record Navigation(Optional<NavigationItem> home,
@@ -51,6 +61,6 @@ public record Config(
 
     public static Config empty() {
         return new Config(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 }
