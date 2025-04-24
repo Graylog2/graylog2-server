@@ -27,7 +27,7 @@ const defaultResourcesFeeds: Record<BrandingResourceKey, string> = {
   enterprise_product: '',
 };
 
-const useResourcesCustomization = (brandingKey: BrandingResourceKey): BrandingResource => {
+const useResourceCustomization = (brandingKey: BrandingResourceKey): BrandingResource => {
   const resources = useMemo(() => {
     const customResources = AppConfig?.branding?.()?.resources ?? {};
 
@@ -42,4 +42,4 @@ const useResourcesCustomization = (brandingKey: BrandingResourceKey): BrandingRe
   return resources[brandingKey];
 };
 
-export default useResourcesCustomization;
+export default useResourceCustomization;
