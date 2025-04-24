@@ -29,7 +29,7 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 type FormValues = Partial<
   Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream' >
 > & {
-  share_request?: EntitySharePayload
+  share_request?: EntitySharePayload,
 };
 
 const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => ({

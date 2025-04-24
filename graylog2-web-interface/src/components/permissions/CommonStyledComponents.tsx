@@ -23,6 +23,7 @@ import { Select } from 'components/common';
 
 import CapabilitySelect from './CapabilitySelect';
 import GranteeIcon from './GranteeIcon';
+import EntityCreateCapabilitySelect from './EntityCreateCapabilitySelect';
 
 export const currentStateColor = (theme: DefaultTheme, currentState: CurrentGranteeState) => {
   switch (currentState) {
@@ -34,23 +35,24 @@ export const currentStateColor = (theme: DefaultTheme, currentState: CurrentGran
       return 'transparent';
   }
 };
+
 export const GranteeListItemContainer = styled.li<{ $currentState: CurrentGranteeState }>(
   ({ theme, $currentState }) => css`
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 5px;
-    border-left: 5px solid ${currentStateColor(theme, $currentState)};
+    padding: ${theme.spacings.xxs};
+    border-left: ${theme.spacings.xxs} solid ${currentStateColor(theme, $currentState)};
   `,
 );
 
-export const GranteeInfo = styled.div`
+export const GranteeInfo = styled.div(({ theme }) => css`
   display: flex;
   align-items: center;
   flex: 1;
   overflow: hidden;
-  margin-right: 10px;
-`;
+  margin-right:  ${theme.spacings.xs};
+`);
 
 export const GranteeListItemTitle = styled.div`
   flex: 1;
@@ -63,36 +65,46 @@ export const StyledCapabilitySelect = styled(CapabilitySelect)`
   flex: 0.5;
 `;
 
-export const StyledGranteeIcon = styled(GranteeIcon)`
-  margin-right: 5px;
+export const StyledEntityCreateCapabilitySelect = styled(EntityCreateCapabilitySelect)`
+  flex: 0.5;
 `;
 
-export const GranteeListItemActions = styled.div`
+export const StyledGranteeIcon = styled(GranteeIcon)(({ theme }) => css`
+  margin-right: ${theme.spacings.xxs};
+`);
+
+export const GranteeListItemActions = styled.div(({ theme }) => css`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 25px;
-  margin-left: 10px;
-`;
-export const ShareFormSection = styled.div`
-  margin-bottom: 25px;
+  width: ${theme.spacings.sm};
+  margin-left: ${theme.spacings.xs};
+`);
+
+export const ShareFormSection = styled.div(({ theme }) => css`
+  margin-bottom: ${theme.spacings.sm};
 
   &:last-child {
     margin-bottom: 0;
   }
-`;
-export const GranteesSelectorHeadline = styled.h5`
-  margin-bottom: 10px;
-`;
+`);
+
+export const GranteesSelectorHeadline = styled.h5(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xs};
+`);
+
 export const ShareFormElements = styled.div`
   display: flex;
 `;
-export const ShareSubmitButton = styled(Button)`
-  margin-left: 15px;
-`;
+
+export const ShareSubmitButton = styled(Button)(({ theme }) => css`
+  margin-left: ${theme.spacings.xs};
+`);
+
 export const GranteesSelect = styled(Select)`
   flex: 1;
 `;
+
 export const GranteesSelectOption = styled.div`
   display: flex;
   align-items: center;
