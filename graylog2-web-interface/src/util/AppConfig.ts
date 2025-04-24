@@ -22,6 +22,16 @@ declare global {
   const IS_CLOUD: boolean | undefined;
 }
 
+export type BrandingResource = { enabled?: boolean; feed?: string | undefined };
+export type BrandingResourceKey =
+  | 'stream_rule_matcher_code'
+  | 'enterprise_product'
+  | 'contact_sales'
+  | 'contact_support'
+  | 'contact_us';
+
+export type BrandingResources = { [key: BrandingResourceKey]: BrandingResource };
+
 type Branding = {
   product_name?: string;
   favicon?: string;
@@ -44,13 +54,7 @@ type Branding = {
   };
   help_url?: string;
   footer?: { enabled: boolean };
-  resources?: {
-    stream_rule_matcher_code?: { enabled: boolean; feed?: string };
-    enterprise_product?: { enabled: boolean; feed?: string };
-    contact_sales?: { enabled: boolean; feed?: string };
-    contact_support?: { enabled: boolean; feed?: string };
-    contact_us?: { enabled: boolean; feed?: string };
-  };
+  resources?: BrandingResources;
 };
 
 export type AppConfigs = {
