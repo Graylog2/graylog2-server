@@ -18,9 +18,10 @@ import { useMemo } from 'react';
 
 import type { BrandingResource, BrandingResourceKey } from 'util/AppConfig';
 import AppConfig from 'util/AppConfig';
+import Version from 'util/Version';
 
 const defaultResourcesFeeds: Record<BrandingResourceKey, string> = {
-  stream_rule_matcher_code: '',
+  stream_rule_matcher_code: `https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`,
   contact_sales: '',
   contact_support: '',
   contact_us: '',
@@ -32,10 +33,11 @@ const useResourceCustomization = (brandingKey: BrandingResourceKey): BrandingRes
     const customResources = AppConfig?.branding?.()?.resources ?? {};
 
     return Object.fromEntries(
-      Object.entries(customResources).map(([key, resource]: [BrandingResourceKey, BrandingResource]) => [
-        key,
-        { enabled: resource.enabled !== false, feed: resource.feed ?? defaultResourcesFeeds[key] },
-      ]),
+      Object.entries(defaultResourcesFeeds).map(([key, defaultFeed]: [BrandingResourceKey, string]) => {
+        const resource = customResources?.[key];
+
+        return [key, { enabled: resource?.enabled !== false, feed: resource?.feed ?? defaultFeed }];
+      }),
     );
   }, []);
 
