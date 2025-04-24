@@ -18,7 +18,6 @@ import * as React from 'react';
 import { Formik, Form, Field } from 'formik';
 import { useCallback, useMemo, useEffect } from 'react';
 
-import Version from 'util/Version';
 import type { StreamRule } from 'stores/streams/StreamsStore';
 import {
   Icon,
@@ -38,6 +37,7 @@ import { useStore } from 'stores/connect';
 import { StreamRulesInputsStore, StreamRulesInputsActions } from 'stores/inputs/StreamRulesInputsStore';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
+import useResourceCustomization from 'brand-customization/useResourceCustomization';
 
 type FormValues = Partial<Pick<StreamRule, 'type' | 'field' | 'description' | 'value' | 'inverted'>>;
 
@@ -87,6 +87,7 @@ const StreamRuleModal = ({
     description: '',
   },
 }: Props) => {
+  const { enabled, feed } = useResourceCustomization('stream_rule_matcher_code');
   const { inputs } = useStore(StreamRulesInputsStore);
   const { data: streamRuleTypes } = useStreamRuleTypes();
 
@@ -214,17 +215,18 @@ const StreamRuleModal = ({
                   <Col md={4}>
                     <Well bsSize="small" className="matcher-github">
                       The server will try to convert to strings or numbers based on the matcher type as well as it can.
-                      <br />
-                      <br />
-                      <BrandIcon name="github" />
-                      &nbsp;
-                      <a
-                        href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        {' '}
-                        Take a look at the matcher code on GitHub
-                      </a>
+                      {enabled && (
+                        <>
+                          <br />
+                          <br />
+                          <BrandIcon name="github" />
+                          &nbsp;
+                          <a href={feed} target="_blank" rel="noopener noreferrer">
+                            {' '}
+                            Take a look at the matcher code on GitHub
+                          </a>
+                        </>
+                      )}
                       <br />
                       <br />
                       Regular expressions use Java syntax.{' '}
