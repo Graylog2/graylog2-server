@@ -69,9 +69,9 @@ public class ConfigFileDocsPrinter implements DocsPrinter {
                 .map(text -> text + "\n\n");
     }
 
-    private Writer append(String formatted) {
+    private void append(String formatted) {
         try {
-            return writer.append(formatted);
+            writer.append(formatted);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -113,7 +113,7 @@ public class ConfigFileDocsPrinter implements DocsPrinter {
     }
 
     private static String formatDocumentation(ConfigurationEntry field) {
-        final String[] lines = field.documentation().split("\n");
+        final String[] lines = Optional.ofNullable(field.documentation()).orElse("").split("\n");
         return Arrays.stream(lines).map(String::trim).peek(line -> {
             if (line.length() > 120) {
                 LOG.warn("Documentation line of " + field.configurationBean().getName() + "." + field.fieldName() + " too long, consider splitting into more lines: " + WordUtils.abbreviate(line, 120, 130, "..."));

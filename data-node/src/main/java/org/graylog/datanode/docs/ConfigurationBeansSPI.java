@@ -28,7 +28,7 @@ public class ConfigurationBeansSPI {
         List<Object> configurationBeans = new ArrayList<>();
         while (iterator.hasNext()) {
             final DocumentedBeansService service = iterator.next();
-            configurationBeans.addAll(service.getConfigurationBeans());
+            configurationBeans.addAll(service.getDocumentedConfigurationBeans());
         }
         return configurationBeans;
     }

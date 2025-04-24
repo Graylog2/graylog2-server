@@ -149,7 +149,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     private String initialClusterManagerNodes;
 
     @Documentation("""
-            Opensearch heap memory. Initial and maxmium heap must be identical for OpenSearch, otherwise the boot fails.
+            Opensearch heap memory. Initial and maximum heap must be identical for OpenSearch, otherwise the boot fails.
             So it's only one config option.
             """)
     @Parameter(value = "opensearch_heap")
@@ -341,15 +341,6 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     """)
     @Parameter(value = "node_roles", converter = StringListConverter.class)
     private List<String> nodeRoles;
-
-    @Documentation(visible = false)
-    @Parameter(value = "async_eventbus_processors")
-    private int asyncEventbusProcessors = 2;
-
-    public int getAsyncEventbusProcessors() {
-        return asyncEventbusProcessors;
-    }
-
 
     public Integer getIndicesQueryBoolMaxClauseCount() {
         return indicesQueryBoolMaxClauseCount;

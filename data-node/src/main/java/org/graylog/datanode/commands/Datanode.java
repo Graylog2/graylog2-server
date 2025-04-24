@@ -95,8 +95,8 @@ public class Datanode extends DatanodeBootstrap implements DocumentedBeansServic
     }
 
     @Override
-    public List<Object> getConfigurationBeans() {
-        return getNodeCommandConfigurationBeans();
+    public List<Object> getDocumentedConfigurationBeans() {
+        return getCommandConfigurationBeans();
     }
 
     private static class ShutdownHook implements Runnable {

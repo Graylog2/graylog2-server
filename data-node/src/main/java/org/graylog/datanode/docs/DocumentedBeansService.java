@@ -19,5 +19,5 @@ package org.graylog.datanode.docs;
 import java.util.List;
 
 public interface DocumentedBeansService {
-    List<Object> getConfigurationBeans();
+    List<Object> getDocumentedConfigurationBeans();
 }
