@@ -508,7 +508,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, NO_BATCHSIZE);
+        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, Set.of(), NO_BATCHSIZE);
 
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.getQueryHash()).isNotEmpty();
@@ -527,7 +527,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        final ChunkedResult scrollResult = searches.scroll("*", range, -1, 0, Collections.singletonList("source"), null, 2);
+        final ChunkedResult scrollResult = searches.scroll("*", range, -1, 0, Collections.singletonList("source"), null, Set.of(), 2);
 
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
@@ -573,7 +573,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, 2);
+        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, Set.of(), 2);
 
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
