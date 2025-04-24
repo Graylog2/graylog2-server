@@ -44,7 +44,7 @@ export type OptionType = {
 };
 
 type Props = {
-  config: GeoIpConfigType;
+  config?: GeoIpConfigType;
   updateConfig: (config: GeoIpConfigType) => Promise<GeoIpConfigType>;
 };
 
@@ -61,7 +61,7 @@ const defaultConfig: GeoIpConfigType = {
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState(false);
-  const [curConfig, setCurConfig] = useState(() => ({ ...defaultConfig }));
+  const [curConfig, setCurConfig] = useState(config);
 
   const sendTelemetry = useSendTelemetry();
 
