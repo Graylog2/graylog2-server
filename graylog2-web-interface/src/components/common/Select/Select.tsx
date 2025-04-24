@@ -34,7 +34,10 @@ type Option = { [key: string]: any };
 
 export type SelectRef = React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>;
 
-const MultiValueRemove = ({ children, ...props }: React.ComponentProps<typeof Components.MultiValueRemove>) => (
+const MultiValueRemove = ({
+  children = undefined,
+  ...props
+}: React.ComponentProps<typeof Components.MultiValueRemove>) => (
   <Components.MultiValueRemove {...props}>{children}</Components.MultiValueRemove>
 );
 
@@ -54,7 +57,7 @@ const DropdownIndicator = (props) => {
   );
 };
 
-const Control = ({ children, ...props }: React.ComponentProps<typeof Components.Control>) => (
+const Control = ({ children = undefined, ...props }: React.ComponentProps<typeof Components.Control>) => (
   <Components.Control {...props} className={CONTROL_CLASS}>
     {children}
   </Components.Control>
@@ -62,19 +65,19 @@ const Control = ({ children, ...props }: React.ComponentProps<typeof Components.
 
 const CustomOption =
   (optionRenderer: (option: Option, isSelected: boolean) => React.ReactElement) =>
-  (props: React.ComponentProps<typeof Components.Option>): React.ReactElement => {
-    const { data, isSelected } = props;
-
-    return <Components.Option {...props}>{optionRenderer(data, isSelected)}</Components.Option>;
-  };
+  ({ data, isSelected, ...props }: React.ComponentProps<typeof Components.Option>): React.ReactElement => (
+    <Components.Option data={data} isSelected={isSelected} {...props}>
+      {optionRenderer(data, isSelected)}
+    </Components.Option>
+  );
 
 const CustomSingleValue =
   (valueRenderer: (option: Option) => React.ReactElement) =>
-  (props: React.ComponentProps<typeof Components.SingleValue>) => {
-    const { data } = props;
-
-    return <Components.SingleValue {...props}>{valueRenderer(data)}</Components.SingleValue>;
-  };
+  ({ data, ...props }: React.ComponentProps<typeof Components.SingleValue>) => (
+    <Components.SingleValue data={data} {...props}>
+      {valueRenderer(data)}
+    </Components.SingleValue>
+  );
 
 const CustomInput = (inputProps: { [key: string]: any }) => (props) => <Components.Input {...props} {...inputProps} />;
 
@@ -304,6 +307,7 @@ const getCustomComponents = (
 
 class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   static defaultProps = {
+    'aria-label': undefined,
     addLabelText: undefined,
     allowCreate: false,
     autoFocus: false,

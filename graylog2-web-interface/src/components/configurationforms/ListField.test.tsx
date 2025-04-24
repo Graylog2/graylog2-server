@@ -19,7 +19,6 @@ import { screen, render, waitFor } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
 import { creatableListField, listField } from 'fixtures/configurationforms';
-import customSelectEvent from 'helpers/selectEvent';
 
 import ListField from './ListField';
 
@@ -86,7 +85,7 @@ describe('<ListField>', () => {
 
     const { container } = render(<SUT onChange={updateFunction} value={['one']} />);
 
-    customSelectEvent.clearAll(container, 'list-field-select');
+    selectEvent.clearAll(container, 'list-field-select');
 
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', []));
   });

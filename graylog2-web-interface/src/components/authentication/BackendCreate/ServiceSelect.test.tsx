@@ -17,13 +17,12 @@
 import * as React from 'react';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 
-import selectEvent from 'helpers/selectEvent';
-
 import 'components/authentication/bindings'; // Bind all authentication plugins
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 import { asMock } from 'helpers/mocking';
 import mockHistory from 'helpers/mocking/mockHistory';
+import selectEvent from 'helpers/selectEvent';
 
 import ServiceSelect from './ServiceSelect';
 

@@ -42,10 +42,10 @@ type Props = {
 };
 
 const ColumnSelect = ({
-  ariaLabel,
-  autoFocus,
+  ariaLabel = undefined,
+  autoFocus = undefined,
   allowCreate = false,
-  className,
+  className = undefined,
   clearable = false,
   columns,
   columnTitle,
@@ -53,11 +53,11 @@ const ColumnSelect = ({
   excludedColumns = [],
   name,
   onChange,
-  onMenuClose,
-  openMenuOnFocus,
-  persistSelection,
-  placeholder,
-  selectRef,
+  onMenuClose = undefined,
+  openMenuOnFocus = undefined,
+  persistSelection = undefined,
+  placeholder = undefined,
+  selectRef = undefined,
   value,
 }: Props) => {
   const columnOptions = useMemo(
