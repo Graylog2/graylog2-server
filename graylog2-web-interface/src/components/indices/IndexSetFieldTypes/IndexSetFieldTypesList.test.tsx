@@ -273,7 +273,7 @@ describe('IndexSetFieldTypesList', () => {
       await screen.findByRole('heading', { name: /Remove field type overrides/i });
       await screen.findByText('Rotate affected indices after change');
 
-      const modal = await screen.findByRole('dialog');
+      const modal = await screen.findByRole('dialog', { name: /Remove field type overrides/i });
 
       expect(modal).toHaveTextContent(
         'After removing the overridden field type for field-1 in index set title, the settings of your search engine will be applied for fields: field-1',
@@ -301,7 +301,7 @@ describe('IndexSetFieldTypesList', () => {
       await screen.findByRole('heading', { name: /Remove field type overrides/i });
       await screen.findByText('Rotate affected indices after change');
 
-      const modal = await screen.findByRole('dialog');
+      const modal = await screen.findByRole('dialog', { name: /Remove field type overrides/i });
 
       expect(modal).toHaveTextContent(
         'After removing the overridden field type for field-2 in index set title, the settings from Profile-1 ( namely field-2: Boolean) will be applied',
@@ -451,7 +451,7 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const button = await screen.findByTitle('Set field type profile');
       fireEvent.click(button);
-      const modal = await screen.findByRole('dialog');
+      const modal = await screen.findByRole('dialog', { name: /Set Profile/i });
       await within(modal).findByRole('button', { name: /Set Profile/i });
     });
   });

@@ -16,16 +16,16 @@
  */
 package org.graylog2.configuration;
 
-import com.github.joschi.jadconfig.Parameter;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class EventBusConfiguration {
-
-    @Documentation("Number of threads used exclusively for dispatching internal events. Default is 2.")
-    @Parameter(value = "async_eventbus_processors")
-    private final int asyncEventbusProcessors = 2;
-
-    public int getAsyncEventbusProcessors() {
-        return asyncEventbusProcessors;
-    }
-
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.FIELD})
+public @interface DocumentationSection {
+    String heading();
+    String description();
 }
