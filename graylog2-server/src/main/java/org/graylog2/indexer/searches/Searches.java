@@ -107,7 +107,7 @@ public class Searches {
     }
 
     @Deprecated
-    public ChunkedResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, int batchSize) {
+    public ChunkedResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, Set<String> streams, int batchSize) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         final Set<String> indexWildcards = indexSetRegistry.getForIndices(affectedIndices).stream()
                 .map(IndexSet::getIndexWildcard)
@@ -121,6 +121,7 @@ public class Searches {
                 .offset(offset)
                 .fields(fields)
                 .filter(filter)
+                .streams(streams)
                 .sorting(sorting)
                 .indices(indexWildcards);
 
