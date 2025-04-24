@@ -25,7 +25,6 @@ import { Logo } from 'components/perspectives/DefaultBrand';
 import AppConfig from 'util/AppConfig';
 import useThemes from 'theme/hooks/useThemes';
 import useProductName from 'brand-customization/useProductName';
-
 import useCustomLogo from 'brand-customization/useCustomLogo';
 
 const LogoContainer = styled.div`
