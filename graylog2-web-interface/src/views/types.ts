@@ -63,6 +63,7 @@ import type { Event } from 'components/events/events/types';
 import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -315,6 +316,19 @@ type AssetInformationComponentProps = {
   addToQuery?: (id: string) => void;
 };
 
+type EventProcedureFormProps = {
+  eventDefinition: EventDefinition;
+  eventProcedureID: string | undefined;
+  onClose: () => void;
+  onSave: (eventProcedureId: string) => void;
+  canEdit: boolean;
+};
+
+type EventProcedureSummaryProps = {
+  eventDefinitionEventProcedure: string | undefined;
+  eventId?: string;
+};
+
 type SearchAction = {
   component: React.ComponentType<SearchActionComponentProps>;
   key: string;
@@ -348,6 +362,16 @@ type AssetInformation = {
   component: React.ComponentType<AssetInformationComponentProps>;
   key: string;
 };
+
+type EventProcedureForm = {
+  component: React.ComponentType<EventProcedureFormProps>;
+  key: string;
+};
+
+type EventProcedureSummary = {
+  component: React.ComponentType<EventProcedureSummaryProps>;
+  key: string;
+}
 
 export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>;
@@ -516,6 +540,8 @@ declare module 'graylog-web-plugin/plugin' {
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
+    'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
+    'views.components.eventProcedureSummary'?: Array<EventProcedureSummary>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
