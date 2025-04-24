@@ -45,15 +45,10 @@ const fieldMap = (productName: string) => ({
   sidecar_version: 'Sidecar version',
 });
 
-type Props = React.PropsWithChildren<{
-  query: string;
-  onSearch: (query: string) => void;
-  onReset: () => void;
-}>;
-
-const SidecarSearchForm = ({ query, onSearch, onReset, children = undefined }: Props) => {
+const SidecarQueryHelper = () => {
   const productName = useProductName();
-  const queryHelp = (
+
+  return (
     <QueryHelper
       entityName="sidecar"
       example={queryExamples}
@@ -61,19 +56,25 @@ const SidecarSearchForm = ({ query, onSearch, onReset, children = undefined }: P
       fieldMap={fieldMap(productName)}
     />
   );
-
-  return (
-    <SearchForm
-      query={query}
-      onSearch={onSearch}
-      onReset={onReset}
-      placeholder="Find sidecars"
-      queryHelpComponent={queryHelp}
-      topMargin={0}
-      useLoadingState>
-      {children}
-    </SearchForm>
-  );
 };
+
+type Props = React.PropsWithChildren<{
+  query: string;
+  onSearch: (query: string) => void;
+  onReset: () => void;
+}>;
+
+const SidecarSearchForm = ({ query, onSearch, onReset, children = undefined }: Props) => (
+  <SearchForm
+    query={query}
+    onSearch={onSearch}
+    onReset={onReset}
+    placeholder="Find sidecars"
+    queryHelpComponent={<SidecarQueryHelper />}
+    topMargin={0}
+    useLoadingState>
+    {children}
+  </SearchForm>
+);
 
 export default SidecarSearchForm;
