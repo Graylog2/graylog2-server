@@ -43,12 +43,12 @@ const background = (theme: DefaultTheme, trend: TrendDirection = 'neutral') =>
     neutral: theme.colors.global.contentBackground,
   })[trend];
 
-const Background = styled.div<{ trend: TrendDirection | undefined }>(({ theme, trend }) => {
-  const bgColor = background(theme, trend);
+const Background = styled.div<{ $trend: TrendDirection | undefined }>(({ theme, $trend }) => {
+  const bgColor = background(theme, $trend);
 
   return css`
     text-align: right;
-    ${trend &&
+    ${$trend &&
     css`
       background-color: ${bgColor} !important; /* Needed for report generation */
       color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
@@ -57,8 +57,8 @@ const Background = styled.div<{ trend: TrendDirection | undefined }>(({ theme, t
   `;
 });
 
-const TextContainer = styled.div<{ trend: TrendDirection | undefined; ref }>(({ theme, trend }) => {
-  const bgColor = background(theme, trend);
+const TextContainer = styled.div<{ $trend: TrendDirection | undefined; ref }>(({ theme, $trend }) => {
+  const bgColor = background(theme, $trend);
 
   return css`
     margin: 5px;
@@ -68,8 +68,8 @@ const TextContainer = styled.div<{ trend: TrendDirection | undefined; ref }>(({ 
   `;
 });
 
-const StyledIcon = styled(Icon)<{ trend: TrendDirection | undefined }>(({ theme, trend }) => {
-  const bgColor = background(theme, trend);
+const StyledIcon = styled(Icon)<{ $trend: TrendDirection | undefined }>(({ theme, $trend }) => {
+  const bgColor = background(theme, $trend);
 
   return css`
     path {
@@ -159,9 +159,9 @@ const Trend = React.forwardRef<HTMLSpanElement, Props>(
       : '--';
 
     return (
-      <Background trend={backgroundTrend} data-testid="trend-background">
-        <TextContainer trend={backgroundTrend} ref={ref}>
-          <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" />{' '}
+      <Background $trend={backgroundTrend} data-testid="trend-background">
+        <TextContainer $trend={backgroundTrend} ref={ref}>
+          <StyledIcon name={trendIcon} $trend={backgroundTrend} data-testid="trend-icon" />{' '}
           <span data-testid="trend-value" title={`Previous value: ${previousConverted}`}>
             {absoluteDifference} / {relativeDifference}
           </span>
