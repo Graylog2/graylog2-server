@@ -24,6 +24,8 @@ import { Input, Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGr
 import { ColorPickerPopover, TimezoneSelect } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import type { SelectCallback } from 'components/bootstrap/types';
+import DocsHelper from 'util/DocsHelper';
+import DocumentationLink from 'components/support/DocumentationLink';
 
 import type { ConfigType, ValidationType } from '../types';
 
@@ -128,14 +130,10 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
   render() {
     const { config, validation } = this.props;
     const { isBacklogSizeEnabled, backlogSize } = this.state;
-    const url = 'https://docs.graylog.org/docs/alerts#notifications';
     const element = (
       <p>
         Custom message to be appended below the alert title. See{' '}
-        <a href={url} rel="noopener noreferrer" target="_blank">
-          docs{' '}
-        </a>
-        for more details.
+        <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="docs " /> for more details.
       </p>
     );
 
