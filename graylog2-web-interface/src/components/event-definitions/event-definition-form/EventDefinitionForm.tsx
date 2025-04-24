@@ -39,11 +39,12 @@ import EventConditionForm from './EventConditionForm';
 import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
+import ShareForm from './ShareForm';
 
 const WizardContainer = styled.div`
   margin-bottom: 10px;
 `;
-export const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
+export const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'Share', 'summary'];
 const STEP_TELEMETRY_KEYS = [
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.STEP_CLICKED,
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.STEP_CLICKED,
@@ -129,7 +130,7 @@ const EventDefinitionForm = ({
   const eventProcedureId = eventDefinition?.event_procedure || undefined;
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
-
+  const isNew = action === 'create';
   const steps = [
     {
       key: STEP_KEYS[0],
@@ -151,8 +152,13 @@ const EventDefinitionForm = ({
       title: 'Notifications',
       component: <NotificationsForm {...defaultStepProps} notifications={notifications} defaults={defaults} />,
     },
-    {
+    ...(isNew ? [{
       key: STEP_KEYS[4],
+      title: 'Share',
+      component: <ShareForm {...defaultStepProps}  />,
+    }]: []),
+    {
+      key: STEP_KEYS[5],
       title: 'Summary',
       component: (
         <EventDefinitionSummary

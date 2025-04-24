@@ -36,6 +36,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import useEventDefinitionWithShareMutation from 'hooks/useEventDefinitionWithShareMutation';
 
 import EventDefinitionForm, { STEP_KEYS } from './EventDefinitionForm';
 
@@ -45,7 +47,9 @@ const fetchNotifications = () => {
 
 type Props = {
   action?: 'edit' | 'create';
-  eventDefinition?: EventDefinition;
+  eventDefinition?: EventDefinition & {
+    share_request?: EntitySharePayload,
+  };
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
   initialStep?: string;
   onCancel?: () => void;
@@ -96,6 +100,7 @@ const EventDefinitionFormContainer = ({
   const [isDirty, setIsDirty] = useState(false);
   const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
+  const { createEventDefinitionWithShare } = useEventDefinitionWithShareMutation();
 
   const entityTypes = useStore(AvailableEventDefinitionTypesStore);
   const notifications = useStore(EventNotificationsStore);
@@ -195,7 +200,12 @@ const EventDefinitionFormContainer = ({
         app_action_value: 'create-event-definition-button',
       });
 
-      EventDefinitionsActions.create(eventDefinition).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
+      if (eventDefinition?.share_request) {
+        const {share_request: shareRequest, ...rest} = eventDefinition;
+        createEventDefinitionWithShare({eventDefinition: rest, shareRequest}).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
+      } else {
+        EventDefinitionsActions.create(eventDefinition).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
+      }
     } else {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.UPDATE_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),

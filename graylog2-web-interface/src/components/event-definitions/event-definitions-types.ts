@@ -30,7 +30,7 @@ type Provider = {
 
 type FieldSpec = {
   [key: string]: {
-    data_type: string;
+    data_type: 'string' | 'error';
     providers: Array<Provider>;
   };
 };
@@ -50,7 +50,7 @@ export type Scheduler = {
   triggered_at: string;
   queued_notifications: number;
   is_scheduled: boolean;
-  status: string;
+  status: 'runnable' | 'running' | 'complete' | 'paused' | 'error' | 'cancelled';
 };
 
 export type SearchFilter = {
