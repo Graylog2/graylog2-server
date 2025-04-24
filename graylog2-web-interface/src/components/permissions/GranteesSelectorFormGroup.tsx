@@ -24,8 +24,8 @@ import { Select } from 'components/common';
 import SelectGroup from 'components/common/SelectGroup';
 import type Grantee from 'logic/permissions/Grantee';
 
-import GranteeIcon from './GranteeIcon';
 import CapabilitySelect from './CapabilitySelect';
+import { StyledGranteeIcon } from './CommonStyledComponents';
 
 type Props = {
   availableGrantees: GranteesList;
@@ -39,10 +39,6 @@ const GranteesSelect = styled(Select)`
 const GranteesSelectOption = styled.div`
   display: flex;
   align-items: center;
-`;
-
-const StyledGranteeIcon = styled(GranteeIcon)`
-  margin-right: 5px;
 `;
 
 const StyledSelectGroup = styled(SelectGroup)`

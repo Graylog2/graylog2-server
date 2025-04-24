@@ -86,7 +86,6 @@ import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
-import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -307,8 +306,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                            @Context UserContext userContext) {
         final Response result = create(schedule, request.entity(), userContext);
 
-        if (request.shareRequest().isPresent() && result.getEntity() instanceof StreamCreatedResponse streamCreatedResponse) {
-            entitySharesService.updateEntityShares(GRNTypes.EVENT_DEFINITION, streamCreatedResponse.streamId(), request.shareRequest().get(), userContext.getUser());
+        if (request.shareRequest().isPresent() && result.getEntity() instanceof EventDefinitionDto eventDefinitionDto) {
+            entitySharesService.updateEntityShares(GRNTypes.EVENT_DEFINITION, eventDefinitionDto.id(), request.shareRequest().get(), userContext.getUser());
         }
 
         return result;

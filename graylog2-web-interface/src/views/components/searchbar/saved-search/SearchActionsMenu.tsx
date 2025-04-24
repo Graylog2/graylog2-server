@@ -138,7 +138,7 @@ const SearchActionsMenu = () => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableSearchAction(loaded, view);
 
   const saveSearch = useCallback(
-    async (newTitle: string,  entityShare?: EntitySharePayload) => {
+    async (newTitle: string, entityShare?: EntitySharePayload) => {
       if (!view.id) {
         return;
       }
@@ -152,7 +152,7 @@ const SearchActionsMenu = () => {
   );
 
   const saveAsSearch = useCallback(
-    async (newTitle: string,  entityShare?: EntitySharePayload) => {
+    async (newTitle: string, entityShare?: EntitySharePayload) => {
       if (!newTitle || newTitle === '') {
         return;
       }

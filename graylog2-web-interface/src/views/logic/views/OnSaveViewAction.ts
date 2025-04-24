@@ -27,7 +27,7 @@ const _extractErrorMessage = (error: FetchError) =>
     ? error.additional.body.message
     : error;
 
-export default (view: View,   entityShare?: EntitySharePayload) => async (dispatch: ViewsDispatch) => {
+export default (view: View, entityShare?: EntitySharePayload) => async (dispatch: ViewsDispatch) => {
   try {
     await ViewManagementActions.update(view, entityShare);
     dispatch(setIsNew(false));

@@ -14,21 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 
-import { Panel } from 'components/bootstrap';
-import DocumentationLink from 'components/support/DocumentationLink';
-import DocsHelper from 'util/DocsHelper';
+import useProductName from 'brand-customization/useProductName';
 
-export default function SidebarPermissions() {
-  return (
-    <Panel bsStyle="info" header={<span>AWS Policy Permissions</span>}>
-      <p>
-        Please refer to the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.AWS_KINESIS_CLOUDWATCH_INPUT} text="official documentation" /> for
-        information on required AWS permissions.
-        <br />
-      </p>
-    </Panel>
-  );
-}
+const ProductName = () => useProductName();
+
+export default ProductName;
