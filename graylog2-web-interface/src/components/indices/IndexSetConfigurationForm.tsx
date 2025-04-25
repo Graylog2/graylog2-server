@@ -207,7 +207,7 @@ const ReadOnlyConfig = () => {
 };
 
 const IndexSetConfigurationForm = ({
-  indexSet: initialIndexSet,
+  indexSet: initialIndexSet = undefined,
   rotationStrategies,
   retentionStrategies,
   retentionStrategiesContext,
@@ -215,7 +215,7 @@ const IndexSetConfigurationForm = ({
   onUpdate,
   cancelLink,
   submitButtonText,
-  submitLoadingText,
+  submitLoadingText = undefined,
 }: Props) => {
   const history = useHistory();
   const productName = useProductName();

@@ -94,7 +94,7 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
         {({ isSubmitting, values, setFieldValue, isValid }) => (
           <Form>
             <Modal.Header>
-              <Modal.Title id="dialog_label">Update Message Processors Configuration</Modal.Title>
+              <Modal.Title>Update Message Processors Configuration</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>

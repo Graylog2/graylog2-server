@@ -46,7 +46,7 @@ type Props = {
   hideExampleTab?: boolean;
 };
 
-const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExampleTab = false }: Props) => {
+const RuleHelper = ({ functionDescriptors = undefined, paginationQueryParameter, hideExampleTab = false }: Props) => {
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [currentPage, setCurrentPage] = useState<number>(paginationQueryParameter.page);
   const [pageSize, setPageSize] = useState<number>(10);

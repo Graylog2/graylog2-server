@@ -100,8 +100,8 @@ const getRetentionConfigState = (strategy: string, data: RetentionStrategyConfig
 
 const RotationConfig = ({
   rotationStrategies,
-  indexSetRotationStrategy,
-  indexSetRotationStrategyClass,
+  indexSetRotationStrategy = undefined,
+  indexSetRotationStrategyClass = undefined,
 }: RotationStrategiesProps) => {
   if (!rotationStrategies) return <Spinner />;
 
@@ -126,8 +126,8 @@ const RotationConfig = ({
 const RetentionConfig = ({
   retentionStrategies,
   retentionStrategiesContext,
-  indexSetRetentionStrategy,
-  indexSetRetentionStrategyClass,
+  indexSetRetentionStrategy = undefined,
+  indexSetRetentionStrategyClass = undefined,
 }: RetentionConfigProps) => {
   if (!retentionStrategies) return <Spinner />;
 
@@ -201,7 +201,13 @@ const validate = (formValues: IndexSetTemplateFormValues, usesLegacyRetention: b
   return errors;
 };
 
-const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCancel, onSubmit }: Props) => {
+const TemplateForm = ({
+  initialValues = undefined,
+  submitButtonText,
+  submitLoadingText,
+  onCancel,
+  onSubmit,
+}: Props) => {
   const productName = useProductName();
   const retentionConfigSegments: Array<{ value: RetentionConfigSegment; label: string }> = [
     { value: 'data_tiering', label: 'Data Tiering' },

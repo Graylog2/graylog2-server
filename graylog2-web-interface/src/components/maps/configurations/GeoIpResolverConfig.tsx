@@ -139,12 +139,12 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
           Edit configuration
         </Button>
       </IfPermitted>
-      <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
+      <Modal show={showModal} onHide={resetConfig}>
         <Formik onSubmit={handleSubmit} initialValues={curConfig}>
           {({ values, setFieldValue, isSubmitting }) => (
             <Form>
               <Modal.Header>
-                <Modal.Title id="dialog_label">{modalTitle}</Modal.Title>
+                <Modal.Title>{modalTitle}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Row>

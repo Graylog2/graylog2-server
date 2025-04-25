@@ -52,7 +52,7 @@ type Props = {
 
 const EventConditionForm = ({
   action = 'create',
-  entityTypes,
+  entityTypes = undefined,
   eventDefinition,
   validation,
   currentUser,

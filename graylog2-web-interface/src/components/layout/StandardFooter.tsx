@@ -40,7 +40,7 @@ type Props = {
   };
 };
 
-const StandardFooter = ({ system }: Props) => {
+const StandardFooter = ({ system = undefined }: Props) => {
   const productName = useProductName();
   const [jvm, setJvm] = useState<Jvm | undefined>();
 
