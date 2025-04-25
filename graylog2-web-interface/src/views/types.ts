@@ -207,7 +207,7 @@ export interface ExportFormat {
 }
 
 export interface SystemConfigurationComponentProps<T = unknown> {
-  config: T;
+  config?: T;
   updateConfig: (newConfig: T) => any;
 }
 
@@ -371,7 +371,7 @@ type EventProcedureForm = {
 type EventProcedureSummary = {
   component: React.ComponentType<EventProcedureSummaryProps>;
   key: string;
-}
+};
 
 export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>;

@@ -23,6 +23,7 @@ import { Link } from 'components/common/router';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   table: LookupTable;
@@ -34,6 +35,7 @@ type InputType = { value: string; valid: boolean };
 const INIT_INPUT = { value: '', valid: false };
 
 const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
+  const productName = useProductName();
   const navigate = useNavigate();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const [purgeKey, setPurgeKey] = React.useState<InputType>(INIT_INPUT);
@@ -152,7 +154,8 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
       <Col md={6}>
         <h2>Test lookup</h2>
         <p>
-          You can manually query the lookup table using this form. The data will be cached as configured by Graylog.
+          You can manually query the lookup table using this form. The data will be cached as configured by{' '}
+          {productName}.
         </p>
         <form onSubmit={handleLookupKey}>
           <fieldset>

@@ -112,7 +112,7 @@ const DnsAdapterDocumentation = () => {
         <strong>Resolve hostname to IPv4 address (A)</strong>: Returns both a <code>single_value</code> containing one
         of the IPv4 addresses that the hostname resolves to, and a <code>multi_value</code> containing all IPv4
         addresses that the hostname resolves to. Input for this type must be a pure domain name (eg.{' '}
-        <code>api.graylog.com</code>).
+        <code>api.example.com</code>).
       </p>
       <StyledPre>{aResponse}</StyledPre>
 
@@ -120,7 +120,7 @@ const DnsAdapterDocumentation = () => {
         <strong>Resolve hostname to IPv6 address (AAAA)</strong>: Returns both a <code>single_value</code> containing
         one of the IPv6 addresses that the hostname resolves to, and a <code>multi_value</code> containing all IPv6
         addresses that the hostname resolves to. Input for this type must be a pure domain name (eg.{' '}
-        <code>api.graylog.com</code>).
+        <code>api.example.com</code>).
       </p>
       <StyledPre>{aaaaResponse}</StyledPre>
 
@@ -128,7 +128,7 @@ const DnsAdapterDocumentation = () => {
         <strong>Resolve hostname to IPv4 and IPv6 address (A and AAAA)</strong>: Returns both a{' '}
         <code>single_value</code> containing one of the IPv4 or IPv6 addresses that the hostname resolves to (will
         return IPv4 if available), and a <code>multi_value</code> containing all IPv4 and IPv6 addresses that the
-        hostname resolves to. Input for this type must be a pure domain name (eg. <code>api.graylog.com</code>).
+        hostname resolves to. Input for this type must be a pure domain name (eg. <code>api.example.com</code>).
       </p>
       <StyledPre>{aAndAaaaResponse}</StyledPre>
 
@@ -142,7 +142,7 @@ const DnsAdapterDocumentation = () => {
 
       <p style={styleMarginBottom}>
         <strong>Text lookup (TXT)</strong>: Returns a <code>multi_value</code> with all TXT records defined for the
-        hostname. Input for this type must be a pure domain name (eg. <code>api.graylog.com</code>).
+        hostname. Input for this type must be a pure domain name (eg. <code>api.example.com</code>).
       </p>
       <StyledPre>{txtResponse}</StyledPre>
 

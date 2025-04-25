@@ -46,7 +46,7 @@ type Props = {
   hideExampleTab?: boolean;
 };
 
-const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExampleTab = false }: Props) => {
+const RuleHelper = ({ functionDescriptors = undefined, paginationQueryParameter, hideExampleTab = false }: Props) => {
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [currentPage, setCurrentPage] = useState<number>(paginationQueryParameter.page);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -113,7 +113,7 @@ const RuleHelper = ({ functionDescriptors, paginationQueryParameter, hideExample
         <Col md={12}>
           <p className={RuleHelperStyle.marginQuickReferenceText}>
             Read the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES} text="full documentation" /> to gain a
-            better understanding of how Graylog pipeline rules work.
+            better understanding of how pipeline rules work.
           </p>
         </Col>
       </Row>

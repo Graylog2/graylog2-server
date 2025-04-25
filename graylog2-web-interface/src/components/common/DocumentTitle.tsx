@@ -17,6 +17,8 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
+import useProductName from 'brand-customization/useProductName';
+
 type Props = {
   title: React.ReactNode;
   children: React.ReactNode;
@@ -35,15 +37,15 @@ type Props = {
  * ```
  */
 const DocumentTitle = ({ children, title }: Props) => {
-  const DEFAULT_TITLE = 'Graylog';
+  const productName = useProductName();
 
   useEffect(() => {
     document.title = `${document.title} - ${title}`;
 
     return () => {
-      document.title = DEFAULT_TITLE;
+      document.title = productName;
     };
-  }, [title]);
+  }, [productName, title]);
 
   return <>{children}</>;
 };

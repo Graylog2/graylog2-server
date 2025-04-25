@@ -70,10 +70,11 @@ const formatStatsString = (stats: IndexSetStats) => {
   return `${indices}, ${documents}, ${size}`;
 };
 
+const DEFAULT_PAGE_NUMBER = 1;
+const DEFAULT_PAGE_SIZE = 10;
+const SEARCH_MIN_TERM_LENGTH = 3;
+
 const IndexSetsComponent = () => {
-  const DEFAULT_PAGE_NUMBER = 1;
-  const DEFAULT_PAGE_SIZE = 10;
-  const SEARCH_MIN_TERM_LENGTH = 3;
   const { indexSetsCount, indexSets, indexSetStats, globalIndexSetStats } =
     useStore<IndexSetsStoreState>(IndexSetsStore);
   const { page, resetPage }: PaginationQueryParameterResult = usePaginationQueryParameter();

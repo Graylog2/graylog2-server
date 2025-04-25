@@ -102,7 +102,7 @@ class EmailNotificationForm extends React.Component<
   static defaultConfig = {
     sender: '', // TODO: Default sender should come from the server. The default should be empty or the address configured in the email server settings
     // eslint-disable-next-line no-template-curly-in-string
-    subject: 'Graylog event notification: ${event_definition_title}', // TODO: Default subject should come from the server
+    subject: 'Event notification: ${event_definition_title}', // TODO: Default subject should come from the server
     reply_to: '',
     body_template: DEFAULT_BODY_TEMPLATE, // TODO: Default body template should come from the server
     html_body_template: DEFAULT_HTML_BODY_TEMPLATE,
@@ -611,7 +611,7 @@ class EmailNotificationForm extends React.Component<
               onChange={this.handleRecipientsChange('user_recipients')}
             />
             <HelpBlock>
-              {get(validation, 'errors.recipients[0]', 'Select Graylog users that will receive this Notification.')}
+              {get(validation, 'errors.recipients[0]', 'Select users that will receive this Notification.')}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -637,11 +637,7 @@ class EmailNotificationForm extends React.Component<
               onChange={this.handleRecipientsChange('cc_users')}
             />
             <HelpBlock>
-              {get(
-                validation,
-                'errors.cc_users[0]',
-                'Select Graylog users that will be on the CC line of this Notification.',
-              )}
+              {get(validation, 'errors.cc_users[0]', 'Select users that will be on the CC line of this Notification.')}
             </HelpBlock>
           </FormGroup>
         </IfPermitted>
@@ -670,7 +666,7 @@ class EmailNotificationForm extends React.Component<
               {get(
                 validation,
                 'errors.bcc_users[0]',
-                'Select Graylog users that will be on the BCC line of this Notification.',
+                'Select users that will be on the BCC line of this Notification.',
               )}
             </HelpBlock>
           </FormGroup>

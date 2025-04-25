@@ -17,6 +17,6 @@
 
 import AppConfig from 'util/AppConfig';
 
-const useProductName = () => AppConfig.branding()?.product_name ?? 'Graylog';
+const useProductName = () => AppConfig.branding?.()?.product_name ?? 'Graylog';
 
 export default useProductName;

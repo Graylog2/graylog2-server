@@ -59,8 +59,8 @@ const NotificationsList = () => {
       <Col md={12}>
         <h2>{getTitle(total)}</h2>
         <p className="description">
-          Notifications are triggered by Graylog and indicate a situation you should act upon. Many notification types
-          will also provide a link to the Graylog documentation if you need more information or assistance.
+          Notifications indicate a situation you should act upon. Many notification types will also provide a link to
+          the documentation if you need more information or assistance.
         </p>
 
         {getContent(total, notifications)}
