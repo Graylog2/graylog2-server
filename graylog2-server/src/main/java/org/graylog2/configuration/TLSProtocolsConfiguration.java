@@ -33,8 +33,10 @@ import java.util.Set;
  */
 public class TLSProtocolsConfiguration {
 
-    @Documentation("allowed TLS protocols for system wide TLS enabled servers. (e.g. message inputs, http interface)." +
-            "Setting this to an empty value, leaves it up to system libraries and the used JDK to chose a default.")
+    @Documentation("""
+            allowed TLS protocols for system wide TLS enabled servers. (e.g. message inputs, http interface)
+            Setting this to an empty value, leaves it up to system libraries and the used JDK to chose a default.
+            """)
     @Parameter(value = "enabled_tls_protocols", converter = StringSetConverter.class)
     private Set<String> enabledTlsProtocols = null;
 
