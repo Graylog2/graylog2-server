@@ -18,7 +18,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
 import { useNavigate } from 'react-router-dom';
-import useProductName from 'brand-customization/useProductName';
 
 import { Icon, LinkToNode, Section } from 'components/common';
 import useParams from 'routing/useParams';
