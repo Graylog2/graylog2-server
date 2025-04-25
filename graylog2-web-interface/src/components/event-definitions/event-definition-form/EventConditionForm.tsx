@@ -52,7 +52,7 @@ type Props = {
 
 const EventConditionForm = ({
   action = 'create',
-  entityTypes,
+  entityTypes = undefined,
   eventDefinition,
   validation,
   currentUser,
@@ -148,7 +148,7 @@ const EventConditionForm = ({
         ) : (
           <>
             <p>
-              Configure how Graylog should create Events of this kind. You can later use those Events as input on other
+              Define how Events of this type should be created. You can later use those Events as input on other
               Conditions, making it possible to build powerful Conditions based on others.
             </p>
             <FormGroup validationState={validation.errors.config ? 'error' : null}>
