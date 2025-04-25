@@ -76,6 +76,7 @@ import org.graylog2.shared.bindings.IsDevelopmentBindings;
 import org.graylog2.shared.bindings.PluginBindings;
 import org.graylog2.shared.metrics.MetricRegistryFactory;
 import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.graylog2.shared.plugins.LoggingClassLoader;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.storage.SearchVersion;
@@ -146,6 +147,9 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     }
 
     protected CmdLineTool(String commandName, NodeConfiguration configuration) {
+        // Wrap the context class loader to allow logging of failed class and resource lookups.
+        Thread.currentThread().setContextClassLoader(new LoggingClassLoader(Thread.currentThread().getContextClassLoader()));
+
         jadConfig = new JadConfig();
         addConverters(jadConfig);
 
