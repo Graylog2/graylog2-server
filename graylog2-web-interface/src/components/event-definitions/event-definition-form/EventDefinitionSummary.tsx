@@ -31,16 +31,20 @@ import useFeature from 'hooks/useFeature';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
+import ShareDetails from './ShareDetails';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  eventDefinition: EventDefinition;
+  eventDefinition: EventDefinition & {
+    share_request?: EntitySharePayload,
+  };
   notifications: Array<EventNotification>;
   validation?: {
     errors: {
@@ -307,6 +311,11 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation = {
           )}
           <Col md={5} mdOffset={isSystemEventDefinition ? 0 : 1}>
             {renderNotifications(eventDefinition.notifications, eventDefinition.notification_settings)}
+          </Col>
+        </Row>
+        <Row>
+          <Col md={5}>
+            <ShareDetails shareState={eventDefinition.share_request} />
           </Col>
         </Row>
       </Col>

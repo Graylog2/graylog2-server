@@ -33,6 +33,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import EventDefinitionFormControls from 'components/event-definitions/event-definition-form/EventDefinitionFormControls';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
@@ -64,7 +65,9 @@ const getConditionPlugin = (type: string | undefined) => {
 type Props = {
   activeStep: string;
   action?: 'edit' | 'create';
-  eventDefinition: EventDefinition;
+  eventDefinition: EventDefinition & {
+    share_request?: EntitySharePayload,
+  };
   currentUser: User;
   validation: {
     errors: {
