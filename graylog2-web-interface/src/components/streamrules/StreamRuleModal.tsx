@@ -87,7 +87,7 @@ const StreamRuleModal = ({
     description: '',
   },
 }: Props) => {
-  const { enabled, feed } = useResourceCustomization('stream_rule_matcher_code');
+  const { enabled, url } = useResourceCustomization('stream_rule_matcher_code');
   const { inputs } = useStore(StreamRulesInputsStore);
   const { data: streamRuleTypes } = useStreamRuleTypes();
 
@@ -221,7 +221,7 @@ const StreamRuleModal = ({
                           <br />
                           <BrandIcon name="github" />
                           &nbsp;
-                          <a href={feed} target="_blank" rel="noopener noreferrer">
+                          <a href={url} target="_blank" rel="noopener noreferrer">
                             {' '}
                             Take a look at the matcher code on GitHub
                           </a>

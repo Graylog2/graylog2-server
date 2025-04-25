@@ -39,7 +39,7 @@ const StyledJumbotron = styled(Jumbotron)(
 );
 
 const NoWidgetsInfo = () => {
-  const { enabled, feed } = useResourceCustomization('enterprise_product');
+  const { enabled, url } = useResourceCustomization('enterprise_product');
   const productName = useProductName();
 
   return (
@@ -78,7 +78,7 @@ const NoWidgetsInfo = () => {
                 <>
                   {' '}
                   (contained in{' '}
-                  <a href={feed} target="_blank" rel="noopener noreferrer">
+                  <a href={url} target="_blank" rel="noopener noreferrer">
                     {productName} Enterprise
                   </a>
                   )

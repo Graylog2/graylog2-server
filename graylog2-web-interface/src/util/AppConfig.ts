@@ -22,7 +22,7 @@ declare global {
   const IS_CLOUD: boolean | undefined;
 }
 
-export type BrandingResource = { enabled?: boolean; feed?: string | undefined };
+export type BrandingResource = { enabled?: boolean; url?: string | undefined };
 export type BrandingResourceKey =
   | 'stream_rule_matcher_code'
   | 'enterprise_product'

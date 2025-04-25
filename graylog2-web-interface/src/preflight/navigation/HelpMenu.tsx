@@ -32,7 +32,7 @@ const StyledButton = styled(Button)(
 );
 
 const HelpMenu = () => {
-  const { enabled, feed } = useResourceCustomization('contact_support');
+  const { enabled, url } = useResourceCustomization('contact_support');
 
   return (
     <Menu width={250} position="bottom-end">
@@ -67,7 +67,7 @@ const HelpMenu = () => {
           Operations changelogs
         </Menu.Item>
         {enabled && (
-          <Menu.Item component="a" rightSection={<Icon name="open_in_new" />} href={feed} target="_blank">
+          <Menu.Item component="a" rightSection={<Icon name="open_in_new" />} href={url} target="_blank">
             Support
           </Menu.Item>
         )}

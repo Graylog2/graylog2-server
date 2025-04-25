@@ -20,7 +20,7 @@ import type { BrandingResource, BrandingResourceKey } from 'util/AppConfig';
 import AppConfig from 'util/AppConfig';
 import Version from 'util/Version';
 
-const defaultResourcesFeeds: Record<BrandingResourceKey, string> = {
+const defaultResourcesUrls: Record<BrandingResourceKey, string> = {
   stream_rule_matcher_code: `https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`,
   contact_sales: 'https://go2.graylog.org/contact-sales',
   contact_support: 'https://support.graylog.org/portal',
@@ -33,10 +33,10 @@ const useResourceCustomization = (brandingKey: BrandingResourceKey): BrandingRes
     const customResources = AppConfig?.branding?.()?.resources ?? {};
 
     return Object.fromEntries(
-      Object.entries(defaultResourcesFeeds).map(([key, defaultFeed]: [BrandingResourceKey, string]) => {
+      Object.entries(defaultResourcesUrls).map(([key, defaultUrl]: [BrandingResourceKey, string]) => {
         const resource = customResources?.[key];
 
-        return [key, { enabled: resource?.enabled !== false, feed: resource?.feed ?? defaultFeed }];
+        return [key, { enabled: resource?.enabled !== false, url: resource?.url ?? defaultUrl }];
       }),
     );
   }, []);

@@ -48,7 +48,7 @@ public record Config(
                             @JsonProperty("contact_support") Optional<ResourceItem> contactSupport,
                             @JsonProperty("contact_us") Optional<ResourceItem> contactUs
                             ) {
-        public record ResourceItem(Optional<Boolean> enabled, Optional<String> feed) {}
+        public record ResourceItem(Optional<Boolean> enabled, Optional<String> url) {}
     }
 
     public record Navigation(Optional<NavigationItem> home,
