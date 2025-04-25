@@ -63,9 +63,14 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
     public static final String TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY = "transport_certificate_password";
     public static final String HTTP_CERTIFICATE_PASSWORD_PROPERTY = "http_certificate_password";
+    public static final String DATANODE_ROLE_OPENSEARCH = "opensearch";
 
     public static final int DATANODE_DEFAULT_PORT = 8999;
     public static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
+
+    @Documentation("Initial role for the Datanode. If not set, the default role is opensearch.")
+    @Parameter("initial_datanode_role")
+    private String iniitialDataNodeRole = DATANODE_ROLE_OPENSEARCH;
 
     @Documentation(visible = false)
     @Parameter(value = "installation_source", validators = StringNotBlankValidator.class)
@@ -338,7 +343,11 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return opensearchAuditLog;
     }
 
-     /**
+    public List<String> getDataNodeRoles() {
+        return List.of(iniitialDataNodeRole);
+    }
+
+    /**
      * The insecure flag causes problems on many places. We should replace it with autosecurity option, that would
      * configure all the CA and certs automatically.
      */
