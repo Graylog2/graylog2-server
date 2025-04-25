@@ -235,8 +235,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     void checkConfiguredHeap() {
         Size heap = Size.parse(configuration.getOpensearchHeap());
         long heapBytes = heap.toBytes();
-        SystemInfo systemInfo = new SystemInfo();
-        GlobalMemory memory = systemInfo.getHardware().getMemory();
+        final GlobalMemory memory = getGlobalMemory();
         long buffer = 2 * 1024 * 1024 * 1024L;
         long freeMemory = memory.getAvailable() - buffer;
         float memoryRatio = (float) freeMemory / heapBytes;
@@ -250,6 +249,12 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                             "recommendedMemory", FileUtils.byteCountToDisplaySize(memory.getTotal()/2),
                             "heapSize", FileUtils.byteCountToDisplaySize(heapBytes))));
         }
+    }
+
+    protected GlobalMemory getGlobalMemory() {
+        SystemInfo systemInfo = new SystemInfo();
+        GlobalMemory memory = systemInfo.getHardware().getMemory();
+        return memory;
     }
 
     @Subscribe
