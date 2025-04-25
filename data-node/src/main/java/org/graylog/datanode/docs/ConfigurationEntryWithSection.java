@@ -14,18 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.configuration;
+package org.graylog.datanode.docs;
 
-import com.github.joschi.jadconfig.Parameter;
-
-public class EventBusConfiguration {
-
-    @Documentation("Number of threads used exclusively for dispatching internal events. Default is 2.")
-    @Parameter(value = "async_eventbus_processors")
-    private final int asyncEventbusProcessors = 2;
-
-    public int getAsyncEventbusProcessors() {
-        return asyncEventbusProcessors;
+public record ConfigurationEntryWithSection(ConfigurationEntry entry, String sectionHeading, String sectionDescription) {
+    public boolean hasSection() {
+        return sectionHeading != null && !sectionHeading.isBlank();
     }
-
 }
