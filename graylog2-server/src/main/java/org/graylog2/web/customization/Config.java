@@ -41,11 +41,11 @@ public record Config(
         public record WelcomeItem(Optional<Boolean> enabled, Optional<String> feed) {}
     }
 
-    public record Resources(Optional<ResourceItem> stream_rule_matcher_code,
-                            Optional<ResourceItem> enterprise_product,
-                            Optional<ResourceItem> contact_sales,
-                            Optional<ResourceItem> contact_support,
-                            Optional<ResourceItem> contact_us
+    public record Resources(Optional<ResourceItem> streamRuleMatcherCode,
+                            Optional<ResourceItem> enterpriseProduct,
+                            Optional<ResourceItem> contactSales,
+                            Optional<ResourceItem> contactSupport,
+                            Optional<ResourceItem> contactUs
                             ) {
         public record ResourceItem(Optional<Boolean> enabled, Optional<String> feed) {}
     }
