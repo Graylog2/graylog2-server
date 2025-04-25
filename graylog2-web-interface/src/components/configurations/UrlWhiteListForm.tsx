@@ -30,6 +30,7 @@ import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsS
 import ToolsStore from 'stores/tools/ToolsStore';
 import { isValidURL } from 'util/URLUtils';
 import generateId from 'logic/generateId';
+import useProductName from 'brand-customization/useProductName';
 
 type ValidationResult = {
   title: { valid: boolean };
@@ -74,7 +75,8 @@ type Props = {
   newEntryId?: string;
 };
 
-const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId }: Props) => {
+const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId = undefined }: Props) => {
+  const productName = useProductName();
   const literal = 'literal';
   const regex = 'regex';
   const options = [
@@ -266,7 +268,7 @@ const UrlWhiteListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
         label="Disable Whitelist"
         checked={config.disabled}
         onChange={() => setConfig({ ...config, disabled: !config.disabled })}
-        help="Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk."
+        help={`Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in ${productName} entities, which may pose a security risk.`}
       />
       <Button bsSize="sm" onClick={(event) => _onAdd(event)}>
         Add Url
