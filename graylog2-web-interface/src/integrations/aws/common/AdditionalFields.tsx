@@ -51,7 +51,7 @@ type AdditionalFieldsProps = {
 
 const AdditionalFields = ({
   children,
-  className,
+  className = undefined,
   onToggle = () => {},
   title,
   visible = false,

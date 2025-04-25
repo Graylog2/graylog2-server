@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
-import styled from 'styled-components';
 
 import ThrottlingCheckbox from 'integrations/components/ThrottlingCheckbox';
 import { Input } from 'components/bootstrap';
