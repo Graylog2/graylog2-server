@@ -17,16 +17,17 @@
 package org.graylog2.web.customization;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Optional;
 
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record Config(
-        Optional<String> productName,
+        @JsonProperty("product_name") Optional<String> productName,
         Optional<String> favicon,
         Optional<Logo> logo,
-        Optional<String> helpUrl,
+        @JsonProperty("help_url") Optional<String> helpUrl,
         Optional<Login> login,
         Optional<Welcome> welcome,
         Optional<Navigation> navigation,
@@ -41,17 +42,17 @@ public record Config(
         public record WelcomeItem(Optional<Boolean> enabled, Optional<String> feed) {}
     }
 
-    public record Resources(Optional<ResourceItem> streamRuleMatcherCode,
-                            Optional<ResourceItem> enterpriseProduct,
-                            Optional<ResourceItem> contactSales,
-                            Optional<ResourceItem> contactSupport,
-                            Optional<ResourceItem> contactUs
+    public record Resources(@JsonProperty("stream_rule_matcher_code") Optional<ResourceItem> streamRuleMatcherCode,
+                            @JsonProperty("enterprise_product") Optional<ResourceItem> enterpriseProduct,
+                            @JsonProperty("contact_sales") Optional<ResourceItem> contactSales,
+                            @JsonProperty("contact_support") Optional<ResourceItem> contactSupport,
+                            @JsonProperty("contact_us") Optional<ResourceItem> contactUs
                             ) {
         public record ResourceItem(Optional<Boolean> enabled, Optional<String> feed) {}
     }
 
     public record Navigation(Optional<NavigationItem> home,
-                             Optional<NavigationItem> userMenu,
+                             @JsonProperty("user_menu") Optional<NavigationItem> userMenu,
                              Optional<NavigationItem> scratchpad,
                              Optional<NavigationItem> help) {
         public record NavigationItem(String icon) {}
