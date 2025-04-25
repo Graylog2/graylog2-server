@@ -26,6 +26,7 @@ import { FormikInput, ModalSubmit, SortableList } from 'components/common';
 import * as ISODurationUtils from 'util/ISODurationUtils';
 import type { FormConfig, Processor } from 'components/configurations/message-processors/Types';
 import MessageProcessorStatusFormGroup from 'components/configurations/message-processors/MessageProcessorStatusFormGroup';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   closeModal: () => void;
@@ -38,10 +39,9 @@ const LabelSpan = styled.span(
     font-weight: bold;
   `,
 );
-
 const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
-  const futureTimestampNormalizationHelpText =
-    "Enable normalisation of timestamps that specify a time significantly ahead of Graylog's own system time. This typically happens when a log source runs on a server with an incorrect system clock. Future timestamps will be normalised to match the time it was first received by either a Graylog Forwarder, or Graylog. It is important to prevent future timestamps when making use of the Warm Tier, as this can otherwise degrade performance.";
+  const productName = useProductName();
+  const futureTimestampNormalizationHelpText = `Enable normalisation of timestamps that specify a time significantly ahead of the ${productName} system time. This typically happens when a log source runs on a server with an incorrect system clock. Future timestamps will be normalised to match the time it was first received by either a ${productName} Forwarder, or ${productName}. It is important to prevent future timestamps when making use of the Warm Tier, as this can otherwise degrade performance.`;
   const hasNoActiveProcessor = () => formConfig.disabled_processors.length >= formConfig.processor_order.length;
   const saveConfig = (values: FormConfig) => {
     if (!hasNoActiveProcessor()) {
@@ -94,7 +94,7 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
         {({ isSubmitting, values, setFieldValue, isValid }) => (
           <Form>
             <Modal.Header>
-              <Modal.Title id="dialog_label">Update Message Processors Configuration</Modal.Title>
+              <Modal.Title>Update Message Processors Configuration</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
@@ -117,7 +117,7 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
                   placeholder="P2D"
                   label="Grace Period"
                   disabled={!values?.enableFutureTimestampNormalization}
-                  help="If Future Timestamp Normalisation is enabled, timestamps specifying a time further ahead of Graylog's own system time than the Grace Period interval will be normalised."
+                  help={`If Future Timestamp Normalisation is enabled, timestamps specifying a time further ahead of the ${productName} system time than the Grace Period interval will be normalised.`}
                   addonAfter={
                     values.enableFutureTimestampNormalization &&
                     ISODurationUtils.formatDuration(values.grace_period, gracePeriodValidator, 'invalid')
