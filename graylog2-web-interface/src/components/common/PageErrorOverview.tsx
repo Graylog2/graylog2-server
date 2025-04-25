@@ -17,6 +17,7 @@
 import React from 'react';
 
 import ErrorPage from 'components/errors/ErrorPage';
+import useProductName from 'brand-customization/useProductName';
 
 type PageErrorOverviewProps = {
   /** Array of errors that prevented the original page to load. */
@@ -29,6 +30,7 @@ type PageErrorOverviewProps = {
  * can't reach the node).
  */
 const PageErrorOverview = ({ errors }: PageErrorOverviewProps) => {
+  const productName = useProductName();
   const formattedErrors = errors
     ? errors.map((error) => <li key={`key-${error.toString()}`}>{error.toString()}</li>)
     : [];
@@ -40,7 +42,7 @@ const PageErrorOverview = ({ errors }: PageErrorOverviewProps) => {
     <ErrorPage title="Error getting data" description={description} displayPageLayout={false}>
       <ul>
         {formattedErrors}
-        <li>Check your Graylog logs for more information.</li>
+        <li>Check your {productName} server logs for more information.</li>
       </ul>
     </ErrorPage>
   );
