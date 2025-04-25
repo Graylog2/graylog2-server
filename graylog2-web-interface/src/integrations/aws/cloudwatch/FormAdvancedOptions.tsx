@@ -23,10 +23,6 @@ import { FormDataContext } from 'integrations/aws/context/FormData';
 import { AdvancedOptionsContext } from 'integrations/aws/context/AdvancedOptions';
 import AdditionalFields from 'integrations/aws/common/AdditionalFields';
 
-const StyledAdditionalFields = styled(AdditionalFields)`
-  margin: 0 0 35px;
-`;
-
 type FormAdvancedOptionsProps = {
   onChange: (...args: any[]) => void;
 };
@@ -42,7 +38,7 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
   };
 
   return (
-    <StyledAdditionalFields title="Advanced Options" visible={isAdvancedOptionsVisible} onToggle={handleToggle}>
+    <AdditionalFields title="Advanced Options" visible={isAdvancedOptionsVisible} onToggle={handleToggle}>
       <ThrottlingCheckbox
         id="awsCloudWatchThrottleEnabled"
         defaultChecked={awsCloudWatchThrottleEnabled?.value}
@@ -67,7 +63,7 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         label="Kinesis Record batch size"
         help="The number of Kinesis records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time."
       />
-    </StyledAdditionalFields>
+    </AdditionalFields>
   );
 };
 
