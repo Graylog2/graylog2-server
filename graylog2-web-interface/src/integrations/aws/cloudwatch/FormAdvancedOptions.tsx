@@ -23,6 +23,10 @@ import { FormDataContext } from 'integrations/aws/context/FormData';
 import { AdvancedOptionsContext } from 'integrations/aws/context/AdvancedOptions';
 import AdditionalFields from 'integrations/aws/common/AdditionalFields';
 
+const StyledAdditionalFields = styled(AdditionalFields)`
+  margin: 0 0 35px;
+`;
+
 type FormAdvancedOptionsProps = {
   onChange: (...args: any[]) => void;
 };
@@ -66,9 +70,5 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
     </StyledAdditionalFields>
   );
 };
-
-const StyledAdditionalFields = styled(AdditionalFields)`
-  margin: 0 0 35px;
-`;
 
 export default FormAdvancedOptions;

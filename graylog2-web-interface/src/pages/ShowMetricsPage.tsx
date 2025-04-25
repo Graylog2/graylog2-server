@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import useProductName from 'brand-customization/useProductName';
 
 import { ClusterNodeMetrics } from '@graylog/server-api';
 
@@ -29,6 +28,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 import useQueryParameters from 'routing/useQuery';
 import useParams from 'routing/useParams';
+import useProductName from 'brand-customization/useProductName';
 
 const metricsNamespace = MetricsStore.namespace;
 

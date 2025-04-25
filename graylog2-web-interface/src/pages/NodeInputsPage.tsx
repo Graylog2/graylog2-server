@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
-import useProductName from 'brand-customization/useProductName';
 
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Link } from 'components/common/router';
@@ -26,6 +25,7 @@ import withParams from 'routing/withParams';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
+import useProductName from 'brand-customization/useProductName';
 
 import useCurrentUser from '../hooks/useCurrentUser';
 

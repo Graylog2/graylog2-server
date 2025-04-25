@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import useProductName from 'brand-customization/useProductName';
 
 import { LinkContainer } from 'components/common/router';
 import RolesOverview from 'components/roles/RolesOverview';
@@ -24,6 +23,7 @@ import DocsHelper from 'util/DocsHelper';
 import { Button, Row, Col, Alert } from 'components/bootstrap';
 import { PageHeader, DocumentTitle, Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
+import useProductName from 'brand-customization/useProductName';
 
 const RolesOverviewPage = () => {
   const productName = useProductName();

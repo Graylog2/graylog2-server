@@ -16,11 +16,11 @@
  */
 
 import React from 'react';
-import ProductName from 'brand-customization/ProductName';
 
 import type { ReportedError } from 'logic/errors/ReportedErrors';
 import { createReactError } from 'logic/errors/ReportedErrors';
 import { Section } from 'preflight/components/common';
+import ProductName from 'brand-customization/ProductName';
 
 type Props = {
   children: React.ReactNode | Array<React.ReactNode>;

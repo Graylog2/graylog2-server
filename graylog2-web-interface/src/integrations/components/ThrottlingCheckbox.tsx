@@ -1,7 +1,7 @@
 import * as React from 'react';
-import useProductName from 'brand-customization/useProductName';
 
 import { Input } from 'components/bootstrap';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   id: string;

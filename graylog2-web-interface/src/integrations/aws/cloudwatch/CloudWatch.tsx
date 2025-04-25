@@ -37,7 +37,7 @@ type CloudWatchProps = {
   onSubmit?: (...args: any[]) => void;
 };
 
-const CloudWatch = ({ externalInputSubmit = false, onSubmit }: CloudWatchProps) => {
+const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: CloudWatchProps) => {
   const { availableSteps, currentStep, isDisabledStep, setAvailableStep, setCurrentStep, setEnabledStep } =
     useContext(StepsContext);
   const { setFormData } = useContext(FormDataContext);

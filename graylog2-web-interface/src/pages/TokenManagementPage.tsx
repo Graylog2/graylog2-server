@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import useProductName from 'brand-customization/useProductName';
 
 import { PageHeader, DocumentTitle } from 'components/common';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import TokenManagement from 'components/users/UsersTokenManagement/TokenManagement';
+import useProductName from 'brand-customization/useProductName';
 
 const TokenManagementPage = () => {
   const productName = useProductName();

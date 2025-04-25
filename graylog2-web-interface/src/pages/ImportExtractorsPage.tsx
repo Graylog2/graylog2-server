@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import useProductName from 'brand-customization/useProductName';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ImportExtractors from 'components/extractors/ImportExtractors';
@@ -24,6 +23,7 @@ import type { ParamsContext } from 'routing/withParams';
 import withParams from 'routing/withParams';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import type { Input } from 'components/messageloaders/Types';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = ParamsContext;
 

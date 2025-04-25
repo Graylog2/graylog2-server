@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
-import useProductName from 'brand-customization/useProductName';
 
 import { Button, Panel, Input } from 'components/bootstrap';
 import FormWrap from 'integrations/aws/common/FormWrap';
@@ -28,6 +27,25 @@ import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/co
 import { ApiContext } from 'integrations/aws/context/Api';
 import { FormDataContext } from 'integrations/aws/context/FormData';
 import Icon from 'components/common/Icon';
+import useProductName from 'brand-customization/useProductName';
+
+const Notice = styled.span`
+  display: flex;
+  align-items: center;
+
+  > span {
+    margin-left: 6px;
+  }
+`;
+
+const CheckAgain = styled.p`
+  display: flex;
+  align-items: center;
+
+  > strong {
+    margin-right: 9px;
+  }
+`;
 
 type StepHealthCheckProps = {
   onSubmit: (...args: any[]) => void;
@@ -53,23 +71,23 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
     },
   );
 
-  const checkForLogs = () => {
+  const checkForLogs = useCallback(() => {
     setPauseCountdown(true);
     setLogDataUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS.HEALTH_CHECK);
-  };
+  }, [setLogDataUrl]);
 
   useEffect(() => {
     if (!logData) {
       checkForLogs();
     }
-  }, []);
+  }, [checkForLogs, logData]);
 
   useEffect(() => {
     if (!logDataProgress.loading && !logDataProgress.data) {
       setPauseCountdown(false);
       setLogDataUrl(null);
     }
-  }, [logDataProgress.loading]);
+  }, [logDataProgress.data, logDataProgress.loading, setLogDataUrl]);
 
   if (!logData) {
     return (
@@ -160,23 +178,5 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
     </FormWrap>
   );
 };
-
-const Notice = styled.span`
-  display: flex;
-  align-items: center;
-
-  > span {
-    margin-left: 6px;
-  }
-`;
-
-const CheckAgain = styled.p`
-  display: flex;
-  align-items: center;
-
-  > strong {
-    margin-right: 9px;
-  }
-`;
 
 export default StepHealthCheck;

@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import useProductName from 'brand-customization/useProductName';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';

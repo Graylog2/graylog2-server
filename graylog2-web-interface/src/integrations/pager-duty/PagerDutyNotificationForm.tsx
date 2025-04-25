@@ -1,10 +1,10 @@
 import React from 'react';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
-import useProductName from 'brand-customization/useProductName';
 
 import { Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
+import useProductName from 'brand-customization/useProductName';
 
 type PagerDutyNotificationFormProps = {
   config: {
