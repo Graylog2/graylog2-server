@@ -25,6 +25,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
@@ -80,6 +81,8 @@ import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
@@ -232,30 +235,20 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     void checkConfiguredHeap() {
         Size heap = Size.parse(configuration.getOpensearchHeap());
         long heapBytes = heap.toBytes();
-        long freeMemory = getFreeMemory();
+        SystemInfo systemInfo = new SystemInfo();
+        GlobalMemory memory = systemInfo.getHardware().getMemory();
+        long buffer = 2 * 1024 * 1024 * 1024L;
+        long freeMemory = memory.getAvailable() - buffer;
         float memoryRatio = (float) freeMemory / heapBytes;
         if (memoryRatio > MEMORY_RATIO_THRESHOLD) {
             LOG.warn("There appears to be about {} times more available memory than the heap size configured for this data node.", memoryRatio);
             clusterEventBus.post(new DataNodeNotficationEvent(nodeId.getNodeId(), Notification.Type.DATA_NODE_HEAP_WARNING,
-                    Map.of("hostname", configuration.getHostname(), "memoryRatio", memoryRatio)));
-        }
-    }
-
-    /**
-     * Tries to determine the free memory available on the machine at the given time minus a buffer of 2 GB.
-     *
-     * @return free memory minus buffer of 2 GB
-     */
-    @SuppressForbidden("Deliberate use of com.sun package, handling exception if not available")
-    long getFreeMemory() {
-        try {
-            SystemInfo systemInfo = new SystemInfo();
-            GlobalMemory memory = systemInfo.getHardware().getMemory();
-            long buffer = 2 * 1024 * 1024 * 1024L;
-            return memory.getAvailable() - buffer;
-        } catch (Exception e) {
-            LOG.warn("Could not determine free memory of system");
-            return 0;
+                    Map.of("hostname", configuration.getHostname(),
+                            "memoryRatio", f("%.1f", memoryRatio),
+                            "totalMemory", FileUtils.byteCountToDisplaySize(memory.getTotal()),
+                            "availableMemory", FileUtils.byteCountToDisplaySize(memory.getAvailable()),
+                            "recommendedMemory", FileUtils.byteCountToDisplaySize(memory.getTotal()/2),
+                            "heapSize", FileUtils.byteCountToDisplaySize(heapBytes))));
         }
     }
 
