@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, act, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
  import selectEvent from 'react-select-event';
 
 import { asMock } from 'helpers/mocking';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
-import {createEntityShareState, viewer} from 'fixtures/entityShareState';
+import {createEntityShareState, everyone, viewer} from 'fixtures/entityShareState';
 import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 
 import OriginalSavedSearchForm from './SavedSearchForm';
