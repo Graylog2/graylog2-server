@@ -41,6 +41,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -279,8 +280,13 @@ public class EntitySharesService {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .forEach(grantDtos::addAll);
+
+        Map<GRN, Capability> capabilities = new HashMap<>();
+        grantDtos.forEach(dto -> {
+            capabilities.put(dto.grantee(), dto.capability());
+        });
         grantDtos.forEach(dto ->
-                updateOnlyEntityShares(dto.target(), EntityShareRequest.create(Map.of(dto.grantee(), dto.capability())), sharingUser));
+                updateOnlyEntityShares(dto.target(), EntityShareRequest.create(capabilities), sharingUser));
     }
 
     private void postUpdateEvent(EntitySharesUpdateEvent updateEvent) {
