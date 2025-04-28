@@ -6018,9 +6018,9 @@ create-require@^1.1.0:
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
 
 cronstrue@^2.50.0:
-  version "2.56.0"
-  resolved "https://registry.yarnpkg.com/cronstrue/-/cronstrue-2.56.0.tgz#70b406106e6059bf9c494c788255d671d8ecc361"
-  integrity sha512-/YC3b4D/E/S8ToQ7f676A2fqoC3vVpXKjJ4SMsP0jYsvRYJdZ6h9+Fq/Y7FoFDEUFCqLTca+G2qTV227lyyFZg==
+  version "2.59.0"
+  resolved "https://registry.yarnpkg.com/cronstrue/-/cronstrue-2.59.0.tgz#a250b2b04eebabf35518725018e501ff94370fb1"
+  integrity sha512-YKGmAy84hKH+hHIIER07VCAHf9u0Ldelx1uU6EBxsRPDXIA1m5fsKmJfyC3xBhw6cVC/1i83VdbL4PvepTrt8A==
 
 cross-env@^7.0.2:
   version "7.0.3"
