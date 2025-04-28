@@ -57,7 +57,7 @@ const HelpMenu = () => {
           rightSection={<Icon name="open_in_new" />}
           href={DocsHelper.toString(DocsHelper.PAGES.CHANGELOG)}
           target="_blank">
-          Graylog changelogs
+          Changelogs
         </Menu.Item>
         <Menu.Item
           component="a"

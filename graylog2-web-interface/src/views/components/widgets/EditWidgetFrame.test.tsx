@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import MockStore from 'helpers/mocking/StoreMock';
 import Widget from 'views/logic/widgets/Widget';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';

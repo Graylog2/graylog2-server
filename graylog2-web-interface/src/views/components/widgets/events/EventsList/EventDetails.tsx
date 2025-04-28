@@ -33,7 +33,7 @@ export const usePluggableEventDetails = (eventId: string) => {
     .map(({ component: PluggableEventAction, key }) => <PluggableEventAction key={key} eventId={eventId} />);
 };
 
-export const DefaultDetailsWrapper = ({ eventId }: { eventId: string; }) => {
+export const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
   const { data: event, isLoading } = useEventById(eventId);
   const currentUser = useCurrentUser();
   const canViewDefinition = isPermitted(currentUser.permissions, `eventdefinitions:read:${event?.event_definition_id}`);
@@ -50,7 +50,7 @@ export const DefaultDetailsWrapper = ({ eventId }: { eventId: string; }) => {
   return <DefaultDetails event={event} eventDefinitionContext={eventDefinition} />;
 };
 
-const EventDetailsWrapper = ({ eventId }: { eventId: string; }) => {
+const EventDetailsWrapper = ({ eventId }: { eventId: string }) => {
   const puggableEventDetails = usePluggableEventDetails(eventId);
 
   if (puggableEventDetails?.length) {

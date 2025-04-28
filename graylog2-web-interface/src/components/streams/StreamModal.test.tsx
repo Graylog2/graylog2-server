@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { indexSets } from 'fixtures/indexSets';
 import { stream } from 'fixtures/streams';
 

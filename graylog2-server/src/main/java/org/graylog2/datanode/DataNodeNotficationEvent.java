@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AppConfig from './AppConfig';
+package org.graylog2.datanode;
 
-export const DEPRECATION_NOTICE = 'Graylog Deprecation Notice:';
+import org.graylog2.notifications.Notification;
 
-const deprecationNotice = (deprecatedMessage) =>
-  // eslint-disable-next-line no-console
-  AppConfig.gl2DevMode() && console.warn(DEPRECATION_NOTICE, deprecatedMessage);
+import java.util.Map;
 
-export default deprecationNotice;
+public record DataNodeNotficationEvent(String nodeId, Notification.Type notificationType, Map<String, Object> details) {
+}

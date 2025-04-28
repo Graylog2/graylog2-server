@@ -14,21 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.datanode;
+import AppConfig from './AppConfig';
 
-import org.graylog2.datanode.DataNodeCommandService;
-import org.graylog2.datanode.DataNodeCommandServiceImpl;
-import org.graylog2.datanode.DataNodeEventService;
-import org.graylog2.migrations.V20231107164300_CreateDataNodeManagerRole;
-import org.graylog2.plugin.PluginModule;
+export const DEPRECATION_NOTICE = 'Deprecation Notice:';
 
-public class DataNodeModule extends PluginModule {
+const deprecationNotice = (deprecatedMessage: string) =>
+  // eslint-disable-next-line no-console
+  AppConfig.gl2DevMode() && console.warn(DEPRECATION_NOTICE, deprecatedMessage);
 
-    @Override
-    protected void configure() {
-        bind(DataNodeCommandService.class).to(DataNodeCommandServiceImpl.class);
-        bind(DataNodeEventService.class).asEagerSingleton();
-        addMigration(V20231107164300_CreateDataNodeManagerRole.class);
-    }
-
-}
+export default deprecationNotice;

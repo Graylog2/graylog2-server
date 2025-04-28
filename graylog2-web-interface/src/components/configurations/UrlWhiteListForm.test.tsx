@@ -17,8 +17,8 @@
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { screen, render, within, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import type { Url } from 'stores/configurations/ConfigurationsStore';
 
 import UrlWhiteListForm from './UrlWhiteListForm';
