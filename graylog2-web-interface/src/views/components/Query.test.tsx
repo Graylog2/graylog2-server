@@ -21,6 +21,7 @@ import View from 'views/logic/views/View';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { createViewWithWidgets, createSearch } from 'fixtures/searches';
+import useUpsellPlugin from 'components/upsell/test/testUpsellPlugin';
 
 import OriginalQuery from './Query';
 
@@ -36,6 +37,7 @@ const Query = (props: Partial<React.ComponentProps<typeof TestStoreProvider>>) =
 );
 
 describe('Query', () => {
+  useUpsellPlugin();
   useViewsPlugin();
 
   it('renders dashboard widget creation explanation on the dashboard page, if no widget is defined', async () => {
