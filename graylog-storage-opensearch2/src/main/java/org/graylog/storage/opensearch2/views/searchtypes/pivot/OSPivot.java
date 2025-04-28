@@ -215,11 +215,21 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
 
         if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
             final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
+            extractFieldNames(query, rowBuilder);
             processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-inner");
             resultBuilder.addRow(rowBuilder.source("non-leaf").build());
         }
 
         return resultBuilder.build();
+    }
+
+    private void extractFieldNames(final Query query, final PivotResult.Row.Builder rowBuilder) {
+        if(query.searchTypes().iterator().hasNext()) {
+            SearchType searchType = query.searchTypes().iterator().next();
+            if(searchType instanceof Pivot pivot) {
+                pivot.rowGroups().forEach(rg -> rg.fields().forEach(field -> rowBuilder.addValue(PivotResult.Value.create(List.of(field), field, true, "row-inner"))));
+            }
+        }
     }
 
     private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {

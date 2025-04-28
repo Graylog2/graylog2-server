@@ -22,12 +22,11 @@ import com.google.common.collect.ImmutableList;
 import org.bson.Document;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
-import org.graylog.plugins.views.search.util.ListOfStringsComparator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public record ExportTabularResultResponse(@JsonProperty List<String> header,
                                           @JsonProperty @JacksonXmlElementWrapper(useWrapping = false) List<DataRow> dataRows) {
@@ -36,27 +35,26 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
 
     }
 
+    private static String removeBrackets(final String string) {
+        if(string.startsWith("[") && string.endsWith("]")) {
+            return string.substring(1, string.length()-1);
+        }
+        return string;
+    }
+
     public static ExportTabularResultResponse fromPivotResult(final PivotResult pivotResult) {
 
         final Collection<PivotResult.Row> rows = pivotResult.rows();
 
-        final int longestRowKey = rows.stream()
-                .mapToInt(row -> row.key().size())
-                .max()
-                .orElse(0);
-
         final List<ImmutableList<String>> columns = rows.stream()
+                .filter(row -> row.key().isEmpty())
                 .flatMap(row -> row.values()
                         .stream()
                         .map(PivotResult.Value::key)
                 )
-                .distinct()
-                .sorted(new ListOfStringsComparator())
                 .toList();
 
-        final List<String> header = new ArrayList<>(longestRowKey + columns.size());
-        header.addAll(Collections.nCopies(longestRowKey, ""));
-        columns.forEach(column -> header.add(column.toString()));
+        final List<String> header = columns.stream().flatMap(r -> r.stream().map(ExportTabularResultResponse::removeBrackets)).toList();
 
         final List<DataRow> dataRows = rows.stream()
                 .filter(row -> "leaf".equals(row.source()))
@@ -70,7 +68,7 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
                                     .findFirst()
                                     .map(value -> value.value())
                                     .orElse(null)
-                            ).toList();
+                            ).filter(Objects::nonNull).toList();
 
                     List<Object> dataRow = new ArrayList<>();
                     dataRow.addAll(key);
