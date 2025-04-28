@@ -18,12 +18,8 @@ package org.graylog.plugins.map.config;
 
 import jakarta.inject.Inject;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 public class GeoIpFileServiceFactory {
     private final GeoIpProcessorConfig processorConfig;
-    private final AtomicReference<GeoIpFileService> actualS3FileService = new AtomicReference<>();
-    private final AtomicReference<GeoIpFileService> actualGcsFileService = new AtomicReference<>();
 
     @Inject
     public GeoIpFileServiceFactory(GeoIpProcessorConfig processorConfig) {
@@ -38,15 +34,9 @@ public class GeoIpFileServiceFactory {
      */
     public GeoIpFileService create(GeoIpResolverConfig config) {
         if (config.useS3()) {
-            if (actualS3FileService.get() == null) {
-                actualS3FileService.set(new S3GeoIpFileService(processorConfig));
-            }
-            return actualS3FileService.get();
+            return new S3GeoIpFileService(processorConfig);
         } else if (config.useGcs()) {
-            if (actualGcsFileService.get() == null) {
-                actualGcsFileService.set(new GcsGeoIpFileService(processorConfig));
-            }
-            return actualGcsFileService.get();
+            return new GcsGeoIpFileService(processorConfig);
         } else {
             return new LocalGeoIpFileService(processorConfig);
         }

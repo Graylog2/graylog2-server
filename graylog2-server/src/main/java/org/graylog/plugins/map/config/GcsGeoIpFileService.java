@@ -83,9 +83,6 @@ public class GcsGeoIpFileService extends GeoIpFileService {
         if (!config.asnDbPath().isBlank() && extractDetails(config.asnDbPath()).isEmpty()) {
             throw new ConfigValidationException("ASN database path is not a valid GCS URL. It must be in the format <gs://bucket-name/object-name>.");
         }
-        if (config.gcsProjectId() == null || config.gcsProjectId().isBlank()) {
-            throw new ConfigValidationException("GCS project ID is not set. It is required to connect to Google Cloud Storage.");
-        }
     }
 
     @Override
@@ -93,7 +90,7 @@ public class GcsGeoIpFileService extends GeoIpFileService {
         return LOG;
     }
 
-    private void getOrSetProjectId(String gcsProjectId) {
+    private void setProjectId(String gcsProjectId) {
         if (projectId == null) {
             projectId = gcsProjectId;
         }
@@ -120,7 +117,7 @@ public class GcsGeoIpFileService extends GeoIpFileService {
     }
 
     private Optional<Instant> genericDownload(String gcsProjectId, String dbPath, Path tempPath) throws IOException {
-        getOrSetProjectId(gcsProjectId);
+        setProjectId(gcsProjectId);
         final Optional<BucketAndObject> details = extractDetails(dbPath);
         if (details.isPresent()) {
             return Optional.of(downloadSingleFile(getGcsStorage(), details.get(), tempPath));
@@ -149,7 +146,7 @@ public class GcsGeoIpFileService extends GeoIpFileService {
     }
 
     private Optional<Instant> genericServerTimestamp(String gcsProjectId, String dbPath) {
-        getOrSetProjectId(gcsProjectId);
+        setProjectId(gcsProjectId);
         return extractDetails(dbPath).flatMap(details -> updateTimestampForGcsObject(getGcsStorage(), details));
     }
 
