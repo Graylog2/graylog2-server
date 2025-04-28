@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import last from 'lodash/last';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/bootstrap';
@@ -25,7 +24,7 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
 import useWidgets from 'views/hooks/useWidgets';
-import usePluginEntities from 'hooks/usePluginEntities';
+import usePluggableUpsellWrapper from 'hooks/usePluggableUpsellWrapper';
 
 const StyledJumbotron = styled(Jumbotron)(
   ({ theme }) => css`
@@ -39,9 +38,7 @@ const StyledJumbotron = styled(Jumbotron)(
 );
 
 const NoWidgetsInfo = () => {
-  const enterpriseLink = usePluginEntities('views.components.query.enterpriseLink');
-  const EnterpriseLinkComponent = last(enterpriseLink);
-  const enabled = EnterpriseLinkComponent !== null;
+  const UpsellWrapper = usePluggableUpsellWrapper();
 
   return (
     <StyledJumbotron>
@@ -75,12 +72,14 @@ const NoWidgetsInfo = () => {
           <li>
             <p>
               4. <b>Share</b> the dashboard with your colleagues. Prepare it for <b>reuse</b> by using parameters
-              {enabled && (
-                <>
-                  {' '}
-                  (contained in <EnterpriseLinkComponent />)
-                </>
-              )}
+              <UpsellWrapper>
+                {' '}
+                (contained in{' '}
+                <a href="https://www.graylog.org/graylog-enterprise-edition" target="_blank" rel="noopener noreferrer">
+                  Graylog Enterprise
+                </a>
+                )
+              </UpsellWrapper>
               .
             </p>
           </li>

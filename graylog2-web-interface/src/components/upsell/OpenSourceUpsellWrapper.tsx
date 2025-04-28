@@ -16,11 +16,6 @@
  */
 import React from 'react';
 
-const EnterpriseLink = () => <a
-    href="https://www.graylog.org/graylog-enterprise-edition"
-    target="_blank"
-    rel="noopener noreferrer">
-    Graylog Enterprise
-  </a>;
+const OpenSourceUpsellWrapper = ({ children }) => <>{children}</>;
 
-export default EnterpriseLink;
+export default OpenSourceUpsellWrapper;
