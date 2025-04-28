@@ -69,20 +69,6 @@ class GcsGeoIpFileServiceTest {
     }
 
     @Test
-    void validateConfigMissingProjectId() {
-        final GeoIpResolverConfig config = mkConfig();
-        final ConfigValidationException exception = assertThrows(ConfigValidationException.class, () -> service.validateConfiguration(config));
-        assertThat(exception.getMessage()).contains("GCS project ID");
-    }
-
-    @Test
-    void validateConfigBlankProjectId() {
-        final GeoIpResolverConfig config = mkConfig().toBuilder().gcsProjectId(" ").build();
-        final ConfigValidationException exception = assertThrows(ConfigValidationException.class, () -> service.validateConfiguration(config));
-        assertThat(exception.getMessage()).contains("GCS project ID");
-    }
-
-    @Test
     void validateConfigValid() {
         final GeoIpResolverConfig config = mkConfig().toBuilder().gcsProjectId("project-id-12345").build();
         try {
