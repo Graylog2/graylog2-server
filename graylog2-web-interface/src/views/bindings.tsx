@@ -118,6 +118,7 @@ import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/
 import ExportMessageWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportMessageWidgetAction';
 import ExportWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetAction';
 import FieldTypeValueRenderer from 'views/components/fieldtypes/FieldTypeValueRenderer';
+import EnterpriseLink from 'views/components/EnterpriseLink';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -474,6 +475,7 @@ const exports: PluginExports = {
   ],
   'views.components.widgets.events.filterComponents': eventsFilterComponents,
   'views.components.widgets.events.attributes': eventsAttributes,
+  'views.components.query.enterpriseLink': [EnterpriseLink],
   'views.reducers': viewsReducers,
   'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
   'views.widgets.actions': [ExportMessageWidgetAction, ExportWidgetAction],

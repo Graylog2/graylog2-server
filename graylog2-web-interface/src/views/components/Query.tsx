@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import last from 'lodash/last';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/bootstrap';
@@ -24,8 +25,7 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
 import useWidgets from 'views/hooks/useWidgets';
-import useResourceCustomization from 'brand-customization/useResourceCustomization';
-import useProductName from 'brand-customization/useProductName';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const StyledJumbotron = styled(Jumbotron)(
   ({ theme }) => css`
@@ -39,8 +39,9 @@ const StyledJumbotron = styled(Jumbotron)(
 );
 
 const NoWidgetsInfo = () => {
-  const { enabled, url } = useResourceCustomization('enterprise_product');
-  const productName = useProductName();
+  const enterpriseLink = usePluginEntities('views.components.query.enterpriseLink');
+  const EnterpriseLinkComponent = last(enterpriseLink);
+  const enabled = EnterpriseLinkComponent !== null;
 
   return (
     <StyledJumbotron>
@@ -77,11 +78,7 @@ const NoWidgetsInfo = () => {
               {enabled && (
                 <>
                   {' '}
-                  (contained in{' '}
-                  <a href={url} target="_blank" rel="noopener noreferrer">
-                    {productName} Enterprise
-                  </a>
-                  )
+                  (contained in <EnterpriseLinkComponent />)
                 </>
               )}
               .

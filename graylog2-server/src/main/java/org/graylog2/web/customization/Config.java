@@ -43,8 +43,6 @@ public record Config(
     }
 
     public record Resources(@JsonProperty("stream_rule_matcher_code") Optional<ResourceItem> streamRuleMatcherCode,
-                            @JsonProperty("enterprise_product") Optional<ResourceItem> enterpriseProduct,
-                            @JsonProperty("contact_sales") Optional<ResourceItem> contactSales,
                             @JsonProperty("contact_support") Optional<ResourceItem> contactSupport,
                             @JsonProperty("contact_us") Optional<ResourceItem> contactUs
                             ) {
