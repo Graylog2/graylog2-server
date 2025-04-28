@@ -17,11 +17,11 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-// import selectEvent from 'react-select-event';
+ import selectEvent from 'react-select-event';
 
 import { asMock } from 'helpers/mocking';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
-import { createEntityShareState } from 'fixtures/entityShareState';
+import {createEntityShareState, viewer} from 'fixtures/entityShareState';
 import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 
 import OriginalSavedSearchForm from './SavedSearchForm';
@@ -38,35 +38,35 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
     getInitialState: jest.fn(),
   },
 }));
-// const shareWithCollaborator = async () =>{
-//   const granteesSelect = await screen.findByLabelText('Search for users and teams');
-//
-//   await act(async () => {
-//     await selectEvent.openMenu(granteesSelect);
-//   });
-//
-//   await act(async () => {
-//     await selectEvent.select(granteesSelect, everyone.title);
-//   });
-//
-//   const capabilitySelect = await screen.findByLabelText('Select a capability');
-//
-//   await act(async () => {
-//     await selectEvent.openMenu(capabilitySelect);
-//   });
-//
-//   await act(async () => {
-//     await selectEvent.select(capabilitySelect, viewer.title);
-//   });
-//
-//   const addCollaborator = await screen.findByRole('button', {
-//     name: /add collaborator/i,
-//   });
-//
-//   userEvent.click(addCollaborator);
-//
-//   await screen.findByText(/everyone/i);
-// };
+const shareWithCollaborator = async () =>{
+  const granteesSelect = await screen.findByLabelText('Search for users and teams');
+
+  await act(async () => {
+    await selectEvent.openMenu(granteesSelect);
+  });
+
+  await act(async () => {
+    await selectEvent.select(granteesSelect, everyone.title);
+  });
+
+  const capabilitySelect = await screen.findByLabelText('Select a capability');
+
+  await act(async () => {
+    await selectEvent.openMenu(capabilitySelect);
+  });
+
+  await act(async () => {
+    await selectEvent.select(capabilitySelect, viewer.title);
+  });
+
+  const addCollaborator = await screen.findByRole('button', {
+    name: /add collaborator/i,
+  });
+
+  userEvent.click(addCollaborator);
+
+  await screen.findByText(/everyone/i);
+};
 
 const SavedSearchForm = ({...props}: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
   <OriginalSavedSearchForm {...props}>
@@ -182,6 +182,20 @@ describe('SavedSearchForm', () => {
       userEvent.click(createNewButton);
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
+    });
+
+    // eslint-disable-next-line jest/no-disabled-tests
+    it.skip('should handle saveSearch with share settings', async () => {
+      const onSaveAs = jest.fn();
+      render(<SavedSearchForm {...props}  saveAsSearch={onSaveAs} isCreateNew />);
+      userEvent.type(await findTitleInput(), ' and further title');
+      const createNewButton = await screen.findByRole('button', { name: /create new/i });
+
+      await shareWithCollaborator();
+
+      userEvent.click(createNewButton);
+
+      expect(onSaveAs).toHaveBeenCalledTimes(1);
     });
   });
 
