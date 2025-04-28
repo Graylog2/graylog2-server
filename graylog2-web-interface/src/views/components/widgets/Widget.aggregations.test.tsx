@@ -16,10 +16,10 @@
  */
 import React from 'react';
 import { render, waitFor, screen, within, act } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import selectEvent from 'helpers/selectEvent';
 import MockStore from 'helpers/mocking/StoreMock';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -75,8 +75,6 @@ jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
   updateWidget: jest.fn(() => async () => {}),
 }));
-
-const selectEventConfig = { container: document.body };
 
 describe('Aggregation Widget', () => {
   useViewsPlugin();
@@ -175,7 +173,7 @@ describe('Aggregation Widget', () => {
         });
 
         await act(async () => {
-          await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
+          await selectEvent.select(metricFieldSelect, 'Count');
         });
 
         await findWidgetConfigSubmitButton();
@@ -190,7 +188,7 @@ describe('Aggregation Widget', () => {
         });
 
         await act(async () => {
-          await selectEvent.select(streamsSelect, 'Stream 1', selectEventConfig);
+          await selectEvent.select(streamsSelect, 'Stream 1');
         });
 
         await screen.findByRole('button', {
@@ -270,7 +268,7 @@ describe('Aggregation Widget', () => {
         });
 
         await act(async () => {
-          await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
+          await selectEvent.select(metricFieldSelect, 'Count');
         });
 
         await findWidgetConfigSubmitButton();

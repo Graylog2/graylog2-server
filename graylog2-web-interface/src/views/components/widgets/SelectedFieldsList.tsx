@@ -52,7 +52,6 @@ type ListItemProps = {
   dragHandleProps: DragHandleProps;
   draggableProps: DraggableProps;
   fieldSelect: React.ComponentType<React.ComponentProps<typeof FieldSelect>>;
-  fieldSelectMenuPortalTarget: HTMLElement | undefined;
   item: { id: string; title: string };
   onChange: (fieldName: string) => void;
   onRemove: () => void;
@@ -73,7 +72,6 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
       dragHandleProps,
       draggableProps,
       fieldSelect = FieldSelect,
-      fieldSelectMenuPortalTarget,
       item,
       onChange,
       onRemove,
@@ -103,7 +101,6 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
             openMenuOnFocus
             clearable={false}
             size={selectSize}
-            menuPortalTarget={fieldSelectMenuPortalTarget}
             excludedFields={selectedFields.filter((fieldName) => fieldName !== item.id)}
             ariaLabel="Fields"
             name="add-field-select"
@@ -133,7 +130,6 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
 type Props = {
   displayOverlayInPortal?: boolean;
   fieldSelect?: React.ComponentType<React.ComponentProps<typeof FieldSelect>>;
-  fieldSelectMenuPortalTarget?: HTMLElement;
   onChange: (newSelectedFields: Array<string>) => void;
   selectSize?: 'normal' | 'small';
   selectedFields: Array<string>;
@@ -149,7 +145,6 @@ const SelectedFieldsList = ({
   displayOverlayInPortal = false,
   showUnit = false,
   fieldSelect = undefined,
-  fieldSelectMenuPortalTarget = undefined,
 }: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
@@ -179,7 +174,6 @@ const SelectedFieldsList = ({
         selectSize={selectSize}
         selectedFields={selectedFields ?? []}
         item={item}
-        fieldSelectMenuPortalTarget={fieldSelectMenuPortalTarget}
         fieldSelect={fieldSelect}
         testIdPrefix={`${testPrefix}-field-${index}`}
         dragHandleProps={dragHandleProps}
@@ -189,16 +183,7 @@ const SelectedFieldsList = ({
         showUnit={showUnit}
       />
     ),
-    [
-      selectSize,
-      selectedFields,
-      fieldSelectMenuPortalTarget,
-      fieldSelect,
-      testPrefix,
-      showUnit,
-      onChangeField,
-      onRemoveField,
-    ],
+    [selectSize, selectedFields, fieldSelect, testPrefix, showUnit, onChangeField, onRemoveField],
   );
 
   const onSortChange = useCallback(
