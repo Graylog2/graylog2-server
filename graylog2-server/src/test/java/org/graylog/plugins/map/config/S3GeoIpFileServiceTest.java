@@ -18,14 +18,18 @@ package org.graylog.plugins.map.config;
 
 import org.graylog2.plugin.validate.ConfigValidationException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -44,23 +48,26 @@ class S3GeoIpFileServiceTest {
         service = new S3GeoIpFileService(processorConfig);
     }
 
-    @Test
-    void validateConfigInvalidCityDbPath() {
-        final GeoIpResolverConfig config = mkConfig().toBuilder().cityDbPath("s3://bucket").build();
+    @ParameterizedTest
+    @MethodSource("allConfigs")
+    void validateConfigInvalidCityDbPath(GeoIpResolverConfig providedConfig) {
+        final GeoIpResolverConfig config = providedConfig.toBuilder().cityDbPath("s3://bucket").build();
         final ConfigValidationException exception = assertThrows(ConfigValidationException.class, () -> service.validateConfiguration(config));
         assertThat(exception.getMessage()).contains("City database path");
     }
 
-    @Test
-    void validateConfigInvalidAsnDbPath() {
-        final GeoIpResolverConfig config = mkConfig().toBuilder().asnDbPath("s3://bucket").build();
+    @ParameterizedTest
+    @MethodSource("allConfigs")
+    void validateConfigInvalidAsnDbPath(GeoIpResolverConfig providedConfig) {
+        final GeoIpResolverConfig config = providedConfig.toBuilder().asnDbPath("s3://bucket").build();
         final ConfigValidationException exception = assertThrows(ConfigValidationException.class, () -> service.validateConfiguration(config));
         assertThat(exception.getMessage()).contains("ASN database path");
     }
 
-    @Test
-    void validateConfigBlankAsnDbPathIsValid() {
-        final GeoIpResolverConfig config = mkConfig().toBuilder().asnDbPath(" ").build();
+    @ParameterizedTest
+    @MethodSource("allConfigs")
+    void validateConfigBlankAsnDbPathIsValid(GeoIpResolverConfig providedConfig) {
+        final GeoIpResolverConfig config = providedConfig.toBuilder().asnDbPath(" ").build();
         try {
             service.validateConfiguration(config);
         } catch (ConfigValidationException e) {
@@ -68,9 +75,9 @@ class S3GeoIpFileServiceTest {
         }
     }
 
-    @Test
-    void validateConfigValid() {
-        final GeoIpResolverConfig config = mkConfig();
+    @ParameterizedTest
+    @MethodSource("allConfigs")
+    void validateConfigValid(GeoIpResolverConfig config) {
         try {
             service.validateConfiguration(config);
         } catch (ConfigValidationException e) {
@@ -78,7 +85,14 @@ class S3GeoIpFileServiceTest {
         }
     }
 
-    private GeoIpResolverConfig mkConfig() {
+    private static Stream<Arguments> allConfigs() {
+        return Stream.of(
+                Arguments.of(mkConfig()),
+                Arguments.of(mkDeprecatedConfig())
+        );
+    }
+
+    private static GeoIpResolverConfig mkConfig() {
         return GeoIpResolverConfig.builder()
                 .enabled(true)
                 .enforceGraylogSchema(true)
@@ -87,9 +101,15 @@ class S3GeoIpFileServiceTest {
                 .refreshIntervalUnit(TimeUnit.MINUTES)
                 .cityDbPath("s3://bucket/city.mmdb")
                 .asnDbPath("s3://bucket/asn.mmdb")
-                .useS3(true)
-                .useGcs(false)
+                .useS3(false)
+                .pullFromCloud(Optional.of(CloudStorageType.S3))
                 .build();
     }
 
+    private static GeoIpResolverConfig mkDeprecatedConfig() {
+        return mkConfig().toBuilder()
+                .useS3(true)
+                .pullFromCloud(Optional.empty())
+                .build();
+    }
 }

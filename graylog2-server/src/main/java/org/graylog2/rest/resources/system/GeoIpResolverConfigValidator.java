@@ -98,7 +98,7 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
             GeoIpResolverConfig curConfig = clusterConfigService.getOrDefault(GeoIpResolverConfig.class,
                     GeoIpResolverConfig.defaultConfig());
             boolean moveTemporaryFiles = false;
-            if (config.useS3() && config.useGcs()) {
+            if (config.useS3() && config.isGcsCloud()) {
                 throw new ConfigValidationException("Cannot use both S3 and GCS at the same time. Please choose at most one.");
             }
 

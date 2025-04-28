@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,7 +89,7 @@ class GcsGeoIpFileServiceTest {
                 .cityDbPath("gs://bucket/city.mmdb")
                 .asnDbPath("gs://bucket/asn.mmdb")
                 .useS3(false)
-                .useGcs(true)
+                .pullFromCloud(Optional.of(CloudStorageType.GCS))
                 .build();
     }
 

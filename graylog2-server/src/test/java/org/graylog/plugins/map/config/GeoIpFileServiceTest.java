@@ -221,7 +221,7 @@ class GeoIpFileServiceTest {
                 .cityDbPath("gs://bucket/city.mmdb")
                 .asnDbPath("gs://bucket/asn.mmdb")
                 .useS3(false)
-                .useGcs(true)
+                .pullFromCloud(Optional.of(CloudStorageType.GCS))
                 .build();
     }
 

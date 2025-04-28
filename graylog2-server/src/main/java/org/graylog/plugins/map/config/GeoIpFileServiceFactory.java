@@ -33,9 +33,13 @@ public class GeoIpFileServiceFactory {
      * @return a new instance of {@link GeoIpFileService}
      */
     public GeoIpFileService create(GeoIpResolverConfig config) {
-        if (config.useS3()) {
+        if (config.useS3() && config.isGcsCloud()) {
+            throw new IllegalArgumentException("Cannot use both S3 and GCS at the same time.");
+        }
+
+        if (config.useS3() || config.isS3Cloud()) {
             return new S3GeoIpFileService(processorConfig);
-        } else if (config.useGcs()) {
+        } else if (config.isGcsCloud()) {
             return new GcsGeoIpFileService(processorConfig);
         } else {
             return new LocalGeoIpFileService(processorConfig);

@@ -135,7 +135,7 @@ class GcsGeoIpFileServiceIT {
                 .cityDbPath("gs://" + bucket + "/" + cityFile)
                 .asnDbPath("gs://" + bucket + "/" + asnFile)
                 .useS3(false)
-                .useGcs(true)
+                .pullFromCloud(Optional.of(CloudStorageType.GCS))
                 .gcsProjectId(fakeGcs.getProjectId())
                 .build();
     }
