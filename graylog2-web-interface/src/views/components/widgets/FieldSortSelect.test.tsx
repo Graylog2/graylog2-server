@@ -17,8 +17,8 @@
 import React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import type { Property } from 'views/logic/fieldtypes/FieldType';
 import FieldType from 'views/logic/fieldtypes/FieldType';

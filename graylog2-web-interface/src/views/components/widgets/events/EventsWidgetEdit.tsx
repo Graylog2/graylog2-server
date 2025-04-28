@@ -174,7 +174,6 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange }: EditWidgetCo
                           columns={columns}
                           createSelectPlaceholder="Select a new column"
                           name="fields"
-                          menuPortalTarget={document.body}
                           columnTitle={columnTitle}
                         />
                       </DescriptionBox>

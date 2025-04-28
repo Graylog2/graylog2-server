@@ -21,6 +21,7 @@ import styled from 'styled-components';
 
 import Button from 'components/bootstrap/Button';
 import useServerVersion from 'routing/useServerVersion';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   reload?: () => void;
@@ -31,6 +32,7 @@ const ButtonContainer = styled.div`
 `;
 const defaultReload = () => window.location.reload();
 const SuggestReloadIfVersionChanged = ({ reload = defaultReload }: Props) => {
+  const productName = useProductName();
   const [versionChanged, setVersionChanged] = useState<boolean>(false);
   const [dismissed, setDismissed] = useState<boolean>(false);
   const [version, setVersion] = useState<string>();
@@ -59,10 +61,10 @@ const SuggestReloadIfVersionChanged = ({ reload = defaultReload }: Props) => {
       radius="md"
       position={{ top: 55, right: 20 }}>
       <p>
-        <strong>Graylog Version Changed</strong>
+        <strong>{productName} Version Changed</strong>
       </p>
       <p>
-        Your Graylog version has changed from <strong>{version}</strong> to <strong>{newVersion}</strong>.
+        Your {productName} version has changed from <strong>{version}</strong> to <strong>{newVersion}</strong>.
       </p>
       <p>Please save your work and reload the page to avoid running into errors.</p>
       <ButtonContainer>

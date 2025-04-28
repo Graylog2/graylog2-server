@@ -104,7 +104,6 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
         aria-label={SELECT_TITLE}
         options={filterOptions}
         matchProp="label"
-        menuPortalTarget={document.body}
         clearable={false}
         size="small"
         onChange={(selectedCol) => onSelectColumn(selectedCol)}

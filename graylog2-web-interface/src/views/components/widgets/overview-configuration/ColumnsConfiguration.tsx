@@ -27,7 +27,7 @@ type Props = {
   columns: Array<string>;
   createSelectPlaceholder?: string;
   displaySortableListOverlayInPortal?: boolean;
-  menuPortalTarget?: HTMLElement;
+
   name: string;
   testPrefix?: string;
 };
@@ -37,7 +37,6 @@ const ColumnsConfiguration = ({
   columns,
   createSelectPlaceholder = 'Add a column',
   displaySortableListOverlayInPortal = false,
-  menuPortalTarget,
   name,
   testPrefix = '',
 }: Props) => (
@@ -62,7 +61,6 @@ const ColumnsConfiguration = ({
           persistSelection={false}
           name="column-create-select"
           value={undefined}
-          menuPortalTarget={menuPortalTarget}
           excludedColumns={value}
           placeholder={createSelectPlaceholder}
           ariaLabel={createSelectPlaceholder}

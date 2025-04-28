@@ -193,13 +193,13 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
           is_mutable: response.is_mutable,
         }))
         .catch((error) => {
-        if (error.status === 404) {
-          UserNotification.error(
-            `Unable to find Event Definition with id <${eventDefinitionId}>, please ensure it wasn't deleted.`,
-            'Could not retrieve Event Definition',
-          );
-        }
-      });
+          if (error.status === 404) {
+            UserNotification.error(
+              `Unable to find Event Definition with id <${eventDefinitionId}>, please ensure it wasn't deleted.`,
+              'Could not retrieve Event Definition',
+            );
+          }
+        });
 
       EventDefinitionsActions.get.promise(promise);
 

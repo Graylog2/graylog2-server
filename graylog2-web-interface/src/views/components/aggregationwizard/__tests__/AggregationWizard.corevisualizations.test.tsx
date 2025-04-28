@@ -17,10 +17,10 @@
 import * as React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
+import selectEvent from 'helpers/selectEvent';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import AreaVisualization from 'views/components/visualizations/area/AreaVisualization';
@@ -35,8 +35,6 @@ import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTy
 const testTimeout = applyTimeoutMultiplier(30000);
 
 const widgetConfig = AggregationWidgetConfig.builder().visualization('table').build();
-
-const selectEventConfig = { container: document.body };
 
 jest.mock('views/hooks/useAggregationFunctions');
 
@@ -80,7 +78,7 @@ const selectOption = async (ariaLabel: string, option: string) => {
   await selectEvent.openMenu(select);
 
   await act(async () => {
-    await selectEvent.select(select, option, selectEventConfig);
+    await selectEvent.select(select, option);
   });
 };
 

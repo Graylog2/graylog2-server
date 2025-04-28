@@ -204,7 +204,6 @@ const RawMessageLoader = ({
   inputs = undefined,
 }: Props) => {
   const productName = useProductName();
-
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [remoteAddress, setRemoteAddress] = useState<string>(DEFAULT_REMOTE_ADDRESS);

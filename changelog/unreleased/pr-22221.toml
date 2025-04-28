@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix sorting in events overview widget based on `timestamp` field."
+
+issues = ["Graylog2/graylog-plugin-enterprise#8488"]
+pulls = ["22221"]

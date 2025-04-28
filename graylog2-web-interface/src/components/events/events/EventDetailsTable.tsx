@@ -28,7 +28,7 @@ const TD = styled.td`
 `;
 
 type Props<T extends EntityBase, M = EventsAdditionalData> = {
-  attributesList: Array<{ id: string; title: string; }>;
+  attributesList: Array<{ id: string; title: string }>;
   event: T;
   meta?: M | {};
   eventProcedureId?: string;

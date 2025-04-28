@@ -84,7 +84,6 @@ export const BrandNavLogo = () => {
   const theme = useTheme();
   const customLogo = useCustomLogo(theme.mode);
 
-  // eslint-disable-next-line react/no-danger
   if (customLogo) return <StyledSvgContainer dangerouslySetInnerHTML={{ __html: customLogo }} />;
 
   return <Logo color={theme.colors.brand.logo} />;

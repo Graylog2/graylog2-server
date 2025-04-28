@@ -16,6 +16,7 @@
  */
 
 import userEvent from '@testing-library/user-event';
+import selectEvent from 'react-select-event';
 
 /*
  * This file contains helper methods, which replace the `react-select-event` methods.
@@ -27,4 +28,10 @@ const clearAll = (container: HTMLElement, selectClassName: string) => {
   userEvent.click(clearIcons[clearIcons.length - 1]);
 };
 
-export default { clearAll };
+const customCreate = (element: HTMLElement, option: string) =>
+  selectEvent.create(element, option, { container: document.body });
+
+const customSelect = (element: HTMLElement, optionOrOptions: string | Array<string> | RegExp) =>
+  selectEvent.select(element, optionOrOptions, { container: document.body });
+
+export default { clearAll, openMenu: selectEvent.openMenu, create: customCreate, select: customSelect };

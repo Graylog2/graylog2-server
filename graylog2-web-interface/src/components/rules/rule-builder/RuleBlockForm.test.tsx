@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+
+import selectEvent from 'helpers/selectEvent';
 
 import RuleBlockForm from './RuleBlockForm';
 import { buildRuleBlock, actionsBlockDict } from './fixtures';

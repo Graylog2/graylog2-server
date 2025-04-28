@@ -61,7 +61,7 @@ const defaultConfig: GeoIpConfigType = {
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState(false);
-  const [curConfig, setCurConfig] = useState(() => config);
+  const [curConfig, setCurConfig] = useState(config);
 
   const sendTelemetry = useSendTelemetry();
 

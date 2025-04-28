@@ -16,8 +16,8 @@
  */
 import React from 'react';
 import { render, screen, act, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import mockAction from 'helpers/mocking/MockAction';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { adminUser } from 'fixtures/users';

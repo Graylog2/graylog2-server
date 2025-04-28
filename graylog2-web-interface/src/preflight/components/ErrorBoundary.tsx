@@ -20,6 +20,7 @@ import React from 'react';
 import type { ReportedError } from 'logic/errors/ReportedErrors';
 import { createReactError } from 'logic/errors/ReportedErrors';
 import { Section } from 'preflight/components/common';
+import ProductName from 'brand-customization/ProductName';
 
 type Props = {
   children: React.ReactNode | Array<React.ReactNode>;
@@ -51,8 +52,8 @@ class ErrorBoundary extends React.Component<Props, State> {
         <div>
           <Section title="Something went wrong" titleOrder={1}>
             <p>
-              An unknown error has occurred. Please have a look at the following message and the graylog server log for
-              more information.
+              An unknown error has occurred. Please have a look at the following message and the <ProductName /> server
+              log for more information.
             </p>
             <pre className="content">
               {error.error.message}

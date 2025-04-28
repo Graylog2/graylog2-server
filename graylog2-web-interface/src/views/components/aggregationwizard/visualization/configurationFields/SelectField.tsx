@@ -51,7 +51,6 @@ const SelectField = ({ name, field, title, error, value, onChange }: FieldCompon
         name={name}
         value={value}
         size="small"
-        menuPortalTarget={document.body}
         onChange={(newValue) => onChange(createEvent(name, newValue))}
       />
     </Input>

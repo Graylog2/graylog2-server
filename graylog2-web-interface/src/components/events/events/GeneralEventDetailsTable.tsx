@@ -23,7 +23,7 @@ import { useGetEventDefinition } from 'components/event-definitions/hooks/useEve
 import { Spinner } from 'components/common';
 
 type Props = {
-  attributesList: Array<{ id: string; title: string; }>;
+  attributesList: Array<{ id: string; title: string }>;
   event: Event;
   meta: EventsAdditionalData;
 };
