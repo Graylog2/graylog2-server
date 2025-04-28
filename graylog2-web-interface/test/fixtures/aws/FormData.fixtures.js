@@ -33,6 +33,7 @@ export const exampleFormDataWithKeySecretAuth = {
   awsEndpointIAM: { value: undefined },
   awsEndpointKinesis: { value: undefined },
   awsCloudWatchAwsSecret: { value: 'mysecret' },
+  overrideSource: { value: '' },
 };
 
 export const exampleFormDataWithAutomaticAuth = {
@@ -49,6 +50,7 @@ export const exampleFormDataWithAutomaticAuth = {
   awsEndpointDynamoDB: { value: undefined },
   awsEndpointIAM: { value: undefined },
   awsEndpointKinesis: { value: undefined },
+  overrideSource: { value: '' },
   key: 'mykey',
   secret: 'mysecret',
 };

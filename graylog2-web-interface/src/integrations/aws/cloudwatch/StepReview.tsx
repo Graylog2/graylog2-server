@@ -28,6 +28,51 @@ import FormWrap from 'integrations/aws/common/FormWrap';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 
+const Container = styled.div`
+  border: 1px solid #a6afbd;
+  margin: 25px 0;
+  padding: 15px;
+  border-radius: 4px;
+`;
+
+const Subheader = styled.h3`
+  margin: 0 0 10px;
+`;
+
+const ReviewItems = styled.ul`
+  list-style: none;
+  margin: 0 0 25px 10px;
+  padding: 0;
+
+  li {
+    padding: 5px;
+
+    &:nth-of-type(odd) {
+      background-color: rgb(220 225 229 / 40%);
+    }
+  }
+
+  strong::after {
+    content: ':';
+    margin-right: 5px;
+  }
+`;
+
+const EditAnchor = styled.a`
+  font-size: 12px;
+  margin-left: 5px;
+  font-style: italic;
+  cursor: pointer;
+
+  &::before {
+    content: '(';
+  }
+
+  &::after {
+    content: ')';
+  }
+`;
+
 type DefaultProps = {
   value: string;
 };
@@ -67,6 +112,8 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
 
   const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
   const addPrefix = !!awsCloudWatchAddFlowLogPrefix.value;
+  const overrideSource = formData.overrideSource?.value ?? '';
+
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
     null,
@@ -82,6 +129,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
+      override_source: overrideSource,
     },
   );
 
@@ -243,50 +291,5 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
     </FormWrap>
   );
 };
-
-const Container = styled.div`
-  border: 1px solid #a6afbd;
-  margin: 25px 0;
-  padding: 15px;
-  border-radius: 4px;
-`;
-
-const Subheader = styled.h3`
-  margin: 0 0 10px;
-`;
-
-const ReviewItems = styled.ul`
-  list-style: none;
-  margin: 0 0 25px 10px;
-  padding: 0;
-
-  li {
-    padding: 5px;
-
-    &:nth-of-type(odd) {
-      background-color: rgb(220 225 229 / 40%);
-    }
-  }
-
-  strong::after {
-    content: ':';
-    margin-right: 5px;
-  }
-`;
-
-const EditAnchor = styled.a`
-  font-size: 12px;
-  margin-left: 5px;
-  font-style: italic;
-  cursor: pointer;
-
-  &::before {
-    content: '(';
-  }
-
-  &::after {
-    content: ')';
-  }
-`;
 
 export default StepReview;

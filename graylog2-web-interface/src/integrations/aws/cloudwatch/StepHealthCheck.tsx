@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { Button, Panel, Input } from 'components/bootstrap';
@@ -32,6 +32,24 @@ type StepHealthCheckProps = {
   onSubmit: (...args: any[]) => void;
   onChange: (...args: any[]) => void;
 };
+
+const Notice = styled.span`
+  display: flex;
+  align-items: center;
+
+  > span {
+    margin-left: 6px;
+  }
+`;
+
+const CheckAgain = styled.p`
+  display: flex;
+  align-items: center;
+
+  > strong {
+    margin-right: 9px;
+  }
+`;
 
 const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const { logData, setLogData } = useContext(ApiContext);
@@ -51,23 +69,23 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
     },
   );
 
-  const checkForLogs = () => {
+  const checkForLogs = useCallback(() => {
     setPauseCountdown(true);
     setLogDataUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS.HEALTH_CHECK);
-  };
+  }, [setPauseCountdown, setLogDataUrl]);
 
   useEffect(() => {
     if (!logData) {
       checkForLogs();
     }
-  }, []);
+  }, [logData, checkForLogs]);
 
   useEffect(() => {
     if (!logDataProgress.loading && !logDataProgress.data) {
       setPauseCountdown(false);
       setLogDataUrl(null);
     }
-  }, [logDataProgress.loading]);
+  }, [logDataProgress.loading, logDataProgress.data, setLogDataUrl]);
 
   if (!logData) {
     return (
@@ -113,7 +131,15 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
   const acknowledgment = knownLog ? 'Awesome!' : 'Drats!';
   const bsStyle = knownLog ? 'success' : 'warning';
   const logTypeLabel = KINESIS_LOG_TYPES.find((type) => type.value === logData.type).label;
-  const logType = knownLog ? `a ${logTypeLabel}` : 'an unknown';
+
+  const getLogType = () => {
+    if (knownLog) return `a ${logTypeLabel}`;
+    if (logTypeLabel === 'None') return logData.additional;
+    
+    return 'an unknown message type.';
+  };
+
+  const logType = getLogType();
 
   const handleSubmit = () => {
     onSubmit();
@@ -138,43 +164,25 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
           <Notice>
             <Icon name={iconName} size="2x" />
             <span>
-              {acknowledgment} looks like <em>{logType}</em> message type.
+              {acknowledgment} looks like <em>{logType}</em>
             </span>
           </Notice>
         }>
         {knownLog
           ? 'Take a look at what we have parsed so far and you can create Pipeline Rules to handle even more!'
-          : 'Not to worry, Graylog can still read in these log messages. We have parsed what we could and you can build Pipeline Rules to do the rest!'}
+          : 'Not to worry, you can still create the input and ingest messages later!'}
       </Panel>
 
       <Input
         id="awsCloudWatchLog"
         type="textarea"
         label="Formatted Log Message"
-        value={logData.message}
+        value={logTypeLabel === 'None' ? 'No Messages' : logData.message}
         rows={10}
         disabled
       />
     </FormWrap>
   );
 };
-
-const Notice = styled.span`
-  display: flex;
-  align-items: center;
-
-  > span {
-    margin-left: 6px;
-  }
-`;
-
-const CheckAgain = styled.p`
-  display: flex;
-  align-items: center;
-
-  > strong {
-    margin-right: 9px;
-  }
-`;
 
 export default StepHealthCheck;
