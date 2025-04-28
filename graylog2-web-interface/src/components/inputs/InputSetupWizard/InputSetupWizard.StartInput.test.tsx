@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 
 import { PipelinesPipelines, Streams, PipelinesConnections } from '@graylog/server-api';
 
+import selectEvent from 'helpers/selectEvent';
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
 import useFilteredStreams from 'components/inputs/InputSetupWizard/hooks/useFilteredStreams';

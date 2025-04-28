@@ -234,9 +234,8 @@ const Scratchpad = () => {
             trigger={['hover', 'focus']}
             overlay={
               <>
-                You can use this space to store personal notes and other information while interacting with Graylog,
-                without leaving your browser window. For example, store timestamps, user IDs, or IP addresses you need
-                in various investigations.
+                You can use this space to store personal notes and other information, without leaving your browser
+                window. For example, store timestamps, user IDs, or IP addresses you need in various investigations.
               </>
             }>
             <Button bsStyle="link">

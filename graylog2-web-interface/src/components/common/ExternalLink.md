@@ -2,8 +2,7 @@
 
 ```js
 <p>
-  Please read the <ExternalLink href="http://docs.graylog.org/">Graylog documentation</ExternalLink> to learn about the
-  product.
+  Please read the <ExternalLink href="http://docs.graylog.org/">documentation</ExternalLink> to learn about the product.
 </p>
 ```
 
@@ -11,12 +10,12 @@
 
 ```js
 <ExternalLink href="http://docs.graylog.org/" iconName="help">
-  Graylog documentation
+  documentation
 </ExternalLink>
 ```
 
 `ExternalLink` without a `href` prop:
 
 ```js
-<ExternalLink>Graylog documentation</ExternalLink>
+<ExternalLink>documentation</ExternalLink>
 ```
