@@ -16,9 +16,9 @@
  */
 import AppConfig from './AppConfig';
 
-export const DEPRECATION_NOTICE = 'Graylog Deprecation Notice:';
+export const DEPRECATION_NOTICE = 'Deprecation Notice:';
 
-const deprecationNotice = (deprecatedMessage) =>
+const deprecationNotice = (deprecatedMessage: string) =>
   // eslint-disable-next-line no-console
   AppConfig.gl2DevMode() && console.warn(DEPRECATION_NOTICE, deprecatedMessage);
 

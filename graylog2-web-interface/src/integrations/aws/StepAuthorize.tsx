@@ -30,6 +30,12 @@ import formValidation from 'integrations/aws/utils/formValidation';
 import AWSAuthenticationTypes from 'integrations/aws/authentication/AWSAuthenticationTypes';
 import AWSCustomEndpoints from 'integrations/aws/authentication/AWSCustomEndpoints';
 
+const DisappearingInput = styled.input`
+  position: fixed;
+  top: -500vh;
+  left: -500vw;
+`;
+
 type StepAuthorizeProps = {
   onSubmit: (...args: any[]) => void;
   onChange: (...args: any[]) => void;
@@ -86,7 +92,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
     return () => {
       setFormError(null);
     };
-  }, [fetchRegionsStatus.error, fetchStreamsStatus.error]);
+  }, [fetchRegionsStatus.error, fetchStreamsStatus.error, onSubmit, setStreams, setStreamsFetch]);
 
   const handleSubmit = () => {
     setStreamsFetch(ApiRoutes.INTEGRATIONS.AWS.KINESIS.STREAMS);
@@ -100,7 +106,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
     return () => {
       clearSidebar();
     };
-  }, []);
+  }, [clearSidebar, setSidebar, sidebarComponent]);
 
   const authType = formData.awsAuthenticationType && formData.awsAuthenticationType.value;
   const isFormValid = formValidation.isFormValid(
@@ -120,7 +126,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
       disabled={isFormValid}
       error={formError}
       title="Create Input &amp; Authorize AWS"
-      description="This integration allows Graylog to read messages directly from a Kinesis stream. CloudWatch messages can optionally be forwarded to Kinesis via CloudWatch subscriptions and then read by Graylog.">
+      description="This integration allows reading messages directly from a Kinesis stream. CloudWatch messages can optionally be forwarded to Kinesis via CloudWatch subscriptions and then processed.">
       <DisappearingInput id="name" type="text" />
       <DisappearingInput id="password" type="password" />
 
@@ -129,8 +135,8 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
         type="text"
         fieldData={formData.awsCloudWatchName}
         onChange={onChange}
-        placeholder="Graylog Input Name"
-        label="Graylog Input Name"
+        placeholder="Input Name"
+        label="Input Name"
         autoComplete="off"
         required
       />
@@ -153,11 +159,5 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
     </FormWrap>
   );
 };
-
-const DisappearingInput = styled.input`
-  position: fixed;
-  top: -500vh;
-  left: -500vw;
-`;
 
 export default StepAuthorize;

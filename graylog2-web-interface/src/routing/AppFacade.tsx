@@ -74,7 +74,7 @@ const AppFacade = () => {
   if (!currentUser) {
     return (
       <LoggedOutThemeProvider>
-        <LoadingPage text="We are preparing Graylog for you..." />
+        <LoadingPage text="We are preparing the web interface for you..." />
       </LoggedOutThemeProvider>
     );
   }
