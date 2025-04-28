@@ -90,7 +90,7 @@ const EventDefinitionFormContainer = ({
   initialStep = STEP_KEYS[0],
   onCancel = undefined,
   onChangeStep = undefined,
-  onEventDefinitionChange = () => { },
+  onEventDefinitionChange = () => {},
   onSubmit = undefined,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);
@@ -153,7 +153,7 @@ const EventDefinitionFormContainer = ({
     onSubmit();
   };
 
-  const showValidationErrors = (errors: { errors: unknown; }) => {
+  const showValidationErrors = (errors: { errors: unknown }) => {
     setValidation(errors);
     setActiveStep(STEP_KEYS[STEP_KEYS.length - 1]);
   };

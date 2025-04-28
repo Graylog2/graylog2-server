@@ -323,7 +323,7 @@ describe('IndexSetFieldTypesList', () => {
       fireEvent.click(originBadge);
 
       expect(tableRow).toHaveTextContent(
-        'Field type Boolean comes from the search engine index mapping. It could have been created dynamically, set by Graylog instance or come from historical profiles and/or custom mappings.',
+        'Field type Boolean comes from the search engine index mapping. It could have been created dynamically, set by the system or come from historical profiles and/or custom mappings.',
       );
     });
 

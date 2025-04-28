@@ -133,7 +133,6 @@ const Metric = ({ index }: Props) => {
                 value={value}
                 aria-label="Select a function"
                 size="small"
-                menuPortalTarget={document.body}
                 onChange={onFunctionChange}
               />
             </Input>
@@ -154,7 +153,6 @@ const Metric = ({ index }: Props) => {
                   <FieldSelect
                     id="metric-field-select"
                     selectRef={metricFieldSelectRef}
-                    menuPortalTarget={document.body}
                     onChange={(fieldName) => {
                       onChange({ target: { name, value: fieldName } });
                     }}
@@ -192,7 +190,6 @@ const Metric = ({ index }: Props) => {
                   value={value}
                   aria-label="Select percentile"
                   size="small"
-                  menuPortalTarget={document.body}
                   onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                 />
               </Input>
@@ -218,7 +215,6 @@ const Metric = ({ index }: Props) => {
                     value={value ?? 'COUNT'}
                     aria-label="Select strategy"
                     size="small"
-                    menuPortalTarget={document.body}
                     onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                   />
                 </Input>
@@ -242,7 +238,6 @@ const Metric = ({ index }: Props) => {
                     isFieldQualified={isFieldQualified}
                     name={name}
                     value={value}
-                    menuPortalTarget={document.body}
                     ariaLabel="Select a field"
                   />
                 </Input>

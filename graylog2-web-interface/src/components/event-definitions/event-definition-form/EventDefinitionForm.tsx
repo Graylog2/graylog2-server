@@ -77,7 +77,7 @@ type Props = {
   };
   entityTypes: {};
   notifications: Array<EventNotification>;
-  defaults: { default_backlog_size: number; };
+  defaults: { default_backlog_size: number };
   onChange: (key: string, value: unknown) => void;
   onChangeStep: (step: string) => void;
   onCancel: () => void;
@@ -138,7 +138,9 @@ const EventDefinitionForm = ({
     {
       key: STEP_KEYS[0],
       title: 'Event Details',
-      component: <EventDetailsForm {...defaultStepProps} eventDefinitionEventProcedure={eventProcedureId} canEdit={canEdit} />,
+      component: (
+        <EventDetailsForm {...defaultStepProps} eventDefinitionEventProcedure={eventProcedureId} canEdit={canEdit} />
+      ),
     },
     {
       key: STEP_KEYS[1],
