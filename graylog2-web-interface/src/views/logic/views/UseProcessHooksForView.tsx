@@ -20,11 +20,13 @@ import * as React from 'react';
 import ErrorPage from 'components/errors/ErrorPage';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import useProductName from 'brand-customization/useProductName';
 
 import type View from './View';
 import processHooks from './processHooks';
 
 const LoadViewError = ({ error }: { error: Error }) => {
+  const productName = useProductName();
   useEffect(() => {
     // eslint-disable-next-line no-console
     console.log(error);
@@ -35,8 +37,8 @@ const LoadViewError = ({ error }: { error: Error }) => {
       title="Something went wrong"
       description={
         <p>
-          An unknown error has occurred. Please have a look at the following message and the graylog server log for more
-          information.
+          An unknown error has occurred. Please have a look at the following message and the {productName} server log
+          for more information.
         </p>
       }>
       <pre>{error?.message}</pre>
