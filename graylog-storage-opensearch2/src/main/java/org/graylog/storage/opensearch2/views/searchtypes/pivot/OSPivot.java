@@ -181,6 +181,11 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = this.effectiveTimeRangeExtractor.extract(queryResult, query, pivot);
 
+        final var fieldsNames = pivot.rowGroups().stream().flatMap(bs -> bs.fields().stream());
+        final var seriesNames = pivot.series().stream().map(SeriesSpec::id).toList();
+
+        final List<String> colGroupNames = pivot.columnGroups().isEmpty() ? seriesNames : new ArrayList<>();
+
         final PivotResult.Builder resultBuilder = PivotResult.builder()
                 .id(pivot.id())
                 .effectiveTimerange(effectiveTimerange)
@@ -205,6 +210,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                         retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
                                 .forEach(columnBucketTuple -> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
+                                    colGroupNames.add(String.join(", ", Stream.concat(columnKeys.stream(), seriesNames.stream()).toList()));
+
                                     final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
                                     processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
@@ -215,21 +222,11 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
 
         if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
             final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
-            extractFieldNames(query, rowBuilder);
             processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-inner");
             resultBuilder.addRow(rowBuilder.source("non-leaf").build());
         }
 
-        return resultBuilder.build();
-    }
-
-    private void extractFieldNames(final Query query, final PivotResult.Row.Builder rowBuilder) {
-        if(query.searchTypes().iterator().hasNext()) {
-            SearchType searchType = query.searchTypes().iterator().next();
-            if(searchType instanceof Pivot pivot) {
-                pivot.rowGroups().forEach(rg -> rg.fields().forEach(field -> rowBuilder.addValue(PivotResult.Value.create(List.of(field), field, true, "row-inner"))));
-            }
-        }
+        return resultBuilder.columnNames(Stream.concat(fieldsNames, colGroupNames.stream().distinct()).toList()).build();
     }
 
     private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
