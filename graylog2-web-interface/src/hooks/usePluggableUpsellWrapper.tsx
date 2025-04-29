@@ -20,15 +20,15 @@ import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { UpsellWrapper } from 'components/upsell/types';
+import OpenSourceUpsellWrapper from 'components/upsell/OpenSourceUpsellWrapper';
 
 const usePluggableUpsellWrapper = () => {
   const upsellWrapper = usePluginEntities('components.upsell.wrapper');
-  const filtratedWrapper: Array<UpsellWrapper> = useMemo(
-    () => upsellWrapper.filter((upsell: UpsellWrapper) => upsell.useCondition()),
-    [upsellWrapper],
-  );
+  if (!upsellWrapper?.[0]?.useCondition?.()) {
+    return OpenSourceUpsellWrapper;
+  }
 
-  return last(filtratedWrapper).component;
+  return upsellWrapper[0].component;
 };
 
 export default usePluggableUpsellWrapper;
