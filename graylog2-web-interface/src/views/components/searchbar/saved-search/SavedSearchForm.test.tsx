@@ -17,8 +17,8 @@
 import React from 'react';
 import { act, render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
