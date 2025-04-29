@@ -44,7 +44,7 @@ const _pageTitle = (authBackend, title) => {
   return title || 'Create LDAP Authentication Service';
 };
 
-const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) => {
+const WizardPageHeader = ({ authenticationBackend: authBackend = undefined, title = undefined }: Props) => {
   const { finishedLoading, activeBackend } = useActiveBackend();
   const pageTitle = _pageTitle(authBackend, title);
 
