@@ -22,11 +22,6 @@ declare global {
   const IS_CLOUD: boolean | undefined;
 }
 
-export type BrandingResource = { enabled?: boolean; url?: string | undefined };
-export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support' | 'contact_us';
-
-export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
-
 type Branding = {
   product_name?: string;
   favicon?: string;
@@ -49,7 +44,6 @@ type Branding = {
   };
   help_url?: string;
   footer?: { enabled: boolean };
-  resources?: BrandingResources;
 };
 
 export type AppConfigs = {
