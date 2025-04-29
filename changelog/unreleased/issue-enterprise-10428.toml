@@ -1,0 +1,5 @@
+type="f"
+message="Fixed Markdown preview displaying underneath Security Events Drawer."
+
+issues=["Graylog2/graylog-plugin-enterprise#10428"]
+pulls=["22444"]
