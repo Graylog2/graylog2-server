@@ -29,7 +29,7 @@ const renderExportWidgetActionDelegate = () =>
 
 describe('ExtraMenuWidgetActions', () => {
   const plugExplanation =
-    /export aggregation widget feature is available for the enterprise version\. graylog provides option to export your data into most popular file formats such as csv, json, yaml, xml etc\./i;
+    /export aggregation widget feature is available for the enterprise version\. This feature provides options to export your data into popular file formats such as CSV, JSON, YAML, XML, etc\./i;
 
   it('Render plug when there is no WidgetExportActionComponent', async () => {
     asMock(useWidgetExportActionComponent).mockReturnValue(null);

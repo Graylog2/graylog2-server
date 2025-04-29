@@ -17,8 +17,8 @@
 import React from 'react';
 import { render, act, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
- import selectEvent from 'react-select-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import {createEntityShareState, everyone, viewer} from 'fixtures/entityShareState';
@@ -183,9 +183,8 @@ describe('SavedSearchForm', () => {
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
-
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('should handle saveSearch with share settings', async () => {
+    
+    it('should handle saveSearch with share settings', async () => {
       const onSaveAs = jest.fn();
       render(<SavedSearchForm {...props}  saveAsSearch={onSaveAs} isCreateNew />);
       userEvent.type(await findTitleInput(), ' and further title');
