@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import useOutputs from 'hooks/useOutputs';
-import { Section, Spinner } from 'components/common';
+import { IfPermitted, Section, Spinner } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 import type { AvailableOutputSummary } from 'components/streams/useAvailableOutputTypes';
@@ -78,12 +78,14 @@ const DestinationOutputs = ({ stream }: Props) => {
         </>
       }
       actions={
-        <AddOutputButton
-          stream={stream}
-          availableOutputTypes={availableOutputTypes.types}
-          assignableOutputs={assignableOutputs}
-          getTypeDefinition={getTypeDefinition}
-        />
+        <IfPermitted permissions="stream_outputs:create">
+          <AddOutputButton
+            stream={stream}
+            availableOutputTypes={availableOutputTypes.types}
+            assignableOutputs={assignableOutputs}
+            getTypeDefinition={getTypeDefinition}
+          />
+        </IfPermitted>
       }>
       <OutputsList
         streamId={stream.id}
