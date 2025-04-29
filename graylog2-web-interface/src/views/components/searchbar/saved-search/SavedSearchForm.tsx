@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import styled from 'styled-components';
 
 import { ButtonToolbar, Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
@@ -38,6 +39,9 @@ const stopEvent = (e) => {
   e.preventDefault();
   e.stopPropagation();
 };
+const StyledPopoverDropdown = styled(Popover.Dropdown)`
+  z-index: 1000 !important;
+`;
 
 const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, saveAsSearch, toggleModal, value }: Props) => {
   const [title, setTitle] = useState(value);
@@ -58,7 +62,7 @@ const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, 
   return (
     <Popover position="left" width={500} opened={show} withArrow withinPortal>
       <Popover.Target>{children}</Popover.Target>
-      <Popover.Dropdown title="Name of search" id="saved-search-popover">
+      <StyledPopoverDropdown title="Name of search" id="saved-search-popover">
         <form onSubmit={stopEvent}>
           <FormGroup>
             <ControlLabel htmlFor="title">Title</ControlLabel>
@@ -100,7 +104,7 @@ const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, 
             </Button>
           </ButtonToolbar>
         </form>
-      </Popover.Dropdown>
+      </StyledPopoverDropdown>
     </Popover>
   );
 };
