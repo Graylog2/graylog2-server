@@ -23,12 +23,11 @@ import { Grid } from 'components/bootstrap';
 import Footer from 'components/layout/Footer';
 import useFooterCustomization from 'brand-customization/useFooterCustomization';
 
-type Props = {
-  children?: React.ReactNode;
+type Props = React.PropsWithChildren<{
   className?: string;
   FooterComponent?: React.ComponentType;
   NotificationsComponent?: React.ComponentType<{ children: React.ReactNode }>;
-};
+}>;
 
 const Container = styled.div(
   ({ theme }) => `
@@ -54,8 +53,8 @@ const StyledGrid = styled(Grid)`
  * The section includes all page specific components, but not elements like the navigation or sidebar.
  */
 const PageContentLayout = ({
-  children,
-  className,
+  children = null,
+  className = undefined,
   FooterComponent = Footer,
   NotificationsComponent = WithGlobalAppNotifications,
 }: Props) => {
