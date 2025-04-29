@@ -107,10 +107,19 @@ if (TARGET === 'start') {
       historyApiFallback: {
         disableDotRule: true,
       },
-      proxy: [{
-        context: ['/api', '/config.js', '/sso'],
-        target: apiUrl,
-      }],
+      proxy: [
+        {
+          context: ['/api', '/config.js', '/sso'],
+          target: apiUrl,
+          onProxyReq: (proxyReq, req) => {
+            const existingHeader = proxyReq.getHeader('X-Graylog-Server-URL');
+            if (!existingHeader?.trim()) {
+              const serverUrl = `${req.protocol}://${req.get('host')}`;
+              proxyReq.setHeader('X-Graylog-Server-URL', serverUrl);
+            }
+          },
+        },
+      ],
     },
   });
 }
@@ -121,10 +130,12 @@ if (TARGET.startsWith('build')) {
     optimization: {
       concatenateModules: false,
       sideEffects: false,
-      minimizer: [new EsbuildPlugin({
-        format: 'cjs',
-        target: supportedBrowsers,
-      })],
+      minimizer: [
+        new EsbuildPlugin({
+          format: 'cjs',
+          target: supportedBrowsers,
+        }),
+      ],
     },
     plugins: [
       new webpack.DefinePlugin({
