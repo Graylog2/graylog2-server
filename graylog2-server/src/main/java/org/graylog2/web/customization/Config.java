@@ -44,7 +44,8 @@ public record Config(
 
     public record Resources(@JsonProperty("stream_rule_matcher_code") Optional<ResourceItem> streamRuleMatcherCode,
                             @JsonProperty("contact_support") Optional<ResourceItem> contactSupport,
-                            @JsonProperty("contact_us") Optional<ResourceItem> contactUs
+                            @JsonProperty("contact_us") Optional<ResourceItem> contactUs,
+                            Optional<ResourceItem> marketplace
                             ) {
         public record ResourceItem(Optional<Boolean> enabled, Optional<String> url) {}
     }
