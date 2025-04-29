@@ -19,10 +19,14 @@ import last from 'lodash/last';
 import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
+import type { UpsellWrapper } from 'components/upsell/types';
 
-const usePluggableUpsellWrapper = (): React.ComponentType<React.PropsWithChildren> => {
+const usePluggableUpsellWrapper = () => {
   const upsellWrapper = usePluginEntities('components.upsell.wrapper');
-  const filtratedWrapper = useMemo(() => upsellWrapper.filter((upsell) => upsell.useCondition()), [upsellWrapper]);
+  const filtratedWrapper: Array<UpsellWrapper> = useMemo(
+    () => upsellWrapper.filter((upsell: UpsellWrapper) => upsell.useCondition()),
+    [upsellWrapper],
+  );
 
   return last(filtratedWrapper).component;
 };

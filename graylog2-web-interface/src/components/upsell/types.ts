@@ -17,11 +17,13 @@
 
 import type React from 'react';
 
+export type UpsellWrapper = {
+  useCondition: () => boolean;
+  component: React.ComponentType<React.PropsWithChildren>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
-    'components.upsell.wrapper'?: Array<{
-      useCondition: () => boolean;
-      component: React.ComponentType<React.PropsWithChildren>;
-    }>;
+    'components.upsell.wrapper'?: Array<UpsellWrapper>;
   }
 }
