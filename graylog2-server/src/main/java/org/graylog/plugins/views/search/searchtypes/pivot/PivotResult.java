@@ -48,6 +48,7 @@ public abstract class PivotResult implements SearchType.Result {
     public abstract ImmutableList<Row> rows();
 
     @JsonProperty
+    @Nullable
     public abstract List<String> columnNames();
 
     @JsonProperty
@@ -85,6 +86,7 @@ public abstract class PivotResult implements SearchType.Result {
         public abstract Builder rows(ImmutableList<Row> rows);
 
         @JsonProperty
+        @Nullable
         public abstract Builder columnNames(List<String> columnNames);
 
         abstract ImmutableList.Builder<Row> rowsBuilder();

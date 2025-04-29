@@ -42,7 +42,7 @@ class ExportTabularResultResponseTest {
         final ExportTabularResultResponse response = ExportTabularResultResponse.fromPivotResult(pivotResult);
 
         final ExportTabularResultResponse expectedResponse = new ExportTabularResultResponse(
-                List.of("", "[count()]", "[max(http_response_code)]", "[DELETE, count()]", "[DELETE, max(http_response_code)]", "[GET, count()]", "[GET, max(http_response_code)]", "[POST, count()]", "[POST, max(http_response_code)]", "[PUT, count()]", "[PUT, max(http_response_code)]"),
+                List.of("1", "2", "3"),
                 List.of(
                         new DataRow(List.of("index", 1507337, 504, 75322, 504, 1296526, 504, 75163, 504, 60326, 504)),
                         new DataRow(List.of("show", 444038, 504, 22229, 504, 381846, 504, 22271, 504, 17692, 504)),

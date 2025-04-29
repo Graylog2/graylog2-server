@@ -1,6 +1,7 @@
 {
   "name": "chart",
   "id": "1031c586-2eb1-4459-8c2c-2a91dec5dd72",
+  "column_names" : ["1", "2", "3"],
   "rows": [
     {
       "key": [

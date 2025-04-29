@@ -40,12 +40,9 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
 
     public static ExportTabularResultResponse fromPivotResult(final PivotResult pivotResult) {
 
-        final Collection<PivotResult.Row> rows = pivotResult.rows();
+        final var header = pivotResult.columnNames();
 
-        final int longestRowKey = rows.stream()
-                .mapToInt(row -> row.key().size())
-                .max()
-                .orElse(0);
+        final Collection<PivotResult.Row> rows = pivotResult.rows();
 
         final List<ImmutableList<String>> columns = rows.stream()
                 .flatMap(row -> row.values()
@@ -55,10 +52,6 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
                 .distinct()
                 .sorted(new ListOfStringsComparator())
                 .toList();
-
-        final List<String> header = new ArrayList<>(longestRowKey + columns.size());
-        header.addAll(Collections.nCopies(longestRowKey, ""));
-        columns.forEach(column -> header.add(column.toString()));
 
         final List<DataRow> dataRows = rows.stream()
                 .filter(row -> "leaf".equals(row.source()))
@@ -81,7 +74,7 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
                 })
                 .toList();
 
-        return new ExportTabularResultResponse(pivotResult.columnNames(), dataRows);
+        return new ExportTabularResultResponse(header, dataRows);
     }
 
     public static ExportTabularResultResponse fromMessageListResult(final MessageList.Result m) {
