@@ -24,8 +24,8 @@ import Icon from 'components/common/Icon';
 import DocumentTitle from 'components/common/DocumentTitle';
 import { qualifyUrl } from 'util/URLUtils';
 import LoginChrome from 'components/login/LoginChrome';
-import type { ServerError } from 'stores/sessions/ServerAvailabilityStore';
 import useProductName from 'brand-customization/useProductName';
+import type { ServerError } from 'stores/sessions/ServerAvailabilityStore';
 
 const StyledIcon = styled(Icon)`
   margin-left: 6px;

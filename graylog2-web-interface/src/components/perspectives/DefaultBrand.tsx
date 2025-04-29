@@ -17,6 +17,9 @@
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 
+import { NAV_LOGO_HEIGHT } from 'theme/constants';
+import useCustomLogo from 'brand-customization/useCustomLogo';
+
 export const Logo = ({ color }: { color: string }) => (
   <svg
     width="90"
@@ -70,14 +73,26 @@ type Props = {
   className?: string;
 };
 
-const DefaultBrand = ({ className = '' }: Props) => {
+const StyledSvgContainer = styled.div`
+  svg {
+    width: 100%;
+    height: ${NAV_LOGO_HEIGHT};
+    display: block;
+  }
+`;
+export const BrandNavLogo = () => {
   const theme = useTheme();
+  const customLogo = useCustomLogo(theme.mode);
 
-  return (
-    <Container className={`${className}`}>
-      <Logo color={theme.colors.brand.logo} />
-    </Container>
-  );
+  if (customLogo) return <StyledSvgContainer dangerouslySetInnerHTML={{ __html: customLogo }} />;
+
+  return <Logo color={theme.colors.brand.logo} />;
 };
+
+const DefaultBrand = ({ className = '' }: Props) => (
+  <Container className={`${className}`}>
+    <BrandNavLogo />
+  </Container>
+);
 
 export default DefaultBrand;

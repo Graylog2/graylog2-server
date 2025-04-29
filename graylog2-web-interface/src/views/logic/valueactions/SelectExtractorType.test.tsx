@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { AdditionalContext } from 'views/logic/ActionContext';
 
 import SelectExtractorType from './SelectExtractorType';
