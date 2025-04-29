@@ -29,7 +29,7 @@ const Backdrop = styled.div`
   flex-direction: column;
   align-items: center;
   inset: 0;
-  z-index: 1051;
+  z-index: 2041;
 
   background-color: rgb(0 0 0 / 50%);
 `;
