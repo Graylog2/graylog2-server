@@ -62,7 +62,7 @@ const _granteesOptions = (grantees: GranteesListType) =>
 const getAvailableGrantee = (grantees: GranteesListType, selected:  SelectedGranteeCapabilities) =>
   grantees?.filter((g) => !selected.has(g.id))?.toList();
 
-const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSetEntityShare, entityId, entityTypeTitle='' }: Props) => {
+const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSetEntityShare, entityId = null, entityTypeTitle='' }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const entityGRN = entityId && createGRN(entityType, entityId);
   const defaultShareSelection = { granteeId: null, capabilityId: 'view' };
