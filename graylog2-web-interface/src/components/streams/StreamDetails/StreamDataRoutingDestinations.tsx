@@ -48,7 +48,7 @@ const StreamDataRoutingDestinations = ({ stream }: Props) => {
   ) : (
     <DestinationPermissionAlert sectionName="Index Set" />
   );
-  const destinationOutput = isPermitted(currentUser.permissions, ['output:read']) ? (
+  const destinationOutput = isPermitted(currentUser.permissions, ['outputs:read']) ? (
     <DestinationOutputs stream={stream} />
   ) : (
     <DestinationPermissionAlert sectionName="Outputs" />
