@@ -14,12 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import last from 'lodash/last';
-import { useMemo } from 'react';
-
 import usePluginEntities from 'hooks/usePluginEntities';
-import type { UpsellWrapper } from 'components/upsell/types';
 import OpenSourceUpsellWrapper from 'components/upsell/OpenSourceUpsellWrapper';
 
 const usePluggableUpsellWrapper = () => {
