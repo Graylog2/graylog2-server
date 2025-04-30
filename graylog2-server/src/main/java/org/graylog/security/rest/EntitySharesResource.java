@@ -48,11 +48,11 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.models.PaginatedResponse;
-import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -72,11 +72,9 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
 
     @Inject
     public EntitySharesResource(GRNRegistry grnRegistry,
-                                UserService userService,
                                 GranteeSharesService granteeSharesService,
                                 EntitySharesService entitySharesService) {
         this.grnRegistry = grnRegistry;
-        this.userService = userService;
         this.granteeSharesService = granteeSharesService;
         this.entitySharesService = entitySharesService;
     }
@@ -116,15 +114,19 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
         // we can do a second request including the "grantees". Then we can do the dependency check to
         // fill out "missing_dependencies".
         // This should probably be a POST request with a JSON payload.
-        return entitySharesService.prepareShare(grn, request, getCurrentUser(), getSubject());
+        return entitySharesService.prepareShare(grn, request, getCurrentUser());
     }
 
     @POST
-    @ApiOperation(value = "Prepare shares independent of any specific entity or collection")
+    @ApiOperation(value = "Prepare shares independent of a specific entity or collection")
     @Path("entities/prepare")
     @NoAuditEvent("This does not change any data")
-    public EntityShareResponse prepareGenericShare(@ApiParam(name = "JSON Body", required = true) @NotNull @Valid EntityShareRequest request) {
-        return entitySharesService.prepareShare(request, getCurrentUser(), getSubject());
+    public EntityShareResponse prepareGenericShare(@ApiParam(name = "JSON Body") List<String> entityGRNs) {
+        if (entityGRNs != null && !entityGRNs.isEmpty()) {
+            return entitySharesService.prepareShare(entityGRNs, getCurrentUser());
+        } else {
+            return entitySharesService.prepareShare(getCurrentUser());
+        }
     }
 
     @POST

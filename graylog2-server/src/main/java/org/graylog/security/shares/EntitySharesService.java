@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import jakarta.inject.Inject;
-import org.apache.shiro.subject.Subject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
@@ -84,17 +83,14 @@ public class EntitySharesService {
      * @param ownedEntity    the entity that should be shared and is owned by the sharing user
      * @param request        sharing request
      * @param sharingUser    the sharing user
-     * @param sharingSubject the sharing subject
      * @return the response
      */
     public EntityShareResponse prepareShare(GRN ownedEntity,
                                             EntityShareRequest request,
-                                            User sharingUser,
-                                            Subject sharingSubject) {
+                                            User sharingUser) {
         requireNonNull(ownedEntity, "ownedEntity cannot be null");
         requireNonNull(request, "request cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
-        requireNonNull(sharingSubject, "sharingSubject cannot be null");
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         final Set<Grantee> modifiableGrantees = getModifiableGrantees(sharingUser, ownedEntity);
@@ -118,12 +114,8 @@ public class EntitySharesService {
      * This method is used for generic sharing operations where the entity is not known yet. The return type is the same
      * as for the specific entity sharing operation, but active shares and dependencies are always null.
      */
-    public EntityShareResponse prepareShare(EntityShareRequest request,
-                                            User sharingUser,
-                                            Subject sharingSubject) {
-        requireNonNull(request, "request cannot be null");
+    public EntityShareResponse prepareShare(User sharingUser) {
         requireNonNull(sharingUser, "sharingUser cannot be null");
-        requireNonNull(sharingSubject, "sharingSubject cannot be null");
 
         final GRN sharingUserGRN = grnRegistry.ofUser(sharingUser);
         final Set<Grantee> modifiableGrantees = getModifiableGrantees(sharingUser);
@@ -134,9 +126,14 @@ public class EntitySharesService {
                 .availableGrantees(modifiableGrantees)
                 .availableCapabilities(getAvailableCapabilities())
                 .activeShares(ImmutableSet.of())
-                .selectedGranteeCapabilities(request.selectedGranteeCapabilities().orElse(ImmutableMap.of()))
+                .selectedGranteeCapabilities(ImmutableMap.of())
                 .validationResult(new ValidationResult())
                 .build();
+    }
+
+    public EntityShareResponse prepareShare(List<String> entityGRNs, User sharingUser) {
+        requireNonNull(entityGRNs, "entityGRNs cannot be null");
+        requireNonNull(sharingUser, "sharingUser cannot be null");
     }
 
     private Set<Grantee> getModifiableGrantees(User sharingUser, GRN ownedEntity) {
@@ -211,7 +208,7 @@ public class EntitySharesService {
         }
 
         // Update capabilities of existing grants (for a grantee)
-        existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach((g -> {
+        existingGrants.stream().filter(grantDTO -> request.grantees().contains(grantDTO.grantee())).forEach(g -> {
             final Capability newCapability = selectedGranteeCapabilities.get(g.grantee());
             if (!g.capability().equals(newCapability)) {
                 grantService.save(g.toBuilder()
@@ -221,7 +218,7 @@ public class EntitySharesService {
                         .build());
                 updateEventBuilder.addUpdates(g.grantee(), newCapability, g.capability());
             }
-        }));
+        });
 
         // Create newly added grants
         // TODO Create multiple entries with one db query
