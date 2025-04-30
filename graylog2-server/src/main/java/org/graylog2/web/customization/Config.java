@@ -34,14 +34,19 @@ public record Config(
         Optional<Footer> footer,
         Optional<Resources> resources
 ) {
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Logo(SVG light, SVG dark) {}
+
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Login(Optional<SVG> background) {}
 
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Welcome(Optional<WelcomeItem> news,
                           Optional<WelcomeItem> releases) {
         public record WelcomeItem(Optional<Boolean> enabled, Optional<String> feed) {}
     }
 
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Resources(@JsonProperty("stream_rule_matcher_code") Optional<ResourceItem> streamRuleMatcherCode,
                             @JsonProperty("contact_support") Optional<ResourceItem> contactSupport,
                             @JsonProperty("contact_us") Optional<ResourceItem> contactUs
@@ -49,6 +54,7 @@ public record Config(
         public record ResourceItem(Optional<Boolean> enabled, Optional<String> url) {}
     }
 
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Navigation(Optional<NavigationItem> home,
                              @JsonProperty("user_menu") Optional<NavigationItem> userMenu,
                              Optional<NavigationItem> scratchpad,
@@ -56,6 +62,7 @@ public record Config(
         public record NavigationItem(String icon) {}
     }
 
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Footer(Optional<Boolean> enabled) {}
 
     public static Config empty() {
