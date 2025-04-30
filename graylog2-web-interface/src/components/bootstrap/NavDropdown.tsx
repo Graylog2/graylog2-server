@@ -39,7 +39,7 @@ const DropdownTrigger = styled.button<{ $active: boolean }>(
     gap: ${theme.spacings.xs};
 
     &:hover,
-    &:focus {
+    &:focus-visible {
       ${hoverIndicatorStyles(theme)}
       color: ${theme.colors.variant.darker.default};
       background-color: transparent;
