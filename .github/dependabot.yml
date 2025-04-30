@@ -18,7 +18,7 @@ updates:
         # - https://github.com/Graylog2/graylog-plugin-enterprise/issues/10504
         #update-types: ["version-update:semver-patch"]
         versions:
-          - "> 2.29"
+          - ">= 2.30"
       - dependency-name: "com.amazonaws:aws-java-sdk-bom"
         update-types: ["version-update:semver-patch"]
       # Lucene >=10 requires JDK 21
