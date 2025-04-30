@@ -183,7 +183,7 @@ describe('SavedSearchForm', () => {
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
-    
+
     it('should handle saveSearch with share settings', async () => {
       const onSaveAs = jest.fn();
       render(<SavedSearchForm {...props}  saveAsSearch={onSaveAs} isCreateNew />);
