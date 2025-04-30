@@ -22,6 +22,7 @@ import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import Menu from 'components/bootstrap/Menu';
+import NavIcon from 'components/navigation/NavIcon';
 
 const HelpMenuLinkItem = ({ href, children = undefined }: React.PropsWithChildren<{ href: string }>) => (
   <Menu.Item component="a" href={href} target="_blank" leftSection={<Icon name="open_in_new" />}>
@@ -33,7 +34,7 @@ const HelpMenu = () => {
   const { setShowHotkeysModal } = useHotkeysContext();
 
   return (
-    <NavDropdown title={<Icon name="help" size="lg" />} hoverTitle="Help" noCaret>
+    <NavDropdown title={<NavIcon type="help" />} hoverTitle="Help" noCaret>
       <HelpMenuLinkItem href={DocsHelper.versionedDocsHomePage()}>Documentation</HelpMenuLinkItem>
 
       <Menu.Item onClick={() => setShowHotkeysModal(true)}>Keyboard Shortcuts</Menu.Item>
