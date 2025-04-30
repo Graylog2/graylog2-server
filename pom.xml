@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>6.2.1-SNAPSHOT</version>
+    <version>6.2.1</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -99,7 +99,7 @@
         <auto-value.version>1.11.0</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.31.2</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.29.52</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.2</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
