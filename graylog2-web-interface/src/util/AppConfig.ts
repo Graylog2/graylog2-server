@@ -27,7 +27,7 @@ export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support'
 
 export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
 
-type Branding = {
+export type Branding = {
   product_name?: string;
   favicon?: string;
   logo?: {
