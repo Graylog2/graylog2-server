@@ -93,11 +93,9 @@ class EntitySharesServiceTest {
         final EventBus serverEventBus = mock(EventBus.class);
         this.entitySharesService = new EntitySharesService(dbGrantService, entityDependencyResolver, entityDependencyPermissionChecker, grnRegistry, granteeService, serverEventBus);
 
-        // TODO this is needed to initialize the CAPABILITIES field
+        // this is needed to initialize the CAPABILITIES field
         new BuiltinCapabilities();
     }
-
-    // TODO Test more EntitySharesService functionality
 
     @DisplayName("Validates we cannot remove the last owner")
     @Test
@@ -223,7 +221,6 @@ class EntitySharesServiceTest {
         assertThat(entityShareResponse.activeShares()).satisfies(activeShares -> {
             assertThat(activeShares).isEmpty();
         });
-
     }
 
     @DisplayName("Only show shares for visible grantees")

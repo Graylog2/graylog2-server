@@ -262,7 +262,7 @@ public class EntitySharesService {
 
         // remove grants that are not present anymore
         // TODO delete multiple entries with one db query
-        existingGrants.forEach((g) -> {
+        existingGrants.forEach(g -> {
             if (!selectedGranteeCapabilities.containsKey(g.grantee())) {
                 grantService.delete(g.id());
                 updateEventBuilder.addDeletes(g.grantee(), g.capability());

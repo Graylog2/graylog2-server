@@ -49,8 +49,6 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.models.PaginatedResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -66,8 +64,6 @@ import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 @Api(value = "Authorization/Shares", description = "Manage share permissions on entities", tags = {CLOUD_VISIBLE})
 @RequiresAuthentication
 public class EntitySharesResource extends RestResourceWithOwnerCheck {
-    private static final Logger LOG = LoggerFactory.getLogger(EntitySharesResource.class);
-
     private final GRNRegistry grnRegistry;
     private final GranteeSharesService granteeSharesService;
     private final EntitySharesService entitySharesService;
@@ -119,16 +115,13 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
         return entitySharesService.prepareShare(grn, request, getCurrentUser());
     }
 
-    /**
-     * Prepare shares independent of a specific entity.
-     * Optionally check for missing permissions on specified dependent entities.
-     *
-     * @param dependentEntityGRNs
-     * @return
-     */
     public record PrepareShareRequest(@JsonProperty("prepare_request") @Nullable List<String> dependentEntityGRNs) {
     }
 
+    /**
+     * Prepare shares independent of a specific entity.
+     * Optionally check for missing permissions on specified dependent entities.
+     */
     @POST
     @ApiOperation(value = "Prepare shares independent of a specific entity or collection")
     @Path("entities/prepare")
