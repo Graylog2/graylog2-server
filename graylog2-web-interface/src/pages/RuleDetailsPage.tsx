@@ -23,9 +23,9 @@ import Rule from 'components/rules/Rule';
 import Routes from 'routing/Routes';
 import useQuery from 'routing/useQuery';
 import { PipelineRulesProvider } from 'components/rules/RuleContext';
-import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import type { RulesStoreState } from 'stores/rules/RulesStore';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
+import usePipelines from 'hooks/usePipelines';
 
 import useHistory from '../routing/useHistory';
 
@@ -39,14 +39,14 @@ function filterPipelines(pipelines = [], title = '') {
 const RuleDetailsPage = () => {
   const { ruleId } = useParams<{ ruleId: string }>();
   const ruleStoreState = useStore(RulesStore);
-  const pipelines = useStore(PipelinesStore, ({ pipelines: state }) => state);
+  const isNewRule = ruleId === 'new';
+  const { data: pipelines } = usePipelines({ enabled: !isNewRule });
   const [isLoading, setIsLoading] = useState(true);
   const [currentRule, setCurrentRule] = useState(undefined);
   const history = useHistory();
   const { rule_builder } = useQuery();
 
   const isRuleBuilder = rule_builder === 'true';
-  const isNewRule = ruleId === 'new';
   const title = currentRule?.title || '';
   const pageTitle = isNewRule ? 'New pipeline rule' : `Pipeline rule ${title}`;
 
@@ -60,8 +60,6 @@ const RuleDetailsPage = () => {
     if (isNewRule) {
       setIsLoading(false);
     } else {
-      PipelinesActions.list();
-
       RulesActions.get(ruleId).then(
         () => {},
         (error) => {
@@ -71,7 +69,7 @@ const RuleDetailsPage = () => {
         },
       );
 
-      setIsLoading(!(currentRule && pipelines));
+      setIsLoading(!(currentRule && pipelines.length > 0));
     }
   }, [currentRule, history, isNewRule, ruleId, pipelines]);
 

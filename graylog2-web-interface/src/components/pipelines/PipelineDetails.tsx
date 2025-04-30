@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { Row, Col } from 'components/bootstrap';
 import { RelativeTime } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
 
 import PipelineForm from './PipelineForm';
 

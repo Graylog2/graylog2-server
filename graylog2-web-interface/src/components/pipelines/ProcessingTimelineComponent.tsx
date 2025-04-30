@@ -16,18 +16,18 @@
  */
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import Immutable from 'immutable';
 
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
 import { useStore } from 'stores/connect';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
-import type { PaginatedPipelines, PipelineType } from 'stores/pipelines/PipelinesStore';
-import { PipelinesActions } from 'stores/pipelines/PipelinesStore';
-import { DEFAULT_PAGINATION, type Pagination } from 'stores/PaginationTypes';
+import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
+import usePipelineMutations from 'hooks/usePipelineMutations';
+import usePipelinesPaginated from 'hooks/usePipelinesPaginated';
 
+import type { PipelineType } from './types';
 import PipelineListItem from './PipelineListItem';
 
 const StyledPaginatedList = styled(PaginatedList)`
@@ -58,33 +58,23 @@ const PipelineFilter = ({ query, onSearch }: { query: string; onSearch: (query: 
   />
 );
 
-const _loadPipelines = (
-  pagination: Pagination,
-  setLoading: (value: boolean) => void,
-  setPaginatedPipelines: (pipelines: PaginatedPipelines | undefined) => void,
-) => {
-  setLoading(true);
-
-  PipelinesActions.listPaginated(pagination).then((paginatedPipelines) => {
-    setPaginatedPipelines(paginatedPipelines);
-    setLoading(false);
-  });
-};
-
 const ProcessingTimelineComponent = () => {
   const { connections } = useStore(PipelineConnectionsStore);
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
   const [query, setQuery] = useState('');
   const [streams, setStreams] = useState<Stream[] | undefined>();
-  const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines | undefined>();
-  const [loading, setLoading] = useState(false);
-  const { list: pipelines = Immutable.List(), pagination: { total = 0 } = {} } = paginatedPipelines || {};
+  const { deletePipeline } = usePipelineMutations();
+  const { data: paginatedPipelinesData, isInitialLoading: isLoadingPipelines } = usePipelinesPaginated({
+    page,
+    perPage,
+    query,
+  });
+  const { pipelines, total } = paginatedPipelinesData;
 
   useEffect(() => {
-    _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
     PipelineConnectionsActions.list();
     StreamsStore.listStreams().then(setStreams);
-  }, [page, perPage, query]);
+  }, []);
 
   const isLoading = !pipelines || !streams || !connections;
 
@@ -100,7 +90,7 @@ const ProcessingTimelineComponent = () => {
   const searchFilter = (
     <Header>
       <PipelineFilter query={query} onSearch={handleSearch} />
-      {loading && (
+      {isLoadingPipelines && (
         <SpinnerWrapper>
           <Spinner text="" delay={0} />
         </SpinnerWrapper>
@@ -122,8 +112,7 @@ const ProcessingTimelineComponent = () => {
     // TODO: Replace with ConfirmDialog components
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
-      PipelinesActions.delete(pipeline.id).then(() => {
-        _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
+      deletePipeline({ pipelineId: pipeline.id }).then(() => {
         setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
       });
     }
@@ -131,7 +120,7 @@ const ProcessingTimelineComponent = () => {
   const dataRowFormater = (pipelineItem: PipelineType) => (
     <PipelineListItem
       pipeline={pipelineItem}
-      pipelines={pipelines.toJS()}
+      pipelines={pipelines}
       connections={connections}
       streams={streams}
       onDeletePipeline={() => _deletePipeline(pipelineItem)}
@@ -147,7 +136,7 @@ const ProcessingTimelineComponent = () => {
           className="table-hover"
           headers={headers}
           headerCellFormatter={_headerCellFormatter}
-          rows={pipelines.toJS()}
+          rows={pipelines}
           customFilter={searchFilter}
           filterKeys={[]}
           filterLabel="Filter Pipelines"
