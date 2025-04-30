@@ -16,6 +16,7 @@
  */
 package org.graylog.security.rest;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -51,6 +52,7 @@ import org.graylog2.rest.models.PaginatedResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -117,13 +119,23 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
         return entitySharesService.prepareShare(grn, request, getCurrentUser());
     }
 
+    /**
+     * Prepare shares independent of a specific entity.
+     * Optionally check for missing permissions on specified dependent entities.
+     *
+     * @param dependentEntityGRNs
+     * @return
+     */
+    public record PrepareShareRequest(@JsonProperty("prepare_request") @Nullable List<String> dependentEntityGRNs) {
+    }
+
     @POST
     @ApiOperation(value = "Prepare shares independent of a specific entity or collection")
     @Path("entities/prepare")
     @NoAuditEvent("This does not change any data")
-    public EntityShareResponse prepareGenericShare(@ApiParam(name = "JSON Body") List<String> entityGRNs) {
-        if (entityGRNs != null && !entityGRNs.isEmpty()) {
-            return entitySharesService.prepareShare(entityGRNs, getCurrentUser());
+    public EntityShareResponse prepareGenericShare(@ApiParam(name = "JSON Body") PrepareShareRequest request) {
+        if (request.dependentEntityGRNs() != null && !request.dependentEntityGRNs().isEmpty()) {
+            return entitySharesService.prepareShare(request.dependentEntityGRNs(), getCurrentUser());
         } else {
             return entitySharesService.prepareShare(getCurrentUser());
         }

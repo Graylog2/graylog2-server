@@ -17,6 +17,7 @@
 package org.graylog.security.shares;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import jakarta.inject.Inject;
@@ -40,6 +41,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -131,9 +133,33 @@ public class EntitySharesService {
                 .build();
     }
 
-    public EntityShareResponse prepareShare(List<String> entityGRNs, User sharingUser) {
-        requireNonNull(entityGRNs, "entityGRNs cannot be null");
+    /**
+     * Similar to generic prepare without a specific entity; but also checks for missing permissions on specified
+     * dependent entities.
+     *
+     * @param dependentEntityGRNs check permissions on these entities
+     * @param sharingUser         the sharing user
+     * @return eligible grantees and missing permissions on dependencies
+     */
+    public EntityShareResponse prepareShare(List<String> dependentEntityGRNs, User sharingUser) {
+        requireNonNull(dependentEntityGRNs, "entityGRNs cannot be null");
         requireNonNull(sharingUser, "sharingUser cannot be null");
+        final EntityShareResponse response = prepareShare(sharingUser);
+        final ImmutableSet<EntityDescriptor> entities = dependentEntityGRNs.stream()
+                .map(grn -> EntityDescriptor.create(grnRegistry.parse(grn), grn, Set.of()))
+                .collect(ImmutableSet.toImmutableSet());
+
+        final ImmutableMultimap<GRN, EntityDescriptor> deniedEntities =
+                entityDependencyPermissionChecker.check(response.sharingUser(), entities,
+                        response.availableGrantees().stream().map(Grantee::grn).collect(Collectors.toSet()));
+
+        Map<GRN, Collection<EntityDescriptor>> missingPermissions = new HashMap<>();
+        deniedEntities.keySet().forEach(grantee -> {
+            final ImmutableSet<EntityDescriptor> missing = deniedEntities.get(grantee).stream().collect(ImmutableSet.toImmutableSet());
+            missingPermissions.put(grantee, missing);
+        });
+
+        return response.toBuilder().missingPermissionsOnDependencies(missingPermissions).build();
     }
 
     private Set<Grantee> getModifiableGrantees(User sharingUser, GRN ownedEntity) {
@@ -280,7 +306,7 @@ public class EntitySharesService {
 
         // Iterate over all existing owner grants and find modifications
         ArrayList<GRN> removedOwners = new ArrayList<>();
-        existingGrants.stream().filter(g -> g.capability().equals(Capability.OWN)).forEach((g) -> {
+        existingGrants.stream().filter(g -> g.capability().equals(Capability.OWN)).forEach(g -> {
             // owner got removed
             if (!selectedGranteeCapabilities.containsKey(g.grantee())) {
                 // Ignore owners that were invisible to the requesting user

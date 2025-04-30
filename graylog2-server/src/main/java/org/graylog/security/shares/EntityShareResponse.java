@@ -65,6 +65,8 @@ public abstract class EntityShareResponse {
         return Builder.create();
     }
 
+    public abstract Builder toBuilder();
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonCreator
