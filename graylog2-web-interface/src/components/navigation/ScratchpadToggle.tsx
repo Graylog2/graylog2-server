@@ -33,7 +33,7 @@ const Toggle = styled(Button)(
     color: ${theme.colors.global.textDefault};
 
     &:hover,
-    &:focus {
+    &:focus-visible {
       ${hoverIndicatorStyles(theme)}
       background: transparent;
       color: ${theme.colors.variant.darker.default};
