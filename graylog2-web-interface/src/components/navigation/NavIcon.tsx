@@ -27,6 +27,13 @@ import type { Branding } from 'util/AppConfig';
 
 type NavIconType = keyof Branding['navigation'];
 
+const DEFAULT_ICONS: Record<NavIconType, IconName> = {
+  'home': 'home',
+  'scratchpad': 'edit_square',
+  'user_menu': 'person',
+  'help': 'help',
+};
+
 const SvgContainer = styled.div`
   svg {
     width: 100%;
@@ -35,18 +42,6 @@ const SvgContainer = styled.div`
     fill: currentColor;
   }
 `;
-
-type Props = {
-  type: NavIconType;
-  title?: string;
-};
-
-const DEFAULT_ICONS: Record<NavIconType, IconName> = {
-  'home': 'home',
-  'scratchpad': 'edit_square',
-  'user_menu': 'person',
-  'help': 'help',
-};
 
 const useCustomIcon = (type: NavIconType) => {
   const navigationCustomization = useNavigationCustomization();
@@ -61,11 +56,16 @@ const useCustomIcon = (type: NavIconType) => {
   }, [customIcon]);
 };
 
-const NavIcon = ({ type, title = undefined }: Props) => {
-  const customIconSvg = useCustomIcon(type);
+type Props = {
+  type: NavIconType;
+  title?: string;
+};
 
-  if (customIconSvg) {
-    return <SvgContainer dangerouslySetInnerHTML={{ __html: customIconSvg }} title={title} />;
+const NavIcon = ({ type, title = undefined }: Props) => {
+  const customSvgIcon = useCustomIcon(type);
+
+  if (customSvgIcon) {
+    return <SvgContainer dangerouslySetInnerHTML={{ __html: customSvgIcon }} title={title} />;
   }
 
   return <Icon name={DEFAULT_ICONS[type]} size="lg" title={title} />;
