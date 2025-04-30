@@ -53,6 +53,7 @@ const SUT = ({ ...props }) => (
     description={mockEntity.description}
     entityType={mockEntity.entityType}
     entityTitle=''
+    entityId={null}
     onSetEntityShare={jest.fn()}
     {...props}
   />

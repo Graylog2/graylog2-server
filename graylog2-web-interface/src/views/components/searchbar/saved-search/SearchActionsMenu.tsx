@@ -48,7 +48,9 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import useHotkey from 'hooks/useHotkey';
+import { createGRN } from 'logic/permissions/GRN';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -145,10 +147,15 @@ const SearchActionsMenu = () => {
       const newView = view.toBuilder().title(newTitle).type(View.Type.Search).build();
 
       await dispatch(onSaveView(newView, entityShare));
+
+      if(entityShare){
+        await EntityShareDomain.update('search', title, createGRN('search', view.id), entityShare);
+      }
+
       closeFormModal();
       await dispatch(loadView(newView));
     },
-    [closeFormModal, dispatch, view],
+    [closeFormModal, dispatch, view, title],
   );
 
   const saveAsSearch = useCallback(
@@ -224,7 +231,8 @@ const SearchActionsMenu = () => {
         saveAsSearch={saveAsSearch}
         isCreateNew={isNew || !isAllowedToEdit}
         toggleModal={toggleFormModal}
-        value={currentTitle}>
+        value={currentTitle}
+        viewId={!isNew && view.id}>
         <SaveViewButton title={title} ref={formTarget} onClick={toggleFormModal} />
       </SavedSearchForm>
       <Button title="Load a previously saved search" onClick={toggleListModal}>
