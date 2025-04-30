@@ -57,8 +57,8 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineCompactSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
-import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
+import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -214,8 +214,9 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true) final CreateStreamRequest cr,
+    public Response create(@ApiParam(name = "JSON body", required = true) final UnwrappedCreateEntityRequest<CreateStreamRequest> wrappedCreateEntityRequest,
                            @Context UserContext userContext) throws ValidationException {
+        final CreateStreamRequest cr = wrappedCreateEntityRequest.getEntity();
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
         stream.setDisabled(true);
@@ -228,32 +229,16 @@ public class StreamResource extends RestResource {
                 .collect(Collectors.toSet());
         final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser());
 
-        StreamCreatedResponse result = new StreamCreatedResponse(id);
+        final StreamCreatedResponse result = new StreamCreatedResponse(id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
                 .path("{streamId}")
                 .build(id);
 
         recentActivityService.create(id, GRNTypes.STREAM, userContext.getUser());
+        wrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest ->
+                entitySharesService.updateEntityShares(GRNTypes.STREAM, result.streamId(), shareRequest, userContext.getUser()));
+
         return Response.created(streamUri).entity(result).build();
-    }
-
-    @POST
-    @Timed
-    @Path("/with-request")
-    @ApiOperation(value = "Create a stream with sharing request", response = StreamCreatedResponse.class)
-    @RequiresPermissions(RestPermissions.STREAMS_CREATE)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response createWithRequest(@ApiParam @Valid @NotNull(message = "Stream request is mandatory") CreateEntityRequest<CreateStreamRequest> request,
-                                      @Context UserContext userContext) throws ValidationException {
-        final Response result = create(request.entity(), userContext);
-
-        if (request.shareRequest().isPresent() && result.getEntity() instanceof StreamCreatedResponse streamCreatedResponse) {
-            entitySharesService.updateEntityShares(GRNTypes.STREAM, streamCreatedResponse.streamId(), request.shareRequest().get(), userContext.getUser());
-        }
-
-        return result;
     }
 
     @GET
