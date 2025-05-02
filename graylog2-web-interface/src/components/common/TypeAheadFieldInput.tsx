@@ -14,39 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import Immutable from 'immutable';
-import $ from 'jquery';
-import 'typeahead.js';
+import * as React from 'react';
+import { useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import { Input } from 'components/bootstrap';
-import UniversalSearch from 'logic/search/UniversalSearch';
-import ApiRoutes from 'routing/ApiRoutes';
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import { SystemFields } from '@graylog/server-api';
 
-import { Container } from './TypeAheadInput';
+import { HelpBlock, Input } from 'components/bootstrap';
+import Select from 'components/common/Select/Select';
+import Spinner from 'components/common/Spinner';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 
-type TypeAheadFieldInputProps = {
+type Props = {
   /** ID of the input. */
   id: string;
-  /**
-   * @deprecated React v15 deprecated `valueLink`s. Please use `onChange`
-   * instead.
-   */
-  valueLink?: any;
   /** Label of the field input */
   label?: string;
   /** Specifies if the input should have the input focus or not. */
   autoFocus?: boolean;
-  /**
-   * Function that is called when the input changes. The function receives
-   * the typeahead event object for the event that triggered the change. For
-   * more information on typeahead events, see:
-   * https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#custom-events
-   */
-  onChange?: (...args: any[]) => void;
-  onBlur?: (...args: any[]) => void;
+  /** Function that is called when the input changes. */
+  onChange?: (e: { target: { value: string; name: string } }) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   /** Display an error for the input * */
   error?: string;
   type?: string;
@@ -58,107 +46,41 @@ type TypeAheadFieldInputProps = {
  * Component that renders an input offering auto-completion for message fields.
  * Fields are loaded from the Graylog server in the background.
  */
-class TypeAheadFieldInput extends React.Component<TypeAheadFieldInputProps> {
-  static defaultProps = {
-    valueLink: undefined,
-    autoFocus: false,
-    label: undefined,
-    onChange: () => {},
-    onBlur: () => {},
-    error: undefined,
-    type: undefined,
-    name: undefined,
-    defaultValue: undefined,
-  };
+const noop = () => {};
+const prepareOptions = (data) =>
+  data.fields.sort(naturalSortIgnoreCase).map((fieldName) => ({ label: fieldName, value: fieldName }));
 
-  private fieldInput: Input;
+const TypeAheadFieldInput = ({
+  id,
+  autoFocus = false,
+  label,
+  onChange = noop,
+  onBlur = noop,
+  error = undefined,
+  type = undefined,
+  name = undefined,
+  defaultValue = undefined,
+}: Props) => {
+  const { data, isInitialLoading } = useQuery(['system', 'fields'], () => SystemFields.fields());
+  const options = useMemo(() => (isInitialLoading ? [] : prepareOptions(data)), [data, isInitialLoading]);
+  const _onChange = useCallback((fieldName: string) => onChange({ target: { value: fieldName, name } }), [onChange]);
 
-  componentDidMount() {
-    if (this.fieldInput) {
-      const { autoFocus, valueLink, onChange } = this.props;
-      const fieldInput = $(this.fieldInput.getInputDOMNode());
-
-      fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.fields().url)).then((data) => {
-        // @ts-ignore
-        fieldInput.typeahead(
-          {
-            hint: true,
-            highlight: true,
-            minLength: 1,
-          },
-          {
-            name: 'fields',
-            displayKey: 'value',
-            source: UniversalSearch.substringMatcher(data.fields, 'value', 6),
-          },
-        );
-
-        if (autoFocus) {
-          fieldInput.focus();
-          // @ts-ignore
-          fieldInput.typeahead('close');
-        }
-      });
-
-      const fieldFormGroup = this.fieldInput.getInputDOMNode();
-
-      $(fieldFormGroup).on('typeahead:change typeahead:selected', (event) => {
-        if (onChange) {
-          onChange(event);
-        }
-
-        if (valueLink) {
-          valueLink.requestChange((event.target as HTMLInputElement).value);
-        }
-      });
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.fieldInput) {
-      const fieldInput = $(this.fieldInput.getInputDOMNode());
-
-      // @ts-ignore
-      fieldInput.typeahead('destroy');
-
-      const fieldFormGroup = this.fieldInput.getInputDOMNode();
-
-      $(fieldFormGroup).off('typeahead:change typeahead:selected');
-    }
-  }
-
-  _getFilteredProps = () => {
-    let props = Immutable.fromJS(this.props);
-
-    ['valueLink', 'onChange'].forEach((key) => {
-      if (props.has(key)) {
-        props = props.delete(key);
-      }
-    });
-
-    return props.toJS();
-  };
-
-  render() {
-    const { id, label, valueLink, error, onBlur } = this.props;
-
-    return (
-      <Container>
-        <Input
-          id={id}
-          ref={(fieldInput) => {
-            this.fieldInput = fieldInput;
-          }}
-          label={label}
-          onBlur={onBlur}
-          error={error}
-          wrapperClassName="typeahead-wrapper"
-          defaultValue={valueLink ? valueLink.value : null}
-          {...this._getFilteredProps()}
-        />
-      </Container>
-    );
-  }
-}
+  return isInitialLoading ? (
+    <Spinner />
+  ) : (
+    <Input label={label} error={error}>
+      <Select
+        id={id}
+        onChange={_onChange}
+        onBlur={onBlur}
+        value={defaultValue}
+        options={options}
+        placeholder=""
+        autoFocus={autoFocus}
+      />
+      <HelpBlock />
+    </Input>
+  );
+};
 
 export default TypeAheadFieldInput;
