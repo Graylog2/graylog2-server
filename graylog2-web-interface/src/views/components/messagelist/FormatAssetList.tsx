@@ -34,20 +34,20 @@ const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: 
   const queryId = useActiveQueryId();
   const dispatch = useAppDispatch();
 
-  const assetsList = React.useMemo(() => pluggableAssetListComponent.map(
+  const assetsList = React.useMemo(() => pluggableAssetListComponent?.map(
     ({ component: PluggableAssetListItem }) => (
       <PluggableAssetListItem assetIds={associated_assets} direction="col" addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)} />
     ),
   ), [pluggableAssetListComponent, associated_assets, dispatch, queryId, fieldType]);
 
-  if (associated_assets.length === 0) {
+  if (associated_assets?.length === 0) {
     return null;
   }
 
   return (
     <div>
       <dt>Associated Assets</dt>
-      {assetsList.map((assetElement) => (
+      {assetsList?.map((assetElement) => (
         <div key={assetElement.props.identifiers[0]}>
           {assetElement}
         </div>
