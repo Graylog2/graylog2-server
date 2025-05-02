@@ -41,7 +41,7 @@ public class JwtTokenAuthFilter implements ContainerRequestFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(JwtTokenAuthFilter.class);
 
-    private static final String AUTHENTICATION_SCHEME = "Bearer";
+    public static final String AUTHENTICATION_SCHEME = "Bearer";
     public static final String REQUIRED_SUBJECT = "admin";
     public static final String REQUIRED_ISSUER = "graylog";
     private final JwtSecret jwtSecret;

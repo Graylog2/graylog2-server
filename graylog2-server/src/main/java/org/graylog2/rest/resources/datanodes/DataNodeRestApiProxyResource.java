@@ -56,7 +56,8 @@ public class DataNodeRestApiProxyResource extends RestResource {
     private static final List<Predicate<ProxyRequestAdapter.ProxyRequest>> allowList = List.of(
             request -> request.path().startsWith("indices-directory") && "GET".equals(request.method()),
             request -> request.path().startsWith("logs") && "GET".equals(request.method()),
-            request -> request.path().startsWith("connection-check") && "POST".equals(request.method())
+            request -> request.path().startsWith("connection-check") && "POST".equals(request.method()),
+            request -> request.path().startsWith("jwt") && "GET".equals(request.method())
     );
 
     private final DatanodeRestApiProxy proxyRequestAdapter;
