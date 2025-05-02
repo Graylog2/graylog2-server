@@ -288,7 +288,8 @@ type SearchActionModalProps = {
 }
 
 type AssetInformationComponentProps = {
-  identifiers: unknown,
+  assetIds: Array<string>;
+  direction: 'col' | 'row';
   addToQuery: (id: string) => void;
 }
 
