@@ -100,6 +100,9 @@ public class RestPermissions implements PluginPermissions {
     public static final String INPUTS_EDIT = "inputs:edit";
     public static final String INPUTS_READ = "inputs:read";
     public static final String INPUTS_TERMINATE = "inputs:terminate";
+    public static final String INPUT_TYPES_CREATE = "inputtypes:create";
+    public static final String INPUT_TYPES_EDIT = "inputtypes:edit";
+    public static final String INPUT_TYPES_READ = "inputtypes:read";
     public static final String JOURNAL_EDIT = "journal:edit";
     public static final String JOURNAL_READ = "journal:read";
     public static final String JVMSTATS_READ = "jvmstats:read";
@@ -263,6 +266,10 @@ public class RestPermissions implements PluginPermissions {
             .add(create(INPUTS_CREATE, ""))
             .add(create(INPUTS_EDIT, ""))
             .add(create(INPUTS_READ, ""))
+            .add(create(INPUT_TYPES_CREATE, ""))
+            .add(create(INPUT_TYPES_EDIT, ""))
+            .add(create(INPUT_TYPES_READ, ""))
+            .add(create(INPUTS_TERMINATE, ""))
             .add(create(INPUTS_TERMINATE, ""))
             .add(create(JOURNAL_EDIT, ""))
             .add(create(JOURNAL_READ, ""))

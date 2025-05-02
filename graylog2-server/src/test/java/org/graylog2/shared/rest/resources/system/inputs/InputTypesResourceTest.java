@@ -16,15 +16,16 @@
  */
 package org.graylog2.shared.rest.resources.system.inputs;
 
+import org.apache.shiro.subject.Subject;
 import org.graylog2.Configuration;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,7 +39,9 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,22 +49,26 @@ class InputTypesResourceTest {
 
     private static final String CLOUD_COMPATIBLE = "cloudCompatible";
     private static final String CLOUD_INCOMPATIBLE = "cloudIncompatible";
+    private static final String PERMITTED_TYPE = "permittedType";
+    private static final String RESTRICTED_TYPE = "restrictedType";
     @Mock
     private MessageInputFactory messageInputFactory;
 
     @Mock
     private Configuration configuration;
 
-    @InjectMocks
     InputTypesResource inputTypesResource;
 
     @BeforeEach
     public void setUp() {
         Map<String, InputDescription> inputs = Stream.of(
                 mockInput(CLOUD_COMPATIBLE, true),
-                mockInput(CLOUD_INCOMPATIBLE, false)
+                mockInput(CLOUD_INCOMPATIBLE, false),
+                mockInput(PERMITTED_TYPE, true),
+                mockInput(RESTRICTED_TYPE, true)
         ).collect(Collectors.toMap(InputDescription::getName, Function.identity()));
         when(messageInputFactory.getAvailableInputs()).thenReturn(inputs);
+        inputTypesResource = new InputTypesTestResource(messageInputFactory, configuration);
     }
 
     private InputDescription mockInput(String name, boolean isCloudCompatible) {
@@ -73,7 +80,7 @@ class InputTypesResourceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true,1", "false,2"})
+    @CsvSource({"true,3", "false,4"})
     public void testInputTypes(boolean isCloud, int inputCount) {
         when(configuration.isCloud()).thenReturn(isCloud);
 
@@ -81,7 +88,7 @@ class InputTypesResourceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true,1", "false,2"})
+    @CsvSource({"true,3", "false,4"})
     public void testInputTypesAll(boolean isCloud, int inputCount) {
         when(configuration.isCloud()).thenReturn(isCloud);
 
@@ -104,4 +111,41 @@ class InputTypesResourceTest {
         assertThat(inputTypesResource.info(CLOUD_INCOMPATIBLE).name()).isEqualTo(CLOUD_INCOMPATIBLE);
         assertThat(inputTypesResource.info(CLOUD_COMPATIBLE).name()).isEqualTo(CLOUD_COMPATIBLE);
     }
+
+    @Test
+    public void testInputInfoPermitted() {
+        when(configuration.isInputTypesRestricted()).thenReturn(false);
+        assertThat(inputTypesResource.info(PERMITTED_TYPE).name()).isEqualTo(PERMITTED_TYPE);
+        when(configuration.isInputTypesRestricted()).thenReturn(true);
+        assertThat(inputTypesResource.info(PERMITTED_TYPE).name()).isEqualTo(PERMITTED_TYPE);
+    }
+
+    @Test
+    public void testInputInfoRestricted() {
+        when(configuration.isInputTypesRestricted()).thenReturn(false);
+        assertThat(inputTypesResource.info(RESTRICTED_TYPE).name()).isEqualTo(RESTRICTED_TYPE);
+        when(configuration.isInputTypesRestricted()).thenReturn(true);
+        assertThatThrownBy(() -> inputTypesResource.info(RESTRICTED_TYPE)).isInstanceOf(NotFoundException.class)
+                .hasMessageContaining(RESTRICTED_TYPE);
+    }
+
+    static class InputTypesTestResource extends InputTypesResource {
+
+        private final Subject subject;
+
+        public InputTypesTestResource(MessageInputFactory messageInputFactory,
+                                      Configuration configuration) {
+            super(messageInputFactory, configuration);
+            this.subject = mock(Subject.class);
+            lenient().doReturn(true).when(subject).isPermitted(anyString());
+            lenient().doReturn(false).when(subject).isPermitted(RestPermissions.INPUT_TYPES_READ + ":" + RESTRICTED_TYPE);
+        }
+
+        @Override
+        protected Subject getSubject() {
+            return subject;
+        }
+
+    }
+
 }

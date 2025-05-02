@@ -29,6 +29,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputTypesSummary;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,9 @@ public class InputTypesResource extends RestResource {
             if (config.isCloud() && !entry.getValue().isCloudCompatible()) {
                 continue;
             }
+            if (config.isInputTypesRestricted() && !isPermitted(RestPermissions.INPUT_TYPES_READ, entry.getValue().getName())) {
+                continue;
+            }
             types.put(entry.getKey(), entry.getValue().getName());
         }
         return InputTypesSummary.create(types);
@@ -87,6 +91,9 @@ public class InputTypesResource extends RestResource {
                 .stream();
         if (config.isCloud()) {
             inputStream = inputStream.filter(e -> e.getValue().isCloudCompatible());
+        }
+        if (config.isInputTypesRestricted()) {
+            inputStream = inputStream.filter(e -> isPermitted(RestPermissions.INPUT_TYPES_READ, e.getValue().getName()));
         }
         return inputStream.collect(Collectors.toMap(Map.Entry::getKey, entry -> {
             final InputDescription description = entry.getValue();
@@ -107,6 +114,8 @@ public class InputTypesResource extends RestResource {
         if (description == null) {
             throwInputTypeNotFound(inputType);
         } else if (config.isCloud() && !description.isCloudCompatible()) {
+            throwInputTypeNotFound(inputType);
+        } else if (config.isInputTypesRestricted() && !isPermitted(RestPermissions.INPUT_TYPES_READ, description.getName())) {
             throwInputTypeNotFound(inputType);
         }
 
