@@ -23,7 +23,7 @@ import Routes from 'routing/Routes';
 import { CounterRate, MetricContainer } from 'components/metrics';
 import PipelineConnectionsList from 'components/pipelines/PipelineConnectionsList';
 import { Button, Label } from 'components/bootstrap';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
 import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
 import type { Stream } from 'logic/streams/types';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';

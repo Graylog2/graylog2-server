@@ -34,19 +34,18 @@ const DropdownTrigger = styled.button<{ $active: boolean }>(
     border: 0;
     padding: 0 15px;
     min-height: ${NAV_ITEM_HEIGHT};
+    display: inline-flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
 
     &:hover,
-    &:focus {
+    &:focus-visible {
       ${hoverIndicatorStyles(theme)}
-    }
-
-    ${$active ? activeIndicatorStyles(theme) : ''}
-
-    &:hover,
-    &:focus {
       color: ${theme.colors.variant.darker.default};
       background-color: transparent;
     }
+
+    ${$active ? activeIndicatorStyles(theme) : ''}
   `,
 );
 
