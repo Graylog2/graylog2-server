@@ -126,13 +126,17 @@ const EventDefinitionForm = ({
     [canEdit, eventDefinition._scope],
   );
 
+  const eventProcedureId = eventDefinition?.event_procedure || undefined;
+
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
 
   const steps = [
     {
       key: STEP_KEYS[0],
       title: 'Event Details',
-      component: <EventDetailsForm {...defaultStepProps} canEdit={canEdit} />,
+      component: (
+        <EventDetailsForm {...defaultStepProps} eventDefinitionEventProcedure={eventProcedureId} canEdit={canEdit} />
+      ),
     },
     {
       key: STEP_KEYS[1],

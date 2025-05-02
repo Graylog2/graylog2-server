@@ -52,7 +52,7 @@ const StyledButton = styled(Button)(
     ${activeIndicatorStyles(theme)}
 
     &:hover,
-    &:focus {
+    &:focus-visible {
       ${activeIndicatorStyles(theme)}
     }
 `,

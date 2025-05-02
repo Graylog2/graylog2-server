@@ -25,7 +25,7 @@ const PermissionsUpdateInfo = () => (
   <Row className="content">
     <Col xs={12}>
       <Alert bsStyle="info" title="Granting Permissions">
-        With Graylog 4.0, we&apos;ve updated the permissions system. Granting permissions for an entity like streams and
+        With version 4.0, we&apos;ve updated the permissions system. Granting permissions for an entity like streams and
         dashboards is no longer part of the user edit page. It can now be configured using the{' '}
         <b>
           <Icon name="person_add" /> Share

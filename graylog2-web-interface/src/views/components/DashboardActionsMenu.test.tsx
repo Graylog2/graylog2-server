@@ -87,7 +87,7 @@ describe('DashboardActionsMenu', () => {
   useViewsPlugin();
 
   const submitDashboardSaveForm = async () => {
-    const saveDashboardModal = await screen.findByRole('dialog');
+    const saveDashboardModal = await screen.findByRole('dialog', { name: /Save new dashboard/i });
 
     const saveButton = within(saveDashboardModal).getByRole('button', {
       name: /create dashboard/i,

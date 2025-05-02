@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import type { EditWidgetComponentProps, WidgetComponentProps } from 'views/types';
 import { Icon } from 'components/common';
 import ClipboardButton from 'components/common/ClipboardButton';
+import useProductName from 'brand-customization/useProductName';
 
 const Container = styled.div`
   height: 100%;
@@ -52,41 +53,45 @@ const OrderedList = styled.ol`
 const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetComponentProps> = ({
   config,
   type,
-}: WidgetComponentProps & EditWidgetComponentProps) => (
-  <Container>
-    <IconContainer>
-      <Icon name="help" size="3x" />
-    </IconContainer>
-    <Description>
-      <Row>
-        <strong>Unknown Widget: {type}</strong>
-      </Row>
-      <Row>
-        Unfortunately we are not able to render this widget, because we do not know how to handle widgets of type{' '}
-        <strong>{type}</strong>. This might be caused by one of these situations:
-      </Row>
+}: WidgetComponentProps & EditWidgetComponentProps) => {
+  const productName = useProductName();
 
-      <Row>
-        <OrderedList>
-          <li>You created this widget using a plugin that is now missing.</li>
-          <li>This widget was part of a legacy dashboard and created by a plugin that is not available anymore.</li>
-        </OrderedList>
-      </Row>
+  return (
+    <Container>
+      <IconContainer>
+        <Icon name="help" size="3x" />
+      </IconContainer>
+      <Description>
+        <Row>
+          <strong>Unknown Widget: {type}</strong>
+        </Row>
+        <Row>
+          Unfortunately we are not able to render this widget, because we do not know how to handle widgets of type{' '}
+          <strong>{type}</strong>. This might be caused by one of these situations:
+        </Row>
 
-      <Row>
-        What can you do about it? You can load the plugin again, contact the original plugin author for a plugin that
-        works with Graylog 3.2+, or remove the widget if you do not need it anymore.
-      </Row>
-      <Row>
-        Either way, you can copy the widget&rsquo;s config to the clipboard:{' '}
-        <ClipboardButton
-          title={<Icon name="content_copy" size="sm" />}
-          text={JSON.stringify(config, null, 2)}
-          bsSize="xsmall"
-        />
-      </Row>
-    </Description>
-  </Container>
-);
+        <Row>
+          <OrderedList>
+            <li>You created this widget using a plugin that is now missing.</li>
+            <li>This widget was part of a legacy dashboard and created by a plugin that is not available anymore.</li>
+          </OrderedList>
+        </Row>
+
+        <Row>
+          What can you do about it? You can load the plugin again, contact the original plugin author for a plugin that
+          works with {productName} 3.2+, or remove the widget if you do not need it anymore.
+        </Row>
+        <Row>
+          Either way, you can copy the widget&rsquo;s config to the clipboard:{' '}
+          <ClipboardButton
+            title={<Icon name="content_copy" size="sm" />}
+            text={JSON.stringify(config, null, 2)}
+            bsSize="xsmall"
+          />
+        </Row>
+      </Description>
+    </Container>
+  );
+};
 
 export default UnknownWidget;

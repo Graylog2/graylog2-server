@@ -336,7 +336,7 @@ public class TeamsEventNotificationTest {
     public void testProductNameInDefaultMessage() throws EventNotificationException {
         final var productName = "SuperDuperLog";
         final var config = new Config(Optional.of(productName), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
         final var customizationConfig = new CustomizationConfig(config);
 
         final var teamsEventNotification = new TeamsEventNotification(notificationCallbackService,

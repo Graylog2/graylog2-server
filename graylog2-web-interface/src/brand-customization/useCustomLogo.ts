@@ -14,12 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AppConfig from './AppConfig';
+import { useMemo } from 'react';
+import DOMPurify from 'dompurify';
 
-export const DEPRECATION_NOTICE = 'Graylog Deprecation Notice:';
+import AppConfig from 'util/AppConfig';
 
-const deprecationNotice = (deprecatedMessage) =>
-  // eslint-disable-next-line no-console
-  AppConfig.gl2DevMode() && console.warn(DEPRECATION_NOTICE, deprecatedMessage);
+const useCustomLogo = (theme: 'dark' | 'light') =>
+  useMemo(
+    () => (AppConfig?.branding?.()?.logo?.[theme] ? DOMPurify.sanitize(AppConfig.branding().logo[theme]) : undefined),
+    [theme],
+  );
 
-export default deprecationNotice;
+export default useCustomLogo;

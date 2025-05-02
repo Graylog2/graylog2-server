@@ -21,6 +21,7 @@ import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
+import useProductName from 'brand-customization/useProductName';
 
 type SystemJobsComponentProps = {
   jobs?: Record<
@@ -31,7 +32,8 @@ type SystemJobsComponentProps = {
   >;
 };
 
-const SystemJobsComponent = ({ jobs }: SystemJobsComponentProps) => {
+const SystemJobsComponent = ({ jobs = undefined }: SystemJobsComponentProps) => {
+  const productName = useProductName();
   useEffect(() => {
     SystemJobsActions.list();
     const interval = setInterval(SystemJobsActions.list, 2000);
@@ -54,8 +56,8 @@ const SystemJobsComponent = ({ jobs }: SystemJobsComponentProps) => {
       <Col md={12}>
         <h2>System jobs</h2>
         <p className="description">
-          A system job is a long-running task a graylog-server node executes for maintenance reasons. Some jobs provide
-          progress information or can be stopped.
+          A system job is a long-running task a {productName} server node executes for maintenance reasons. Some jobs
+          provide progress information or can be stopped.
         </p>
 
         <SystemJobsList jobs={jobList} />

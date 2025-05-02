@@ -40,7 +40,6 @@ const ToggleIcon = styled(Icon)`
 type Props = {
   createSelectPlaceholder?: string;
   displaySortableListOverlayInPortal?: boolean;
-  menuPortalTarget?: HTMLElement;
   onChange: (newFields: Array<string>) => void;
   isFieldQualified?: (field: FieldTypeMapping) => boolean;
   selectSize?: 'normal' | 'small';
@@ -56,7 +55,6 @@ type Props = {
 const FieldsConfiguration = ({
   createSelectPlaceholder = 'Add a field',
   displaySortableListOverlayInPortal = false,
-  menuPortalTarget = undefined,
   onChange,
   isFieldQualified = undefined,
   selectSize = undefined,
@@ -112,7 +110,6 @@ const FieldsConfiguration = ({
           selectSize={selectSize}
           displayOverlayInPortal={displaySortableListOverlayInPortal}
           onChange={onChange}
-          fieldSelectMenuPortalTarget={menuPortalTarget}
           fieldSelect={FieldSelectComponent}
           showUnit={showUnit}
         />
@@ -126,7 +123,6 @@ const FieldsConfiguration = ({
         name="field-create-select"
         value={undefined}
         size={selectSize}
-        menuPortalTarget={menuPortalTarget}
         excludedFields={selectedFields ?? []}
         placeholder={createSelectPlaceholder}
         ariaLabel={createSelectPlaceholder}
