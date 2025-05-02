@@ -120,10 +120,8 @@ const ContentPacksList = ({
             id="content-packs-filter"
             label="Filter"
             data={contentPacks}
-            displayKey="name"
             onDataFiltered={filterContentPacks}
             searchInKeys={['name', 'summary']}
-            filterSuggestions={[]}
           />
         </Col>
         <Col md={5}>{pagination}</Col>

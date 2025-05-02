@@ -46,8 +46,6 @@ type DataTableProps = {
   customFilter?: React.ReactNode;
   /** Adds a custom class to the row element. */
   rowClassName?: string;
-  /** Object key that should be used to display data in the data filter input. */
-  displayKey?: string;
   /**
    * Function that renders a row in the table. It receives two arguments: the row, and its index.
    * It usually returns a `<tr>` element with the formatted row.
@@ -109,7 +107,6 @@ class DataTable extends React.Component<
     filterSuggestions: [],
     filterKeys: [],
     filterLabel: 'Filter',
-    displayKey: 'value',
     noDataText: 'No data available.',
     rowClassName: '',
     useResponsiveTable: true,
@@ -186,9 +183,6 @@ class DataTable extends React.Component<
       filterKeys,
       id,
       filterLabel,
-      filterBy,
-      displayKey,
-      filterSuggestions,
       children,
       noDataText,
       className,
@@ -216,15 +210,7 @@ class DataTable extends React.Component<
     return (
       <div>
         {customFilter || (
-          <Filter
-            label={filterLabel}
-            rows={rows}
-            id={id}
-            displayKey={displayKey}
-            filterBy={filterBy}
-            filterSuggestions={filterSuggestions}
-            filterKeys={filterKeys}
-            onDataFiltered={this.filterDataRows}>
+          <Filter label={filterLabel} rows={rows} id={id} filterKeys={filterKeys} onDataFiltered={this.filterDataRows}>
             {children}
           </Filter>
         )}

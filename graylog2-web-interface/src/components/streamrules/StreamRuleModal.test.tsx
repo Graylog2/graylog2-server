@@ -26,6 +26,11 @@ import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 import StreamRuleModal from './StreamRuleModal';
 
 jest.mock('components/streams/hooks/useStreamRuleTypes');
+jest.mock('@graylog/server-api', () => ({
+  SystemFields: {
+    fields: async () => ({ fields: [] }),
+  },
+}));
 
 jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
   StreamRulesInputsActions: {
@@ -67,7 +72,7 @@ describe('StreamRuleModal', () => {
   it('should render without provided stream rule', async () => {
     render(<SUT />);
 
-    await screen.findByRole('textbox', {
+    await screen.findByRole('combobox', {
       name: /field/i,
     });
   });
@@ -75,15 +80,13 @@ describe('StreamRuleModal', () => {
   it('should render with provided stream rule', async () => {
     render(<SUT initialValues={getStreamRule()} />);
 
-    const fieldInput = await screen.findByRole('textbox', {
-      name: /field/i,
-    });
+    await screen.findByRole('combobox', { name: /field/i });
 
     const valueInput = await screen.findByRole('textbox', {
       name: /value/i,
     });
 
-    expect(fieldInput).toHaveValue('field_1');
+    expect(await screen.findAllByText('field_1')).toHaveLength(2);
     expect(valueInput).toHaveValue('value_1');
   });
 

@@ -45,7 +45,7 @@ type Props = {
    * Function that renders a row in the table. It receives two arguments: the row, and its index.
    * It usually returns a `<tr>` element with the formatted row.
    */
-  dataRowFormatter: (row: unknown) => React.ReactNode;
+  dataRowFormatter: (row: unknown) => React.ReactElement;
   /** Label to use next to the suggestions for the data filter input. */
   filterBy?: string;
   /** List of object keys to use as filter in the data filter input. Use an empty array to disable data filter. */
@@ -57,7 +57,7 @@ type Props = {
    * It usually returns a `<th>` element with the header.
    * Default will wrap the headers in a <th> tag.
    */
-  headerCellFormatter?: (header: string) => React.ReactNode;
+  headerCellFormatter?: (header: string) => React.ReactElement;
   /** Array of values to be use as headers. The render is controlled by `headerCellFormatter`. */
   headers: Array<string>;
   /** Element id to use in the table container */

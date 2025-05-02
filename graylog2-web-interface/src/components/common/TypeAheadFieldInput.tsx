@@ -37,7 +37,6 @@ type Props = {
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   /** Display an error for the input * */
   error?: string;
-  type?: string;
   name?: string;
   defaultValue?: string;
 };
@@ -53,29 +52,31 @@ const prepareOptions = (data) =>
 const TypeAheadFieldInput = ({
   id,
   autoFocus = false,
-  label,
+  label = undefined,
   onChange = noop,
   onBlur = noop,
   error = undefined,
-  type = undefined,
   name = undefined,
   defaultValue = undefined,
 }: Props) => {
   const { data, isInitialLoading } = useQuery(['system', 'fields'], () => SystemFields.fields());
   const options = useMemo(() => (isInitialLoading ? [] : prepareOptions(data)), [data, isInitialLoading]);
-  const _onChange = useCallback((fieldName: string) => onChange({ target: { value: fieldName, name } }), [onChange]);
+  const _onChange = useCallback(
+    (fieldName: string) => onChange({ target: { value: fieldName, name } }),
+    [name, onChange],
+  );
 
   return isInitialLoading ? (
     <Spinner />
   ) : (
     <Input label={label} error={error}>
       <Select
-        id={id}
+        inputId={id}
         onChange={_onChange}
         onBlur={onBlur}
         value={defaultValue}
         options={options}
-        placeholder=""
+        placeholder="Select Field"
         autoFocus={autoFocus}
       />
       <HelpBlock />
