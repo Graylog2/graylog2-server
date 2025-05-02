@@ -17,20 +17,22 @@
 package org.graylog2.web.customization;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Optional;
 
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record Config(
-        Optional<String> productName,
+        @JsonProperty("product_name") Optional<String> productName,
         Optional<String> favicon,
         Optional<Logo> logo,
-        Optional<String> helpUrl,
+        @JsonProperty("help_url") Optional<String> helpUrl,
         Optional<Login> login,
         Optional<Welcome> welcome,
         Optional<Navigation> navigation,
-        Optional<Footer> footer
+        Optional<Footer> footer,
+        Optional<Resources> resources
 ) {
     public record Logo(SVG light, SVG dark) {}
     public record Login(Optional<SVG> background) {}
@@ -40,8 +42,15 @@ public record Config(
         public record WelcomeItem(Optional<Boolean> enabled, Optional<String> feed) {}
     }
 
+    public record Resources(@JsonProperty("stream_rule_matcher_code") Optional<ResourceItem> streamRuleMatcherCode,
+                            @JsonProperty("contact_support") Optional<ResourceItem> contactSupport,
+                            @JsonProperty("contact_us") Optional<ResourceItem> contactUs
+                            ) {
+        public record ResourceItem(Optional<Boolean> enabled, Optional<String> url) {}
+    }
+
     public record Navigation(Optional<NavigationItem> home,
-                             Optional<NavigationItem> userMenu,
+                             @JsonProperty("user_menu") Optional<NavigationItem> userMenu,
                              Optional<NavigationItem> scratchpad,
                              Optional<NavigationItem> help) {
         public record NavigationItem(String icon) {}
@@ -51,6 +60,6 @@ public record Config(
 
     public static Config empty() {
         return new Config(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 }

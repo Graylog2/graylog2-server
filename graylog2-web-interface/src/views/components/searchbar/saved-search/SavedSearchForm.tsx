@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import styled from 'styled-components';
 
 import { ButtonToolbar, Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
@@ -25,6 +26,7 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 
 import styles from './SavedSearchForm.css';
 
+
 type Props = React.PropsWithChildren<{
   show: boolean;
   saveSearch: (newTitle: string, entityShare?: EntitySharePayload) => void;
@@ -32,14 +34,17 @@ type Props = React.PropsWithChildren<{
   toggleModal: () => void;
   isCreateNew: boolean;
   value: string;
+  viewId?: string;
 }>;
 
 const stopEvent = (e) => {
   e.preventDefault();
   e.stopPropagation();
 };
+const StyledPopoverDropdown = styled(Popover.Dropdown)`
+`;
 
-const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, saveAsSearch, toggleModal, value }: Props) => {
+const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, saveAsSearch, toggleModal, value, viewId = null }: Props) => {
   const [title, setTitle] = useState(value);
   const [sharePayload, setSharePayload] = useState(null);
   const onChangeTitle = useCallback(
@@ -58,7 +63,7 @@ const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, 
   return (
     <Popover position="left" width={500} opened={show} withArrow withinPortal>
       <Popover.Target>{children}</Popover.Target>
-      <Popover.Dropdown title="Name of search" id="saved-search-popover">
+      <StyledPopoverDropdown title="Name of search" id="saved-search-popover">
         <form onSubmit={stopEvent}>
           <FormGroup>
             <ControlLabel htmlFor="title">Title</ControlLabel>
@@ -69,8 +74,9 @@ const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, 
           )}
           <EntityCreateShareFormGroup
             description='Search for a User or Team to add as collaborator on this search.'
-            entityType='view'
+            entityType='search'
             entityTitle=''
+            entityId={isCreateNew ? null: viewId}
             onSetEntityShare={(payload) => setSharePayload(payload)}
           />
           <ButtonToolbar>
@@ -100,7 +106,7 @@ const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, 
             </Button>
           </ButtonToolbar>
         </form>
-      </Popover.Dropdown>
+      </StyledPopoverDropdown>
     </Popover>
   );
 };
