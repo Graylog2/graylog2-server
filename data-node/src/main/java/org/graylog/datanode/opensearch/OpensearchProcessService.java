@@ -129,8 +129,13 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private void onConfigurationChange(OpensearchConfiguration config) {
         configure(config);
         if (config.securityConfigured()) {
-            LOG.info("OpenSearch starting up");
             checkWritePreflightFinishedOnInsecureStartup();
+            if (!configuration.getDataNodeRoles().contains(Configuration.DATANODE_ROLE_OPENSEARCH)) {
+                LOG.info("OpenSearch disabled, not starting OpenSearch process");
+                stateMachine.fire(OpensearchEvent.PROCESS_PREPARED);
+                return;
+            }
+            LOG.info("OpenSearch starting up");
             try {
                 lockfileCheck.checkDatanodeLock(config.getDatanodeDirectories().getDataTargetDir());
                 if (stateMachine.isInState(OpensearchState.WAITING_FOR_CONFIGURATION) && !this.processAutostart) {
