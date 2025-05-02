@@ -16,7 +16,7 @@
  */
 import usePluginEntities from 'hooks/usePluginEntities';
 import OpenSourceUpsellWrapper from 'components/upsell/OpenSourceUpsellWrapper';
-import type { UpsellWrapper } from 'components/upsell/type';
+import type { UpsellWrapper } from 'components/upsell/types';
 
 const usePluggableUpsellWrapper = (): UpsellWrapper['component'] => {
   const upsellWrapper = usePluginEntities('components.upsell.wrapper');
