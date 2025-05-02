@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
@@ -48,7 +49,7 @@ const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: 
     <div>
       <dt>Associated Assets</dt>
       {assetsList?.map((assetElement) => (
-        <div key={assetElement.props.identifiers[0]}>
+        <div key={uuidv4()}>
           {assetElement}
         </div>
       ))}
