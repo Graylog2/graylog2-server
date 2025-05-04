@@ -337,8 +337,9 @@ export const layoutsFor4axis = {
       family: 'defaultFont',
       size: 16,
     },
-    ticktext: ['52.4 ms', '104.8 ms', '157.1 ms', '209.5 ms'],
-    tickvals: [0.0523815987933635, 0.104763197586727, 0.1571447963800905, 0.209526395173454],
+    ticktext: ['55 ms', '105 ms', '160 ms', '210 ms'],
+    tickvals: [0.055, 0.105, 0.16, 0.21],
+    range: [0, 0.21],
     title: {
       font: {
         color: '#fff',
@@ -361,8 +362,9 @@ export const layoutsFor4axis = {
       family: 'defaultFont',
       size: 16,
     },
-    ticktext: ['130.3 B', '260.5 B', '390.8 B', '521.0 B'],
-    tickvals: [130.25, 260.5, 390.75, 521],
+    ticktext: ['135 B', '265 B', '395 B', '525 B'],
+    tickvals: [135, 265, 395, 525],
+    range: [0, 525],
     title: {
       font: {
         color: '#fff',

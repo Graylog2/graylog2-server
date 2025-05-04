@@ -26,7 +26,13 @@ import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import { getBaseUnit, getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
+import {
+  getBaseUnit,
+  getPrettifiedValue,
+  roundValue,
+  convertValueToBaseUnit,
+  ConvertedResult,
+} from 'views/components/visualizations/utils/unitConverters';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
@@ -91,21 +97,33 @@ const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: Fiel
   const max = Math.max(...values);
   const step = (max - min) / TIME_AXIS_LABELS_QUANTITY;
 
-  const tickvals = Array(TIME_AXIS_LABELS_QUANTITY)
+  const valueBaseUnit = getBaseUnit(fieldType);
+  const prettyRoundedValues = Array(TIME_AXIS_LABELS_QUANTITY)
     .fill(null)
-    .map((_, index) => (index + 1) * step);
-  const timeBaseUnit = getBaseUnit(fieldType);
-  const prettyValues = tickvals.map((value) =>
-    getPrettifiedValue(value, { abbrev: timeBaseUnit.abbrev, unitType: timeBaseUnit.unitType }),
-  );
+    .map((_, index) => {
+      const originalBaseValue = (index + 1) * step;
 
-  const ticktext = prettyValues.map((prettified) =>
-    formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev),
+      const prettyValue = getPrettifiedValue(originalBaseValue, {
+        abbrev: valueBaseUnit.abbrev,
+        unitType: valueBaseUnit.unitType,
+      });
+
+      return {
+        value: roundValue(prettyValue.value),
+        unit: prettyValue.unit,
+      };
+    });
+  const roundedTickValues = prettyRoundedValues.map(
+    (prettified) => convertValueToBaseUnit(prettified.value, prettified.unit).value,
+  );
+  const roundedTickText = prettyRoundedValues.map((prettified) =>
+    formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev, 0),
   );
 
   return {
-    tickvals,
-    ticktext,
+    tickvals: roundedTickValues,
+    ticktext: roundedTickText,
+    range: [0, roundedTickValues[TIME_AXIS_LABELS_QUANTITY - 1]],
   };
 };
 
