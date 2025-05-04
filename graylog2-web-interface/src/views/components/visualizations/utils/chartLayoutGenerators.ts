@@ -31,7 +31,6 @@ import {
   getPrettifiedValue,
   roundValue,
   convertValueToBaseUnit,
-  ConvertedResult,
 } from 'views/components/visualizations/utils/unitConverters';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
