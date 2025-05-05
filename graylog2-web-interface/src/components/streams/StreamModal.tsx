@@ -27,9 +27,9 @@ import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShare
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type FormValues = Partial<
-  Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream' >
+  Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream'>
 > & {
-  share_request?: EntitySharePayload,
+  share_request?: EntitySharePayload;
 };
 
 const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => ({
@@ -62,7 +62,7 @@ type Props = {
   onClose: () => void;
   onSubmit: (values: Partial<Stream>, shareRequest?: EntitySharePayload) => Promise<void>;
   indexSets: Array<IndexSet>;
-  isNew?: boolean,
+  isNew?: boolean;
 };
 
 const StreamModal = ({
@@ -82,7 +82,10 @@ const StreamModal = ({
 }: Props) => {
   const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
 
-  const _onSubmit = useCallback(({share_request, ...rest }: FormValues) => onSubmit(rest, share_request).then(() => onClose()), [onClose, onSubmit]);
+  const _onSubmit = useCallback(
+    ({ share_request, ...rest }: FormValues) => onSubmit(rest, share_request).then(() => onClose()),
+    [onClose, onSubmit],
+  );
 
   return (
     <Modal onHide={onClose} show>
@@ -116,13 +119,12 @@ const StreamModal = ({
               <IndexSetSelect indexSets={indexSets} />
               {isNew && (
                 <EntityCreateShareFormGroup
-                  description='Search for a User or Team to add as collaborator on this stream.'
-                  entityType='stream'
-                  entityTitle=''
+                  description="Search for a User or Team to add as collaborator on this stream."
+                  entityType="stream"
+                  entityTitle=""
                   onSetEntityShare={(payload) => setFieldValue('share_request', payload)}
                 />
               )}
-
             </Modal.Body>
             <Modal.Footer>
               <ModalSubmit

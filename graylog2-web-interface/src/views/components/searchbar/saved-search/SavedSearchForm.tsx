@@ -26,11 +26,10 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 
 import styles from './SavedSearchForm.css';
 
-
 type Props = React.PropsWithChildren<{
   show: boolean;
   saveSearch: (newTitle: string, entityShare?: EntitySharePayload) => void;
-  saveAsSearch: (newTitle: string,  entityShare?: EntitySharePayload) => void;
+  saveAsSearch: (newTitle: string, entityShare?: EntitySharePayload) => void;
   toggleModal: () => void;
   isCreateNew: boolean;
   value: string;
@@ -41,10 +40,18 @@ const stopEvent = (e) => {
   e.preventDefault();
   e.stopPropagation();
 };
-const StyledPopoverDropdown = styled(Popover.Dropdown)`
-`;
+const StyledPopoverDropdown = styled(Popover.Dropdown)``;
 
-const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, saveAsSearch, toggleModal, value, viewId = null }: Props) => {
+const SavedSearchForm = ({
+  children = undefined,
+  show,
+  isCreateNew,
+  saveSearch,
+  saveAsSearch,
+  toggleModal,
+  value,
+  viewId = null,
+}: Props) => {
   const [title, setTitle] = useState(value);
   const [sharePayload, setSharePayload] = useState(null);
   const onChangeTitle = useCallback(
@@ -73,10 +80,10 @@ const SavedSearchForm = ({ children = undefined, show, isCreateNew, saveSearch, 
             ({ component: Component, id }) => Component && <Component key={id} disabledViewCreation={disableSaveAs} />,
           )}
           <EntityCreateShareFormGroup
-            description='Search for a User or Team to add as collaborator on this search.'
-            entityType='search'
-            entityTitle=''
-            entityId={isCreateNew ? null: viewId}
+            description="Search for a User or Team to add as collaborator on this search."
+            entityType="search"
+            entityTitle=""
+            entityId={isCreateNew ? null : viewId}
             onSetEntityShare={(payload) => setSharePayload(payload)}
           />
           <ButtonToolbar>
