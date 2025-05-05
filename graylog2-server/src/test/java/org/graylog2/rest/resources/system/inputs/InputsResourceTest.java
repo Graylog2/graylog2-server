@@ -24,7 +24,9 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.plugin.database.users.User;
@@ -128,7 +130,7 @@ class InputsResourceTest {
     }
 
     @Test
-    void testStreamReferences() {
+    void testStreamReferences() throws NotFoundException {
         when(streamRuleService.loadForInput("inputId")).thenReturn(List.of(
                 new StreamRuleMock(Map.of("_id", "ruleId1", "stream_id", "streamId1")),
                 new StreamRuleMock(Map.of("_id", "ruleId2", "stream_id", "streamId2"))
@@ -136,6 +138,9 @@ class InputsResourceTest {
         when(streamService.streamTitleFromCache("streamId1")).thenReturn("streamTitle1");
         when(streamService.streamTitleFromCache("streamId2")).thenReturn("streamTitle2");
         when(pipelineService.loadBySourcePattern("inputId")).thenReturn(Collections.emptyList());
+        Input input = mock(Input.class);
+        when(input.getType()).thenReturn("type");
+        when(inputService.find("inputId")).thenReturn(input);
 
         final List<InputsResource.InputReference> expected = List.of(
                 new InputsResource.InputReference("streamId1", "streamTitle1"),
@@ -147,13 +152,16 @@ class InputsResourceTest {
     }
 
     @Test
-    void testPipelineReferences() {
+    void testPipelineReferences() throws NotFoundException {
         when(streamRuleService.loadForInput("inputId")).thenReturn(Collections.emptyList());
         when(pipelineService.loadBySourcePattern("inputId")).thenReturn(
                 List.of(PipelineDao.builder().id("pipelineId1").title("pipelineTitle1").source("source1").build(),
                         PipelineDao.builder().id("pipelineId2").title("pipelineTitle2").source("source2").build())
         );
 
+        Input input = mock(Input.class);
+        when(input.getType()).thenReturn("type");
+        when(inputService.find("inputId")).thenReturn(input);
         final InputsResource.InputReferences refs = inputsResource.getReferences("inputId");
 
         assertThat(refs.pipelineRefs()).hasSize(2);
