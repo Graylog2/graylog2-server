@@ -44,7 +44,7 @@ const _pageTitle = (authBackend, title) => {
   return title || 'Create LDAP Authentication Service';
 };
 
-const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) => {
+const WizardPageHeader = ({ authenticationBackend: authBackend = undefined, title = undefined }: Props) => {
   const { finishedLoading, activeBackend } = useActiveBackend();
   const pageTitle = _pageTitle(authBackend, title);
 
@@ -58,7 +58,7 @@ const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) 
           title: 'Authentication documentation',
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
+        <span>Configure authentication services of this cluster.</span>
       </PageHeader>
     </>
   );
