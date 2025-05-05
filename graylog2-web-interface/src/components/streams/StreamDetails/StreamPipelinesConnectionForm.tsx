@@ -25,7 +25,7 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
 import useStreamPipelinesConnectionMutation from 'components/streams/hooks/useStreamPipelinesConnections';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';

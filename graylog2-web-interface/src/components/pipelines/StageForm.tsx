@@ -23,7 +23,7 @@ import { Button, ControlLabel, FormGroup, BootstrapModalForm, Input } from 'comp
 import { getValueFromInput } from 'util/FormsUtils';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
-import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType, StageType } from 'components/pipelines/types';
 import { RulesStore } from 'stores/rules/RulesStore';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';

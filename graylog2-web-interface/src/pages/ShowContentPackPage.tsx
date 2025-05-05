@@ -33,6 +33,7 @@ import useParams from 'routing/useParams';
 import useContentPackRevisions from 'components/content-packs/hooks/useContentPackRevisions';
 import useContentPackInstallations from 'components/content-packs/hooks/useContentPackInstallations';
 import type FetchError from 'logic/errors/FetchError';
+import MarketplaceLink from 'components/support/MarketplaceLink';
 
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
@@ -162,11 +163,7 @@ const ShowContentPackPage = () => {
             Content packs accelerate the set up process for a specific data source. A content pack can include
             inputs/extractors, streams, and dashboards.
             <br />
-            Find more content packs in{' '}
-            <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">
-              the Graylog Marketplace
-            </a>
-            .
+            <MarketplaceLink prefix="Find more content packs in" />
           </span>
         </PageHeader>
 

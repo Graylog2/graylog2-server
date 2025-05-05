@@ -22,11 +22,11 @@ import AppConfig from 'util/AppConfig';
 import { Navbar, Nav, NavItem } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';
-import { Icon } from 'components/common';
 import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
+import NavIcon from 'components/navigation/NavIcon';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -82,7 +82,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
           <LinkContainer relativeActive to={activePerspective.welcomeRoute}>
             <NavItem id="welcome-nav-link">
-              <Icon size="lg" title="Welcome" name="home" />
+              <NavIcon type="home" title="Welcome" />
             </NavItem>
           </LinkContainer>
 

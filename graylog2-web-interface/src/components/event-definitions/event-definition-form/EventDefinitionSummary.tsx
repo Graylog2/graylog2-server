@@ -53,7 +53,7 @@ type Props = {
 const EventDefinitionSummary = ({
   eventDefinition,
   notifications,
-  validation = { errors: { title: '' } },
+  validation = { errors: {} },
   currentUser,
 }: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);

@@ -53,24 +53,24 @@ export const HELP = {
   ),
   userNameAttribute: (
     <span>
-      Which LDAP attribute to use for the username of the user in Graylog, e.g <code>uid</code>.<br />
+      Which LDAP attribute to use for the username of the synchronized user, e.g <code>uid</code>.<br />
       Try to load a test user in the sidebar section <i>User Login Test</i>, if you are unsure which attribute to use.
     </span>
   ),
   userFullNameAttribute: (
     <span>
-      Which LDAP attribute to use for the full name of a synchronized Graylog user, e.g. <code>cn</code>.<br />
+      Which LDAP attribute to use for the full name of a synchronized user, e.g. <code>cn</code>.<br />
     </span>
   ),
   userUniqueIdAttribute: (
     <span>
-      Which LDAP attribute to use for the ID of a synchronized Graylog user, e.g. <code>entryUUID</code>.<br />
+      Which LDAP attribute to use for the ID of a synchronized user, e.g. <code>entryUUID</code>.<br />
     </span>
   ),
   defaultRoles: (
     <span>
-      The default Graylog roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the
-      Graylog web interface
+      The default roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the web
+      interface
     </span>
   ),
   emailAttributes: (

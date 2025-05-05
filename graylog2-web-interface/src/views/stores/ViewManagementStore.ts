@@ -26,6 +26,7 @@ import type { ViewJson } from 'views/logic/views/View';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import type { Pagination, Attribute } from 'stores/PaginationTypes';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 export type SortOrder = 'asc' | 'desc';
 
@@ -51,7 +52,7 @@ export type ViewSummary = {
 export type ViewSummaries = Array<ViewSummary>;
 
 type ViewManagementActionsType = RefluxActions<{
-  create: (view: View) => Promise<View>;
+  create: (view: View, entityShare?: EntitySharePayload) => Promise<View>;
   delete: (view: View) => Promise<View>;
   forValue: () => Promise<ViewSummaries>;
   get: (viewId: string) => Promise<ViewJson>;
@@ -62,7 +63,7 @@ type ViewManagementActionsType = RefluxActions<{
     sortBy?: string,
     sortOrder?: SortOrder,
   ) => Promise<PaginatedViews>;
-  update: (view: View) => Promise<View>;
+  update: (view: View, entityShare?: EntitySharePayload) => Promise<View>;
 }>;
 
 const ViewManagementActions: ViewManagementActionsType = singletonActions('views.ViewManagement', () =>
@@ -77,7 +78,9 @@ const ViewManagementActions: ViewManagementActionsType = singletonActions('views
 );
 
 const viewsUrl = qualifyUrl('/views');
+const viewsWithShareUrl = qualifyUrl('/views/with-request');
 const viewsIdUrl = (id) => qualifyUrl(`/views/${id}`);
+const viewsIdShareUrl = (id) => qualifyUrl(`/views/${id}/with-request`);
 const forValueUrl = () => qualifyUrl('/views/forValue');
 
 type ViewManagementStoreState = {
@@ -112,8 +115,10 @@ const ViewManagementStore = singletonStore('views.ViewManagement', () =>
       return promise;
     },
 
-    create(view: View): Promise<View> {
-      const promise = fetch('POST', viewsUrl, JSON.stringify(view));
+    create(view: View, entityShare?: EntitySharePayload): Promise<View> {
+      const url = entityShare ? viewsWithShareUrl : viewsUrl;
+      const payload = entityShare ? JSON.stringify({entity: view, share_request: entityShare}) : JSON.stringify(view);
+      const promise = fetch('POST', url, payload);
 
       ViewManagementActions.create.promise(promise);
 
@@ -124,8 +129,10 @@ const ViewManagementStore = singletonStore('views.ViewManagement', () =>
       return CurrentUserStore.reload();
     },
 
-    update(view: View): Promise<View> {
-      const promise = fetch('PUT', viewsIdUrl(view.id), JSON.stringify(view));
+    update(view: View,   entityShare?: EntitySharePayload): Promise<View> {
+      const url = entityShare ? viewsIdShareUrl(view.id) : viewsIdUrl(view.id);
+      const payload = entityShare ? JSON.stringify({entity: view, share_request: entityShare}) : JSON.stringify(view);
+      const promise = fetch('PUT', url, payload);
 
       ViewManagementActions.update.promise(promise);
 

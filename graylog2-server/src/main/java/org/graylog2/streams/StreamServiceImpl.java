@@ -89,7 +89,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
     private final Set<StreamDeletionGuard> streamDeletionGuards;
-    private final CacheLoader<String, String> streamTitleLoader;
     private final LoadingCache<String, String> streamTitleCache;
 
     @Inject
@@ -110,7 +109,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.clusterEventBus = clusterEventBus;
         this.streamDeletionGuards = streamDeletionGuards;
 
-        this.streamTitleLoader = new CacheLoader<String, String>() {
+        final CacheLoader<String, String> streamTitleLoader = new CacheLoader<String, String>() {
             @Nonnull
             @Override
             public String load(@Nonnull String streamId) throws NotFoundException {

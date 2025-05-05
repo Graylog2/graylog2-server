@@ -135,7 +135,7 @@ const menu = (base) => ({
 
 const menuPortal = (base) => ({
   ...base,
-  zIndex: 1052,
+  zIndex: 1061,
 });
 
 const singleValueAndPlaceholder =
