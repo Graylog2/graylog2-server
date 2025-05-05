@@ -67,6 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.CharMatcher.anyOf;
@@ -714,6 +715,16 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         if (!RESERVED_FIELDS.contains(key)) {
             final Object removedValue = fields.remove(key);
             updateSize(key, null, removedValue);
+        }
+    }
+
+    public void removeFieldsByValue(Predicate<String> removalPredicate) {
+        for (Iterator<Map.Entry<String, Object>> fieldItr = fields.entrySet().iterator(); fieldItr.hasNext(); ) {
+            final Map.Entry<String, Object> entry = fieldItr.next();
+            if (!RESERVED_FIELDS.contains(entry.getKey()) && entry.getValue() instanceof String valStr && removalPredicate.test(valStr)) {
+                fieldItr.remove();
+                updateSize(entry.getKey(), null, valStr);
+            }
         }
     }
 
