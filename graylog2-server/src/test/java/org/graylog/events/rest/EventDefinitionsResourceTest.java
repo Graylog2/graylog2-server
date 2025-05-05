@@ -28,7 +28,9 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.security.DBGrantService;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.junit.Before;
@@ -66,6 +68,10 @@ public class EventDefinitionsResourceTest {
     ObjectMapper objectMapper;
     @Mock
     EntitySharesService entitySharesService;
+    @Mock
+    DBGrantService dbGrantService;
+    @Mock
+    GRNRegistry grnRegistry;
 
     EventDefinitionsResource resource;
 
@@ -73,7 +79,8 @@ public class EventDefinitionsResourceTest {
     public void setup() {
         resource = new EventDefinitionsResource(
                 dbService, eventDefinitionHandler, contextService, engine, recentActivityService,
-                auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration(), entitySharesService);
+                auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration(), entitySharesService,
+                dbGrantService, grnRegistry);
         when(config1.type()).thenReturn(CONFIG_TYPE_1);
         when(config2.type()).thenReturn(CONFIG_TYPE_2);
     }
