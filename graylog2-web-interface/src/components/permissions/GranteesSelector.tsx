@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import type { FormikProps } from 'formik';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import type { $PropertyType } from 'utility-types';
 import styled, { css } from 'styled-components';
 
@@ -25,11 +25,8 @@ import type EntityShareState from 'logic/permissions/EntityShareState';
 import type Capability from 'logic/permissions/Capability';
 import type Grantee from 'logic/permissions/Grantee';
 import { Button } from 'components/bootstrap';
-import { Select } from 'components/common';
-import SelectGroup from 'components/common/SelectGroup';
 
-import GranteeIcon from './GranteeIcon';
-import CapabilitySelect from './CapabilitySelect';
+import GranteesSelectorFormGroup from './GranteesSelectorFormGroup';
 
 export type SelectionRequest = {
   granteeId: $PropertyType<Grantee, 'id'>;
@@ -69,33 +66,9 @@ const Errors = styled.div(
   `,
 );
 
-const GranteesSelect = styled(Select)`
-  flex: 1;
-`;
-
-const GranteesSelectOption = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const StyledGranteeIcon = styled(GranteeIcon)`
-  margin-right: 5px;
-`;
-
-const StyledSelectGroup = styled(SelectGroup)`
-  flex: 1;
-
-  > div:last-child {
-    flex: 0.5;
-  }
-`;
-
 const SubmitButton = styled(Button)`
   margin-left: 15px;
 `;
-
-const _granteesOptions = (grantees: GranteesList) =>
-  grantees.map((grantee) => ({ label: grantee.title, value: grantee.id, granteeType: grantee.type })).toJS();
 
 const _initialCapabilityId = (capabilities: CapabilitiesList) => {
   const initialCapabilityTitle = 'Viewer';
@@ -103,23 +76,7 @@ const _initialCapabilityId = (capabilities: CapabilitiesList) => {
   return capabilities.find((capability) => capability.title === initialCapabilityTitle)?.id;
 };
 
-const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
-
-const _renderGranteesSelectOption = ({
-  label,
-  granteeType,
-}: {
-  label: string;
-  granteeType: $PropertyType<Grantee, 'type'>;
-}) => (
-  <GranteesSelectOption>
-    <StyledGranteeIcon type={granteeType} />
-    {label}
-  </GranteesSelectOption>
-);
-
-const GranteesSelector = ({ availableGrantees, availableCapabilities, className, onSubmit, formRef }: Props) => {
-  const granteesOptions = _granteesOptions(availableGrantees);
+const GranteesSelector = ({ availableGrantees, availableCapabilities, className = null, onSubmit, formRef = null }: Props) => {
   const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
   const _handelSubmit = (data, resetForm) => {
@@ -137,20 +94,7 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
         {({ isSubmitting, isValid, errors }) => (
           <Form>
             <FormElements>
-              <StyledSelectGroup>
-                <Field name="granteeId" validate={_isRequired('grantee')}>
-                  {({ field: { name, value, onChange } }) => (
-                    <GranteesSelect
-                      onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
-                      optionRenderer={_renderGranteesSelectOption}
-                      options={granteesOptions}
-                      placeholder="Search for users and teams"
-                      value={value}
-                    />
-                  )}
-                </Field>
-                <CapabilitySelect capabilities={availableCapabilities} />
-              </StyledSelectGroup>
+              <GranteesSelectorFormGroup availableGrantees={availableGrantees} availableCapabilities={availableCapabilities} />
               <SubmitButton
                 bsStyle="success"
                 disabled={isSubmitting || !isValid}

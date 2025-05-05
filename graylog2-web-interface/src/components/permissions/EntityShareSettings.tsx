@@ -29,9 +29,8 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 import type { SelectionRequest, FormValues as GranteesSelectFormValues } from './GranteesSelector';
 import GranteesSelector from './GranteesSelector';
 import GranteesList from './GranteesList';
-import DependenciesWarning from './DependenciesWarning';
-import ValidationError from './ValidationError';
 import ShareableEntityURL from './ShareableEntityURL';
+import EntityShareValidationsDependencies from './EntityShareValidationsDependencies';
 
 type Props = {
   entityGRN: GRN;
@@ -80,7 +79,7 @@ const EntityShareSettings = ({
   setDisableSubmit,
   granteesSelectFormRef,
   showShareableEntityURL = true,
-  entityTypeTitle,
+  entityTypeTitle = null,
 }: Props) => {
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
@@ -136,16 +135,11 @@ const EntityShareSettings = ({
           title="Collaborators"
         />
       </Section>
-      {validationResults?.failed && (
-        <Section>
-          <ValidationError validationResult={validationResults} availableGrantees={availableGrantees} />
-        </Section>
-      )}
-      {missingDependencies?.size > 0 && (
-        <Section>
-          <DependenciesWarning missingDependencies={missingDependencies} availableGrantees={availableGrantees} />
-        </Section>
-      )}
+      <EntityShareValidationsDependencies
+        missingDependencies={missingDependencies}
+        validationResults={validationResults}
+        availableGrantees={availableGrantees}
+      />
       {showShareableEntityURL && (
         <Section>
           <ShareableEntityURL entityGRN={entityGRN} />
