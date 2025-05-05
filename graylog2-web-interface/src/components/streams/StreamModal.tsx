@@ -104,16 +104,6 @@ const StreamModal = ({
                 id="description"
                 help="What kind of messages are routed into this stream?"
               />
-
-              <IndexSetSelect indexSets={indexSets} />
-              {isNew && (
-                <EntityCreateShareFormGroup
-                  description='Search for a User or Team to add as collaborator on this stream.'
-                  entityType='stream'
-                  entityTitle=''
-                  onSetEntityShare={(payload) => setFieldValue('share_request', payload)}
-                />
-              )}
               <FormikInput
                 label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
                 help={
@@ -123,6 +113,16 @@ const StreamModal = ({
                 id="remove_matches_from_default_stream"
                 type="checkbox"
               />
+              <IndexSetSelect indexSets={indexSets} />
+              {isNew && (
+                <EntityCreateShareFormGroup
+                  description='Search for a User or Team to add as collaborator on this stream.'
+                  entityType='stream'
+                  entityTitle=''
+                  onSetEntityShare={(payload) => setFieldValue('share_request', payload)}
+                />
+              )}
+
             </Modal.Body>
             <Modal.Footer>
               <ModalSubmit

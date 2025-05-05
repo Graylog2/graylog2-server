@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { EntityList, Pluralize, Spinner } from 'components/common';
-import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType, StageType } from 'components/pipelines/types';
 import type { Stream } from 'stores/streams/StreamsStore';
 import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';

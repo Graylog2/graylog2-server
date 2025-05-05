@@ -23,11 +23,11 @@ declare global {
 }
 
 export type BrandingResource = { enabled?: boolean; url?: string | undefined };
-export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support' | 'contact_us';
+export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support' | 'contact_us' | 'marketplace';
 
 export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
 
-type Branding = {
+export type Branding = {
   product_name?: string;
   favicon?: string;
   logo?: {

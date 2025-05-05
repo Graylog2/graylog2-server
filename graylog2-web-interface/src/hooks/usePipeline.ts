@@ -18,37 +18,42 @@ import { useQuery } from '@tanstack/react-query';
 
 import { PipelinesPipelines } from '@graylog/server-api';
 
-import type { PipelineType } from 'components/pipelines/types';
+import { type PipelineType } from 'components/pipelines/types';
 import type FetchError from 'logic/errors/FetchError';
 import { defaultOnError } from 'util/conditional/onError';
 
-export const PIPELINES_QUERY_KEY = ['pipelines'];
+export const PIPELINE_QUERY_KEY = ['pipeline'];
 
 type Options = {
   enabled: boolean;
 };
 
-const usePipelines = (
+const usePipeline = (
+  pipelineId: string,
   { enabled }: Options = { enabled: true },
 ): {
-  data: Array<PipelineType>;
+  data: PipelineType;
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery<Array<PipelineType>, FetchError>(
-    PIPELINES_QUERY_KEY,
+  const { data, refetch, isInitialLoading } = useQuery<PipelineType, FetchError>(
+    [...PIPELINE_QUERY_KEY, pipelineId],
     () =>
-      defaultOnError(PipelinesPipelines.getAll(), 'Loading pipelines failed with status', 'Could not load pipelines'),
+      defaultOnError(
+        PipelinesPipelines.get(pipelineId),
+        'Loading pipeline failed with status',
+        'Could not load pipeline',
+      ),
     {
       enabled,
     },
   );
 
   return {
-    data: data ?? [],
+    data: data ?? undefined,
     refetch,
     isInitialLoading,
   };
 };
 
-export default usePipelines;
+export default usePipeline;
