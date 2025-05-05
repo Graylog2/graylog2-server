@@ -39,19 +39,13 @@ const _paginatedRows = (rows: Array<unknown>, perPage: number, currentPage: numb
 type Props = {
   /** DataTable class */
   className?: string;
-  /** Object key that should be used to display data in the data filter input. */
-  displayKey?: string;
   /**
    * Function that renders a row in the table. It receives two arguments: the row, and its index.
    * It usually returns a `<tr>` element with the formatted row.
    */
   dataRowFormatter: (row: unknown) => React.ReactElement;
-  /** Label to use next to the suggestions for the data filter input. */
-  filterBy?: string;
   /** List of object keys to use as filter in the data filter input. Use an empty array to disable data filter. */
   filterKeys?: Array<string>;
-  /** Label to use next to the data filter input. */
-  filterLabel?: string;
   /**
    * Function that renders a single header cell in the table. It receives two arguments: the header, and its index.
    * It usually returns a `<th>` element with the header.
@@ -89,12 +83,10 @@ type DataTablePagination = {
  * If you want to display a lists which gets paginated by the backend, wrap use the DataTable in combination with the PaginatedList.
  */
 const PaginatedDataTable = ({
+  // eslint-disable-next-line react/require-default-props
   rows = [],
   pagination: initialPagination = DEFAULT_PAGINATION,
-  filterKeys,
-  filterLabel = 'Filter',
-  displayKey,
-  filterBy,
+  filterKeys = undefined,
   id,
   useResponsiveTable = false,
   ...rest
@@ -108,7 +100,7 @@ const PaginatedDataTable = ({
     setPagination(initialPagination);
   }, [rows, initialPagination]);
 
-  const _onPageChange = (newPage, newPerPage) => {
+  const _onPageChange = (newPage: number, newPerPage: number) => {
     setPagination({ page: newPage, perPage: newPerPage });
   };
 
@@ -135,9 +127,6 @@ const PaginatedDataTable = ({
             setFilteredRows={setFilteredRows}
             rows={rows}
             resetPagination={_resetPagination}
-            displayKey={displayKey}
-            filterBy={filterBy}
-            filterLabel={filterLabel}
           />
         }
         rows={paginatedRows}

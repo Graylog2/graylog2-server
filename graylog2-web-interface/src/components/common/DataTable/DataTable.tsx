@@ -51,14 +51,10 @@ type DataTableProps = {
    * It usually returns a `<tr>` element with the formatted row.
    */
   dataRowFormatter: (...args: any[]) => React.ReactElement;
-  /** Label to use next to the suggestions for the data filter input. */
-  filterBy?: string;
   /** Label to use next to the data filter input. */
   filterLabel?: string;
   /** List of object keys to use as filter in the data filter input. Use an empty array to disable data filter. */
   filterKeys?: any[];
-  /** Array to use as suggestions in the data filter input. */
-  filterSuggestions?: any[];
   /**
    * Function that renders a single header cell in the table. It receives two arguments: the header, and its index.
    * It usually returns a `<th>` element with the header.
@@ -103,8 +99,6 @@ class DataTable extends React.Component<
     customFilter: undefined,
     children: undefined,
     className: '',
-    filterBy: '',
-    filterSuggestions: [],
     filterKeys: [],
     filterLabel: 'Filter',
     noDataText: 'No data available.',
