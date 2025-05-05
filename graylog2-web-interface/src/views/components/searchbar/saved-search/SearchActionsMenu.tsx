@@ -47,7 +47,10 @@ import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
 import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import useHotkey from 'hooks/useHotkey';
+import { createGRN } from 'logic/permissions/GRN';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -137,26 +140,29 @@ const SearchActionsMenu = () => {
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableSearchAction(loaded, view);
 
   const saveSearch = useCallback(
-    async (newTitle: string) => {
+    async (newTitle: string, entityShare?: EntitySharePayload) => {
       if (!view.id) {
         return;
       }
-
       const newView = view.toBuilder().title(newTitle).type(View.Type.Search).build();
 
-      await dispatch(onSaveView(newView));
+      await dispatch(onSaveView(newView, entityShare));
+
+      if(entityShare){
+        await EntityShareDomain.update('search', title, createGRN('search', view.id), entityShare);
+      }
+
       closeFormModal();
       await dispatch(loadView(newView));
     },
-    [closeFormModal, dispatch, view],
+    [closeFormModal, dispatch, view, title],
   );
 
   const saveAsSearch = useCallback(
-    async (newTitle: string) => {
+    async (newTitle: string, entityShare?: EntitySharePayload) => {
       if (!newTitle || newTitle === '') {
         return;
       }
-
       const viewWithPluginData = await executePluggableDuplicationHandler(
         view,
         currentUser.permissions,
@@ -165,7 +171,7 @@ const SearchActionsMenu = () => {
 
       const newView = viewWithPluginData.toBuilder().newId().title(newTitle).type(View.Type.Search).build();
 
-      ViewManagementActions.create(newView)
+      ViewManagementActions.create(newView, entityShare)
         .then((createdView) => {
           toggleFormModal();
 
@@ -225,7 +231,8 @@ const SearchActionsMenu = () => {
         saveAsSearch={saveAsSearch}
         isCreateNew={isNew || !isAllowedToEdit}
         toggleModal={toggleFormModal}
-        value={currentTitle}>
+        value={currentTitle}
+        viewId={!isNew && view.id}>
         <SaveViewButton title={title} ref={formTarget} onClick={toggleFormModal} />
       </SavedSearchForm>
       <Button title="Load a previously saved search" onClick={toggleListModal}>

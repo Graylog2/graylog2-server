@@ -14,7 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import { notifications } from '@mantine/notifications';
+
+import Icon from 'components/common/Icon/Icon';
 
 const UserNotification = {
   error(message: string, title = 'Error') {
@@ -23,12 +26,15 @@ const UserNotification = {
       title,
       autoClose: 10000,
       color: 'red',
+      icon: <Icon name="exclamation" type="regular" />,
     });
   },
   warning(message: string, title = 'Attention') {
     notifications.show({
       message,
       title,
+      color: 'blue',
+      icon: <Icon name="exclamation" type="regular" rotation={180} />,
     });
   },
   success(message: string, title = 'Success') {
@@ -36,6 +42,7 @@ const UserNotification = {
       message,
       title,
       color: 'green',
+      icon: <Icon name="check" type="regular" />,
     });
   },
 };
