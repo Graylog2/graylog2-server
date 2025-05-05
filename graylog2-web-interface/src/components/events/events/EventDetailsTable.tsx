@@ -31,6 +31,7 @@ type Props<T extends EntityBase, M = EventsAdditionalData> = {
   attributesList: Array<{ id: string; title: string }>;
   event: T;
   meta?: M | {};
+  eventProcedureId?: string;
   attributesRenderers: ColumnRenderersByAttribute<T, M>;
 };
 
@@ -38,6 +39,7 @@ const EventDetailsTable = <E extends EntityBase = Event>({
   event,
   attributesList,
   meta = {},
+  eventProcedureId = '',
   attributesRenderers,
 }: Props<E>) => (
   <Table condensed striped>
@@ -55,7 +57,7 @@ const EventDetailsTable = <E extends EntityBase = Event>({
                 <b>{attribute.title}</b>
               </TD>
             )}
-            <td>{renderCell ? renderCell(value, event, attribute, meta) : value}</td>
+            <td>{renderCell ? renderCell(value, event, attribute, meta, eventProcedureId) : value}</td>
           </tr>
         );
       })}

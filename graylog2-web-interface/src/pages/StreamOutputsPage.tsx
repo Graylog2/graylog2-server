@@ -24,8 +24,11 @@ import OutputsComponent from 'components/outputs/OutputsComponent';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useStream from 'components/streams/hooks/useStream';
+import useProductName from 'brand-customization/useProductName';
+import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const StreamOutputsPage = () => {
+  const productName = useProductName();
   const currentUser = useCurrentUser();
   const { streamId } = useParams();
   const { data: stream } = useStream(streamId);
@@ -42,14 +45,10 @@ const StreamOutputsPage = () => {
             <h1>Outputs for Stream &raquo;{stream.title}&laquo;</h1>
 
             <p className="description">
-              Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want
-              here. You can also reuse outputs that are already running for other streams. A global view of all
-              configured outputs is available <Link to={Routes.SYSTEM.OUTPUTS}>here</Link>. You can find output plugins
-              on{' '}
-              <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">
-                the Graylog Marketplace
-              </a>
-              .
+              {productName} nodes can forward messages of streams via outputs. Launch or terminate as many outputs as
+              you want here. You can also reuse outputs that are already running for other streams. A global view of all
+              configured outputs is available <Link to={Routes.SYSTEM.OUTPUTS}>here</Link>.{' '}
+              <MarketplaceLink prefix="You can find output plugins on" />
               <br />
               <i>Removing</i> an output removes it from this stream but it will still be in the list of available
               outputs. Deleting an output <i>globally</i> will remove it from this and all other streams and terminate

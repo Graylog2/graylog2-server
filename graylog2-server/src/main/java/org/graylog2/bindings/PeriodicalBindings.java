@@ -27,7 +27,6 @@ import org.graylog2.inputs.diagnosis.InputDiagnosisMetricsPeriodical;
 import org.graylog2.periodical.ClusterHealthCheckThread;
 import org.graylog2.periodical.ContentPackLoaderPeriodical;
 import org.graylog2.periodical.DataNodeHousekeepingPeriodical;
-import org.graylog2.periodical.ESVersionCheckPeriodical;
 import org.graylog2.periodical.ExpiredTokenCleaner;
 import org.graylog2.periodical.IndexBlockCheck;
 import org.graylog2.periodical.IndexRangesCleanupPeriodical;
@@ -36,6 +35,8 @@ import org.graylog2.periodical.IndexRotationThread;
 import org.graylog2.periodical.IndexerClusterCheckerThread;
 import org.graylog2.periodical.LeaderPresenceCheckPeriodical;
 import org.graylog2.periodical.NodePingThread;
+import org.graylog2.periodical.OrphanedTokenCleaner;
+import org.graylog2.periodical.SearchVersionCheckPeriodical;
 import org.graylog2.periodical.ThrottleStateUpdaterThread;
 import org.graylog2.periodical.TrafficCounterPeriodical;
 import org.graylog2.periodical.UserSessionTerminationPeriodical;
@@ -63,12 +64,13 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(TrafficCounterPeriodical.class);
         periodicalBinder.addBinding().to(IndexFieldTypePollerPeriodical.class).asEagerSingleton();
         periodicalBinder.addBinding().to(ScheduleTriggerCleanUp.class);
-        periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
+        periodicalBinder.addBinding().to(SearchVersionCheckPeriodical.class);
         periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
         periodicalBinder.addBinding().to(TelemetryClusterInfoPeriodical.class);
         periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
         periodicalBinder.addBinding().to(DataNodeHousekeepingPeriodical.class);
         periodicalBinder.addBinding().to(InputDiagnosisMetricsPeriodical.class);
         periodicalBinder.addBinding().to(ExpiredTokenCleaner.class);
+        periodicalBinder.addBinding().to(OrphanedTokenCleaner.class);
     }
 }

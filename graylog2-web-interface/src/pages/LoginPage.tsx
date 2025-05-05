@@ -30,6 +30,7 @@ import AppConfig from 'util/AppConfig';
 import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
 import { SessionActions } from 'stores/sessions/SessionStore';
 import usePluginEntities from 'hooks/usePluginEntities';
+import useProductName from 'brand-customization/useProductName';
 
 import LoadingPage from './LoadingPage';
 
@@ -64,15 +65,17 @@ type ErrorFallbackProps = {
 
 const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
   const isCloud = AppConfig.isCloud();
+  const productName = useProductName();
 
   return (
     <Alert bsStyle="danger">
       {isCloud ? (
-        <p>Error loading login screen, please contact your Graylog account manager.</p>
+        <p>Error loading login screen, please contact your {productName} account manager.</p>
       ) : (
         <>
           <p>
-            Error using active authentication service login. Please check its configuration or contact your Graylog
+            Error using active authentication service login. Please check its configuration or contact your{' '}
+            {productName}
             account manager. Error details:
           </p>
           <StyledPre>{error.message}</StyledPre>

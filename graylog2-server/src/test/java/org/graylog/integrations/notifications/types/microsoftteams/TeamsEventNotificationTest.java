@@ -27,6 +27,7 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.PermanentEventNotificationException;
+import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.processor.EventDefinitionDto;
@@ -41,6 +42,8 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.web.customization.Config;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
@@ -53,6 +56,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -80,7 +84,7 @@ public class TeamsEventNotificationTest {
 
     private TeamsEventNotificationConfig teamsEventNotificationConfig;
     private EventNotificationContext eventNotificationContext;
-    private MessageFactory messageFactory = new TestMessageFactory();
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     private final String expectedColor = "#FF2052";
     private final String expectedImage = "iconUrl";
@@ -92,6 +96,7 @@ public class TeamsEventNotificationTest {
         eventNotificationContext = NotificationTestData.getDummyContext(getHttpNotification(), "ayirp").toBuilder().notificationConfig(teamsEventNotificationConfig).build();
         final ImmutableList<MessageSummary> messageSummaries = generateMessageSummaries(50);
         when(notificationCallbackService.getBacklogForEvent(eventNotificationContext)).thenReturn(messageSummaries);
+        final var customizationConfig = CustomizationConfig.empty();
 
         teamsEventNotification = new TeamsEventNotification(notificationCallbackService,
                 new ObjectMapperProvider(),
@@ -99,7 +104,8 @@ public class TeamsEventNotificationTest {
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                new HttpConfiguration());
+                new TemplateModelProvider(customizationConfig, new ObjectMapperProvider(), new HttpConfiguration()),
+                customizationConfig);
     }
 
     private void getDummyTeamsNotificationConfig() {
@@ -169,13 +175,15 @@ public class TeamsEventNotificationTest {
         List<MessageSummary> messageSummaries = generateMessageSummaries(50);
         Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, teamsEventNotificationConfig.type(), messageSummaries, DateTimeZone.UTC);
         //there are 9 keys and two asserts needs to be implemented (backlog,event)
-        assertThat(customMessageModel).isNotNull();
-        assertThat(customMessageModel.get("event_definition_description")).isEqualTo("Event Definition Test Description");
-        assertThat(customMessageModel.get("event_definition_title")).isEqualTo("Event Definition Test Title");
-        assertThat(customMessageModel.get("event_definition_type")).isEqualTo("test-dummy-v1");
-        assertThat(customMessageModel.get("type")).isEqualTo("teams-notification-v1");
-        assertThat(customMessageModel.get("job_definition_id")).isEqualTo("<unknown>");
-        assertThat(customMessageModel.get("job_trigger_id")).isEqualTo("<unknown>");
+        assertThat(customMessageModel).isNotNull()
+                .containsAllEntriesOf(Map.of(
+                        "event_definition_description", "Event Definition Test Description",
+                        "event_definition_title", "Event Definition Test Title",
+                        "event_definition_type", "test-dummy-v1",
+                        "type", "teams-notification-v1",
+                        "job_definition_id", "<unknown>",
+                        "job_trigger_id", "<unknown>"
+                ));
     }
 
 
@@ -314,6 +322,36 @@ public class TeamsEventNotificationTest {
         TeamsEventNotificationConfig.Builder builder = TeamsEventNotificationConfig.builder();
         builder.customMessage("Title");
         return builder.build();
+    }
+
+    @Test
+    public void testDefaultProductNameInDefaultMessage() throws EventNotificationException {
+        TeamsMessage actual = teamsEventNotification.createTeamsMessage(eventNotificationContext, TeamsEventNotificationConfig.builder().iconUrl(expectedImage).build());
+        assertThat(actual.sections())
+                .hasSize(1)
+                .allMatch(section -> section.text().contains("Graylog Teams Notification"));
+    }
+
+    @Test
+    public void testProductNameInDefaultMessage() throws EventNotificationException {
+        final var productName = "SuperDuperLog";
+        final var config = new Config(Optional.of(productName), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+        final var customizationConfig = new CustomizationConfig(config);
+
+        final var teamsEventNotification = new TeamsEventNotification(notificationCallbackService,
+                new ObjectMapperProvider(),
+                Engine.createEngine(),
+                mockNotificationService,
+                nodeId,
+                mockrequestClient,
+                new TemplateModelProvider(customizationConfig, new ObjectMapperProvider(), new HttpConfiguration()),
+                customizationConfig);
+
+        TeamsMessage actual = teamsEventNotification.createTeamsMessage(eventNotificationContext, TeamsEventNotificationConfig.builder().iconUrl(expectedImage).build());
+        assertThat(actual.sections())
+                .hasSize(1)
+                .allMatch(section -> section.text().contains("SuperDuperLog Teams Notification"));
     }
 }
 

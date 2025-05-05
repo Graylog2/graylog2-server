@@ -24,6 +24,7 @@ import Icon from 'components/common/Icon';
 import DocumentTitle from 'components/common/DocumentTitle';
 import { qualifyUrl } from 'util/URLUtils';
 import LoginChrome from 'components/login/LoginChrome';
+import useProductName from 'brand-customization/useProductName';
 import type { ServerError } from 'stores/sessions/ServerAvailabilityStore';
 
 const StyledIcon = styled(Icon)`
@@ -37,7 +38,8 @@ type Props = {
   };
 };
 
-const ServerUnavailablePage = ({ server }: Props) => {
+const ServerUnavailablePage = ({ server = undefined }: Props) => {
+  const productName = useProductName();
   const [showDetails, setShowDetails] = useState(false);
 
   const _toggleDetails = () => setShowDetails(!showDetails);
@@ -118,8 +120,8 @@ const ServerUnavailablePage = ({ server }: Props) => {
           <Modal.Body>
             <div>
               <p>
-                We are experiencing problems connecting to the Graylog server running on <i>{qualifyUrl('')}</i>. Please
-                verify that the server is healthy and working correctly.
+                We are experiencing problems connecting to the {productName} server running on <i>{qualifyUrl('')}</i>.
+                Please verify that the server is healthy and working correctly.
               </p>
               <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
               <p>

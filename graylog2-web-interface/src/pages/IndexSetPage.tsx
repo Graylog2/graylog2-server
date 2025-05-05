@@ -21,6 +21,7 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 import { LinkContainer } from 'components/common/router';
 import { Alert, Row, Col, Panel, Button, ButtonToolbar } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
+import useProductName from 'brand-customization/useProductName';
 import {
   IndicesConfigurationDropdown,
   IndicesMaintenanceDropdown,
@@ -42,30 +43,34 @@ import { IndicesActions, IndicesStore } from 'stores/indices/IndicesStore';
 
 const REFRESH_INTERVAL = 2000;
 
-const ElasticsearchUnavailableInformation = () => (
-  <Row className="content">
-    <Col md={8} mdOffset={2}>
-      <div className="top-margin">
-        <Panel
-          bsStyle="danger"
-          header={
-            <span>
-              <Icon name="warning" /> Indices overview unavailable
-            </span>
-          }>
-          <p>
-            We could not get the indices overview information. This usually means there was a problem connecting to
-            Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from Graylog</strong>.
-          </p>
-          <p>
-            Graylog will continue storing your messages in its journal, but you will not be able to search on them until
-            Elasticsearch is reachable again.
-          </p>
-        </Panel>
-      </div>
-    </Col>
-  </Row>
-);
+const ElasticsearchUnavailableInformation = () => {
+  const productName = useProductName();
+
+  return (
+    <Row className="content">
+      <Col md={8} mdOffset={2}>
+        <div className="top-margin">
+          <Panel
+            bsStyle="danger"
+            header={
+              <span>
+                <Icon name="warning" /> Indices overview unavailable
+              </span>
+            }>
+            <p>
+              We could not get the indices overview information. This usually means there was a problem connecting to
+              the indexer, and <strong>you should ensure the indexer is up and reachable from {productName}</strong>.
+            </p>
+            <p>
+              Messages will continue to be stored in the journal, but searching on them will not be possible until the
+              indexer is reachable again.
+            </p>
+          </Panel>
+        </div>
+      </Col>
+    </Row>
+  );
+};
 
 type Props = {
   params: {
@@ -89,10 +94,6 @@ class IndexSetPage extends React.Component<Props, State> {
     indexerOverview: undefined,
     indexerOverviewError: undefined,
     indexSet: undefined,
-    indexDetails: {
-      indices: undefined,
-      closedIndices: undefined,
-    },
   };
 
   constructor(props) {
@@ -169,8 +170,8 @@ class IndexSetPage extends React.Component<Props, State> {
           </ButtonToolbar>
         }>
         <span>
-          This is an overview of all indices (message stores) in this index set Graylog is currently taking in account
-          for searches and analysis.
+          This is an overview of all indices (message stores) in this index set currently being considered for searches
+          and analysis.
         </span>
       </PageHeader>
     );

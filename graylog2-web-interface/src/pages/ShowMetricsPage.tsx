@@ -28,6 +28,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 import useQueryParameters from 'routing/useQuery';
 import useParams from 'routing/useParams';
+import useProductName from 'brand-customization/useProductName';
 
 const metricsNamespace = MetricsStore.namespace;
 
@@ -51,6 +52,7 @@ const useNodeId = (nodes: NodesStoreState['nodes']) => {
 };
 
 const ShowMetricsPage = () => {
+  const productName = useProductName();
   const nodes = useStore(NodesStore, (state) => state.nodes);
   const nodeId = useNodeId(nodes);
   const { data: names, isLoading } = useQuery(
@@ -77,8 +79,8 @@ const ShowMetricsPage = () => {
       <span>
         <PageHeader title={title}>
           <span>
-            All Graylog nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you
-            can access all metrics via JMX, too.
+            All {productName} nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that
+            you can access all metrics via JMX, too.
             <br />
             This node is reporting a total of {(names || []).length} metrics.
           </span>

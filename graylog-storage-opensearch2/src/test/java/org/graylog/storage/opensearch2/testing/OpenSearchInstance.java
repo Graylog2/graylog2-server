@@ -44,6 +44,7 @@ import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
@@ -56,6 +57,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -118,8 +120,9 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 config,
                 new BasicCredentialsProvider(),
                 null,
-                false,
-                null)
+                IndexerJwtAuthToken.disabled(),
+                Collections.emptySet(),
+                Collections.emptySet())
                 .get();
     }
 

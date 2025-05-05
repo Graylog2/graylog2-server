@@ -24,6 +24,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { BsSize } from 'components/bootstrap/types';
 import type { StyleProps } from 'components/bootstrap/Button';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type Props = {
   bsSize?: BsSize;
@@ -31,14 +32,14 @@ type Props = {
   buttonText?: string;
   className?: string;
   indexSets: Array<IndexSet>;
-  onCreate: (values: Partial<Stream>) => Promise<void>;
+  onCreate: (values: Partial<Stream>, entityShare: EntitySharePayload) => Promise<void>;
 };
 
 const CreateStreamButton = ({
-  bsSize,
-  bsStyle,
+  bsSize='md',
+  bsStyle='default',
   buttonText = 'Create stream',
-  className,
+  className='',
   indexSets,
   onCreate,
 }: Props) => {
@@ -66,6 +67,7 @@ const CreateStreamButton = ({
           indexSets={indexSets}
           onSubmit={onCreate}
           onClose={toggleCreateModal}
+          isNew
         />
       )}
     </>
