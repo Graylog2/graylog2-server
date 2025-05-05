@@ -21,13 +21,13 @@ import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import { asMock } from 'helpers/mocking';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 
 import CAUpload from './CAUpload';
 
 jest.mock('logic/rest/FetchProvider', () => ({ fetchMultiPartFormData: jest.fn() }));
 
-jest.mock('preflight/util/UserNotification', () => ({
+jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
