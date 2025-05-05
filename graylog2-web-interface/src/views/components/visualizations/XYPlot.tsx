@@ -17,6 +17,8 @@
 
 import React, { useCallback } from 'react';
 import merge from 'lodash/merge';
+import cloneDeep from 'lodash/cloneDeep';
+import moment from 'moment';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -98,7 +100,7 @@ const XYPlot = ({
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
 
-  const layout: Partial<PlotLayout> = { ...defaultLayout, ...plotLayout };
+  const layout: Partial<PlotLayout> = cloneDeep({ ...defaultLayout, ...plotLayout });
   const dispatch = useViewsDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(
@@ -109,12 +111,44 @@ const XYPlot = ({
     [config.isTimeline, onZoom],
   );
 
-  if (config.isTimeline && effectiveTimerange) {
-    const normalizedFrom = formatTime(effectiveTimerange.from, 'internal');
-    const normalizedTo = formatTime(effectiveTimerange.to, 'internal');
+  function floorToSeconds(momentObj, interval) {
+    const secondsSinceHour = momentObj.minutes() * 60 + momentObj.seconds();
+    const floored = Math.floor(secondsSinceHour / interval) * interval;
 
+    const minutes = Math.floor(floored / 60);
+    const seconds = floored % 60;
+
+    return moment(momentObj).minutes(minutes).seconds(seconds).milliseconds(0);
+  }
+
+  function ceilToSeconds(momentObj, interval) {
+    const secondsSinceHour = momentObj.minutes() * 60 + momentObj.seconds();
+    const ceiled = Math.ceil(secondsSinceHour / interval) * interval;
+
+    const minutes = Math.floor(ceiled / 60);
+    const seconds = ceiled % 60;
+
+    return moment(momentObj).minutes(minutes).seconds(seconds).milliseconds(0);
+  }
+
+  if (config.isTimeline && effectiveTimerange) {
+    const normalizedFrom = floorToSeconds(
+      moment.parseZone(formatTime(effectiveTimerange.from, 'internal')),
+      3,
+    ).format();
+    const normalizedTo = ceilToSeconds(moment.parseZone(formatTime(effectiveTimerange.to, 'internal')), 3).format();
+    console.log({
+      config,
+      chartData,
+      effectiveTimerange,
+      normalizedFrom,
+      normalizedTo,
+    });
+    const xValues = chartData?.[0]?.x;
+    const minX = xValues?.[0];
+    const maxX = xValues?.[xValues.length - 1];
     layout.xaxis = merge(layout.xaxis, {
-      range: [normalizedFrom, normalizedTo],
+      range: [minX, maxX],
       type: 'date',
     });
   } else {
