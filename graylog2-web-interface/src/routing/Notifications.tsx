@@ -24,6 +24,7 @@ const StyledNotifications = styled(MantineNotifications)(
       background-color: ${theme.colors.global.contentBackground};
       border-radius: 4px;
       box-shadow: 0 2px 10px rgb(0 0 0 / 20%);
+      border: 1px solid ${theme.colors.variant.default};
     }
 
     .mantine-Notification-title {
