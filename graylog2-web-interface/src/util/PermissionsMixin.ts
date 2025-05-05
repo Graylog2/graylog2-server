@@ -67,7 +67,10 @@ export const isPermitted = (
   return _permissionPredicate(possessedPermissions, requiredPermissions);
 };
 
-export const isAnyPermitted = (possessedPermissions: UserPermissions, requiredPermissions: Permissions) => {
+export const isAnyPermitted = (
+  possessedPermissions: UserPermissions | Permissions,
+  requiredPermissions: Permissions,
+) => {
   if (!requiredPermissions || requiredPermissions.length === 0) {
     return true;
   }
