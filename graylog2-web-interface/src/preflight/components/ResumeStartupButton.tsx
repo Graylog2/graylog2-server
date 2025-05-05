@@ -34,7 +34,7 @@ type Props = {
 const ResumeStartupButton = ({
   setIsWaitingForStartup,
   children = 'Resume startup',
-  variant,
+  variant = undefined,
   compact = false,
 }: Props) => {
   const { data: dataNodes } = useDataNodes();

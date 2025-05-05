@@ -29,7 +29,7 @@ type Props = {
   color?: string;
 };
 
-const ResumeStartupButton = ({ variant, compact = false, color }: Props) => {
+const ResumeStartupButton = ({ variant = undefined, compact = false, color = undefined }: Props) => {
   const [isRestartingConfiguration, setIsRestartingConfiguration] = useState(false);
   const onResumeStartup = useCallback(() => {
     // eslint-disable-next-line no-alert
