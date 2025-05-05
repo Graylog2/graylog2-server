@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import { createGRN } from 'logic/permissions/GRN';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { hasAdminPermission } from 'util/PermissionsMixin';
 
 type ChildFun = (props: { disabled: boolean }) => React.ReactElement;
 
@@ -32,11 +33,10 @@ const HasOwnership = ({ children, id, type, hideChildren = false }: Props) => {
   const currentUser = useCurrentUser();
   const entity = createGRN(type, id);
   const ownership = `entity:own:${entity}`;
-  const adminPermission = '*';
 
   if (currentUser) {
     const { grnPermissions = [], permissions } = currentUser;
-    const isAdmin = permissions.includes(adminPermission);
+    const isAdmin = hasAdminPermission(permissions);
 
     if (grnPermissions.includes(ownership) || isAdmin) {
       if (!hideChildren && typeof children === 'function') {

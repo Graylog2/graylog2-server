@@ -86,6 +86,10 @@ export const isAnyPermitted = (
   return requiredPermissions.some((p) => _permissionPredicate(possessedPermissions, p));
 };
 
+const ADMIN_PERMISSION = '*';
+export const hasAdminPermission = (permissions: UserPermissions | Permissions) =>
+  permissions.includes(ADMIN_PERMISSION);
+
 const PermissionsMixin = { isPermitted, isAnyPermitted };
 
 export default PermissionsMixin;
