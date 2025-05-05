@@ -230,4 +230,15 @@ public class DBEventDefinitionService {
                 .map(this::getEventDefinitionWithRefetchedFilters)
                 .toList();
     }
+
+    /**
+     * Stream event definitions by using the provided query. Use judiciously!
+     *
+     * @param query The query
+     * @return Stream of all found event definitions
+     */
+    @MustBeClosed
+    public Stream<EventDefinitionDto> streamByQuery(Bson query) {
+        return stream(collection.find(query));
+    }
 }
