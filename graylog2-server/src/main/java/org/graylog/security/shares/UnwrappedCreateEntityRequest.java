@@ -30,6 +30,9 @@ public class UnwrappedCreateEntityRequest<T> {
     @JsonProperty("share_request")
     public EntityShareRequest shareRequest;
 
+    public UnwrappedCreateEntityRequest() {
+    }
+
     public UnwrappedCreateEntityRequest(T entity, @Nullable EntityShareRequest shareRequest) {
         this.shareRequest = shareRequest;
         this.entity = entity;
