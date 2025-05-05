@@ -134,6 +134,7 @@ const ApiRoutes = {
   },
   EntityShareController: {
     prepare: (entityGRN: string) => ({ url: `/authz/shares/entities/${entityGRN}/prepare` }),
+    prepareEntityCreate: () => ({ url: `/authz/shares/entities/prepare` }),
     update: (entityGRN: string) => ({ url: `/authz/shares/entities/${entityGRN}` }),
     userSharesPaginated: (username: string) => ({ url: `/authz/shares/user/${username}` }),
     entityScopes: () => ({ url: '/entity_scopes' }),

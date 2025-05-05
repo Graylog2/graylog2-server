@@ -47,7 +47,7 @@ describe('OnSaveViewAction', () => {
 
     expect(dispatch).toHaveBeenCalledWith(setIsDirty(false));
     expect(dispatch).toHaveBeenCalledWith(setIsNew(false));
-    expect(ViewManagementActions.update).toHaveBeenCalledWith(view);
+    expect(ViewManagementActions.update).toHaveBeenCalledWith(view, undefined);
   });
 
   it('shows notification upon success', async () => {
