@@ -29,7 +29,7 @@ type Props = {
   hideChildren?: boolean;
 };
 
-const HasOwnership = ({ children, id, type, hideChildren = false }: Props) => {
+const HasOwnership = ({ children, id = undefined, type, hideChildren = false }: Props) => {
   const currentUser = useCurrentUser();
   const entity = createGRN(type, id);
   const ownership = `entity:own:${entity}`;
