@@ -72,7 +72,7 @@ public class InputTypesResource extends RestResource {
             if (config.isCloud() && !entry.getValue().isCloudCompatible()) {
                 continue;
             }
-            if (config.isInputTypesRestricted() && !isPermitted(RestPermissions.INPUT_TYPES_READ, entry.getKey())) {
+            if (!isPermitted(RestPermissions.INPUT_TYPES_READ, entry.getKey())) {
                 continue;
             }
             types.put(entry.getKey(), entry.getValue().getName());
@@ -92,10 +92,9 @@ public class InputTypesResource extends RestResource {
         if (config.isCloud()) {
             inputStream = inputStream.filter(e -> e.getValue().isCloudCompatible());
         }
-        if (config.isInputTypesRestricted()) {
-            inputStream = inputStream.filter(e -> isPermitted(RestPermissions.INPUT_TYPES_READ, e.getKey()));
-        }
-        return inputStream.collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+        return inputStream
+                .filter(e -> isPermitted(RestPermissions.INPUT_TYPES_READ, e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
             final InputDescription description = entry.getValue();
             return InputTypeInfo.create(entry.getKey(), description.getName(), description.isExclusive(),
                     description.getRequestedConfiguration(), description.getLinkToDocs());
@@ -115,7 +114,7 @@ public class InputTypesResource extends RestResource {
             throwInputTypeNotFound(inputType);
         } else if (config.isCloud() && !description.isCloudCompatible()) {
             throwInputTypeNotFound(inputType);
-        } else if (config.isInputTypesRestricted() && !isPermitted(RestPermissions.INPUT_TYPES_READ, inputType)) {
+        } else if (!isPermitted(RestPermissions.INPUT_TYPES_READ, inputType)) {
             throwInputTypeNotFound(inputType);
         }
 

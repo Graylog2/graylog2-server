@@ -80,7 +80,7 @@ class InputTypesResourceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true,3", "false,4"})
+    @CsvSource({"true,2", "false,3"})
     public void testInputTypes(boolean isCloud, int inputCount) {
         when(configuration.isCloud()).thenReturn(isCloud);
 
@@ -88,7 +88,7 @@ class InputTypesResourceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true,3", "false,4"})
+    @CsvSource({"true,2", "false,3"})
     public void testInputTypesAll(boolean isCloud, int inputCount) {
         when(configuration.isCloud()).thenReturn(isCloud);
 
@@ -114,17 +114,11 @@ class InputTypesResourceTest {
 
     @Test
     public void testInputInfoPermitted() {
-        when(configuration.isInputTypesRestricted()).thenReturn(false);
-        assertThat(inputTypesResource.info(PERMITTED_TYPE).name()).isEqualTo(PERMITTED_TYPE);
-        when(configuration.isInputTypesRestricted()).thenReturn(true);
         assertThat(inputTypesResource.info(PERMITTED_TYPE).name()).isEqualTo(PERMITTED_TYPE);
     }
 
     @Test
     public void testInputInfoRestricted() {
-        when(configuration.isInputTypesRestricted()).thenReturn(false);
-        assertThat(inputTypesResource.info(RESTRICTED_TYPE).name()).isEqualTo(RESTRICTED_TYPE);
-        when(configuration.isInputTypesRestricted()).thenReturn(true);
         assertThatThrownBy(() -> inputTypesResource.info(RESTRICTED_TYPE)).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining(RESTRICTED_TYPE);
     }

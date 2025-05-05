@@ -296,19 +296,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
         return streamAwareFieldTypes;
     }
 
-    @Documentation("""
-            This parameter adds a permission check for input types.
-            When enabled, user's must be member of a group that explicitly has the permission to read/create/edit
-            inputs of the given type.
-            Default: false
-            """)
-    @Parameter(value = "restrict_input_types")
-    private boolean inputTypesRestricted = false;
-
-    public boolean isInputTypesRestricted() {
-        return inputTypesRestricted;
-    }
-
     /**
      * @deprecated Use {@link #isLeader()} instead.
      */

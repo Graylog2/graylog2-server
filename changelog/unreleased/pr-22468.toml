@@ -1,5 +1,5 @@
 type = "a" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
-message = "Add configuration option to restrict input types and enforce it when retrieving input types."
+message = "Adds permissions to restrict input types."
 
 issues = ["graylog-plugin-enterprise#10477"]
 pulls = ["22468"]
