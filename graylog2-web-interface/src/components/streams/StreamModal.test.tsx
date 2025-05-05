@@ -127,6 +127,87 @@ describe('StreamModal', () => {
         index_set_id: 'index-set-id-2',
         remove_matches_from_default_stream: false,
         title: 'Stream Title and further title',
+      }, undefined),
+    );
+  });
+
+  it('should save stream with sharing settings', async () => {
+    const onSubmit = jest.fn(() => Promise.resolve());
+    const onClose = jest.fn();
+    render(<SUT onSubmit={onSubmit} onClose={onClose} isNew />);
+
+    const title = await screen.findByRole('textbox', {
+      name: /title/i,
+    });
+
+    const description = await screen.findByRole('textbox', {
+      name: /description/i,
+    });
+
+    userEvent.type(title, 'New title');
+    userEvent.type(description, 'New description');
+
+    const indexSetSelect = await screen.findByLabelText('Index Set');
+
+    await act(async () => {
+      await selectEvent.openMenu(indexSetSelect);
+    });
+
+    await act(async () => {
+      await selectEvent.select(indexSetSelect, 'Example Index Set');
+    });
+
+    const granteesSelect = await screen.findByLabelText('Search for users and teams');
+
+    await act(async () => {
+      await selectEvent.openMenu(granteesSelect);
+    });
+
+    await act(async () => {
+      await selectEvent.select(granteesSelect, everyone.title);
+    });
+
+    const capabilitySelect = await screen.findByLabelText('Select a capability');
+
+    await act(async () => {
+      await selectEvent.openMenu(capabilitySelect);
+    });
+
+    await act(async () => {
+      await selectEvent.select(capabilitySelect, viewer.title);
+    });
+
+    const addCollaborator = await screen.findByRole('button', {
+      name: /add collaborator/i,
+    });
+
+    fireEvent.click(addCollaborator);
+
+    await screen.findByText(/everyone/i);
+
+    const submitButton = await screen.findByRole('button', {
+      name: /submit/i,
+    });
+
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    });
+
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await userEvent.click(submitButton);
+    });
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({
+        description: 'New description',
+        index_set_id: 'index-set-id-2',
+        remove_matches_from_default_stream: false,
+        title: 'New title',
+      }, {
+        selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
+          [everyone.id]: viewer.id,
+        })
       }),
     );
   });

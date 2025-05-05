@@ -22,7 +22,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, FormikInput, Space } from 'preflight/components/common';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
 type FormValues = {};

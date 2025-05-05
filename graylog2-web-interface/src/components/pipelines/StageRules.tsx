@@ -21,7 +21,7 @@ import { DataTable, Icon } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType, StageType } from 'components/pipelines/types';
 import type { RuleType } from 'stores/rules/RulesStore';
 
 const TitleTd = styled.td`

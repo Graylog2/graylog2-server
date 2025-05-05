@@ -24,6 +24,7 @@ const defaultResourcesUrls: Record<BrandingResourceKey, string> = {
   stream_rule_matcher_code: `https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`,
   contact_support: 'https://support.graylog.org/portal',
   contact_us: 'https://www.graylog.org/community-support/',
+  marketplace: 'https://marketplace.graylog.org/',
 };
 
 const useResourceCustomization = (brandingKey: BrandingResourceKey): BrandingResource => {

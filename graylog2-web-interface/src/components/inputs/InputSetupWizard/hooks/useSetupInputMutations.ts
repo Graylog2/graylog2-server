@@ -20,7 +20,8 @@ import { PipelinesPipelines, Streams, PipelinesRules, PipelinesConnections } fro
 
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
 import type { Stream } from 'logic/streams/types';
-import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { NewPipelineType, PipelineType } from 'components/pipelines/types';
+import { DEFAULT_PIPELINE } from 'components/pipelines/types';
 
 export type RoutingParams = {
   stream_id?: string;
@@ -30,9 +31,6 @@ export type RoutingParams = {
 
 export type StreamConfiguration = Pick<Stream, 'index_set_id' | 'title' | 'remove_matches_from_default_stream'> &
   Partial<Pick<Stream, 'description'>>;
-
-type PipelineConfiguration = Pick<PipelineType, 'title' | 'description'> &
-  Partial<Pick<PipelineType, 'source' | 'stages'>>;
 
 const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> =>
   Streams.create({
@@ -46,14 +44,9 @@ const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: s
 
 const startStream = async (streamId) => Streams.resume(streamId);
 
-const createPipeline = (pipeline: PipelineConfiguration): Promise<PipelineType> => {
+const createPipeline = (pipeline: NewPipelineType): Promise<PipelineType> => {
   const requestPipeline = {
-    id: undefined,
-    errors: undefined,
-    created_at: undefined,
-    modified_at: undefined,
-    stages: [{ stage: 0, rules: [], match: 'EITHER' } as StageType],
-    _scope: undefined,
+    ...DEFAULT_PIPELINE,
     ...pipeline,
   };
 

@@ -99,7 +99,7 @@
         <auto-value.version>1.11.0</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.31.2</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.29.52</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.2</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
@@ -118,7 +118,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.38.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.51.0</gcs.version>
+        <gcs.version>2.52.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.1</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -183,7 +183,7 @@
         <unboundid-ldap.version>7.0.2</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-2</zstd.version>
+        <zstd.version>1.5.7-3</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.6</jjwt.version>
@@ -195,7 +195,7 @@
         <assertj-core.version>3.27.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>3.19.3</equalsverifier.version>
+        <equalsverifier.version>3.19.4</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>

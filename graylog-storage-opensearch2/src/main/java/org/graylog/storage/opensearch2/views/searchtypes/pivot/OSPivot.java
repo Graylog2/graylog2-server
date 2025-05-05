@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.util.ListOfStringsComparator;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
@@ -181,6 +182,11 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
     public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = this.effectiveTimeRangeExtractor.extract(queryResult, query, pivot);
 
+        final var fieldsNames = pivot.rowGroups().stream().flatMap(bs -> bs.fields().stream());
+        final var seriesNames = pivot.series().stream().map(SeriesSpec::id).toList();
+
+        final List<String> colGroupNames = pivot.columnGroups().isEmpty() ? seriesNames : new ArrayList<>();
+
         final PivotResult.Builder resultBuilder = PivotResult.builder()
                 .id(pivot.id())
                 .effectiveTimerange(effectiveTimerange)
@@ -205,6 +211,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                         retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
                                 .forEach(columnBucketTuple -> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
+                                    colGroupNames.add(String.join(", ", Stream.concat(columnKeys.stream(), seriesNames.stream()).toList()));
+
                                     final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
                                     processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
@@ -219,7 +227,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
             resultBuilder.addRow(rowBuilder.source("non-leaf").build());
         }
 
-        return resultBuilder.build();
+        return resultBuilder.columnNames(Stream.concat(fieldsNames, colGroupNames.stream().distinct().sorted()).toList()).build();
     }
 
     private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
