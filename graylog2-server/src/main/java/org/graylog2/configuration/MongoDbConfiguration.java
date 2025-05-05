@@ -25,8 +25,10 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
 
 public class MongoDbConfiguration {
-    @Documentation("Increase this value according to the maximum connections your MongoDB server can handle from a single client " +
-            "if you encounter MongoDB connection problems.")
+    @Documentation("""
+            Increase this value according to the maximum connections your MongoDB server can handle from a single client
+            if you encounter MongoDB connection problems.
+            """)
     @Parameter(value = "mongodb_max_connections", validator = PositiveIntegerValidator.class)
     private int maxConnections = 1000;
 
@@ -34,8 +36,10 @@ public class MongoDbConfiguration {
     @Parameter(value = "mongodb_uri", required = true, validator = StringNotBlankValidator.class)
     private String uri = "mongodb://localhost/graylog";
 
-    @Documentation("Maximum number of attempts to connect to MongoDB on boot for the version probe." +
-            "Default 0 means retry indefinitely until a connection can be established")
+    @Documentation("""
+            Maximum number of attempts to connect to MongoDB on boot for the version probe.
+            Default 0 means retry indefinitely until a connection can be established
+            """)
     @Parameter(value = "mongodb_version_probe_attempts", validators = {PositiveIntegerValidator.class})
     int mongodbVersionProbeAttempts = 0;
 
@@ -60,7 +64,7 @@ public class MongoDbConfiguration {
 
     @ValidatorMethod
     public void validate() throws ValidationException {
-        if(getMongoClientURI() == null) {
+        if (getMongoClientURI() == null) {
             throw new ValidationException("mongodb_uri is not a valid MongoDB connection string");
         }
     }

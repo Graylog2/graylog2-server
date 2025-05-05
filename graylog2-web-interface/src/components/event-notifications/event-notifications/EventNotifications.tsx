@@ -45,7 +45,7 @@ const renderEmptyContent = () => (
       <EmptyEntity>
         <p>
           Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications to
-          integrate Graylog Alerts with an external alerting system you use.
+          integrate Alerts with an external alerting system you use.
         </p>
         <IfPermitted permissions="eventnotifications:create">
           <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>

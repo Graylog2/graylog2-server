@@ -35,12 +35,34 @@ export const fetchEventDefinitions = (searchParams: SearchParams) =>
     attributes,
   }));
 
+export const fetchEventDefinition = (eventDefinitionId: string) =>
+  EventDefinitionsStore.get(eventDefinitionId).then(({ event_definition, context, is_mutable }) => ({
+    eventDefinition: event_definition,
+    context: context,
+    is_mutable: is_mutable,
+  }));
+
 export const keyFn = (searchParams: SearchParams) => ['eventDefinition', 'overview', searchParams];
 
 type EventDefinitionResult = {
   list: Array<EventDefinition>;
   pagination: { total: number };
   attributes: Array<{ id: string; title: string; sortable: boolean }>;
+};
+
+export const useGetEventDefinition = (eventDefinitionId: string) => {
+  const { data, isFetching } = useQuery<any, Error>(['get-event-definition', eventDefinitionId], () =>
+    defaultOnError(
+      fetchEventDefinition(eventDefinitionId),
+      'Loading Event Definition failed with status',
+      'Could not load Event definition',
+    ),
+  );
+
+  return {
+    data: isFetching ? null : data,
+    isFetching,
+  };
 };
 
 const useEventDefinitions = (

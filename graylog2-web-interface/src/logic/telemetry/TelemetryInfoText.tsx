@@ -18,24 +18,29 @@ import React from 'react';
 
 import { ExternalLink } from 'components/common';
 import { Alert } from 'components/bootstrap';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   showProfile?: boolean;
 };
 
-const TelemetryInfoText = ({ showProfile }: Props) => (
-  <Alert bsStyle="info">
-    We would like to collect anonymous usage data to help us prioritize improvements and make Graylog better in the
-    future.
-    <br />
-    We do not collect personal data, sensitive information, or content such as logs in your instances.
-    <br />
-    Learn more on our <ExternalLink href="https://www.graylog.org/privacy-policy/">Privacy Policy</ExternalLink>.
-    <br />
-    You can turn data collection off or on any time
-    {showProfile && <b> in the user profile</b>}
-    {!showProfile && ' here'}.
-  </Alert>
-);
+const TelemetryInfoText = ({ showProfile = undefined }: Props) => {
+  const productName = useProductName();
+
+  return (
+    <Alert bsStyle="info">
+      We would like to collect anonymous usage data to help us prioritize improvements and make ${productName} better in
+      the future.
+      <br />
+      We do not collect personal data, sensitive information, or content such as logs in your instances.
+      <br />
+      Learn more on our <ExternalLink href="https://www.graylog.org/privacy-policy/">Privacy Policy</ExternalLink>.
+      <br />
+      You can turn data collection off or on any time
+      {showProfile && <b> in the user profile</b>}
+      {!showProfile && ' here'}.
+    </Alert>
+  );
+};
 
 export default TelemetryInfoText;

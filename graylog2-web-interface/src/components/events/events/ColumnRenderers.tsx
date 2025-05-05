@@ -24,6 +24,7 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import PriorityName from 'components/events/events/PriorityName';
+import AppConfig from 'util/AppConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
 import EventFields from 'components/events/events/EventFields';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
@@ -77,6 +78,18 @@ const RemediationStepRenderer = ({
     <MarkdownPreview show withFullView noBorder noBackground value={eventDefinitionContext.remediation_steps} />
   ) : (
     <em>No remediation steps</em>
+  );
+};
+
+const EventProcedureRenderer = ({ eventId, eventProcedureId }: { eventId: string; eventProcedureId: string }) => {
+  const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
+
+  return (
+    <>
+      {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary }) => (
+        <PluggableEventProcedureSummary eventId={eventId} eventDefinitionEventProcedure={eventProcedureId} />
+      ))}
+    </>
   );
 };
 
@@ -155,9 +168,19 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event, __, meta: EventsAdditionalData) => (
-        <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
-      ),
+      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => {
+        const isEventProceduresEnabled = AppConfig.isFeatureEnabled('show_event_procedures');
+
+        return (
+          <>
+            {isEventProceduresEnabled ? (
+              <EventProcedureRenderer eventId={event.id} eventProcedureId={eventProcedureId} />
+            ) : (
+              <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
+            )}
+          </>
+        );
+      },
       width: 0.3,
     },
     timerange_start: {

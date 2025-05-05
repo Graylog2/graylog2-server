@@ -21,7 +21,7 @@ import { useCallback, useState } from 'react';
 import { Button } from 'preflight/components/common';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 
 type Props = {
   variant?: string;
@@ -29,7 +29,7 @@ type Props = {
   color?: string;
 };
 
-const ResumeStartupButton = ({ variant, compact = false, color }: Props) => {
+const ResumeStartupButton = ({ variant = undefined, compact = false, color = undefined }: Props) => {
   const [isRestartingConfiguration, setIsRestartingConfiguration] = useState(false);
   const onResumeStartup = useCallback(() => {
     // eslint-disable-next-line no-alert
