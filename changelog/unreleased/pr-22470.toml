@@ -1,0 +1,5 @@
+type = "a"
+message = "Round axis values on widget charts."
+
+issues = ["graylog-plugin-enterprise#8898"]
+pulls = ["22470"]
