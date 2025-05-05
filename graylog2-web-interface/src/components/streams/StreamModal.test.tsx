@@ -127,7 +127,7 @@ describe('StreamModal', () => {
         index_set_id: 'index-set-id-2',
         remove_matches_from_default_stream: false,
         title: 'Stream Title and further title',
-      }, undefined),
+      }),
     );
   });
 
@@ -204,11 +204,11 @@ describe('StreamModal', () => {
         index_set_id: 'index-set-id-2',
         remove_matches_from_default_stream: false,
         title: 'New title',
-      }, {
-        selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
-          [everyone.id]: viewer.id,
-        })
-      }),
+        share_request: {
+          selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
+            [everyone.id]: viewer.id,
+          })
+        }}),
     );
   });
 });

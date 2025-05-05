@@ -34,6 +34,10 @@ export type EntitySharePayload = {
   selected_grantee_capabilities: SelectedGranteeCapabilities;
 };
 
+export type EntityShare = {
+  share_request?: EntitySharePayload;
+};
+
 export type ActionsType = {
   prepare: (
     entityType: string,

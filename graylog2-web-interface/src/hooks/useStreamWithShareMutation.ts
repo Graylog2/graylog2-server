@@ -25,7 +25,7 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 import { KEY_PREFIX } from 'components/streams/hooks/useStreams';
 
 const createStreamWithShare = async ({ stream, shareRequest }: { stream: Stream; shareRequest: EntitySharePayload }) =>
-  Streams.createWithRequest({entity: stream, share_request: { selected_grantee_capabilities: shareRequest.selected_grantee_capabilities.toJS() } });
+  Streams.create({...stream, share_request: { selected_grantee_capabilities: shareRequest.selected_grantee_capabilities.toJS() } });
 
 const useStreamWithShareMutation = () => {
  const queryClient = useQueryClient();
