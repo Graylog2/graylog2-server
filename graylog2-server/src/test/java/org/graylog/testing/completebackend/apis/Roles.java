@@ -35,7 +35,7 @@ public class Roles implements GraylogRestApi {
         this.api = api;
     }
 
-    public GraylogApiResponse createRole(@NotBlank String name, String description, @NotNull Set<String> permissions, boolean readOnly) {
+    public GraylogApiResponse create(@NotBlank String name, String description, @NotNull Set<String> permissions, boolean readOnly) {
         final ValidatableResponse result = given()
                 .spec(api.requestSpecification())
                 .when()
@@ -45,5 +45,15 @@ public class Roles implements GraylogRestApi {
                 .log().ifError()
                 .statusCode(Response.Status.CREATED.getStatusCode());
         return new GraylogApiResponse(result);
+    }
+
+    public void delete(String rolename) {
+        final ValidatableResponse result = given()
+                .spec(api.requestSpecification())
+                .when()
+                .delete("/roles/" + rolename)
+                .then()
+                .log().ifError()
+                .statusCode(Response.Status.NO_CONTENT.getStatusCode());
     }
 }
