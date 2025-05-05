@@ -16,7 +16,26 @@
  */
 import * as React from 'react';
 import { Notifications as MantineNotifications } from '@mantine/notifications';
+import styled, { css } from 'styled-components';
 
-const Notifications = () => <MantineNotifications />;
+const StyledNotifications = styled(MantineNotifications)(
+  ({ theme }) => css`
+    .mantine-Notification-root {
+      background-color: ${theme.colors.global.contentBackground};
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgb(0 0 0 / 20%);
+    }
+
+    .mantine-Notification-title {
+      font-weight: bold;
+    }
+
+    .mantine-Notification-description {
+      color: ${theme.colors.gray[10]};
+    }
+  `,
+);
+
+const Notifications = () => <StyledNotifications />;
 
 export default Notifications;
