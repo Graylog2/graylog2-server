@@ -230,6 +230,7 @@ class EntitySharesServiceTest {
         });
 
     }
+
     @DisplayName("Only show shares for visible grantees")
     @Test
     void showShareForVisibleGrantee() {
@@ -240,7 +241,7 @@ class EntitySharesServiceTest {
         final GRN janeGRN = grnRegistry.newGRN(GRNTypes.USER, "jane");
         final ImmutableSet<Grantee> allGranteesSet = ImmutableSet.of(Grantee.createUser(janeGRN, "jane"));
         when(granteeService.getAvailableGrantees(user)).thenReturn(allGranteesSet);
-        lenient().when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
+        when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
 
         final Subject subject = mock(Subject.class);
         final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(entity, shareRequest, user, subject);
@@ -248,6 +249,25 @@ class EntitySharesServiceTest {
             assertThat(activeShares).hasSize(1);
             assertThat(activeShares.iterator().next().grantee()).isEqualTo(janeGRN);
         });
+    }
+
+    @DisplayName("Show shares without entity")
+    @Test
+    void showShareWithoutEntity() {
+        final EntityShareRequest shareRequest = EntityShareRequest.create(null);
+
+        final User user = createMockUser("hans");
+        final GRN janeGRN = grnRegistry.newGRN(GRNTypes.USER, "jane");
+        final ImmutableSet<Grantee> allGranteesSet = ImmutableSet.of(Grantee.createUser(janeGRN, "jane"));
+        when(granteeService.getAvailableGrantees(user)).thenReturn(allGranteesSet);
+        when(granteeService.getModifiableGrantees(any(), any())).thenReturn(allGranteesSet);
+
+        final Subject subject = mock(Subject.class);
+        final EntityShareResponse entityShareResponse = entitySharesService.prepareShare(shareRequest, user, subject);
+        assertThat(entityShareResponse.activeShares()).isEmpty();
+        assertThat(entityShareResponse.availableGrantees()).hasSize(1);
+        assertThat(entityShareResponse.availableCapabilities()).hasSize(3);
+        assertThat(entityShareResponse.selectedGranteeCapabilities()).isEmpty();
     }
 
     private User createMockUser(String name) {

@@ -104,7 +104,6 @@
     "react-ultimate-pagination": "^1.2.0",
     "react-window": "^1.8.2",
     "react-window-infinite-loader": "^1.0.8",
-    "toastr": "^2.1.2",
     "twix": "^1.1.4",
     "urijs": "^1.19.6",
     "uuid": "11.1.0",
@@ -177,6 +176,7 @@
   "resolutions": {
     "@types/react": "18.3.12",
     "nth-check": "2.0.1",
-    "typescript": "5.8.2"
+    "typescript": "5.8.2",
+    "jquery": "3.5.1"
   }
 }
