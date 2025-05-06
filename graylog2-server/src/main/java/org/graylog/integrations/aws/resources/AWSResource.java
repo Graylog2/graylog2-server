@@ -125,12 +125,11 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Timed
     @Path("/inputs")
     @ApiOperation(value = "Create a new AWS input.")
-    @RequiresPermissions(RestPermissions.INPUTS_CREATE)
     @AuditEvent(type = IntegrationsAuditEventTypes.KINESIS_INPUT_CREATE)
+    @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":org.graylog.integrations.aws.inputs.AWSInput"})
     public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
                            @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull AWSInputCreateRequest saveRequest) throws Exception {
-
         Input input = awsService.saveInput(saveRequest, getCurrentUser(), isSetupWizard);
         return Response.ok().entity(getInputSummary(input)).build();
     }
