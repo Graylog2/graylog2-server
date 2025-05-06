@@ -80,17 +80,18 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
 
   const readOnly = !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1';
   const hasEventProcedure = !!eventDefinitionEventProcedure;
+  const hasRemediationSteps = eventDefinition?.remediation_steps;
 
   const renderEventProcedure = () => {
     if (isEventProceduresEnabled) {
       return (
         <>
-          {hasEventProcedure || showAddEventProcedureForm ? (
+          {hasEventProcedure || hasRemediationSteps || showAddEventProcedureForm ? (
             <>
               {pluggableEventProcedureForm.map(({ component: PluggableEventProcedureForm }) => (
                 <PluggableEventProcedureForm
-                  eventDefinition={eventDefinition}
                   eventProcedureID={eventDefinitionEventProcedure}
+                  remediationSteps={eventDefinition?.remediation_steps}
                   onClose={() => setShowAddEventProcedureForm(false)}
                   onSave={(eventProcedureId) => onChange('event_procedure', eventProcedureId)}
                   canEdit={canEdit}
