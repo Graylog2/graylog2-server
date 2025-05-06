@@ -36,10 +36,10 @@ type Props = {
 };
 
 const CreateStreamButton = ({
-  bsSize='md',
-  bsStyle='default',
+  bsSize = 'md',
+  bsStyle = 'default',
   buttonText = 'Create stream',
-  className='',
+  className = '',
   indexSets,
   onCreate,
 }: Props) => {

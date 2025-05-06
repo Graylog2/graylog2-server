@@ -38,7 +38,7 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
     getInitialState: jest.fn(),
   },
 }));
-const shareWithCollaborator = async () =>{
+const shareWithCollaborator = async () => {
   const granteesSelect = await screen.findByLabelText('Search for users and teams');
 
   await act(async () => {
@@ -68,7 +68,7 @@ const shareWithCollaborator = async () =>{
   await screen.findByText(/everyone/i);
 };
 
-const SavedSearchForm = ({...props}: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
+const SavedSearchForm = ({ ...props }: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
   <OriginalSavedSearchForm {...props}>
     <button type="button">Submit</button>
   </OriginalSavedSearchForm>
@@ -186,7 +186,7 @@ describe('SavedSearchForm', () => {
 
     it('should handle saveSearch with share settings', async () => {
       const onSaveAs = jest.fn();
-      render(<SavedSearchForm {...props}  saveAsSearch={onSaveAs} isCreateNew />);
+      render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} isCreateNew />);
       userEvent.type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
 

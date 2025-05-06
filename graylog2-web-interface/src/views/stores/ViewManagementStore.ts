@@ -52,7 +52,7 @@ export type ViewSummary = {
 export type ViewSummaries = Array<ViewSummary>;
 
 type ViewManagementActionsType = RefluxActions<{
-  create: (view: View, entitShare?: EntitySharePayload) => Promise<View>;
+  create: (view: View, entityShare?: EntitySharePayload) => Promise<View>;
   delete: (view: View) => Promise<View>;
   forValue: () => Promise<ViewSummaries>;
   get: (viewId: string) => Promise<ViewJson>;
@@ -63,7 +63,7 @@ type ViewManagementActionsType = RefluxActions<{
     sortBy?: string,
     sortOrder?: SortOrder,
   ) => Promise<PaginatedViews>;
-  update: (view: View, entitShare?: EntitySharePayload) => Promise<View>;
+  update: (view: View, entityShare?: EntitySharePayload) => Promise<View>;
 }>;
 
 const ViewManagementActions: ViewManagementActionsType = singletonActions('views.ViewManagement', () =>
