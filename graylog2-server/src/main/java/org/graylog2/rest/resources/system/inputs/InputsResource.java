@@ -171,9 +171,8 @@ public class InputsResource extends AbstractInputsResource {
             @ApiResponse(code = 404, message = "No such input.")
     })
     public InputReferences getReferences(@ApiParam(name = "inputId", required = true)
-                                         @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+                                             @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
-        final Input input = inputService.find(inputId);
         checkPermission(RestPermissions.STREAMS_READ);
         checkPermission(PipelineRestPermissions.PIPELINE_READ);
 
