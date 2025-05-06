@@ -68,10 +68,6 @@ public class EventDefinitionsResourceTest {
     ObjectMapper objectMapper;
     @Mock
     EntitySharesService entitySharesService;
-    @Mock
-    DBGrantService dbGrantService;
-    @Mock
-    GRNRegistry grnRegistry;
 
     EventDefinitionsResource resource;
 
@@ -79,8 +75,7 @@ public class EventDefinitionsResourceTest {
     public void setup() {
         resource = new EventDefinitionsResource(
                 dbService, eventDefinitionHandler, contextService, engine, recentActivityService,
-                auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration(), entitySharesService,
-                dbGrantService, grnRegistry);
+                auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration(), entitySharesService);
         when(config1.type()).thenReturn(CONFIG_TYPE_1);
         when(config2.type()).thenReturn(CONFIG_TYPE_2);
     }
