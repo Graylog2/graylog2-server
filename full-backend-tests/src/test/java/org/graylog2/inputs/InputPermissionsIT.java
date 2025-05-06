@@ -27,7 +27,6 @@ import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.shared.security.RestPermissions;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -94,7 +93,7 @@ public class InputPermissionsIT {
         user = apis.users().createUser(restrictedInputsCreator);
     }
 
-    private Users.@NotNull User createUser(String username, GraylogApiResponse... roles) {
+    private Users.User createUser(String username, GraylogApiResponse... roles) {
         return new Users.User(username, RandomString.make(), "<Generated>", username,
                 username + "@graylog", false, 30_0000, "Europe/Vienna",
                 Arrays.stream(roles).map(role -> role.properJSONPath().read("name", String.class)).toList(), List.of());
