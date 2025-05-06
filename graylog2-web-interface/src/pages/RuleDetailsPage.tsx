@@ -40,7 +40,7 @@ const RuleDetailsPage = () => {
   const { ruleId } = useParams<{ ruleId: string }>();
   const ruleStoreState = useStore(RulesStore);
   const isNewRule = ruleId === 'new';
-  const { data: pipelines } = usePipelines({ enabled: !isNewRule });
+  const { data: pipelines, isInitialLoading: isInitialLoadingPipelines } = usePipelines({ enabled: !isNewRule });
   const [isLoading, setIsLoading] = useState(true);
   const [currentRule, setCurrentRule] = useState(undefined);
   const history = useHistory();
@@ -69,9 +69,9 @@ const RuleDetailsPage = () => {
         },
       );
 
-      setIsLoading(!(currentRule && pipelines.length > 0));
+      setIsLoading(!currentRule || isInitialLoadingPipelines);
     }
-  }, [currentRule, history, isNewRule, ruleId, pipelines]);
+  }, [currentRule, history, isNewRule, ruleId, isInitialLoadingPipelines]);
 
   if (isLoading) {
     return <Spinner text="Loading Rule Details..." />;
