@@ -29,7 +29,7 @@ const TelemetryInfoText = ({ showProfile = undefined }: Props) => {
 
   return (
     <Alert bsStyle="info">
-      We would like to collect anonymous usage data to help us prioritize improvements and make ${productName} better in
+      We would like to collect anonymous usage data to help us prioritize improvements and make {productName} better in
       the future.
       <br />
       We do not collect personal data, sensitive information, or content such as logs in your instances.
