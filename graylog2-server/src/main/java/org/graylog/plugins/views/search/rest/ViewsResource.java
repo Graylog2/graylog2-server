@@ -232,8 +232,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") ViewDTO dto,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) {
-        if (dto.type().equals(ViewDTO.Type.DASHBOARD) && !searchUser.canCreateDashboards()) {
-            throw new ForbiddenException("User is not allowed to create new dashboards.");
+        if (!searchUser.canCreateView(dto)) {
+            throw new ForbiddenException("User is not allowed to create view of type " + dto.type());
         }
 
         validateIntegrity(dto, searchUser, true);
