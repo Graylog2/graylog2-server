@@ -92,7 +92,7 @@ public class StaticFieldsResource extends RestResource {
             LOG.error(msg);
             throw new jakarta.ws.rs.NotFoundException(msg);
         }
-        checkPermission(RestPermissions.INPUT_TYPES_EDIT, input.getType());
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
 
         // Check if key is a valid message key.
         if (!Message.validKey(csfr.key())) {
@@ -147,7 +147,7 @@ public class StaticFieldsResource extends RestResource {
             LOG.error(msg);
             throw new jakarta.ws.rs.NotFoundException(msg);
         }
-        checkPermission(RestPermissions.INPUT_TYPES_EDIT, input.getType());
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType());  // remove after sharing inputs implemented
 
         if (!input.getStaticFields().containsKey(key)) {
             final String msg = "No such static field [" + key + "] on input <" + inputId + ">.";

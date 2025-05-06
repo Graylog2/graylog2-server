@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.rest.resources.system.inputs;
 
+import jakarta.ws.rs.NotFoundException;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.Configuration;
 import org.graylog2.shared.inputs.InputDescription;
@@ -29,8 +30,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import jakarta.ws.rs.NotFoundException;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -132,7 +131,7 @@ class InputTypesResourceTest {
             super(messageInputFactory, configuration);
             this.subject = mock(Subject.class);
             lenient().doReturn(true).when(subject).isPermitted(anyString());
-            lenient().doReturn(false).when(subject).isPermitted(RestPermissions.INPUT_TYPES_READ + ":" + RESTRICTED_TYPE);
+            lenient().doReturn(false).when(subject).isPermitted(RestPermissions.INPUT_TYPES_CREATE + ":" + RESTRICTED_TYPE);
         }
 
         @Override

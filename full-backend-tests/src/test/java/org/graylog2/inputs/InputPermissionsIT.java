@@ -42,12 +42,10 @@ public class InputPermissionsIT {
     private final GraylogApis apis;
 
     private GraylogApiResponse roleInputsReader;
-    private GraylogApiResponse roleRestrictedInputsReader;
     private GraylogApiResponse roleInputsCreator;
     private GraylogApiResponse roleRestrictedInputsCreator;
 
     private Users.User inputsReader;
-    private Users.User restrictedInputsReader;
     private Users.User inputsCreator;
     private Users.User restrictedInputsCreator;
 
@@ -58,38 +56,29 @@ public class InputPermissionsIT {
     @BeforeAll
     void setUp() {
         roleInputsReader = apis.roles().create("custom_inputs_reader", "inputs reader can only see inputs", Set.of(
-                RestPermissions.INPUTS_READ,
-                RestPermissions.INPUT_TYPES_READ
+                RestPermissions.INPUTS_READ
         ), false);
         inputsReader = createUser("inputs.reader", roleInputsReader);
 
-        roleRestrictedInputsReader = apis.roles().create("custom_restricted_inputs_reader", "inputs reader can only see two input types", Set.of(
-                RestPermissions.INPUTS_READ,
-                RestPermissions.INPUT_TYPES_READ + ":org.graylog2.inputs.random.FakeHttpMessageInput",
-                RestPermissions.INPUT_TYPES_READ + ":org.graylog2.inputs.gelf.tcp.GELFTCPInput"
-        ), false);
-        restrictedInputsReader = createUser("restricted.inputs.reader", roleRestrictedInputsReader);
-
         roleInputsCreator = apis.roles().create("custom_inputs_creator", "inputs creator can only create inputs", Set.of(
                 RestPermissions.INPUTS_READ,
-                RestPermissions.INPUT_TYPES_READ,
                 RestPermissions.INPUTS_CREATE,
                 RestPermissions.INPUT_TYPES_CREATE
         ), false);
         inputsCreator = createUser("inputs.creator", roleInputsCreator);
 
-        roleRestrictedInputsCreator = apis.roles().create("custom_inputs_admin", "inputs admin manages inputs", Set.of(
+        roleRestrictedInputsCreator = apis.roles().create("custom_restricted_inputs_creator", "inputs creator can only create certain inputs", Set.of(
                 RestPermissions.INPUTS_READ,
-                RestPermissions.INPUT_TYPES_READ + ":org.graylog2.inputs.random.FakeHttpMessageInput",
                 RestPermissions.INPUTS_CREATE,
-                RestPermissions.INPUT_TYPES_CREATE + ":org.graylog2.inputs.random.FakeHttpMessageInput"
+                RestPermissions.INPUT_TYPES_CREATE + ":org.graylog2.inputs.random.FakeHttpMessageInput",
+                RestPermissions.INPUT_TYPES_CREATE + ":org.graylog2.inputs.gelf.tcp.GELFTCPInput"
+
         ), false);
         restrictedInputsCreator = createUser("restricted.inputs.creator", roleRestrictedInputsCreator);
 
         waitForRolesCacheRefresh();
 
         apis.users().createUser(inputsReader);
-        apis.users().createUser(restrictedInputsReader);
         apis.users().createUser(inputsCreator);
         apis.users().createUser(restrictedInputsCreator);
     }
@@ -118,12 +107,10 @@ public class InputPermissionsIT {
     @AfterAll
     void tearDown() {
         apis.users().deleteUser(inputsReader.username());
-        apis.users().deleteUser(restrictedInputsReader.username());
         apis.users().deleteUser(inputsCreator.username());
         apis.users().deleteUser(restrictedInputsCreator.username());
 
         apis.roles().delete(roleInputsReader.properJSONPath().read("name", String.class));
-        apis.roles().delete(roleRestrictedInputsReader.properJSONPath().read("name", String.class));
         apis.roles().delete(roleInputsCreator.properJSONPath().read("name", String.class));
         apis.roles().delete(roleRestrictedInputsCreator.properJSONPath().read("name", String.class));
     }
@@ -142,9 +129,23 @@ public class InputPermissionsIT {
                 "Timed out waiting for HTTP Random Message Input to become available");
 
         apis.forUser(inputsReader).inputs().getInput(inputId).assertThat().body("id", equalTo(inputId));
-        apis.forUser(restrictedInputsReader).inputs().getInput(inputId).assertThat().body("id", equalTo(inputId));
 
         apis.inputs().deleteInput(inputId);
+
+        String inputId2 = apis.forUser(restrictedInputsCreator).inputs().createGlobalInput("testInput",
+                "org.graylog2.inputs.random.FakeHttpMessageInput",
+                Map.of("sleep", 30,
+                        "sleep_deviation", 30,
+                        "source", "example.org"));
+        apis.waitFor(() ->
+                        apis.inputs().getInputState(inputId2)
+                                .extract().body().jsonPath().get("state")
+                                .equals("RUNNING"),
+                "Timed out waiting for HTTP Random Message Input to become available");
+
+        apis.forUser(inputsReader).inputs().getInput(inputId2).assertThat().body("id", equalTo(inputId2));
+
+        apis.inputs().deleteInput(inputId2);
     }
 
     @ContainerMatrixTest
@@ -163,9 +164,6 @@ public class InputPermissionsIT {
                 "Timed out waiting for Json Input to become available");
 
         apis.forUser(inputsReader).inputs().getInput(inputId).assertThat().body("id", equalTo(inputId));
-        Assertions.assertThatThrownBy(() -> apis.forUser(restrictedInputsCreator).inputs().getInput(inputId))
-                .isInstanceOf(AssertionError.class)
-                .hasMessageContaining("Expected status code <200> but was <403>");
 
         apis.inputs().deleteInput(inputId);
 
@@ -185,13 +183,17 @@ public class InputPermissionsIT {
     void testInputTypesRead() {
         final GraylogApiResponse inputTypesForReader = apis.forUser(inputsReader).inputs().getInputTypes();
         final Map<String, String> typesReader = inputTypesForReader.properJSONPath().read("types");
-        Assertions.assertThat(typesReader).hasSizeGreaterThan(5);
+        Assertions.assertThat(typesReader).isEmpty();
 
-        final GraylogApiResponse inputTypesForRestrictedReader = apis.forUser(restrictedInputsReader).inputs().getInputTypes();
-        final Map<String, String> typesRestricted = inputTypesForRestrictedReader.properJSONPath().read("types");
+        final GraylogApiResponse inputTypesForRestrictedCreator = apis.forUser(restrictedInputsCreator).inputs().getInputTypes();
+        final Map<String, String> typesRestricted = inputTypesForRestrictedCreator.properJSONPath().read("types");
         Assertions.assertThat(typesRestricted).containsOnlyKeys(
                 "org.graylog2.inputs.random.FakeHttpMessageInput",
                 "org.graylog2.inputs.gelf.tcp.GELFTCPInput"
         );
+
+        final GraylogApiResponse inputTypesForCreator = apis.forUser(inputsCreator).inputs().getInputTypes();
+        final Map<String, String> typesCreator = inputTypesForCreator.properJSONPath().read("types");
+        Assertions.assertThat(typesCreator).hasSizeGreaterThan(5);
     }
 }

@@ -17,14 +17,17 @@
 package org.graylog2.migrations;
 
 import jakarta.inject.Inject;
+import org.apache.commons.collections4.CollectionUtils;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Set;
 
 public class V20250506090000_AddInputTypesPermissions extends Migration {
@@ -33,11 +36,14 @@ public class V20250506090000_AddInputTypesPermissions extends Migration {
 
     private final ClusterConfigService clusterConfigService;
     private final RoleService roleService;
+    private final UserService userService;
 
     @Inject
-    public V20250506090000_AddInputTypesPermissions(final ClusterConfigService clusterConfigService, RoleService roleService) {
+    public V20250506090000_AddInputTypesPermissions(final ClusterConfigService clusterConfigService,
+                                                    RoleService roleService, UserService userService) {
         this.clusterConfigService = clusterConfigService;
         this.roleService = roleService;
+        this.userService = userService;
     }
 
     @Override
@@ -54,39 +60,39 @@ public class V20250506090000_AddInputTypesPermissions extends Migration {
         LOG.debug("Starting migration to add input types permissions.");
         roleService.loadAll().stream()
                 .filter(role -> !role.isReadOnly())
-                .forEach(role -> {
+                .filter(role -> CollectionUtils.containsAny(role.getPermissions(),
+                        RestPermissions.INPUTS_CHANGESTATE, RestPermissions.INPUTS_CREATE,
+                        RestPermissions.INPUTS_EDIT, RestPermissions.INPUTS_TERMINATE))
+                .peek(role -> {
                     Set<String> permissions = role.getPermissions();
-                    boolean needsEdit = false;
-                    if (permissions.contains(RestPermissions.INPUTS_CHANGESTATE)) {
-                        permissions.add(RestPermissions.INPUT_TYPES_CHANGESTATE);
-                        needsEdit = true;
-                    }
-                    if (permissions.contains(RestPermissions.INPUTS_CREATE)) {
-                        permissions.add(RestPermissions.INPUT_TYPES_CREATE);
-                        needsEdit = true;
-                    }
-                    if (permissions.contains(RestPermissions.INPUTS_EDIT)) {
-                        permissions.add(RestPermissions.INPUT_TYPES_EDIT);
-                        needsEdit = true;
-                    }
-                    if (permissions.contains(RestPermissions.INPUTS_READ)) {
-                        permissions.add(RestPermissions.INPUT_TYPES_READ);
-                        needsEdit = true;
-                    }
-                    if (permissions.contains(RestPermissions.INPUTS_TERMINATE)) {
-                        permissions.add(RestPermissions.INPUT_TYPES_TERMINATE);
-                        needsEdit = true;
-                    }
-                    if (needsEdit) {
-                        LOG.info("Updating role {} to include input type permissions", role.getName());
-                        role.setPermissions(permissions);
-                        try {
-                            roleService.save(role);
-                        } catch (ValidationException e) {
-                            LOG.error("Could not add input type permissions.", e);
-                        }
+                    permissions.add(RestPermissions.INPUT_TYPES_CREATE);
+                    role.setPermissions(permissions);
+                }).forEach(role -> {
+                    LOG.info("Updating role {} to include input type permission", role.getName());
+                    try {
+                        roleService.save(role);
+                    } catch (ValidationException e) {
+                        LOG.error("Error updating role.", e);
                     }
                 });
+
+        userService.loadAll().stream()
+                .filter(user -> CollectionUtils.containsAny(user.getPermissions(),
+                        RestPermissions.INPUTS_CHANGESTATE, RestPermissions.INPUTS_CREATE,
+                        RestPermissions.INPUTS_EDIT, RestPermissions.INPUTS_TERMINATE))
+                .peek(user -> {
+                    List<String> permissions = user.getPermissions();
+                    permissions.add(RestPermissions.INPUT_TYPES_CREATE);
+                    user.setPermissions(permissions);
+                }).forEach(user -> {
+                    LOG.info("Updating user {} to include individual input type permission", user.getName());
+                    try {
+                        userService.save(user);
+                    } catch (ValidationException e) {
+                        LOG.error("Error updating user.", e);
+                    }
+                });
+
         clusterConfigService.write(new V20250506090000_AddInputTypesPermissions.MigrationCompleted());
     }
 

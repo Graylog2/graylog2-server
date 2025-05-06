@@ -100,11 +100,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String INPUTS_EDIT = "inputs:edit";
     public static final String INPUTS_READ = "inputs:read";
     public static final String INPUTS_TERMINATE = "inputs:terminate";
-    public static final String INPUT_TYPES_CHANGESTATE = "inputs_of_type:changestate";
-    public static final String INPUT_TYPES_CREATE = "inputs_of_type:create";
-    public static final String INPUT_TYPES_EDIT = "inputs_of_type:edit";
-    public static final String INPUT_TYPES_READ = "inputs_of_type:read";
-    public static final String INPUT_TYPES_TERMINATE = "inputs_of_type:terminate";
+    public static final String INPUT_TYPES_CREATE = "input_types:create";
     public static final String JOURNAL_EDIT = "journal:edit";
     public static final String JOURNAL_READ = "journal:read";
     public static final String JVMSTATS_READ = "jvmstats:read";
@@ -269,11 +265,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(INPUTS_EDIT, ""))
             .add(create(INPUTS_READ, ""))
             .add(create(INPUTS_TERMINATE, ""))
-            .add(create(INPUT_TYPES_CHANGESTATE, ""))
             .add(create(INPUT_TYPES_CREATE, ""))
-            .add(create(INPUT_TYPES_EDIT, ""))
-            .add(create(INPUT_TYPES_READ, ""))
-            .add(create(INPUT_TYPES_TERMINATE, ""))
             .add(create(JOURNAL_EDIT, ""))
             .add(create(JOURNAL_READ, ""))
             .add(create(JVMSTATS_READ, ""))
@@ -360,7 +352,6 @@ public class RestPermissions implements PluginPermissions {
             FIELDNAMES_READ,
             INDEXERCLUSTER_READ,
             INPUTS_READ,
-            INPUT_TYPES_READ,
             JOURNAL_READ,
             JVMSTATS_READ,
             MESSAGECOUNT_READ,

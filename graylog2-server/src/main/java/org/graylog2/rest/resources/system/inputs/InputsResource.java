@@ -133,7 +133,6 @@ public class InputsResource extends AbstractInputsResource {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         final Input input = inputService.find(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_READ, input.getType());
 
         return getInputSummary(input);
     }
@@ -150,7 +149,6 @@ public class InputsResource extends AbstractInputsResource {
                                         @Context SearchUser searchUser) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         final Input input = inputService.find(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_READ, input.getType());
         return inputDiagnosticService.getInputDiagnostics(input, searchUser);
     }
 
@@ -176,7 +174,6 @@ public class InputsResource extends AbstractInputsResource {
                                          @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         final Input input = inputService.find(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_READ, input.getType());
         checkPermission(RestPermissions.STREAMS_READ);
         checkPermission(PipelineRestPermissions.PIPELINE_READ);
 
@@ -197,7 +194,6 @@ public class InputsResource extends AbstractInputsResource {
     public InputsList list() {
         final Set<InputSummary> inputs = inputService.all().stream()
                 .filter(input -> isPermitted(RestPermissions.INPUTS_READ, input.getId()))
-                .filter(input -> isPermitted(RestPermissions.INPUT_TYPES_READ, input.getType()))
                 .map(this::getInputSummary)
                 .collect(Collectors.toSet());
 
@@ -259,7 +255,7 @@ public class InputsResource extends AbstractInputsResource {
     public void terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
         final Input input = inputService.find(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_TERMINATE, input.getType());
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
         if (0 < inputService.destroy(input)) {
             clusterEventBus.post(new InputDeletedEvent(input.getId(), input.getTitle()));
         }
@@ -284,7 +280,7 @@ public class InputsResource extends AbstractInputsResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input input = inputService.find(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_EDIT, input.getType());
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType());  // remove after sharing inputs implemented
         final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node(), input.getDesiredState());
 
         messageInput.checkConfiguration();

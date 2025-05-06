@@ -120,7 +120,7 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input mongoInput = inputService.find(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_EDIT, mongoInput.getType());
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, mongoInput.getType()); // remove after sharing inputs implemented
         final String id = new com.eaio.uuid.UUID().toString();
         final Extractor extractor = buildExtractorFromRequest(cer, id);
 
@@ -167,7 +167,7 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input mongoInput = inputService.find(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_EDIT, mongoInput.getType());
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, mongoInput.getType()); // remove after sharing inputs implemented
 
         final Extractor originalExtractor = inputService.getExtractor(mongoInput, extractorId);
         final Extractor extractor = buildExtractorFromRequest(cer, originalExtractor.getId());
@@ -198,7 +198,6 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         final Input input = inputService.find(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_READ, input.getType());
         final List<ExtractorSummary> extractors = Lists.newArrayList();
         for (Extractor extractor : inputService.getExtractors(input)) {
             extractors.add(toSummary(extractor));
@@ -228,7 +227,6 @@ public class ExtractorsResource extends RestResource {
             LOG.error("Input <{}> not found.", inputId);
             throw new jakarta.ws.rs.NotFoundException("Couldn't find input " + inputId);
         }
-        checkPermission(RestPermissions.INPUT_TYPES_READ, input.getType());
 
         final Input mongoInput = inputService.find(input.getPersistId());
         final Extractor extractor = inputService.getExtractor(mongoInput, extractorId);
@@ -255,7 +253,7 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final MessageInput input = persistedInputs.get(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_EDIT, input.getType());
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
 
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
@@ -288,7 +286,7 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputPersistId);
 
         final Input mongoInput = inputService.find(inputPersistId);
-        checkPermission(RestPermissions.INPUT_TYPES_EDIT, mongoInput.getType());
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, mongoInput.getType()); // remove after sharing inputs implemented
 
         for (Extractor extractor : inputService.getExtractors(mongoInput)) {
             if (oer.order().containsValue(extractor.getId())) {
