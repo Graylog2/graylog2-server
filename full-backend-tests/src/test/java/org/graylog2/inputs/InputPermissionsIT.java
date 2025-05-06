@@ -16,7 +16,6 @@
  */
 package org.graylog2.inputs;
 
-import io.restassured.path.json.JsonPath;
 import net.bytebuddy.utility.RandomString;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.Lifecycle;
@@ -87,10 +86,27 @@ public class InputPermissionsIT {
         ), false);
         restrictedInputsCreator = createUser("restricted.inputs.creator", roleRestrictedInputsCreator);
 
-        JsonPath user = apis.users().createUser(inputsReader);
-        user = apis.users().createUser(restrictedInputsReader);
-        user = apis.users().createUser(inputsCreator);
-        user = apis.users().createUser(restrictedInputsCreator);
+        waitForRolesCacheRefresh();
+
+        apis.users().createUser(inputsReader);
+        apis.users().createUser(restrictedInputsReader);
+        apis.users().createUser(inputsCreator);
+        apis.users().createUser(restrictedInputsCreator);
+    }
+
+    /**
+     * Roles are stored in mongodb, but the auth backend is refreshing those only once every second. If we trigger a call
+     * before the role is refreshed, we may get weird results.
+     * @see org.graylog2.security.InMemoryRolePermissionResolver
+     */
+    private static void waitForRolesCacheRefresh() {
+        try {
+            // This is naive and wrong, but very simple to implement. Another approach would be to have a fingerprint of
+            // roles cache, similarly to StreamRouterEngine and its fingerprint.
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Users.User createUser(String username, GraylogApiResponse... roles) {
