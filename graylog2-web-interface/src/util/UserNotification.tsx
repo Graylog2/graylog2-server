@@ -18,6 +18,7 @@ import * as React from 'react';
 import { notifications } from '@mantine/notifications';
 
 import Icon from 'components/common/Icon/Icon';
+import { singleton } from 'logic/singleton';
 
 const UserNotification = {
   error(message: string, title = 'Error') {
@@ -47,4 +48,4 @@ const UserNotification = {
   },
 };
 
-export default UserNotification;
+export default singleton('core.UserNotification', () => UserNotification);
