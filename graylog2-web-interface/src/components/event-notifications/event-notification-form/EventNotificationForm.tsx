@@ -25,6 +25,8 @@ import withTelemetry from 'logic/telemetry/withTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import withLocation from 'routing/withLocation';
+import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 const getNotificationPlugin = (type: string) => {
   if (type === undefined) {
@@ -111,6 +113,12 @@ class EventNotificationForm extends React.Component<
     onChange('config', nextConfig);
   };
 
+  handleEntityShareChange = (entityShare: EntitySharePayload) => {
+    const { onChange } = this.props;
+
+    onChange('share_request', entityShare);
+  };
+
   handleTypeChange = (nextType) => {
     const { sendTelemetry, location } = this.props;
 
@@ -146,13 +154,14 @@ class EventNotificationForm extends React.Component<
     const notificationPlugin = getNotificationPlugin(notification.config.type);
     const notificationFormComponent = notificationPlugin?.formComponent
       ? React.createElement(notificationPlugin.formComponent, {
-          config: notification.config,
-          onChange: this.handleConfigChange,
-          validation: validation,
-          setIsSubmitEnabled: this.setIsSubmitEnabled,
-        })
+        config: notification.config,
+        onChange: this.handleConfigChange,
+        validation: validation,
+        setIsSubmitEnabled: this.setIsSubmitEnabled,
+      })
       : null;
 
+    const isNew = action === 'create';
     const testButtonText = testResult.isLoading ? <Spinner text="Testing..." /> : 'Execute Test Notification';
 
     return (
@@ -177,7 +186,7 @@ class EventNotificationForm extends React.Component<
               name="description"
               label={
                 <span>
-                  Description <small className="text-muted">(Optional)</small>
+                        Description <small className="text-muted">(Optional)</small>
                 </span>
               }
               type="textarea"
@@ -205,7 +214,7 @@ class EventNotificationForm extends React.Component<
             {notificationFormComponent && (
               <FormGroup>
                 <ControlLabel>
-                  Test Notification <small className="text-muted">(Optional)</small>
+                                Test Notification <small className="text-muted">(Optional)</small>
                 </ControlLabel>
                 <FormControl.Static>
                   <Button
@@ -226,11 +235,19 @@ class EventNotificationForm extends React.Component<
                 <HelpBlock>Execute this Notification with a test Alert.</HelpBlock>
               </FormGroup>
             )}
+            {isNew && (
+              <EntityCreateShareFormGroup
+                description='Search for a User or Team to add as collaborator on this notification.'
+                entityType='notification'
+                entityTitle=''
+                onSetEntityShare={this.handleEntityShareChange}
+              />
+            )}
 
             {!embedded && (
               <FormSubmit
                 disabledSubmit={!isSubmitEnabled}
-                submitButtonText={`${action === 'create' ? 'Create' : 'Update'} notification`}
+                submitButtonText={`${isNew ? 'Create' : 'Update'} notification`}
                 onCancel={onCancel}
               />
             )}
