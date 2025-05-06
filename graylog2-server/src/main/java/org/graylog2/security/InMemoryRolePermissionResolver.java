@@ -17,27 +17,25 @@
 package org.graylog2.security;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.shared.users.Role;
+import org.graylog2.users.RoleChangedEvent;
 import org.graylog2.users.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -50,15 +48,12 @@ public class InMemoryRolePermissionResolver implements RolePermissionResolver {
 
     @Inject
     public InMemoryRolePermissionResolver(RoleService roleService,
-                                          @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
+                                          EventBus eventBus) {
         this.roleService = roleService;
-        final RoleUpdater updater = new RoleUpdater();
 
+        eventBus.register(this);
         // eagerly load rules
-        updater.run();
-
-        // update rules every second in the background
-        daemonScheduler.scheduleAtFixedRate(updater, 1, 1, TimeUnit.SECONDS);
+        updateRoles();
     }
 
     @Override
@@ -93,15 +88,17 @@ public class InMemoryRolePermissionResolver implements RolePermissionResolver {
     }
 
 
-    private class RoleUpdater implements Runnable {
-        @Override
-        public void run() {
-            try {
-                final Map<String, Role> index = roleService.loadAllIdMap();
-                InMemoryRolePermissionResolver.this.idToRoleIndex.set(ImmutableMap.copyOf(index));
-            } catch (Exception e) {
-                log.error("Could not find roles collection, no user roles updated.", e);
-            }
+    @Subscribe
+    public void handleRoleChangedEvent(RoleChangedEvent event) {
+        updateRoles();
+    }
+
+    private void updateRoles() {
+        try {
+            final Map<String, Role> index = roleService.loadAllIdMap();
+            this.idToRoleIndex.set(ImmutableMap.copyOf(index));
+        } catch (Exception e) {
+            log.error("Could not find roles collection, no user roles updated.", e);
         }
     }
 }
