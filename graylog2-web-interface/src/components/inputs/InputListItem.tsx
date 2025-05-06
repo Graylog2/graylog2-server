@@ -175,7 +175,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
     );
   }
 
-  if (isPermitted(permissions, [`inputs:edit:${input.id}`])) {
+  if (isPermitted(permissions, [`inputs:edit:${input.id}`, 'input_types:create', `input_types:create:${input.type}`])) {
     if (!AppConfig.isCloud()) {
       let extractorRoute;
 
@@ -209,7 +209,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
       title="More actions"
       id={`more-actions-dropdown-${input.id}`}
       pullRight>
-      <IfPermitted permissions={`inputs:edit:${input.id}`}>
+      <IfPermitted permissions={[`inputs:edit:${input.id}`, 'input_types:create', `input_types:create:${input.type}`]}>
         <MenuItem key={`edit-input-${input.id}`} onSelect={editInput} disabled={definition === undefined}>
           Edit input
         </MenuItem>
@@ -262,7 +262,7 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
         </LinkContainer>
       )}
 
-      <IfPermitted permissions={`inputs:edit:${input.id}`}>
+      <IfPermitted permissions={[`inputs:edit:${input.id}`, 'input_types:create', `input_types:create:${input.type}`]}>
         <MenuItem
           key={`add-static-field-${input.id}`}
           onSelect={() => {
@@ -272,10 +272,10 @@ const InputListItem = ({ input, currentNode, permissions }: Props) => {
         </MenuItem>
       </IfPermitted>
 
-      <IfPermitted permissions="inputs:terminate">
+      <IfPermitted permissions={['inputs:terminate', 'input_types:create', `input_types:create:${input.type}`]}>
         <MenuItem key={`divider-${input.id}`} divider />
       </IfPermitted>
-      <IfPermitted permissions="inputs:terminate">
+      <IfPermitted permissions={['inputs:terminate', 'input_types:create', `input_types:create:${input.type}`]}>
         <DeleteMenuItem key={`delete-input-${input.id}`} onSelect={deleteInput}>
           Delete input
         </DeleteMenuItem>
