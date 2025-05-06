@@ -38,7 +38,7 @@ export type ActionsType = {
   prepare: (
     entityType: string,
     entityTitle: string,
-    GRN: GRN,
+    GRN?: GRN,
     payload?: EntitySharePayload,
   ) => Promise<EntityShareState>;
   update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<EntityShareState>;

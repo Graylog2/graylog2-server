@@ -32,7 +32,7 @@ type Props = {
   title?: string;
 };
 
-const CapabilitySelect = ({ capabilities, onChange, title = 'Select a capability', ...rest }: Props) => {
+const CapabilitySelect = ({ capabilities, onChange = null, title = 'Select a capability', ...rest }: Props) => {
   const capabilitiesOptions = _capabilitiesOptions(capabilities);
 
   const handleChange = useCallback(
