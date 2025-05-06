@@ -70,21 +70,21 @@ const GranteesSelectorFormGroup = ({ availableGrantees, availableCapabilities }:
   const granteesOptions = _granteesOptions(availableGrantees);
 
   return (
-      <StyledSelectGroup>
-        <Field name="granteeId" validate={_isRequired('grantee')}>
-          {({ field: { name, value, onChange } }) => (
-            <GranteesSelect
-              onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
-              optionRenderer={_renderGranteesSelectOption}
-              options={granteesOptions}
-              placeholder="Search for users and teams"
-              value={value}
-            />
-          )}
-        </Field>
-        <CapabilitySelect capabilities={availableCapabilities} />
-      </StyledSelectGroup>
-   );
+    <StyledSelectGroup>
+      <Field name="granteeId" validate={_isRequired('grantee')}>
+        {({ field: { name, value, onChange } }) => (
+          <GranteesSelect
+            onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
+            optionRenderer={_renderGranteesSelectOption}
+            options={granteesOptions}
+            placeholder="Search for users and teams"
+            value={value}
+          />
+        )}
+      </Field>
+      <CapabilitySelect capabilities={availableCapabilities} />
+    </StyledSelectGroup>
+  );
 };
 
 export default GranteesSelectorFormGroup;

@@ -48,7 +48,7 @@ const fetchNotifications = () => {
 type Props = {
   action?: 'edit' | 'create';
   eventDefinition?: EventDefinition & {
-    share_request?: EntitySharePayload,
+    share_request?: EntitySharePayload;
   };
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
   initialStep?: string;
@@ -201,8 +201,11 @@ const EventDefinitionFormContainer = ({
       });
 
       if (eventDefinition?.share_request) {
-        const {share_request: shareRequest, ...rest} = eventDefinition;
-        createEventDefinitionWithShare({eventDefinition: rest, shareRequest}).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
+        const { share_request: shareRequest, ...rest } = eventDefinition;
+        createEventDefinitionWithShare({ eventDefinition: rest, shareRequest }).then(
+          handleSubmitSuccessResponse,
+          handleSubmitFailureResponse,
+        );
       } else {
         EventDefinitionsActions.create(eventDefinition).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
       }

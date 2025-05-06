@@ -20,11 +20,7 @@ import { act } from 'react';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
-import {
-  createEntityShareState,
-  everyone,
-  viewer,
-} from 'fixtures/entityShareState';
+import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 
 import EntityCreateShareFormGroup from './EntityCreateShareFormGroup';
@@ -41,7 +37,7 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
 }));
 
 const mockEntity = {
-  description:'Search for a User or Team to add as collaborator on this stream.',
+  description: 'Search for a User or Team to add as collaborator on this stream.',
   entityType: 'stream',
   entityId: null,
 };
@@ -52,7 +48,7 @@ const SUT = ({ ...props }) => (
   <EntityCreateShareFormGroup
     description={mockEntity.description}
     entityType={mockEntity.entityType}
-    entityTitle=''
+    entityTitle=""
     entityId={null}
     onSetEntityShare={jest.fn()}
     {...props}
@@ -78,12 +74,12 @@ describe('EntityCreateShareFormGroup', () => {
     await waitFor(() => {
       expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId);
     });
-  })
+  });
 
   it('updates entity share state on submit', async () => {
     const mockOnSetEntityShare = jest.fn();
 
-    render(<SUT onSetEntityShare={mockOnSetEntityShare}/>);
+    render(<SUT onSetEntityShare={mockOnSetEntityShare} />);
     // Select a grantee
     const granteesSelect = await screen.findByLabelText('Search for users and teams');
 
@@ -113,25 +109,18 @@ describe('EntityCreateShareFormGroup', () => {
     fireEvent.click(addCollaborator);
 
     await waitFor(() => {
-      expect(EntityShareActions.prepare).toHaveBeenCalledWith(
-        'stream',
-        '',
-        null,
-        {
-          selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
-            [everyone.id]: viewer.id,
-          }),
-        },
-      );
+      expect(EntityShareActions.prepare).toHaveBeenCalledWith('stream', '', null, {
+        selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
+          [everyone.id]: viewer.id,
+        }),
+      });
     });
     await waitFor(() => {
       expect(mockOnSetEntityShare).toHaveBeenCalledWith({
         selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
           [everyone.id]: viewer.id,
         }),
-      },);
+      });
     });
   });
-
 });
-

@@ -76,7 +76,13 @@ const _initialCapabilityId = (capabilities: CapabilitiesList) => {
   return capabilities.find((capability) => capability.title === initialCapabilityTitle)?.id;
 };
 
-const GranteesSelector = ({ availableGrantees, availableCapabilities, className = null, onSubmit, formRef = null }: Props) => {
+const GranteesSelector = ({
+  availableGrantees,
+  availableCapabilities,
+  className = null,
+  onSubmit,
+  formRef = null,
+}: Props) => {
   const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
   const _handelSubmit = (data, resetForm) => {
@@ -94,7 +100,10 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className 
         {({ isSubmitting, isValid, errors }) => (
           <Form>
             <FormElements>
-              <GranteesSelectorFormGroup availableGrantees={availableGrantees} availableCapabilities={availableCapabilities} />
+              <GranteesSelectorFormGroup
+                availableGrantees={availableGrantees}
+                availableCapabilities={availableCapabilities}
+              />
               <SubmitButton
                 bsStyle="success"
                 disabled={isSubmitting || !isValid}
