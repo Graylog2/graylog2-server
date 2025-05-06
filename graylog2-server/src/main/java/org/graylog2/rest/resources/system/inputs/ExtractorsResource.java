@@ -24,6 +24,20 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
 import org.graylog2.audit.AuditEventTypes;
@@ -52,23 +66,6 @@ import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
 import java.util.List;
@@ -123,6 +120,7 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input mongoInput = inputService.find(inputId);
+        checkPermission(RestPermissions.INPUT_TYPES_EDIT, mongoInput.getType());
         final String id = new com.eaio.uuid.UUID().toString();
         final Extractor extractor = buildExtractorFromRequest(cer, id);
 
@@ -169,6 +167,8 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input mongoInput = inputService.find(inputId);
+        checkPermission(RestPermissions.INPUT_TYPES_EDIT, mongoInput.getType());
+
         final Extractor originalExtractor = inputService.getExtractor(mongoInput, extractorId);
         final Extractor extractor = buildExtractorFromRequest(cer, originalExtractor.getId());
 
@@ -198,6 +198,7 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         final Input input = inputService.find(inputId);
+        checkPermission(RestPermissions.INPUT_TYPES_READ, input.getType());
         final List<ExtractorSummary> extractors = Lists.newArrayList();
         for (Extractor extractor : inputService.getExtractors(input)) {
             extractors.add(toSummary(extractor));
@@ -227,6 +228,7 @@ public class ExtractorsResource extends RestResource {
             LOG.error("Input <{}> not found.", inputId);
             throw new jakarta.ws.rs.NotFoundException("Couldn't find input " + inputId);
         }
+        checkPermission(RestPermissions.INPUT_TYPES_READ, input.getType());
 
         final Input mongoInput = inputService.find(input.getPersistId());
         final Extractor extractor = inputService.getExtractor(mongoInput, extractorId);
@@ -253,6 +255,8 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final MessageInput input = persistedInputs.get(inputId);
+        checkPermission(RestPermissions.INPUT_TYPES_EDIT, input.getType());
+
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
             throw new jakarta.ws.rs.NotFoundException("Couldn't find input " + inputId);
@@ -284,6 +288,7 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputPersistId);
 
         final Input mongoInput = inputService.find(inputPersistId);
+        checkPermission(RestPermissions.INPUT_TYPES_EDIT, mongoInput.getType());
 
         for (Extractor extractor : inputService.getExtractors(mongoInput)) {
             if (oer.order().containsValue(extractor.getId())) {

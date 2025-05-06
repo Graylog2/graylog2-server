@@ -22,6 +22,18 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -39,21 +51,6 @@ import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
 
@@ -95,6 +92,7 @@ public class StaticFieldsResource extends RestResource {
             LOG.error(msg);
             throw new jakarta.ws.rs.NotFoundException(msg);
         }
+        checkPermission(RestPermissions.INPUT_TYPES_EDIT, input.getType());
 
         // Check if key is a valid message key.
         if (!Message.validKey(csfr.key())) {
@@ -149,6 +147,7 @@ public class StaticFieldsResource extends RestResource {
             LOG.error(msg);
             throw new jakarta.ws.rs.NotFoundException(msg);
         }
+        checkPermission(RestPermissions.INPUT_TYPES_EDIT, input.getType());
 
         if (!input.getStaticFields().containsKey(key)) {
             final String msg = "No such static field [" + key + "] on input <" + inputId + ">.";
