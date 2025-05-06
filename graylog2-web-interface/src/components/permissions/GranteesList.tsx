@@ -115,7 +115,7 @@ const GranteesList = ({
   const totalGrantees = selectedGrantees.size;
   const totalPages = Math.ceil(totalGrantees / pageSize);
   const showPageSizeSelect = totalGrantees > initialPageSize;
-  const ItemComponent  = isCreating ? CreateGranteesListItem : GranteesListItem;
+  const ItemComponent = isCreating ? CreateGranteesListItem : GranteesListItem;
 
   return (
     <div className={className}>

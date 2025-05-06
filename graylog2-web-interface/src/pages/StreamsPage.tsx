@@ -43,7 +43,7 @@ const StreamsPage = () => {
     });
 
     if (entityShare) {
-      return createStreamWithShare({stream, shareRequest: entityShare}).then((response) => response);
+      return createStreamWithShare({ stream, shareRequest: entityShare }).then((response) => response);
     }
 
     return StreamsStore.save(stream, () => {
