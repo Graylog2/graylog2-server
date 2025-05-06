@@ -14,30 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { notifications } from '@mantine/notifications';
+import { useMemo } from 'react';
+import DOMPurify from 'dompurify';
 
-const UserNotification = {
-  error(message: string, title = 'Error') {
-    notifications.show({
-      message,
-      title,
-      autoClose: 10000,
-      color: 'red',
-    });
-  },
-  warning(message: string, title = 'Attention') {
-    notifications.show({
-      message,
-      title,
-    });
-  },
-  success(message: string, title = 'Success') {
-    notifications.show({
-      message,
-      title,
-      color: 'green',
-    });
-  },
-};
+import AppConfig from 'util/AppConfig';
 
-export default UserNotification;
+const useCustomLogo = (theme: 'dark' | 'light') =>
+  useMemo(
+    () => (AppConfig?.branding?.()?.logo?.[theme] ? DOMPurify.sanitize(AppConfig.branding().logo[theme]) : undefined),
+    [theme],
+  );
+
+export default useCustomLogo;

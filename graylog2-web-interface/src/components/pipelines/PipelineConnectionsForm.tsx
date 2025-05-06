@@ -21,7 +21,7 @@ import { Link } from 'components/common/router';
 import { SelectableList } from 'components/common';
 import { ControlLabel, FormGroup, HelpBlock, Button, BootstrapModalForm } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType } from 'components/pipelines/types';
 import type { Stream } from 'stores/streams/StreamsStore';
 import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
 import { isPermitted } from 'util/PermissionsMixin';

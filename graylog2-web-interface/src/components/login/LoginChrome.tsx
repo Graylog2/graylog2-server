@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import DOMPurify from 'dompurify';
 
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
@@ -25,6 +24,8 @@ import backgroundImage from 'images/auth/login-bg.svg';
 import { Logo } from 'components/perspectives/DefaultBrand';
 import AppConfig from 'util/AppConfig';
 import useThemes from 'theme/hooks/useThemes';
+import useCustomLogo from 'brand-customization/useCustomLogo';
+import useProductName from 'brand-customization/useProductName';
 
 const LogoContainer = styled.div`
   display: block;
@@ -116,12 +117,6 @@ const CustomLogo = styled.div`
   }
 `;
 
-const useCustomLogo = (theme: 'dark' | 'light') =>
-  useMemo(
-    () => (AppConfig.branding()?.logo?.[theme] ? DOMPurify.sanitize(AppConfig.branding().logo[theme]) : undefined),
-    [theme],
-  );
-
 const CustomizableLogo = () => {
   const { colorScheme } = useThemes('dark', false);
   const customLogo = useCustomLogo(colorScheme);
@@ -153,12 +148,13 @@ const useLoginBackground = () =>
   );
 
 const LoginChrome = ({ children }: Props) => {
+  const productName = useProductName();
   const loginBackground = useLoginBackground();
 
   return (
     <LoginContainer>
       <LoginBox>
-        <WelcomeMessage>Welcome to Graylog</WelcomeMessage>
+        <WelcomeMessage>Welcome to {productName}</WelcomeMessage>
         {children}
       </LoginBox>
       <Background>

@@ -14,12 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AppConfig from './AppConfig';
 
-export const DEPRECATION_NOTICE = 'Graylog Deprecation Notice:';
+import AppConfig from 'util/AppConfig';
 
-const deprecationNotice = (deprecatedMessage) =>
-  // eslint-disable-next-line no-console
-  AppConfig.gl2DevMode() && console.warn(DEPRECATION_NOTICE, deprecatedMessage);
+const useNavigationCustomization = () => AppConfig.branding?.()?.navigation;
 
-export default deprecationNotice;
+export default useNavigationCustomization;

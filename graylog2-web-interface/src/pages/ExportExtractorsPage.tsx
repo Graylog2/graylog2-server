@@ -21,6 +21,7 @@ import ExportExtractors from 'components/extractors/ExportExtractors';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
+import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const ExportExtractorsPage = () => {
   const { inputId } = useParams();
@@ -44,11 +45,7 @@ const ExportExtractorsPage = () => {
             </span>
           }>
           <span>
-            The extractors of an input can be exported to JSON for importing into other setups or sharing in{' '}
-            <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">
-              the Graylog Marketplace
-            </a>
-            .
+            <MarketplaceLink prefix="The extractors of an input can be exported to JSON for importing into other setups or sharing in" />
           </span>
         </PageHeader>
         <ExportExtractors id={input.id} />

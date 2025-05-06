@@ -21,6 +21,7 @@ import type { Subtract } from 'utility-types';
 
 import { Messages } from '@graylog/server-api';
 
+import useProductName from 'brand-customization/useProductName';
 import { getValueFromInput } from 'util/FormsUtils';
 import { Select, FormSubmit } from 'components/common';
 import { Col, Row, Input } from 'components/bootstrap';
@@ -196,7 +197,13 @@ const parseRawMessage = (
   );
 };
 
-const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, codecTypes, inputs }: Props) => {
+const RawMessageLoader = ({
+  onMessageLoaded,
+  inputIdSelector = false,
+  codecTypes = undefined,
+  inputs = undefined,
+}: Props) => {
+  const productName = useProductName();
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [remoteAddress, setRemoteAddress] = useState<string>(DEFAULT_REMOTE_ADDRESS);
@@ -368,7 +375,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, codecTypes
                   Source IP address <small>(optional)</small>
                 </span>
               }
-              help={`Remote IP address to use as message source. Graylog will use ${DEFAULT_REMOTE_ADDRESS} by default.`}
+              help={`Remote IP address to use as message source. ${productName} will use ${DEFAULT_REMOTE_ADDRESS} by default.`}
               value={remoteAddress}
               onChange={_onRemoteAddressChange}
             />

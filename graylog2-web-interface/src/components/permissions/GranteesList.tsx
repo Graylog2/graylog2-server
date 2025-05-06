@@ -29,6 +29,7 @@ import type Capability from 'logic/permissions/Capability';
 import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 
 import GranteesListItem from './GranteesListItem';
+import CreateGranteesListItem from './CreateGranteesListItem';
 
 const Header = styled.div`
   display: flex;
@@ -85,6 +86,7 @@ type Props = {
   selectedGrantees: SelectedGrantees;
   title: string;
   entityTypeTitle?: string | null | undefined;
+  isCreating?: boolean;
 };
 
 const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number, currentPage: number) => {
@@ -99,11 +101,12 @@ const GranteesList = ({
   onDelete,
   onCapabilityChange,
   entityType,
-  entityTypeTitle,
+  entityTypeTitle = null,
   availableCapabilities,
   selectedGrantees,
-  className,
+  className = null,
   title,
+  isCreating = false,
 }: Props) => {
   const initialPageSize = DEFAULT_PAGE_SIZES[0];
   const [pageSize, setPageSize] = useState(initialPageSize);
@@ -112,6 +115,7 @@ const GranteesList = ({
   const totalGrantees = selectedGrantees.size;
   const totalPages = Math.ceil(totalGrantees / pageSize);
   const showPageSizeSelect = totalGrantees > initialPageSize;
+  const ItemComponent = isCreating ? CreateGranteesListItem : GranteesListItem;
 
   return (
     <div className={className}>
@@ -128,7 +132,7 @@ const GranteesList = ({
               const currentGranteeState = grantee.currentState(activeShares);
 
               return (
-                <GranteesListItem
+                <ItemComponent
                   availableCapabilities={availableCapabilities}
                   currentGranteeState={currentGranteeState}
                   grantee={grantee}

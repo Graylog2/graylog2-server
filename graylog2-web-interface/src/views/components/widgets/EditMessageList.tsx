@@ -96,7 +96,6 @@ const EditMessageList = ({
           <DescriptionBox description="Fields">
             <FieldsConfiguration
               onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
-              menuPortalTarget={document.body}
               selectedFields={config.fields}
             />
           </DescriptionBox>

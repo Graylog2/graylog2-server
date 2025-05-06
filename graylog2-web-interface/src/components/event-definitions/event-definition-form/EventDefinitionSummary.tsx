@@ -26,19 +26,25 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
+import usePluginEntities from 'hooks/usePluginEntities';
+import useFeature from 'hooks/useFeature';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
+import ShareDetails from './ShareDetails';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  eventDefinition: EventDefinition;
+  eventDefinition: EventDefinition & {
+    share_request?: EntitySharePayload;
+  };
   notifications: Array<EventNotification>;
   validation?: {
     errors: {
@@ -48,8 +54,15 @@ type Props = {
   currentUser: User;
 };
 
-const EventDefinitionSummary = ({ eventDefinition, notifications, validation, currentUser }: Props) => {
+const EventDefinitionSummary = ({
+  eventDefinition,
+  notifications,
+  validation = { errors: {} },
+  currentUser,
+}: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
+  const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
+  const isEventProceduresEnabled = useFeature('show_event_procedures');
 
   useEffect(() => {
     const flipShowValidation = () => {
@@ -71,16 +84,41 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
-        <dt style={{ margin: '16px 0 0' }}>Remediation Steps</dt>
-        <dd>
-          <MarkdownPreview
-            show
-            withFullView
-            noBorder
-            noBackground
-            value={eventDefinition.remediation_steps || 'No remediation steps given'}
-          />
-        </dd>
+        {isEventProceduresEnabled ? (
+          <>
+            {!eventDefinition?.event_procedure ? (
+              <>
+                <dt style={{ margin: '16px 0 0' }}>Event Procedure Summary</dt>
+                <dd>
+                  {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary, key }) => (
+                    <PluggableEventProcedureSummary
+                      eventDefinitionEventProcedure={eventDefinition?.event_procedure}
+                      key={key}
+                    />
+                  ))}
+                </dd>
+              </>
+            ) : (
+              <>
+                <dt style={{ margin: '16px 0 0' }}>Event Procedure Summary</dt>
+                <p>This Event does not have any Event Procedures.</p>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <dt style={{ margin: '16px 0 0' }}>Remediation Steps</dt>
+            <dd>
+              <MarkdownPreview
+                show
+                withFullView
+                noBorder
+                noBackground
+                value={eventDefinition.remediation_steps || 'No remediation steps given'}
+              />
+            </dd>
+          </>
+        )}
       </dl>
     </>
   );
@@ -281,6 +319,11 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
           )}
           <Col md={5} mdOffset={isSystemEventDefinition ? 0 : 1}>
             {renderNotifications(eventDefinition.notifications, eventDefinition.notification_settings)}
+          </Col>
+        </Row>
+        <Row>
+          <Col md={5}>
+            <ShareDetails shareState={eventDefinition.share_request} />
           </Col>
         </Row>
       </Col>
