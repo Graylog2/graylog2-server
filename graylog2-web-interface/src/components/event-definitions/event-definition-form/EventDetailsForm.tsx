@@ -94,7 +94,6 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
                   remediationSteps={eventDefinition?.remediation_steps}
                   onClose={() => setShowAddEventProcedureForm(false)}
                   onSave={(eventProcedureId) => onChange('event_procedure', eventProcedureId)}
-                  canEdit={canEdit}
                 />
               ))}
             </>
