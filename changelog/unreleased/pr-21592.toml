@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Improve find query for index ranges: remove indices that are actually out of range but were selected as defelctor indices by mistake. Also, throw exception if end time is before begin time in query."
+
+pulls = ["21592"]
