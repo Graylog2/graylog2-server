@@ -242,7 +242,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final User user = userContext.getUser();
         var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
         recentActivityService.create(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
-        updateViewSharing(unwrappedCreateEntityRequest, searchUser, dto);
+        updateViewSharing(unwrappedCreateEntityRequest, searchUser, result);
 
         return result;
     }
@@ -362,7 +362,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         var result = dbService.update(updatedDTO);
         recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
-        updateViewSharing(unwrappedCreateEntityRequest, searchUser, updatedDTO);
+        updateViewSharing(unwrappedCreateEntityRequest, searchUser, result);
 
         return result;
     }
