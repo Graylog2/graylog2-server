@@ -14,17 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import usePluginEntities from 'hooks/usePluginEntities';
-import OpenSourceUpsellWrapper from 'components/upsell/OpenSourceUpsellWrapper';
-import type { UpsellWrapper } from 'components/upsell/types';
+package org.graylog2.shared.rest;
 
-const usePluggableUpsellWrapper = (): UpsellWrapper['component'] => {
-  const upsellWrapper = usePluginEntities('components.upsell.wrapper');
-  if (!upsellWrapper?.[0]?.useCondition?.()) {
-    return OpenSourceUpsellWrapper;
-  }
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-  return upsellWrapper[0].component;
-};
-
-export default usePluggableUpsellWrapper;
+/**
+ * Annotation for resource methods that shouldn't be protected with the {@link VerboseCsrfProtectionFilter}.
+ * <p>
+ * <strong>WARNING:</strong> This annotation must be used carefully! There are only a few use cases where we need
+ * the annotation.
+ */
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SkipCSRFProtection {
+    String value() default "Unknown reason";
+}

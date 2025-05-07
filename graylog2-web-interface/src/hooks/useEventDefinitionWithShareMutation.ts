@@ -17,32 +17,40 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Streams } from '@graylog/server-api';
+import { EventsDefinitions } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
-import type { Stream } from 'logic/streams/types';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
-import { KEY_PREFIX } from 'components/streams/hooks/useStreams';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
-const createStreamWithShare = async ({ stream, shareRequest }: { stream: Stream; shareRequest: EntitySharePayload }) =>
-  Streams.createWithRequest({
-    entity: stream,
+const createEventDefinitionWithShare = async ({
+  eventDefinition,
+  shareRequest,
+}: {
+  eventDefinition: EventDefinition;
+  shareRequest: EntitySharePayload;
+}) =>
+  EventsDefinitions.createWithRequest(true, {
+    entity: eventDefinition as any,
     share_request: { selected_grantee_capabilities: shareRequest.selected_grantee_capabilities.toJS() },
   });
 
-const useStreamWithShareMutation = () => {
+const useEventDefinitionWithShareMutation = () => {
   const queryClient = useQueryClient();
-  const addMutation = useMutation(createStreamWithShare, {
+  const addMutation = useMutation(createEventDefinitionWithShare, {
     onError: (errorThrown) => {
-      UserNotification.error(`Creating stream failed with status: ${errorThrown}`, 'Could not create stream');
+      UserNotification.error(
+        `Creating event definition failed with status: ${errorThrown}`,
+        'Could not create event definition',
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(KEY_PREFIX);
-      UserNotification.success('Stream has been successfully created.', 'Success!');
+      queryClient.invalidateQueries(['eventDefinition', 'overview']);
+      UserNotification.success('Even Definition has been successfully created.', 'Success!');
     },
   });
 
-  return { createStreamWithShare: addMutation.mutateAsync };
+  return { createEventDefinitionWithShare: addMutation.mutateAsync };
 };
 
-export default useStreamWithShareMutation;
+export default useEventDefinitionWithShareMutation;

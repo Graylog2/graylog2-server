@@ -69,6 +69,7 @@ import static com.mongodb.client.model.Aggregates.match;
 import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Aggregates.sort;
 import static com.mongodb.client.model.Aggregates.unwind;
+import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.lte;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
@@ -309,6 +310,35 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
                                 d.getString(AccessTokenImpl.USERNAME)
                         );
                     }
+            ).toList();
+        }
+    }
+
+    @Override
+    public List<ExpiredToken> findOrphanedTokens() {
+        final String joinField = "token_username";
+        final MongoCollection<Document> tokenCollection = mongoCollection(AccessTokenImpl.class);
+        final AggregateIterable<Document> aggregateIt = tokenCollection.aggregate(List.of(
+                lookup(UserImpl.COLLECTION_NAME, AccessTokenImpl.USERNAME, UserImpl.USERNAME, joinField),
+                match(eq(joinField, new Document("$size", 0))),
+                // Load only token-id, expiration date and user-name:
+                project(fields(
+                        include(AccessTokenImpl.ID_FIELD),
+                        include(AccessTokenImpl.NAME),
+                        include(AccessTokenImpl.EXPIRES_AT),
+                        include(AccessTokenImpl.USERNAME)
+                ))
+        ));
+        try (var stream = StreamSupport.stream(aggregateIt.spliterator(), false)) {
+            return stream.map(d ->
+                    new ExpiredToken(
+                            d.getObjectId(AccessTokenImpl.ID_FIELD).toString(),
+                            d.getString(AccessTokenImpl.NAME),
+                            new DateTime(d.getDate(AccessTokenImpl.EXPIRES_AT)).withZone(DateTimeZone.UTC),
+                            //The user doesn't exist. At least that's what we're looking for.
+                            null,
+                            d.getString(AccessTokenImpl.USERNAME)
+                    )
             ).toList();
         }
     }

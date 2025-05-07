@@ -117,7 +117,7 @@ const ViewManagementStore = singletonStore('views.ViewManagement', () =>
 
     create(view: View, entityShare?: EntitySharePayload): Promise<View> {
       const url = entityShare ? viewsWithShareUrl : viewsUrl;
-      const payload = entityShare ? JSON.stringify({entity: view, share_request: entityShare}) : JSON.stringify(view);
+      const payload = entityShare ? JSON.stringify({ entity: view, share_request: entityShare }) : JSON.stringify(view);
       const promise = fetch('POST', url, payload);
 
       ViewManagementActions.create.promise(promise);
@@ -129,9 +129,9 @@ const ViewManagementStore = singletonStore('views.ViewManagement', () =>
       return CurrentUserStore.reload();
     },
 
-    update(view: View,   entityShare?: EntitySharePayload): Promise<View> {
+    update(view: View, entityShare?: EntitySharePayload): Promise<View> {
       const url = entityShare ? viewsIdShareUrl(view.id) : viewsIdUrl(view.id);
-      const payload = entityShare ? JSON.stringify({entity: view, share_request: entityShare}) : JSON.stringify(view);
+      const payload = entityShare ? JSON.stringify({ entity: view, share_request: entityShare }) : JSON.stringify(view);
       const promise = fetch('PUT', url, payload);
 
       ViewManagementActions.update.promise(promise);
