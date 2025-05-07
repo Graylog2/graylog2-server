@@ -23,11 +23,20 @@ import UserNotification from 'util/UserNotification';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
-const createEventDefinitionWithShare = async ({ eventDefinition, shareRequest }: { eventDefinition: EventDefinition; shareRequest: EntitySharePayload }) =>
-  EventsDefinitions.createWithRequest(true,{ entity: eventDefinition as any, share_request: { selected_grantee_capabilities: shareRequest.selected_grantee_capabilities.toJS() } });
+const createEventDefinitionWithShare = async ({
+  eventDefinition,
+  shareRequest,
+}: {
+  eventDefinition: EventDefinition;
+  shareRequest: EntitySharePayload;
+}) =>
+  EventsDefinitions.createWithRequest(true, {
+    entity: eventDefinition as any,
+    share_request: { selected_grantee_capabilities: shareRequest.selected_grantee_capabilities.toJS() },
+  });
 
 const useEventDefinitionWithShareMutation = () => {
- const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const addMutation = useMutation(createEventDefinitionWithShare, {
     onError: (errorThrown) => {
       UserNotification.error(
@@ -41,7 +50,7 @@ const useEventDefinitionWithShareMutation = () => {
     },
   });
 
- return { createEventDefinitionWithShare: addMutation.mutateAsync };
+  return { createEventDefinitionWithShare: addMutation.mutateAsync };
 };
 
 export default useEventDefinitionWithShareMutation;

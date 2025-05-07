@@ -25,25 +25,31 @@ type Props = {
   onChange: (id: $PropertyType<CapabilityType, 'id'>) => void;
   capabilities: CapabilitiesList;
   title?: string;
-  value:  $PropertyType<CapabilityType, 'id'>,
+  value: $PropertyType<CapabilityType, 'id'>;
 };
 
 const _capabilitiesOptions = (capabilities: CapabilitiesList) =>
   capabilities.map((capability) => ({ label: capability.title, value: capability.id })).toJS();
 
-const EntityCreateCapabilitySelect = ({ capabilities, onChange, value, title = 'Select a capability', ...rest }: Props) => {
+const EntityCreateCapabilitySelect = ({
+  capabilities,
+  onChange,
+  value,
+  title = 'Select a capability',
+  ...rest
+}: Props) => {
   const capabilitiesOptions = _capabilitiesOptions(capabilities);
 
   return (
-   <Select
-     clearable={false}
-     onChange={onChange}
-     options={capabilitiesOptions}
-     placeholder={title}
-     value={value}
-     {...rest}
-   />
-  )
+    <Select
+      clearable={false}
+      onChange={onChange}
+      options={capabilitiesOptions}
+      placeholder={title}
+      value={value}
+      {...rest}
+    />
+  );
 };
 
 export default EntityCreateCapabilitySelect;

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -33,7 +32,15 @@ import { Spinner } from 'components/common';
 import type { SelectionRequest } from './GranteesSelector';
 import GranteesList from './GranteesList';
 import EntityCreateCapabilitySelect from './EntityCreateCapabilitySelect';
-import { GranteesSelect, GranteesSelectOption, GranteesSelectorHeadline, ShareFormElements, ShareFormSection, ShareSubmitButton, StyledGranteeIcon } from './CommonStyledComponents';
+import {
+  GranteesSelect,
+  GranteesSelectOption,
+  GranteesSelectorHeadline,
+  ShareFormElements,
+  ShareFormSection,
+  ShareSubmitButton,
+  StyledGranteeIcon,
+} from './CommonStyledComponents';
 import EntityShareValidationsDependencies from './EntityShareValidationsDependencies';
 
 type Props = {
@@ -59,10 +66,17 @@ const _renderGranteesSelectOption = ({
 );
 const _granteesOptions = (grantees: GranteesListType) =>
   grantees.map((grantee) => ({ label: grantee.title, value: grantee.id, granteeType: grantee.type })).toJS();
-const getAvailableGrantee = (grantees: GranteesListType, selected:  SelectedGranteeCapabilities) =>
+const getAvailableGrantee = (grantees: GranteesListType, selected: SelectedGranteeCapabilities) =>
   grantees?.filter((g) => !selected.has(g.id))?.toList();
 
-const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSetEntityShare, entityId = null, entityTypeTitle='' }: Props) => {
+const EntityCreateShareFormGroup = ({
+  description,
+  entityType,
+  entityTitle,
+  onSetEntityShare,
+  entityId = null,
+  entityTypeTitle = '',
+}: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
   const entityGRN = entityId && createGRN(entityType, entityId);
   const defaultShareSelection = { granteeId: null, capabilityId: 'view' };
@@ -93,7 +107,7 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSe
       setDisableSubmit(false);
 
       return response;
-    })
+    });
   };
 
   const handleDeletion = (granteeId: GRN) => {
@@ -114,7 +128,7 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSe
   };
 
   const handleAddCollaborator = () => {
-    handleSelection(shareSelection)
+    handleSelection(shareSelection);
   };
 
   return (
@@ -126,14 +140,16 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSe
             <p>{description}</p>
             <ShareFormElements>
               <GranteesSelect
-                onChange={(granteeId) => setShareSelection({...shareSelection, granteeId})}
+                onChange={(granteeId) => setShareSelection({ ...shareSelection, granteeId })}
                 optionRenderer={_renderGranteesSelectOption}
-                options={_granteesOptions(getAvailableGrantee(entityShareState.availableGrantees,entityShareState.selectedGranteeCapabilities))}
+                options={_granteesOptions(
+                  getAvailableGrantee(entityShareState.availableGrantees, entityShareState.selectedGranteeCapabilities),
+                )}
                 placeholder="Search for users and teams"
                 value={shareSelection.granteeId}
               />
               <EntityCreateCapabilitySelect
-                onChange={(capabilityId) => setShareSelection({...shareSelection, capabilityId})}
+                onChange={(capabilityId) => setShareSelection({ ...shareSelection, capabilityId })}
                 capabilities={entityShareState?.availableCapabilities}
                 value={shareSelection.capabilityId}
               />
@@ -141,9 +157,8 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSe
                 bsStyle="success"
                 title="Add Collaborator"
                 onClick={handleAddCollaborator}
-                disabled={disableSubmit || !shareSelection.granteeId}
-              >
-                 Add Collaborator
+                disabled={disableSubmit || !shareSelection.granteeId}>
+                Add Collaborator
               </ShareSubmitButton>
             </ShareFormElements>
           </ShareFormSection>
@@ -164,13 +179,13 @@ const EntityCreateShareFormGroup = ({ description, entityType, entityTitle, onSe
             missingDependencies={entityShareState.missingDependencies}
             validationResults={entityShareState.validationResults}
             availableGrantees={entityShareState.availableGrantees}
-           />
+          />
         </>
-      ): (
+      ) : (
         <Spinner />
       )}
     </>
-  )
+  );
 };
 
 export default EntityCreateShareFormGroup;

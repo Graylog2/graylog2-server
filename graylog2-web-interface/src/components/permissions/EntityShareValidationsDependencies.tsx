@@ -16,32 +16,32 @@
  */
 import * as React from 'react';
 
-import type { GranteesList, MissingDependencies } from "logic/permissions/EntityShareState";
-import type ValidationResult from "logic/permissions/ValidationResult";
+import type { GranteesList, MissingDependencies } from 'logic/permissions/EntityShareState';
+import type ValidationResult from 'logic/permissions/ValidationResult';
 
-import { ShareFormSection } from "./CommonStyledComponents";
-import ValidationError from "./ValidationError";
-import DependenciesWarning from "./DependenciesWarning";
+import { ShareFormSection } from './CommonStyledComponents';
+import ValidationError from './ValidationError';
+import DependenciesWarning from './DependenciesWarning';
 
 type Props = {
-  validationResults: ValidationResult,
-  missingDependencies: MissingDependencies,
+  validationResults: ValidationResult;
+  missingDependencies: MissingDependencies;
   availableGrantees: GranteesList;
 };
 
 const EntityShareValidationsDependencies = ({ validationResults, missingDependencies, availableGrantees }: Props) => (
-    <>
-      {validationResults?.failed && (
-        <ShareFormSection>
-          <ValidationError validationResult={validationResults} availableGrantees={availableGrantees} />
-        </ShareFormSection>
-      )}
-      {missingDependencies?.size > 0 && (
-        <ShareFormSection>
-          <DependenciesWarning missingDependencies={missingDependencies} availableGrantees={availableGrantees} />
-        </ShareFormSection>
-      )}
-    </>
-  );
+  <>
+    {validationResults?.failed && (
+      <ShareFormSection>
+        <ValidationError validationResult={validationResults} availableGrantees={availableGrantees} />
+      </ShareFormSection>
+    )}
+    {missingDependencies?.size > 0 && (
+      <ShareFormSection>
+        <DependenciesWarning missingDependencies={missingDependencies} availableGrantees={availableGrantees} />
+      </ShareFormSection>
+    )}
+  </>
+);
 
 export default EntityShareValidationsDependencies;

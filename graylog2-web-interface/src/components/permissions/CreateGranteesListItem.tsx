@@ -32,7 +32,7 @@ import {
   GranteeListItemContainer,
   GranteeListItemTitle,
   StyledEntityCreateCapabilitySelect,
-  StyledGranteeIcon
+  StyledGranteeIcon,
 } from './CommonStyledComponents';
 
 type Props = {

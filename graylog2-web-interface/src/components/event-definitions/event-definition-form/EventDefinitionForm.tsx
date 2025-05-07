@@ -66,7 +66,7 @@ type Props = {
   activeStep: string;
   action?: 'edit' | 'create';
   eventDefinition: EventDefinition & {
-    share_request?: EntitySharePayload,
+    share_request?: EntitySharePayload;
   };
   currentUser: User;
   validation: {
@@ -157,11 +157,15 @@ const EventDefinitionForm = ({
       title: 'Notifications',
       component: <NotificationsForm {...defaultStepProps} notifications={notifications} defaults={defaults} />,
     },
-    ...(isNew ? [{
-      key: STEP_KEYS[4],
-      title: 'Share',
-      component: <ShareForm {...defaultStepProps}  />,
-    }]: []),
+    ...(isNew
+      ? [
+          {
+            key: STEP_KEYS[4],
+            title: 'Share',
+            component: <ShareForm {...defaultStepProps} />,
+          },
+        ]
+      : []),
     {
       key: STEP_KEYS[5],
       title: 'Summary',
