@@ -34,6 +34,7 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.NonApiResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.web.PluginUISettingsProvider;
 import org.graylog2.web.customization.Config;
@@ -49,6 +50,7 @@ import static java.util.Objects.requireNonNull;
 
 @Path("/config.js")
 @CSP(group = CSP.DEFAULT)
+@NonApiResource
 public class AppConfigResource {
     private final Configuration configuration;
     private final HttpConfiguration httpConfiguration;
