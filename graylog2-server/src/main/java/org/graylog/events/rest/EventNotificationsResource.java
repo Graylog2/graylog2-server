@@ -196,12 +196,12 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         recentActivityService.create(entity.id(), GRNTypes.EVENT_NOTIFICATION, userContext.getUser());
 
         unwrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest -> {
-            entitySharesService.updateEntityShares(GRNTypes.EVENT_NOTIFICATION, dto.id(), shareRequest, userContext.getUser());
+            entitySharesService.updateEntityShares(GRNTypes.EVENT_NOTIFICATION, entity.id(), shareRequest, userContext.getUser());
         });
 
         return Response.ok().entity(entity).build();
     }
-    
+
     @PUT
     @Path("/{notificationId}")
     @ApiOperation("Update existing notification")

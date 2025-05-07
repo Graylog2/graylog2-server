@@ -214,9 +214,9 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true) final UnwrappedCreateEntityRequest<CreateStreamRequest> wrappedCreateEntityRequest,
+    public Response create(@ApiParam(name = "JSON body", required = true) final UnwrappedCreateEntityRequest<CreateStreamRequest> unwrappedCreateEntityRequest,
                            @Context UserContext userContext) throws ValidationException {
-        final CreateStreamRequest cr = wrappedCreateEntityRequest.getEntity();
+        final CreateStreamRequest cr = unwrappedCreateEntityRequest.getEntity();
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
         stream.setDisabled(true);
@@ -235,7 +235,7 @@ public class StreamResource extends RestResource {
                 .build(id);
 
         recentActivityService.create(id, GRNTypes.STREAM, userContext.getUser());
-        wrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest ->
+        unwrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest ->
                 entitySharesService.updateEntityShares(GRNTypes.STREAM, result.streamId(), shareRequest, userContext.getUser()));
 
         return Response.created(streamUri).entity(result).build();
