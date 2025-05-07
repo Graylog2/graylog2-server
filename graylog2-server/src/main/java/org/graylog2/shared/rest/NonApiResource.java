@@ -14,27 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-module.exports = [
-  '@emotion/react',
-  '@mantine/core',
-  '@mantine/notifications',
-  '@reduxjs/toolkit',
-  '@tanstack/react-query',
-  'chroma-js',
-  'formik',
-  'jquery',
-  'leaflet',
-  'moment',
-  'moment-timezone',
-  'react',
-  'react-bootstrap',
-  'react-dom',
-  'react-redux',
-  'react-router',
-  'react-router-bootstrap',
-  'redux',
-  'reflux',
-  'reflux-core',
-  'styled-components',
-  'use-query-params',
-];
+package org.graylog2.shared.rest;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * This annotation is used to mark resources that are not part of the API and don't use the "/api" path prefix.
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface NonApiResource {
+    /**
+     * The prefix to use for the resource path.
+     */
+    String prefix() default "/";
+}
