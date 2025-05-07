@@ -100,7 +100,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
           ) : (
             <>
               <ControlLabel>Event Procedure Summary</ControlLabel>
-              <p>This Event does not have any Event Procedures yet.</p>
+              <p>This Event Definition does not have any Event Procedures yet.</p>
               <Button bsStyle="success" onClick={() => setShowAddEventProcedureForm(true)}>
                 Add Event Procedure
               </Button>
