@@ -19,12 +19,15 @@ module.exports = {
   rules: {
     'prefer-hook': require('./rules/prefer-hook'),
     'use-arrow-function-for-event-handlers-in-classes': require('./rules/use-arrow-function-for-event-handlers-in-classes'),
+    'without-forbidden-words': require('./rules/without-forbidden-words'),
   },
   configs: {
     recommended: {
       rules: {
         'graylog/prefer-hook': 'warn',
         'graylog/use-arrow-function-for-event-handlers-in-classes': 'error',
+        // eslint-disable-next-line graylog/without-forbidden-words
+        'graylog/without-forbidden-words': ['error', { words: ['graylog'] }],
       },
     },
   },
