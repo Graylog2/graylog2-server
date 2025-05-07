@@ -108,6 +108,8 @@ import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
 
+import java.time.Clock;
+
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
     private final boolean isMigrationCommand;
@@ -193,6 +195,7 @@ public class ServerBindings extends Graylog2Module {
         bind(Engine.class).annotatedWith(Names.named("HtmlSafe")).toProvider(HtmlSafeJmteEngineProvider.class).asEagerSingleton();
         bind(Engine.class).annotatedWith(Names.named("JsonSafe")).toProvider(JsonSafeEngineProvider.class).asEagerSingleton();
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
+        bind(Clock.class).toProvider(Clock::systemUTC).asEagerSingleton();
     }
 
     private void bindInterfaces() {
