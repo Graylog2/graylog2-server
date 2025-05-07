@@ -81,7 +81,7 @@ public class DocumentationResource extends RestResource {
             }
         }
 
-        this.generator = new Generator(resourceClasses.build(), pluginRestControllerMapping, PLUGIN_PREFIX, objectMapper, configuration.isCloud());
+        this.generator = new Generator(resourceClasses.build(), pluginRestControllerMapping, PLUGIN_PREFIX, objectMapper, configuration.isCloud(), true);
     }
 
     @GET
