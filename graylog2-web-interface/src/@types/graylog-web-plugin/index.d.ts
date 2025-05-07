@@ -133,6 +133,7 @@ interface InputConfiguration {
 }
 interface ProviderType {
   type: string;
+  title?: string;
   formComponent: React.ComponentType<{
     onErrorChange: (error?: string) => void;
     setLoginFormState: (loginFormState: string) => void;

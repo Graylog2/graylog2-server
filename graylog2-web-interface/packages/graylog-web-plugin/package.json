@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-plugin",
-  "version": "6.3.0-SNAPSHOT",
+  "version": "6.3.0-alpha.3",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
   "packageManager": "yarn@1.22.22",
@@ -54,7 +54,7 @@
     "styled-components": "6.1.1",
     "typescript": "5.8.3",
     "use-query-params": "^2.2.0",
-    "webpack": "5.99.7",
+    "webpack": "5.99.8",
     "webpack-cli": "6.0.1",
     "webpack-merge": "4.2.2"
   }
