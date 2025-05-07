@@ -7738,7 +7738,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-prettier "10.1.2"
     eslint-import-resolver-webpack "0.13.10"
     eslint-plugin-compat "6.0.2"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-ff1b9418-2292-4915-9cc9-d924f3a41c29-1746426122742/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "28.11.0"
     eslint-plugin-jest-dom "5.5.0"
@@ -9364,12 +9364,12 @@ graphemer@^1.4.0:
     "@tanstack/react-query" "4.36.1"
     "@types/jquery" "3.5.32"
     "@types/react" "18.3.13"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.3.0-SNAPSHOT-1f337d02-e393-4e55-b1b4-83300a7746e1-1746426122687/node_modules/babel-preset-graylog"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.3.0-SNAPSHOT-1f337d02-e393-4e55-b1b4-83300a7746e1-1746426122687/node_modules/eslint-config-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.6"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.3.0-SNAPSHOT-1f337d02-e393-4e55-b1b4-83300a7746e1-1746426122687/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.48"
@@ -12104,9 +12104,9 @@ material-colors@^1.2.1:
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
 material-symbols@^0.31.1:
-  version "0.31.1"
-  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.31.1.tgz#13fc42323aaf02b24ce7375f33c6961ed45f2eb5"
-  integrity sha512-QULafUmQ1WhtrcTClYlFhbt+11pYeezjfrses2S/fcyjZ2cG9SxT7kCubIGDSjaT7ohyY986+iOo3ZyEVBiUzw==
+  version "0.31.2"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.31.2.tgz#ad4800a740d869e47bd3b2e86d07bccd571bf275"
+  integrity sha512-WANME7n9kqLNG1mcdcTuvbxkMuBQ64ktK/18d44/p/wZF0XkYXjXWs62cp4qnYGjtWABvUM3ZTB096MJsLbNSw==
 
 math-intrinsics@^1.0.0, math-intrinsics@^1.1.0:
   version "1.1.0"

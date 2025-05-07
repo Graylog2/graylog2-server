@@ -24,7 +24,7 @@ import { FormikInput, ModalSubmit, InputOptionalInfo } from 'components/common';
 import { Modal } from 'components/bootstrap';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
 import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
-import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type { EntityShare, EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type FormValues = Partial<
   Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream' >
@@ -60,7 +60,7 @@ type Props = {
   submitButtonText: string;
   submitLoadingText: string;
   onClose: () => void;
-  onSubmit: (values: Partial<Stream>, shareRequest?: EntitySharePayload) => Promise<void>;
+  onSubmit: (values: Partial<Stream> & EntityShare) => Promise<void>;
   indexSets: Array<IndexSet>;
   isNew?: boolean,
 };
@@ -82,7 +82,7 @@ const StreamModal = ({
 }: Props) => {
   const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
 
-  const _onSubmit = useCallback(({share_request, ...rest }: FormValues) => onSubmit(rest, share_request).then(() => onClose()), [onClose, onSubmit]);
+  const _onSubmit = useCallback((values: FormValues) => onSubmit(values).then(() => onClose()), [onClose, onSubmit]);
 
   return (
     <Modal onHide={onClose} show>
@@ -104,6 +104,7 @@ const StreamModal = ({
                 id="description"
                 help="What kind of messages are routed into this stream?"
               />
+              <IndexSetSelect indexSets={indexSets} />
               <FormikInput
                 label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
                 help={
@@ -113,7 +114,6 @@ const StreamModal = ({
                 id="remove_matches_from_default_stream"
                 type="checkbox"
               />
-              <IndexSetSelect indexSets={indexSets} />
               {isNew && (
                 <EntityCreateShareFormGroup
                   description='Search for a User or Team to add as collaborator on this stream.'

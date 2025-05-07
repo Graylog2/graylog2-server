@@ -148,7 +148,7 @@ const SearchActionsMenu = () => {
 
       await dispatch(onSaveView(newView, entityShare));
 
-      if(entityShare){
+      if (entityShare) {
         await EntityShareDomain.update('search', title, createGRN('search', view.id), entityShare);
       }
 

@@ -59,7 +59,6 @@ const SUT = (props: Partial<React.ComponentProps<typeof StreamModal>>) => (
 jest.setTimeout(10000);
 
 describe('StreamModal', () => {
-
   beforeEach(() => {
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
   });
@@ -122,12 +121,14 @@ describe('StreamModal', () => {
     });
 
     await waitFor(() =>
-      expect(onSubmit).toHaveBeenCalledWith({
-        description: 'Stream Description and further description',
-        index_set_id: 'index-set-id-2',
-        remove_matches_from_default_stream: false,
-        title: 'Stream Title and further title',
-      }, undefined),
+      expect(onSubmit).toHaveBeenCalledWith(
+        {
+          description: 'Stream Description and further description',
+          index_set_id: 'index-set-id-2',
+          remove_matches_from_default_stream: false,
+          title: 'Stream Title and further title',
+        }
+      ),
     );
   });
 
@@ -204,11 +205,11 @@ describe('StreamModal', () => {
         index_set_id: 'index-set-id-2',
         remove_matches_from_default_stream: false,
         title: 'New title',
-      }, {
-        selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
-          [everyone.id]: viewer.id,
-        })
-      }),
+        share_request: {
+          selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
+            [everyone.id]: viewer.id,
+          })
+        }}),
     );
   });
 });

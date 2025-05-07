@@ -32,10 +32,15 @@ const ShareForm = ({ onChange }: Props) => {
   return (
     <Row>
       <Col md={6} lg={6}>
-        <h2 className={commonStyles.title}>Share <small>(optional)</small></h2>
+        <h2 className={commonStyles.title}>
+          Share <small>(optional)</small>
+        </h2>
         <EntityCreateShareFormGroup
-          description='Search for a User or Team to add as collaborator on this event definition.'
-          onSetEntityShare={handleEntityShareSet} entityType='event_definition' entityTitle=''/>
+          description="Search for a User or Team to add as collaborator on this event definition."
+          onSetEntityShare={handleEntityShareSet}
+          entityType="event_definition"
+          entityTitle=""
+        />
       </Col>
     </Row>
   );

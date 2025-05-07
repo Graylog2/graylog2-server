@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -16,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState  } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
 
@@ -35,7 +34,7 @@ import { PageSizeSelect, Pagination } from 'components/common';
 import { Alert } from 'components/bootstrap';
 
 type Props = {
-  shareState?: EntitySharePayload,
+  shareState?: EntitySharePayload;
 };
 const List = styled.div(
   ({ theme }) => `
@@ -87,13 +86,12 @@ const ShareDetails = ({ shareState = null }: Props) => {
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [currentPage, setCurrentPage] = useState(1);
 
-
   if (!shareState) {
     return null;
-  };
+  }
 
   const activeShares = entityShareState?.activeShares;
-  const selectedGrantees= entityShareState?.selectedGrantees;
+  const selectedGrantees = entityShareState?.selectedGrantees;
   const paginatedGrantees = getPaginatedGrantees(selectedGrantees, pageSize, currentPage);
   const totalGrantees = selectedGrantees.size;
   const totalPages = Math.ceil(totalGrantees / pageSize);
@@ -106,7 +104,7 @@ const ShareDetails = ({ shareState = null }: Props) => {
       {showPageSizeSelect && (
         <StyledPageSizeSelect onChange={(newPageSize) => setPageSize(newPageSize)} pageSize={pageSize} />
       )}
-       {paginatedGrantees.size > 0 ? (
+      {paginatedGrantees.size > 0 ? (
         <List>
           {paginatedGrantees
             .map((grantee) => {
@@ -127,12 +125,11 @@ const ShareDetails = ({ shareState = null }: Props) => {
       ) : (
         <Alert>This Event definition has no collaborators.</Alert>
       )}
-       <PaginationWrapper>
+      <PaginationWrapper>
         <StyledPagination totalPages={totalPages} currentPage={currentPage} onChange={setCurrentPage} />
       </PaginationWrapper>
     </>
-
-  )
+  );
 };
 
 export default ShareDetails;
