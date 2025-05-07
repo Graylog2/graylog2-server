@@ -73,6 +73,7 @@
 
                             <execution>
                                 <id>yarn install</id>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
@@ -81,14 +82,43 @@
                                     <arguments>install</arguments>
                                 </configuration>
                             </execution>
-
+                            <execution>
+                                <id>Generate backend API types</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>generate:apidefs</arguments>
+                                </configuration>
+                            </execution>
                             <execution>
                                 <id>yarn run build</id>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
                                 <configuration>
                                     <arguments>run build</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-web-ui-resources</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                                    <resources>
+                                        <resource><directory>${web.build-dir}</directory></resource>
+                                    </resources>
                                 </configuration>
                             </execution>
                         </executions>
