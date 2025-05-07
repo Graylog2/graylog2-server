@@ -14,10 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.map.config;
+package org.graylog2.shared.rest;
 
-public class S3DownloadException extends Exception {
-    public S3DownloadException(String message) {
-        super(message);
-    }
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Annotation for resource methods that shouldn't be protected with the {@link VerboseCsrfProtectionFilter}.
+ * <p>
+ * <strong>WARNING:</strong> This annotation must be used carefully! There are only a few use cases where we need
+ * the annotation.
+ */
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface SkipCSRFProtection {
+    String value() default "Unknown reason";
 }
