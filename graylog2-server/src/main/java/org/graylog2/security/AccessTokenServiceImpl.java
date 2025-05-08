@@ -72,6 +72,7 @@ import static com.mongodb.client.model.Aggregates.sort;
 import static com.mongodb.client.model.Aggregates.unwind;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Filters.ne;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
 import static com.mongodb.client.model.Sorts.ascending;
@@ -323,6 +324,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final String joinField = "token_username";
         final MongoCollection<Document> tokenCollection = mongoCollection(AccessTokenImpl.class);
         final AggregateIterable<Document> aggregateIt = tokenCollection.aggregate(List.of(
+                match(ne(AccessTokenImpl.USERNAME, configuration.getRootUsername())),
                 lookup(UserImpl.COLLECTION_NAME, AccessTokenImpl.USERNAME, UserImpl.USERNAME, joinField),
                 match(eq(joinField, new Document("$size", 0))),
                 // Load only token-id, expiration date and user-name:
@@ -334,9 +336,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
                 ))
         ));
         try (var stream = StreamSupport.stream(aggregateIt.spliterator(), false)) {
-            return stream
-                    .filter(d -> !d.getString(AccessTokenImpl.USERNAME).equals(configuration.getRootUsername()))
-                    .map(d ->
+            return stream.map(d ->
                             new ExpiredToken(
                                     d.getObjectId(AccessTokenImpl.ID_FIELD).toString(),
                                     d.getString(AccessTokenImpl.NAME),
