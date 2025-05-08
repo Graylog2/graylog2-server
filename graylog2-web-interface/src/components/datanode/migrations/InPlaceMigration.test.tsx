@@ -150,7 +150,7 @@ describe('InPlaceMigration', () => {
     renderStep(MIGRATION_STATE.RESTART_GRAYLOG.key);
 
     await screen.findByRole('button', {
-      name: /6. Update configuration file and restart exiGraylog/i,
+      name: /6. Update configuration file and restart Graylog/i,
     });
 
     await screen.findByText(/please restart Graylog to finish the migration./);
