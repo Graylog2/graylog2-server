@@ -24,6 +24,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.Configuration;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -67,6 +68,9 @@ public class AccessTokenServiceImplTest {
     @Mock
     private ClusterConfigService configService;
 
+    @Mock
+    private Configuration configuration;
+
     private AccessTokenService accessTokenService;
 
     @Before
@@ -76,7 +80,7 @@ public class AccessTokenServiceImplTest {
         when(accessTokenCipher.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
         when(accessTokenCipher.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
 
-        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService);
+        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService, configuration);
     }
 
     @After
