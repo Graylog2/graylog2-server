@@ -19,6 +19,7 @@ package org.graylog.events.processor;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import org.bson.conversions.Bson;
@@ -52,7 +53,6 @@ import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.elemMatch;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.pull;
 import static com.mongodb.client.model.Updates.set;
 import static org.graylog.events.processor.EventDefinitionDto.FIELD_TITLE;
 import static org.graylog2.database.utils.MongoUtils.idEq;
@@ -250,7 +250,7 @@ public class DBEventDefinitionService {
      */
     public void removeEventProcedureFromAll(String procedureId) {
         collection.updateMany(
-                eq(EventDefinitionDto.FIELD_EVENT_PROCEDURE, procedureId),
-                pull(EventDefinitionDto.FIELD_EVENT_PROCEDURE, procedureId));
+                Filters.eq(EventDefinitionDto.FIELD_EVENT_PROCEDURE, procedureId),
+                Updates.unset(EventDefinitionDto.FIELD_EVENT_PROCEDURE));
     }
 }
