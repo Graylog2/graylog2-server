@@ -82,9 +82,9 @@ public class RoleServiceImpl implements RoleService {
 
         // make sure the two built-in roles actually exist
         adminRoleObjectId = checkNotNull(ensureBuiltinRole(ADMIN_ROLENAME, Sets.newHashSet("*"), "Admin",
-                "Grants all permissions for Graylog administrators (built-in)"));
+                "Grants all permissions for administrators (built-in)"));
         readerRoleObjectId = checkNotNull(ensureBuiltinRole(READER_ROLENAME, permissions.readerBasePermissions(), "Reader",
-                "Grants basic permissions for every Graylog user (built-in)"));
+                "Grants basic permissions for every user (built-in)"));
 
     }
 

@@ -214,7 +214,7 @@ const AWSPluginConfiguration = ({
             help={
               <span>
                 When enabled, we&apos;ll access the AWS APIs through the HTTP proxy configured (
-                <code>http_proxy_uri</code>) in your ${productName} configuration file.
+                <code>http_proxy_uri</code>) in your {productName} configuration file.
                 <br />
                 <em>Important:</em> You have to restart all AWS inputs for this configuration to take effect.
               </span>
