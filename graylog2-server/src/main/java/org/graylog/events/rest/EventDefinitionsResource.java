@@ -303,7 +303,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response createWithRequest(@ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
                                       @ApiParam @Valid @NotNull(message = "Eventdef request is mandatory") CreateEntityRequest<EventDefinitionDto> request,
-                                      @Context UserContext userContext) {
+                                @Context UserContext userContext) {
         final Response result = create(schedule, request.entity(), userContext);
 
         if (request.shareRequest().isPresent() && result.getEntity() instanceof EventDefinitionDto eventDefinitionDto) {
@@ -377,7 +377,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation(value = "Delete multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
     public BulkOperationResponse bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
-                                            @Context UserContext userContext) {
+                                        @Context UserContext userContext) {
         return bulkDeletionExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_DELETE, "definitionId", EventDefinitionDto.class));
@@ -405,7 +405,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation(value = "Enable multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
     public BulkOperationResponse bulkSchedule(@ApiParam(name = "Event definitions to enable", required = true) final BulkOperationRequest bulkOperationRequest,
-                                              @Context UserContext userContext) {
+                                        @Context UserContext userContext) {
         return bulkScheduleExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_UPDATE, "definitionId", EventDefinitionDto.class));
@@ -432,7 +432,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation(value = "Disable multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
     public BulkOperationResponse bulkUnschedule(@ApiParam(name = "Event definitions to disable", required = true) final BulkOperationRequest bulkOperationRequest,
-                                                @Context UserContext userContext) {
+                                        @Context UserContext userContext) {
         return bulkUnscheduleExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_UPDATE, "definitionId", EventDefinitionDto.class));
