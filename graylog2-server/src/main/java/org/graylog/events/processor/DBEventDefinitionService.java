@@ -52,6 +52,7 @@ import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.elemMatch;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.pull;
 import static com.mongodb.client.model.Updates.set;
 import static org.graylog.events.processor.EventDefinitionDto.FIELD_TITLE;
 import static org.graylog2.database.utils.MongoUtils.idEq;
@@ -240,5 +241,16 @@ public class DBEventDefinitionService {
     @MustBeClosed
     public Stream<EventDefinitionDto> streamByQuery(Bson query) {
         return stream(collection.find(query));
+    }
+
+    /**
+     * Remove event procedures from all event definitions that reference it.
+     *
+     * @param procedureId The event procedure ID
+     */
+    public void removeEventProcedureFromAll(String procedureId) {
+        collection.updateMany(
+                eq(EventDefinitionDto.FIELD_EVENT_PROCEDURE, procedureId),
+                pull(EventDefinitionDto.FIELD_EVENT_PROCEDURE, procedureId));
     }
 }
