@@ -30,13 +30,7 @@ const defaultComponentIgnore = [
 
 module.exports = {
   skipComponentsWithoutExample: true,
-  require: [
-    'core-js/stable',
-    'regenerator-runtime/runtime',
-    'bootstrap/less/bootstrap.less',
-    'toastr/toastr.less',
-    './fetch-mock',
-  ],
+  require: ['core-js/stable', 'regenerator-runtime/runtime', 'bootstrap/less/bootstrap.less', './fetch-mock'],
   sections: [
     {
       name: 'Introduction',

@@ -39,11 +39,11 @@ describe('DashboardPropertiesModal', () => {
     );
 
     await screen.findByText('Saving new dashboard');
-    const titleInput = await screen.findByRole('textbox', { name: /title/i, hidden: true });
+    const titleInput = await screen.findByRole('textbox', { name: /title/i });
 
     await userEvent.type(titleInput, 'My title');
 
-    userEvent.click(await screen.findByRole('button', { name: /create dashboard/i, hidden: true }));
+    userEvent.click(await screen.findByRole('button', { name: /create dashboard/i }));
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith(

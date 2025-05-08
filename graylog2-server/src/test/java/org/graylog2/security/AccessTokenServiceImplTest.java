@@ -315,6 +315,31 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
+    @MongoDBFixtures("findOrphanedTokens_allAssigned.json")
+    public void findOrphanedTokensAllAssigned() {
+        final List<AccessTokenService.ExpiredToken> expiredTokens = accessTokenService.findOrphanedTokens();
+
+        assertThat(expiredTokens).isEmpty();
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    @MongoDBFixtures("findOrphanedTokens_twoOrphaned.json")
+    public void findOrphanedTokensReturnsOnlyTokensWithoutUsers() {
+        final List<AccessTokenService.ExpiredToken> orphanedTokens = accessTokenService.findOrphanedTokens();
+        final List<AccessTokenService.ExpiredToken> expected =
+                List.of(
+                        new AccessTokenService.ExpiredToken("44f9deadbeefdeadbeefaffe", "test", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "other_user"),
+                        new AccessTokenService.ExpiredToken("54f9deadbeefdeadbeefaffe", "rest", DateTime.parse("2015-03-15T16:00:00.000Z"), null, "deleted_user")
+                );
+
+        assertThat(orphanedTokens).isNotEmpty()
+                .containsExactlyInAnyOrderElementsOf(expected);
+
+        verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
     @MongoDBFixtures("accessTokensSingleToken.json")
     public void deleteByIdReturns0ForNonExistingToken() {
         final int deletedTokens = accessTokenService.deleteById("aaaaaaaaaaaaaaaaaaaaaaaa");

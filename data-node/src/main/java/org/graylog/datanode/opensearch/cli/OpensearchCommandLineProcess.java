@@ -31,6 +31,7 @@ import org.graylog.datanode.process.CommandLineProcess;
 import org.graylog.datanode.process.CommandLineProcessListener;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +44,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -128,8 +129,8 @@ public class OpensearchCommandLineProcess implements Closeable {
         LOG.info("Creating opensearch keystore");
         final String createdMessage = opensearchCli.keystore().create();
         LOG.info(createdMessage);
-        final Map<String, String> keystoreItems = config.getKeystoreItems();
-        keystoreItems.forEach((key, value) -> opensearchCli.keystore().add(key, value));
+        final Collection<OpensearchKeystoreItem> keystoreItems = config.getKeystoreItems();
+        keystoreItems.forEach((item) -> item.persist(opensearchCli.keystore()));
         LOG.info("Added {} keystore items", keystoreItems.size());
     }
 

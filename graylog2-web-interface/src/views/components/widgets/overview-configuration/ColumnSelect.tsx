@@ -30,7 +30,6 @@ type Props = {
   columns: Array<string>;
   excludedColumns?: Array<string>;
   id: string;
-  menuPortalTarget?: HTMLElement;
   name: string;
   onChange: (columnName: string) => void;
   onMenuClose?: () => void;
@@ -43,23 +42,22 @@ type Props = {
 };
 
 const ColumnSelect = ({
-  ariaLabel,
-  autoFocus,
+  ariaLabel = undefined,
+  autoFocus = undefined,
   allowCreate = false,
-  className,
+  className = undefined,
   clearable = false,
   columns,
   columnTitle,
   id,
   excludedColumns = [],
-  menuPortalTarget,
   name,
   onChange,
-  onMenuClose,
-  openMenuOnFocus,
-  persistSelection,
-  placeholder,
-  selectRef,
+  onMenuClose = undefined,
+  openMenuOnFocus = undefined,
+  persistSelection = undefined,
+  placeholder = undefined,
+  selectRef = undefined,
   value,
 }: Props) => {
   const columnOptions = useMemo(
@@ -91,7 +89,6 @@ const ColumnSelect = ({
       value={value}
       aria-label={ariaLabel}
       autoFocus={autoFocus}
-      menuPortalTarget={menuPortalTarget}
       onChange={onChange}
     />
   );

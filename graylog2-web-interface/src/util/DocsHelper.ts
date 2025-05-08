@@ -15,11 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import AppConfig from 'util/AppConfig';
+
+const defaultDocsUrl = 'https://go2docs.graylog.org/current';
+const docsUrl = AppConfig.branding?.()?.help_url ?? defaultDocsUrl;
+
 const docsHelper = {
   PAGES: {
     ALERTS: 'interacting_with_your_log_data/alerts.html',
     AUDIT_LOG: 'interacting_with_your_log_data/audit_log.html',
     AUTHENTICATORS: 'setting_up_graylog/user_authentication.htm',
+    AWS_KINESIS_CLOUDWATCH_INPUT: 'getting_in_log_data/aws_kinesis_cloudwatch_input.html',
     CHANGELOG: 'changelogs/changelog.html',
     CLUSTER_STATUS_EXPLAINED: 'setting_up_graylog/opensearch.htm#ClusterStatusExplained',
     COLLECTOR: 'getting_in_log_data/graylog_sidecar.html',
@@ -63,7 +69,7 @@ const docsHelper = {
     WELCOME: '', // Welcome page to the documentation
   },
 
-  DOCS_URL: 'https://go2docs.graylog.org/current',
+  DOCS_URL: docsUrl,
 
   toString(path: string) {
     const baseUrl = this.DOCS_URL;

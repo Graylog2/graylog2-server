@@ -56,6 +56,7 @@ import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.system.urlwhitelist.UrlNotWhitelistedException;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -290,8 +291,12 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
     }
 
     public static class Descriptor extends LookupDataAdapter.Descriptor<Config> {
-        public Descriptor() {
+        private final CustomizationConfig customizationConfig;
+
+        @Inject
+        public Descriptor(CustomizationConfig customizationConfig) {
             super(NAME, Config.class);
+            this.customizationConfig = customizationConfig;
         }
 
         @Override
@@ -300,7 +305,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
                     .type(NAME)
                     .url("https://example.invalid/api/lookup?key=${key}")
                     .singleValueJSONPath("$.value")
-                    .userAgent("Graylog Lookup - https://www.graylog.org/")
+                    .userAgent("%1$s Lookup".formatted(customizationConfig.productName()))
                     .headers(Collections.emptyMap())
                     .build();
         }

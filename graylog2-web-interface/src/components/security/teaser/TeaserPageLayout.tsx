@@ -120,7 +120,12 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
         </ContentArea>
       </Container>
       {showModal && (
-        <ConfirmDialog show title="Security Demo" onConfirm={() => setShowModal(false)} btnConfirmText="Close">
+        <ConfirmDialog
+          show
+          title="Security Demo"
+          onConfirm={() => setShowModal(false)}
+          onCancel={() => setShowModal(false)}
+          btnConfirmText="Close">
           <Col>
             <h2 className="text-danger">OVERVIEW</h2>
             <p>

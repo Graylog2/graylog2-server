@@ -49,7 +49,7 @@ class OpensearchKeystoreCommandLineIT {
 
     private OpensearchCli createCli(Path tempDir) throws URISyntaxException {
         final Path binDirPath = detectOpensearchBinDir();
-        return new OpensearchCli(tempDir, binDirPath);
+        return new OpensearchCli(new CliEnv(tempDir), binDirPath);
     }
 
     @Nonnull

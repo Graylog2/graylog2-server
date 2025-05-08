@@ -99,7 +99,8 @@ public interface Notification extends Persisted {
         REMOTE_REINDEX_RUNNING,
         REMOTE_REINDEX_FINISHED,
         DATA_NODE_VERSION_MISMATCH,
-        DATA_TIERING_ROLLOVER_ERROR
+        DATA_TIERING_ROLLOVER_ERROR,
+        DATA_NODE_HEAP_WARNING
     }
 
     enum Severity {

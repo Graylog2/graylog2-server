@@ -237,7 +237,17 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         return filter;
     }
 
-    private QueryBuilder buildExtraFilter(String field, String value) {
+    static QueryBuilder buildExtraFilter(String field, String value) {
+        // Handle range queries, which require special query builders.
+        if (value.startsWith("<=")) {
+            return QueryBuilders.rangeQuery(field).lte(value.replace("<=", ""));
+        } else if (value.startsWith(">=")) {
+            return QueryBuilders.rangeQuery(field).gte(value.replace(">=", ""));
+        } else if (value.startsWith("<")) {
+            return QueryBuilders.rangeQuery(field).lt(value.replace("<", ""));
+        } else if (value.startsWith(">")) {
+            return QueryBuilders.rangeQuery(field).gt(value.replace(">", ""));
+        }
         return QueryBuilders.multiMatchQuery(value, field);
     }
 

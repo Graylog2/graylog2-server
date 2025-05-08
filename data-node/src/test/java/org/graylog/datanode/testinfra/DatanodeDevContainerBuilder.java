@@ -18,6 +18,7 @@ package org.graylog.datanode.testinfra;
 
 import com.google.common.base.Suppliers;
 import org.graylog.datanode.configuration.OpensearchArchitecture;
+import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import org.testcontainers.images.builder.dockerfile.DockerfileBuilder;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -57,6 +59,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private Optional<DatanodeDockerHooks> customizer = Optional.empty();
     private Network network;
     private Map<String, String> env;
+    private PluginJarsProvider pluginJarsProvider;
 
     protected static Path getPath() {
         return getProjectReposPath().resolve(Path.of("graylog2-server", "data-node", "target"));
@@ -119,6 +122,12 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     @Override
     public org.graylog.testing.datanode.DatanodeDevContainerBuilder env(Map<String, String> env) {
         this.env = env;
+        return this;
+    }
+
+    @Override
+    public org.graylog.testing.datanode.DatanodeDevContainerBuilder pluginJarsProvider(PluginJarsProvider pluginJarsProvider) {
+        this.pluginJarsProvider = pluginJarsProvider;
         return this;
     }
 
@@ -196,6 +205,15 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         container.withFileSystemBind(graylog.toString(), IMAGE_WORKING_DIR + "/graylog-datanode.jar")
                 .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/")
                 .withFileSystemBind(downloadedOpensearch.toString(), IMAGE_WORKING_DIR + "/" + opensearchDistributionName, BindMode.READ_ONLY);
+
+        if (pluginJarsProvider != null) {
+            pluginJarsProvider.getJars().forEach(hostPath -> {
+                if (Files.exists(hostPath)) {
+                    final Path containerPath = Paths.get(IMAGE_WORKING_DIR, "plugin", hostPath.getFileName().toString());
+                    container.withFileSystemBind(hostPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
+                }
+            });
+        }
 
         customizer.ifPresent(c -> c.onContainer(container));
         return container;
