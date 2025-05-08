@@ -25,6 +25,7 @@ import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -34,6 +35,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
@@ -47,6 +49,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
+import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
@@ -99,8 +102,9 @@ public class StreamCatalogTest {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         final StreamRuleService streamRuleService = new StreamRuleServiceImpl(mongoConnection, clusterEventBus);
+        final MongoCollections mc = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongoConnection);
         final StreamService streamService = new StreamServiceImpl(
-                mongoConnection,
+                mc,
                 streamRuleService,
                 outputService,
                 indexSetService,
@@ -117,9 +121,9 @@ public class StreamCatalogTest {
     @Test
     public void encode() {
         final ImmutableMap<String, Object> streamFields = ImmutableMap.of(
-                StreamImpl.FIELD_TITLE, "Stream Title",
-                StreamImpl.FIELD_DESCRIPTION, "Stream Description",
-                StreamImpl.FIELD_DISABLED, false
+                StreamDTO.FIELD_TITLE, "Stream Title",
+                StreamDTO.FIELD_DESCRIPTION, "Stream Description",
+                StreamDTO.FIELD_DISABLED, false
         );
 
         final ImmutableMap<String, Object> streamRuleFields = ImmutableMap.<String, Object>builder()
