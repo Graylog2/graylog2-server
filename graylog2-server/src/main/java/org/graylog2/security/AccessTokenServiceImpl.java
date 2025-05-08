@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.PersistedServiceImpl;
@@ -71,6 +72,7 @@ import static com.mongodb.client.model.Aggregates.sort;
 import static com.mongodb.client.model.Aggregates.unwind;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Filters.ne;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
 import static com.mongodb.client.model.Sorts.ascending;
@@ -90,14 +92,17 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     private final PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
     private final AccessTokenCipher cipher;
     private final ClusterConfigService configService;
+    private final Configuration configuration;
     private LoadingCache<String, DateTime> lastAccessCache;
 
     @Inject
-    public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService, AccessTokenCipher accessTokenCipher, ClusterConfigService configService) {
+    public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService,
+                                  AccessTokenCipher accessTokenCipher, ClusterConfigService configService, Configuration configuration) {
         super(mongoConnection);
         this.paginatedAccessTokenEntityService = paginatedAccessTokenEntityService;
         this.cipher = accessTokenCipher;
         this.configService = configService;
+        this.configuration = configuration;
         setLastAccessCache(30, TimeUnit.SECONDS);
 
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN_TYPE, 1));
@@ -319,6 +324,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final String joinField = "token_username";
         final MongoCollection<Document> tokenCollection = mongoCollection(AccessTokenImpl.class);
         final AggregateIterable<Document> aggregateIt = tokenCollection.aggregate(List.of(
+                match(ne(AccessTokenImpl.USERNAME, configuration.getRootUsername())),
                 lookup(UserImpl.COLLECTION_NAME, AccessTokenImpl.USERNAME, UserImpl.USERNAME, joinField),
                 match(eq(joinField, new Document("$size", 0))),
                 // Load only token-id, expiration date and user-name:
@@ -331,15 +337,15 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         ));
         try (var stream = StreamSupport.stream(aggregateIt.spliterator(), false)) {
             return stream.map(d ->
-                    new ExpiredToken(
-                            d.getObjectId(AccessTokenImpl.ID_FIELD).toString(),
-                            d.getString(AccessTokenImpl.NAME),
-                            new DateTime(d.getDate(AccessTokenImpl.EXPIRES_AT)).withZone(DateTimeZone.UTC),
-                            //The user doesn't exist. At least that's what we're looking for.
-                            null,
-                            d.getString(AccessTokenImpl.USERNAME)
-                    )
-            ).toList();
+                            new ExpiredToken(
+                                    d.getObjectId(AccessTokenImpl.ID_FIELD).toString(),
+                                    d.getString(AccessTokenImpl.NAME),
+                                    new DateTime(d.getDate(AccessTokenImpl.EXPIRES_AT)).withZone(DateTimeZone.UTC),
+                                    //The user doesn't exist. At least that's what we're looking for.
+                                    null,
+                                    d.getString(AccessTokenImpl.USERNAME)
+                            )
+                    ).toList();
         }
     }
 
