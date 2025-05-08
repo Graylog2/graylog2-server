@@ -22,12 +22,13 @@ import { loadDashboard } from 'views/logic/views/Actions';
 import type { HistoryFunction } from 'routing/useHistory';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import type View from './View';
 
-export default (view: View, history: HistoryFunction) => async (dispatch: ViewsDispatch) => {
+export default (view: View, history: HistoryFunction, entityShare?: EntitySharePayload) => async (dispatch: ViewsDispatch) => {
   try {
-    const savedView = await ViewManagementActions.create(view);
+    const savedView = await ViewManagementActions.create(view, entityShare);
 
     flushSync(() => {
       dispatch(setIsDirty(false));
