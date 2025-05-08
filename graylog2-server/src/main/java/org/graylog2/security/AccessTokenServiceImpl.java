@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.PersistedServiceImpl;
@@ -90,14 +91,17 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     private final PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
     private final AccessTokenCipher cipher;
     private final ClusterConfigService configService;
+    private final Configuration configuration;
     private LoadingCache<String, DateTime> lastAccessCache;
 
     @Inject
-    public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService, AccessTokenCipher accessTokenCipher, ClusterConfigService configService) {
+    public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService,
+                                  AccessTokenCipher accessTokenCipher, ClusterConfigService configService, Configuration configuration) {
         super(mongoConnection);
         this.paginatedAccessTokenEntityService = paginatedAccessTokenEntityService;
         this.cipher = accessTokenCipher;
         this.configService = configService;
+        this.configuration = configuration;
         setLastAccessCache(30, TimeUnit.SECONDS);
 
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN_TYPE, 1));
@@ -330,16 +334,18 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
                 ))
         ));
         try (var stream = StreamSupport.stream(aggregateIt.spliterator(), false)) {
-            return stream.map(d ->
-                    new ExpiredToken(
-                            d.getObjectId(AccessTokenImpl.ID_FIELD).toString(),
-                            d.getString(AccessTokenImpl.NAME),
-                            new DateTime(d.getDate(AccessTokenImpl.EXPIRES_AT)).withZone(DateTimeZone.UTC),
-                            //The user doesn't exist. At least that's what we're looking for.
-                            null,
-                            d.getString(AccessTokenImpl.USERNAME)
-                    )
-            ).toList();
+            return stream
+                    .filter(d -> !d.getString(AccessTokenImpl.USERNAME).equals(configuration.getRootUsername()))
+                    .map(d ->
+                            new ExpiredToken(
+                                    d.getObjectId(AccessTokenImpl.ID_FIELD).toString(),
+                                    d.getString(AccessTokenImpl.NAME),
+                                    new DateTime(d.getDate(AccessTokenImpl.EXPIRES_AT)).withZone(DateTimeZone.UTC),
+                                    //The user doesn't exist. At least that's what we're looking for.
+                                    null,
+                                    d.getString(AccessTokenImpl.USERNAME)
+                            )
+                    ).toList();
         }
     }
 
