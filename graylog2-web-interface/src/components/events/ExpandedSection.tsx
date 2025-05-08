@@ -31,8 +31,7 @@ type Props = {
 
 const ExpandedSection = ({ defaultLayout, event }: Props) => {
   const { permissions } = useCurrentUser();
-  console.log({ permissions });
-  if (!isPermitted(permissions, 'eventdefinitions:read:' + event.event_definition_id)) {
+  if (!isPermitted(permissions, `eventdefinitions:read:${event.event_definition_id}`)) {
     return <em>No further details</em>;
   }
 
