@@ -148,7 +148,8 @@ public class InputsResource extends AbstractInputsResource {
                                         @PathParam("inputId") String inputId,
                                         @Context SearchUser searchUser) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
-        return inputDiagnosticService.getInputDiagnostics(inputService.find(inputId), searchUser);
+        final Input input = inputService.find(inputId);
+        return inputDiagnosticService.getInputDiagnostics(input, searchUser);
     }
 
     public record InputReferences(
@@ -170,7 +171,7 @@ public class InputsResource extends AbstractInputsResource {
             @ApiResponse(code = 404, message = "No such input.")
     })
     public InputReferences getReferences(@ApiParam(name = "inputId", required = true)
-                                         @PathParam("inputId") String inputId) {
+                                             @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         checkPermission(RestPermissions.STREAMS_READ);
         checkPermission(PipelineRestPermissions.PIPELINE_READ);
@@ -218,6 +219,7 @@ public class InputsResource extends AbstractInputsResource {
             throwBadRequestIfNotGlobal(lr);
             // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
             final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node(), isSetupWizard);
+            checkPermission(RestPermissions.INPUT_TYPES_CREATE, messageInput.getType());
             if (config.isCloud() && !messageInput.isCloudCompatible()) {
                 throw new BadRequestException(String.format(Locale.ENGLISH,
                         "The input type <%s> is not allowed in the cloud environment!", lr.type()));
@@ -252,6 +254,7 @@ public class InputsResource extends AbstractInputsResource {
     public void terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
         final Input input = inputService.find(inputId);
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
         if (0 < inputService.destroy(input)) {
             clusterEventBus.post(new InputDeletedEvent(input.getId(), input.getTitle()));
         }
@@ -276,6 +279,7 @@ public class InputsResource extends AbstractInputsResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input input = inputService.find(inputId);
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType());  // remove after sharing inputs implemented
         final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node(), input.getDesiredState());
 
         messageInput.checkConfiguration();
