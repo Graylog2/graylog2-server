@@ -16,6 +16,8 @@
  */
 package org.graylog.security.entities;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
@@ -26,9 +28,6 @@ import org.graylog.security.GrantDTO;
 import org.graylog2.plugin.database.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 @Singleton
 public class EntityOwnershipService {

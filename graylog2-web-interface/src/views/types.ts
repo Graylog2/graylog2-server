@@ -63,7 +63,6 @@ import type { Event } from 'components/events/events/types';
 import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -317,11 +316,10 @@ type AssetInformationComponentProps = {
 };
 
 type EventProcedureFormProps = {
-  eventDefinition: EventDefinition;
   eventProcedureID: string | undefined;
+  remediationSteps: string;
   onClose: () => void;
   onSave: (eventProcedureId: string) => void;
-  canEdit: boolean;
 };
 
 type EventProcedureSummaryProps = {

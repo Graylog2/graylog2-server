@@ -36,6 +36,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDefinitionForm, { STEP_KEYS } from './EventDefinitionForm';
 
@@ -45,7 +46,9 @@ const fetchNotifications = () => {
 
 type Props = {
   action?: 'edit' | 'create';
-  eventDefinition?: EventDefinition;
+  eventDefinition?: EventDefinition & {
+    share_request?: EntitySharePayload,
+  };
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
   initialStep?: string;
   onCancel?: () => void;
