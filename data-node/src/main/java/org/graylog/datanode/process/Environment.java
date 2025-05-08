@@ -16,8 +16,10 @@
  */
 package org.graylog.datanode.process;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -26,6 +28,9 @@ import static java.util.function.Predicate.not;
 public class Environment {
 
     private static final String JAVA_HOME_ENV = "JAVA_HOME";
+    private static final String OPENSEARCH_JAVA_HOME_ENV = "OPENSEARCH_JAVA_HOME";
+    public static final String OPENSEARCH_JAVA_OPTS_ENV = "OPENSEARCH_JAVA_OPTS";
+    public static final String OPENSEARCH_PATH_CONF_ENV = "OPENSEARCH_PATH_CONF";
 
     private final Map<String, String> env;
     private final Map<String, String> additionalVariables = new HashMap<>();
@@ -36,6 +41,25 @@ public class Environment {
 
     public Environment put(String key, String value) {
         this.additionalVariables.put(key, value);
+        return this;
+    }
+
+    /**
+     * OPENSEARCH_JAVA_HOME is the first env property where opensearch binary is looking for java home. If we set this,
+     * we can be sure that this JVM will be actually used, preventing users to override it.
+     */
+    public Environment withOpensearchJavaHome(Path javaHome) {
+        put(OPENSEARCH_JAVA_HOME_ENV, javaHome.toAbsolutePath().toString());
+        return this;
+    }
+
+    public Environment withOpensearchJavaOpts(List<String> javaOpts) {
+        put(OPENSEARCH_JAVA_OPTS_ENV, String.join(" ", javaOpts));
+        return this;
+    }
+
+    public Environment withOpensearchPathConf(Path opensearchConfPath) {
+        put(OPENSEARCH_PATH_CONF_ENV, opensearchConfPath.toString());
         return this;
     }
 

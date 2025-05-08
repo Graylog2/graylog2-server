@@ -37,4 +37,7 @@ public record OpensearchDistribution(Path directory, String version, @Nullable S
         return getOpensearchBinDirPath().resolve("opensearch");
     }
 
+    public Path getOpensearchJavaHome() {
+        return directory.resolve("jdk");
+    }
 }

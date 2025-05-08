@@ -19,15 +19,24 @@ package org.graylog.datanode.process;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 class EnvironmentTest {
 
     @Test
     void testFiltering() {
-        final Environment env = new Environment(Map.of("USER", "test", "JAVA_HOME", "/path/to/jre"));
+        Map<String, String> userEnv = new LinkedHashMap<>();
+        userEnv.put("USER", "test");
+        userEnv.put("JAVA_HOME", "/path/to/jre");
+        userEnv.put("OPENSEARCH_JAVA_HOME", "/path/to/jre");
+        final Environment env = new Environment(userEnv);
+        env.withOpensearchJavaHome(Path.of("/dist/opensearch/jdk"));
+
         Assertions.assertThat(env.getEnv())
-                 .doesNotContainKey("JAVA_HOME")
-                .containsKey("USER");
+                .doesNotContainKey("JAVA_HOME")
+                .containsKey("USER")
+                .containsEntry("OPENSEARCH_JAVA_HOME", "/dist/opensearch/jdk");
     }
 }
