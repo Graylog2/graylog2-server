@@ -31,7 +31,7 @@ import ValidationResult from './ValidationResult';
 
 export type GranteesList = Immutable.List<Grantee>;
 export type CapabilitiesList = Immutable.List<Capability>;
-export type ActiveShares = Immutable.List<ActiveShare>;
+export type ActiveShares = Immutable.List<ActiveShare> | null;
 export type MissingDependencies = Immutable.Map<GRN, Immutable.List<SharedEntity>>;
 export type SelectedGranteeCapabilities = Immutable.Map<
   $PropertyType<GranteeType, 'id'>,

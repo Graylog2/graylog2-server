@@ -23,16 +23,21 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { FormikInput, ModalSubmit, InputOptionalInfo } from 'components/common';
 import { Modal } from 'components/bootstrap';
 import IndexSetSelect from 'components/streams/IndexSetSelect';
+import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
+import type { EntityShare, EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type FormValues = Partial<
-  Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream'>
->;
+  Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream' >
+> & {
+  share_request?: EntitySharePayload,
+};
 
 const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => ({
   index_set_id: initialValues.index_set_id ?? indexSets?.find((indexSet) => indexSet.default)?.id,
   description: initialValues.description ?? undefined,
   title: initialValues.title ?? undefined,
   remove_matches_from_default_stream: initialValues.remove_matches_from_default_stream ?? undefined,
+  share_request: initialValues.share_request ?? undefined,
 });
 
 const validate = (values: FormValues) => {
@@ -55,8 +60,9 @@ type Props = {
   submitButtonText: string;
   submitLoadingText: string;
   onClose: () => void;
-  onSubmit: (values: FormValues) => Promise<void>;
+  onSubmit: (values: Partial<Stream> & EntityShare) => Promise<void>;
   indexSets: Array<IndexSet>;
+  isNew?: boolean,
 };
 
 const StreamModal = ({
@@ -64,6 +70,7 @@ const StreamModal = ({
     title: '',
     description: '',
     remove_matches_from_default_stream: false,
+    share_request: null,
   },
   title: modalTitle,
   submitButtonText,
@@ -71,6 +78,7 @@ const StreamModal = ({
   onClose,
   onSubmit,
   indexSets,
+  isNew = false,
 }: Props) => {
   const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
 
@@ -79,7 +87,7 @@ const StreamModal = ({
   return (
     <Modal onHide={onClose} show>
       <Formik<FormValues> initialValues={_initialValues} onSubmit={_onSubmit} validate={validate}>
-        {({ isSubmitting, isValidating }) => (
+        {({ isSubmitting, isValidating, setFieldValue }) => (
           <Form>
             <Modal.Header>
               <Modal.Title>{modalTitle}</Modal.Title>
@@ -96,9 +104,7 @@ const StreamModal = ({
                 id="description"
                 help="What kind of messages are routed into this stream?"
               />
-
               <IndexSetSelect indexSets={indexSets} />
-
               <FormikInput
                 label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
                 help={
@@ -108,6 +114,15 @@ const StreamModal = ({
                 id="remove_matches_from_default_stream"
                 type="checkbox"
               />
+              {isNew && (
+                <EntityCreateShareFormGroup
+                  description='Search for a User or Team to add as collaborator on this stream.'
+                  entityType='stream'
+                  entityTitle=''
+                  onSetEntityShare={(payload) => setFieldValue('share_request', payload)}
+                />
+              )}
+
             </Modal.Body>
             <Modal.Footer>
               <ModalSubmit
