@@ -24,6 +24,8 @@ import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 
+const noDetails = <em>No further details</em>;
+
 type Props = {
   defaultLayout: DefaultLayout;
   event: Event;
@@ -31,10 +33,9 @@ type Props = {
 
 const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
-
   const nonDisplayedAttributes = useNonDisplayedAttributes(defaultLayout);
 
-  if (!nonDisplayedAttributes.length) return <em>No further details</em>;
+  if (!nonDisplayedAttributes.length) return noDetails;
 
   return <GeneralEventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />;
 };
@@ -42,7 +43,7 @@ const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
 const ExpandedSection = ({ defaultLayout, event }: Props) => {
   const { permissions } = useCurrentUser();
   if (!isPermitted(permissions, `eventdefinitions:read:${event.event_definition_id}`)) {
-    return <em>No further details</em>;
+    return noDetails;
   }
 
   return <GeneralEventDetails defaultLayout={defaultLayout} event={event} />;
