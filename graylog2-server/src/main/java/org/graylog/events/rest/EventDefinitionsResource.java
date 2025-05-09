@@ -66,8 +66,8 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.scheduler.schedule.CronUtils;
 import org.graylog.security.UserContext;
-import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
+import org.graylog.security.shares.UnwrappedCreateEntityRequest;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -281,7 +281,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response create(@ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
-                           @ApiParam(name = "JSON Body") EventDefinitionDto dto, @Context UserContext userContext) {
+                           @ApiParam(name = "JSON Body") UnwrappedCreateEntityRequest<EventDefinitionDto> unwrappedCreateEntityRequest, @Context UserContext userContext) {
+        final EventDefinitionDto dto = unwrappedCreateEntityRequest.getEntity();
         checkEventDefinitionPermissions(dto, "create");
 
         final ValidationResult result = dto.validate(null, eventDefinitionConfiguration);
@@ -292,25 +293,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 eventDefinitionHandler.create(dto, Optional.of(userContext.getUser())) :
                 eventDefinitionHandler.createWithoutSchedule(dto.toBuilder().state(EventDefinition.State.DISABLED).build(), Optional.of(userContext.getUser()));
         recentActivityService.create(entity.id(), GRNTypes.EVENT_DEFINITION, userContext.getUser());
+        unwrappedCreateEntityRequest.getShareRequest().ifPresent(shareRequest -> {
+            entitySharesService.updateEntityShares(GRNTypes.EVENT_DEFINITION, entity.id(), shareRequest, userContext.getUser());
+        });
+
         return Response.ok().entity(entity).build();
-    }
-
-    @POST
-    @Path("/with-request")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Create new event definition with sharing request", response = EventDefinitionDto.class)
-    @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
-    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
-    public Response createWithRequest(@ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
-                                      @ApiParam @Valid @NotNull(message = "Eventdef request is mandatory") CreateEntityRequest<EventDefinitionDto> request,
-                           @Context UserContext userContext) {
-        final Response result = create(schedule, request.entity(), userContext);
-
-        if (request.shareRequest().isPresent() && result.getEntity() instanceof EventDefinitionDto eventDefinitionDto) {
-            entitySharesService.updateEntityShares(GRNTypes.EVENT_DEFINITION, eventDefinitionDto.id(), request.shareRequest().get(), userContext.getUser());
-        }
-
-        return result;
     }
 
     @PUT

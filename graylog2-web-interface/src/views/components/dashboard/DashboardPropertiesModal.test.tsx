@@ -19,10 +19,14 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import View from 'views/logic/views/View';
+import mockComponent from 'helpers/mocking/MockComponent';
 
 import DashboardPropertiesModal from './DashboardPropertiesModal';
 
+jest.mock('components/permissions/EntityCreateShareFormGroup', () => mockComponent ('EntityCreateShareFormGroup'));
+
 describe('DashboardPropertiesModal', () => {
+
   it('should use updated view when saving', async () => {
     const onSave = jest.fn();
     const view = View.builder().type(View.Type.Dashboard).title('').build();
@@ -50,6 +54,7 @@ describe('DashboardPropertiesModal', () => {
         expect.objectContaining({
           title: 'My title',
         }),
+        null,
       );
     });
   });
