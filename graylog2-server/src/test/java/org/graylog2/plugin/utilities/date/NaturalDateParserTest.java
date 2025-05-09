@@ -24,9 +24,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.Date;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Locale;
 
+import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -52,10 +54,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  */
 public class NaturalDateParserTest {
+
+    private static final Instant fixedInstant = Instant.parse("2025-05-05T09:45:23Z");
+    private static final Clock fixedClock = Clock.fixed(fixedInstant, UTC);
+
     private NaturalDateParser naturalDateParser;
     private NaturalDateParser naturalDateParserAntarctica;
     private NaturalDateParser naturalDateParserUtc;
-    private Date referenceDate;
 
     final String[] testsThatAlignToStartOfDay = {
             "yesterday", "the day before yesterday", "today",
@@ -77,16 +82,14 @@ public class NaturalDateParserTest {
 
     @BeforeEach
     public void setUp() {
-        // a reference date for all tests that don't specify one explicitly to guard against testing weirdness on CI
-        referenceDate = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss").withZoneUTC().parseDateTime("05.05.2025 09:45:23").toDate();
-        naturalDateParser = new NaturalDateParser();
-        naturalDateParserUtc = new NaturalDateParser("Etc/UTC");
-        naturalDateParserAntarctica = new NaturalDateParser("Antarctica/Palmer");
+        naturalDateParser = new NaturalDateParser("Etc/UTC", Locale.getDefault(), fixedClock);
+        naturalDateParserUtc = new NaturalDateParser("Etc/UTC", Locale.getDefault(), fixedClock);
+        naturalDateParserAntarctica = new NaturalDateParser("Antarctica/Palmer", Locale.getDefault(), fixedClock);
     }
 
     @Test
     public void testParse() throws Exception {
-        NaturalDateParser.Result today = naturalDateParser.parse("today", referenceDate);
+        NaturalDateParser.Result today = naturalDateParser.parse("today");
         assertNotNull(today.getFrom());
         assertNotNull(today.getTo());
 
@@ -95,22 +98,22 @@ public class NaturalDateParserTest {
     }
 
     @Test
-    public void testParseFailsOnUnparsableDate() {
+    public void testParseFailsOnUnparsableDate() throws Exception {
         assertThrows(NaturalDateParser.DateNotParsableException.class, () -> {
-            naturalDateParser.parse("LOLWUT", referenceDate);
+            naturalDateParser.parse("LOLWUT");
         });
     }
 
     @Test
-    public void testParseFailsOnEmptyDate() {
+    public void testParseFailsOnEmptyDate() throws Exception {
         assertThrows(NaturalDateParser.DateNotParsableException.class, () -> {
-            naturalDateParser.parse("", referenceDate);
+            naturalDateParser.parse("");
         });
     }
 
     @Test
     public void testDefaultTZ() throws Exception {
-        NaturalDateParser.Result today = naturalDateParser.parse("today", referenceDate);
+        NaturalDateParser.Result today = naturalDateParser.parse("today");
         assertThat(today.getFrom()).as("From should not be null").isNotNull();
         assertThat(today.getTo()).as("To should not be null").isNotNull();
         assertThat(today.getDateTimeZone().getID()).as("should have the Etc/UTC as Timezone").isEqualTo("Etc/UTC");
@@ -118,7 +121,7 @@ public class NaturalDateParserTest {
 
     @Test
     public void testUTCTZ() throws Exception {
-        NaturalDateParser.Result today = naturalDateParserUtc.parse("today", referenceDate);
+        NaturalDateParser.Result today = naturalDateParserUtc.parse("today");
         assertThat(today.getFrom()).as("From should not be null").isNotNull();
         assertThat(today.getTo()).as("To should not be null").isNotNull();
         assertThat(today.getDateTimeZone().getID()).as("should have the Etc/UTC as Timezone").isEqualTo("Etc/UTC");
@@ -126,7 +129,7 @@ public class NaturalDateParserTest {
 
     @Test
     public void testAntarcticaTZ() throws Exception {
-        NaturalDateParser.Result today = naturalDateParserAntarctica.parse("today", referenceDate);
+        NaturalDateParser.Result today = naturalDateParserAntarctica.parse("today");
         assertThat(today.getFrom()).as("From should not be null").isNotNull();
         assertThat(today.getTo()).as("To should not be null").isNotNull();
         assertThat(today.getDateTimeZone().getID()).as("should have the Antarctica/Palmer as Timezone").isEqualTo("Antarctica/Palmer");
@@ -141,23 +144,23 @@ public class NaturalDateParserTest {
 
     @Test
     public void testTemporalOrder() throws Exception {
-        NaturalDateParser.Result result1 = naturalDateParserUtc.parse("last hour", referenceDate);
+        NaturalDateParser.Result result1 = naturalDateParserUtc.parse("last hour");
         assertThat(result1.getFrom()).as("from should be before to in").isBefore(result1.getTo());
 
-        NaturalDateParser.Result result2 = naturalDateParserUtc.parse("last one hour", referenceDate);
+        NaturalDateParser.Result result2 = naturalDateParserUtc.parse("last one hour");
         assertThat(result2.getFrom()).as("from should be before to in").isBefore(result2.getTo());
     }
 
     // https://github.com/Graylog2/graylog2-server/issues/1226
     @Test
     public void issue1226() throws Exception {
-        NaturalDateParser.Result result99days = naturalDateParser.parse("last 99 days", referenceDate);
+        NaturalDateParser.Result result99days = naturalDateParser.parse("last 99 days");
         assertThat(result99days.getFrom()).isEqualToIgnoringMillis(result99days.getTo().minusDays(100));
 
-        NaturalDateParser.Result result100days = naturalDateParser.parse("last 100 days", referenceDate);
+        NaturalDateParser.Result result100days = naturalDateParser.parse("last 100 days");
         assertThat(result100days.getFrom()).isEqualToIgnoringMillis(result100days.getTo().minusDays(101));
 
-        NaturalDateParser.Result result101days = naturalDateParser.parse("last 101 days", referenceDate);
+        NaturalDateParser.Result result101days = naturalDateParser.parse("last 101 days");
         assertThat(result101days.getFrom()).isEqualToIgnoringMillis(result101days.getTo().minusDays(102));
     }
 
@@ -364,7 +367,7 @@ public class NaturalDateParserTest {
         final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
 
         for(String test: testsThatAlignToStartOfDay) {
-            NaturalDateParser.Result result = naturalDateParser.parse(test, referenceDate);
+            NaturalDateParser.Result result = naturalDateParser.parse(test);
             assertNotNull(result.getFrom());
             assertNotNull(result.getTo());
 
@@ -383,7 +386,7 @@ public class NaturalDateParserTest {
         final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
 
         for(String[] test: multipleDaytestsThatAlignToAGivenTime) {
-            NaturalDateParser.Result result = naturalDateParser.parse(test[0], referenceDate);
+            NaturalDateParser.Result result = naturalDateParser.parse(test[0]);
             assertNotNull(result.getFrom());
             assertNotNull(result.getTo());
 
@@ -397,7 +400,7 @@ public class NaturalDateParserTest {
         final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
 
         for(String[] test: singleDaytestsThatAlignToAGivenTime) {
-            NaturalDateParser.Result result = naturalDateParser.parse(test[0], referenceDate);
+            NaturalDateParser.Result result = naturalDateParser.parse(test[0]);
             assertNotNull(result.getFrom());
             assertNotNull(result.getTo());
 
@@ -411,7 +414,7 @@ public class NaturalDateParserTest {
         final DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
 
         for(String test: testsThatAlignToStartOfDay) {
-            NaturalDateParser.Result result = naturalDateParser.parse(test, referenceDate);
+            NaturalDateParser.Result result = naturalDateParser.parse(test);
             assertNotNull(result.getFrom());
             assertNotNull(result.getTo());
 
