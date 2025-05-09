@@ -20,6 +20,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog.security.GrantDTO;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -29,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -144,5 +146,15 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
      */
     default boolean usesScopedEntities() {
         return false;
+    }
+
+    /**
+     * Return a list of existing grants targeting the given entity.
+     *
+     * @param nativeEntity target entity
+     * @return list of grants where the entity is the target
+     */
+    default List<GrantDTO> resolveGrants(EntityClass nativeEntity) {
+        return List.of();
     }
 }
