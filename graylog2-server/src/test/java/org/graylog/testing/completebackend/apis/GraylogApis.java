@@ -54,6 +54,9 @@ public class GraylogApis implements GraylogRestApi {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogApis.class);
     private static final ObjectMapperProvider OBJECT_MAPPER_PROVIDER = new ObjectMapperProvider();
 
+    private final String username;
+    private final String password;
+
     private final GraylogBackend backend;
     private final Users users;
     private final Streams streams;
@@ -69,8 +72,16 @@ public class GraylogApis implements GraylogRestApi {
     private final Dashboards dashboards;
     private final Pipelines pipelines;
     private final Inputs inputs;
+    private final Roles roles;
 
     public GraylogApis(GraylogBackend backend) {
+        this(backend, "admin", "admin");
+    }
+
+    public GraylogApis(GraylogBackend backend, String username, String password) {
+        this.username = username;
+        this.password = password;
+
         this.backend = backend;
         this.users = new Users(this);
         this.streams = new Streams(this);
@@ -86,6 +97,15 @@ public class GraylogApis implements GraylogRestApi {
         this.dashboards = new Dashboards(this);
         this.pipelines = new Pipelines(this);
         this.inputs = new Inputs(this);
+        this.roles = new Roles(this);
+    }
+
+    public GraylogApis forUser(String username, String password) {
+        return new GraylogApis(backend, username, password);
+    }
+
+    public GraylogApis forUser(Users.User user) {
+        return new GraylogApis(backend, user.username(), user.password());
     }
 
     public RequestSpecification requestSpecification() {
@@ -96,11 +116,11 @@ public class GraylogApis implements GraylogRestApi {
                 .accept(JSON)
                 .contentType(JSON)
                 .header("X-Requested-By", "peterchen")
-                .auth().basic("admin", "admin");
+                .auth().basic(username, password);
     }
 
     public Supplier<RequestSpecification> requestSpecificationSupplier() {
-        return () -> this.requestSpecification();
+        return this::requestSpecification;
     }
 
     public GraylogBackend backend() {
@@ -161,6 +181,10 @@ public class GraylogApis implements GraylogRestApi {
 
     public Inputs inputs() {
         return inputs;
+    }
+
+    public Roles roles() {
+        return roles;
     }
 
     protected RequestSpecification prefix(final Users.User user) {
