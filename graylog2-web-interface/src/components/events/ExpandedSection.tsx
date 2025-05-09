@@ -29,12 +29,7 @@ type Props = {
   event: Event;
 };
 
-const ExpandedSection = ({ defaultLayout, event }: Props) => {
-  const { permissions } = useCurrentUser();
-  if (!isPermitted(permissions, `eventdefinitions:read:${event.event_definition_id}`)) {
-    return <em>No further details</em>;
-  }
-
+const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
 
   const nonDisplayedAttributes = useNonDisplayedAttributes(defaultLayout);
@@ -42,6 +37,15 @@ const ExpandedSection = ({ defaultLayout, event }: Props) => {
   if (!nonDisplayedAttributes.length) return <em>No further details</em>;
 
   return <GeneralEventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />;
+};
+
+const ExpandedSection = ({ defaultLayout, event }: Props) => {
+  const { permissions } = useCurrentUser();
+  if (!isPermitted(permissions, `eventdefinitions:read:${event.event_definition_id}`)) {
+    return <em>No further details</em>;
+  }
+
+  return <GeneralEventDetails defaultLayout={defaultLayout} event={event} />;
 };
 
 export default ExpandedSection;
