@@ -19,7 +19,7 @@ package org.graylog.events.notifications;
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
-import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationPersistenceService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class SystemNotificationRenderServiceTest {
-    static NotificationService notificationService = mock(NotificationService.class);
+    static NotificationPersistenceService notificationService = mock(NotificationPersistenceService.class);
     static org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);
     static SystemNotificationRenderService renderService;
     Notification notification;
@@ -64,9 +64,9 @@ class SystemNotificationRenderServiceTest {
 
         SystemNotificationRenderService.RenderResponse renderResponse =
                 renderService.render(notification.getType(), null, SystemNotificationRenderService.Format.HTML, null);
-        assertThat(renderResponse.title).isEqualToIgnoringWhitespace("Email Transport Configuration is missing or invalid!");
-        assertThat(renderResponse.description).containsSequence("java.lang.Exception: My Test Exception");
-        assertThat(renderResponse.description).containsSequence("<span>");
+        assertThat(renderResponse.title()).isEqualToIgnoringWhitespace("Email Transport Configuration is missing or invalid!");
+        assertThat(renderResponse.description()).containsSequence("java.lang.Exception: My Test Exception");
+        assertThat(renderResponse.description()).containsSequence("<span>");
     }
 
     @Test
@@ -82,8 +82,8 @@ class SystemNotificationRenderServiceTest {
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
 
         SystemNotificationRenderService.RenderResponse renderResponse = renderService.render(notification);
-        assertThat(renderResponse.description).containsSequence("java.lang.Exception: My Test Exception");
-        assertThat(renderResponse.description).doesNotContain("<span>");
+        assertThat(renderResponse.description()).containsSequence("java.lang.Exception: My Test Exception");
+        assertThat(renderResponse.description()).doesNotContain("<span>");
     }
 
     @Test
@@ -100,7 +100,7 @@ class SystemNotificationRenderServiceTest {
 
         SystemNotificationRenderService.RenderResponse renderResponse =
                 renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
-        assertThat(renderResponse.description).doesNotContain(url);
+        assertThat(renderResponse.description()).doesNotContain(url);
     }
 
     @Test
@@ -117,7 +117,7 @@ class SystemNotificationRenderServiceTest {
 
         SystemNotificationRenderService.RenderResponse renderResponse =
                 renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
-        assertThat(renderResponse.description).containsSequence(url);
+        assertThat(renderResponse.description()).containsSequence(url);
     }
 
     @Test
@@ -137,7 +137,7 @@ class SystemNotificationRenderServiceTest {
 
         SystemNotificationRenderService.RenderResponse renderResponse =
                 renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
-        assertThat(renderResponse.description).containsSequence("11: 12");
+        assertThat(renderResponse.description()).containsSequence("11: 12");
     }
 
     @Test
@@ -170,7 +170,7 @@ class SystemNotificationRenderServiceTest {
                 renderService.render(notification.getType(), null, SystemNotificationRenderService.Format.HTML, null);
 
         // HTML-escaping applied
-        assertThat(renderResponse.title).contains("Test: &lt;123&gt;");
-        assertThat(renderResponse.description).contains("Test: &lt;abc&gt");
+        assertThat(renderResponse.title()).contains("Test: &lt;123&gt;");
+        assertThat(renderResponse.description()).contains("Test: &lt;abc&gt");
     }
 }
