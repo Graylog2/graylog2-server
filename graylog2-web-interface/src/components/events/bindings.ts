@@ -14,21 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import PageNavigation from 'components/common/PageNavigation';
-import usePluginEntities from 'hooks/usePluginEntities';
-import { Row } from 'components/bootstrap';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-const EventsPageNavigation = () => {
-  const navigationItems = usePluginEntities('alerts.pageNavigation');
-  const formattedNavigationItems = navigationItems.map((item) => ({ title: item.description, path: item.path, exactPathMatch: item.description === 'Alerts & Events' }));
+import Routes from 'routing/Routes';
 
-  return (
-    <Row>
-      <PageNavigation items={formattedNavigationItems} />
-    </Row>
-  );
+const ALERTS_TITLE = 'Alerts & Events';
+const EVENT_DEFINITIONS_TITLE = 'Event Definitions';
+const NOTIFICATIONS_TITLE = 'Notifications';
+
+const eventsBindings: PluginExports = {
+  'alerts.pageNavigation': [
+    { description: ALERTS_TITLE, path: Routes.ALERTS.LIST },
+    { description: EVENT_DEFINITIONS_TITLE, path: Routes.ALERTS.DEFINITIONS.LIST },
+    { description: NOTIFICATIONS_TITLE, path: Routes.ALERTS.NOTIFICATIONS.LIST },
+  ],
 };
 
-export default EventsPageNavigation;
+export default eventsBindings;
