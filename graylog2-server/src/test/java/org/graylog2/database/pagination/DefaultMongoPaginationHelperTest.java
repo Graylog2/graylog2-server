@@ -60,14 +60,12 @@ class DefaultMongoPaginationHelperTest {
                     .map(name -> new DTO(new ObjectId().toHexString(), name))
                     .toList();
 
-    private MongoCollections mongoCollections;
-    private MongoCollection<DTO> collection;
     private MongoPaginationHelper<DTO> paginationHelper;
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
-        collection = mongoCollections.collection("test", DTO.class);
+        final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
+        final MongoCollection<DTO> collection = mongoCollections.collection("test", DTO.class);
         paginationHelper = new DefaultMongoPaginationHelper<>(collection);
 
         collection.insertMany(DTOs);
@@ -76,12 +74,12 @@ class DefaultMongoPaginationHelperTest {
     @Test
     void testFilter() {
         final Bson filter = Filters.in("name", "A", "B", "C");
-        final PaginatedList<DTO> filterdPage = paginationHelper.filter(filter).page(1);
-        assertThat(filterdPage)
+        final PaginatedList<DTO> filteredPage = paginationHelper.filter(filter).page(1);
+        assertThat(filteredPage)
                 .isEqualTo(paginationHelper.filter(filter).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(DTOs.subList(0, 3));
 
-        assertThat(filterdPage.pagination()).satisfies(pagination -> {
+        assertThat(filteredPage.pagination()).satisfies(pagination -> {
             assertThat(pagination.total()).isEqualTo(3);
             assertThat(pagination.page()).isEqualTo(1);
             assertThat(pagination.perPage()).isEqualTo(0);
