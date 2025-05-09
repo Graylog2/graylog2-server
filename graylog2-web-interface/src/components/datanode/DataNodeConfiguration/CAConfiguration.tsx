@@ -23,6 +23,7 @@ import CAUpload from 'components/datanode/DataNodeConfiguration/CAUpload';
 import DocumentationLink from 'components/support/DocumentationLink';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useProductName from 'brand-customization/useProductName';
 
 const StyledAlert = styled(Alert)`
   margin-top: 10px;
@@ -35,6 +36,7 @@ const UploadCA = 'Upload CA';
 
 const CAConfiguration = () => {
   const sendTelemetry = useSendTelemetry();
+  const productName = useProductName();
 
   const handleTabSwitch = (e) => {
     sendTelemetry(
@@ -57,10 +59,11 @@ const CAConfiguration = () => {
         The certificate authority will provision and manage certificates for your Data Nodes more easily.
       </p>
       <StyledAlert bsStyle="info" title="Reusing certificates">
-        If your existing cluster uses certificates, by default these will get replaced with the Graylog CA and
+        If your existing cluster uses certificates, by default these will get replaced with the {productName} CA and
         automatically generated certificates during provisioning of the data nodes in the next step. If you want to
         include your own CA, you can upload an existing certificate. Please see{' '}
-        <DocumentationLink page="graylog-data-node" text="Graylog Data Node - Getting Started" /> for more information.
+        <DocumentationLink page="graylog-data-node" text={`${productName} Data Node - Getting Started`} /> for more
+        information.
       </StyledAlert>
       <Tabs defaultActiveKey={TAB_KEYS[0]} id="ca-configurations" onClick={handleTabSwitch}>
         <Tab eventKey={TAB_KEYS[0]} title="Create new CA">
