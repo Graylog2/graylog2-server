@@ -16,12 +16,16 @@
  */
 package org.graylog2.datanode;
 
-import org.graylog.plugins.datanode.dto.ClusterState;
+import jakarta.inject.Provider;
 import org.graylog2.plugin.Version;
 
-import java.util.List;
-
-public record DatanodeUpgradeStatus(Version serverVersion, ClusterState clusterState,
-                                    boolean clusterHealthy, boolean shardReplicationEnabled, List<DataNodeInformation> upToDateNodes,
-                                    List<DataNodeInformation> outdatedNodes, List<String> warnings) {
+/**
+ * Let's inject the server version where needed. Using the static CURRENT_CLASSPATH field is making our code untestable.
+ * Injection allows clean unit tests.
+ */
+public class ServerVersionProvider implements Provider<Version> {
+    @Override
+    public Version get() {
+        return Version.CURRENT_CLASSPATH;
+    }
 }

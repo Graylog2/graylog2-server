@@ -31,6 +31,12 @@ import ClusterConfigurationPageNavigation from 'components/cluster-configuration
 import DocumentationLink from 'components/support/DocumentationLink';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
+const ServerVersion = styled.dl(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[60]};
+  `,
+);
+
 const StyledHorizontalDl = styled.dl(
   ({ theme }) => css`
     margin: ${theme.spacings.md} 0;
@@ -182,6 +188,13 @@ const DataNodeUpgradePage = () => {
               <Alert bsStyle="success">All your Data Nodes are Up-to-date.</Alert>
             )}
             {!data?.shard_replication_enabled && manualUpgradeAlert(nodeInProgress)}
+            {(data?.warnings?.length || 0) > 0 && (
+              <Alert bsStyle="danger">
+                {data.warnings.map((warning) => (
+                  <p>{warning}</p>
+                ))}
+              </Alert>
+            )}
           </Col>
           <Col xs={12}>
             <h3>
@@ -212,6 +225,10 @@ const DataNodeUpgradePage = () => {
               />
             </h3>
             <StyledHorizontalDl>
+              <dt>Server Version:</dt>
+              <ServerVersion>
+                <b>{data?.server_version?.version || ''}</b>
+              </ServerVersion>
               {upgradeMethod === 'rolling-upgrade' && (
                 <>
                   <dt>Shard Replication:</dt>
