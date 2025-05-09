@@ -19,6 +19,7 @@ package org.graylog.events.processor;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import org.bson.conversions.Bson;
@@ -240,5 +241,16 @@ public class DBEventDefinitionService {
     @MustBeClosed
     public Stream<EventDefinitionDto> streamByQuery(Bson query) {
         return stream(collection.find(query));
+    }
+
+    /**
+     * Remove event procedures from all event definitions that reference it.
+     *
+     * @param procedureId The event procedure ID
+     */
+    public void removeEventProcedureFromAll(String procedureId) {
+        collection.updateMany(
+                Filters.eq(EventDefinitionDto.FIELD_EVENT_PROCEDURE, procedureId),
+                Updates.unset(EventDefinitionDto.FIELD_EVENT_PROCEDURE));
     }
 }
