@@ -41,8 +41,11 @@ const EnterprisePage = () => {
       <div>
         <PageHeader title={`Try ${productName} Enterprise`}>
           <span>
-            {productName} Enterprise adds commercial functionality to the Open Source {productName} core. You can learn
-            more about {productName} Enterprise on the <EnterpriseProductLink>product page</EnterpriseProductLink>.
+            {productName} Enterprise adds commercial functionality to the Open Source {productName} core.{' '}
+            <UpsellWrapper>
+              You can learn more about {productName} Enterprise on the{' '}
+              <EnterpriseProductLink>product page</EnterpriseProductLink>.
+            </UpsellWrapper>
           </span>
         </PageHeader>
 
