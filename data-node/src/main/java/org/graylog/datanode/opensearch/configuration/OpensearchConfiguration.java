@@ -66,16 +66,17 @@ public class OpensearchConfiguration {
     }
 
     public Environment getEnv() {
-        final Environment env = new Environment(System.getenv());
+        return new Environment(System.getenv())
+                .withOpensearchJavaHome(opensearchDistribution.getOpensearchJavaHome())
+                .withOpensearchJavaOpts(getJavaOpts())
+                .withOpensearchPathConf(opensearchConfigurationDir.configurationRoot());
+    }
 
-        List<String> javaOpts = new LinkedList<>();
-
-        configurationParts.stream().map(DatanodeConfigurationPart::javaOpts)
-                .forEach(javaOpts::addAll);
-
-        env.put("OPENSEARCH_JAVA_OPTS", String.join(" ", javaOpts));
-        env.put("OPENSEARCH_PATH_CONF", opensearchConfigurationDir.configurationRoot().toString());
-        return env;
+    @Nonnull
+    private List<String> getJavaOpts() {
+        return configurationParts.stream()
+                .flatMap(part -> part.javaOpts().stream())
+                .collect(Collectors.toList());
     }
 
     public HttpHost getRestBaseUrl() {
