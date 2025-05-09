@@ -26,18 +26,19 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 
 import type View from './View';
 
-export default (view: View, history: HistoryFunction, entityShare?: EntitySharePayload) => async (dispatch: ViewsDispatch) => {
-  try {
-    const savedView = await ViewManagementActions.create(view, entityShare);
+export default (view: View, history: HistoryFunction, entityShare?: EntitySharePayload) =>
+  async (dispatch: ViewsDispatch) => {
+    try {
+      const savedView = await ViewManagementActions.create(view, entityShare);
 
-    flushSync(() => {
-      dispatch(setIsDirty(false));
-      dispatch(setIsNew(false));
-    });
+      flushSync(() => {
+        dispatch(setIsDirty(false));
+        dispatch(setIsNew(false));
+      });
 
-    loadDashboard(history, savedView.id);
-    UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
-  } catch (error) {
-    UserNotification.error(`Saving view failed: ${error}`, 'Error!');
-  }
-};
+      loadDashboard(history, savedView.id);
+      UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
+    } catch (error) {
+      UserNotification.error(`Saving view failed: ${error}`, 'Error!');
+    }
+  };

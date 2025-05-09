@@ -47,7 +47,7 @@ const fetchNotifications = () => {
 type Props = {
   action?: 'edit' | 'create';
   eventDefinition?: EventDefinition & {
-    share_request?: EntitySharePayload,
+    share_request?: EntitySharePayload;
   };
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
   initialStep?: string;

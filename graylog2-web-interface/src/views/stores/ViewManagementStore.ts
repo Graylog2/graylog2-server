@@ -114,7 +114,7 @@ const ViewManagementStore = singletonStore('views.ViewManagement', () =>
     },
 
     create(view: View, entityShare?: EntitySharePayload): Promise<View> {
-      const promise = fetch('POST', viewsUrl,  JSON.stringify({...view.toJSON(), share_request: entityShare}));
+      const promise = fetch('POST', viewsUrl, JSON.stringify({ ...view.toJSON(), share_request: entityShare }));
 
       ViewManagementActions.create.promise(promise);
 
@@ -126,7 +126,11 @@ const ViewManagementStore = singletonStore('views.ViewManagement', () =>
     },
 
     update(view: View, entityShare?: EntitySharePayload): Promise<View> {
-      const promise = fetch('PUT', viewsIdUrl(view.id), JSON.stringify({...view.toJSON(), share_request: entityShare}));
+      const promise = fetch(
+        'PUT',
+        viewsIdUrl(view.id),
+        JSON.stringify({ ...view.toJSON(), share_request: entityShare }),
+      );
 
       ViewManagementActions.update.promise(promise);
 
