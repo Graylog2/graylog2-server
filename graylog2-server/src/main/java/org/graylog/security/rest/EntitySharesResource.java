@@ -16,6 +16,7 @@
  */
 package org.graylog.security.rest;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -52,7 +53,9 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -116,15 +119,26 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
         // we can do a second request including the "grantees". Then we can do the dependency check to
         // fill out "missing_dependencies".
         // This should probably be a POST request with a JSON payload.
-        return entitySharesService.prepareShare(grn, request, getCurrentUser(), getSubject());
+        return entitySharesService.prepareShare(grn, request, getCurrentUser());
     }
 
+    public record PrepareShareRequest(@JsonProperty("prepare_request") @Nullable List<String> dependentEntityGRNs) {
+    }
+
+    /**
+     * Prepare shares independent of a specific entity.
+     * Optionally check for missing permissions on specified dependent entities.
+     */
     @POST
-    @ApiOperation(value = "Prepare shares independent of any specific entity or collection")
+    @ApiOperation(value = "Prepare shares independent of a specific entity or collection")
     @Path("entities/prepare")
     @NoAuditEvent("This does not change any data")
-    public EntityShareResponse prepareGenericShare(@ApiParam(name = "JSON Body", required = true) @NotNull @Valid EntityShareRequest request) {
-        return entitySharesService.prepareShare(request, getCurrentUser(), getSubject());
+    public EntityShareResponse prepareGenericShare(@ApiParam(name = "JSON Body") PrepareShareRequest request) {
+        if (request.dependentEntityGRNs() != null && !request.dependentEntityGRNs().isEmpty()) {
+            return entitySharesService.prepareShare(request.dependentEntityGRNs(), getCurrentUser());
+        } else {
+            return entitySharesService.prepareShare(getCurrentUser());
+        }
     }
 
     @POST
