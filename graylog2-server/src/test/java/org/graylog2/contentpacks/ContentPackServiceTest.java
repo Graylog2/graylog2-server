@@ -22,6 +22,11 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.text.IniRealm;
+import org.apache.shiro.util.ThreadContext;
 import org.bson.types.ObjectId;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.conditions.Expr;
@@ -111,6 +116,7 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.streams.matchers.StreamRuleMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -201,6 +207,7 @@ public class ContentPackServiceTest {
     private GrokPattern grokPattern;
     private ImmutableSet<NativeEntityDescriptor> nativeEntityDescriptors;
     private ImmutableMap<ModelId, Object> entityObjectMap;
+    private User user;
 
     @Before
     public void setUp() throws Exception {
@@ -219,7 +226,7 @@ public class ContentPackServiceTest {
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
                 );
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), configuration, userService);
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");
@@ -259,6 +266,18 @@ public class ContentPackServiceTest {
                 .createdAt(Instant.now())
                 .createdBy("me")
                 .build();
+
+        // configure test security context
+        IniRealm iniRealm = new IniRealm(ContentPackServiceTest.class.getResource("content-pack-service-test-permissions.ini").getPath());
+        iniRealm.setName("runAs-context");
+        SecurityManager securityManager = new DefaultSecurityManager(iniRealm);
+        SecurityUtils.setSecurityManager(securityManager);
+    }
+
+    @After
+    public void tearDown() {
+        ThreadContext.unbindSubject();
+        ThreadContext.unbindSecurityManager();
     }
 
     @Test
@@ -278,7 +297,10 @@ public class ContentPackServiceTest {
         for (String id : Stream.ALL_SYSTEM_STREAM_IDS) {
             when(streamService.load(id)).thenReturn(createTestStream(id));
         }
+        when(mockUser.getId()).thenReturn(TEST_USER);
+        when(mockUser.getName()).thenReturn(TEST_USER);
         when(userService.load(TEST_USER)).thenReturn(mockUser);
+        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
         when(searchDbService.save(any())).thenReturn(Search.builder().id("id").build());
         when(viewService.saveWithOwner(any(), any())).thenReturn(ViewDTO.builder().id("id").title("title").searchId("id").state(Collections.emptyMap()).build());
         when(eventDefinitionHandler.create(any(), any())).thenReturn(createTestEventDefinitionDto());
@@ -311,6 +333,10 @@ public class ContentPackServiceTest {
         when(contentPackInstallService.insert(captor.capture())).thenReturn(null);
 
         when(configuration.isCloud()).thenReturn(false);
+        when(mockUser.getId()).thenReturn(TEST_USER);
+        when(mockUser.getName()).thenReturn(TEST_USER);
+        when(userService.load(TEST_USER)).thenReturn(mockUser);
+        when(userService.loadById(TEST_USER)).thenReturn(mockUser);
         contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
         assertThat(captor.getValue().entities()).hasSize(1);
 
