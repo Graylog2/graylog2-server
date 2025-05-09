@@ -22,11 +22,13 @@ import org.bson.conversions.Bson;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
+import org.graylog.grn.GRNTypes;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.plugin.database.users.User;
@@ -56,16 +58,19 @@ public class EventDefinitionHandler {
     private final DBEventDefinitionService eventDefinitionService;
     private final DBJobDefinitionService jobDefinitionService;
     private final DBJobTriggerService jobTriggerService;
+    private final EntitySharesService entitySharesService;
     private final JobSchedulerClock clock;
 
     @Inject
     public EventDefinitionHandler(DBEventDefinitionService eventDefinitionService,
                                   DBJobDefinitionService jobDefinitionService,
                                   DBJobTriggerService jobTriggerService,
+                                  EntitySharesService entitySharesService,
                                   JobSchedulerClock clock) {
         this.eventDefinitionService = eventDefinitionService;
         this.jobDefinitionService = jobDefinitionService;
         this.jobTriggerService = jobTriggerService;
+        this.entitySharesService = entitySharesService;
         this.clock = clock;
     }
 
@@ -110,7 +115,10 @@ public class EventDefinitionHandler {
                 .state(EventDefinition.State.DISABLED)
                 .build();
 
-        return createWithoutSchedule(copy, user);
+        EventDefinitionDto copyDto = createWithoutSchedule(copy, user);
+        user.ifPresent(theUser -> entitySharesService.cloneEntityGrants(GRNTypes.EVENT_DEFINITION, eventDefinition.id(), copyDto.id(), theUser));
+
+        return copyDto;
     }
 
     /**

@@ -239,7 +239,7 @@ public class EntitySharesService {
 
         // remove grants that are not present anymore
         // TODO delete multiple entries with one db query
-        existingGrants.forEach((g) -> {
+        existingGrants.forEach(g -> {
             if (!selectedGranteeCapabilities.containsKey(g.grantee())) {
                 grantService.delete(g.id());
                 updateEventBuilder.addDeletes(g.grantee(), g.capability());
@@ -253,6 +253,29 @@ public class EntitySharesService {
                 .activeShares(activeShares)
                 .selectedGranteeCapabilities(getSelectedGranteeCapabilities(activeShares, request))
                 .build();
+    }
+
+    /**
+     * Add all grants of the original entity to the cloned entity, if they are visible to the sharing user.
+     */
+    public EntityShareResponse cloneEntityGrants(GRNType grnType, String idOrigin, String idClone, User sharingUser) {
+        requireNonBlank(idOrigin, "original entity ID cannot be null or empty");
+        requireNonBlank(idClone, "cloned entity ID cannot be null or empty");
+        requireNonNull(sharingUser, "sharingUser cannot be null");
+        final GRN grnOrigin = grnRegistry.newGRN(grnType, idOrigin);
+        final GRN grnClone = grnRegistry.newGRN(grnType, idClone);
+
+        final Set<GRN> modifiableGranteeGRNs = getModifiableGrantees(sharingUser, grnOrigin)
+                .stream().map(Grantee::grn).collect(Collectors.toSet());
+        final List<GrantDTO> existingGrants = grantService.getForTarget(grnOrigin);
+
+        EntityShareRequest shareRequest = EntityShareRequest.create(
+                existingGrants.stream()
+                        .filter(grant -> modifiableGranteeGRNs.contains(grant.grantee()))
+                        .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability))
+        );
+
+        return updateEntityShares(grnClone, shareRequest, sharingUser);
     }
 
     private void postUpdateEvent(EntitySharesUpdateEvent updateEvent) {
@@ -283,7 +306,7 @@ public class EntitySharesService {
 
         // Iterate over all existing owner grants and find modifications
         ArrayList<GRN> removedOwners = new ArrayList<>();
-        existingGrants.stream().filter(g -> g.capability().equals(Capability.OWN)).forEach((g) -> {
+        existingGrants.stream().filter(g -> g.capability().equals(Capability.OWN)).forEach(g -> {
             // owner got removed
             if (!selectedGranteeCapabilities.containsKey(g.grantee())) {
                 // Ignore owners that were invisible to the requesting user
@@ -308,14 +331,6 @@ public class EntitySharesService {
                 removedOwners.stream().map(Objects::toString).collect(Collectors.toSet()));
 
         return validationResult;
-    }
-
-    /**
-     * Return all existing grants for the given entity
-     */
-    public Map<GRN, Capability> getGrants(GRN ownedEntity) {
-        return grantService.getForTarget(ownedEntity).stream()
-                .collect(Collectors.toMap(GrantDTO::grantee, GrantDTO::capability));
     }
 
     private Map<GRN, Capability> getSelectedGranteeCapabilities(ImmutableSet<ActiveShare> activeShares, EntityShareRequest shareRequest) {
