@@ -46,21 +46,15 @@ type DataTableProps = {
   customFilter?: React.ReactNode;
   /** Adds a custom class to the row element. */
   rowClassName?: string;
-  /** Object key that should be used to display data in the data filter input. */
-  displayKey?: string;
   /**
    * Function that renders a row in the table. It receives two arguments: the row, and its index.
    * It usually returns a `<tr>` element with the formatted row.
    */
   dataRowFormatter: (...args: any[]) => React.ReactElement;
-  /** Label to use next to the suggestions for the data filter input. */
-  filterBy?: string;
   /** Label to use next to the data filter input. */
   filterLabel?: string;
   /** List of object keys to use as filter in the data filter input. Use an empty array to disable data filter. */
   filterKeys?: any[];
-  /** Array to use as suggestions in the data filter input. */
-  filterSuggestions?: any[];
   /**
    * Function that renders a single header cell in the table. It receives two arguments: the header, and its index.
    * It usually returns a `<th>` element with the header.
@@ -105,11 +99,8 @@ class DataTable extends React.Component<
     customFilter: undefined,
     children: undefined,
     className: '',
-    filterBy: '',
-    filterSuggestions: [],
     filterKeys: [],
     filterLabel: 'Filter',
-    displayKey: 'value',
     noDataText: 'No data available.',
     rowClassName: '',
     useResponsiveTable: true,
@@ -186,9 +177,6 @@ class DataTable extends React.Component<
       filterKeys,
       id,
       filterLabel,
-      filterBy,
-      displayKey,
-      filterSuggestions,
       children,
       noDataText,
       className,
@@ -216,15 +204,7 @@ class DataTable extends React.Component<
     return (
       <div>
         {customFilter || (
-          <Filter
-            label={filterLabel}
-            rows={rows}
-            id={id}
-            displayKey={displayKey}
-            filterBy={filterBy}
-            filterSuggestions={filterSuggestions}
-            filterKeys={filterKeys}
-            onDataFiltered={this.filterDataRows}>
+          <Filter label={filterLabel} rows={rows} id={id} filterKeys={filterKeys} onDataFiltered={this.filterDataRows}>
             {children}
           </Filter>
         )}

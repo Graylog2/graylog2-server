@@ -24,13 +24,10 @@ type Props = {
   rows: Array<unknown>;
   id?: string;
   filterKeys?: any[];
-  displayKey?: string;
-  filterBy?: string;
-  filterLabel?: unknown;
 };
 
 const Filter = ({ setFilteredRows, resetPagination, rows, ...filterProps }: Props) => {
-  const onDataFiltered = (newFilteredGroups, filterText) => {
+  const onDataFiltered = (newFilteredGroups: unknown[], filterText: string) => {
     if (filterText && filterText !== '') {
       setFilteredRows(newFilteredGroups);
     } else {
