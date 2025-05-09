@@ -388,6 +388,7 @@ public class ContentPackServiceTest {
                 .failedEntities(ImmutableSet.of())
                 .entities(nativeEntityDescriptors)
                 .entityObjects(entityObjectMap)
+                .entityGrants(ImmutableMap.of(ModelId.of("12345"), new ArrayList<>()))
                 .build();
 
         ContentPackUninstallation resultSuccess = contentPackService.uninstallContentPack(contentPack, contentPackInstallation);
