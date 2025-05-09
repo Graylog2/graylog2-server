@@ -182,18 +182,18 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public RoleImpl save(Role role1) throws ValidationException {
+    public RoleImpl save(Role role) throws ValidationException {
         // sucky but necessary because of graylog2-shared not knowing about mongodb :(
-        if (!(role1 instanceof final RoleImpl role)) {
+        if (!(role instanceof final RoleImpl roleImpl)) {
             throw new IllegalArgumentException("invalid Role implementation class");
         }
-        final Set<ConstraintViolation<Role>> violations = validate(role);
+        final Set<ConstraintViolation<Role>> violations = validate(roleImpl);
         if (!violations.isEmpty()) {
             throw new ValidationException("Validation failed.", violations.toString());
         }
-        final RoleImpl result = collection.findOneAndReplace(eq(NAME_LOWER, role.nameLower()), role,
+        final RoleImpl result = collection.findOneAndReplace(eq(NAME_LOWER, roleImpl.nameLower()), roleImpl,
                 new FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER).upsert(true));
-        triggerChangeEvent(role1.getName());
+        triggerChangeEvent(roleImpl.getName());
         return result;
     }
 
