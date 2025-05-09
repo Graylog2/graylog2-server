@@ -34,7 +34,7 @@ class EnvironmentTest {
         final Environment env = new Environment(userEnv);
         env.withOpensearchJavaHome(Path.of("/dist/opensearch/jdk"));
 
-        Assertions.assertThat(env.getEnv())
+        Assertions.assertThat(env.env())
                 .doesNotContainKey("JAVA_HOME")
                 .containsKey("USER")
                 .containsEntry("OPENSEARCH_JAVA_HOME", "/dist/opensearch/jdk");

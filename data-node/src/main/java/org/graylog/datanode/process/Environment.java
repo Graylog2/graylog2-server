@@ -25,22 +25,19 @@ import java.util.stream.Collectors;
 
 import static java.util.function.Predicate.not;
 
-public class Environment {
+public record Environment(Map<String, String> env) {
 
     private static final String JAVA_HOME_ENV = "JAVA_HOME";
     private static final String OPENSEARCH_JAVA_HOME_ENV = "OPENSEARCH_JAVA_HOME";
     public static final String OPENSEARCH_JAVA_OPTS_ENV = "OPENSEARCH_JAVA_OPTS";
     public static final String OPENSEARCH_PATH_CONF_ENV = "OPENSEARCH_PATH_CONF";
 
-    private final Map<String, String> env;
-    private final Map<String, String> additionalVariables = new HashMap<>();
-
     public Environment(Map<String, String> env) {
-        this.env = env;
+        this.env = new HashMap<>(cleanEnvironment(env));
     }
 
     public Environment put(String key, String value) {
-        this.additionalVariables.put(key, value);
+        this.env.put(key, value);
         return this;
     }
 
@@ -63,18 +60,15 @@ public class Environment {
         return this;
     }
 
-    public Map<String, String> getEnv() {
-        Map<String, String> env = new HashMap<>();
-        env.putAll(cleanEnvironment(this.env));
-        env.putAll(additionalVariables);
+    @Override
+    public Map<String, String> env() {
         return Collections.unmodifiableMap(env);
     }
 
-    private Map<String, String> cleanEnvironment(Map<String, String> env) {
+    private static Map<String, String> cleanEnvironment(Map<String, String> env) {
         return env.entrySet().stream()
                 // Remove JAVA_HOME from environment because OpenSearch should use its bundled JVM.
-                .filter(not(entry -> JAVA_HOME_ENV.equals(entry.getKey())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .filter(not(entry -> JAVA_HOME_ENV.equals(entry.getKey()))).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
 
