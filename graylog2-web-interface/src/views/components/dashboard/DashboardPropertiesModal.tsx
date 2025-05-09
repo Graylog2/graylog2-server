@@ -22,20 +22,24 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
 import type View from 'views/logic/views/View';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type Props = {
   onClose: () => void;
-  onSave: (view: View) => void;
+  onSave: (view: View, entityShare?: EntitySharePayload) => void;
   show: boolean;
   submitButtonText: string;
   title: string;
   view: View;
+  dashboardId?: string;
 };
 
-const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle, submitButtonText }: Props) => {
+const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle, submitButtonText, dashboardId = null }: Props) => {
   const [updatedDashboard, setUpdatedDashboard] = useState(view);
+  const [sharePayload, setSharePayload] = useState(null);
   const pluggableFormComponents = useSaveViewFormControls();
-
+  
   const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
     let value = FormsUtils.getValueFromInput(event.target);
@@ -61,7 +65,7 @@ const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTit
 
   const _onSave = (e: React.FormEvent<HTMLFormElement>) => {
     e.stopPropagation();
-    onSave(updatedDashboard);
+    onSave(updatedDashboard, sharePayload);
     onClose();
   };
 
@@ -102,6 +106,13 @@ const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTit
           help="A longer, helpful description of the dashboard and its functionality."
           onChange={_onChange}
           value={updatedDashboard.description}
+        />
+        <EntityCreateShareFormGroup
+          description='Search for a User or Team to add as collaborator on this dashboard.'
+          entityType='dashboard'
+          entityTitle=''
+          entityId={dashboardId}
+          onSetEntityShare={(payload) => setSharePayload(payload)}
         />
         {pluggableFormComponents?.map(({ component: Component, id }) => Component && <Component key={id} />)}
       </>
