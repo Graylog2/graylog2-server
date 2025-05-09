@@ -29,6 +29,8 @@ import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.security.UserContext;
+import org.graylog.security.UserContextMissingException;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -62,8 +64,10 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
 import org.graylog2.contentpacks.model.parameters.Parameter;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,26 +96,49 @@ public class ContentPackService {
     private final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades;
     private final ObjectMapper objectMapper;
     private final Configuration configuration;
+    private final UserService userService;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
                               Set<ConstraintChecker> constraintCheckers,
                               Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades,
                               ObjectMapper objectMapper,
-                              Configuration configuration) {
+                              Configuration configuration,
+                              UserService userService) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
         this.objectMapper = objectMapper;
         this.configuration = configuration;
+        this.userService = userService;
+    }
+
+
+    public ContentPackInstallation installContentPack(ContentPack contentPack,
+                                                      Map<String, ValueReference> parameters,
+                                                      String comment,
+                                                      String username) {
+        User user = userService.load(username);
+        if (user == null) {
+            throw new IllegalArgumentException("Unknown user <" + username + ">");
+        }
+        return UserContext.runAs(user.getId(), () -> {
+            final UserContext userContext;
+            try {
+                userContext = new UserContext.Factory(userService).create();
+                return installContentPack(contentPack, parameters, comment, userContext);
+            } catch (UserContextMissingException e) {
+                throw new IllegalArgumentException("User Context missing", e);
+            }
+        });
     }
 
     public ContentPackInstallation installContentPack(ContentPack contentPack,
                                                       Map<String, ValueReference> parameters,
                                                       String comment,
-                                                      String user) {
+                                                      UserContext userContext) {
         if (contentPack instanceof ContentPackV1 contentPackV1) {
-            return installContentPack(contentPackV1, parameters, comment, user);
+            return installContentPack(contentPackV1, parameters, comment, userContext);
         } else {
             throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
         }
@@ -120,7 +147,7 @@ public class ContentPackService {
     private ContentPackInstallation installContentPack(ContentPackV1 contentPack,
                                                        Map<String, ValueReference> parameters,
                                                        String comment,
-                                                       String user) {
+                                                       UserContext userContext) {
         ensureConstraints(contentPack.constraints());
 
         final Entity rootEntity = EntityV1.createRoot(contentPack);
@@ -142,7 +169,17 @@ public class ContentPackService {
                 }
 
                 final EntityDescriptor entityDescriptor = entity.toEntityDescriptor();
-                final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
+                final EntityWithExcerptFacade<?, ?> facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
+
+                facade.getCreatePermissions(entity)
+                        .flatMap(permissions ->
+                                permissions.stream()
+                                        .filter(p -> !userContext.isPermitted(p))
+                                        .peek(p -> LOG.warn("Missing permission <{}>", p))
+                                        .findFirst()
+                        ).ifPresent(p -> {
+                            throw new IllegalArgumentException("Missing permissions");
+                        });
 
                 if (configuration.isCloud() && entity.type().equals(INPUT_V1) && entity instanceof EntityV1 entityV1) {
                     final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
@@ -154,8 +191,7 @@ public class ContentPackService {
                     }
                 }
 
-                @SuppressWarnings({"rawtypes", "unchecked"})
-                final Optional<NativeEntity> existingEntity = facade.findExisting(entity, parameters);
+                final Optional<? extends NativeEntity<?>> existingEntity = facade.findExisting(entity, parameters);
                 if (existingEntity.isPresent()) {
                     LOG.trace("Found existing entity for {}", entityDescriptor);
                     final NativeEntity<?> nativeEntity = existingEntity.get();
@@ -173,7 +209,7 @@ public class ContentPackService {
                     allEntities.put(entityDescriptor, nativeEntity.entity());
                 } else {
                     LOG.trace("Creating new entity for {}", entityDescriptor);
-                    final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, user);
+                    final NativeEntity<?> createdEntity = facade.createNativeEntity(entity, validatedParameters, allEntities, userContext.getUser().getName());
                     allEntityDescriptors.add(createdEntity.descriptor());
                     createdEntities.put(entityDescriptor, createdEntity.entity());
                     allEntities.put(entityDescriptor, createdEntity.entity());
@@ -193,7 +229,7 @@ public class ContentPackService {
                 // TODO: Store complete entity instead of only the descriptor?
                 .entities(allEntityDescriptors.build())
                 .createdAt(Instant.now())
-                .createdBy(user)
+                .createdBy(userContext.getUser().getName())
                 .build();
 
         return contentPackInstallationPersistenceService.insert(installation);

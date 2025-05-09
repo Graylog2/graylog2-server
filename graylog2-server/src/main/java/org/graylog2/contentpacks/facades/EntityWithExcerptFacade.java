@@ -29,6 +29,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -145,4 +146,10 @@ public interface EntityWithExcerptFacade<EntityClass, ExcerptClass> {
     default boolean usesScopedEntities() {
         return false;
     }
+
+    default Optional<List<String>> getCreatePermissions(Entity entity) {
+        return Optional.empty();
+    }
+
+    ;
 }
