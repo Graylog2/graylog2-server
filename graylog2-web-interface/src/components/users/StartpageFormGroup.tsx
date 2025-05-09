@@ -30,6 +30,7 @@ import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import useStreams from 'components/streams/hooks/useStreams';
 import useSavedSearches from 'views/hooks/useSavedSearches';
 import type { SettingsFormValues } from 'components/users/UserEdit/SettingsSection';
+import { hasAdminPermission } from 'util/PermissionsMixin';
 
 const Container = styled.div`
   display: flex;
@@ -70,13 +71,11 @@ const typeOptions = [
   { value: 'search', label: 'Search' },
 ];
 
-const ADMIN_PERMISSION = '*';
-
 const useStartPageOptions = (userId, permissions) => {
   const {
     values: { startpage },
   } = useFormikContext<SettingsFormValues>();
-  const selectedUserIsAdmin = permissions.includes(ADMIN_PERMISSION);
+  const selectedUserIsAdmin = hasAdminPermission(permissions);
   const [userDashboards, setUserDashboards] = useState<Option[]>([]);
   const [userStreams, setUserStreams] = useState<Option[]>([]);
   const [userSearches, setUserSearches] = useState<Option[]>([]);
