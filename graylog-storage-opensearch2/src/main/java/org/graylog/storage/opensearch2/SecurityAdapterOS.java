@@ -25,11 +25,15 @@ import org.graylog.shaded.opensearch2.org.apache.http.entity.ContentType;
 import org.graylog.shaded.opensearch2.org.apache.http.entity.StringEntity;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog2.indexer.security.SecurityAdapter;
+import org.graylog2.indexer.security.SecurityRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * see: https://opensearch.org/docs/latest/security/access-control/api/
@@ -49,7 +53,7 @@ public class SecurityAdapterOS implements SecurityAdapter {
 
     @Override
     public Mapping getMappingForRole(final String role) {
-        final JsonNode result = jsonApi.perform(request("GET", "rolesmapping/" + role), "Unable to retrieve role mapping for role " + role);
+        final JsonNode result = jsonApi.perform(securityApiRequest("GET", "rolesmapping/" + role), "Unable to retrieve role mapping for role " + role);
 
         final JsonNode fields = result.path(role);
         try {
@@ -61,7 +65,7 @@ public class SecurityAdapterOS implements SecurityAdapter {
 
     public MappingResponse addUserToRoleMapping(final String role, final String user) {
         final var mapping = getMappingForRole(role);
-        if(!mapping.users().contains(user)) {
+        if (!mapping.users().contains(user)) {
             final List<String> users = new ArrayList<>();
             users.addAll(mapping.users());
             users.add(user);
@@ -73,7 +77,7 @@ public class SecurityAdapterOS implements SecurityAdapter {
 
     public MappingResponse removeUserFromRoleMapping(final String role, final String user) {
         final var mapping = getMappingForRole(role);
-        if(mapping.users().contains(user)) {
+        if (mapping.users().contains(user)) {
             final var users = mapping.users().stream().filter(u -> !u.equals(user)).toList();
             return setUserToRoleMapping(role, new Mapping(mapping.backendRoles(), mapping.hosts(), users));
         } else {
@@ -81,10 +85,27 @@ public class SecurityAdapterOS implements SecurityAdapter {
         }
     }
 
+    @Override
+    public List<SecurityRole> getRoles() {
+        final JsonNode response = jsonApi.perform(securityApiRequest("GET", "roles"), "Unable to retrieve roles");
+        List<SecurityRole> roles = new ArrayList<>();
+
+        final Iterator<Map.Entry<String, JsonNode>> elements = response.fields();
+
+        while (elements.hasNext()) {
+            final Map.Entry<String, JsonNode> roleNode = elements.next();
+            final String roleName = roleNode.getKey();
+            final JsonNode roleValue = roleNode.getValue();
+            final String description = Optional.ofNullable(roleValue.get("description")).map(JsonNode::asText).orElse(null);
+            roles.add(new SecurityRole(roleName, description));
+        }
+        return roles;
+    }
+
     private MappingResponse setUserToRoleMapping(final String role, final Mapping mapping) {
         try {
             final JsonNode result = jsonApi.perform(
-                    request("PUT", "rolesmapping/" + role,
+                    securityApiRequest("PUT", "rolesmapping/" + role,
                             new StringEntity(objectMapper.writeValueAsString(mapping), ContentType.APPLICATION_JSON)
                     ),
                     "Could not set role mapping for role " + role);
@@ -97,14 +118,14 @@ public class SecurityAdapterOS implements SecurityAdapter {
         }
     }
 
-    private Request request(@SuppressWarnings("SameParameterValue") String method, String endpoint) {
-        return this.request(method, endpoint, null);
+    private Request securityApiRequest(@SuppressWarnings("SameParameterValue") String method, String endpoint) {
+        return this.securityApiRequest(method, endpoint, null);
     }
 
-    private Request request(@SuppressWarnings("SameParameterValue") String method, String endpoint, HttpEntity entity) {
+    private Request securityApiRequest(@SuppressWarnings("SameParameterValue") String method, String endpoint, HttpEntity entity) {
         final Request request = new Request(method, "/_plugins/_security/api/" + endpoint);
         request.addParameter("format", "json");
-        if(entity != null) {
+        if (entity != null) {
             request.setEntity(entity);
         }
         return request;
