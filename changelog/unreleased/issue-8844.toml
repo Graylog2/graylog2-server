@@ -1,4 +1,4 @@
 type = "f"
 message = "Handle timestamp parsing for Netscaler WAF logs."
 
-issues = ["8844"]
+issues = ["Graylog2/graylog-plugin-enterprise#8844"]
