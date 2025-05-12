@@ -113,7 +113,7 @@ public class EventDefinitionHandlerTest {
         this.jobDefinitionService = spy(new DBJobDefinitionService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider));
         this.jobTriggerService = spy(new DBJobTriggerService(mongoCollections, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 
-        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(EntitySharesService.class), clock);
+        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock);
     }
 
     @Test
@@ -187,7 +187,7 @@ public class EventDefinitionHandlerTest {
                 .build();
 
         final var existingEvent = eventDefinitionService.save(newDto);
-        final var duplicated = handler.duplicate(existingEvent, Optional.empty());
+        final var duplicated = handler.duplicate(mock(EntitySharesService.class), existingEvent, Optional.empty());
         final var saved = eventDefinitionService.get(duplicated.id()).get();
 
         assertThat(saved.title()).startsWith("COPY-");
