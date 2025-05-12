@@ -120,6 +120,7 @@ const LoginPage = () => {
     () => registeredLoginComponents.find((c) => c.type === activeBackend),
     [activeBackend, registeredLoginComponents],
   );
+  const loginComponentTitle = loginComponent?.title ?? loginComponent?.type.replace(/^\w/, (c) => c.toUpperCase());
   const CustomLogin = loginComponent?.formComponent;
   const hasCustomLogin = CustomLogin !== undefined;
 
@@ -174,7 +175,7 @@ const LoginPage = () => {
         <PluggableLoginForm />
         {shouldDisplayFallbackLink && (
           <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
-            {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
+            {`Login with ${useFallback ? loginComponentTitle : 'default method'}`}
           </StyledButton>
         )}
       </LoginChrome>

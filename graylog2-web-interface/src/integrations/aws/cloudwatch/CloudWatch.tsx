@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 
 import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
 import Wizard from 'components/common/Wizard';
-import { getValueFromInput } from 'util/FormsUtils.js';
+import { getValueFromInput } from 'util/FormsUtils';
 import Routes from 'routing/Routes';
 import StepAuthorize from 'integrations/aws/StepAuthorize';
 import { StepsContext } from 'integrations/aws/context/Steps';

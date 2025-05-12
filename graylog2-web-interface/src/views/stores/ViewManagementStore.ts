@@ -78,9 +78,7 @@ const ViewManagementActions: ViewManagementActionsType = singletonActions('views
 );
 
 const viewsUrl = qualifyUrl('/views');
-const viewsWithShareUrl = qualifyUrl('/views/with-request');
 const viewsIdUrl = (id) => qualifyUrl(`/views/${id}`);
-const viewsIdShareUrl = (id) => qualifyUrl(`/views/${id}/with-request`);
 const forValueUrl = () => qualifyUrl('/views/forValue');
 
 type ViewManagementStoreState = {
@@ -116,9 +114,7 @@ const ViewManagementStore = singletonStore('views.ViewManagement', () =>
     },
 
     create(view: View, entityShare?: EntitySharePayload): Promise<View> {
-      const url = entityShare ? viewsWithShareUrl : viewsUrl;
-      const payload = entityShare ? JSON.stringify({ entity: view, share_request: entityShare }) : JSON.stringify(view);
-      const promise = fetch('POST', url, payload);
+      const promise = fetch('POST', viewsUrl, JSON.stringify({ ...view.toJSON(), share_request: entityShare }));
 
       ViewManagementActions.create.promise(promise);
 
@@ -130,9 +126,11 @@ const ViewManagementStore = singletonStore('views.ViewManagement', () =>
     },
 
     update(view: View, entityShare?: EntitySharePayload): Promise<View> {
-      const url = entityShare ? viewsIdShareUrl(view.id) : viewsIdUrl(view.id);
-      const payload = entityShare ? JSON.stringify({ entity: view, share_request: entityShare }) : JSON.stringify(view);
-      const promise = fetch('PUT', url, payload);
+      const promise = fetch(
+        'PUT',
+        viewsIdUrl(view.id),
+        JSON.stringify({ ...view.toJSON(), share_request: entityShare }),
+      );
 
       ViewManagementActions.update.promise(promise);
 
