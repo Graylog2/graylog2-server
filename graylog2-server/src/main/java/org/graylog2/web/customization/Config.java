@@ -32,7 +32,8 @@ public record Config(
         Optional<Welcome> welcome,
         Optional<Navigation> navigation,
         Optional<Footer> footer,
-        Optional<Resources> resources
+        Optional<Resources> resources,
+        @JsonProperty("investigation_reporting_by_ai") Optional<InvestigationReportingByAI> investigationReportingByAI
 ) {
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Logo(SVG light, SVG dark) {}
@@ -66,8 +67,11 @@ public record Config(
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Footer(Optional<Boolean> enabled) {}
 
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    public record InvestigationReportingByAI(Optional<Boolean> enabled) {}
+
     public static Config empty() {
         return new Config(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 }
