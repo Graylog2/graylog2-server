@@ -66,7 +66,9 @@ const docsHelper = {
     UPGRADE_GUIDE: 'upgrading_graylog/upgrading_graylog.html',
     USERS_ROLES: 'setting_up_graylog/users_teams.htm',
     DATA_LAKE_PREVIEW: 'setting_up_graylog/data_lake_preview.htm',
-    WELCOME: '', // Welcome page to the documentation
+    WELCOME: '', // Welcome page to the documentationm
+    DATA_TIERING: 'setting_up_graylog/data_tiering.htm',
+    DATA_TIERING_WARM_TIER_SETUP: 'setting_up_graylog/data_tiering.htm#PrepareYourEnvironmentforaWarmTier',
   },
 
   DOCS_URL: docsUrl,
