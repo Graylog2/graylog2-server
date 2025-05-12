@@ -24,6 +24,7 @@ import { Alert, Input, Row, Col } from 'components/bootstrap';
 import { SearchForm, Spinner, Icon } from 'components/common';
 import { getValueFromInput } from 'util/FormsUtils';
 import { compare as naturalSort } from 'logic/DefaultCompare';
+import useProductName from 'brand-customization/useProductName';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
@@ -61,6 +62,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
   const [availableIndices, setAvailableIndices] = useState<RemoteIndex[]>([]);
   const [selectedIndices, setSelectedIndices] = useState<RemoteIndex[]>([]);
   const [queryIndex, setQueryIndex] = useState<string>('');
+  const productName = useProductName();
 
   const { initialValues, saveFormValues } = useSaveRemoteReindexMigrationFormValues();
 
@@ -290,7 +292,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep, hideActions }: Migrat
                         {!index.managed && !index.closed && (
                           <Icon
                             name="warning"
-                            title="This is an index not managed by Graylog. If you import it, you will not be able to query it in Graylog."
+                            title={`This is an index not managed by ${productName}. If you import it, you will not be able to query it in ${productName}.`}
                           />
                         )}
                         {index.closed && (

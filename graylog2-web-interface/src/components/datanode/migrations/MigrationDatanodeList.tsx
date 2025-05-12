@@ -21,6 +21,7 @@ import { Icon, Spinner, Timestamp } from 'components/common';
 import { Alert, Table } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   showProvisioningState?: boolean;
@@ -32,6 +33,7 @@ const StyledIcon = styled(Icon)`
 
 const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
   const { data: dataNodes, isInitialLoading } = useDataNodes();
+  const productName = useProductName();
 
   if (isInitialLoading) {
     return <Spinner text="Loading Data Nodes" />;
@@ -58,8 +60,8 @@ const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
           <h4>Data Nodes found: {dataNodes?.list.length}</h4>
           {dataNodes.list.find((datanode) => !datanode.version_compatible) && (
             <Alert bsStyle="warning" title="Incompatible Data Nodes found">
-              There are Data Nodes running with versions incompatible to your current Graylog version. Please make sure
-              to use the same version for both Graylog and Data Node.
+              There are Data Nodes running with versions incompatible to your current {productName} version. Please make
+              sure to use the same version for both {productName} and Data Node.
             </Alert>
           )}
           <br />
@@ -84,7 +86,10 @@ const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
                   </td>
                   <td>
                     {!datanode.version_compatible && (
-                      <Icon name="warning" title="This version is incompatible with your current Graylog version." />
+                      <Icon
+                        name="warning"
+                        title={`This version is incompatible with your current ${productName} version.`}
+                      />
                     )}
                     {datanode.datanode_version}
                   </td>
