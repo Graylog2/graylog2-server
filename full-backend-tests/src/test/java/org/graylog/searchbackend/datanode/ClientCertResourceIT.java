@@ -36,6 +36,7 @@ import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.security.TruststoreCreator;
+import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
@@ -58,6 +59,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collections;
+import java.util.List;
 
 @ContainerMatrixTestsConfiguration(searchVersions = SearchServer.DATANODE_DEV,
                                    additionalConfigurationParameters = {
@@ -71,6 +73,14 @@ public class ClientCertResourceIT {
 
     public ClientCertResourceIT(GraylogApis api) {
         this.api = api;
+    }
+
+    @ContainerMatrixTest
+    void testObtainRoles() {
+        final ValidatableResponse roles = api.get("/ca/clientcert/roles", 200);
+        final List<String> names = roles.extract().body().jsonPath().get("name");
+        Assertions.assertThat(names)
+                .contains("all_access", "readall");
     }
 
     @ContainerMatrixTest
