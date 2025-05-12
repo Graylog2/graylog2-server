@@ -32,8 +32,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -105,9 +105,7 @@ public class CEFCodecTest {
         final MappedMessage cefMessage = mock(MappedMessage.class);
         when(cefMessage.mappedExtensions()).thenReturn(Collections.singletonMap("dvc", "128.66.23.42"));
         final Message message = codec.decodeSafe(rawMessage).get();
-
-        assertNotNull(message);
-        assertEquals(new DateTime(2024, 9, 13, 10, 28, 31, DateTimeZone.UTC), message.getTimestamp());
+        verifyFields(message);
     }
 
     @Test
@@ -117,8 +115,14 @@ public class CEFCodecTest {
         final MappedMessage cefMessage = mock(MappedMessage.class);
         when(cefMessage.mappedExtensions()).thenReturn(Collections.singletonMap("dvc", "128.66.23.42"));
         final Message message = codec.decodeSafe(rawMessage).get();
+        verifyFields(message);
+    }
 
-        assertNotNull(message);
+    private static void verifyFields(Message message) {
+        assertTrue(message.getMessage().contains("Product: [EventID, Severity] Name"));
+        assertEquals(6, message.getField("level"));
+        assertEquals("Vendor", message.getField("device_vendor"));
+        assertEquals("local0", message.getField("facility"));
         assertEquals(new DateTime(2024, 9, 13, 10, 28, 31, DateTimeZone.UTC), message.getTimestamp());
     }
 
