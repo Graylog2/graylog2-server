@@ -105,7 +105,18 @@ public class CEFCodecTest {
         final MappedMessage cefMessage = mock(MappedMessage.class);
         when(cefMessage.mappedExtensions()).thenReturn(Collections.singletonMap("dvc", "128.66.23.42"));
         final Message message = codec.decodeSafe(rawMessage).get();
-        System.out.println(message.getTimestamp());
+
+        assertNotNull(message);
+        assertEquals(new DateTime(2024, 9, 13, 10, 28, 31, DateTimeZone.UTC), message.getTimestamp());
+    }
+
+    @Test
+    public void testIssue8844WithoutPriority() {
+        // https://github.com/Graylog2/graylog-plugin-enterprise/issues/8844
+        final RawMessage rawMessage = buildRawMessage("<134>2024-09-13T12:23:43.288000+02:00 netscaler-waf appname 1234 msgid - CEF:0|Vendor|Product|Version|EventID|Name|Severity|...\n");
+        final MappedMessage cefMessage = mock(MappedMessage.class);
+        when(cefMessage.mappedExtensions()).thenReturn(Collections.singletonMap("dvc", "128.66.23.42"));
+        final Message message = codec.decodeSafe(rawMessage).get();
 
         assertNotNull(message);
         assertEquals(new DateTime(2024, 9, 13, 10, 28, 31, DateTimeZone.UTC), message.getTimestamp());
