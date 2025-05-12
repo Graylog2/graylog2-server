@@ -243,7 +243,6 @@ public class DBGrantService {
         return mongoUtils.save(grantDTO);
     }
 
-    // TODO: Use this in PreservedEntityService
     public void bulkCreate(List<GrantDTO> grants) {
         List<InsertOneModel<GrantDTO>> bulkWrites = grants.stream()
                 .map(InsertOneModel::new)
