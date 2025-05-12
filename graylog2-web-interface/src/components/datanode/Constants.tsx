@@ -14,6 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
+
+import ProductName from 'brand-customization/ProductName';
+
 export const TIME_UNITS = ['hours', 'days', 'months', 'years'] as const;
 export const TIME_UNITS_UPPER = TIME_UNITS.map((unit) => unit.toLocaleUpperCase());
 
@@ -83,7 +87,11 @@ export const MIGRATION_STATE = {
   },
   RESTART_GRAYLOG: {
     key: 'RESTART_GRAYLOG',
-    description: 'Update configuration file and restart Graylog',
+    description: (
+      <>
+        Update configuration file and restart <ProductName />
+      </>
+    ),
   },
   REMOTE_REINDEX_WELCOME_PAGE: {
     key: 'REMOTE_REINDEX_WELCOME_PAGE',

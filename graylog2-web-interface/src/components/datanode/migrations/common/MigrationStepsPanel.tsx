@@ -86,7 +86,11 @@ const MigrationStepsPanel = ({ currentStep, sortedMigrationSteps, renderStepComp
           <Panel key={migrationStep} eventKey={migrationStep} collapsible={false}>
             <Panel.Heading>
               <Panel.Title>
-                <PanelToggle tabIndex={index} $clickable={isPreviousStep}>{`${index + 1}. ${description}`}</PanelToggle>
+                <PanelToggle tabIndex={index} $clickable={isPreviousStep}>
+                  <>
+                    {index + 1}. {description}
+                  </>
+                </PanelToggle>
               </Panel.Title>
             </Panel.Heading>
             <PanelBody collapsible={!isCurrentStep} $editable={isCurrentStep}>

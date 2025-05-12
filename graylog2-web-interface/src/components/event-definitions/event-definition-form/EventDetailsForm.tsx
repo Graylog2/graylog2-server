@@ -80,27 +80,27 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
 
   const readOnly = !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1';
   const hasEventProcedure = !!eventDefinitionEventProcedure;
+  const hasRemediationSteps = eventDefinition?.remediation_steps;
 
   const renderEventProcedure = () => {
     if (isEventProceduresEnabled) {
       return (
         <>
-          {hasEventProcedure || showAddEventProcedureForm ? (
+          {hasEventProcedure || hasRemediationSteps || showAddEventProcedureForm ? (
             <>
               {pluggableEventProcedureForm.map(({ component: PluggableEventProcedureForm }) => (
                 <PluggableEventProcedureForm
-                  eventDefinition={eventDefinition}
                   eventProcedureID={eventDefinitionEventProcedure}
+                  remediationSteps={eventDefinition?.remediation_steps}
                   onClose={() => setShowAddEventProcedureForm(false)}
                   onSave={(eventProcedureId) => onChange('event_procedure', eventProcedureId)}
-                  canEdit={canEdit}
                 />
               ))}
             </>
           ) : (
             <>
               <ControlLabel>Event Procedure Summary</ControlLabel>
-              <p>This Event does not have any Event Procedures yet.</p>
+              <p>This Event Definition does not have any Event Procedures yet.</p>
               <Button bsStyle="success" onClick={() => setShowAddEventProcedureForm(true)}>
                 Add Event Procedure
               </Button>
