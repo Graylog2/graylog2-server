@@ -66,7 +66,7 @@ const NodeInputsPage = () => {
             You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
           </span>
         </PageHeader>
-        <InputsList permissions={currentUser.permissions} node={node} />
+        <InputsList permissions={currentUser.permissions.toArray()} node={node} />
       </div>
     </DocumentTitle>
   );

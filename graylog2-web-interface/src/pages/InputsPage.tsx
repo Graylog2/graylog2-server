@@ -61,7 +61,7 @@ const InputsPage = () => {
             </span>
           )}
         </PageHeader>
-        <InputsList permissions={currentUser.permissions} />
+        <InputsList permissions={currentUser.permissions.toArray()} />
       </div>
     </DocumentTitle>
   );

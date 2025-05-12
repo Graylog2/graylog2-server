@@ -93,10 +93,10 @@ const _onFilterInputs = (globalInputs: Array<Input>, localInputs: Array<Input>, 
 
 type Props = {
   permissions: Array<string>;
-  node: NodeInfo;
+  node?: NodeInfo;
 };
 
-const InputsList = ({ permissions, node }: Props) => {
+const InputsList = ({ permissions, node = undefined }: Props) => {
   useEffect(() => {
     InputTypesActions.list();
     InputsActions.list();
