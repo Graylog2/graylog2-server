@@ -464,7 +464,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 new BadRequestException(f("Unable to find event definition '%s' to duplicate", definitionId)));
         checkEventDefinitionPermissions(eventDefinitionDto, "create");
 
-        return eventDefinitionHandler.duplicate(eventDefinitionDto, Optional.of(userContext.getUser()));
+        return eventDefinitionHandler.duplicate(entitySharesService, eventDefinitionDto, Optional.of(userContext.getUser()));
     }
 
     @POST

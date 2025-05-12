@@ -58,19 +58,16 @@ public class EventDefinitionHandler {
     private final DBEventDefinitionService eventDefinitionService;
     private final DBJobDefinitionService jobDefinitionService;
     private final DBJobTriggerService jobTriggerService;
-    private final EntitySharesService entitySharesService;
     private final JobSchedulerClock clock;
 
     @Inject
     public EventDefinitionHandler(DBEventDefinitionService eventDefinitionService,
                                   DBJobDefinitionService jobDefinitionService,
                                   DBJobTriggerService jobTriggerService,
-                                  EntitySharesService entitySharesService,
                                   JobSchedulerClock clock) {
         this.eventDefinitionService = eventDefinitionService;
         this.jobDefinitionService = jobDefinitionService;
         this.jobTriggerService = jobTriggerService;
-        this.entitySharesService = entitySharesService;
         this.clock = clock;
     }
 
@@ -106,7 +103,7 @@ public class EventDefinitionHandler {
      * @param user            the user who copied this eventDefinition. If empty, no ownership will be registered.
      * @return the newly created event definition
      */
-    public EventDefinitionDto duplicate(EventDefinitionDto eventDefinition, Optional<User> user) {
+    public EventDefinitionDto duplicate(EntitySharesService entitySharesService, EventDefinitionDto eventDefinition, Optional<User> user) {
         var copy = eventDefinition.toBuilder()
                 .id(null)
                 .title("COPY-" + eventDefinition.title())

@@ -229,8 +229,8 @@ public class EventDefinitionHandlerTest {
     @Test
     @MongoDBFixtures("event-processors.json")
     public void update() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final JobDefinitionDto existingJobDefinition = jobDefinitionService.get("54e3deadbeefdeadbeef0001").orElse(null);
@@ -240,7 +240,6 @@ public class EventDefinitionHandlerTest {
                 .executeEveryMs(550000)
                 .searchWithinMs(800000)
                 .build();
-        final EventProcessorExecutionJob.Data existingTriggerData = (EventProcessorExecutionJob.Data) existingTrigger.data().orElseThrow(AssertionError::new);
 
         assertThat(existingDto).isNotNull();
         assertThat(existingJobDefinition).isNotNull();
@@ -283,8 +282,8 @@ public class EventDefinitionHandlerTest {
     @Test
     @MongoDBFixtures("event-processors.json")
     public void updateWithSchedulingDisabled() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final JobDefinitionDto existingJobDefinition = jobDefinitionService.get("54e3deadbeefdeadbeef0001").orElse(null);
@@ -320,8 +319,8 @@ public class EventDefinitionHandlerTest {
     @Test
     @MongoDBFixtures("event-processors-without-schedule.json")
     public void updateWithSchedulingReEnabled() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final TestEventProcessorConfig existingConfig = (TestEventProcessorConfig) existingDto.config();
@@ -363,8 +362,8 @@ public class EventDefinitionHandlerTest {
     @Test
     @MongoDBFixtures("event-processors.json")
     public void updateWithErrors() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final JobDefinitionDto existingJobDefinition = jobDefinitionService.get("54e3deadbeefdeadbeef0001").orElse(null);
