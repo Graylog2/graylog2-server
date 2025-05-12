@@ -46,16 +46,12 @@ type InputType = {
 
 const InputOption = ({ input }: { input: InputType }) => {
   const inputTypes = useInputTypes();
-  const inputType = inputTypes[input.type];
+  const inputType = inputTypes[input.type] ?? 'Unknown Input Type';
 
-  return (
-    <option key={input.id} value={input.id}>
-      {`${input.title} (${inputType})`}
-    </option>
-  );
+  return <option value={input.id}>{`${input.title} (${inputType})`}</option>;
 };
 
-const _formatInput = (input: InputType) => <InputOption input={input} />;
+const _formatInput = (input: InputType) => <InputOption key={input.id} input={input} />;
 
 const _sortByTitle = (input1: InputType, input2: InputType) => input1.title.localeCompare(input2.title);
 

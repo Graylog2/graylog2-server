@@ -92,11 +92,10 @@ const _onFilterInputs = (globalInputs: Array<Input>, localInputs: Array<Input>, 
 };
 
 type Props = {
-  permissions: Array<string>;
   node?: NodeInfo;
 };
 
-const InputsList = ({ permissions, node = undefined }: Props) => {
+const InputsList = ({ node = undefined }: Props) => {
   useEffect(() => {
     InputTypesActions.list();
     InputsActions.list();
@@ -140,7 +139,7 @@ const InputsList = ({ permissions, node = undefined }: Props) => {
             bsNoItemsStyle="info"
             noItemsText={globalInputs.length <= 0 ? 'There are no global inputs.' : 'No global inputs match the filter'}
             items={filteredGlobalInputs.map((input) => (
-              <InputListItem key={input.id} input={input} currentNode={currentNode} permissions={permissions} />
+              <InputListItem key={input.id} input={input} currentNode={currentNode} />
             ))}
           />
           <br />
@@ -155,7 +154,7 @@ const InputsList = ({ permissions, node = undefined }: Props) => {
             bsNoItemsStyle="info"
             noItemsText={localInputs.length <= 0 ? 'There are no local inputs.' : 'No local inputs match the filter'}
             items={filteredLocalInputs.map((input) => (
-              <InputListItem key={input.id} input={input} currentNode={currentNode} permissions={permissions} />
+              <InputListItem key={input.id} input={input} currentNode={currentNode} />
             ))}
           />
         </Col>
