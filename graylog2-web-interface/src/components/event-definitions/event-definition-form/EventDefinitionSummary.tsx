@@ -86,7 +86,7 @@ const EventDefinitionSummary = ({
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
         {isEventProceduresEnabled ? (
           <>
-            {!eventDefinition?.event_procedure ? (
+            {eventDefinition?.event_procedure ? (
               <>
                 <dt style={{ margin: '16px 0 0' }}>Event Procedure Summary</dt>
                 <dd>
