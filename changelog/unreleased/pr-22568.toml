@@ -1,0 +1,5 @@
+type = "added"
+message = "Added Event Procedures page in Alerts page navigation"
+
+issues = ["graylog-plugin-enterprise#10683"]
+pulls = ["22568"]
