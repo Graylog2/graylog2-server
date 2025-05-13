@@ -22,11 +22,6 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.realm.text.IniRealm;
-import org.apache.shiro.util.ThreadContext;
 import org.bson.types.ObjectId;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.conditions.Expr;
@@ -102,6 +97,8 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.security.AuthorizationExtension;
+import org.graylog2.security.WithAuthorization;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
@@ -116,14 +113,12 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.streams.matchers.StreamRuleMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
 import java.time.Instant;
@@ -140,10 +135,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith({MockitoExtension.class, AuthorizationExtension.class})
 public class ContentPackServiceTest {
     private final String TEST_USER = "test_user";
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -209,7 +203,7 @@ public class ContentPackServiceTest {
     private ImmutableMap<ModelId, Object> entityObjectMap;
     private User user;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
                 contentPackInstallService;
@@ -266,21 +260,10 @@ public class ContentPackServiceTest {
                 .createdAt(Instant.now())
                 .createdBy("me")
                 .build();
-
-        // configure test security context
-        IniRealm iniRealm = new IniRealm(ContentPackServiceTest.class.getResource("content-pack-service-test-permissions.ini").getPath());
-        iniRealm.setName("runAs-context");
-        SecurityManager securityManager = new DefaultSecurityManager(iniRealm);
-        SecurityUtils.setSecurityManager(securityManager);
-    }
-
-    @After
-    public void tearDown() {
-        ThreadContext.unbindSubject();
-        ThreadContext.unbindSecurityManager();
     }
 
     @Test
+    @WithAuthorization(permissions = {"*"})
     public void installContentPackWithSystemStreamDependencies() throws Exception {
         ImmutableSet<Entity> entities = ImmutableSet.of(createTestViewEntity(), createTestEventDefinitionEntity());
         ContentPackV1 contentPack = ContentPackV1.builder()
@@ -309,6 +292,7 @@ public class ContentPackServiceTest {
     }
 
     @Test
+    @WithAuthorization(permissions = {"inputs:create", "input_types:create:org.graylog2.inputs.gelf.udp.GELFUDPInput"})
     public void installContentPackWithCloudCheck() throws Exception {
         ImmutableSet<Entity> entities = ImmutableSet.of(createTestGelfUDPEntity());
         ContentPackV1 contentPack = ContentPackV1.builder()
