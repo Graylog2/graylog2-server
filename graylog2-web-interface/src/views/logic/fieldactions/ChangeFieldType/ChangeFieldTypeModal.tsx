@@ -20,6 +20,7 @@ import mapValues from 'lodash/mapValues';
 import { useQuery } from '@tanstack/react-query';
 
 import { Streams } from '@graylog/server-api';
+
 import { BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
@@ -49,7 +50,7 @@ const StyledLabel = styled.h5`
   margin-bottom: 5px;
 `;
 
-const failureStreamId = '0000000000000000000000042';
+const failureStreamId = '000000000000000000000004';
 
 type Props = {
   show: boolean;
@@ -76,18 +77,23 @@ const FailureStreamLink = () => {
     retry: 0,
   });
 
-  return isFetchingFailureStream
-    ? <Spinner />
-    : (
-      <span>
-        <StreamLink stream={isErrorFailureStream ? ({ id: failureStreamId, title: 'Processing and Indexing Failures' } as Stream)
+  return isFetchingFailureStream ? (
+    <Spinner />
+  ) : (
+    <span>
+      <StreamLink
+        stream={
+          isErrorFailureStream
+            ? ({ id: failureStreamId, title: 'Processing and Indexing Failures' } as Stream)
             : failureStream
         }
       />
       <i>
-        {' '} (<Link to={Routes.SYSTEM.ENTERPRISE}>Enterprise Plugin</Link> required)</i>
-      </span>
-    );
+        {' '}
+        (<Link to={Routes.SYSTEM.ENTERPRISE}>Enterprise Plugin</Link> required)
+      </i>
+    </span>
+  );
 };
 
 const ChangeFieldTypeModal = ({
